@@ -6,11 +6,12 @@
     {
       "id": "remote",
       "name": "Read and Write ChittyOS",
-      "type": "remote",
+      "type": "local",
       "access": "readwrite",
       "category": "ecosystem",
-      "endpoint": "https://mcp.chitty.cc/mcp",
-      "authTokenKey": "chittymcp",
+      "command": "/bin/sh",
+      "args": ["-lc", "TOKEN=\"$(/Users/nb/.local/bin/chitty-mcp-token chittymcp 2>/dev/null || true)\"; if [ -n \"$TOKEN\" ]; then export MCP_AUTH_HEADER=\"Bearer $TOKEN\"; fi; exec npx -y mcp-remote https://mcp.chitty.cc/mcp"],
+      "lazy": true,
       "enabled": true
     },
     {
@@ -21,6 +22,7 @@
       "category": "ecosystem",
       "endpoint": "https://builds.mcp.cloudflare.com/mcp",
       "authTokenKey": "cloudflare-mcp",
+      "lazy": true,
       "enabled": true
     },
     {
@@ -77,6 +79,7 @@
       "category": "search",
       "endpoint": "https://autorag.mcp.cloudflare.com/mcp",
       "authTokenKey": "chittyevidence-search",
+      "lazy": true,
       "enabled": true
     },
 

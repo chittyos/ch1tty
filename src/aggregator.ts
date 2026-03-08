@@ -130,6 +130,9 @@ export class Aggregator {
   }
 
   async shutdown(): Promise<void> {
-    await this.childManager.shutdown();
+    await Promise.allSettled([
+      this.childManager.shutdown(),
+      this.remoteProxy.shutdown(),
+    ]);
   }
 }

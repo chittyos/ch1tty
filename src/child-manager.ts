@@ -15,6 +15,8 @@ interface ToolEntry {
 }
 
 const TOOL_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const SPAWN_TIMEOUT_MS = 30_000; // 30s to spawn + connect
+const LIST_TIMEOUT_MS = 15_000; // 15s to list tools after connected
 
 export class ChildManager {
   private children = new Map<string, ChildConnection>();
@@ -81,19 +83,40 @@ export class ChildManager {
     return { client, transport, toolCache: null };
   }
 
+  private withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms);
+      promise.then(
+        (val) => { clearTimeout(timer); resolve(val); },
+        (err) => { clearTimeout(timer); reject(err); },
+      );
+    });
+  }
+
   async listTools(serverId: string): Promise<ToolEntry[]> {
     const config = this.configs.get(serverId);
     if (!config) return [];
 
-    // For lazy servers not yet spawned, spawn to discover tools
-    const conn = await this.spawn(serverId);
-
-    // Check cache
-    if (conn.toolCache && Date.now() < conn.toolCache.expiresAt) {
-      return conn.toolCache.tools;
+    // Check cache before spawning
+    const existing = this.children.get(serverId);
+    if (existing?.toolCache && Date.now() < existing.toolCache.expiresAt) {
+      return existing.toolCache.tools;
     }
 
-    const result = await conn.client.listTools();
+    // Spawn with timeout
+    const conn = await this.withTimeout(
+      this.spawn(serverId),
+      SPAWN_TIMEOUT_MS,
+      `spawn ${serverId}`,
+    );
+
+    // List tools with timeout
+    const result = await this.withTimeout(
+      conn.client.listTools(),
+      LIST_TIMEOUT_MS,
+      `listTools ${serverId}`,
+    );
+
     const tools: ToolEntry[] = result.tools.map((t) => ({
       name: t.name,
       description: t.description,
