@@ -19,6 +19,7 @@ export interface ServerConfig {
   endpoint?: string;
   authTokenKey?: string;
   lazy?: boolean;
+  enabled?: boolean;
   env?: Record<string, string>;
 }
 

@@ -21,6 +21,7 @@ const SERVER_KEYS = new Set([
   'endpoint',
   'authTokenKey',
   'lazy',
+  'enabled',
   'env',
 ]);
 
@@ -106,6 +107,7 @@ function validateServerConfig(raw: unknown, index: number): ServerConfig {
   const endpoint = assertOptionalString(raw.endpoint, `${prefix}.endpoint`);
   const authTokenKey = assertOptionalString(raw.authTokenKey, `${prefix}.authTokenKey`);
   const lazy = assertOptionalBoolean(raw.lazy, `${prefix}.lazy`);
+  const enabled = assertOptionalBoolean(raw.enabled, `${prefix}.enabled`);
   const env = assertOptionalEnv(raw.env, `${prefix}.env`);
 
   if (type === 'local' && !command) {
@@ -126,6 +128,7 @@ function validateServerConfig(raw: unknown, index: number): ServerConfig {
     endpoint,
     authTokenKey,
     lazy,
+    enabled,
     env,
   };
 }

@@ -32,6 +32,7 @@ export class Aggregator {
 
   private activeConfigs(): ServerConfig[] {
     return this.configs.filter((c) => {
+      if (c.enabled === false) return false;
       if (this.accessFilter && c.access !== this.accessFilter) return false;
       if (this.categoryFilter && c.category !== this.categoryFilter) return false;
       return true;
