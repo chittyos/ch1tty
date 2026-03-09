@@ -40,6 +40,20 @@
       "enabled": true
     },
 
+    {"_comment": "── docs: Read Library Documentation ───────────────────────"},
+
+    {
+      "id": "context7",
+      "name": "Read Library Documentation",
+      "type": "local",
+      "access": "read",
+      "category": "docs",
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"],
+      "lazy": true,
+      "enabled": true
+    },
+
     {"_comment": "── code: Read and Write Source Code ───────────────────────"},
 
     {
