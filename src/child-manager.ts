@@ -1,4 +1,8 @@
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+
+const execFileAsync = promisify(execFile);
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import type { ServerConfig } from './types.js';
 
@@ -52,11 +56,39 @@ export class ChildManager {
     }
   }
 
-  private async doSpawn(config: ServerConfig): Promise<ChildConnection> {
-    const env: Record<string, string> = {
+  private async resolveEnv(config: ServerConfig): Promise<Record<string, string>> {
+    const configEnv = config.env || {};
+
+    // Resolve 1Password op:// references from config.env only (not process.env)
+    const resolved: Record<string, string> = { ...configEnv };
+    const opKeys = Object.entries(configEnv).filter(([, v]) => v.startsWith('op://'));
+    if (opKeys.length > 0) {
+      const results = await Promise.allSettled(
+        opKeys.map(async ([key, ref]) => {
+          const { stdout } = await execFileAsync('op', ['read', ref], { timeout: 30_000 });
+          return { key, value: stdout.trim() };
+        }),
+      );
+
+      for (const result of results) {
+        if (result.status === 'fulfilled') {
+          resolved[result.value.key] = result.value.value;
+        } else {
+          process.stderr.write(
+            `[ch1tty:${config.id}] Failed to resolve env from 1Password: ${result.reason}\n`,
+          );
+        }
+      }
+    }
+
+    return {
       ...process.env as Record<string, string>,
-      ...(config.env || {}),
+      ...resolved,
     };
+  }
+
+  private async doSpawn(config: ServerConfig): Promise<ChildConnection> {
+    const env = await this.resolveEnv(config);
 
     const transport = new StdioClientTransport({
       command: config.command!,
