@@ -6,11 +6,13 @@
     {
       "id": "remote",
       "name": "Read and Write ChittyOS",
-      "type": "remote",
+      "type": "local",
       "access": "readwrite",
       "category": "ecosystem",
-      "endpoint": "https://mcp.chitty.cc/mcp",
-      "authTokenKey": "chittymcp"
+      "command": "/bin/sh",
+      "args": ["-lc", "TOKEN=\"$(/Users/nb/.local/bin/chitty-mcp-token chittymcp 2>/dev/null || true)\"; if [ -n \"$TOKEN\" ]; then export MCP_AUTH_HEADER=\"Bearer $TOKEN\"; fi; exec npx -y mcp-remote https://mcp.chitty.cc/mcp"],
+      "lazy": true,
+      "enabled": true
     },
     {
       "id": "cloudflare",
@@ -19,7 +21,9 @@
       "access": "readwrite",
       "category": "ecosystem",
       "endpoint": "https://builds.mcp.cloudflare.com/mcp",
-      "authTokenKey": "cloudflare-mcp"
+      "authTokenKey": "cloudflare-mcp",
+      "lazy": true,
+      "enabled": true
     },
     {
       "id": "neon",
@@ -27,12 +31,27 @@
       "type": "local",
       "access": "readwrite",
       "category": "ecosystem",
-      "command": "op",
-      "args": ["run", "--", "sh", "-lc", "npx -y @neondatabase/mcp-server-neon start \"$NEON_API_KEY\""],
+      "command": "/bin/sh",
+      "args": ["-lc", "exec npx -y @neondatabase/mcp-server-neon start \"$NEON_API_KEY\""],
       "env": {
         "NEON_API_KEY": "op://ChittyOS-Integrations/neon/api_key"
       },
-      "lazy": true
+      "lazy": true,
+      "enabled": true
+    },
+
+    {"_comment": "── docs: Read Library Documentation ───────────────────────"},
+
+    {
+      "id": "context7",
+      "name": "Read Library Documentation",
+      "type": "local",
+      "access": "read",
+      "category": "docs",
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"],
+      "lazy": true,
+      "enabled": true
     },
 
     {"_comment": "── code: Read and Write Source Code ───────────────────────"},
@@ -45,7 +64,8 @@
       "category": "code",
       "command": "uvx",
       "args": ["--from", "git+https://github.com/oraios/serena", "serena", "start-mcp-server"],
-      "lazy": true
+      "lazy": true,
+      "enabled": true
     },
 
     {
@@ -59,7 +79,8 @@
       "env": {
         "NEON_DATABASE_URL": "op://Private/Neon/database_url"
       },
-      "lazy": true
+      "lazy": true,
+      "enabled": true
     },
 
     {"_comment": "── search: Search Evidence ────────────────────────────────"},
@@ -71,7 +92,9 @@
       "access": "read",
       "category": "search",
       "endpoint": "https://autorag.mcp.cloudflare.com/mcp",
-      "authTokenKey": "chittyevidence-search"
+      "authTokenKey": "chittyevidence-search",
+      "lazy": true,
+      "enabled": true
     },
 
     {"_comment": "── reasoning: Read-only Reasoning ────────────────────────"},
@@ -84,7 +107,8 @@
       "category": "reasoning",
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
-      "lazy": true
+      "lazy": true,
+      "enabled": true
     },
 
     {"_comment": "── desktop: Read and Write Local Machine ─────────────────"},
@@ -97,7 +121,8 @@
       "category": "desktop",
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-filesystem", "/Users/nb/.claude/projects", "/Users/nb/Documents", "/Users/nb/Desktop"],
-      "lazy": true
+      "lazy": true,
+      "enabled": true
     },
     {
       "id": "desktop",
@@ -107,7 +132,8 @@
       "category": "desktop",
       "command": "npx",
       "args": ["-y", "@wonderwhy-er/desktop-commander@latest"],
-      "lazy": true
+      "lazy": true,
+      "enabled": true
     },
     {
       "id": "chrome",
@@ -117,7 +143,20 @@
       "category": "desktop",
       "command": "node",
       "args": ["/Users/nb/Library/Application Support/Claude/Claude Extensions/ant.dir.ant.anthropic.chrome-control/server/index.js"],
-      "lazy": true
+      "lazy": true,
+      "enabled": true
+    },
+
+    {
+      "id": "playwright",
+      "name": "Control Browser Automation",
+      "type": "local",
+      "access": "readwrite",
+      "category": "desktop",
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"],
+      "lazy": true,
+      "enabled": true
     },
 
     {"_comment": "── documents: Fill and Analyze Documents ──────────────────"},
@@ -130,7 +169,8 @@
       "category": "documents",
       "command": "node",
       "args": ["/Users/nb/Library/Application Support/Claude/Claude Extensions/ant.dir.gh.silverstein.pdf-filler-simple/server/index.js"],
-      "lazy": true
+      "lazy": true,
+      "enabled": true
     },
 
     {"_comment": "── communication: Read and Send Messages ──────────────────"},
@@ -143,7 +183,11 @@
       "category": "communication",
       "command": "node",
       "args": ["/Users/nb/Desktop/Projects/github.com/CHITTYOS/chittymac/build/server.js"],
-      "lazy": true
+      "env": {
+        "NEON_DATABASE_URL": "op://Connect Serv - Production/NEON Notion DB - ChittyChain /password"
+      },
+      "lazy": true,
+      "enabled": true
     },
     {
       "id": "imessage",
@@ -153,7 +197,8 @@
       "category": "communication",
       "command": "/bin/sh",
       "args": ["-c", "source /Users/nb/.config/claude/mcp-servers/chitty-imessage/.env && exec node /Users/nb/.config/claude/mcp-servers/chitty-imessage/build/index.js"],
-      "lazy": true
+      "lazy": true,
+      "enabled": true
     }
   ]
 }

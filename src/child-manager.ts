@@ -1,4 +1,8 @@
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+
+const execFileAsync = promisify(execFile);
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import type { ServerConfig } from './types.js';
 
@@ -15,6 +19,8 @@ interface ToolEntry {
 }
 
 const TOOL_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const SPAWN_TIMEOUT_MS = 30_000; // 30s to spawn + connect
+const LIST_TIMEOUT_MS = 15_000; // 15s to list tools after connected
 
 export class ChildManager {
   private children = new Map<string, ChildConnection>();
@@ -50,11 +56,39 @@ export class ChildManager {
     }
   }
 
-  private async doSpawn(config: ServerConfig): Promise<ChildConnection> {
-    const env: Record<string, string> = {
+  private async resolveEnv(config: ServerConfig): Promise<Record<string, string>> {
+    const configEnv = config.env || {};
+
+    // Resolve 1Password op:// references from config.env only (not process.env)
+    const resolved: Record<string, string> = { ...configEnv };
+    const opKeys = Object.entries(configEnv).filter(([, v]) => v.startsWith('op://'));
+    if (opKeys.length > 0) {
+      const results = await Promise.allSettled(
+        opKeys.map(async ([key, ref]) => {
+          const { stdout } = await execFileAsync('op', ['read', ref], { timeout: 30_000 });
+          return { key, value: stdout.trim() };
+        }),
+      );
+
+      for (const result of results) {
+        if (result.status === 'fulfilled') {
+          resolved[result.value.key] = result.value.value;
+        } else {
+          process.stderr.write(
+            `[ch1tty:${config.id}] Failed to resolve env from 1Password: ${result.reason}\n`,
+          );
+        }
+      }
+    }
+
+    return {
       ...process.env as Record<string, string>,
-      ...(config.env || {}),
+      ...resolved,
     };
+  }
+
+  private async doSpawn(config: ServerConfig): Promise<ChildConnection> {
+    const env = await this.resolveEnv(config);
 
     const transport = new StdioClientTransport({
       command: config.command!,
@@ -81,19 +115,40 @@ export class ChildManager {
     return { client, transport, toolCache: null };
   }
 
+  private withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms);
+      promise.then(
+        (val) => { clearTimeout(timer); resolve(val); },
+        (err) => { clearTimeout(timer); reject(err); },
+      );
+    });
+  }
+
   async listTools(serverId: string): Promise<ToolEntry[]> {
     const config = this.configs.get(serverId);
     if (!config) return [];
 
-    // For lazy servers not yet spawned, spawn to discover tools
-    const conn = await this.spawn(serverId);
-
-    // Check cache
-    if (conn.toolCache && Date.now() < conn.toolCache.expiresAt) {
-      return conn.toolCache.tools;
+    // Check cache before spawning
+    const existing = this.children.get(serverId);
+    if (existing?.toolCache && Date.now() < existing.toolCache.expiresAt) {
+      return existing.toolCache.tools;
     }
 
-    const result = await conn.client.listTools();
+    // Spawn with timeout
+    const conn = await this.withTimeout(
+      this.spawn(serverId),
+      SPAWN_TIMEOUT_MS,
+      `spawn ${serverId}`,
+    );
+
+    // List tools with timeout
+    const result = await this.withTimeout(
+      conn.client.listTools(),
+      LIST_TIMEOUT_MS,
+      `listTools ${serverId}`,
+    );
+
     const tools: ToolEntry[] = result.tools.map((t) => ({
       name: t.name,
       description: t.description,
