@@ -10,7 +10,7 @@
       "access": "readwrite",
       "category": "ecosystem",
       "command": "/bin/sh",
-      "args": ["-lc", "TOKEN=\"$(/Users/nb/.local/bin/chitty-mcp-token chittymcp 2>/dev/null || true)\"; if [ -n \"$TOKEN\" ]; then export MCP_AUTH_HEADER=\"Bearer $TOKEN\"; fi; exec npx -y mcp-remote https://mcp.chitty.cc/mcp"],
+      "args": ["-lc", "TOKEN=\"$(chitty-mcp-token chittymcp 2>/dev/null || true)\"; if [ -n \"$TOKEN\" ]; then export MCP_AUTH_HEADER=\"Bearer $TOKEN\"; fi; exec npx -y mcp-remote https://mcp.chitty.cc/mcp"],
       "lazy": true,
       "enabled": true
     },
@@ -47,7 +47,7 @@
       "name": "Read Library Documentation",
       "type": "local",
       "access": "read",
-      "category": "docs",
+      "category": "documents",
       "command": "npx",
       "args": ["-y", "@upstash/context7-mcp@latest"],
       "lazy": true,
