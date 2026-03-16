@@ -47,7 +47,7 @@
       "name": "Read Library Documentation",
       "type": "local",
       "access": "read",
-      "category": "docs",
+      "category": "documents",
       "command": "npx",
       "args": ["-y", "@upstash/context7-mcp@latest"],
       "lazy": true,
