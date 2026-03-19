@@ -26,6 +26,7 @@ export class ChildManager {
   private children = new Map<string, ChildConnection>();
   private configs = new Map<string, ServerConfig>();
   private connecting = new Map<string, Promise<ChildConnection>>();
+  private opAvailable: boolean | null = null;
 
   registerServer(config: ServerConfig): void {
     if (config.type !== 'local') return;
@@ -56,6 +57,17 @@ export class ChildManager {
     }
   }
 
+  private async isOpAvailable(): Promise<boolean> {
+    if (this.opAvailable !== null) return this.opAvailable;
+    try {
+      await execFileAsync('op', ['whoami'], { timeout: 5_000 });
+      this.opAvailable = true;
+    } catch {
+      this.opAvailable = false;
+    }
+    return this.opAvailable;
+  }
+
   private async resolveEnv(config: ServerConfig): Promise<Record<string, string>> {
     const configEnv = config.env || {};
 
@@ -63,20 +75,31 @@ export class ChildManager {
     const resolved: Record<string, string> = { ...configEnv };
     const opKeys = Object.entries(configEnv).filter(([, v]) => v.startsWith('op://'));
     if (opKeys.length > 0) {
-      const results = await Promise.allSettled(
-        opKeys.map(async ([key, ref]) => {
-          const { stdout } = await execFileAsync('op', ['read', ref], { timeout: 30_000 });
-          return { key, value: stdout.trim() };
-        }),
-      );
+      // Check op CLI availability once (cached) to avoid noisy errors on
+      // machines where 1Password isn't configured
+      if (!(await this.isOpAvailable())) {
+        process.stderr.write(
+          `[ch1tty:${config.id}] 1Password CLI not configured — skipping op:// env resolution\n`,
+        );
+        for (const [key] of opKeys) {
+          delete resolved[key];
+        }
+      } else {
+        const results = await Promise.allSettled(
+          opKeys.map(async ([key, ref]) => {
+            const { stdout } = await execFileAsync('op', ['read', ref], { timeout: 30_000 });
+            return { key, value: stdout.trim() };
+          }),
+        );
 
-      for (const result of results) {
-        if (result.status === 'fulfilled') {
-          resolved[result.value.key] = result.value.value;
-        } else {
-          process.stderr.write(
-            `[ch1tty:${config.id}] Failed to resolve env from 1Password: ${result.reason}\n`,
-          );
+        for (const result of results) {
+          if (result.status === 'fulfilled') {
+            resolved[result.value.key] = result.value.value;
+          } else {
+            process.stderr.write(
+              `[ch1tty:${config.id}] Failed to resolve env from 1Password: ${result.reason}\n`,
+            );
+          }
         }
       }
     }
