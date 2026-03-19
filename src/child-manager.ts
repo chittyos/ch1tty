@@ -63,7 +63,17 @@ export class ChildManager {
       await execFileAsync('op', ['whoami'], { timeout: 5_000 });
       this.opAvailable = true;
     } catch {
-      this.opAvailable = false;
+      // Fall back to Connect server mode (op whoami doesn't support Connect)
+      if (process.env.OP_CONNECT_HOST && process.env.OP_CONNECT_TOKEN) {
+        try {
+          await execFileAsync('op', ['vault', 'list', '--format=json'], { timeout: 5_000 });
+          this.opAvailable = true;
+        } catch {
+          this.opAvailable = false;
+        }
+      } else {
+        this.opAvailable = false;
+      }
     }
     return this.opAvailable;
   }
