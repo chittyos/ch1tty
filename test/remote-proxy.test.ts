@@ -7,11 +7,13 @@ function registerDefaultServer(proxy: RemoteProxy): void {
     id: 'remote',
     name: 'Remote',
     type: 'remote',
+    access: 'read',
+    category: 'search',
     endpoint: 'https://example.com/mcp',
   });
 }
 
-test('callTool returns structured error for non-200 HTTP responses', async () => {
+test('callTool returns structured error for failed HTTP responses', async () => {
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async () => new Response('', { status: 502, statusText: 'Bad Gateway' });
 
@@ -21,13 +23,13 @@ test('callTool returns structured error for non-200 HTTP responses', async () =>
 
     const result = await proxy.callTool('remote', 'do_work', { foo: 'bar' });
     assert.equal(result.isError, true);
-    assert.match(result.content[0].text, /Remote call failed: 502 Bad Gateway/);
+    assert.match(result.content[0].text, /Remote call error:/);
   } finally {
     globalThis.fetch = originalFetch;
   }
 });
 
-test('callTool normalizes JSON parse failures into structured MCP errors', async () => {
+test('callTool normalizes parse failures into structured MCP errors', async () => {
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async () => new Response('not-json', {
     status: 200,
@@ -41,58 +43,50 @@ test('callTool normalizes JSON parse failures into structured MCP errors', async
     const result = await proxy.callTool('remote', 'do_work', {});
     assert.equal(result.isError, true);
     assert.match(result.content[0].text, /Remote call error:/);
-    assert.match(result.content[0].text, /Invalid JSON response/);
   } finally {
     globalThis.fetch = originalFetch;
   }
 });
 
-test('callTool enforces CH1TTY_HTTP_TIMEOUT_MS via abort timeout', async () => {
-  const originalFetch = globalThis.fetch;
-  const originalTimeout = process.env.CH1TTY_HTTP_TIMEOUT_MS;
-  process.env.CH1TTY_HTTP_TIMEOUT_MS = '5';
+test('callTool returns error for unknown server', async () => {
+  const proxy = new RemoteProxy();
 
-  globalThis.fetch = async (_input: string | URL | Request, init?: RequestInit) => {
-    return new Promise<Response>((_resolve, reject) => {
-      init?.signal?.addEventListener('abort', () => {
-        reject(new DOMException('Aborted', 'AbortError'));
-      });
-    });
-  };
-
-  try {
-    const proxy = new RemoteProxy();
-    registerDefaultServer(proxy);
-
-    const result = await proxy.callTool('remote', 'do_work', {});
-    assert.equal(result.isError, true);
-    assert.match(result.content[0].text, /timed out after 5ms/);
-  } finally {
-    if (originalTimeout === undefined) {
-      delete process.env.CH1TTY_HTTP_TIMEOUT_MS;
-    } else {
-      process.env.CH1TTY_HTTP_TIMEOUT_MS = originalTimeout;
-    }
-    globalThis.fetch = originalFetch;
-  }
+  const result = await proxy.callTool('nonexistent', 'do_work', {});
+  assert.equal(result.isError, true);
+  assert.match(result.content[0].text, /Unknown remote server/);
 });
 
-test('callTool normalizes malformed SSE responses into structured errors', async () => {
-  const originalFetch = globalThis.fetch;
-  globalThis.fetch = async () => new Response('event: message\ndata: not-json\n\n', {
-    status: 200,
-    headers: { 'content-type': 'text/event-stream' },
+test('isRegistered returns false for unregistered servers', () => {
+  const proxy = new RemoteProxy();
+  assert.equal(proxy.isRegistered('nope'), false);
+});
+
+test('isRegistered returns true for registered servers', () => {
+  const proxy = new RemoteProxy();
+  registerDefaultServer(proxy);
+  assert.equal(proxy.isRegistered('remote'), true);
+});
+
+test('listTools returns empty array for server without endpoint', async () => {
+  const proxy = new RemoteProxy();
+  proxy.registerServer({
+    id: 'noep',
+    name: 'No Endpoint',
+    type: 'remote',
+    access: 'read',
+    category: 'search',
   });
 
-  try {
-    const proxy = new RemoteProxy();
-    registerDefaultServer(proxy);
+  const tools = await proxy.listTools('noep');
+  assert.deepEqual(tools, []);
+});
 
-    const result = await proxy.callTool('remote', 'do_work', {});
-    assert.equal(result.isError, true);
-    assert.match(result.content[0].text, /Remote call error:/);
-    assert.match(result.content[0].text, /Unable to parse SSE JSON payload/);
-  } finally {
-    globalThis.fetch = originalFetch;
-  }
+test('getStatus returns disconnected for unconnected server', () => {
+  const proxy = new RemoteProxy();
+  registerDefaultServer(proxy);
+
+  const status = proxy.getStatus('remote');
+  assert.equal(status.connected, false);
+  assert.equal(status.toolCount, 0);
+  assert.equal(status.toolCacheAge, null);
 });

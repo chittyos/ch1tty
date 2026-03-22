@@ -46,9 +46,11 @@ Routes `{serverId}/{toolName}` calls to the appropriate backend (local child pro
 - Managing child process lifecycle
 - Proxying HTTP MCP calls with auth
 - Caching tool lists and auth tokens
+- Aggregating resources and prompts from all backends
+- Meta-tools for gateway introspection (status, reload)
+- Config path interpolation (~ and env vars)
 
 ### Out of Scope
 - Tool composition or chaining
 - Context-aware routing
 - Pattern learning from usage
-- Resource or prompt aggregation (tools only in v1)

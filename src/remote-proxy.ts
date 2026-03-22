@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
-import type { ServerConfig } from './types.js';
+import type { ServerConfig, ResourceEntry, ResourceTemplateEntry, PromptEntry } from './types.js';
 
 interface ToolEntry {
   name: string;
@@ -18,6 +18,8 @@ interface RemoteConnection {
   client: Client;
   transport: StreamableHTTPClientTransport;
   toolCache: { tools: ToolEntry[]; expiresAt: number } | null;
+  resourceCache: { resources: ResourceEntry[]; templates: ResourceTemplateEntry[]; expiresAt: number } | null;
+  promptCache: { prompts: PromptEntry[]; expiresAt: number } | null;
 }
 
 const TOOL_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
@@ -108,7 +110,7 @@ export class RemoteProxy {
     );
 
     await client.connect(transport);
-    return { client, transport, toolCache: null };
+    return { client, transport, toolCache: null, resourceCache: null, promptCache: null };
   }
 
   private withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
@@ -192,6 +194,114 @@ export class RemoteProxy {
         isError: true,
       };
     }
+  }
+
+  async listResources(serverId: string): Promise<{ resources: ResourceEntry[]; templates: ResourceTemplateEntry[] }> {
+    const config = this.configs.get(serverId);
+    if (!config?.endpoint) return { resources: [], templates: [] };
+
+    const existing = this.connections.get(serverId);
+    if (existing?.resourceCache && Date.now() < existing.resourceCache.expiresAt) {
+      return { resources: existing.resourceCache.resources, templates: existing.resourceCache.templates };
+    }
+
+    try {
+      const conn = await this.withTimeout(this.connect(serverId), CONNECT_TIMEOUT_MS, `connect ${serverId}`);
+
+      const [resResult, tmplResult] = await Promise.allSettled([
+        this.withTimeout(conn.client.listResources(), LIST_TIMEOUT_MS, `listResources ${serverId}`),
+        this.withTimeout(conn.client.listResourceTemplates(), LIST_TIMEOUT_MS, `listResourceTemplates ${serverId}`),
+      ]);
+
+      const resources: ResourceEntry[] = resResult.status === 'fulfilled'
+        ? resResult.value.resources.map((r) => ({
+            uri: r.uri, name: r.name, description: r.description, mimeType: r.mimeType,
+          }))
+        : [];
+
+      const templates: ResourceTemplateEntry[] = tmplResult.status === 'fulfilled'
+        ? tmplResult.value.resourceTemplates.map((t) => ({
+            uriTemplate: t.uriTemplate, name: t.name, description: t.description, mimeType: t.mimeType,
+          }))
+        : [];
+
+      conn.resourceCache = { resources, templates, expiresAt: Date.now() + TOOL_CACHE_TTL };
+      return { resources, templates };
+    } catch (err) {
+      process.stderr.write(`[ch1tty:${serverId}] Resource list error: ${err}\n`);
+      return { resources: [], templates: [] };
+    }
+  }
+
+  async readResource(serverId: string, uri: string): Promise<{
+    contents: Array<{ uri: string; mimeType?: string; text?: string; blob?: string }>;
+  }> {
+    const conn = await this.connect(serverId);
+    const result = await conn.client.readResource({ uri });
+    return {
+      contents: result.contents.map((c) => ({
+        uri: c.uri,
+        mimeType: c.mimeType,
+        text: 'text' in c ? (c.text as string) : undefined,
+        blob: 'blob' in c ? (c.blob as string) : undefined,
+      })),
+    };
+  }
+
+  async listPrompts(serverId: string): Promise<PromptEntry[]> {
+    const config = this.configs.get(serverId);
+    if (!config?.endpoint) return [];
+
+    const existing = this.connections.get(serverId);
+    if (existing?.promptCache && Date.now() < existing.promptCache.expiresAt) {
+      return existing.promptCache.prompts;
+    }
+
+    try {
+      const conn = await this.withTimeout(this.connect(serverId), CONNECT_TIMEOUT_MS, `connect ${serverId}`);
+      const result = await this.withTimeout(
+        conn.client.listPrompts(),
+        LIST_TIMEOUT_MS,
+        `listPrompts ${serverId}`,
+      );
+
+      const prompts: PromptEntry[] = result.prompts.map((p) => ({
+        name: p.name,
+        description: p.description,
+        arguments: p.arguments?.map((a) => ({
+          name: a.name, description: a.description, required: a.required,
+        })),
+      }));
+
+      conn.promptCache = { prompts, expiresAt: Date.now() + TOOL_CACHE_TTL };
+      return prompts;
+    } catch (err) {
+      process.stderr.write(`[ch1tty:${serverId}] Prompt list error: ${err}\n`);
+      return [];
+    }
+  }
+
+  async getPrompt(serverId: string, name: string, promptArgs?: Record<string, string>): Promise<{
+    description?: string;
+    messages: Array<{ role: string; content: { type: string; text: string } }>;
+  }> {
+    const conn = await this.connect(serverId);
+    const result = await conn.client.getPrompt({ name, arguments: promptArgs });
+    return {
+      description: result.description,
+      messages: result.messages.map((m) => ({
+        role: m.role,
+        content: m.content as { type: string; text: string },
+      })),
+    };
+  }
+
+  getStatus(serverId: string): { connected: boolean; toolCount: number; toolCacheAge: number | null } {
+    const conn = this.connections.get(serverId);
+    if (!conn) return { connected: false, toolCount: 0, toolCacheAge: null };
+    const toolCount = conn.toolCache?.tools.length ?? 0;
+    const toolCacheAge = conn.toolCache ? Date.now() - (conn.toolCache.expiresAt - TOOL_CACHE_TTL) : null;
+    return { connected: true, toolCount, toolCacheAge };
   }
 
   isRegistered(serverId: string): boolean {

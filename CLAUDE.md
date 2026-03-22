@@ -23,15 +23,32 @@ npm run dev     # Watch mode for development
 ## Key Patterns
 
 - Tool names are namespaced: `remote/chitty_memory_persist`, `serena/find_symbol`, `thinking/sequentialthinking`
+- Resources are namespaced: `serverId://originalUri`
+- Prompts are namespaced: `serverId/promptName`
 - Local servers spawn lazily on first tool call
 - Auth tokens retrieved via `chitty-mcp-token` CLI (execFileSync, not exec — no shell injection)
 - Tool lists cached 5 minutes, auth tokens cached 11 hours
 - All child stderr piped to gateway stderr with `[ch1tty:serverId]` prefix
 - Graceful shutdown: SIGINT/SIGTERM → close all children → exit
 
+## Meta-Tools
+
+Built-in tools under the `ch1tty/` namespace:
+
+- `ch1tty/status` — Returns gateway uptime, connected servers, tool counts, cache ages
+- `ch1tty/reload` — Hot-reloads `servers.json` without restarting the gateway
+
 ## Config Override
 
 Set `CH1TTY_CONFIG` env var to use a custom servers.json path.
+
+## Config Path Interpolation
+
+Paths in `command`, `args`, and `endpoint` fields support:
+- `~/` expands to the user's home directory
+- `${VAR}` or `$VAR` expands to environment variable values
+
+This makes `servers.json` portable across machines.
 
 ## Adding a Server
 
@@ -42,9 +59,9 @@ Add an entry to `servers.json`:
   "name": "My Server",
   "type": "local",
   "command": "node",
-  "args": ["/path/to/server.js"],
+  "args": ["~/path/to/server.js"],
   "lazy": true
 }
 ```
 
-No code changes required.
+No code changes required. Or call `ch1tty/reload` to pick up changes without restarting.
