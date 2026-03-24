@@ -1,11 +1,11 @@
 {
   "servers": [
 
-    {"_comment": "── ecosystem: Read and Write ChittyOS Infrastructure ───────"},
+    {"_comment": "── remote: HTTP endpoints (work everywhere) ──────────────────"},
 
     {
-      "id": "remote",
-      "name": "Read and Write ChittyOS",
+      "id": "chittyos",
+      "name": "ChittyOS Ecosystem",
       "type": "remote",
       "access": "readwrite",
       "category": "ecosystem",
@@ -16,7 +16,7 @@
     },
     {
       "id": "cloudflare",
-      "name": "Read and Write Cloudflare",
+      "name": "Cloudflare Platform",
       "type": "remote",
       "access": "readwrite",
       "category": "ecosystem",
@@ -26,68 +26,8 @@
       "enabled": true
     },
     {
-      "id": "neon",
-      "name": "Read and Write Neon Database",
-      "type": "local",
-      "access": "readwrite",
-      "category": "ecosystem",
-      "command": "/bin/sh",
-      "args": ["-lc", "exec npx -y @neondatabase/mcp-server-neon start \"$NEON_API_KEY\""],
-      "env": {
-        "NEON_API_KEY": "op://ChittyOS-Integrations/neon/api_key"
-      },
-      "lazy": true,
-      "enabled": true
-    },
-
-    {"_comment": "── docs: Read Library Documentation ───────────────────────"},
-
-    {
-      "id": "context7",
-      "name": "Read Library Documentation",
-      "type": "local",
-      "access": "read",
-      "category": "documents",
-      "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp@latest"],
-      "lazy": true,
-      "enabled": true
-    },
-
-    {"_comment": "── code: Read and Write Source Code ───────────────────────"},
-
-    {
-      "id": "serena",
-      "name": "Read and Write Source Code",
-      "type": "local",
-      "access": "readwrite",
-      "category": "code",
-      "command": "uvx",
-      "args": ["--from", "git+https://github.com/oraios/serena", "serena", "start-mcp-server"],
-      "lazy": true,
-      "enabled": true
-    },
-
-    {
-      "id": "quality",
-      "name": "Read and Write Quality Metrics",
-      "type": "local",
-      "access": "readwrite",
-      "category": "ecosystem",
-      "command": "node",
-      "args": ["/Users/nb/.config/claude/mcp-servers/chitty-quality/build/index.js"],
-      "env": {
-        "NEON_DATABASE_URL": "op://Private/Neon/database_url"
-      },
-      "lazy": true,
-      "enabled": true
-    },
-
-    {"_comment": "── search: Search Evidence ────────────────────────────────"},
-
-    {
       "id": "evidence",
-      "name": "Search Evidence Documents",
+      "name": "Evidence Search",
       "type": "remote",
       "access": "read",
       "category": "search",
@@ -97,8 +37,33 @@
       "enabled": true
     },
 
-    {"_comment": "── reasoning: Read-only Reasoning ────────────────────────"},
+    {"_comment": "── local: portable stdio servers (npx/uvx, no hardcoded paths) ─"},
 
+    {
+      "id": "neon",
+      "name": "Neon Database",
+      "type": "local",
+      "access": "readwrite",
+      "category": "ecosystem",
+      "command": "npx",
+      "args": ["-y", "@neondatabase/mcp-server-neon", "start"],
+      "env": {
+        "NEON_API_KEY": "op://ChittyOS-Integrations/neon/api_key"
+      },
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "context7",
+      "name": "Library Docs",
+      "type": "local",
+      "access": "read",
+      "category": "documents",
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"],
+      "lazy": true,
+      "enabled": true
+    },
     {
       "id": "thinking",
       "name": "Sequential Thinking",
@@ -110,46 +75,20 @@
       "lazy": true,
       "enabled": true
     },
-
-    {"_comment": "── desktop: Read and Write Local Machine ─────────────────"},
-
     {
       "id": "fs",
-      "name": "Read and Write Filesystem",
+      "name": "Filesystem",
       "type": "local",
       "access": "readwrite",
       "category": "desktop",
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/Users/nb/.claude/projects", "/Users/nb/Documents", "/Users/nb/Desktop"],
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "~/projects", "~/Documents"],
       "lazy": true,
       "enabled": true
     },
-    {
-      "id": "desktop",
-      "name": "Control your Mac",
-      "type": "local",
-      "access": "readwrite",
-      "category": "desktop",
-      "command": "npx",
-      "args": ["-y", "@wonderwhy-er/desktop-commander@latest"],
-      "lazy": true,
-      "enabled": true
-    },
-    {
-      "id": "chrome",
-      "name": "Control Chrome",
-      "type": "local",
-      "access": "readwrite",
-      "category": "desktop",
-      "command": "node",
-      "args": ["/Users/nb/Library/Application Support/Claude/Claude Extensions/ant.dir.ant.anthropic.chrome-control/server/index.js"],
-      "lazy": true,
-      "enabled": true
-    },
-
     {
       "id": "playwright",
-      "name": "Control Browser Automation",
+      "name": "Browser Automation",
       "type": "local",
       "access": "readwrite",
       "category": "desktop",
@@ -159,46 +98,93 @@
       "enabled": true
     },
 
-    {"_comment": "── documents: Fill and Analyze Documents ──────────────────"},
-
-    {
-      "id": "pdf",
-      "name": "Fill and Analyze PDFs",
-      "type": "local",
-      "access": "write",
-      "category": "documents",
-      "command": "node",
-      "args": ["/Users/nb/Library/Application Support/Claude/Claude Extensions/ant.dir.gh.silverstein.pdf-filler-simple/server/index.js"],
-      "lazy": true,
-      "enabled": true
-    },
-
-    {"_comment": "── communication: Read and Send Messages ──────────────────"},
+    {"_comment": "── macOS: run on homelab, TODO: proxy via ChittyConnect ───────"},
 
     {
       "id": "chittymac",
-      "name": "Read and Write Apple Notes",
+      "name": "Apple Notes (macOS homelab)",
       "type": "local",
       "access": "readwrite",
       "category": "communication",
       "command": "node",
-      "args": ["/Users/nb/Desktop/Projects/github.com/CHITTYOS/chittymac/build/server.js"],
+      "args": ["~/Desktop/Projects/github.com/CHITTYOS/chittymac/build/server.js"],
       "env": {
         "NEON_DATABASE_URL": "op://Connect Serv - Production/NEON Notion DB - ChittyChain /password"
       },
       "lazy": true,
-      "enabled": true
+      "enabled": false
     },
     {
       "id": "imessage",
-      "name": "Read and Send iMessages",
+      "name": "iMessage (macOS homelab)",
       "type": "local",
       "access": "readwrite",
       "category": "communication",
-      "command": "/bin/sh",
-      "args": ["-c", "source /Users/nb/.config/claude/mcp-servers/chitty-imessage/.env && exec node /Users/nb/.config/claude/mcp-servers/chitty-imessage/build/index.js"],
+      "command": "node",
+      "args": ["~/.config/claude/mcp-servers/chitty-imessage/build/index.js"],
       "lazy": true,
-      "enabled": true
+      "enabled": false
+    },
+
+    {"_comment": "── disabled: need local install or not yet ported ────────────"},
+
+    {
+      "id": "serena",
+      "name": "Source Code Analysis",
+      "type": "local",
+      "access": "readwrite",
+      "category": "code",
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/oraios/serena", "serena", "start-mcp-server"],
+      "lazy": true,
+      "enabled": false
+    },
+    {
+      "id": "quality",
+      "name": "Quality Metrics",
+      "type": "local",
+      "access": "readwrite",
+      "category": "ecosystem",
+      "command": "node",
+      "args": ["~/.config/claude/mcp-servers/chitty-quality/build/index.js"],
+      "env": {
+        "NEON_DATABASE_URL": "op://Private/Neon/database_url"
+      },
+      "lazy": true,
+      "enabled": false
+    },
+    {
+      "id": "desktop",
+      "name": "Desktop Commander (macOS)",
+      "type": "local",
+      "access": "readwrite",
+      "category": "desktop",
+      "command": "npx",
+      "args": ["-y", "@wonderwhy-er/desktop-commander@latest"],
+      "lazy": true,
+      "enabled": false
+    },
+    {
+      "id": "chrome",
+      "name": "Chrome Control (macOS)",
+      "type": "local",
+      "access": "readwrite",
+      "category": "desktop",
+      "command": "node",
+      "args": ["~/Library/Application Support/Claude/Claude Extensions/ant.dir.ant.anthropic.chrome-control/server/index.js"],
+      "lazy": true,
+      "enabled": false
+    },
+    {
+      "id": "pdf",
+      "name": "PDF Filler (macOS)",
+      "type": "local",
+      "access": "write",
+      "category": "documents",
+      "command": "node",
+      "args": ["~/Library/Application Support/Claude/Claude Extensions/ant.dir.gh.silverstein.pdf-filler-simple/server/index.js"],
+      "lazy": true,
+      "enabled": false
     }
   ]
 }
