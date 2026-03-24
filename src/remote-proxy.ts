@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import type { ServerConfig, ResourceEntry, ResourceTemplateEntry, PromptEntry, ToolEntry, ToolCallResult, BackendStatus, Backend } from './types.js';
+import { VERSION, withTimeout, normalizeToolResult } from './utils.js';
 
 interface TokenCache {
   token: string;
@@ -99,22 +100,12 @@ export class RemoteProxy implements Backend {
     });
 
     const client = new Client(
-      { name: `ch1tty-remote-${config.id}`, version: '1.0.0' },
+      { name: `ch1tty-remote-${config.id}`, version: VERSION },
       { capabilities: {} },
     );
 
     await client.connect(transport);
     return { client, transport, toolCache: null, resourceCache: null, promptCache: null };
-  }
-
-  private withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
-    return new Promise((resolve, reject) => {
-      const timer = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms);
-      promise.then(
-        (val) => { clearTimeout(timer); resolve(val); },
-        (err) => { clearTimeout(timer); reject(err); },
-      );
-    });
   }
 
   async listTools(serverId: string): Promise<ToolEntry[]> {
@@ -128,13 +119,13 @@ export class RemoteProxy implements Backend {
     }
 
     try {
-      const conn = await this.withTimeout(
+      const conn = await withTimeout(
         this.connect(serverId),
         CONNECT_TIMEOUT_MS,
         `connect ${serverId}`,
       );
 
-      const result = await this.withTimeout(
+      const result = await withTimeout(
         conn.client.listTools(),
         LIST_TIMEOUT_MS,
         `listTools ${serverId}`,
@@ -166,19 +157,7 @@ export class RemoteProxy implements Backend {
     try {
       const conn = await this.connect(serverId);
       const result = await conn.client.callTool({ name: toolName, arguments: args });
-
-      // Normalize the result shape (same pattern as child-manager)
-      if ('content' in result) {
-        return {
-          content: (result.content as Array<{ type: string; text: string }>),
-          isError: (result.isError as boolean | undefined) ?? false,
-        };
-      }
-
-      return {
-        content: [{ type: 'text', text: JSON.stringify((result as { toolResult: unknown }).toolResult) }],
-        isError: false,
-      };
+      return normalizeToolResult(result as Record<string, unknown>);
     } catch (err) {
       return {
         content: [{ type: 'text', text: `Remote call error: ${String(err)}` }],
@@ -197,11 +176,11 @@ export class RemoteProxy implements Backend {
     }
 
     try {
-      const conn = await this.withTimeout(this.connect(serverId), CONNECT_TIMEOUT_MS, `connect ${serverId}`);
+      const conn = await withTimeout(this.connect(serverId), CONNECT_TIMEOUT_MS, `connect ${serverId}`);
 
       const [resResult, tmplResult] = await Promise.allSettled([
-        this.withTimeout(conn.client.listResources(), LIST_TIMEOUT_MS, `listResources ${serverId}`),
-        this.withTimeout(conn.client.listResourceTemplates(), LIST_TIMEOUT_MS, `listResourceTemplates ${serverId}`),
+        withTimeout(conn.client.listResources(), LIST_TIMEOUT_MS, `listResources ${serverId}`),
+        withTimeout(conn.client.listResourceTemplates(), LIST_TIMEOUT_MS, `listResourceTemplates ${serverId}`),
       ]);
 
       const resources: ResourceEntry[] = resResult.status === 'fulfilled'
@@ -249,8 +228,8 @@ export class RemoteProxy implements Backend {
     }
 
     try {
-      const conn = await this.withTimeout(this.connect(serverId), CONNECT_TIMEOUT_MS, `connect ${serverId}`);
-      const result = await this.withTimeout(
+      const conn = await withTimeout(this.connect(serverId), CONNECT_TIMEOUT_MS, `connect ${serverId}`);
+      const result = await withTimeout(
         conn.client.listPrompts(),
         LIST_TIMEOUT_MS,
         `listPrompts ${serverId}`,
