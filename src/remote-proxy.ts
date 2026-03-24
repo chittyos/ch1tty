@@ -1,13 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
-import type { ServerConfig, ResourceEntry, ResourceTemplateEntry, PromptEntry } from './types.js';
-
-interface ToolEntry {
-  name: string;
-  description?: string;
-  inputSchema: Record<string, unknown>;
-}
+import type { ServerConfig, ResourceEntry, ResourceTemplateEntry, PromptEntry, ToolEntry, ToolCallResult, BackendStatus, Backend } from './types.js';
 
 interface TokenCache {
   token: string;
@@ -27,7 +21,7 @@ const TOKEN_CACHE_TTL = 11 * 60 * 60 * 1000; // 11 hours (tokens last 12hr)
 const CONNECT_TIMEOUT_MS = 15_000;
 const LIST_TIMEOUT_MS = 15_000;
 
-export class RemoteProxy {
+export class RemoteProxy implements Backend {
   private configs = new Map<string, ServerConfig>();
   private connections = new Map<string, RemoteConnection>();
   private connecting = new Map<string, Promise<RemoteConnection>>();
@@ -160,10 +154,7 @@ export class RemoteProxy {
     }
   }
 
-  async callTool(serverId: string, toolName: string, args: Record<string, unknown> = {}): Promise<{
-    content: Array<{ type: string; text: string }>;
-    isError?: boolean;
-  }> {
+  async callTool(serverId: string, toolName: string, args: Record<string, unknown> = {}): Promise<ToolCallResult> {
     const config = this.configs.get(serverId);
     if (!config?.endpoint) {
       return {
@@ -296,7 +287,7 @@ export class RemoteProxy {
     };
   }
 
-  getStatus(serverId: string): { connected: boolean; toolCount: number; toolCacheAge: number | null } {
+  getStatus(serverId: string): BackendStatus {
     const conn = this.connections.get(serverId);
     if (!conn) return { connected: false, toolCount: 0, toolCacheAge: null };
     const toolCount = conn.toolCache?.tools.length ?? 0;

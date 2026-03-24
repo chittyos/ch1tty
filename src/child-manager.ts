@@ -4,7 +4,7 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 
 const execFileAsync = promisify(execFile);
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
-import type { ServerConfig, ResourceEntry, ResourceTemplateEntry, PromptEntry } from './types.js';
+import type { ServerConfig, ResourceEntry, ResourceTemplateEntry, PromptEntry, ToolEntry, ToolCallResult, BackendStatus, Backend } from './types.js';
 
 interface ChildConnection {
   client: Client;
@@ -14,17 +14,11 @@ interface ChildConnection {
   promptCache: { prompts: PromptEntry[]; expiresAt: number } | null;
 }
 
-interface ToolEntry {
-  name: string;
-  description?: string;
-  inputSchema: Record<string, unknown>;
-}
-
 const TOOL_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 const SPAWN_TIMEOUT_MS = 30_000; // 30s to spawn + connect
 const LIST_TIMEOUT_MS = 15_000; // 15s to list tools after connected
 
-export class ChildManager {
+export class ChildManager implements Backend {
   private children = new Map<string, ChildConnection>();
   private configs = new Map<string, ServerConfig>();
   private connecting = new Map<string, Promise<ChildConnection>>();
@@ -194,10 +188,7 @@ export class ChildManager {
     return tools;
   }
 
-  async callTool(serverId: string, toolName: string, args: Record<string, unknown> = {}): Promise<{
-    content: Array<{ type: string; text: string }>;
-    isError?: boolean;
-  }> {
+  async callTool(serverId: string, toolName: string, args: Record<string, unknown> = {}): Promise<ToolCallResult> {
     const conn = await this.spawn(serverId);
     const result = await conn.client.callTool({ name: toolName, arguments: args });
 
@@ -316,7 +307,7 @@ export class ChildManager {
     };
   }
 
-  getStatus(serverId: string): { connected: boolean; toolCount: number; toolCacheAge: number | null } {
+  getStatus(serverId: string): BackendStatus {
     const conn = this.children.get(serverId);
     if (!conn) return { connected: false, toolCount: 0, toolCacheAge: null };
     const toolCount = conn.toolCache?.tools.length ?? 0;
