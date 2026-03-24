@@ -6,11 +6,11 @@
     {
       "id": "remote",
       "name": "Read and Write ChittyOS",
-      "type": "local",
+      "type": "remote",
       "access": "readwrite",
       "category": "ecosystem",
-      "command": "npx",
-      "args": ["-y", "mcp-remote", "https://mcp.chitty.cc/mcp"],
+      "endpoint": "https://connect.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
       "lazy": true,
       "enabled": true
     },
