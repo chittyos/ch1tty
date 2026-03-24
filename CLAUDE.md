@@ -1,3 +1,13 @@
+---
+uri: chittycanon://docs/tech/procedure/ch1tty-dev-guide
+namespace: chittycanon://docs/tech
+type: procedure
+version: 2.0.0
+status: ACTIVE
+title: "Ch1tty Development Guide"
+visibility: PUBLIC
+---
+
 # CLAUDE.md — Ch1tty
 
 ## What This Is
@@ -14,15 +24,16 @@ npm run dev     # Watch mode for development
 
 ## Architecture
 
-- **Entry**: `src/index.ts` — creates `Server`, wires `ListTools` + `CallTool` handlers, connects `StdioServerTransport`
-- **Aggregator**: `src/aggregator.ts` — routes namespaced tool calls (`serverId/toolName`) to the correct backend
-- **ChildManager**: `src/child-manager.ts` — spawns/manages local MCP child processes via `StdioClientTransport`
-- **RemoteProxy**: `src/remote-proxy.ts` — proxies tool calls to HTTP MCP endpoints (mcp.chitty.cc, Cloudflare, etc.)
+- **Entry**: `src/index.ts` — creates `Server`, wires all MCP handlers, connects `StdioServerTransport`
+- **Aggregator**: `src/aggregator.ts` — routes namespaced calls to the correct `Backend` via `Map<serverId, Backend>`
+- **ChildManager**: `src/child-manager.ts` — implements `Backend` for local stdio child processes
+- **RemoteProxy**: `src/remote-proxy.ts` — implements `Backend` for HTTP MCP endpoints (connect.chitty.cc, Cloudflare, etc.)
 - **Config**: `servers.json` — declarative server registry, no code changes needed to add servers
+- **Types**: `src/types.ts` — `Backend` interface, shared types (`ToolEntry`, `ToolCallResult`, `BackendStatus`)
 
 ## Key Patterns
 
-- Tool names are namespaced: `remote/chitty_memory_persist`, `serena/find_symbol`, `thinking/sequentialthinking`
+- Tool names are namespaced: `chittyos/chitty_memory_persist`, `thinking/sequentialthinking`
 - Resources are namespaced: `serverId://originalUri`
 - Prompts are namespaced: `serverId/promptName`
 - Local servers spawn lazily on first tool call
@@ -30,6 +41,7 @@ npm run dev     # Watch mode for development
 - Tool lists cached 5 minutes, auth tokens cached 11 hours
 - All child stderr piped to gateway stderr with `[ch1tty:serverId]` prefix
 - Graceful shutdown: SIGINT/SIGTERM → close all children → exit
+- Config supports `_comment` entries for inline documentation in servers.json
 
 ## Meta-Tools
 
@@ -57,9 +69,11 @@ Add an entry to `servers.json`:
 {
   "id": "myserver",
   "name": "My Server",
-  "type": "local",
-  "command": "node",
-  "args": ["~/path/to/server.js"],
+  "type": "remote",
+  "access": "readwrite",
+  "category": "ecosystem",
+  "endpoint": "https://example.com/mcp",
+  "authTokenKey": "my-token-key",
   "lazy": true
 }
 ```

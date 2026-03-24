@@ -5,6 +5,7 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 const execFileAsync = promisify(execFile);
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import type { ServerConfig, ResourceEntry, ResourceTemplateEntry, PromptEntry, ToolEntry, ToolCallResult, BackendStatus, Backend } from './types.js';
+import { VERSION, withTimeout, normalizeToolResult } from './utils.js';
 
 interface ChildConnection {
   client: Client;
@@ -127,7 +128,7 @@ export class ChildManager implements Backend {
     });
 
     const client = new Client(
-      { name: `ch1tty-child-${config.id}`, version: '1.0.0' },
+      { name: `ch1tty-child-${config.id}`, version: VERSION },
       { capabilities: {} },
     );
 
@@ -144,16 +145,6 @@ export class ChildManager implements Backend {
     return { client, transport, toolCache: null, resourceCache: null, promptCache: null };
   }
 
-  private withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
-    return new Promise((resolve, reject) => {
-      const timer = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms);
-      promise.then(
-        (val) => { clearTimeout(timer); resolve(val); },
-        (err) => { clearTimeout(timer); reject(err); },
-      );
-    });
-  }
-
   async listTools(serverId: string): Promise<ToolEntry[]> {
     const config = this.configs.get(serverId);
     if (!config) return [];
@@ -165,14 +156,14 @@ export class ChildManager implements Backend {
     }
 
     // Spawn with timeout
-    const conn = await this.withTimeout(
+    const conn = await withTimeout(
       this.spawn(serverId),
       SPAWN_TIMEOUT_MS,
       `spawn ${serverId}`,
     );
 
     // List tools with timeout
-    const result = await this.withTimeout(
+    const result = await withTimeout(
       conn.client.listTools(),
       LIST_TIMEOUT_MS,
       `listTools ${serverId}`,
@@ -191,20 +182,7 @@ export class ChildManager implements Backend {
   async callTool(serverId: string, toolName: string, args: Record<string, unknown> = {}): Promise<ToolCallResult> {
     const conn = await this.spawn(serverId);
     const result = await conn.client.callTool({ name: toolName, arguments: args });
-
-    // Normalize the result shape
-    if ('content' in result) {
-      return {
-        content: (result.content as Array<{ type: string; text: string }>),
-        isError: (result.isError as boolean | undefined) ?? false,
-      };
-    }
-
-    // Legacy toolResult format
-    return {
-      content: [{ type: 'text', text: JSON.stringify((result as { toolResult: unknown }).toolResult) }],
-      isError: false,
-    };
+    return normalizeToolResult(result as Record<string, unknown>);
   }
 
   async listResources(serverId: string): Promise<{ resources: ResourceEntry[]; templates: ResourceTemplateEntry[] }> {
@@ -217,11 +195,11 @@ export class ChildManager implements Backend {
     }
 
     try {
-      const conn = await this.withTimeout(this.spawn(serverId), SPAWN_TIMEOUT_MS, `spawn ${serverId}`);
+      const conn = await withTimeout(this.spawn(serverId), SPAWN_TIMEOUT_MS, `spawn ${serverId}`);
 
       const [resResult, tmplResult] = await Promise.allSettled([
-        this.withTimeout(conn.client.listResources(), LIST_TIMEOUT_MS, `listResources ${serverId}`),
-        this.withTimeout(conn.client.listResourceTemplates(), LIST_TIMEOUT_MS, `listResourceTemplates ${serverId}`),
+        withTimeout(conn.client.listResources(), LIST_TIMEOUT_MS, `listResources ${serverId}`),
+        withTimeout(conn.client.listResourceTemplates(), LIST_TIMEOUT_MS, `listResourceTemplates ${serverId}`),
       ]);
 
       const resources: ResourceEntry[] = resResult.status === 'fulfilled'
@@ -269,8 +247,8 @@ export class ChildManager implements Backend {
     }
 
     try {
-      const conn = await this.withTimeout(this.spawn(serverId), SPAWN_TIMEOUT_MS, `spawn ${serverId}`);
-      const result = await this.withTimeout(
+      const conn = await withTimeout(this.spawn(serverId), SPAWN_TIMEOUT_MS, `spawn ${serverId}`);
+      const result = await withTimeout(
         conn.client.listPrompts(),
         LIST_TIMEOUT_MS,
         `listPrompts ${serverId}`,

@@ -1,4 +1,18 @@
+---
+uri: chittycanon://docs/tech/policy/ch1tty-charter
+namespace: chittycanon://docs/tech
+type: policy
+version: 2.0.0
+status: ACTIVE
+registered_with: chittycanon://core/services/canon
+title: "Ch1tty Charter"
+certifier: chittycanon://core/services/chittycertify
+visibility: PUBLIC
+---
+
 # CHARTER.md — Ch1tty
+
+**Canonical URI**: `chittycanon://core/services/ch1tty`
 
 ## Service Identity
 
@@ -19,17 +33,32 @@ Universal MCP gateway that aggregates all MCP servers into a single stdio connec
 Ch1tty exposes the standard MCP protocol over stdio:
 
 ### tools/list
-Returns the union of all backend tools, namespaced as `{serverId}/{toolName}`.
+Returns the union of all backend tools, namespaced as `{serverId}/{toolName}`. Includes built-in meta-tools under `ch1tty/`.
 
 ### tools/call
 Routes `{serverId}/{toolName}` calls to the appropriate backend (local child process or remote HTTP endpoint).
 
+### resources/list
+Returns the union of all backend resources, namespaced as `{serverId}://{originalUri}`.
+
+### resources/read
+Routes `{serverId}://{originalUri}` reads to the appropriate backend.
+
+### resourceTemplates/list
+Returns the union of all backend resource templates, namespaced as `{serverId}://{originalUriTemplate}`.
+
+### prompts/list
+Returns the union of all backend prompts, namespaced as `{serverId}/{promptName}`.
+
+### prompts/get
+Routes `{serverId}/{promptName}` requests to the appropriate backend.
+
 ## Dependencies
 
 ### Upstream (Ch1tty depends on)
-- `mcp.chitty.cc` — Remote MCP gateway (ChittyMCP)
-- `chitty-mcp-token` — Auth token helper (1Password-backed)
-- Local MCP servers (Serena, filesystem, desktop-commander, etc.)
+- `connect.chitty.cc/mcp` — ChittyConnect MCP surface (`chittycanon://core/services/chittyconnect`)
+- `chitty-mcp-token` — Auth token helper (1Password-backed, via `chittycanon://core/services/auth`)
+- Local MCP servers (filesystem, context7, sequential-thinking, etc.)
 - Cloudflare MCP endpoints (builds, autorag)
 
 ### Downstream (depends on Ch1tty)
@@ -43,10 +72,10 @@ Routes `{serverId}/{toolName}` calls to the appropriate backend (local child pro
 ### In Scope
 - Aggregating tool lists from multiple backends
 - Routing tool calls by namespace prefix
+- Aggregating resources and prompts from all backends
 - Managing child process lifecycle
 - Proxying HTTP MCP calls with auth
 - Caching tool lists and auth tokens
-- Aggregating resources and prompts from all backends
 - Meta-tools for gateway introspection (status, reload)
 - Config path interpolation (~ and env vars)
 
