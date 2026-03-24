@@ -1,11 +1,25 @@
+---
+uri: chittycanon://docs/tech/architecture/ch1tty
+namespace: chittycanon://docs/tech
+type: architecture
+version: 2.0.0
+status: ACTIVE
+registered_with: chittycanon://core/services/canon
+title: "Ch1tty Architecture"
+certifier: chittycanon://core/services/chittycertify
+visibility: PUBLIC
+---
+
 # CHITTY.md — Ch1tty
 
 ## Architecture Summary
 
-Ch1tty is a Node.js MCP server that acts as a gateway/aggregator. It presents itself as a single stdio MCP server to AI clients while internally routing to multiple backends:
+Ch1tty is a Node.js MCP server that acts as a gateway/aggregator. It presents itself as a single stdio MCP server to AI clients while internally routing to multiple backends via the `Backend` interface:
 
-- **Local backends**: Spawned as child processes via `StdioClientTransport` (Serena, filesystem, desktop-commander, etc.)
-- **Remote backends**: Reached via HTTP POST with JSON-RPC (mcp.chitty.cc, Cloudflare MCP endpoints)
+- **Local backends** (`ChildManager`): Spawned as child processes via `StdioClientTransport`
+- **Remote backends** (`RemoteProxy`): Reached via `StreamableHTTPClientTransport` (connect.chitty.cc, Cloudflare MCP endpoints)
+
+Both implement the same `Backend` interface — the aggregator routes via `Map<serverId, Backend>`.
 
 ## Stack
 
@@ -13,9 +27,9 @@ Ch1tty is a Node.js MCP server that acts as a gateway/aggregator. It presents it
 |-----------|-----------|
 | Runtime | Node.js |
 | Language | TypeScript (ES2022, Node16 modules) |
-| MCP SDK | `@modelcontextprotocol/sdk` v1.22.0 |
+| MCP SDK | `@modelcontextprotocol/sdk` |
 | Auth | `chitty-mcp-token` (1Password CLI wrapper) |
-| Config | `servers.json` (declarative) |
+| Config | `servers.json` (declarative, with path interpolation) |
 
 ## Ecosystem Position
 
@@ -24,10 +38,10 @@ AI Client (Claude/Codex)
     │ stdio
     ▼
   Ch1tty ─── aggregates ──► Local MCP servers (stdio children)
-    │                        └ Serena, filesystem, desktop-commander, ...
+    │                        └ neon, context7, thinking, fs, playwright
     │
     └──── proxies ──────────► Remote MCP endpoints (HTTP)
-                              └ mcp.chitty.cc, Cloudflare, ...
+                              └ connect.chitty.cc, Cloudflare, ...
 ```
 
 ## Consumers

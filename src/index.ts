@@ -12,6 +12,7 @@ import {
 import { Aggregator } from './aggregator.js';
 import type { AggregatorOptions } from './aggregator.js';
 import { loadConfigFromPath, resolveConfigPath } from './config.js';
+import { VERSION } from './utils.js';
 import type { ServerAccess, ServerCategory } from './types.js';
 
 async function main(): Promise<void> {
@@ -29,7 +30,7 @@ async function main(): Promise<void> {
   const aggregator = new Aggregator(config.servers, options);
 
   const server = new Server(
-    { name: 'ch1tty', version: '2.0.0' },
+    { name: 'ch1tty', version: VERSION },
     { capabilities: { tools: {}, resources: {}, prompts: {} } },
   );
 
@@ -78,7 +79,7 @@ async function main(): Promise<void> {
 
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  process.stderr.write('[ch1tty] MCP gateway v2.0 started\n');
+  process.stderr.write(`[ch1tty] MCP gateway v${VERSION} started\n`);
 }
 
 main().catch((err) => {
