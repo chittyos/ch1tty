@@ -2,10 +2,9 @@ import type {
   ServerAccess,
   ServerCategory,
   ServerConfig,
-  ResourceEntry,
-  ResourceTemplateEntry,
-  PromptEntry,
   ServerStatus,
+  ToolCallResult,
+  Backend,
 } from './types.js';
 import { ChildManager } from './child-manager.js';
 import { RemoteProxy } from './remote-proxy.js';
@@ -21,8 +20,7 @@ export interface AggregatorOptions {
 }
 
 export class Aggregator {
-  private childManager = new ChildManager();
-  private remoteProxy = new RemoteProxy();
+  private backends = new Map<string, Backend>();
   private configs: ServerConfig[];
   private accessFilter?: ServerAccess;
   private categoryFilter?: ServerCategory;
@@ -34,13 +32,18 @@ export class Aggregator {
     this.categoryFilter = options?.categoryFilter;
     this.configPath = options?.configPath;
     this.configs = configs;
+    this.rebuildBackends();
+  }
+
+  private rebuildBackends(): void {
+    this.backends.clear();
+    const stdio = new ChildManager();
+    const http = new RemoteProxy();
 
     for (const config of this.activeConfigs()) {
-      if (config.type === 'local') {
-        this.childManager.registerServer(config);
-      } else {
-        this.remoteProxy.registerServer(config);
-      }
+      const backend = config.type === 'local' ? stdio : http;
+      backend.registerServer(config);
+      this.backends.set(config.id, backend);
     }
   }
 
@@ -51,6 +54,10 @@ export class Aggregator {
       if (this.categoryFilter && c.category !== this.categoryFilter) return false;
       return true;
     });
+  }
+
+  private backendFor(serverId: string): Backend | undefined {
+    return this.backends.get(serverId);
   }
 
   // ── Meta-tools ────────────────────────────────────────────────
@@ -74,9 +81,7 @@ export class Aggregator {
     ];
   }
 
-  private async handleMetaTool(
-    toolName: string,
-  ): Promise<{ content: Array<{ type: string; text: string }>; isError?: boolean }> {
+  private async handleMetaTool(toolName: string): Promise<ToolCallResult> {
     switch (toolName) {
       case 'status':
         return this.handleStatus();
@@ -90,18 +95,17 @@ export class Aggregator {
     }
   }
 
-  private async handleStatus(): Promise<{ content: Array<{ type: string; text: string }>; isError?: boolean }> {
+  private async handleStatus(): Promise<ToolCallResult> {
     const statuses: ServerStatus[] = this.activeConfigs().map((config) => {
-      const backend = config.type === 'local'
-        ? this.childManager.getStatus(config.id)
-        : this.remoteProxy.getStatus(config.id);
+      const backend = this.backendFor(config.id);
+      const status = backend?.getStatus(config.id) ?? { connected: false, toolCount: 0, toolCacheAge: null };
 
       return {
         id: config.id,
         name: config.name,
         type: config.type,
         enabled: config.enabled !== false,
-        ...backend,
+        ...status,
       };
     });
 
@@ -119,7 +123,7 @@ export class Aggregator {
     };
   }
 
-  private async handleReload(): Promise<{ content: Array<{ type: string; text: string }>; isError?: boolean }> {
+  private async handleReload(): Promise<ToolCallResult> {
     if (!this.configPath) {
       return {
         content: [{ type: 'text', text: 'No config path available for reload' }],
@@ -135,30 +139,9 @@ export class Aggregator {
       const added = newConfig.servers.filter((c) => !oldIds.has(c.id));
       const removed = this.configs.filter((c) => !newIds.has(c.id));
 
-      // Shutdown removed servers
-      for (const config of removed) {
-        if (config.type === 'local') {
-          // ChildManager doesn't have per-server shutdown, but new instance won't include them
-        }
-      }
-
-      // Rebuild managers
       await this.shutdown();
       this.configs = newConfig.servers;
-
-      const newChildManager = new ChildManager();
-      const newRemoteProxy = new RemoteProxy();
-
-      for (const config of this.activeConfigs()) {
-        if (config.type === 'local') {
-          newChildManager.registerServer(config);
-        } else {
-          newRemoteProxy.registerServer(config);
-        }
-      }
-
-      this.childManager = newChildManager;
-      this.remoteProxy = newRemoteProxy;
+      this.rebuildBackends();
 
       const result = {
         reloaded: true,
@@ -190,10 +173,10 @@ export class Aggregator {
   }> {
     const toolPromises = this.activeConfigs().map(async (config) => {
       try {
-        const tools = config.type === 'local'
-          ? await this.childManager.listTools(config.id)
-          : await this.remoteProxy.listTools(config.id);
+        const backend = this.backendFor(config.id);
+        if (!backend) return [];
 
+        const tools = await backend.listTools(config.id);
         const tag = `[${config.category}:${config.access}]`;
         return tools.map((t) => ({
           name: `${config.id}${SEPARATOR}${t.name}`,
@@ -215,17 +198,10 @@ export class Aggregator {
       r.status === 'fulfilled' ? r.value : [],
     );
 
-    // Prepend meta-tools
     return { tools: [...this.metaTools(), ...tools] };
   }
 
-  async callTool(
-    namespacedName: string,
-    args: Record<string, unknown> = {},
-  ): Promise<{
-    content: Array<{ type: string; text: string }>;
-    isError?: boolean;
-  }> {
+  async callTool(namespacedName: string, args: Record<string, unknown> = {}): Promise<ToolCallResult> {
     const sepIndex = namespacedName.indexOf(SEPARATOR);
     const knownServers = [META_SERVER_ID, ...this.configs.map((config) => config.id)].join(', ') || '(none)';
     if (sepIndex === -1) {
@@ -241,40 +217,29 @@ export class Aggregator {
     const serverId = namespacedName.slice(0, sepIndex);
     const toolName = namespacedName.slice(sepIndex + 1);
 
-    // Handle meta-tools
     if (serverId === META_SERVER_ID) {
       return this.handleMetaTool(toolName);
     }
 
-    if (this.childManager.isRegistered(serverId)) {
-      try {
-        return await this.childManager.callTool(serverId, toolName, args);
-      } catch (err) {
-        return {
-          content: [{ type: 'text', text: `Tool call failed for ${serverId}/${toolName}: ${String(err)}` }],
-          isError: true,
-        };
-      }
+    const backend = this.backendFor(serverId);
+    if (!backend) {
+      return {
+        content: [{
+          type: 'text',
+          text: `Unknown server "${serverId}". Known servers: ${knownServers}`,
+        }],
+        isError: true,
+      };
     }
 
-    if (this.remoteProxy.isRegistered(serverId)) {
-      try {
-        return await this.remoteProxy.callTool(serverId, toolName, args);
-      } catch (err) {
-        return {
-          content: [{ type: 'text', text: `Tool call failed for ${serverId}/${toolName}: ${String(err)}` }],
-          isError: true,
-        };
-      }
+    try {
+      return await backend.callTool(serverId, toolName, args);
+    } catch (err) {
+      return {
+        content: [{ type: 'text', text: `Tool call failed for ${serverId}/${toolName}: ${String(err)}` }],
+        isError: true,
+      };
     }
-
-    return {
-      content: [{
-        type: 'text',
-        text: `Unknown server "${serverId}". Known servers: ${knownServers}`,
-      }],
-      isError: true,
-    };
   }
 
   // ── Resources ─────────────────────────────────────────────────
@@ -284,10 +249,10 @@ export class Aggregator {
   }> {
     const resourcePromises = this.activeConfigs().map(async (config) => {
       try {
-        const { resources } = config.type === 'local'
-          ? await this.childManager.listResources(config.id)
-          : await this.remoteProxy.listResources(config.id);
+        const backend = this.backendFor(config.id);
+        if (!backend) return [];
 
+        const { resources } = await backend.listResources(config.id);
         return resources.map((r) => ({
           uri: `${config.id}://${r.uri}`,
           name: `[${config.name}] ${r.name}`,
@@ -301,11 +266,9 @@ export class Aggregator {
     });
 
     const results = await Promise.allSettled(resourcePromises);
-    const resources = results.flatMap((r) =>
-      r.status === 'fulfilled' ? r.value : [],
-    );
-
-    return { resources };
+    return {
+      resources: results.flatMap((r) => r.status === 'fulfilled' ? r.value : []),
+    };
   }
 
   async listAllResourceTemplates(): Promise<{
@@ -313,10 +276,10 @@ export class Aggregator {
   }> {
     const templatePromises = this.activeConfigs().map(async (config) => {
       try {
-        const { templates } = config.type === 'local'
-          ? await this.childManager.listResources(config.id)
-          : await this.remoteProxy.listResources(config.id);
+        const backend = this.backendFor(config.id);
+        if (!backend) return [];
 
+        const { templates } = await backend.listResources(config.id);
         return templates.map((t) => ({
           uriTemplate: `${config.id}://${t.uriTemplate}`,
           name: `[${config.name}] ${t.name}`,
@@ -330,33 +293,26 @@ export class Aggregator {
     });
 
     const results = await Promise.allSettled(templatePromises);
-    const resourceTemplates = results.flatMap((r) =>
-      r.status === 'fulfilled' ? r.value : [],
-    );
-
-    return { resourceTemplates };
+    return {
+      resourceTemplates: results.flatMap((r) => r.status === 'fulfilled' ? r.value : []),
+    };
   }
 
   async readResource(uri: string): Promise<{
     contents: Array<{ uri: string; mimeType?: string; text?: string; blob?: string }>;
   }> {
-    // Parse namespaced URI: serverId://originalUri
     const match = uri.match(/^([^:]+):\/\/(.+)$/);
     if (!match) {
       throw new Error(`Invalid namespaced resource URI: ${uri}`);
     }
 
     const [, serverId, originalUri] = match;
-
-    if (this.childManager.isRegistered(serverId)) {
-      return this.childManager.readResource(serverId, originalUri);
+    const backend = this.backendFor(serverId);
+    if (!backend) {
+      throw new Error(`Unknown server "${serverId}" in resource URI: ${uri}`);
     }
 
-    if (this.remoteProxy.isRegistered(serverId)) {
-      return this.remoteProxy.readResource(serverId, originalUri);
-    }
-
-    throw new Error(`Unknown server "${serverId}" in resource URI: ${uri}`);
+    return backend.readResource(serverId, originalUri);
   }
 
   // ── Prompts ───────────────────────────────────────────────────
@@ -370,10 +326,10 @@ export class Aggregator {
   }> {
     const promptPromises = this.activeConfigs().map(async (config) => {
       try {
-        const prompts = config.type === 'local'
-          ? await this.childManager.listPrompts(config.id)
-          : await this.remoteProxy.listPrompts(config.id);
+        const backend = this.backendFor(config.id);
+        if (!backend) return [];
 
+        const prompts = await backend.listPrompts(config.id);
         return prompts.map((p) => ({
           name: `${config.id}${SEPARATOR}${p.name}`,
           description: `[${config.name}] ${p.description || p.name}`,
@@ -386,11 +342,9 @@ export class Aggregator {
     });
 
     const results = await Promise.allSettled(promptPromises);
-    const prompts = results.flatMap((r) =>
-      r.status === 'fulfilled' ? r.value : [],
-    );
-
-    return { prompts };
+    return {
+      prompts: results.flatMap((r) => r.status === 'fulfilled' ? r.value : []),
+    };
   }
 
   async getPrompt(namespacedName: string, args?: Record<string, string>): Promise<{
@@ -405,23 +359,27 @@ export class Aggregator {
     const serverId = namespacedName.slice(0, sepIndex);
     const promptName = namespacedName.slice(sepIndex + 1);
 
-    if (this.childManager.isRegistered(serverId)) {
-      return this.childManager.getPrompt(serverId, promptName, args);
+    const backend = this.backendFor(serverId);
+    if (!backend) {
+      throw new Error(`Unknown server "${serverId}" for prompt: ${namespacedName}`);
     }
 
-    if (this.remoteProxy.isRegistered(serverId)) {
-      return this.remoteProxy.getPrompt(serverId, promptName, args);
-    }
-
-    throw new Error(`Unknown server "${serverId}" for prompt: ${namespacedName}`);
+    return backend.getPrompt(serverId, promptName, args);
   }
 
   // ── Lifecycle ─────────────────────────────────────────────────
 
   async shutdown(): Promise<void> {
-    await Promise.allSettled([
-      this.childManager.shutdown(),
-      this.remoteProxy.shutdown(),
-    ]);
+    const seen = new Set<Backend>();
+    const shutdowns: Promise<void>[] = [];
+
+    for (const backend of this.backends.values()) {
+      if (seen.has(backend)) continue;
+      seen.add(backend);
+      shutdowns.push(backend.shutdown());
+    }
+
+    await Promise.allSettled(shutdowns);
+    this.backends.clear();
   }
 }

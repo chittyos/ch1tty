@@ -5,8 +5,8 @@ import type { ServerConfig } from '../src/types.js';
 
 function createAggregator(): Aggregator {
   const config: ServerConfig[] = [
-    { id: 'local', name: 'Local', type: 'local', command: 'node' },
-    { id: 'remote', name: 'Remote', type: 'remote', endpoint: 'https://example.com/mcp' },
+    { id: 'local', name: 'Local', type: 'local', access: 'read', category: 'code', command: 'node' },
+    { id: 'remote', name: 'Remote', type: 'remote', access: 'read', category: 'ecosystem', endpoint: 'https://example.com/mcp' },
   ];
   return new Aggregator(config);
 }
@@ -32,26 +32,15 @@ test('callTool reports unknown server with known server ids', async () => {
 test('callTool normalizes local backend exceptions into MCP error shape', async () => {
   const aggregator = createAggregator() as unknown as {
     callTool: Aggregator['callTool'];
-    childManager: {
-      isRegistered: (serverId: string) => boolean;
-      callTool: (serverId: string, toolName: string, args: Record<string, unknown>) => Promise<never>;
-    };
-    remoteProxy: {
-      isRegistered: (serverId: string) => boolean;
-      callTool: (serverId: string, toolName: string, args: Record<string, unknown>) => Promise<unknown>;
-    };
+    backends: Map<string, unknown>;
   };
 
-  aggregator.childManager = {
-    isRegistered: (serverId) => serverId === 'local',
+  aggregator.backends.set('local', {
+    isRegistered: (serverId: string) => serverId === 'local',
     callTool: async () => {
       throw new Error('child boom');
     },
-  };
-  aggregator.remoteProxy = {
-    isRegistered: () => false,
-    callTool: async () => ({ content: [] }),
-  };
+  });
 
   const result = await aggregator.callTool('local/run', { foo: 'bar' });
 
@@ -63,26 +52,15 @@ test('callTool normalizes local backend exceptions into MCP error shape', async 
 test('callTool normalizes remote backend exceptions into MCP error shape', async () => {
   const aggregator = createAggregator() as unknown as {
     callTool: Aggregator['callTool'];
-    childManager: {
-      isRegistered: (serverId: string) => boolean;
-      callTool: (serverId: string, toolName: string, args: Record<string, unknown>) => Promise<unknown>;
-    };
-    remoteProxy: {
-      isRegistered: (serverId: string) => boolean;
-      callTool: (serverId: string, toolName: string, args: Record<string, unknown>) => Promise<never>;
-    };
+    backends: Map<string, unknown>;
   };
 
-  aggregator.childManager = {
-    isRegistered: () => false,
-    callTool: async () => ({ content: [] }),
-  };
-  aggregator.remoteProxy = {
-    isRegistered: (serverId) => serverId === 'remote',
+  aggregator.backends.set('remote', {
+    isRegistered: (serverId: string) => serverId === 'remote',
     callTool: async () => {
       throw new Error('remote boom');
     },
-  };
+  });
 
   const result = await aggregator.callTool('remote/run', { foo: 'bar' });
 
