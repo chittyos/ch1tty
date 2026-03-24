@@ -17,7 +17,7 @@ test('callTool rejects malformed namespaced tool names with known server ids', a
 
   assert.equal(result.isError, true);
   assert.match(result.content[0].text, /Expected format: serverId\/toolName/);
-  assert.match(result.content[0].text, /Known servers: local, remote/);
+  assert.match(result.content[0].text, /Known servers: ch1tty, local, remote/);
 });
 
 test('callTool reports unknown server with known server ids', async () => {
@@ -26,7 +26,7 @@ test('callTool reports unknown server with known server ids', async () => {
 
   assert.equal(result.isError, true);
   assert.match(result.content[0].text, /Unknown server "unknown"/);
-  assert.match(result.content[0].text, /Known servers: local, remote/);
+  assert.match(result.content[0].text, /Known servers: ch1tty, local, remote/);
 });
 
 test('callTool normalizes local backend exceptions into MCP error shape', async () => {

@@ -3,6 +3,11 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import {
   ListToolsRequestSchema,
   CallToolRequestSchema,
+  ListResourcesRequestSchema,
+  ListResourceTemplatesRequestSchema,
+  ReadResourceRequestSchema,
+  ListPromptsRequestSchema,
+  GetPromptRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { Aggregator } from './aggregator.js';
 import type { AggregatorOptions } from './aggregator.js';
@@ -13,7 +18,7 @@ async function main(): Promise<void> {
   const configPath = resolveConfigPath();
   const config = loadConfigFromPath(configPath);
 
-  const options: AggregatorOptions = {};
+  const options: AggregatorOptions = { configPath };
   if (process.env.CH1TTY_ACCESS) {
     options.accessFilter = process.env.CH1TTY_ACCESS as ServerAccess;
   }
@@ -24,10 +29,11 @@ async function main(): Promise<void> {
   const aggregator = new Aggregator(config.servers, options);
 
   const server = new Server(
-    { name: 'ch1tty', version: '1.0.0' },
-    { capabilities: { tools: {} } },
+    { name: 'ch1tty', version: '2.0.0' },
+    { capabilities: { tools: {}, resources: {}, prompts: {} } },
   );
 
+  // ── Tools ───────────────────────────────────────────────────
   server.setRequestHandler(ListToolsRequestSchema, async () => {
     return aggregator.listAllTools();
   });
@@ -37,7 +43,30 @@ async function main(): Promise<void> {
     return aggregator.callTool(name, (args ?? {}) as Record<string, unknown>);
   });
 
-  // Graceful shutdown
+  // ── Resources ───────────────────────────────────────────────
+  server.setRequestHandler(ListResourcesRequestSchema, async () => {
+    return aggregator.listAllResources();
+  });
+
+  server.setRequestHandler(ListResourceTemplatesRequestSchema, async () => {
+    return aggregator.listAllResourceTemplates();
+  });
+
+  server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
+    return aggregator.readResource(request.params.uri);
+  });
+
+  // ── Prompts ─────────────────────────────────────────────────
+  server.setRequestHandler(ListPromptsRequestSchema, async () => {
+    return aggregator.listAllPrompts();
+  });
+
+  server.setRequestHandler(GetPromptRequestSchema, async (request) => {
+    const { name, arguments: args } = request.params;
+    return aggregator.getPrompt(name, args);
+  });
+
+  // ── Lifecycle ───────────────────────────────────────────────
   const cleanup = async () => {
     await aggregator.shutdown();
     await server.close();
@@ -49,7 +78,7 @@ async function main(): Promise<void> {
 
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  process.stderr.write('[ch1tty] MCP gateway started\n');
+  process.stderr.write('[ch1tty] MCP gateway v2.0 started\n');
 }
 
 main().catch((err) => {

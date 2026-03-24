@@ -9,8 +9,8 @@
       "type": "local",
       "access": "readwrite",
       "category": "ecosystem",
-      "command": "/bin/sh",
-      "args": ["-lc", "TOKEN=\"$(chitty-mcp-token chittymcp 2>/dev/null || true)\"; if [ -n \"$TOKEN\" ]; then export MCP_AUTH_HEADER=\"Bearer $TOKEN\"; fi; exec npx -y mcp-remote https://mcp.chitty.cc/mcp"],
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://mcp.chitty.cc/mcp"],
       "lazy": true,
       "enabled": true
     },

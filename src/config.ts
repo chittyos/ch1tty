@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { homedir } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { ServerAccess, ServerCategory, ServerConfig, ServersConfig } from './types.js';
@@ -24,6 +25,35 @@ const SERVER_KEYS = new Set([
   'enabled',
   'env',
 ]);
+
+/**
+ * Expand ~ to home directory and ${VAR} / $VAR to environment variable values.
+ */
+export function interpolatePath(input: string): string {
+  let result = input;
+
+  // Expand leading ~/ or standalone ~
+  if (result.startsWith('~/') || result === '~') {
+    result = homedir() + result.slice(1);
+  }
+
+  // Expand ${VAR} and $VAR patterns
+  result = result.replace(/\$\{([^}]+)\}|\$([A-Za-z_][A-Za-z0-9_]*)/g, (_, braced, bare) => {
+    const varName = braced || bare;
+    return process.env[varName] ?? '';
+  });
+
+  return result;
+}
+
+function interpolateConfig(config: ServerConfig): ServerConfig {
+  return {
+    ...config,
+    command: config.command ? interpolatePath(config.command) : config.command,
+    args: config.args?.map(interpolatePath),
+    endpoint: config.endpoint ? interpolatePath(config.endpoint) : config.endpoint,
+  };
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -145,7 +175,7 @@ export function validateServersConfig(raw: unknown): ServersConfig {
 
   // Filter out comment-only entries (objects with just _comment)
   const entries = servers.filter((s) => !(isRecord(s) && '_comment' in s && Object.keys(s).length === 1));
-  const validated = entries.map((server, index) => validateServerConfig(server, index));
+  const validated = entries.map((server, index) => interpolateConfig(validateServerConfig(server, index)));
   const seen = new Set<string>();
   for (const server of validated) {
     if (seen.has(server.id)) {
