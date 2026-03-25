@@ -4,7 +4,7 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 
 const execFileAsync = promisify(execFile);
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
-import type { ServerConfig, ResourceEntry, ResourceTemplateEntry, PromptEntry, ToolEntry, ToolCallResult, BackendStatus, Backend } from './types.js';
+import type { ServerConfig, LocalServerConfig, ResourceEntry, ResourceTemplateEntry, PromptEntry, ToolEntry, ToolCallResult, BackendStatus, Backend, ContentItem } from './types.js';
 import { VERSION, withTimeout, normalizeToolResult } from './utils.js';
 
 interface ChildConnection {
@@ -18,10 +18,11 @@ interface ChildConnection {
 const TOOL_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 const SPAWN_TIMEOUT_MS = 30_000; // 30s to spawn + connect
 const LIST_TIMEOUT_MS = 15_000; // 15s to list tools after connected
+const CALL_TIMEOUT_MS = 120_000; // 2 min for tool calls
 
 export class ChildManager implements Backend {
   private children = new Map<string, ChildConnection>();
-  private configs = new Map<string, ServerConfig>();
+  private configs = new Map<string, LocalServerConfig>();
   private connecting = new Map<string, Promise<ChildConnection>>();
   private opAvailable: boolean | null = null;
 
@@ -33,7 +34,6 @@ export class ChildManager implements Backend {
   private async spawn(serverId: string): Promise<ChildConnection> {
     const config = this.configs.get(serverId);
     if (!config) throw new Error(`Unknown local server: ${serverId}`);
-    if (!config.command) throw new Error(`No command configured for server: ${serverId}`);
 
     const existing = this.children.get(serverId);
     if (existing) return existing;
@@ -49,6 +49,10 @@ export class ChildManager implements Backend {
       const conn = await promise;
       this.children.set(serverId, conn);
       return conn;
+    } catch (err) {
+      // On failure, ensure no stale connection is stored
+      this.children.delete(serverId);
+      throw err;
     } finally {
       this.connecting.delete(serverId);
     }
@@ -75,7 +79,7 @@ export class ChildManager implements Backend {
     return this.opAvailable;
   }
 
-  private async resolveEnv(config: ServerConfig): Promise<Record<string, string>> {
+  private async resolveEnv(config: LocalServerConfig): Promise<Record<string, string>> {
     const configEnv = config.env || {};
 
     // Resolve 1Password op:// references from config.env only (not process.env)
@@ -111,17 +115,23 @@ export class ChildManager implements Backend {
       }
     }
 
+    // Filter out undefined values from process.env before spreading
+    const baseEnv: Record<string, string> = {};
+    for (const [k, v] of Object.entries(process.env)) {
+      if (v !== undefined) baseEnv[k] = v;
+    }
+
     return {
-      ...process.env as Record<string, string>,
+      ...baseEnv,
       ...resolved,
     };
   }
 
-  private async doSpawn(config: ServerConfig): Promise<ChildConnection> {
+  private async doSpawn(config: LocalServerConfig): Promise<ChildConnection> {
     const env = await this.resolveEnv(config);
 
     const transport = new StdioClientTransport({
-      command: config.command!,
+      command: config.command,
       args: config.args || [],
       env,
       stderr: 'pipe',
@@ -180,8 +190,12 @@ export class ChildManager implements Backend {
   }
 
   async callTool(serverId: string, toolName: string, args: Record<string, unknown> = {}): Promise<ToolCallResult> {
-    const conn = await this.spawn(serverId);
-    const result = await conn.client.callTool({ name: toolName, arguments: args });
+    const conn = await withTimeout(this.spawn(serverId), SPAWN_TIMEOUT_MS, `spawn ${serverId}`);
+    const result = await withTimeout(
+      conn.client.callTool({ name: toolName, arguments: args }),
+      CALL_TIMEOUT_MS,
+      `callTool ${serverId}/${toolName}`,
+    );
     return normalizeToolResult(result as Record<string, unknown>);
   }
 
@@ -225,7 +239,7 @@ export class ChildManager implements Backend {
   async readResource(serverId: string, uri: string): Promise<{
     contents: Array<{ uri: string; mimeType?: string; text?: string; blob?: string }>;
   }> {
-    const conn = await this.spawn(serverId);
+    const conn = await withTimeout(this.spawn(serverId), SPAWN_TIMEOUT_MS, `spawn ${serverId}`);
     const result = await conn.client.readResource({ uri });
     return {
       contents: result.contents.map((c) => ({
@@ -272,15 +286,15 @@ export class ChildManager implements Backend {
 
   async getPrompt(serverId: string, name: string, promptArgs?: Record<string, string>): Promise<{
     description?: string;
-    messages: Array<{ role: string; content: { type: string; text: string } }>;
+    messages: Array<{ role: string; content: ContentItem }>;
   }> {
-    const conn = await this.spawn(serverId);
+    const conn = await withTimeout(this.spawn(serverId), SPAWN_TIMEOUT_MS, `spawn ${serverId}`);
     const result = await conn.client.getPrompt({ name, arguments: promptArgs });
     return {
       description: result.description,
       messages: result.messages.map((m) => ({
         role: m.role,
-        content: m.content as { type: string; text: string },
+        content: m.content as ContentItem,
       })),
     };
   }

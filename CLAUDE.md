@@ -3,7 +3,9 @@ uri: chittycanon://docs/tech/procedure/ch1tty-dev-guide
 namespace: chittycanon://docs/tech
 type: procedure
 version: 2.0.0
-status: ACTIVE
+status: CERTIFIED
+registered_with: chittycanon://core/services/canon
+certifier: chittycanon://core/services/chittycertify
 title: "Ch1tty Development Guide"
 visibility: PUBLIC
 ---
@@ -79,3 +81,25 @@ Add an entry to `servers.json`:
 ```
 
 No code changes required. Or call `ch1tty/reload` to pick up changes without restarting.
+
+## Health Server
+
+Set `CH1TTY_HEALTH_PORT` to enable an HTTP health endpoint (off by default):
+
+```bash
+CH1TTY_HEALTH_PORT=9099 npm start
+```
+
+Endpoints served on `127.0.0.1:{port}`:
+- `GET /health` — `{"status":"ok","service":"ch1tty","version":"2.0.0"}`
+- `GET /api/v1/status` — Full gateway status snapshot (uptime, servers, tool counts)
+
+Binds to localhost only. Used for registration compliance and process monitoring.
+
+## Registration
+
+Registration payload is in `register.json`. Submit to `register.chitty.cc`:
+
+```bash
+CHITTY_REGISTER_TOKEN=... ./scripts/register.sh
+```

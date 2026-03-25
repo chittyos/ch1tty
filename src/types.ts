@@ -8,20 +8,29 @@ export type ServerCategory =
   | 'documents'
   | 'communication';
 
-export interface ServerConfig {
+interface BaseServerConfig {
   id: string;
   name: string;
-  type: 'local' | 'remote';
   access: ServerAccess;
   category: ServerCategory;
-  command?: string;
-  args?: string[];
-  endpoint?: string;
-  authTokenKey?: string;
   lazy?: boolean;
   enabled?: boolean;
+}
+
+export interface LocalServerConfig extends BaseServerConfig {
+  type: 'local';
+  command: string;
+  args?: string[];
   env?: Record<string, string>;
 }
+
+export interface RemoteServerConfig extends BaseServerConfig {
+  type: 'remote';
+  endpoint: string;
+  authTokenKey?: string;
+}
+
+export type ServerConfig = LocalServerConfig | RemoteServerConfig;
 
 export interface ServersConfig {
   servers: ServerConfig[];
@@ -35,9 +44,15 @@ export interface AggregatedTool {
   inputSchema: Record<string, unknown>;
 }
 
+/** MCP content item — supports text, image, and resource types. */
+export type ContentItem =
+  | { type: 'text'; text: string }
+  | { type: 'image'; data: string; mimeType: string }
+  | { type: 'resource'; resource: { uri: string; mimeType?: string; text?: string; blob?: string } };
+
 export interface ToolCallResult {
   [key: string]: unknown;
-  content: Array<{ type: string; text: string }>;
+  content: ContentItem[];
   isError?: boolean;
 }
 
@@ -97,7 +112,7 @@ export interface Backend {
   readResource(serverId: string, uri: string): Promise<{ contents: Array<{ uri: string; mimeType?: string; text?: string; blob?: string }> }>;
 
   listPrompts(serverId: string): Promise<PromptEntry[]>;
-  getPrompt(serverId: string, name: string, args?: Record<string, string>): Promise<{ description?: string; messages: Array<{ role: string; content: { type: string; text: string } }> }>;
+  getPrompt(serverId: string, name: string, args?: Record<string, string>): Promise<{ description?: string; messages: Array<{ role: string; content: ContentItem }> }>;
 
   shutdown(): Promise<void>;
 }
