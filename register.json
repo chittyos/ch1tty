@@ -1,0 +1,21 @@
+{
+  "name": "ch1tty",
+  "description": "ChittyOS Universal MCP Gateway — aggregates all MCP backends behind one stdio server",
+  "version": "2.0.0",
+  "endpoints": ["/health", "/api/v1/status"],
+  "schema": {
+    "version": "1.0.0",
+    "entities": ["Server", "Tool", "Resource", "Prompt"],
+    "relationships": ["aggregates", "namespaces", "proxies"]
+  },
+  "security": {
+    "authentication": "apikey",
+    "encryption": "tls"
+  },
+  "metadata": {
+    "maintainer": "chittyos-infrastructure",
+    "transport": "stdio",
+    "health_port_env": "CH1TTY_HEALTH_PORT",
+    "repository": "github.com/CHITTYOS/ch1tty"
+  }
+}

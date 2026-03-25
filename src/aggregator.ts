@@ -5,10 +5,12 @@ import type {
   ServerStatus,
   ToolCallResult,
   Backend,
+  ContentItem,
 } from './types.js';
 import { ChildManager } from './child-manager.js';
 import { RemoteProxy } from './remote-proxy.js';
 import { loadConfigFromPath } from './config.js';
+import { VERSION } from './utils.js';
 
 const SEPARATOR = '/';
 const META_SERVER_ID = 'ch1tty';
@@ -95,7 +97,16 @@ export class Aggregator {
     }
   }
 
-  private async handleStatus(): Promise<ToolCallResult> {
+  getStatusSnapshot(): {
+    gateway: string;
+    version: string;
+    transport: string;
+    uptime: number;
+    totalServers: number;
+    connectedServers: number;
+    totalTools: number;
+    servers: ServerStatus[];
+  } {
     const statuses: ServerStatus[] = this.activeConfigs().map((config) => {
       const backend = this.backendFor(config.id);
       const status = backend?.getStatus(config.id) ?? { connected: false, toolCount: 0, toolCacheAge: null };
@@ -109,15 +120,20 @@ export class Aggregator {
       };
     });
 
-    const summary = {
+    return {
       gateway: 'ch1tty',
+      version: VERSION,
+      transport: 'stdio',
       uptime: Math.round((Date.now() - this.startedAt) / 1000),
       totalServers: statuses.length,
       connectedServers: statuses.filter((s) => s.connected).length,
       totalTools: statuses.reduce((sum, s) => sum + s.toolCount, 0),
       servers: statuses,
     };
+  }
 
+  private async handleStatus(): Promise<ToolCallResult> {
+    const summary = this.getStatusSnapshot();
     return {
       content: [{ type: 'text', text: JSON.stringify(summary, null, 2) }],
     };
@@ -139,9 +155,20 @@ export class Aggregator {
       const added = newConfig.servers.filter((c) => !oldIds.has(c.id));
       const removed = this.configs.filter((c) => !newIds.has(c.id));
 
-      await this.shutdown();
+      // Build new backends before shutting down old ones (atomic swap)
+      const oldBackends = this.backends;
       this.configs = newConfig.servers;
       this.rebuildBackends();
+
+      // Now shut down the old backends
+      const seen = new Set<Backend>();
+      const shutdowns: Promise<void>[] = [];
+      for (const backend of oldBackends.values()) {
+        if (seen.has(backend)) continue;
+        seen.add(backend);
+        shutdowns.push(backend.shutdown());
+      }
+      await Promise.allSettled(shutdowns);
 
       const result = {
         reloaded: true,
@@ -349,7 +376,7 @@ export class Aggregator {
 
   async getPrompt(namespacedName: string, args?: Record<string, string>): Promise<{
     description?: string;
-    messages: Array<{ role: string; content: { type: string; text: string } }>;
+    messages: Array<{ role: string; content: ContentItem }>;
   }> {
     const sepIndex = namespacedName.indexOf(SEPARATOR);
     if (sepIndex === -1) {

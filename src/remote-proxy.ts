@@ -1,8 +1,11 @@
-import { execFileSync } from 'node:child_process';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
-import type { ServerConfig, ResourceEntry, ResourceTemplateEntry, PromptEntry, ToolEntry, ToolCallResult, BackendStatus, Backend } from './types.js';
+import type { ServerConfig, RemoteServerConfig, ResourceEntry, ResourceTemplateEntry, PromptEntry, ToolEntry, ToolCallResult, BackendStatus, Backend, ContentItem } from './types.js';
 import { VERSION, withTimeout, normalizeToolResult } from './utils.js';
+
+const execFileAsync = promisify(execFile);
 
 interface TokenCache {
   token: string;
@@ -21,9 +24,10 @@ const TOOL_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 const TOKEN_CACHE_TTL = 11 * 60 * 60 * 1000; // 11 hours (tokens last 12hr)
 const CONNECT_TIMEOUT_MS = 15_000;
 const LIST_TIMEOUT_MS = 15_000;
+const CALL_TIMEOUT_MS = 120_000; // 2 min for tool calls
 
 export class RemoteProxy implements Backend {
-  private configs = new Map<string, ServerConfig>();
+  private configs = new Map<string, RemoteServerConfig>();
   private connections = new Map<string, RemoteConnection>();
   private connecting = new Map<string, Promise<RemoteConnection>>();
   private tokenCaches = new Map<string, TokenCache>();
@@ -33,7 +37,7 @@ export class RemoteProxy implements Backend {
     this.configs.set(config.id, config);
   }
 
-  private getAuthToken(config: ServerConfig): string | null {
+  private async getAuthToken(config: RemoteServerConfig): Promise<string | null> {
     if (!config.authTokenKey) return null;
 
     const cached = this.tokenCaches.get(config.id);
@@ -42,10 +46,10 @@ export class RemoteProxy implements Backend {
     }
 
     try {
-      const token = execFileSync('chitty-mcp-token', [config.authTokenKey], {
-        encoding: 'utf-8',
+      const { stdout } = await execFileAsync('chitty-mcp-token', [config.authTokenKey], {
         timeout: 10_000,
-      }).trim();
+      });
+      const token = stdout.trim();
 
       this.tokenCaches.set(config.id, {
         token,
@@ -64,7 +68,6 @@ export class RemoteProxy implements Backend {
   private async connect(serverId: string): Promise<RemoteConnection> {
     const config = this.configs.get(serverId);
     if (!config) throw new Error(`Unknown remote server: ${serverId}`);
-    if (!config.endpoint) throw new Error(`No endpoint configured for server: ${serverId}`);
 
     const existing = this.connections.get(serverId);
     if (existing) return existing;
@@ -80,19 +83,23 @@ export class RemoteProxy implements Backend {
       const conn = await promise;
       this.connections.set(serverId, conn);
       return conn;
+    } catch (err) {
+      // On failure, ensure no stale connection is stored
+      this.connections.delete(serverId);
+      throw err;
     } finally {
       this.connecting.delete(serverId);
     }
   }
 
-  private async doConnect(config: ServerConfig): Promise<RemoteConnection> {
+  private async doConnect(config: RemoteServerConfig): Promise<RemoteConnection> {
     const headers: Record<string, string> = {};
-    const token = this.getAuthToken(config);
+    const token = await this.getAuthToken(config);
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const url = new URL(config.endpoint!);
+    const url = new URL(config.endpoint);
     const transport = new StreamableHTTPClientTransport(url, {
       requestInit: {
         headers,
@@ -110,7 +117,7 @@ export class RemoteProxy implements Backend {
 
   async listTools(serverId: string): Promise<ToolEntry[]> {
     const config = this.configs.get(serverId);
-    if (!config?.endpoint) return [];
+    if (!config) return [];
 
     // Check cache before connecting
     const existing = this.connections.get(serverId);
@@ -147,7 +154,7 @@ export class RemoteProxy implements Backend {
 
   async callTool(serverId: string, toolName: string, args: Record<string, unknown> = {}): Promise<ToolCallResult> {
     const config = this.configs.get(serverId);
-    if (!config?.endpoint) {
+    if (!config) {
       return {
         content: [{ type: 'text', text: `Unknown remote server: ${serverId}` }],
         isError: true,
@@ -155,8 +162,12 @@ export class RemoteProxy implements Backend {
     }
 
     try {
-      const conn = await this.connect(serverId);
-      const result = await conn.client.callTool({ name: toolName, arguments: args });
+      const conn = await withTimeout(this.connect(serverId), CONNECT_TIMEOUT_MS, `connect ${serverId}`);
+      const result = await withTimeout(
+        conn.client.callTool({ name: toolName, arguments: args }),
+        CALL_TIMEOUT_MS,
+        `callTool ${serverId}/${toolName}`,
+      );
       return normalizeToolResult(result as Record<string, unknown>);
     } catch (err) {
       return {
@@ -168,7 +179,7 @@ export class RemoteProxy implements Backend {
 
   async listResources(serverId: string): Promise<{ resources: ResourceEntry[]; templates: ResourceTemplateEntry[] }> {
     const config = this.configs.get(serverId);
-    if (!config?.endpoint) return { resources: [], templates: [] };
+    if (!config) return { resources: [], templates: [] };
 
     const existing = this.connections.get(serverId);
     if (existing?.resourceCache && Date.now() < existing.resourceCache.expiresAt) {
@@ -206,7 +217,7 @@ export class RemoteProxy implements Backend {
   async readResource(serverId: string, uri: string): Promise<{
     contents: Array<{ uri: string; mimeType?: string; text?: string; blob?: string }>;
   }> {
-    const conn = await this.connect(serverId);
+    const conn = await withTimeout(this.connect(serverId), CONNECT_TIMEOUT_MS, `connect ${serverId}`);
     const result = await conn.client.readResource({ uri });
     return {
       contents: result.contents.map((c) => ({
@@ -220,7 +231,7 @@ export class RemoteProxy implements Backend {
 
   async listPrompts(serverId: string): Promise<PromptEntry[]> {
     const config = this.configs.get(serverId);
-    if (!config?.endpoint) return [];
+    if (!config) return [];
 
     const existing = this.connections.get(serverId);
     if (existing?.promptCache && Date.now() < existing.promptCache.expiresAt) {
@@ -253,15 +264,15 @@ export class RemoteProxy implements Backend {
 
   async getPrompt(serverId: string, name: string, promptArgs?: Record<string, string>): Promise<{
     description?: string;
-    messages: Array<{ role: string; content: { type: string; text: string } }>;
+    messages: Array<{ role: string; content: ContentItem }>;
   }> {
-    const conn = await this.connect(serverId);
+    const conn = await withTimeout(this.connect(serverId), CONNECT_TIMEOUT_MS, `connect ${serverId}`);
     const result = await conn.client.getPrompt({ name, arguments: promptArgs });
     return {
       description: result.description,
       messages: result.messages.map((m) => ({
         role: m.role,
-        content: m.content as { type: string; text: string },
+        content: m.content as ContentItem,
       })),
     };
   }

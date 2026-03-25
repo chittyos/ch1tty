@@ -3,7 +3,7 @@ uri: chittycanon://docs/tech/policy/ch1tty-charter
 namespace: chittycanon://docs/tech
 type: policy
 version: 2.0.0
-status: ACTIVE
+status: CERTIFIED
 registered_with: chittycanon://core/services/canon
 title: "Ch1tty Charter"
 certifier: chittycanon://core/services/chittycertify

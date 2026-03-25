@@ -13,6 +13,7 @@ import { Aggregator } from './aggregator.js';
 import type { AggregatorOptions } from './aggregator.js';
 import { loadConfigFromPath, resolveConfigPath } from './config.js';
 import { VERSION } from './utils.js';
+import { HealthServer } from './health-server.js';
 import type { ServerAccess, ServerCategory } from './types.js';
 
 async function main(): Promise<void> {
@@ -20,14 +21,28 @@ async function main(): Promise<void> {
   const config = loadConfigFromPath(configPath);
 
   const options: AggregatorOptions = { configPath };
-  if (process.env.CH1TTY_ACCESS) {
-    options.accessFilter = process.env.CH1TTY_ACCESS as ServerAccess;
+  const accessEnv = process.env.CH1TTY_ACCESS;
+  if (accessEnv) {
+    if (!['read', 'write', 'readwrite'].includes(accessEnv)) {
+      throw new Error(`Invalid CH1TTY_ACCESS value: "${accessEnv}". Must be read, write, or readwrite`);
+    }
+    options.accessFilter = accessEnv as ServerAccess;
   }
-  if (process.env.CH1TTY_CATEGORY) {
-    options.categoryFilter = process.env.CH1TTY_CATEGORY as ServerCategory;
+  const categoryEnv = process.env.CH1TTY_CATEGORY;
+  if (categoryEnv) {
+    options.categoryFilter = categoryEnv as ServerCategory;
   }
 
   const aggregator = new Aggregator(config.servers, options);
+
+  // Optional health HTTP server (for registration compliance + observability)
+  let healthServer: HealthServer | null = null;
+  const healthPort = process.env.CH1TTY_HEALTH_PORT ? parseInt(process.env.CH1TTY_HEALTH_PORT, 10) : null;
+  if (healthPort && Number.isFinite(healthPort)) {
+    healthServer = new HealthServer(aggregator, { port: healthPort });
+    await healthServer.start();
+    process.stderr.write(`[ch1tty] Health server listening on 127.0.0.1:${healthPort}\n`);
+  }
 
   const server = new Server(
     { name: 'ch1tty', version: VERSION },
@@ -69,6 +84,7 @@ async function main(): Promise<void> {
 
   // ── Lifecycle ───────────────────────────────────────────────
   const cleanup = async () => {
+    if (healthServer) await healthServer.stop();
     await aggregator.shutdown();
     await server.close();
     process.exit(0);

@@ -3,7 +3,7 @@ uri: chittycanon://docs/tech/architecture/ch1tty
 namespace: chittycanon://docs/tech
 type: architecture
 version: 2.0.0
-status: ACTIVE
+status: CERTIFIED
 registered_with: chittycanon://core/services/canon
 title: "Ch1tty Architecture"
 certifier: chittycanon://core/services/chittycertify
@@ -58,5 +58,5 @@ AI Client (Claude/Codex)
 | CLAUDE.md | Present |
 | CHARTER.md | Present |
 | CHITTY.md | Present |
-| Health endpoint | N/A (stdio server) |
-| Registry entry | Pending |
+| Health endpoint | Optional (CH1TTY_HEALTH_PORT) |
+| Registry entry | Ready (register.json) |

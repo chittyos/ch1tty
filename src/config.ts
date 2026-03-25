@@ -47,11 +47,16 @@ export function interpolatePath(input: string): string {
 }
 
 function interpolateConfig(config: ServerConfig): ServerConfig {
+  if (config.type === 'local') {
+    return {
+      ...config,
+      command: interpolatePath(config.command),
+      args: config.args?.map(interpolatePath),
+    };
+  }
   return {
     ...config,
-    command: config.command ? interpolatePath(config.command) : config.command,
-    args: config.args?.map(interpolatePath),
-    endpoint: config.endpoint ? interpolatePath(config.endpoint) : config.endpoint,
+    endpoint: interpolatePath(config.endpoint),
   };
 }
 
@@ -140,26 +145,38 @@ function validateServerConfig(raw: unknown, index: number): ServerConfig {
   const enabled = assertOptionalBoolean(raw.enabled, `${prefix}.enabled`);
   const env = assertOptionalEnv(raw.env, `${prefix}.env`);
 
-  if (type === 'local' && !command) {
-    throw new Error(`${prefix}.command is required for local servers`);
-  }
-  if (type === 'remote' && !endpoint) {
-    throw new Error(`${prefix}.endpoint is required for remote servers`);
+  if (type === 'local') {
+    if (!command) {
+      throw new Error(`${prefix}.command is required for local servers`);
+    }
+    return {
+      id,
+      name,
+      type,
+      access: access as ServerAccess,
+      category: category as ServerCategory,
+      command,
+      args,
+      lazy,
+      enabled,
+      env,
+    };
   }
 
+  // type === 'remote'
+  if (!endpoint) {
+    throw new Error(`${prefix}.endpoint is required for remote servers`);
+  }
   return {
     id,
     name,
     type,
     access: access as ServerAccess,
     category: category as ServerCategory,
-    command,
-    args,
     endpoint,
     authTokenKey,
     lazy,
     enabled,
-    env,
   };
 }
 
@@ -173,9 +190,14 @@ export function validateServersConfig(raw: unknown): ServersConfig {
     throw new Error('Config root must include a "servers" array');
   }
 
-  // Filter out comment-only entries (objects with just _comment)
-  const entries = servers.filter((s) => !(isRecord(s) && '_comment' in s && Object.keys(s).length === 1));
-  const validated = entries.map((server, index) => interpolateConfig(validateServerConfig(server, index)));
+  // Filter out comment-only entries (objects with just _comment), preserving original indexes
+  const indexed: Array<{ entry: unknown; originalIndex: number }> = [];
+  for (let i = 0; i < servers.length; i++) {
+    const s = servers[i];
+    if (isRecord(s) && '_comment' in s && Object.keys(s).length === 1) continue;
+    indexed.push({ entry: s, originalIndex: i });
+  }
+  const validated = indexed.map(({ entry, originalIndex }) => interpolateConfig(validateServerConfig(entry, originalIndex)));
   const seen = new Set<string>();
   for (const server of validated) {
     if (seen.has(server.id)) {

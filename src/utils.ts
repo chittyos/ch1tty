@@ -1,4 +1,4 @@
-import type { ToolCallResult } from './types.js';
+import type { ContentItem, ToolCallResult } from './types.js';
 
 export const VERSION = '2.0.0';
 
@@ -13,9 +13,9 @@ export function withTimeout<T>(promise: Promise<T>, ms: number, label: string): 
 }
 
 export function normalizeToolResult(result: Record<string, unknown>): ToolCallResult {
-  if ('content' in result) {
+  if ('content' in result && Array.isArray(result.content)) {
     return {
-      content: (result.content as Array<{ type: string; text: string }>),
+      content: (result.content as Array<Record<string, unknown>>).map(normalizeContentItem),
       isError: (result.isError as boolean | undefined) ?? false,
     };
   }
@@ -25,4 +25,18 @@ export function normalizeToolResult(result: Record<string, unknown>): ToolCallRe
     content: [{ type: 'text', text: JSON.stringify((result as { toolResult: unknown }).toolResult) }],
     isError: false,
   };
+}
+
+function normalizeContentItem(item: Record<string, unknown>): ContentItem {
+  switch (item.type) {
+    case 'image':
+      return { type: 'image', data: item.data as string, mimeType: item.mimeType as string };
+    case 'resource':
+      return {
+        type: 'resource',
+        resource: item.resource as { uri: string; mimeType?: string; text?: string; blob?: string },
+      };
+    default:
+      return { type: 'text', text: (item.text as string) ?? '' };
+  }
 }
