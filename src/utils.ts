@@ -1,6 +1,6 @@
 import type { ContentItem, ToolCallResult } from './types.js';
 
-export const VERSION = '2.0.0';
+export const VERSION = '2.1.0';
 
 export function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
   return new Promise((resolve, reject) => {

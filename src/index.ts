@@ -1,19 +1,10 @@
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import {
-  ListToolsRequestSchema,
-  CallToolRequestSchema,
-  ListResourcesRequestSchema,
-  ListResourceTemplatesRequestSchema,
-  ReadResourceRequestSchema,
-  ListPromptsRequestSchema,
-  GetPromptRequestSchema,
-} from '@modelcontextprotocol/sdk/types.js';
 import { Aggregator } from './aggregator.js';
 import type { AggregatorOptions } from './aggregator.js';
 import { loadConfigFromPath, resolveConfigPath } from './config.js';
 import { VERSION } from './utils.js';
-import { HealthServer } from './health-server.js';
+import { HttpServer } from './http-server.js';
+import { createMcpServer } from './mcp-server.js';
 import type { ServerAccess, ServerCategory } from './types.js';
 
 async function main(): Promise<void> {
@@ -35,58 +26,32 @@ async function main(): Promise<void> {
 
   const aggregator = new Aggregator(config.servers, options);
 
-  // Optional health HTTP server (for registration compliance + observability)
-  let healthServer: HealthServer | null = null;
-  const healthPort = process.env.CH1TTY_HEALTH_PORT ? parseInt(process.env.CH1TTY_HEALTH_PORT, 10) : null;
-  if (healthPort && Number.isFinite(healthPort)) {
-    healthServer = new HealthServer(aggregator, { port: healthPort });
-    await healthServer.start();
-    process.stderr.write(`[ch1tty] Health server listening on 127.0.0.1:${healthPort}\n`);
+  // HTTP server — health, status, and remote MCP endpoint
+  let httpServer: HttpServer | null = null;
+  const httpPort = process.env.CH1TTY_PORT
+    ? parseInt(process.env.CH1TTY_PORT, 10)
+    : process.env.CH1TTY_HEALTH_PORT
+      ? parseInt(process.env.CH1TTY_HEALTH_PORT, 10)
+      : null;
+  if (httpPort && Number.isFinite(httpPort)) {
+    const mcpToken = process.env.CH1TTY_MCP_TOKEN;
+    httpServer = new HttpServer(aggregator, {
+      port: httpPort,
+      enableMcp: true,
+      mcpToken,
+    });
+    await httpServer.start();
+    const mcpStatus = mcpToken ? 'auth required' : 'open';
+    process.stderr.write(`[ch1tty] HTTP server on 0.0.0.0:${httpPort} — /health /api/v1/status /mcp (${mcpStatus})\n`);
   }
 
-  const server = new Server(
-    { name: 'ch1tty', version: VERSION },
-    { capabilities: { tools: {}, resources: {}, prompts: {} } },
-  );
+  // Stdio MCP server for local clients (Claude Code, IDE)
+  const stdioServer = createMcpServer(aggregator);
 
-  // ── Tools ───────────────────────────────────────────────────
-  server.setRequestHandler(ListToolsRequestSchema, async () => {
-    return aggregator.listAllTools();
-  });
-
-  server.setRequestHandler(CallToolRequestSchema, async (request) => {
-    const { name, arguments: args } = request.params;
-    return aggregator.callTool(name, (args ?? {}) as Record<string, unknown>);
-  });
-
-  // ── Resources ───────────────────────────────────────────────
-  server.setRequestHandler(ListResourcesRequestSchema, async () => {
-    return aggregator.listAllResources();
-  });
-
-  server.setRequestHandler(ListResourceTemplatesRequestSchema, async () => {
-    return aggregator.listAllResourceTemplates();
-  });
-
-  server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
-    return aggregator.readResource(request.params.uri);
-  });
-
-  // ── Prompts ─────────────────────────────────────────────────
-  server.setRequestHandler(ListPromptsRequestSchema, async () => {
-    return aggregator.listAllPrompts();
-  });
-
-  server.setRequestHandler(GetPromptRequestSchema, async (request) => {
-    const { name, arguments: args } = request.params;
-    return aggregator.getPrompt(name, args);
-  });
-
-  // ── Lifecycle ───────────────────────────────────────────────
   const cleanup = async () => {
-    if (healthServer) await healthServer.stop();
+    if (httpServer) await httpServer.stop();
     await aggregator.shutdown();
-    await server.close();
+    await stdioServer.close();
     process.exit(0);
   };
 
@@ -94,7 +59,7 @@ async function main(): Promise<void> {
   process.on('SIGTERM', cleanup);
 
   const transport = new StdioServerTransport();
-  await server.connect(transport);
+  await stdioServer.connect(transport);
   process.stderr.write(`[ch1tty] MCP gateway v${VERSION} started\n`);
 }
 

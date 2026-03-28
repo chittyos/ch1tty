@@ -2,7 +2,7 @@
 uri: chittycanon://docs/tech/procedure/ch1tty-dev-guide
 namespace: chittycanon://docs/tech
 type: procedure
-version: 2.0.0
+version: 2.1.0
 status: CERTIFIED
 registered_with: chittycanon://core/services/canon
 certifier: chittycanon://core/services/chittycertify
@@ -14,7 +14,7 @@ visibility: PUBLIC
 
 ## What This Is
 
-Ch1tty is the ChittyOS universal MCP gateway. It aggregates all MCP servers (local stdio children + remote HTTP endpoints) behind a single stdio MCP server. AI clients connect to Ch1tty once instead of configuring 10+ individual servers.
+Ch1tty is the ChittyOS universal MCP gateway. It aggregates all MCP servers (local stdio children + remote HTTP endpoints) behind a single interface. Local clients connect via stdio, remote clients connect via Streamable HTTP at `/mcp`. This lets AI clients (Claude Code, Claude web, ChatGPT, CF Agents) access all backends — including local-only servers like Neon that can't run on Cloudflare Workers.
 
 ## Commands
 
@@ -26,7 +26,9 @@ npm run dev     # Watch mode for development
 
 ## Architecture
 
-- **Entry**: `src/index.ts` — creates `Server`, wires all MCP handlers, connects `StdioServerTransport`
+- **Entry**: `src/index.ts` — starts stdio transport + optional HTTP server, wires to aggregator
+- **MCP Server**: `src/mcp-server.ts` — shared factory creating configured `Server` instances for any transport
+- **HTTP Server**: `src/http-server.ts` — HTTP server: `/health`, `/api/v1/status`, `/mcp` (Streamable HTTP MCP)
 - **Aggregator**: `src/aggregator.ts` — routes namespaced calls to the correct `Backend` via `Map<serverId, Backend>`
 - **ChildManager**: `src/child-manager.ts` — implements `Backend` for local stdio child processes
 - **RemoteProxy**: `src/remote-proxy.ts` — implements `Backend` for HTTP MCP endpoints (connect.chitty.cc, Cloudflare, etc.)
@@ -82,19 +84,29 @@ Add an entry to `servers.json`:
 
 No code changes required. Or call `ch1tty/reload` to pick up changes without restarting.
 
-## Health Server
+## HTTP Server & Remote MCP
 
-Set `CH1TTY_HEALTH_PORT` to enable an HTTP health endpoint (off by default):
+Set `CH1TTY_PORT` (or `CH1TTY_HEALTH_PORT`) to enable the HTTP server:
 
 ```bash
-CH1TTY_HEALTH_PORT=9099 npm start
+CH1TTY_PORT=9099 npm start
+CH1TTY_MCP_TOKEN=secret123 CH1TTY_PORT=9099 npm start  # with auth
 ```
 
-Endpoints served on `127.0.0.1:{port}`:
-- `GET /health` — `{"status":"ok","service":"ch1tty","version":"2.0.0"}`
-- `GET /api/v1/status` — Full gateway status snapshot (uptime, servers, tool counts)
+Endpoints on `0.0.0.0:{port}`:
+- `GET /health` — `{"status":"ok","service":"ch1tty","version":"2.1.0"}`
+- `GET /api/v1/status` — Full gateway status snapshot
+- `POST /mcp` — **Streamable HTTP MCP endpoint** for remote clients
 
-Binds to localhost only. Used for registration compliance and process monitoring.
+The `/mcp` endpoint speaks the MCP Streamable HTTP transport protocol. Any MCP client can connect:
+- Claude web/desktop via remote MCP server config
+- ChatGPT via Apps & Connectors
+- Cloudflare Agents via `addMcpServer("ch1tty", "https://ch1tty.chitty.cc/mcp")`
+- MCP Inspector for testing
+
+Auth: if `CH1TTY_MCP_TOKEN` is set, requests must include `Authorization: Bearer <token>`.
+
+This is the key value prop — local-only servers (Neon, Playwright, filesystem) become accessible to remote AI clients through ch1tty's MCP surface.
 
 ## Registration
 
