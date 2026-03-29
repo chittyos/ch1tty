@@ -1,8 +1,8 @@
 {
   "servers": [
-
-    {"_comment": "── remote: HTTP endpoints (work everywhere) ──────────────────"},
-
+    {
+      "_comment": "\u2500\u2500 remote: HTTP endpoints (work everywhere) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500"
+    },
     {
       "id": "chittyos",
       "name": "ChittyOS Ecosystem",
@@ -36,9 +36,20 @@
       "lazy": true,
       "enabled": true
     },
-
-    {"_comment": "── local: portable stdio servers (npx/uvx, no hardcoded paths) ─"},
-
+    {
+      "id": "contextual",
+      "name": "ChittyContextual Intelligence",
+      "type": "remote",
+      "access": "read",
+      "category": "ecosystem",
+      "endpoint": "https://contextual.chitty.cc/agents/ContextualMcpAgent/",
+      "authTokenKey": "chittycontextual",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "_comment": "\u2500\u2500 local: portable stdio servers (npx/uvx, no hardcoded paths) \u2500"
+    },
     {
       "id": "neon",
       "name": "Neon Database",
@@ -46,7 +57,11 @@
       "access": "readwrite",
       "category": "ecosystem",
       "command": "npx",
-      "args": ["-y", "@neondatabase/mcp-server-neon", "start"],
+      "args": [
+        "-y",
+        "@neondatabase/mcp-server-neon",
+        "start"
+      ],
       "env": {
         "NEON_API_KEY": "op://ChittyOS-Integrations/neon/api_key"
       },
@@ -60,7 +75,10 @@
       "access": "read",
       "category": "documents",
       "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp@latest"],
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@latest"
+      ],
       "lazy": true,
       "enabled": true
     },
@@ -71,8 +89,21 @@
       "access": "read",
       "category": "reasoning",
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
       "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "cowork",
+      "name": "VM Shell Tools",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "desktop",
+      "endpoint": "http://127.0.0.1:8850/mcp",
+      "lazy": false,
       "enabled": true
     },
     {
@@ -82,7 +113,12 @@
       "access": "readwrite",
       "category": "desktop",
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem", "~/projects", "~/Documents"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "~/projects",
+        "~/Documents"
+      ],
       "lazy": true,
       "enabled": true
     },
@@ -93,13 +129,16 @@
       "access": "readwrite",
       "category": "desktop",
       "command": "npx",
-      "args": ["-y", "@playwright/mcp@latest"],
+      "args": [
+        "-y",
+        "@playwright/mcp@latest"
+      ],
       "lazy": true,
       "enabled": true
     },
-
-    {"_comment": "── macOS: run on homelab, TODO: proxy via ChittyConnect ───────"},
-
+    {
+      "_comment": "\u2500\u2500 macOS: run on homelab, TODO: proxy via ChittyConnect \u2500\u2500\u2500\u2500\u2500\u2500\u2500"
+    },
     {
       "id": "chittymac",
       "name": "Apple Notes (macOS homelab)",
@@ -107,7 +146,9 @@
       "access": "readwrite",
       "category": "communication",
       "command": "node",
-      "args": ["~/Desktop/Projects/github.com/CHITTYOS/chittymac/build/server.js"],
+      "args": [
+        "~/Desktop/Projects/github.com/CHITTYOS/chittymac/build/server.js"
+      ],
       "env": {
         "NEON_DATABASE_URL": "op://Connect Serv - Production/NEON Notion DB - ChittyChain /password"
       },
@@ -121,13 +162,15 @@
       "access": "readwrite",
       "category": "communication",
       "command": "node",
-      "args": ["~/.config/claude/mcp-servers/chitty-imessage/build/index.js"],
+      "args": [
+        "~/.config/claude/mcp-servers/chitty-imessage/build/index.js"
+      ],
       "lazy": true,
       "enabled": false
     },
-
-    {"_comment": "── disabled: need local install or not yet ported ────────────"},
-
+    {
+      "_comment": "\u2500\u2500 disabled: need local install or not yet ported \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500"
+    },
     {
       "id": "serena",
       "name": "Source Code Analysis",
@@ -135,7 +178,12 @@
       "access": "readwrite",
       "category": "code",
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/oraios/serena", "serena", "start-mcp-server"],
+      "args": [
+        "--from",
+        "git+https://github.com/oraios/serena",
+        "serena",
+        "start-mcp-server"
+      ],
       "lazy": true,
       "enabled": false
     },
@@ -146,7 +194,9 @@
       "access": "readwrite",
       "category": "ecosystem",
       "command": "node",
-      "args": ["~/.config/claude/mcp-servers/chitty-quality/build/index.js"],
+      "args": [
+        "~/.config/claude/mcp-servers/chitty-quality/build/index.js"
+      ],
       "env": {
         "NEON_DATABASE_URL": "op://Private/Neon/database_url"
       },
@@ -160,7 +210,10 @@
       "access": "readwrite",
       "category": "desktop",
       "command": "npx",
-      "args": ["-y", "@wonderwhy-er/desktop-commander@latest"],
+      "args": [
+        "-y",
+        "@wonderwhy-er/desktop-commander@latest"
+      ],
       "lazy": true,
       "enabled": false
     },
@@ -171,7 +224,9 @@
       "access": "readwrite",
       "category": "desktop",
       "command": "node",
-      "args": ["~/Library/Application Support/Claude/Claude Extensions/ant.dir.ant.anthropic.chrome-control/server/index.js"],
+      "args": [
+        "~/Library/Application Support/Claude/Claude Extensions/ant.dir.ant.anthropic.chrome-control/server/index.js"
+      ],
       "lazy": true,
       "enabled": false
     },
@@ -182,7 +237,9 @@
       "access": "write",
       "category": "documents",
       "command": "node",
-      "args": ["~/Library/Application Support/Claude/Claude Extensions/ant.dir.gh.silverstein.pdf-filler-simple/server/index.js"],
+      "args": [
+        "~/Library/Application Support/Claude/Claude Extensions/ant.dir.gh.silverstein.pdf-filler-simple/server/index.js"
+      ],
       "lazy": true,
       "enabled": false
     }
