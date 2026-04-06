@@ -53,7 +53,10 @@ async function main(): Promise<void> {
     }
   }
 
-  // Stdio transport — always active
+  // Stdio transport — always active, single session
+  const stdioSessionId = `stdio-${crypto.randomUUID().slice(0, 8)}`;
+  aggregator.sessions.getOrCreate(stdioSessionId, 'stdio');
+
   const server = new Server(
     { name: 'ch1tty', version: VERSION },
     { capabilities: { tools: {}, resources: {}, prompts: {} } },
@@ -65,7 +68,7 @@ async function main(): Promise<void> {
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params;
-    return aggregator.callTool(name, (args ?? {}) as Record<string, unknown>);
+    return aggregator.callTool(name, (args ?? {}) as Record<string, unknown>, stdioSessionId);
   });
 
   server.setRequestHandler(ListResourcesRequestSchema, async () => {
