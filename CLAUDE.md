@@ -96,10 +96,44 @@ Endpoints served on `127.0.0.1:{port}`:
 
 Binds to localhost only. Used for registration compliance and process monitoring.
 
-## Registration
+## Scripts
 
-Registration payload is in `register.json`. Submit to `register.chitty.cc`:
-
+### `scripts/register.sh`
+Submit registration payload to `register.chitty.cc`.
 ```bash
 CHITTY_REGISTER_TOKEN=... ./scripts/register.sh
 ```
+
+### `scripts/ch1tty-ingest.sh`
+Ingest Claude Code session logs into Ch1tty's local buffer. Replaces ingested sessions with a consolidated synthetic stub visible in `--resume` picker.
+
+```bash
+bash scripts/ch1tty-ingest.sh                    # All projects
+bash scripts/ch1tty-ingest.sh <project-slug>      # Single project
+```
+
+**What it does:**
+1. Scans `~/.claude/projects/*/` for `.jsonl` session files
+2. Skips active sessions (checks PIDs) and existing synthetic stubs
+3. Writes each session to `~/.claude/chittycontext/buffers/ingest-*.jsonl` as `SESSION_INGEST` events
+4. Archives originals to `.ingested/`
+5. Generates a two-line `session.jsonl` stub with topic summary extracted from first user messages
+
+**Stub preview in `--resume`:**
+```
+Consolidated context for CHITTYOS/chittyidentity — 14 sessions: task lifecycle | MCP gateway | compliance tests
+```
+
+**Automation:** Runs automatically on SessionStart when wired into `~/.claude/settings.json` hooks:
+```json
+{
+  "hooks": {
+    "SessionStart": [{
+      "matcher": "startup",
+      "hooks": [{ "type": "command", "command": "ch1tty-ingest.sh 2>/dev/null &" }]
+    }]
+  }
+}
+```
+
+**Canon compliance:** Uses `chitty_id` field naming, `@canon: chittycanon://gov/governance#core-types` annotation. Buffer entries are `SESSION_INGEST` event type (pending enum addition to chittyledger schema).
