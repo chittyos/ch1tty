@@ -11,6 +11,9 @@ import { ChildManager } from './child-manager.js';
 import { RemoteProxy } from './remote-proxy.js';
 import { loadConfigFromPath } from './config.js';
 import { VERSION } from './utils.js';
+import * as alchemist from './alchemist.js';
+import { ChittyTaskClient } from './task-client.js';
+import type { AuthInfo } from '@modelcontextprotocol/sdk/server/auth/types.js';
 
 const SEPARATOR = '/';
 const META_SERVER_ID = 'ch1tty';
@@ -21,6 +24,11 @@ export interface AggregatorOptions {
   configPath?: string;
 }
 
+export interface ToolExecutionContext {
+  authInfo?: AuthInfo;
+  sessionId?: string;
+}
+
 export class Aggregator {
   private backends = new Map<string, Backend>();
   private configs: ServerConfig[];
@@ -28,6 +36,7 @@ export class Aggregator {
   private categoryFilter?: ServerCategory;
   private configPath?: string;
   private startedAt = Date.now();
+  private taskClient = new ChittyTaskClient();
 
   constructor(configs: ServerConfig[], options?: AggregatorOptions) {
     this.accessFilter = options?.accessFilter;
@@ -80,15 +89,182 @@ export class Aggregator {
         description: '[ch1tty] Hot-reload servers.json without restarting the gateway',
         inputSchema: { type: 'object' },
       },
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}alchemist_discover`,
+        description: '[ch1tty] The Alchemist — scan all backends, map tool capabilities, categories, and server groupings',
+        inputSchema: { type: 'object' },
+      },
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}alchemist_combos`,
+        description: '[ch1tty] The Alchemist — detect composable tool chains, cross-backend pipelines, and workflow patterns',
+        inputSchema: { type: 'object' },
+      },
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}alchemist_prompts`,
+        description: '[ch1tty] The Alchemist — generate optimized prompt strings tailored to the current tool surface',
+        inputSchema: { type: 'object' },
+      },
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}alchemist_suggest`,
+        description: '[ch1tty] The Alchemist — given a goal, returns a recipe: which tools, what order, what prompts',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            goal: {
+              type: 'string',
+              description: 'What you want to accomplish (e.g. "track evidence", "monitor services", "query finances")',
+            },
+          },
+          required: ['goal'],
+        },
+      },
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}task_list`,
+        description: '[ch1tty] Canonical task management — list tasks from Chitty task service',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            sessionId: { type: 'string', description: 'Optional explicit session id override' },
+            status: { type: 'string', description: 'Optional task status filter' },
+            limit: { type: 'number', description: 'Optional max tasks to return' },
+          },
+        },
+      },
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}task_create`,
+        description: '[ch1tty] Canonical task management — create a tracked task in Chitty task service',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            title: { type: 'string', description: 'Task title' },
+            description: { type: 'string', description: 'Optional task description' },
+            taskType: { type: 'string', description: 'Task classification, defaults to user_request' },
+            priority: { type: 'string', description: 'Priority, for example low, normal, high' },
+            metadata: { type: 'object', description: 'Optional structured metadata' },
+          },
+          required: ['title'],
+        },
+      },
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}task_get`,
+        description: '[ch1tty] Canonical task management — fetch a single task by id',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            taskId: { type: 'string', description: 'Task identifier' },
+          },
+          required: ['taskId'],
+        },
+      },
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}task_update`,
+        description: '[ch1tty] Canonical task management — update task state, assignment, or result',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            taskId: { type: 'string', description: 'Task identifier' },
+            status: { type: 'string', description: 'New task status' },
+            title: { type: 'string', description: 'Updated title' },
+            description: { type: 'string', description: 'Updated description' },
+            priority: { type: 'string', description: 'Updated priority' },
+            assignedService: { type: 'string', description: 'Owning service id' },
+            result: { type: 'object', description: 'Structured task result payload' },
+            error: { type: 'string', description: 'Failure detail for failed tasks' },
+          },
+          required: ['taskId'],
+        },
+      },
+      // ── Ledger write tools — model/channel agnostic ──
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}log_decision`,
+        description: '[ch1tty] Log a decision to the entity\'s ChittyLedger — auditable, cross-channel visible',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            decision: { type: 'string', description: 'What was decided' },
+            reasoning: { type: 'string', description: 'Why — the rationale' },
+            topic: { type: 'string', description: 'Which workstream/topic this relates to' },
+            project: { type: 'string', description: 'Project context (auto-detected from session if omitted)' },
+          },
+          required: ['decision'],
+        },
+      },
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}log_event`,
+        description: '[ch1tty] Log a generic event to ChittyLedger — tool calls, outcomes, observations',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            action: { type: 'string', description: 'What happened' },
+            type: { type: 'string', description: 'Event type: tool_call, outcome, observation, milestone' },
+            topic: { type: 'string', description: 'Workstream/topic' },
+            project: { type: 'string', description: 'Project context' },
+            metadata: { type: 'object', description: 'Structured data about the event' },
+          },
+          required: ['action'],
+        },
+      },
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}update_workstream`,
+        description: '[ch1tty] Tag events to a workstream or create a new workstream',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            workstream: { type: 'string', description: 'Workstream name (existing or new)' },
+            status: { type: 'string', description: 'active, paused, completed' },
+            summary: { type: 'string', description: 'Current state of this workstream' },
+          },
+          required: ['workstream'],
+        },
+      },
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}session_checkpoint`,
+        description: '[ch1tty] Checkpoint current session — flush events to ledger, snapshot state',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            summary: { type: 'string', description: 'What was accomplished since last checkpoint' },
+            nextSteps: { type: 'string', description: 'What should happen next' },
+          },
+        },
+      },
     ];
   }
 
-  private async handleMetaTool(toolName: string): Promise<ToolCallResult> {
+  private async handleMetaTool(
+    toolName: string,
+    args?: Record<string, unknown>,
+    context?: ToolExecutionContext,
+  ): Promise<ToolCallResult> {
     switch (toolName) {
       case 'status':
         return this.handleStatus();
       case 'reload':
         return this.handleReload();
+      case 'alchemist_discover':
+        return this.handleAlchemist('discover');
+      case 'alchemist_combos':
+        return this.handleAlchemist('combos');
+      case 'alchemist_prompts':
+        return this.handleAlchemist('prompts');
+      case 'alchemist_suggest':
+        return this.handleAlchemist('suggest', args?.goal as string);
+      case 'task_list':
+        return this.handleTaskTool('list', args, context);
+      case 'task_create':
+        return this.handleTaskTool('create', args, context);
+      case 'task_get':
+        return this.handleTaskTool('get', args, context);
+      case 'task_update':
+        return this.handleTaskTool('update', args, context);
+      case 'log_decision':
+        return this.handleLedgerWrite('DECISION', args, context);
+      case 'log_event':
+        return this.handleLedgerWrite('EVENT', args, context);
+      case 'update_workstream':
+        return this.handleLedgerWrite('WORKSTREAM', args, context);
+      case 'session_checkpoint':
+        return this.handleLedgerWrite('CHECKPOINT', args, context);
       default:
         return {
           content: [{ type: 'text', text: `Unknown meta-tool: ${toolName}` }],
@@ -189,6 +365,125 @@ export class Aggregator {
     }
   }
 
+  // ── Alchemist ────────────────────────────────────────────────
+
+  private async handleAlchemist(mode: 'discover' | 'combos' | 'prompts' | 'suggest', goal?: string): Promise<ToolCallResult> {
+    try {
+      const { tools: allTools } = await this.listAllTools();
+      // Filter out meta-tools for cleaner analysis
+      const tools = allTools.filter((t) => !t.name.startsWith(`${META_SERVER_ID}${SEPARATOR}`));
+
+      let result: unknown;
+      switch (mode) {
+        case 'discover':
+          result = alchemist.discover(tools as Array<{ name: string; description?: string; inputSchema: Record<string, unknown> }>);
+          break;
+        case 'combos':
+          result = alchemist.combos(tools as Array<{ name: string; description?: string; inputSchema: Record<string, unknown> }>);
+          break;
+        case 'prompts':
+          result = alchemist.prompts(tools as Array<{ name: string; description?: string; inputSchema: Record<string, unknown> }>);
+          break;
+        case 'suggest':
+          if (!goal) {
+            return {
+              content: [{ type: 'text', text: 'The "goal" parameter is required for alchemist_suggest' }],
+              isError: true,
+            };
+          }
+          result = alchemist.suggest(goal, tools as Array<{ name: string; description?: string; inputSchema: Record<string, unknown> }>);
+          if (!result) {
+            return {
+              content: [{ type: 'text', text: `No recipe found for goal: "${goal}". Try broader terms like "evidence", "finance", "monitor", "memory", or "data".` }],
+            };
+          }
+          break;
+      }
+
+      return {
+        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+      };
+    } catch (err) {
+      return {
+        content: [{ type: 'text', text: `Alchemist error: ${String(err)}` }],
+        isError: true,
+      };
+    }
+  }
+
+  // ── Task Management ───────────────────────────────────────────
+
+  private async handleTaskTool(
+    mode: 'list' | 'create' | 'get' | 'update',
+    args: Record<string, unknown> = {},
+    context?: ToolExecutionContext,
+  ): Promise<ToolCallResult> {
+    if (!this.taskClient.isConfigured()) {
+      return this.taskClient.missingConfigResult();
+    }
+
+    try {
+      let result: unknown;
+      switch (mode) {
+        case 'list':
+          result = await this.taskClient.listTasks({
+            sessionId: asString(args.sessionId),
+            status: asString(args.status),
+            limit: asNumber(args.limit),
+          }, toTaskContext(context));
+          break;
+        case 'create': {
+          const title = asString(args.title);
+          if (!title) {
+            return missingArgResult('title', 'task_create');
+          }
+          result = await this.taskClient.createTask({
+            title,
+            description: asString(args.description),
+            taskType: asString(args.taskType),
+            priority: asString(args.priority),
+            metadata: asRecord(args.metadata),
+            sessionId: asString(args.sessionId),
+          }, toTaskContext(context));
+          break;
+        }
+        case 'get': {
+          const taskId = asString(args.taskId);
+          if (!taskId) {
+            return missingArgResult('taskId', 'task_get');
+          }
+          result = await this.taskClient.getTask(taskId);
+          break;
+        }
+        case 'update': {
+          const taskId = asString(args.taskId);
+          if (!taskId) {
+            return missingArgResult('taskId', 'task_update');
+          }
+          result = await this.taskClient.updateTask(taskId, {
+            status: asString(args.status),
+            title: asString(args.title),
+            description: asString(args.description),
+            priority: asString(args.priority),
+            assignedService: asString(args.assignedService),
+            result: asRecord(args.result),
+            error: asString(args.error),
+          }, toTaskContext(context));
+          break;
+        }
+      }
+
+      return {
+        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+      };
+    } catch (err) {
+      return {
+        content: [{ type: 'text', text: `Task management error: ${String(err)}` }],
+        isError: true,
+      };
+    }
+  }
+
   // ── Tools ─────────────────────────────────────────────────────
 
   async listAllTools(): Promise<{
@@ -228,7 +523,11 @@ export class Aggregator {
     return { tools: [...this.metaTools(), ...tools] };
   }
 
-  async callTool(namespacedName: string, args: Record<string, unknown> = {}): Promise<ToolCallResult> {
+  async callTool(
+    namespacedName: string,
+    args: Record<string, unknown> = {},
+    context?: ToolExecutionContext,
+  ): Promise<ToolCallResult> {
     const sepIndex = namespacedName.indexOf(SEPARATOR);
     const knownServers = [META_SERVER_ID, ...this.configs.map((config) => config.id)].join(', ') || '(none)';
     if (sepIndex === -1) {
@@ -245,7 +544,7 @@ export class Aggregator {
     const toolName = namespacedName.slice(sepIndex + 1);
 
     if (serverId === META_SERVER_ID) {
-      return this.handleMetaTool(toolName);
+      return this.handleMetaTool(toolName, args, context);
     }
 
     const backend = this.backendFor(serverId);
@@ -293,8 +592,32 @@ export class Aggregator {
     });
 
     const results = await Promise.allSettled(resourcePromises);
+    const backendResources = results.flatMap((r) => r.status === 'fulfilled' ? r.value : []);
+
+    // Native Ch1tty resources — model/channel agnostic session awareness
+    const nativeResources = [
+      {
+        uri: 'ch1tty://sessions/active',
+        name: '[ch1tty] Active Sessions',
+        description: 'All active sessions across this machine — parallel session awareness',
+        mimeType: 'application/json',
+      },
+      {
+        uri: 'ch1tty://workstreams',
+        name: '[ch1tty] Workstreams',
+        description: 'Workstream index — topics/projects across all sessions and channels',
+        mimeType: 'application/json',
+      },
+      {
+        uri: 'ch1tty://resume',
+        name: '[ch1tty] Resume Context',
+        description: 'Synthesized context for resuming work — cross-session, cross-channel',
+        mimeType: 'application/json',
+      },
+    ];
+
     return {
-      resources: results.flatMap((r) => r.status === 'fulfilled' ? r.value : []),
+      resources: [...nativeResources, ...backendResources],
     };
   }
 
@@ -328,6 +651,11 @@ export class Aggregator {
   async readResource(uri: string): Promise<{
     contents: Array<{ uri: string; mimeType?: string; text?: string; blob?: string }>;
   }> {
+    // ── Native Ch1tty resources ──
+    if (uri.startsWith('ch1tty://')) {
+      return this.readNativeResource(uri);
+    }
+
     const match = uri.match(/^([^:]+):\/\/(.+)$/);
     if (!match) {
       throw new Error(`Invalid namespaced resource URI: ${uri}`);
@@ -340,6 +668,128 @@ export class Aggregator {
     }
 
     return backend.readResource(serverId, originalUri);
+  }
+
+  /**
+   * Native Ch1tty resources — session awareness, workstreams, resume.
+   * Model/channel agnostic. Any MCP client gets this.
+   */
+  private async readNativeResource(uri: string): Promise<{
+    contents: Array<{ uri: string; mimeType?: string; text?: string }>;
+  }> {
+    const path = uri.replace('ch1tty://', '');
+
+    if (path === 'sessions/active') {
+      // Scan local sessions + check for cross-machine sessions from ledger
+      const sessions = await this.getActiveSessions();
+      return {
+        contents: [{ uri, mimeType: 'application/json', text: JSON.stringify(sessions, null, 2) }],
+      };
+    }
+
+    if (path === 'workstreams') {
+      // Workstream index — from local cache or Neon
+      const workstreams = await this.getWorkstreams();
+      return {
+        contents: [{ uri, mimeType: 'application/json', text: JSON.stringify(workstreams, null, 2) }],
+      };
+    }
+
+    if (path === 'resume') {
+      // Synthesized resume context
+      const resume = await this.getResumeContext();
+      return {
+        contents: [{ uri, mimeType: 'application/json', text: JSON.stringify(resume, null, 2) }],
+      };
+    }
+
+    throw new Error(`Unknown ch1tty resource: ${uri}`);
+  }
+
+  /** Scan ~/.claude/sessions/ for active pids, grouped by cwd */
+  private async getActiveSessions(): Promise<{
+    sessions: Array<{ pid: number; cwd: string; sessionId: string; startedAt: number; alive: boolean }>;
+    byProject: Record<string, number>;
+  }> {
+    const fs = await import('fs/promises');
+    const path = await import('path');
+    const os = await import('os');
+    const sessionsDir = path.join(os.homedir(), '.claude', 'sessions');
+
+    const sessions: Array<{ pid: number; cwd: string; sessionId: string; startedAt: number; alive: boolean }> = [];
+    const byProject: Record<string, number> = {};
+
+    try {
+      const files = await fs.readdir(sessionsDir);
+      for (const file of files) {
+        if (!file.endsWith('.json')) continue;
+        try {
+          const data = JSON.parse(await fs.readFile(path.join(sessionsDir, file), 'utf-8'));
+          let alive = false;
+          try {
+            process.kill(data.pid, 0);
+            alive = true;
+          } catch { /* dead */ }
+
+          if (alive) {
+            sessions.push({
+              pid: data.pid,
+              cwd: data.cwd,
+              sessionId: data.sessionId,
+              startedAt: data.startedAt,
+              alive,
+            });
+            const project = data.cwd?.split('/').pop() || 'unknown';
+            byProject[project] = (byProject[project] || 0) + 1;
+          }
+        } catch { /* skip malformed */ }
+      }
+    } catch { /* sessions dir may not exist */ }
+
+    return { sessions, byProject };
+  }
+
+  /** Get workstream index — local cache file or empty */
+  private async getWorkstreams(): Promise<{ workstreams: unknown[] }> {
+    const fs = await import('fs/promises');
+    const path = await import('path');
+    const os = await import('os');
+    const indexFile = path.join(os.homedir(), '.claude', 'chittycontext', 'workstream_index.json');
+
+    try {
+      const data = JSON.parse(await fs.readFile(indexFile, 'utf-8'));
+      return data;
+    } catch {
+      return { workstreams: [] };
+    }
+  }
+
+  /** Get resume context — checkpoint + active sessions + workstreams */
+  private async getResumeContext(): Promise<Record<string, unknown>> {
+    const fs = await import('fs/promises');
+    const path = await import('path');
+    const os = await import('os');
+
+    const sessions = await this.getActiveSessions();
+    const workstreams = await this.getWorkstreams();
+
+    // Find most recent checkpoint
+    const checkpointsDir = path.join(os.homedir(), '.claude', 'checkpoints');
+    let latestCheckpoint: string | null = null;
+    try {
+      const files = await fs.readdir(checkpointsDir);
+      const latest = files.filter(f => f.endsWith('-latest.md')).sort().pop();
+      if (latest) {
+        latestCheckpoint = await fs.readFile(path.join(checkpointsDir, latest), 'utf-8');
+      }
+    } catch { /* no checkpoints */ }
+
+    return {
+      activeSessions: sessions,
+      workstreams,
+      checkpoint: latestCheckpoint ? { available: true, preview: latestCheckpoint.slice(0, 500) } : null,
+      resumeFrom: 'ch1tty://resume',
+    };
   }
 
   // ── Prompts ───────────────────────────────────────────────────
@@ -369,8 +819,27 @@ export class Aggregator {
     });
 
     const results = await Promise.allSettled(promptPromises);
+    const backendPrompts = results.flatMap((r) => r.status === 'fulfilled' ? r.value : []);
+
+    // Native Ch1tty prompts — model/channel agnostic
+    const nativePrompts = [
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}resume`,
+        description: '[ch1tty] Resume work — shows workstreams, active sessions, and synthesized context across all channels',
+        arguments: [
+          { name: 'topic', description: 'Optional: resume a specific topic or project', required: false },
+          { name: 'entity', description: 'Optional: resume as a specific ChittyID', required: false },
+        ],
+      },
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}session_context`,
+        description: '[ch1tty] Current session context — active parallel sessions, uncommitted work, workstream state',
+        arguments: [],
+      },
+    ];
+
     return {
-      prompts: results.flatMap((r) => r.status === 'fulfilled' ? r.value : []),
+      prompts: [...nativePrompts, ...backendPrompts],
     };
   }
 
@@ -386,12 +855,115 @@ export class Aggregator {
     const serverId = namespacedName.slice(0, sepIndex);
     const promptName = namespacedName.slice(sepIndex + 1);
 
+    // ── Native Ch1tty prompts ──
+    if (serverId === META_SERVER_ID) {
+      return this.getNativePrompt(promptName, args);
+    }
+
     const backend = this.backendFor(serverId);
     if (!backend) {
       throw new Error(`Unknown server "${serverId}" for prompt: ${namespacedName}`);
     }
 
     return backend.getPrompt(serverId, promptName, args);
+  }
+
+  /** Handle ledger write tools — writes to local buffer, daemon flushes to Neon */
+  private async handleLedgerWrite(
+    type: string,
+    args?: Record<string, unknown>,
+    _context?: ToolExecutionContext,
+  ): Promise<ToolCallResult> {
+    const fs = await import('fs/promises');
+    const path = await import('path');
+    const os = await import('os');
+
+    const bufferDir = path.join(os.homedir(), '.claude', 'chittycontext', 'buffers');
+    await fs.mkdir(bufferDir, { recursive: true });
+
+    const bufferFile = path.join(bufferDir, `session-${process.pid}.jsonl`);
+
+    const event: Record<string, unknown> = {
+      type,
+      timestamp: new Date().toISOString(),
+      pid: process.pid,
+      ...args,
+    };
+
+    // Append to session buffer (fast, local, ~1ms)
+    await fs.appendFile(bufferFile, JSON.stringify(event) + '\n');
+
+    const messages: Record<string, string> = {
+      DECISION: `Decision logged: "${args?.decision || '?'}"`,
+      EVENT: `Event logged: "${args?.action || '?'}"`,
+      WORKSTREAM: `Workstream "${args?.workstream || '?'}" updated`,
+      CHECKPOINT: `Checkpoint saved: "${args?.summary || 'session state'}"`,
+    };
+
+    return {
+      content: [{
+        type: 'text',
+        text: messages[type] || `Logged ${type} event to session buffer. Daemon will flush to ChittyLedger.`,
+      }],
+    };
+  }
+
+  /** Native Ch1tty prompts — resume, session context */
+  private async getNativePrompt(name: string, args?: Record<string, string>): Promise<{
+    description?: string;
+    messages: Array<{ role: string; content: ContentItem }>;
+  }> {
+    if (name === 'resume') {
+      const resume = await this.getResumeContext();
+      const sessions = resume.activeSessions as { sessions: unknown[]; byProject: Record<string, number> };
+      const workstreams = resume.workstreams as { workstreams: unknown[] };
+
+      let text = '# Resume Context\n\n';
+      text += `## Active Sessions\n${JSON.stringify(sessions.byProject, null, 2)}\n\n`;
+      text += `## Workstreams\n${JSON.stringify(workstreams.workstreams, null, 2)}\n\n`;
+
+      if (resume.checkpoint) {
+        text += `## Latest Checkpoint\n${(resume.checkpoint as { preview: string }).preview}\n`;
+      }
+
+      if (args?.topic) {
+        text += `\n## Requested Topic: ${args.topic}\n`;
+        text += 'Filter the above context to this topic and present relevant workstreams.\n';
+      }
+
+      return {
+        description: 'Resume work from where you or any channel left off',
+        messages: [{
+          role: 'user',
+          content: { type: 'text', text },
+        }],
+      };
+    }
+
+    if (name === 'session_context') {
+      const sessions = await this.getActiveSessions();
+      const workstreams = await this.getWorkstreams();
+
+      let text = '# Current Session Context\n\n';
+      text += `Active sessions: ${sessions.sessions.length}\n`;
+      text += `By project: ${JSON.stringify(sessions.byProject)}\n\n`;
+
+      if (sessions.sessions.length > 1) {
+        text += '**WARNING: Parallel sessions active.** Check git diff --stat before modifying files.\n\n';
+      }
+
+      text += `Workstreams: ${JSON.stringify(workstreams, null, 2)}\n`;
+
+      return {
+        description: 'Current session awareness — parallel sessions, workstream state',
+        messages: [{
+          role: 'user',
+          content: { type: 'text', text },
+        }],
+      };
+    }
+
+    throw new Error(`Unknown ch1tty prompt: ${name}`);
   }
 
   // ── Lifecycle ─────────────────────────────────────────────────
@@ -409,4 +981,46 @@ export class Aggregator {
     await Promise.allSettled(shutdowns);
     this.backends.clear();
   }
+}
+
+function asString(value: unknown): string | undefined {
+  return typeof value === 'string' && value.length > 0 ? value : undefined;
+}
+
+function asNumber(value: unknown): number | undefined {
+  return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+}
+
+function asRecord(value: unknown): Record<string, unknown> | undefined {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return undefined;
+  }
+  return value as Record<string, unknown>;
+}
+
+function missingArgResult(argName: string, toolName: string): ToolCallResult {
+  return {
+    content: [{ type: 'text', text: `The "${argName}" parameter is required for ${toolName}` }],
+    isError: true,
+  };
+}
+
+function toTaskContext(context?: ToolExecutionContext): {
+  sessionId?: string;
+  auth?: {
+    clientId?: string;
+    scopes?: string[];
+    token?: string;
+  };
+} {
+  return {
+    sessionId: context?.sessionId,
+    auth: context?.authInfo
+      ? {
+          clientId: context.authInfo.clientId,
+          scopes: context.authInfo.scopes,
+          token: context.authInfo.token,
+        }
+      : undefined,
+  };
 }

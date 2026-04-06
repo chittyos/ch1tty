@@ -2,8 +2,8 @@
 uri: chittycanon://docs/tech/policy/ch1tty-charter
 namespace: chittycanon://docs/tech
 type: policy
-version: 2.0.0
-status: CERTIFIED
+version: 3.0.0
+status: ACTIVE
 registered_with: chittycanon://core/services/canon
 title: "Ch1tty Charter"
 certifier: chittycanon://core/services/chittycertify
@@ -20,66 +20,165 @@ visibility: PUBLIC
 |-------|-------|
 | Name | Ch1tty |
 | ID | ch1tty |
-| Tier | 2 (Platform) |
-| Domain | Infrastructure / MCP Gateway |
+| Entity Type | Person (P, Synthetic) |
+| Tier | 0 (Core Engine) |
+| Domain | Intelligent Middleware Agent |
+| Runtime | Custom Ollama model + Node.js MCP aggregator |
+| URL | ch1tty.com |
 | Status | Active |
 
 ## Purpose
 
-Universal MCP gateway that aggregates all MCP servers into a single stdio connection. Replaces per-client multi-server configuration with one unified entry point.
+Ch1tty is the **intelligent middleware agent** for the ChittyOS ecosystem. It sits between users (and their myCh1tty instances) and all capabilities — tools, MCPs, plugins, services, cloud substrates.
 
-## API Contract
+Ch1tty is not a proxy. It is not a router. It is **meta** — it chooses which routing strategy to use, which orchestrator to invoke, or whether to bypass middleware entirely.
 
-Ch1tty exposes the standard MCP protocol over stdio:
+Ch1tty is a Person (P, Synthetic) — a custom Ollama model that makes judgment calls, not a config file that follows rules.
 
-### tools/list
-Returns the union of all backend tools, namespaced as `{serverId}/{toolName}`. Includes built-in meta-tools under `ch1tty/`.
+## What Ch1tty Does
 
-### tools/call
-Routes `{serverId}/{toolName}` calls to the appropriate backend (local child process or remote HTTP endpoint).
+### 1. Programmed Connections (System)
+Maintains 50+ system-level integrations available to all users:
+- ChittyOS services (connect, auth, register, etc.)
+- Cloud substrates (Claude, Gemini, GPT, Codex)
+- External services (Notion, GitHub, Stripe, Mercury, Neon)
+- Local MCP backends (filesystem, Playwright, sequential-thinking)
 
-### resources/list
-Returns the union of all backend resources, namespaced as `{serverId}://{originalUri}`.
+### 2. Meta-Routing (Strategy Selection)
+Doesn't route — chooses WHICH routing strategy fits the request:
 
-### resources/read
-Routes `{serverId}://{originalUri}` reads to the appropriate backend.
+| Strategy | When Ch1tty uses it |
+|----------|-------------------|
+| Orchestrator (TY-VY-RY) | Identity/trust matters |
+| Direct pass-through | Simple, trusted, go fast |
+| Parallel fan-out | Send to multiple substrates, merge results |
+| Queue/batch | Not urgent, batch for cron |
+| Alchemist-first | Unknown territory, learn before routing |
+| Direct connect | Recommend myCh1tty bypass middleware entirely |
+| Build new strategy | Alchemist proposes, Ch1tty adopts |
 
-### resourceTemplates/list
-Returns the union of all backend resource templates, namespaced as `{serverId}://{originalUriTemplate}`.
+### 3. System Learning (Non-identifiable)
+Learns from aggregate, non-identifiable system feedback:
+- Tool failure rates across all users → fix/retire
+- Usage frequency → prioritize connections
+- Request shapes with no tool → build new connections
+- Latency/health patterns → optimize globally
 
-### prompts/list
-Returns the union of all backend prompts, namespaced as `{serverId}/{promptName}`.
+### 4. User Preferences (Bounded, System-Defined)
+Tracks a defined, bounded set of per-user personalization:
+- Tool preferences (prefers Claude for code, Gemini for search)
+- Industry (legal, proptech, finance, dev)
+- Code preferences (language, style, conventions)
+- Active connections (which system connections enabled)
+- Behavioral patterns (timezone, work hours)
+- Interaction style (terse vs verbose)
 
-### prompts/get
-Routes `{serverId}/{promptName}` requests to the appropriate backend.
+These are FIELDS Ch1tty decided to track. A defined schema. Not open-ended learning.
+
+### 5. Gateway Policy Enforcement
+Enforces policies for all channels that route through Ch1tty:
+- Hook registry rules (synced from orchestrator KV)
+- Focal trust gating (RY-plane evaluation)
+- Credential scoping (per-user, per-connection)
+
+### 6. myCh1tty Middleware
+Serves as middleware for all myCh1tty instances:
+- myCh1tty custom connections route THROUGH Ch1tty's system connections
+- Ch1tty handles what it knows; myCh1tty handles what it doesn't
+- Ch1tty can recommend direct connections (bypass middleware) when warranted
+- Ch1tty can be a client OF myCh1tty when it needs user-specific context
+
+## Scope
+
+### IS Responsible For
+- All system-level connections (programmed integrations)
+- Meta-routing decisions (choosing the strategy, not just the route)
+- System learning from aggregate non-identifiable feedback
+- Bounded user preference tracking within defined schema
+- Gateway policy enforcement for all channels
+- Serving as middleware for myCh1tty instances
+- MCP aggregation (tools, resources, prompts from all backends)
+
+### IS NOT Responsible For
+- Custom user connections (myCh1tty's domain)
+- Unbounded user-specific learning (myCh1tty's domain)
+- User-specific alchemy/optimization (myCh1tty's domain)
+- Storing user credentials long-term (ChittyConnect / 1Password)
+- Identity minting (ChittyID / orchestrator)
+- Billing (ChittyCorp commercial layer)
+
+## Internal Organs
+
+These are how Ch1tty does its job — not standalone services:
+
+| Component | Role |
+|-----------|------|
+| Orchestrator | TY-VY-RY evaluation, registry, channels, lifecycle |
+| Alchemist | System telemetry → new tools, retirements, strategy proposals |
+| Gateway (chittyagent-ch1tty) | Cloud-facing MCP interface, OAuth, policy enforcement |
+| Daemon (chittymarket-sync) | Sync to local nodes/channels |
+| Lifecycle engine | Entity management, fission/fusion/suspension |
+| ChittyMarket | Capability catalog and manifest |
 
 ## Dependencies
 
 ### Upstream (Ch1tty depends on)
-- `connect.chitty.cc/mcp` — ChittyConnect MCP surface (`chittycanon://core/services/chittyconnect`)
-- `chitty-mcp-token` — Auth token helper (1Password-backed, via `chittycanon://core/services/auth`)
-- Local MCP servers (filesystem, context7, sequential-thinking, etc.)
-- Cloudflare MCP endpoints (builds, autorag)
+| Service | Purpose |
+|---------|---------|
+| connect.chitty.cc | ChittyConnect — state, credentials, intelligence APIs |
+| Neon (Hyperdrive) | Persistent analytics, task queue, entity state |
+| 1Password | Cold credential source |
+| Local MCP servers | Neon, Playwright, filesystem, context7 |
+| Cloud MCP endpoints | Cloudflare, builds, autorag |
 
 ### Downstream (depends on Ch1tty)
-- Claude Code (via `.mcp.json`)
-- Claude Desktop (via `claude_desktop_config.json`)
-- Codex (via `config.toml`)
-- Any MCP-compatible AI client
+| Consumer | Relationship |
+|----------|-------------|
+| myCh1tty instances | Ch1tty is their middleware layer |
+| Claude Code | Via daemon sync + MCP |
+| Claude Desktop / Mobile | Via chittyagent-ch1tty gateway |
+| ChatGPT | Via chittyagent-chatgpt → Ch1tty |
+| Codex / Codex App | Via MCP or REST adapter |
+| Gemini | Via ChittySeed template + webhooks |
+| Homelab nodes | Via daemon per node |
+| Any MCP-compatible client | Via universal channel protocol |
 
-## Scope Boundaries
+## Commercial Model
 
-### In Scope
-- Aggregating tool lists from multiple backends
-- Routing tool calls by namespace prefix
-- Aggregating resources and prompts from all backends
-- Managing child process lifecycle
-- Proxying HTTP MCP calls with auth
-- Caching tool lists and auth tokens
-- Meta-tools for gateway introspection (status, reload)
-- Config path interpolation (~ and env vars)
+Ch1tty is the **free tier** of the ChittyOS product:
+- All programmed connections: free / usage-based
+- System learning improves everyone's experience
+- Bounded user preferences personalize within the schema
+- When a user needs CUSTOM connections → myCh1tty (paid tier)
 
-### Out of Scope
-- Tool composition or chaining
-- Context-aware routing
-- Pattern learning from usage
+## API Contract
+
+### MCP Protocol (stdio + Streamable HTTP)
+- `tools/list` — Union of all backend tools, namespaced `{serverId}/{toolName}`
+- `tools/call` — Meta-routed to appropriate backend via strategy selection
+- `resources/list` — Union of all backend resources
+- `resources/read` — Routed to appropriate backend
+- `prompts/list` — Union of all backend prompts
+- `prompts/get` — Routed to appropriate backend
+
+### Channel Protocol (REST)
+- `POST /api/v1/channels/register` — New channel joins ecosystem
+- `GET /api/v1/seed` — ChittySeed template (live, not static)
+- `GET /api/v1/channels` — List registered channels
+
+### Registry API (REST)
+- `GET /api/v1/registry/{skills|agents|hooks}` — Current indices
+- `POST /api/v1/registry/{skills|agents|hooks}` — Register new capability
+- `GET /api/v1/lifecycle/{entities|signals}` — Entity state + signals
+
+## Ownership
+
+| Role | Owner |
+|------|-------|
+| Service Owner | ChittyCorp |
+| Technical Lead | [`03-1-USA-8244-P-2603-0-33`](https://agent.chitty.cc/api/v1/entity/03-1-USA-8244-P-2603-0-33) — P, Synthetic: ChittyOS architecture, middleware design, lifecycle engine |
+| Foundation Steward | ChittyFoundation (standards, certification) |
+| Contact | ch1tty@chitty.cc |
+
+---
+*Charter Version: 3.0.0 | Last Updated: 2026-04-06*

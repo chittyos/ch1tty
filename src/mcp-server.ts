@@ -12,7 +12,7 @@ import {
   ListPromptsRequestSchema,
   GetPromptRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
-import type { Aggregator } from './aggregator.js';
+import type { Aggregator, ToolExecutionContext } from './aggregator.js';
 import { VERSION } from './utils.js';
 
 export function createMcpServer(aggregator: Aggregator): Server {
@@ -25,9 +25,13 @@ export function createMcpServer(aggregator: Aggregator): Server {
     return aggregator.listAllTools();
   });
 
-  server.setRequestHandler(CallToolRequestSchema, async (request) => {
+  server.setRequestHandler(CallToolRequestSchema, async (request, extra) => {
     const { name, arguments: args } = request.params;
-    return aggregator.callTool(name, (args ?? {}) as Record<string, unknown>);
+    return aggregator.callTool(
+      name,
+      (args ?? {}) as Record<string, unknown>,
+      toToolExecutionContext(extra),
+    );
   });
 
   server.setRequestHandler(ListResourcesRequestSchema, async () => {
@@ -52,4 +56,14 @@ export function createMcpServer(aggregator: Aggregator): Server {
   });
 
   return server;
+}
+
+function toToolExecutionContext(extra: {
+  authInfo?: ToolExecutionContext['authInfo'];
+  sessionId?: string;
+}): ToolExecutionContext {
+  return {
+    authInfo: extra.authInfo,
+    sessionId: extra.sessionId,
+  };
 }
