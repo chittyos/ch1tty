@@ -6,6 +6,8 @@ const execFileAsync = promisify(execFile);
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import type { ServerConfig, LocalServerConfig, ResourceEntry, ResourceTemplateEntry, PromptEntry, ToolEntry, ToolCallResult, BackendStatus, Backend, ContentItem } from './types.js';
 import { VERSION, withTimeout, normalizeToolResult } from './utils.js';
+import { log } from './logger.js';
+import { CircuitBreaker } from './circuit-breaker.js';
 
 interface ChildConnection {
   client: Client;
@@ -25,6 +27,7 @@ export class ChildManager implements Backend {
   private configs = new Map<string, LocalServerConfig>();
   private connecting = new Map<string, Promise<ChildConnection>>();
   private opAvailable: boolean | null = null;
+  private breaker = new CircuitBreaker();
 
   registerServer(config: ServerConfig): void {
     if (config.type !== 'local') return;
@@ -58,6 +61,31 @@ export class ChildManager implements Backend {
     }
   }
 
+  /** Clear a dead connection so next call triggers a fresh spawn. */
+  private evict(serverId: string): void {
+    const conn = this.children.get(serverId);
+    if (conn) {
+      conn.client.close().catch(() => {});
+      this.children.delete(serverId);
+      log.debug(`Evicted dead connection`, serverId);
+    }
+  }
+
+  /** Spawn with auto-reconnect: on failure, evict stale connection and retry once. */
+  private async spawnWithReconnect(serverId: string): Promise<ChildConnection> {
+    try {
+      return await withTimeout(this.spawn(serverId), SPAWN_TIMEOUT_MS, `spawn ${serverId}`);
+    } catch (err) {
+      // If we had a cached connection that went stale, evict and retry
+      if (this.children.has(serverId)) {
+        this.evict(serverId);
+        log.info(`Reconnecting after stale connection`, serverId);
+        return await withTimeout(this.spawn(serverId), SPAWN_TIMEOUT_MS, `spawn ${serverId}`);
+      }
+      throw err;
+    }
+  }
+
   private async isOpAvailable(): Promise<boolean> {
     if (this.opAvailable !== null) return this.opAvailable;
     try {
@@ -86,12 +114,8 @@ export class ChildManager implements Backend {
     const resolved: Record<string, string> = { ...configEnv };
     const opKeys = Object.entries(configEnv).filter(([, v]) => v.startsWith('op://'));
     if (opKeys.length > 0) {
-      // Check op CLI availability once (cached) to avoid noisy errors on
-      // machines where 1Password isn't configured
       if (!(await this.isOpAvailable())) {
-        process.stderr.write(
-          `[ch1tty:${config.id}] 1Password CLI not configured — skipping op:// env resolution\n`,
-        );
+        log.warn(`1Password CLI not configured — skipping op:// env resolution`, config.id);
         for (const [key] of opKeys) {
           delete resolved[key];
         }
@@ -107,9 +131,7 @@ export class ChildManager implements Backend {
           if (result.status === 'fulfilled') {
             resolved[result.value.key] = result.value.value;
           } else {
-            process.stderr.write(
-              `[ch1tty:${config.id}] Failed to resolve env from 1Password: ${result.reason}\n`,
-            );
+            log.error(`Failed to resolve env from 1Password: ${result.reason}`, config.id);
           }
         }
       }
@@ -142,12 +164,12 @@ export class ChildManager implements Backend {
       { capabilities: {} },
     );
 
-    // Log child stderr for debugging
+    // Log child stderr
     const stderr = transport.stderr;
     if (stderr) {
       const readable = stderr as import('node:stream').Readable;
       readable.on('data', (chunk: Buffer) => {
-        process.stderr.write(`[ch1tty:${config.id}] ${chunk.toString()}`);
+        log.childStderr(config.id, chunk);
       });
     }
 
@@ -159,49 +181,71 @@ export class ChildManager implements Backend {
     const config = this.configs.get(serverId);
     if (!config) return [];
 
+    if (!this.breaker.isAllowed(serverId)) {
+      log.debug(`Circuit open, skipping tool list`, serverId);
+      return [];
+    }
+
     // Check cache before spawning
     const existing = this.children.get(serverId);
     if (existing?.toolCache && Date.now() < existing.toolCache.expiresAt) {
       return existing.toolCache.tools;
     }
 
-    // Spawn with timeout
-    const conn = await withTimeout(
-      this.spawn(serverId),
-      SPAWN_TIMEOUT_MS,
-      `spawn ${serverId}`,
-    );
+    try {
+      const conn = await this.spawnWithReconnect(serverId);
 
-    // List tools with timeout
-    const result = await withTimeout(
-      conn.client.listTools(),
-      LIST_TIMEOUT_MS,
-      `listTools ${serverId}`,
-    );
+      const result = await withTimeout(
+        conn.client.listTools(),
+        LIST_TIMEOUT_MS,
+        `listTools ${serverId}`,
+      );
 
-    const tools: ToolEntry[] = result.tools.map((t) => ({
-      name: t.name,
-      description: t.description,
-      inputSchema: t.inputSchema as Record<string, unknown>,
-    }));
+      const tools: ToolEntry[] = result.tools.map((t) => ({
+        name: t.name,
+        description: t.description,
+        inputSchema: t.inputSchema as Record<string, unknown>,
+      }));
 
-    conn.toolCache = { tools, expiresAt: Date.now() + TOOL_CACHE_TTL };
-    return tools;
+      conn.toolCache = { tools, expiresAt: Date.now() + TOOL_CACHE_TTL };
+      this.breaker.recordSuccess(serverId);
+      return tools;
+    } catch (err) {
+      this.breaker.recordFailure(serverId);
+      this.evict(serverId);
+      throw err;
+    }
   }
 
   async callTool(serverId: string, toolName: string, args: Record<string, unknown> = {}): Promise<ToolCallResult> {
-    const conn = await withTimeout(this.spawn(serverId), SPAWN_TIMEOUT_MS, `spawn ${serverId}`);
-    const result = await withTimeout(
-      conn.client.callTool({ name: toolName, arguments: args }),
-      CALL_TIMEOUT_MS,
-      `callTool ${serverId}/${toolName}`,
-    );
-    return normalizeToolResult(result as Record<string, unknown>);
+    if (!this.breaker.isAllowed(serverId)) {
+      return {
+        content: [{ type: 'text', text: `Backend "${serverId}" is temporarily unavailable (circuit open). Try again shortly.` }],
+        isError: true,
+      };
+    }
+
+    try {
+      const conn = await this.spawnWithReconnect(serverId);
+      const result = await withTimeout(
+        conn.client.callTool({ name: toolName, arguments: args }),
+        CALL_TIMEOUT_MS,
+        `callTool ${serverId}/${toolName}`,
+      );
+      this.breaker.recordSuccess(serverId);
+      return normalizeToolResult(result as Record<string, unknown>);
+    } catch (err) {
+      this.breaker.recordFailure(serverId);
+      this.evict(serverId);
+      throw err;
+    }
   }
 
   async listResources(serverId: string): Promise<{ resources: ResourceEntry[]; templates: ResourceTemplateEntry[] }> {
     const config = this.configs.get(serverId);
     if (!config) return { resources: [], templates: [] };
+
+    if (!this.breaker.isAllowed(serverId)) return { resources: [], templates: [] };
 
     const existing = this.children.get(serverId);
     if (existing?.resourceCache && Date.now() < existing.resourceCache.expiresAt) {
@@ -209,7 +253,7 @@ export class ChildManager implements Backend {
     }
 
     try {
-      const conn = await withTimeout(this.spawn(serverId), SPAWN_TIMEOUT_MS, `spawn ${serverId}`);
+      const conn = await this.spawnWithReconnect(serverId);
 
       const [resResult, tmplResult] = await Promise.allSettled([
         withTimeout(conn.client.listResources(), LIST_TIMEOUT_MS, `listResources ${serverId}`),
@@ -229,9 +273,12 @@ export class ChildManager implements Backend {
         : [];
 
       conn.resourceCache = { resources, templates, expiresAt: Date.now() + TOOL_CACHE_TTL };
+      this.breaker.recordSuccess(serverId);
       return { resources, templates };
     } catch (err) {
-      process.stderr.write(`[ch1tty:${serverId}] Resource list error: ${err}\n`);
+      this.breaker.recordFailure(serverId);
+      this.evict(serverId);
+      log.error(`Resource list error: ${err}`, serverId);
       return { resources: [], templates: [] };
     }
   }
@@ -239,7 +286,7 @@ export class ChildManager implements Backend {
   async readResource(serverId: string, uri: string): Promise<{
     contents: Array<{ uri: string; mimeType?: string; text?: string; blob?: string }>;
   }> {
-    const conn = await withTimeout(this.spawn(serverId), SPAWN_TIMEOUT_MS, `spawn ${serverId}`);
+    const conn = await this.spawnWithReconnect(serverId);
     const result = await conn.client.readResource({ uri });
     return {
       contents: result.contents.map((c) => ({
@@ -255,13 +302,15 @@ export class ChildManager implements Backend {
     const config = this.configs.get(serverId);
     if (!config) return [];
 
+    if (!this.breaker.isAllowed(serverId)) return [];
+
     const existing = this.children.get(serverId);
     if (existing?.promptCache && Date.now() < existing.promptCache.expiresAt) {
       return existing.promptCache.prompts;
     }
 
     try {
-      const conn = await withTimeout(this.spawn(serverId), SPAWN_TIMEOUT_MS, `spawn ${serverId}`);
+      const conn = await this.spawnWithReconnect(serverId);
       const result = await withTimeout(
         conn.client.listPrompts(),
         LIST_TIMEOUT_MS,
@@ -277,9 +326,12 @@ export class ChildManager implements Backend {
       }));
 
       conn.promptCache = { prompts, expiresAt: Date.now() + TOOL_CACHE_TTL };
+      this.breaker.recordSuccess(serverId);
       return prompts;
     } catch (err) {
-      process.stderr.write(`[ch1tty:${serverId}] Prompt list error: ${err}\n`);
+      this.breaker.recordFailure(serverId);
+      this.evict(serverId);
+      log.error(`Prompt list error: ${err}`, serverId);
       return [];
     }
   }
@@ -288,7 +340,7 @@ export class ChildManager implements Backend {
     description?: string;
     messages: Array<{ role: string; content: ContentItem }>;
   }> {
-    const conn = await withTimeout(this.spawn(serverId), SPAWN_TIMEOUT_MS, `spawn ${serverId}`);
+    const conn = await this.spawnWithReconnect(serverId);
     const result = await conn.client.getPrompt({ name, arguments: promptArgs });
     return {
       description: result.description,
@@ -317,7 +369,7 @@ export class ChildManager implements Backend {
     for (const [id, conn] of this.children) {
       closePromises.push(
         conn.client.close().catch((err) => {
-          process.stderr.write(`[ch1tty] Error closing ${id}: ${err}\n`);
+          log.error(`Error closing ${id}: ${err}`);
         }),
       );
     }
@@ -325,5 +377,6 @@ export class ChildManager implements Backend {
     await Promise.allSettled(closePromises);
     this.children.clear();
     this.connecting.clear();
+    this.breaker.reset();
   }
 }

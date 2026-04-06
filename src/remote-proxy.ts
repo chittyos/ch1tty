@@ -4,6 +4,8 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import type { ServerConfig, RemoteServerConfig, ResourceEntry, ResourceTemplateEntry, PromptEntry, ToolEntry, ToolCallResult, BackendStatus, Backend, ContentItem } from './types.js';
 import { VERSION, withTimeout, normalizeToolResult } from './utils.js';
+import { log } from './logger.js';
+import { CircuitBreaker } from './circuit-breaker.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -31,6 +33,7 @@ export class RemoteProxy implements Backend {
   private connections = new Map<string, RemoteConnection>();
   private connecting = new Map<string, Promise<RemoteConnection>>();
   private tokenCaches = new Map<string, TokenCache>();
+  private breaker = new CircuitBreaker();
 
   registerServer(config: ServerConfig): void {
     if (config.type !== 'remote') return;
@@ -58,9 +61,7 @@ export class RemoteProxy implements Backend {
 
       return token;
     } catch (err) {
-      process.stderr.write(
-        `[ch1tty:${config.id}] Failed to get auth token: ${err}\n`,
-      );
+      log.error(`Failed to get auth token: ${err}`, config.id);
       return null;
     }
   }
@@ -92,6 +93,30 @@ export class RemoteProxy implements Backend {
     }
   }
 
+  /** Clear a dead connection so next call triggers a fresh connect. */
+  private evict(serverId: string): void {
+    const conn = this.connections.get(serverId);
+    if (conn) {
+      conn.client.close().catch(() => {});
+      this.connections.delete(serverId);
+      log.debug(`Evicted dead connection`, serverId);
+    }
+  }
+
+  /** Connect with auto-reconnect: on failure, evict stale connection and retry once. */
+  private async connectWithReconnect(serverId: string): Promise<RemoteConnection> {
+    try {
+      return await withTimeout(this.connect(serverId), CONNECT_TIMEOUT_MS, `connect ${serverId}`);
+    } catch (err) {
+      if (this.connections.has(serverId)) {
+        this.evict(serverId);
+        log.info(`Reconnecting after stale connection`, serverId);
+        return await withTimeout(this.connect(serverId), CONNECT_TIMEOUT_MS, `connect ${serverId}`);
+      }
+      throw err;
+    }
+  }
+
   private async doConnect(config: RemoteServerConfig): Promise<RemoteConnection> {
     const headers: Record<string, string> = {};
     const token = await this.getAuthToken(config);
@@ -119,6 +144,11 @@ export class RemoteProxy implements Backend {
     const config = this.configs.get(serverId);
     if (!config) return [];
 
+    if (!this.breaker.isAllowed(serverId)) {
+      log.debug(`Circuit open, skipping tool list`, serverId);
+      return [];
+    }
+
     // Check cache before connecting
     const existing = this.connections.get(serverId);
     if (existing?.toolCache && Date.now() < existing.toolCache.expiresAt) {
@@ -126,11 +156,7 @@ export class RemoteProxy implements Backend {
     }
 
     try {
-      const conn = await withTimeout(
-        this.connect(serverId),
-        CONNECT_TIMEOUT_MS,
-        `connect ${serverId}`,
-      );
+      const conn = await this.connectWithReconnect(serverId);
 
       const result = await withTimeout(
         conn.client.listTools(),
@@ -145,9 +171,12 @@ export class RemoteProxy implements Backend {
       }));
 
       conn.toolCache = { tools, expiresAt: Date.now() + TOOL_CACHE_TTL };
+      this.breaker.recordSuccess(serverId);
       return tools;
     } catch (err) {
-      process.stderr.write(`[ch1tty:${serverId}] Tool list error: ${err}\n`);
+      this.breaker.recordFailure(serverId);
+      this.evict(serverId);
+      log.error(`Tool list error: ${err}`, serverId);
       return [];
     }
   }
@@ -161,15 +190,25 @@ export class RemoteProxy implements Backend {
       };
     }
 
+    if (!this.breaker.isAllowed(serverId)) {
+      return {
+        content: [{ type: 'text', text: `Backend "${serverId}" is temporarily unavailable (circuit open). Try again shortly.` }],
+        isError: true,
+      };
+    }
+
     try {
-      const conn = await withTimeout(this.connect(serverId), CONNECT_TIMEOUT_MS, `connect ${serverId}`);
+      const conn = await this.connectWithReconnect(serverId);
       const result = await withTimeout(
         conn.client.callTool({ name: toolName, arguments: args }),
         CALL_TIMEOUT_MS,
         `callTool ${serverId}/${toolName}`,
       );
+      this.breaker.recordSuccess(serverId);
       return normalizeToolResult(result as Record<string, unknown>);
     } catch (err) {
+      this.breaker.recordFailure(serverId);
+      this.evict(serverId);
       return {
         content: [{ type: 'text', text: `Remote call error: ${String(err)}` }],
         isError: true,
@@ -181,13 +220,15 @@ export class RemoteProxy implements Backend {
     const config = this.configs.get(serverId);
     if (!config) return { resources: [], templates: [] };
 
+    if (!this.breaker.isAllowed(serverId)) return { resources: [], templates: [] };
+
     const existing = this.connections.get(serverId);
     if (existing?.resourceCache && Date.now() < existing.resourceCache.expiresAt) {
       return { resources: existing.resourceCache.resources, templates: existing.resourceCache.templates };
     }
 
     try {
-      const conn = await withTimeout(this.connect(serverId), CONNECT_TIMEOUT_MS, `connect ${serverId}`);
+      const conn = await this.connectWithReconnect(serverId);
 
       const [resResult, tmplResult] = await Promise.allSettled([
         withTimeout(conn.client.listResources(), LIST_TIMEOUT_MS, `listResources ${serverId}`),
@@ -207,9 +248,12 @@ export class RemoteProxy implements Backend {
         : [];
 
       conn.resourceCache = { resources, templates, expiresAt: Date.now() + TOOL_CACHE_TTL };
+      this.breaker.recordSuccess(serverId);
       return { resources, templates };
     } catch (err) {
-      process.stderr.write(`[ch1tty:${serverId}] Resource list error: ${err}\n`);
+      this.breaker.recordFailure(serverId);
+      this.evict(serverId);
+      log.error(`Resource list error: ${err}`, serverId);
       return { resources: [], templates: [] };
     }
   }
@@ -217,7 +261,7 @@ export class RemoteProxy implements Backend {
   async readResource(serverId: string, uri: string): Promise<{
     contents: Array<{ uri: string; mimeType?: string; text?: string; blob?: string }>;
   }> {
-    const conn = await withTimeout(this.connect(serverId), CONNECT_TIMEOUT_MS, `connect ${serverId}`);
+    const conn = await this.connectWithReconnect(serverId);
     const result = await conn.client.readResource({ uri });
     return {
       contents: result.contents.map((c) => ({
@@ -233,13 +277,15 @@ export class RemoteProxy implements Backend {
     const config = this.configs.get(serverId);
     if (!config) return [];
 
+    if (!this.breaker.isAllowed(serverId)) return [];
+
     const existing = this.connections.get(serverId);
     if (existing?.promptCache && Date.now() < existing.promptCache.expiresAt) {
       return existing.promptCache.prompts;
     }
 
     try {
-      const conn = await withTimeout(this.connect(serverId), CONNECT_TIMEOUT_MS, `connect ${serverId}`);
+      const conn = await this.connectWithReconnect(serverId);
       const result = await withTimeout(
         conn.client.listPrompts(),
         LIST_TIMEOUT_MS,
@@ -255,9 +301,12 @@ export class RemoteProxy implements Backend {
       }));
 
       conn.promptCache = { prompts, expiresAt: Date.now() + TOOL_CACHE_TTL };
+      this.breaker.recordSuccess(serverId);
       return prompts;
     } catch (err) {
-      process.stderr.write(`[ch1tty:${serverId}] Prompt list error: ${err}\n`);
+      this.breaker.recordFailure(serverId);
+      this.evict(serverId);
+      log.error(`Prompt list error: ${err}`, serverId);
       return [];
     }
   }
@@ -266,7 +315,7 @@ export class RemoteProxy implements Backend {
     description?: string;
     messages: Array<{ role: string; content: ContentItem }>;
   }> {
-    const conn = await withTimeout(this.connect(serverId), CONNECT_TIMEOUT_MS, `connect ${serverId}`);
+    const conn = await this.connectWithReconnect(serverId);
     const result = await conn.client.getPrompt({ name, arguments: promptArgs });
     return {
       description: result.description,
@@ -295,7 +344,7 @@ export class RemoteProxy implements Backend {
     for (const [id, conn] of this.connections) {
       closePromises.push(
         conn.client.close().catch((err) => {
-          process.stderr.write(`[ch1tty] Error closing remote ${id}: ${err}\n`);
+          log.error(`Error closing remote ${id}: ${err}`);
         }),
       );
     }
@@ -303,5 +352,6 @@ export class RemoteProxy implements Backend {
     await Promise.allSettled(closePromises);
     this.connections.clear();
     this.connecting.clear();
+    this.breaker.reset();
   }
 }
