@@ -96,19 +96,25 @@ export class HttpMcpServer {
 
     if (req.method === 'POST' && !sessionId) {
       // New session — create server + transport
+      let mcpSessionId: string | undefined;
       const transport = new StreamableHTTPServerTransport({
         sessionIdGenerator: () => crypto.randomUUID(),
         onsessioninitialized: (newSessionId) => {
+          mcpSessionId = newSessionId;
           this.sessions.set(newSessionId, { server: mcpServer, transport });
+          this.aggregator.sessions.getOrCreate(newSessionId, 'http');
         },
       });
 
-      const mcpServer = this.createMcpServer();
+      const mcpServer = this.createMcpServer(() => mcpSessionId);
 
       // Clean up on close
       transport.onclose = () => {
         const sid = [...this.sessions.entries()].find(([, s]) => s.transport === transport)?.[0];
-        if (sid) this.sessions.delete(sid);
+        if (sid) {
+          this.sessions.delete(sid);
+          this.aggregator.sessions.remove(sid);
+        }
         mcpServer.close().catch(() => {});
       };
 
@@ -123,7 +129,7 @@ export class HttpMcpServer {
     res.end(JSON.stringify({ error: 'bad request', message: 'Missing or invalid session' }));
   }
 
-  private createMcpServer(): Server {
+  private createMcpServer(getSessionId: () => string | undefined): Server {
     const server = new Server(
       { name: 'ch1tty', version: VERSION },
       { capabilities: { tools: {}, resources: {}, prompts: {} } },
@@ -135,7 +141,7 @@ export class HttpMcpServer {
 
     server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const { name, arguments: args } = request.params;
-      return this.aggregator.callTool(name, (args ?? {}) as Record<string, unknown>);
+      return this.aggregator.callTool(name, (args ?? {}) as Record<string, unknown>, getSessionId());
     });
 
     server.setRequestHandler(ListResourcesRequestSchema, async () => {
