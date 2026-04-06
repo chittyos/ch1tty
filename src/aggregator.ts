@@ -12,6 +12,7 @@ import { ChildManager } from './child-manager.js';
 import { RemoteProxy } from './remote-proxy.js';
 import { loadConfigFromPath } from './config.js';
 import { VERSION } from './utils.js';
+import { log } from './logger.js';
 
 const SEPARATOR = '/';
 const META_SERVER_ID = 'ch1tty';
@@ -108,7 +109,7 @@ export class Aggregator {
             inputSchema: t.inputSchema,
           }));
         } catch (err) {
-          process.stderr.write(`[ch1tty] Failed to list tools for ${config.id}: ${err}\n`);
+          log.error(`Failed to list tools: ${err}`, config.id);
           return [];
         }
       });
@@ -396,7 +397,7 @@ export class Aggregator {
         totalServers: this.activeConfigs().length,
       };
 
-      process.stderr.write(`[ch1tty] Config reloaded: +${added.length} -${removed.length} servers\n`);
+      log.info(`Config reloaded: +${added.length} -${removed.length} servers`);
       return {
         content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
       };
@@ -467,7 +468,7 @@ export class Aggregator {
           mimeType: r.mimeType,
         }));
       } catch (err) {
-        process.stderr.write(`[ch1tty] Failed to list resources for ${config.id}: ${err}\n`);
+        log.error(`Failed to list resources: ${err}`, config.id);
         return [];
       }
     });
@@ -494,7 +495,7 @@ export class Aggregator {
           mimeType: t.mimeType,
         }));
       } catch (err) {
-        process.stderr.write(`[ch1tty] Failed to list resource templates for ${config.id}: ${err}\n`);
+        log.error(`Failed to list resource templates: ${err}`, config.id);
         return [];
       }
     });
@@ -543,7 +544,7 @@ export class Aggregator {
           arguments: p.arguments,
         }));
       } catch (err) {
-        process.stderr.write(`[ch1tty] Failed to list prompts for ${config.id}: ${err}\n`);
+        log.error(`Failed to list prompts: ${err}`, config.id);
         return [];
       }
     });

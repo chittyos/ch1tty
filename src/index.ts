@@ -14,6 +14,7 @@ import type { AggregatorOptions } from './aggregator.js';
 import { loadConfigFromPath, resolveConfigPath } from './config.js';
 import { VERSION } from './utils.js';
 import { HttpMcpServer } from './http-server.js';
+import { log } from './logger.js';
 import type { ServerAccess, ServerCategory } from './types.js';
 
 async function main(): Promise<void> {
@@ -44,11 +45,11 @@ async function main(): Promise<void> {
       mcpToken: process.env.CH1TTY_MCP_TOKEN,
     });
     await httpServer.start();
-    process.stderr.write(`[ch1tty] HTTP server listening on 0.0.0.0:${httpPort}\n`);
+    log.info(`HTTP server listening on 0.0.0.0:${httpPort}`);
     if (process.env.CH1TTY_MCP_TOKEN) {
-      process.stderr.write(`[ch1tty] MCP endpoint: /mcp (bearer token required)\n`);
+      log.info(`MCP endpoint: /mcp (bearer token required)`);
     } else {
-      process.stderr.write(`[ch1tty] MCP endpoint: /mcp (no auth — set CH1TTY_MCP_TOKEN to secure)\n`);
+      log.warn(`MCP endpoint: /mcp (no auth — set CH1TTY_MCP_TOKEN to secure)`);
     }
   }
 
@@ -101,10 +102,10 @@ async function main(): Promise<void> {
 
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  process.stderr.write(`[ch1tty] MCP gateway v${VERSION} started (slim-mcp: search + execute)\n`);
+  log.info(`MCP gateway v${VERSION} started (slim-mcp: search + execute)`);
 }
 
 main().catch((err) => {
-  process.stderr.write(`[ch1tty] Fatal error: ${err}\n`);
+  log.error(`Fatal error: ${err}`);
   process.exit(1);
 });
