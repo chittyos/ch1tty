@@ -14,6 +14,7 @@ import { loadConfigFromPath } from './config.js';
 import { VERSION } from './utils.js';
 import { log } from './logger.js';
 import { SessionTracker } from './session.js';
+import { SessionCoordinator } from './coordinator.js';
 
 const SEPARATOR = '/';
 const META_SERVER_ID = 'ch1tty';
@@ -43,6 +44,7 @@ export class Aggregator {
   private configPath?: string;
   private startedAt = Date.now();
   readonly sessions = new SessionTracker();
+  readonly coordinator = new SessionCoordinator();
 
   // Internal tool registry — never exposed directly to clients
   private registry: NamespacedTool[] = [];
@@ -72,6 +74,17 @@ export class Aggregator {
     // Invalidate registry on backend rebuild
     this.registry = [];
     this.registryExpiresAt = 0;
+
+    // Bind ecosystem backend to coordinator (first 'ecosystem' category remote server)
+    const ecosystemConfig = this.activeConfigs().find(
+      (c) => c.type === 'remote' && c.category === 'ecosystem',
+    );
+    if (ecosystemConfig) {
+      const backend = this.backends.get(ecosystemConfig.id);
+      if (backend) {
+        this.coordinator.bindEcosystem(backend, ecosystemConfig.id);
+      }
+    }
   }
 
   private activeConfigs(): ServerConfig[] {
@@ -211,12 +224,20 @@ export class Aggregator {
 
     const registry = await this.getRegistry();
 
-    // Build session context for relevance boosting
+    // Build session context for relevance boosting (coordinator + session tracker)
     const recentServerIds = new Set<string>();
     if (sessionId) {
-      for (const tool of this.sessions.getRecentTools(sessionId)) {
-        const sep = tool.indexOf(SEPARATOR);
-        if (sep > 0) recentServerIds.add(tool.slice(0, sep));
+      // Coordinator affinity (richer — tracks all tool calls with timestamps)
+      const affinity = this.coordinator.getServerAffinity(sessionId);
+      for (const serverId of affinity.keys()) {
+        recentServerIds.add(serverId);
+      }
+      // Fallback to session tracker if coordinator hasn't seen this session
+      if (recentServerIds.size === 0) {
+        for (const tool of this.sessions.getRecentTools(sessionId)) {
+          const sep = tool.indexOf(SEPARATOR);
+          if (sep > 0) recentServerIds.add(tool.slice(0, sep));
+        }
       }
     }
 
@@ -243,11 +264,13 @@ export class Aggregator {
         return { server: c.id, name: c.name, category: c.category, tools: count };
       });
 
+      const entity = sessionId ? this.coordinator.getEntityContext(sessionId) : undefined;
       return {
         content: [{
           type: 'text',
           text: JSON.stringify({
             hint: 'Use query, server, or category to search for specific tools',
+            ...(entity?.chittyId ? { entity: entity.chittyId, identityClass: entity.identityClass } : {}),
             servers: serverSummary,
             totalTools: registry.length,
           }, null, 2),
@@ -331,6 +354,7 @@ export class Aggregator {
       const result = await backend.callTool(serverId, name, toolArgs);
       if (sessionId) {
         this.sessions.recordToolCall(sessionId, toolName);
+        this.coordinator.onToolCall(sessionId, toolName);
       }
       return result;
     } catch (err) {
@@ -352,6 +376,7 @@ export class Aggregator {
     totalTools: number;
     registryCached: boolean;
     activeSessions: number;
+    coordinator: ReturnType<SessionCoordinator['getSnapshot']>;
     servers: ServerStatus[];
   } {
     const statuses: ServerStatus[] = this.activeConfigs().map((config) => {
@@ -376,6 +401,7 @@ export class Aggregator {
       totalTools: statuses.reduce((sum, s) => sum + s.toolCount, 0),
       registryCached: Date.now() < this.registryExpiresAt,
       activeSessions: this.sessions.count,
+      coordinator: this.coordinator.getSnapshot(),
       servers: statuses,
     };
   }

@@ -103,6 +103,7 @@ export class HttpMcpServer {
           mcpSessionId = newSessionId;
           this.sessions.set(newSessionId, { server: mcpServer, transport });
           this.aggregator.sessions.getOrCreate(newSessionId, 'http');
+          this.aggregator.coordinator.onSessionStart(newSessionId, 'http');
         },
       });
 
@@ -114,6 +115,7 @@ export class HttpMcpServer {
         if (sid) {
           this.sessions.delete(sid);
           this.aggregator.sessions.remove(sid);
+          this.aggregator.coordinator.onSessionEnd(sid);
         }
         mcpServer.close().catch(() => {});
       };
