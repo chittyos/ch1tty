@@ -2,7 +2,7 @@
 uri: chittycanon://docs/tech/procedure/ch1tty-dev-guide
 namespace: chittycanon://docs/tech
 type: procedure
-version: 2.0.0
+version: 3.0.0
 status: CERTIFIED
 registered_with: chittycanon://core/services/canon
 certifier: chittycanon://core/services/chittycertify
@@ -14,7 +14,9 @@ visibility: PUBLIC
 
 ## What This Is
 
-Ch1tty is the ChittyOS universal MCP gateway. It aggregates all MCP servers (local stdio children + remote HTTP endpoints) behind a single stdio MCP server. AI clients connect to Ch1tty once instead of configuring 10+ individual servers.
+Ch1tty is the ChittyOS universal MCP gateway. It aggregates all MCP servers (local stdio children + remote HTTP endpoints) behind a **slim-MCP surface**: just 4 tools (`search`, `execute`, `status`, `reload`). Clients discover capabilities via `search` and invoke them via `execute` — the full tool registry stays internal, keeping context windows minimal.
+
+Dual transport: local clients connect via **stdio**, remote clients via **Streamable HTTP** at `/mcp`.
 
 ## Commands
 
@@ -26,31 +28,37 @@ npm run dev     # Watch mode for development
 
 ## Architecture
 
-- **Entry**: `src/index.ts` — creates `Server`, wires all MCP handlers, connects `StdioServerTransport`
-- **Aggregator**: `src/aggregator.ts` — routes namespaced calls to the correct `Backend` via `Map<serverId, Backend>`
-- **ChildManager**: `src/child-manager.ts` — implements `Backend` for local stdio child processes
-- **RemoteProxy**: `src/remote-proxy.ts` — implements `Backend` for HTTP MCP endpoints (connect.chitty.cc, Cloudflare, etc.)
+- **Entry**: `src/index.ts` — wires stdio + optional HTTP transport to the aggregator
+- **Aggregator**: `src/aggregator.ts` — slim-MCP surface: search/execute/status/reload meta-tools, internal tool registry, backend routing
+- **HTTP Server**: `src/http-server.ts` — Streamable HTTP MCP transport on `/mcp`, health on `/health`, bearer auth
+- **ChildManager**: `src/child-manager.ts` — `Backend` for local stdio child processes
+- **RemoteProxy**: `src/remote-proxy.ts` — `Backend` for remote HTTP MCP endpoints
 - **Config**: `servers.json` — declarative server registry, no code changes needed to add servers
-- **Types**: `src/types.ts` — `Backend` interface, shared types (`ToolEntry`, `ToolCallResult`, `BackendStatus`)
+- **Types**: `src/types.ts` — `Backend` interface, shared types
+
+## Slim-MCP Pattern
+
+Ch1tty exposes exactly 4 tools to clients:
+
+| Tool | Purpose |
+|------|---------|
+| `ch1tty/search` | Query the internal tool registry by keyword, server, or category |
+| `ch1tty/execute` | Invoke any discovered tool by namespaced name + args |
+| `ch1tty/status` | Gateway status — servers, tool counts, uptime |
+| `ch1tty/reload` | Hot-reload `servers.json` without restart |
+
+The full backend tool registry (100+ tools across all servers) is never exposed in `tools/list`. Clients search on-demand, keeping context cost at ~4 tool definitions regardless of how many backends are connected.
 
 ## Key Patterns
 
-- Tool names are namespaced: `chittyos/chitty_memory_persist`, `thinking/sequentialthinking`
-- Resources are namespaced: `serverId://originalUri`
-- Prompts are namespaced: `serverId/promptName`
+- Internal tool names are namespaced: `serverId/toolName`
+- Resources and prompts are passthrough (low cardinality, fine to expose directly)
 - Local servers spawn lazily on first tool call
-- Auth tokens retrieved via `chitty-mcp-token` CLI (execFileSync, not exec — no shell injection)
-- Tool lists cached 5 minutes, auth tokens cached 11 hours
+- Auth tokens retrieved via `chitty-mcp-token` CLI (execFileSync — no shell injection)
+- Tool registry cached 5 minutes, auth tokens cached 11 hours
 - All child stderr piped to gateway stderr with `[ch1tty:serverId]` prefix
 - Graceful shutdown: SIGINT/SIGTERM → close all children → exit
 - Config supports `_comment` entries for inline documentation in servers.json
-
-## Meta-Tools
-
-Built-in tools under the `ch1tty/` namespace:
-
-- `ch1tty/status` — Returns gateway uptime, connected servers, tool counts, cache ages
-- `ch1tty/reload` — Hot-reloads `servers.json` without restarting the gateway
 
 ## Config Override
 
@@ -61,8 +69,6 @@ Set `CH1TTY_CONFIG` env var to use a custom servers.json path.
 Paths in `command`, `args`, and `endpoint` fields support:
 - `~/` expands to the user's home directory
 - `${VAR}` or `$VAR` expands to environment variable values
-
-This makes `servers.json` portable across machines.
 
 ## Adding a Server
 
@@ -80,21 +86,30 @@ Add an entry to `servers.json`:
 }
 ```
 
-No code changes required. Or call `ch1tty/reload` to pick up changes without restarting.
+No code changes required. Call `ch1tty/reload` to pick up changes without restarting.
 
-## Health Server
+## HTTP Server
 
-Set `CH1TTY_HEALTH_PORT` to enable an HTTP health endpoint (off by default):
+Set `CH1TTY_PORT` to enable the HTTP server with MCP transport:
 
 ```bash
-CH1TTY_HEALTH_PORT=9099 npm start
+CH1TTY_PORT=9099 CH1TTY_MCP_TOKEN=secret123 npm start
 ```
 
-Endpoints served on `127.0.0.1:{port}`:
-- `GET /health` — `{"status":"ok","service":"ch1tty","version":"2.0.0"}`
-- `GET /api/v1/status` — Full gateway status snapshot (uptime, servers, tool counts)
+Endpoints on `0.0.0.0:{port}`:
+- `GET /health` — `{"status":"ok","service":"ch1tty","version":"3.0.0"}`
+- `GET /api/v1/status` — Full gateway status snapshot
+- `* /mcp` — **Streamable HTTP MCP endpoint** (bearer token required if `CH1TTY_MCP_TOKEN` is set)
 
-Binds to localhost only. Used for registration compliance and process monitoring.
+### Environment Variables
+
+| Variable | Purpose |
+|----------|---------|
+| `CH1TTY_PORT` | HTTP server port (enables HTTP transport) |
+| `CH1TTY_MCP_TOKEN` | Bearer token for `/mcp` endpoint auth |
+| `CH1TTY_CONFIG` | Custom servers.json path |
+| `CH1TTY_ACCESS` | Filter servers by access level (read/write/readwrite) |
+| `CH1TTY_CATEGORY` | Filter servers by category |
 
 ## Registration
 

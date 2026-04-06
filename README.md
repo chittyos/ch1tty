@@ -3,8 +3,8 @@
 
 # Ch1tty
 
-> ChittyOS Universal MCP Gateway — one stdio server, all backends.
+> ChittyOS Universal MCP Gateway — slim-MCP: search + execute.
 
-Ch1tty aggregates all MCP servers — local stdio child processes and remote HTTP endpoints — behind a single stdio interface. AI clients connect to Ch1tty once instead of configuring 10+ individual servers. Tool names are namespaced (`serverId/toolName`), local servers spawn lazily on first use, and tool lists are cached for 5 minutes. A built-in `ch1tty/reload` tool hot-reloads `servers.json` without restarting the gateway.
+Ch1tty aggregates all MCP servers behind 4 tools: `search`, `execute`, `status`, `reload`. The full tool registry (100+ tools across local stdio children and remote HTTP endpoints) stays internal — clients discover capabilities via search and invoke them via execute, keeping context windows minimal.
 
-**Domain**: local stdio (no HTTP deployment)
+**Dual transport**: stdio for local clients, Streamable HTTP (`/mcp`) for remote clients.
