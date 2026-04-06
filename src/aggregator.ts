@@ -4,6 +4,7 @@ import type {
   ServerConfig,
   ServerStatus,
   ToolCallResult,
+  ToolEntry,
   Backend,
   ContentItem,
 } from './types.js';
@@ -14,6 +15,17 @@ import { VERSION } from './utils.js';
 
 const SEPARATOR = '/';
 const META_SERVER_ID = 'ch1tty';
+
+interface NamespacedTool {
+  serverId: string;
+  serverName: string;
+  category: ServerCategory;
+  access: ServerAccess;
+  name: string;
+  namespacedName: string;
+  description: string;
+  inputSchema: Record<string, unknown>;
+}
 
 export interface AggregatorOptions {
   accessFilter?: ServerAccess;
@@ -28,6 +40,12 @@ export class Aggregator {
   private categoryFilter?: ServerCategory;
   private configPath?: string;
   private startedAt = Date.now();
+
+  // Internal tool registry — never exposed directly to clients
+  private registry: NamespacedTool[] = [];
+  private registryExpiresAt = 0;
+  private registryRefreshing: Promise<void> | null = null;
+  private static readonly REGISTRY_TTL = 5 * 60 * 1000; // 5 minutes
 
   constructor(configs: ServerConfig[], options?: AggregatorOptions) {
     this.accessFilter = options?.accessFilter;
@@ -47,6 +65,10 @@ export class Aggregator {
       backend.registerServer(config);
       this.backends.set(config.id, backend);
     }
+
+    // Invalidate registry on backend rebuild
+    this.registry = [];
+    this.registryExpiresAt = 0;
   }
 
   private activeConfigs(): ServerConfig[] {
@@ -62,7 +84,57 @@ export class Aggregator {
     return this.backends.get(serverId);
   }
 
-  // ── Meta-tools ────────────────────────────────────────────────
+  // ── Internal tool registry ───────────────────────────────────
+
+  private async refreshRegistry(): Promise<void> {
+    // Coalesce concurrent refreshes
+    if (this.registryRefreshing) return this.registryRefreshing;
+
+    this.registryRefreshing = (async () => {
+      const toolPromises = this.activeConfigs().map(async (config) => {
+        try {
+          const backend = this.backendFor(config.id);
+          if (!backend) return [];
+
+          const tools = await backend.listTools(config.id);
+          return tools.map((t): NamespacedTool => ({
+            serverId: config.id,
+            serverName: config.name,
+            category: config.category,
+            access: config.access,
+            name: t.name,
+            namespacedName: `${config.id}${SEPARATOR}${t.name}`,
+            description: t.description ?? t.name,
+            inputSchema: t.inputSchema,
+          }));
+        } catch (err) {
+          process.stderr.write(`[ch1tty] Failed to list tools for ${config.id}: ${err}\n`);
+          return [];
+        }
+      });
+
+      const results = await Promise.allSettled(toolPromises);
+      this.registry = results.flatMap((r) =>
+        r.status === 'fulfilled' ? r.value : [],
+      );
+      this.registryExpiresAt = Date.now() + Aggregator.REGISTRY_TTL;
+    })();
+
+    try {
+      await this.registryRefreshing;
+    } finally {
+      this.registryRefreshing = null;
+    }
+  }
+
+  private async getRegistry(): Promise<NamespacedTool[]> {
+    if (Date.now() >= this.registryExpiresAt) {
+      await this.refreshRegistry();
+    }
+    return this.registry;
+  }
+
+  // ── Meta-tools (the only tools exposed to clients) ──────────
 
   private metaTools(): Array<{
     name: string;
@@ -71,40 +143,187 @@ export class Aggregator {
   }> {
     return [
       {
+        name: `${META_SERVER_ID}${SEPARATOR}search`,
+        description: 'Search the tool registry. Returns matching tool names, descriptions, and input schemas. Use before execute.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: { type: 'string', description: 'Search keywords matched against tool names and descriptions' },
+            server: { type: 'string', description: 'Filter by server id (e.g. "neon", "chittyos")' },
+            category: { type: 'string', description: 'Filter by category (ecosystem, code, search, reasoning, desktop, documents, communication)' },
+            limit: { type: 'number', description: 'Max results to return (default 20)' },
+          },
+        },
+      },
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}execute`,
+        description: 'Execute a tool by its namespaced name (serverId/toolName). Use search to discover available tools first.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            tool: { type: 'string', description: 'Namespaced tool name from search results (e.g. "neon/list_projects")' },
+            args: { type: 'object', description: 'Arguments to pass to the tool' },
+          },
+          required: ['tool'],
+        },
+      },
+      {
         name: `${META_SERVER_ID}${SEPARATOR}status`,
-        description: '[ch1tty] Gateway status — connected servers, tool counts, cache ages',
+        description: 'Gateway status — connected servers, tool counts, cache ages',
         inputSchema: { type: 'object' },
       },
       {
         name: `${META_SERVER_ID}${SEPARATOR}reload`,
-        description: '[ch1tty] Hot-reload servers.json without restarting the gateway',
+        description: 'Hot-reload servers.json without restarting the gateway',
         inputSchema: { type: 'object' },
       },
     ];
   }
 
-  private async handleMetaTool(toolName: string): Promise<ToolCallResult> {
+  private async handleMetaTool(toolName: string, args: Record<string, unknown>): Promise<ToolCallResult> {
     switch (toolName) {
+      case 'search':
+        return this.handleSearch(args);
+      case 'execute':
+        return this.handleExecute(args);
       case 'status':
         return this.handleStatus();
       case 'reload':
         return this.handleReload();
       default:
         return {
-          content: [{ type: 'text', text: `Unknown meta-tool: ${toolName}` }],
+          content: [{ type: 'text', text: `Unknown tool: ch1tty/${toolName}` }],
           isError: true,
         };
     }
   }
 
+  // ── Search ──────────────────────────────────────────────────
+
+  private async handleSearch(args: Record<string, unknown>): Promise<ToolCallResult> {
+    const query = typeof args.query === 'string' ? args.query.toLowerCase() : '';
+    const serverFilter = typeof args.server === 'string' ? args.server : undefined;
+    const categoryFilter = typeof args.category === 'string' ? args.category : undefined;
+    const limit = typeof args.limit === 'number' ? args.limit : 20;
+
+    const registry = await this.getRegistry();
+
+    let matches = registry;
+
+    if (serverFilter) {
+      matches = matches.filter((t) => t.serverId === serverFilter);
+    }
+    if (categoryFilter) {
+      matches = matches.filter((t) => t.category === categoryFilter);
+    }
+    if (query) {
+      const terms = query.split(/\s+/);
+      matches = matches.filter((t) => {
+        const haystack = `${t.namespacedName} ${t.description} ${t.serverName} ${t.category}`.toLowerCase();
+        return terms.every((term) => haystack.includes(term));
+      });
+    }
+
+    // If no filters at all, return a summary of available servers instead of all tools
+    if (!query && !serverFilter && !categoryFilter) {
+      const serverSummary = this.activeConfigs().map((c) => {
+        const count = registry.filter((t) => t.serverId === c.id).length;
+        return { server: c.id, name: c.name, category: c.category, tools: count };
+      });
+
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            hint: 'Use query, server, or category to search for specific tools',
+            servers: serverSummary,
+            totalTools: registry.length,
+          }, null, 2),
+        }],
+      };
+    }
+
+    const results = matches.slice(0, limit).map((t) => ({
+      tool: t.namespacedName,
+      server: t.serverId,
+      category: t.category,
+      description: t.description,
+      inputSchema: t.inputSchema,
+    }));
+
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify({
+          matches: results.length,
+          total: matches.length,
+          tools: results,
+        }, null, 2),
+      }],
+    };
+  }
+
+  // ── Execute ─────────────────────────────────────────────────
+
+  private async handleExecute(args: Record<string, unknown>): Promise<ToolCallResult> {
+    const toolName = typeof args.tool === 'string' ? args.tool : '';
+    const toolArgs = (typeof args.args === 'object' && args.args !== null && !Array.isArray(args.args))
+      ? args.args as Record<string, unknown>
+      : {};
+
+    if (!toolName) {
+      return {
+        content: [{ type: 'text', text: 'Missing required "tool" argument. Use ch1tty/search to find tools first.' }],
+        isError: true,
+      };
+    }
+
+    const sepIndex = toolName.indexOf(SEPARATOR);
+    if (sepIndex === -1) {
+      return {
+        content: [{
+          type: 'text',
+          text: `Invalid tool name "${toolName}". Expected format: serverId/toolName. Use ch1tty/search to discover tools.`,
+        }],
+        isError: true,
+      };
+    }
+
+    const serverId = toolName.slice(0, sepIndex);
+    const name = toolName.slice(sepIndex + 1);
+
+    const backend = this.backendFor(serverId);
+    if (!backend) {
+      const knownServers = this.activeConfigs().map((c) => c.id).join(', ') || '(none)';
+      return {
+        content: [{
+          type: 'text',
+          text: `Unknown server "${serverId}". Known servers: ${knownServers}`,
+        }],
+        isError: true,
+      };
+    }
+
+    try {
+      return await backend.callTool(serverId, name, toolArgs);
+    } catch (err) {
+      return {
+        content: [{ type: 'text', text: `Execute failed for ${toolName}: ${String(err)}` }],
+        isError: true,
+      };
+    }
+  }
+
+  // ── Status / Reload ─────────────────────────────────────────
+
   getStatusSnapshot(): {
     gateway: string;
     version: string;
-    transport: string;
     uptime: number;
     totalServers: number;
     connectedServers: number;
     totalTools: number;
+    registryCached: boolean;
     servers: ServerStatus[];
   } {
     const statuses: ServerStatus[] = this.activeConfigs().map((config) => {
@@ -123,11 +342,11 @@ export class Aggregator {
     return {
       gateway: 'ch1tty',
       version: VERSION,
-      transport: 'stdio',
       uptime: Math.round((Date.now() - this.startedAt) / 1000),
       totalServers: statuses.length,
       connectedServers: statuses.filter((s) => s.connected).length,
       totalTools: statuses.reduce((sum, s) => sum + s.toolCount, 0),
+      registryCached: Date.now() < this.registryExpiresAt,
       servers: statuses,
     };
   }
@@ -189,7 +408,7 @@ export class Aggregator {
     }
   }
 
-  // ── Tools ─────────────────────────────────────────────────────
+  // ── Public MCP interface ────────────────────────────────────
 
   async listAllTools(): Promise<{
     tools: Array<{
@@ -198,44 +417,17 @@ export class Aggregator {
       inputSchema: { type: 'object'; properties?: Record<string, object>; required?: string[] };
     }>;
   }> {
-    const toolPromises = this.activeConfigs().map(async (config) => {
-      try {
-        const backend = this.backendFor(config.id);
-        if (!backend) return [];
-
-        const tools = await backend.listTools(config.id);
-        const tag = `[${config.category}:${config.access}]`;
-        return tools.map((t) => ({
-          name: `${config.id}${SEPARATOR}${t.name}`,
-          description: `${tag} [${config.name}] ${t.description || t.name}`,
-          inputSchema: (t.inputSchema || { type: 'object' }) as {
-            type: 'object';
-            properties?: Record<string, object>;
-            required?: string[];
-          },
-        }));
-      } catch (err) {
-        process.stderr.write(`[ch1tty] Failed to list tools for ${config.id}: ${err}\n`);
-        return [];
-      }
-    });
-
-    const results = await Promise.allSettled(toolPromises);
-    const tools = results.flatMap((r) =>
-      r.status === 'fulfilled' ? r.value : [],
-    );
-
-    return { tools: [...this.metaTools(), ...tools] };
+    // Slim-MCP: only expose meta-tools, never backend tools directly
+    return { tools: this.metaTools() };
   }
 
   async callTool(namespacedName: string, args: Record<string, unknown> = {}): Promise<ToolCallResult> {
     const sepIndex = namespacedName.indexOf(SEPARATOR);
-    const knownServers = [META_SERVER_ID, ...this.configs.map((config) => config.id)].join(', ') || '(none)';
     if (sepIndex === -1) {
       return {
         content: [{
           type: 'text',
-          text: `Invalid tool name "${namespacedName}". Expected format: serverId/toolName. Known servers: ${knownServers}`,
+          text: `Invalid tool name "${namespacedName}". Available tools: ch1tty/search, ch1tty/execute, ch1tty/status, ch1tty/reload`,
         }],
         isError: true,
       };
@@ -244,32 +436,20 @@ export class Aggregator {
     const serverId = namespacedName.slice(0, sepIndex);
     const toolName = namespacedName.slice(sepIndex + 1);
 
-    if (serverId === META_SERVER_ID) {
-      return this.handleMetaTool(toolName);
-    }
-
-    const backend = this.backendFor(serverId);
-    if (!backend) {
+    if (serverId !== META_SERVER_ID) {
       return {
         content: [{
           type: 'text',
-          text: `Unknown server "${serverId}". Known servers: ${knownServers}`,
+          text: `Unknown tool "${namespacedName}". Use ch1tty/search to discover tools, then ch1tty/execute to invoke them.`,
         }],
         isError: true,
       };
     }
 
-    try {
-      return await backend.callTool(serverId, toolName, args);
-    } catch (err) {
-      return {
-        content: [{ type: 'text', text: `Tool call failed for ${serverId}/${toolName}: ${String(err)}` }],
-        isError: true,
-      };
-    }
+    return this.handleMetaTool(toolName, args);
   }
 
-  // ── Resources ─────────────────────────────────────────────────
+  // ── Resources (passthrough — low cardinality, fine to expose) ─
 
   async listAllResources(): Promise<{
     resources: Array<{ uri: string; name: string; description?: string; mimeType?: string }>;
@@ -342,7 +522,7 @@ export class Aggregator {
     return backend.readResource(serverId, originalUri);
   }
 
-  // ── Prompts ───────────────────────────────────────────────────
+  // ── Prompts (passthrough — low cardinality) ─────────────────
 
   async listAllPrompts(): Promise<{
     prompts: Array<{
@@ -394,7 +574,7 @@ export class Aggregator {
     return backend.getPrompt(serverId, promptName, args);
   }
 
-  // ── Lifecycle ─────────────────────────────────────────────────
+  // ── Lifecycle ───────────────────────────────────────────────
 
   async shutdown(): Promise<void> {
     const seen = new Set<Backend>();

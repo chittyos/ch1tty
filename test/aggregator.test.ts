@@ -11,25 +11,56 @@ function createAggregator(): Aggregator {
   return new Aggregator(config);
 }
 
-test('callTool rejects malformed namespaced tool names with known server ids', async () => {
+test('callTool rejects malformed tool names', async () => {
   const aggregator = createAggregator();
   const result = await aggregator.callTool('malformed-name');
 
   assert.equal(result.isError, true);
-  assert.match(result.content[0].text, /Expected format: serverId\/toolName/);
-  assert.match(result.content[0].text, /Known servers: ch1tty, local, remote/);
+  assert.match(result.content[0].text, /Invalid tool name/);
+  assert.match(result.content[0].text, /ch1tty\/search/);
 });
 
-test('callTool reports unknown server with known server ids', async () => {
+test('callTool rejects non-ch1tty namespaced calls (slim-mcp enforces search+execute)', async () => {
   const aggregator = createAggregator();
   const result = await aggregator.callTool('unknown/tool');
 
   assert.equal(result.isError, true);
-  assert.match(result.content[0].text, /Unknown server "unknown"/);
-  assert.match(result.content[0].text, /Known servers: ch1tty, local, remote/);
+  assert.match(result.content[0].text, /Use ch1tty\/search to discover tools/);
 });
 
-test('callTool normalizes local backend exceptions into MCP error shape', async () => {
+test('ch1tty/execute routes to backend tools', async () => {
+  const aggregator = createAggregator() as unknown as {
+    callTool: Aggregator['callTool'];
+    backends: Map<string, unknown>;
+  };
+
+  aggregator.backends.set('local', {
+    isRegistered: (serverId: string) => serverId === 'local',
+    callTool: async () => ({
+      content: [{ type: 'text', text: 'success' }],
+    }),
+  });
+
+  const result = await aggregator.callTool('ch1tty/execute', {
+    tool: 'local/run',
+    args: { foo: 'bar' },
+  });
+
+  assert.equal(result.isError, undefined);
+  assert.match(result.content[0].text, /success/);
+});
+
+test('ch1tty/execute returns error for unknown server', async () => {
+  const aggregator = createAggregator();
+  const result = await aggregator.callTool('ch1tty/execute', {
+    tool: 'unknown/tool',
+  });
+
+  assert.equal(result.isError, true);
+  assert.match(result.content[0].text, /Unknown server "unknown"/);
+});
+
+test('ch1tty/execute normalizes backend exceptions into MCP error shape', async () => {
   const aggregator = createAggregator() as unknown as {
     callTool: Aggregator['callTool'];
     backends: Map<string, unknown>;
@@ -42,29 +73,20 @@ test('callTool normalizes local backend exceptions into MCP error shape', async 
     },
   });
 
-  const result = await aggregator.callTool('local/run', { foo: 'bar' });
+  const result = await aggregator.callTool('ch1tty/execute', {
+    tool: 'local/run',
+    args: { foo: 'bar' },
+  });
 
   assert.equal(result.isError, true);
-  assert.match(result.content[0].text, /Tool call failed for local\/run/);
+  assert.match(result.content[0].text, /Execute failed for local\/run/);
   assert.match(result.content[0].text, /child boom/);
 });
 
-test('callTool normalizes remote backend exceptions into MCP error shape', async () => {
-  const aggregator = createAggregator() as unknown as {
-    callTool: Aggregator['callTool'];
-    backends: Map<string, unknown>;
-  };
-
-  aggregator.backends.set('remote', {
-    isRegistered: (serverId: string) => serverId === 'remote',
-    callTool: async () => {
-      throw new Error('remote boom');
-    },
-  });
-
-  const result = await aggregator.callTool('remote/run', { foo: 'bar' });
+test('ch1tty/execute requires tool argument', async () => {
+  const aggregator = createAggregator();
+  const result = await aggregator.callTool('ch1tty/execute', {});
 
   assert.equal(result.isError, true);
-  assert.match(result.content[0].text, /Tool call failed for remote\/run/);
-  assert.match(result.content[0].text, /remote boom/);
+  assert.match(result.content[0].text, /Missing required "tool" argument/);
 });

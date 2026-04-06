@@ -2,7 +2,7 @@
 uri: chittycanon://docs/tech/policy/ch1tty-charter
 namespace: chittycanon://docs/tech
 type: policy
-version: 2.0.0
+version: 3.0.0
 status: CERTIFIED
 registered_with: chittycanon://core/services/canon
 title: "Ch1tty Charter"
@@ -26,32 +26,28 @@ visibility: PUBLIC
 
 ## Purpose
 
-Universal MCP gateway that aggregates all MCP servers into a single stdio connection. Replaces per-client multi-server configuration with one unified entry point.
+Universal MCP gateway with slim-MCP surface. Aggregates all MCP servers behind 4 tools: `search`, `execute`, `status`, `reload`. Clients discover and invoke capabilities on-demand instead of loading 100+ tool definitions into context.
+
+Dual transport: stdio for local clients, Streamable HTTP for remote clients.
 
 ## API Contract
 
-Ch1tty exposes the standard MCP protocol over stdio:
+Ch1tty exposes the standard MCP protocol over stdio and HTTP:
 
 ### tools/list
-Returns the union of all backend tools, namespaced as `{serverId}/{toolName}`. Includes built-in meta-tools under `ch1tty/`.
+Returns exactly 4 meta-tools: `ch1tty/search`, `ch1tty/execute`, `ch1tty/status`, `ch1tty/reload`.
 
 ### tools/call
-Routes `{serverId}/{toolName}` calls to the appropriate backend (local child process or remote HTTP endpoint).
+- `ch1tty/search` — query internal tool registry by keyword, server, category
+- `ch1tty/execute` — invoke any backend tool by namespaced name
+- `ch1tty/status` — gateway status snapshot
+- `ch1tty/reload` — hot-reload servers.json
 
-### resources/list
-Returns the union of all backend resources, namespaced as `{serverId}://{originalUri}`.
+### resources/list, resources/read
+Passthrough — returns union of all backend resources, namespaced as `{serverId}://{originalUri}`.
 
-### resources/read
-Routes `{serverId}://{originalUri}` reads to the appropriate backend.
-
-### resourceTemplates/list
-Returns the union of all backend resource templates, namespaced as `{serverId}://{originalUriTemplate}`.
-
-### prompts/list
-Returns the union of all backend prompts, namespaced as `{serverId}/{promptName}`.
-
-### prompts/get
-Routes `{serverId}/{promptName}` requests to the appropriate backend.
+### prompts/list, prompts/get
+Passthrough — returns union of all backend prompts, namespaced as `{serverId}/{promptName}`.
 
 ## Dependencies
 
@@ -64,22 +60,22 @@ Routes `{serverId}/{promptName}` requests to the appropriate backend.
 ### Downstream (depends on Ch1tty)
 - Claude Code (via `.mcp.json`)
 - Claude Desktop (via `claude_desktop_config.json`)
+- Claude web / ChatGPT / Cloudflare Agents (via Streamable HTTP at `/mcp`)
 - Codex (via `config.toml`)
 - Any MCP-compatible AI client
 
 ## Scope Boundaries
 
 ### In Scope
-- Aggregating tool lists from multiple backends
-- Routing tool calls by namespace prefix
+- Slim-MCP surface: search + execute + status + reload
+- Internal tool registry with caching
 - Aggregating resources and prompts from all backends
 - Managing child process lifecycle
 - Proxying HTTP MCP calls with auth
-- Caching tool lists and auth tokens
-- Meta-tools for gateway introspection (status, reload)
+- Dual transport: stdio + Streamable HTTP
 - Config path interpolation (~ and env vars)
 
 ### Out of Scope
 - Tool composition or chaining
-- Context-aware routing
+- OAuth authorization server (handled by cloud Worker)
 - Pattern learning from usage

@@ -39,23 +39,29 @@ test('unknown meta-tool returns error', async () => {
   const result = await aggregator.callTool('ch1tty/nonexistent');
 
   assert.equal(result.isError, true);
-  assert.match(result.content[0].text, /Unknown meta-tool/);
+  assert.match(result.content[0].text, /Unknown tool: ch1tty\/nonexistent/);
 });
 
-test('listAllTools includes meta-tools', async () => {
+test('listAllTools returns only slim-mcp meta-tools', async () => {
   const aggregator = createAggregator();
-
-  // Mock the managers to avoid real spawning
-  const agg = aggregator as unknown as {
-    childManager: { listTools: () => Promise<Array<{ name: string; description: string; inputSchema: object }>> };
-    remoteProxy: { listTools: () => Promise<Array<{ name: string; description: string; inputSchema: object }>> };
-  };
-  agg.childManager = { listTools: async () => [] };
-  agg.remoteProxy = { listTools: async () => [] };
-
   const { tools } = await aggregator.listAllTools();
-  const metaNames = tools.filter((t) => t.name.startsWith('ch1tty/')).map((t) => t.name);
+  const names = tools.map((t) => t.name);
 
-  assert.ok(metaNames.includes('ch1tty/status'));
-  assert.ok(metaNames.includes('ch1tty/reload'));
+  assert.deepEqual(names, [
+    'ch1tty/search',
+    'ch1tty/execute',
+    'ch1tty/status',
+    'ch1tty/reload',
+  ]);
+});
+
+test('ch1tty/search with no filters returns server summary', async () => {
+  const aggregator = createAggregator();
+  const result = await aggregator.callTool('ch1tty/search', {});
+
+  assert.equal(result.isError, undefined);
+  const data = JSON.parse(result.content[0].text);
+  assert.ok(data.servers);
+  assert.ok(data.hint);
+  assert.equal(data.servers.length, 2);
 });
