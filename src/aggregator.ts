@@ -13,6 +13,7 @@ import { RemoteProxy } from './remote-proxy.js';
 import { loadConfigFromPath } from './config.js';
 import { VERSION } from './utils.js';
 import { log } from './logger.js';
+import { SessionTracker } from './session.js';
 
 const SEPARATOR = '/';
 const META_SERVER_ID = 'ch1tty';
@@ -41,6 +42,7 @@ export class Aggregator {
   private categoryFilter?: ServerCategory;
   private configPath?: string;
   private startedAt = Date.now();
+  readonly sessions = new SessionTracker();
 
   // Internal tool registry — never exposed directly to clients
   private registry: NamespacedTool[] = [];
@@ -181,12 +183,12 @@ export class Aggregator {
     ];
   }
 
-  private async handleMetaTool(toolName: string, args: Record<string, unknown>): Promise<ToolCallResult> {
+  private async handleMetaTool(toolName: string, args: Record<string, unknown>, sessionId?: string): Promise<ToolCallResult> {
     switch (toolName) {
       case 'search':
-        return this.handleSearch(args);
+        return this.handleSearch(args, sessionId);
       case 'execute':
-        return this.handleExecute(args);
+        return this.handleExecute(args, sessionId);
       case 'status':
         return this.handleStatus();
       case 'reload':
@@ -201,13 +203,22 @@ export class Aggregator {
 
   // ── Search ──────────────────────────────────────────────────
 
-  private async handleSearch(args: Record<string, unknown>): Promise<ToolCallResult> {
+  private async handleSearch(args: Record<string, unknown>, sessionId?: string): Promise<ToolCallResult> {
     const query = typeof args.query === 'string' ? args.query.toLowerCase() : '';
     const serverFilter = typeof args.server === 'string' ? args.server : undefined;
     const categoryFilter = typeof args.category === 'string' ? args.category : undefined;
     const limit = typeof args.limit === 'number' ? args.limit : 20;
 
     const registry = await this.getRegistry();
+
+    // Build session context for relevance boosting
+    const recentServerIds = new Set<string>();
+    if (sessionId) {
+      for (const tool of this.sessions.getRecentTools(sessionId)) {
+        const sep = tool.indexOf(SEPARATOR);
+        if (sep > 0) recentServerIds.add(tool.slice(0, sep));
+      }
+    }
 
     let matches = registry;
 
@@ -244,12 +255,22 @@ export class Aggregator {
       };
     }
 
+    // Sort: boost tools from recently-used servers to the top
+    if (recentServerIds.size > 0) {
+      matches = [...matches].sort((a, b) => {
+        const aRecent = recentServerIds.has(a.serverId) ? 1 : 0;
+        const bRecent = recentServerIds.has(b.serverId) ? 1 : 0;
+        return bRecent - aRecent;
+      });
+    }
+
     const results = matches.slice(0, limit).map((t) => ({
       tool: t.namespacedName,
       server: t.serverId,
       category: t.category,
       description: t.description,
       inputSchema: t.inputSchema,
+      ...(recentServerIds.has(t.serverId) ? { recentlyUsed: true } : {}),
     }));
 
     return {
@@ -258,6 +279,7 @@ export class Aggregator {
         text: JSON.stringify({
           matches: results.length,
           total: matches.length,
+          ...(sessionId ? { sessionId } : {}),
           tools: results,
         }, null, 2),
       }],
@@ -266,7 +288,7 @@ export class Aggregator {
 
   // ── Execute ─────────────────────────────────────────────────
 
-  private async handleExecute(args: Record<string, unknown>): Promise<ToolCallResult> {
+  private async handleExecute(args: Record<string, unknown>, sessionId?: string): Promise<ToolCallResult> {
     const toolName = typeof args.tool === 'string' ? args.tool : '';
     const toolArgs = (typeof args.args === 'object' && args.args !== null && !Array.isArray(args.args))
       ? args.args as Record<string, unknown>
@@ -306,7 +328,11 @@ export class Aggregator {
     }
 
     try {
-      return await backend.callTool(serverId, name, toolArgs);
+      const result = await backend.callTool(serverId, name, toolArgs);
+      if (sessionId) {
+        this.sessions.recordToolCall(sessionId, toolName);
+      }
+      return result;
     } catch (err) {
       return {
         content: [{ type: 'text', text: `Execute failed for ${toolName}: ${String(err)}` }],
@@ -325,6 +351,7 @@ export class Aggregator {
     connectedServers: number;
     totalTools: number;
     registryCached: boolean;
+    activeSessions: number;
     servers: ServerStatus[];
   } {
     const statuses: ServerStatus[] = this.activeConfigs().map((config) => {
@@ -348,6 +375,7 @@ export class Aggregator {
       connectedServers: statuses.filter((s) => s.connected).length,
       totalTools: statuses.reduce((sum, s) => sum + s.toolCount, 0),
       registryCached: Date.now() < this.registryExpiresAt,
+      activeSessions: this.sessions.count,
       servers: statuses,
     };
   }
@@ -422,7 +450,7 @@ export class Aggregator {
     return { tools: this.metaTools() };
   }
 
-  async callTool(namespacedName: string, args: Record<string, unknown> = {}): Promise<ToolCallResult> {
+  async callTool(namespacedName: string, args: Record<string, unknown> = {}, sessionId?: string): Promise<ToolCallResult> {
     const sepIndex = namespacedName.indexOf(SEPARATOR);
     if (sepIndex === -1) {
       return {
@@ -447,7 +475,7 @@ export class Aggregator {
       };
     }
 
-    return this.handleMetaTool(toolName, args);
+    return this.handleMetaTool(toolName, args, sessionId);
   }
 
   // ── Resources (passthrough — low cardinality, fine to expose) ─
