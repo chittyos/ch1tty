@@ -13,6 +13,7 @@ import { loadConfigFromPath } from './config.js';
 import { VERSION } from './utils.js';
 import * as alchemist from './alchemist.js';
 import { ChittyTaskClient } from './task-client.js';
+import { OllamaClient } from './ollama.js';
 import type { AuthInfo } from '@modelcontextprotocol/sdk/server/auth/types.js';
 
 const SEPARATOR = '/';
@@ -37,6 +38,7 @@ export class Aggregator {
   private configPath?: string;
   private startedAt = Date.now();
   private taskClient = new ChittyTaskClient();
+  private ollama = new OllamaClient();
 
   constructor(configs: ServerConfig[], options?: AggregatorOptions) {
     this.accessFilter = options?.accessFilter;
@@ -174,6 +176,24 @@ export class Aggregator {
           required: ['taskId'],
         },
       },
+      // ── Ollama intelligence tools ──
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}think`,
+        description: '[ch1tty] Meta-routing — ask Ch1tty\'s Ollama brain for the optimal strategy to handle a request',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            request: { type: 'string', description: 'What needs to be done' },
+            context: { type: 'string', description: 'Additional context (project, entity, urgency)' },
+          },
+          required: ['request'],
+        },
+      },
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}brain_status`,
+        description: '[ch1tty] Check Ollama brain status — model, availability, health',
+        inputSchema: { type: 'object' },
+      },
       // ── Ledger write tools — model/channel agnostic ──
       {
         name: `${META_SERVER_ID}${SEPARATOR}log_decision`,
@@ -257,6 +277,10 @@ export class Aggregator {
         return this.handleTaskTool('get', args, context);
       case 'task_update':
         return this.handleTaskTool('update', args, context);
+      case 'think':
+        return this.handleThink(args);
+      case 'brain_status':
+        return this.handleBrainStatus();
       case 'log_decision':
         return this.handleLedgerWrite('DECISION', args, context);
       case 'log_event':
@@ -310,8 +334,16 @@ export class Aggregator {
 
   private async handleStatus(): Promise<ToolCallResult> {
     const summary = this.getStatusSnapshot();
+    const brain = await this.ollama.health();
     return {
-      content: [{ type: 'text', text: JSON.stringify(summary, null, 2) }],
+      content: [{ type: 'text', text: JSON.stringify({
+        ...summary,
+        brain: {
+          status: brain.ok ? 'connected' : 'offline',
+          model: brain.model,
+          models: brain.models,
+        },
+      }, null, 2) }],
     };
   }
 
@@ -866,6 +898,57 @@ export class Aggregator {
     }
 
     return backend.getPrompt(serverId, promptName, args);
+  }
+
+  /** Ask Ollama brain for routing decision */
+  private async handleThink(args?: Record<string, unknown>): Promise<ToolCallResult> {
+    const request = (args?.request as string) || '';
+    if (!request) {
+      return { content: [{ type: 'text', text: 'Provide a request to think about.' }], isError: true };
+    }
+
+    // Build context for Ollama
+    const tools = (await this.listAllTools()).tools.map((t) => t.name);
+    const backends = this.activeConfigs().map((c) => c.id);
+
+    const decision = await this.ollama.route({
+      request,
+      availableTools: tools,
+      activeBackends: backends,
+      sessionInfo: {
+        project: (args?.context as string) || undefined,
+      },
+    });
+
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify({
+          strategy: decision.strategy,
+          backend: decision.backend,
+          tool: decision.tool,
+          reasoning: decision.reasoning,
+          confidence: decision.confidence,
+          model: this.ollama.modelName,
+        }, null, 2),
+      }],
+    };
+  }
+
+  /** Ollama brain health check */
+  private async handleBrainStatus(): Promise<ToolCallResult> {
+    const health = await this.ollama.health();
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify({
+          brain: health.ok ? 'connected' : 'offline',
+          model: health.model,
+          availableModels: health.models,
+          fallback: 'deterministic routing (keyword-based)',
+        }, null, 2),
+      }],
+    };
   }
 
   /** Handle ledger write tools — writes to local buffer, daemon flushes to Neon */
