@@ -56,6 +56,7 @@ async function main(): Promise<void> {
   // Stdio transport — always active, single session
   const stdioSessionId = `stdio-${crypto.randomUUID().slice(0, 8)}`;
   aggregator.sessions.getOrCreate(stdioSessionId, 'stdio');
+  aggregator.coordinator.onSessionStart(stdioSessionId, 'stdio');
 
   const server = new Server(
     { name: 'ch1tty', version: VERSION },
