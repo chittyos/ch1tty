@@ -1,3 +1,4 @@
+import { handleGptAction } from './gpt-actions.js';
 import { createServer, type Server as HttpServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
@@ -36,6 +37,12 @@ export class HttpMcpServer {
 
   private handleRequest(req: IncomingMessage, res: ServerResponse): void {
     const url = req.url ?? '/';
+
+    // GPT Actions facade
+    if (url.startsWith('/gpt-actions')) {
+      const sessionId = 'gpt-actions-' + (req.headers['x-conversation-id'] || 'default');
+      if (handleGptAction(this.aggregator, sessionId, req, res, url)) return;
+    }
 
     // Health endpoints — no auth required
     if (req.method === 'GET' && url === '/health') {
