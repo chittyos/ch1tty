@@ -69,9 +69,12 @@ export class SessionCoordinator {
     this.stageSession(sessionId).catch((err) => {
       log.warn(`Background staging failed for session ${sessionId}: ${err}`);
     });
+
+    // Record session start to ledger
+    this.recordToLedger(sessionId, 'session_start', { transport });
   }
 
-  /** Called when a tool is executed. Records patterns and updates affinity. */
+  /** Called when a tool is executed. Records patterns, updates affinity, delegates to ledger. */
   onToolCall(sessionId: string, namespacedTool: string): void {
     const ctx = this.contexts.get(sessionId);
     if (!ctx) return;
@@ -95,6 +98,13 @@ export class SessionCoordinator {
         lastUsed: Date.now(),
       });
     }
+
+    // Delegate to ledger (fire-and-forget)
+    this.recordToLedger(sessionId, 'tool_call', {
+      tool: namespacedTool,
+      session_id: sessionId,
+      entity_id: ctx.entity?.chittyId,
+    });
   }
 
   /** Called when a session ends. Persists observations if possible. */
@@ -102,18 +112,29 @@ export class SessionCoordinator {
     const ctx = this.contexts.get(sessionId);
     if (!ctx) return;
 
-    // Best-effort: checkpoint session observations to ContextConsciousness
-    if (ctx.toolPatterns.size > 0 && this.ecosystemBackend) {
-      const patterns = [...ctx.toolPatterns.values()]
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 20)
-        .map((p) => `${p.tool} (${p.count}x)`);
+    const patterns = [...ctx.toolPatterns.values()]
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 20);
+    const patternSummary = patterns.map((p) => `${p.tool} (${p.count}x)`);
+    const totalCalls = patterns.reduce((sum, p) => sum + p.count, 0);
+    const duration = Math.round((Date.now() - (ctx.entity?.resolvedAt ?? Date.now())) / 1000);
 
+    // Checkpoint to ContextConsciousness (best-effort)
+    if (ctx.toolPatterns.size > 0 && this.ecosystemBackend) {
       await this.callEcosystem('context_checkpoint', {
         session_id: sessionId,
-        summary: `Session ended. Top tools: ${patterns.join(', ')}`,
-      }).catch(() => {}); // best effort
+        summary: `Session ended. ${totalCalls} tool calls. Top: ${patternSummary.join(', ')}`,
+      }).catch(() => {});
     }
+
+    // Record session end to ledger with summary
+    this.recordToLedger(sessionId, 'session_end', {
+      tool_calls: totalCalls,
+      unique_tools: ctx.toolPatterns.size,
+      duration_seconds: duration,
+      top_tools: patternSummary.slice(0, 5),
+      servers_used: [...ctx.serverAffinity.keys()],
+    });
 
     this.contexts.delete(sessionId);
   }
@@ -135,6 +156,23 @@ export class SessionCoordinator {
     return [...ctx.toolPatterns.values()]
       .sort((a, b) => b.count - a.count)
       .slice(0, limit);
+  }
+
+  /** Log a decision to the ledger on behalf of the entity. */
+  logDecision(sessionId: string, decision: string, reasoning?: string, topic?: string): void {
+    this.recordToLedger(sessionId, 'decision', {
+      decision,
+      ...(reasoning ? { reasoning } : {}),
+      ...(topic ? { topic } : {}),
+    });
+  }
+
+  /** Log a milestone or observation to the ledger. */
+  logEvent(sessionId: string, action: string, eventType?: string, metadata?: Record<string, unknown>): void {
+    this.recordToLedger(sessionId, eventType ?? 'event', {
+      action,
+      ...metadata,
+    });
   }
 
   /** Is staging complete for this session? */
@@ -245,6 +283,21 @@ export class SessionCoordinator {
   }
 
   // ── Helpers ─────────────────────────────────────────────────
+
+  /** Fire-and-forget ledger write — delegates to chitty_ledger_record via ecosystem backend. */
+  private recordToLedger(sessionId: string, eventType: string, metadata: Record<string, unknown>): void {
+    if (!this.ecosystemBackend) return;
+
+    const ctx = this.contexts.get(sessionId);
+    this.callEcosystem('chitty_ledger_record', {
+      event_type: eventType,
+      entity_id: ctx?.entity?.chittyId,
+      session_id: sessionId,
+      metadata,
+    }).catch((err) => {
+      log.debug(`Ledger write skipped: ${err}`, undefined, { sessionId, eventType });
+    });
+  }
 
   private async callEcosystem(toolName: string, args: Record<string, unknown>): Promise<ToolCallResult> {
     if (!this.ecosystemBackend || !this.ecosystemServerId) {
