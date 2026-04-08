@@ -13,6 +13,7 @@
  */
 
 import { log } from './logger.js';
+import { LedgerClient } from './ledger.js';
 import type { Backend, ToolCallResult } from './types.js';
 
 // ── Types ─────────────────────────────────────────────────────
@@ -47,11 +48,13 @@ export class SessionCoordinator {
   private contexts = new Map<string, SessionContext>();
   private ecosystemBackend?: Backend;
   private ecosystemServerId?: string;
+  readonly ledger = new LedgerClient();
 
   /** Register the ecosystem backend for coordinator's own tool calls. */
   bindEcosystem(backend: Backend, serverId: string): void {
     this.ecosystemBackend = backend;
     this.ecosystemServerId = serverId;
+    this.ledger.bind(backend, serverId);
     log.info(`Coordinator bound to ecosystem backend: ${serverId}`);
   }
 
@@ -127,7 +130,7 @@ export class SessionCoordinator {
       }).catch(() => {});
     }
 
-    // Record session end to ledger with summary
+    // Record session end to ledger with summary, then flush
     this.recordToLedger(sessionId, 'session_end', {
       tool_calls: totalCalls,
       unique_tools: ctx.toolPatterns.size,
@@ -135,6 +138,9 @@ export class SessionCoordinator {
       top_tools: patternSummary.slice(0, 5),
       servers_used: [...ctx.serverAffinity.keys()],
     });
+
+    // Best-effort flush so session entries land promptly
+    await this.ledger.flush().catch(() => {});
 
     this.contexts.delete(sessionId);
   }
@@ -184,6 +190,7 @@ export class SessionCoordinator {
   getSnapshot(): {
     activeSessions: number;
     boundEntity: boolean;
+    ledger: ReturnType<LedgerClient['getStats']>;
     sessions: Array<{
       sessionId: string;
       entity?: string;
@@ -201,6 +208,7 @@ export class SessionCoordinator {
     return {
       activeSessions: sessions.length,
       boundEntity: sessions.some((s) => s.entity !== undefined),
+      ledger: this.ledger.getStats(),
       sessions,
     };
   }
@@ -284,19 +292,10 @@ export class SessionCoordinator {
 
   // ── Helpers ─────────────────────────────────────────────────
 
-  /** Fire-and-forget ledger write — delegates to chitty_ledger_record via ecosystem backend. */
+  /** Buffer a ledger entry — the LedgerClient handles batching, retries, and flush. */
   private recordToLedger(sessionId: string, eventType: string, metadata: Record<string, unknown>): void {
-    if (!this.ecosystemBackend) return;
-
     const ctx = this.contexts.get(sessionId);
-    this.callEcosystem('chitty_ledger_record', {
-      event_type: eventType,
-      entity_id: ctx?.entity?.chittyId,
-      session_id: sessionId,
-      metadata,
-    }).catch((err) => {
-      log.debug(`Ledger write skipped: ${err}`, undefined, { sessionId, eventType });
-    });
+    this.ledger.record(sessionId, eventType, metadata, ctx?.entity?.chittyId);
   }
 
   private async callEcosystem(toolName: string, args: Record<string, unknown>): Promise<ToolCallResult> {
