@@ -1,4 +1,5 @@
 import { handleGptAction } from './gpt-actions.js';
+import { handleOpenClawRoute } from './openclaw-facade.js';
 import { createServer, type Server as HttpServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
@@ -42,6 +43,11 @@ export class HttpMcpServer {
     if (url.startsWith('/gpt-actions')) {
       const sessionId = 'gpt-actions-' + (req.headers['x-conversation-id'] || 'default');
       if (handleGptAction(this.aggregator, sessionId, req, res, url)) return;
+    }
+
+    // OpenClaw facade
+    if (url.startsWith('/openclaw')) {
+      if (handleOpenClawRoute(this.aggregator, req, res, url)) return;
     }
 
     // Health endpoints — no auth required

@@ -37,6 +37,17 @@
       "enabled": true
     },
 
+    {
+      "id": "cowork",
+      "name": "Co-Work VM Bridge",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "desktop",
+      "endpoint": "http://127.0.0.1:8850/mcp",
+      "lazy": true,
+      "enabled": true
+    },
+
     {"_comment": "── local: portable stdio servers (npx/uvx, no hardcoded paths) ─"},
 
     {
