@@ -1,7 +1,8 @@
 {
   "name": "ch1tty",
-  "description": "ChittyOS Universal MCP Gateway — aggregates all MCP backends behind one stdio server",
-  "version": "2.0.0",
+  "description": "ChittyOS Universal MCP Gateway — slim-MCP surface (search/execute/status/reload) over all backends",
+  "version": "4.0.0",
+  "base_url": "https://ch1tty.chitty.cc",
   "endpoints": ["/health", "/api/v1/status"],
   "schema": {
     "version": "1.0.0",
@@ -14,8 +15,55 @@
   },
   "metadata": {
     "maintainer": "chittyos-infrastructure",
-    "transport": "stdio",
+    "transport": "stdio+http",
     "health_port_env": "CH1TTY_HEALTH_PORT",
     "repository": "github.com/CHITTYOS/ch1tty"
+  },
+  "capabilities": {
+    "tools": [
+      {
+        "name": "search",
+        "description": "Search the tool registry. Returns matching tool names, descriptions, and input schemas.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": { "type": "string", "description": "Search keywords" },
+            "server": { "type": "string", "description": "Filter by server id" },
+            "category": { "type": "string", "description": "Filter by category" },
+            "limit": { "type": "number", "description": "Max results (default 20)" }
+          }
+        },
+        "http": { "method": "POST", "path": "/mcp" },
+        "access": "read"
+      },
+      {
+        "name": "execute",
+        "description": "Execute a tool by its namespaced name (serverId/toolName). Use search first.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "tool": { "type": "string", "description": "Namespaced tool name from search results" },
+            "args": { "type": "object", "description": "Arguments to pass to the tool" }
+          },
+          "required": ["tool"]
+        },
+        "http": { "method": "POST", "path": "/mcp" },
+        "access": "readwrite"
+      },
+      {
+        "name": "status",
+        "description": "Gateway status — connected servers, tool counts, cache ages",
+        "inputSchema": { "type": "object" },
+        "http": { "method": "GET", "path": "/api/v1/status" },
+        "access": "read"
+      },
+      {
+        "name": "reload",
+        "description": "Hot-reload servers.json without restarting the gateway",
+        "inputSchema": { "type": "object" },
+        "http": { "method": "POST", "path": "/mcp" },
+        "access": "write"
+      }
+    ]
   }
 }
