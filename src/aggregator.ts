@@ -632,6 +632,9 @@ export class Aggregator {
   // ── Lifecycle ───────────────────────────────────────────────
 
   async shutdown(): Promise<void> {
+    // Flush ledger before shutting down backends
+    await this.coordinator.ledger.shutdown();
+
     const seen = new Set<Backend>();
     const shutdowns: Promise<void>[] = [];
 
