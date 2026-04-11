@@ -14,6 +14,7 @@
 
 import { log } from './logger.js';
 import { LedgerClient } from './ledger.js';
+import { OllamaBrain, type OllamaBrainConfig, type RoutedTool, type ToolCandidate } from './ollama-brain.js';
 import type { Backend, ToolCallResult } from './types.js';
 
 // ── Types ─────────────────────────────────────────────────────
@@ -49,6 +50,29 @@ export class SessionCoordinator {
   private ecosystemBackend?: Backend;
   private ecosystemServerId?: string;
   readonly ledger = new LedgerClient();
+  readonly brain: OllamaBrain;
+
+  constructor(brainConfig: Partial<OllamaBrainConfig> = {}) {
+    this.brain = new OllamaBrain(brainConfig);
+  }
+
+  /**
+   * Route a free-form intent query to ranked tool candidates via the local
+   * Ollama brain. Returns null when the brain is unavailable, times out,
+   * or produces no high-confidence matches — callers MUST fall back to the
+   * deterministic literal search path on null.
+   *
+   * This is a discovery-only capability. The brain never participates in
+   * the execute path; execution stays deterministic per the fractal rule
+   * "coordinator orchestrates, it does not accumulate".
+   */
+  async routeIntent(query: string, candidates: ToolCandidate[]): Promise<RoutedTool[] | null> {
+    const result = await this.brain.route(query, candidates);
+    if (result) {
+      log.debug(`Brain routed "${query.slice(0, 40)}" → ${result.length} candidate(s)`);
+    }
+    return result;
+  }
 
   /** Register the ecosystem backend for coordinator's own tool calls. */
   bindEcosystem(backend: Backend, serverId: string): void {
@@ -191,6 +215,7 @@ export class SessionCoordinator {
     activeSessions: number;
     boundEntity: boolean;
     ledger: ReturnType<LedgerClient['getStats']>;
+    brain: ReturnType<OllamaBrain['getStats']>;
     sessions: Array<{
       sessionId: string;
       entity?: string;
@@ -209,6 +234,7 @@ export class SessionCoordinator {
       activeSessions: sessions.length,
       boundEntity: sessions.some((s) => s.entity !== undefined),
       ledger: this.ledger.getStats(),
+      brain: this.brain.getStats(),
       sessions,
     };
   }
