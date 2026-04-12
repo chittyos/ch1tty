@@ -55,11 +55,10 @@
       "name": "Notion",
       "type": "local",
       "access": "readwrite",
-      "category": "ecosystem",
+      "category": "documents",
       "command": "npx",
-      "args": ["-y", "@notionhq/notion-mcp-server", "--stdio"],
+      "args": ["-y", "@notionhq/notion-mcp-server"],
       "env": {
-        "OPENAPI_MCP_HEADERS": "{\"Authorization\":\"Bearer ${NOTION_TOKEN}\",\"Notion-Version\":\"2022-06-28\"}",
         "NOTION_TOKEN": "op://ChittyOS-Integrations/notion/api_token"
       },
       "lazy": true,
@@ -67,12 +66,12 @@
     },
     {
       "id": "stripe",
-      "name": "Stripe",
+      "name": "Stripe Billing",
       "type": "local",
       "access": "readwrite",
       "category": "ecosystem",
       "command": "npx",
-      "args": ["-y", "@stripe/mcp", "--tools=all"],
+      "args": ["-y", "@stripe/mcp"],
       "env": {
         "STRIPE_SECRET_KEY": "op://ChittyOS-Integrations/stripe/secret_key"
       },
@@ -80,8 +79,9 @@
       "enabled": true
     },
     {
+      "_comment": "deprecated upstream — replace when GitHub ships official MCP",
       "id": "github",
-      "name": "GitHub",
+      "name": "GitHub API",
       "type": "local",
       "access": "readwrite",
       "category": "code",
