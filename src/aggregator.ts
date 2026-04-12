@@ -196,7 +196,8 @@ export class Aggregator {
       {
         name: `${META_SERVER_ID}${SEPARATOR}cast`,
         description:
-          'Describe what you want done in natural language. Ch1tty resolves your intent to the right tool and executes it. ' +
+          'Describe what you want done in natural language. Ch1tty searches its full surface — tools, prompts, and resources — ' +
+          'resolves intent, and executes the best tool match. Related prompts and resources are surfaced alongside. ' +
           'Sub-meta to master-meta — the gateway calling itself.',
         inputSchema: {
           type: 'object',
@@ -505,29 +506,96 @@ export class Aggregator {
       };
     }
 
-    // Step 1: Score registry against intent (Ch1tty searching itself)
-    const registry = await this.getRegistry();
-    const scored = this.scoreIntent(intent, registry, sessionId);
+    const terms = intent.toLowerCase().split(/\s+/).filter((t) => t.length > 2);
 
-    if (scored.length === 0) {
+    // Step 1: Score tools, prompts, and resources in parallel (Ch1tty searching itself)
+    const [registry, { prompts: allPrompts }, { resources: allResources }] = await Promise.all([
+      this.getRegistry(),
+      this.listAllPrompts().catch(() => ({ prompts: [] as Array<{ name: string; description?: string; arguments?: Array<{ name: string; description?: string; required?: boolean }> }> })),
+      this.listAllResources().catch(() => ({ resources: [] as Array<{ uri: string; name: string; description?: string; mimeType?: string }> })),
+    ]);
+
+    const scoredTools = this.scoreIntent(intent, registry, sessionId);
+
+    // Score prompts against intent
+    const scoredPrompts = allPrompts
+      .map((p) => {
+        const haystack = `${p.name} ${p.description || ''}`.toLowerCase();
+        const matchCount = terms.filter((t) => haystack.includes(t)).length;
+        const score = terms.length > 0 ? Math.round((matchCount / terms.length) * 100) / 100 : 0;
+        return { ...p, score };
+      })
+      .filter((p) => p.score > 0.1)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5);
+
+    // Score resources against intent
+    const scoredResources = allResources
+      .map((r) => {
+        const haystack = `${r.uri} ${r.name} ${r.description || ''}`.toLowerCase();
+        const matchCount = terms.filter((t) => haystack.includes(t)).length;
+        const score = terms.length > 0 ? Math.round((matchCount / terms.length) * 100) / 100 : 0;
+        return { ...r, score };
+      })
+      .filter((r) => r.score > 0.1)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5);
+
+    // No matches across any surface
+    if (scoredTools.length === 0 && scoredPrompts.length === 0 && scoredResources.length === 0) {
       return {
         content: [{
           type: 'text',
           text: JSON.stringify({
             cast: 'no_match',
             intent,
-            hint: 'No tools matched your intent. Try ch1tty/search with different keywords.',
+            hint: 'No tools, prompts, or resources matched your intent. Try ch1tty/search with different keywords.',
           }, null, 2),
         }],
       };
     }
 
-    const best = scored[0];
-    const alternatives = scored.slice(1, 4).map((t) => ({
+    const best = scoredTools[0];
+    const alternatives = scoredTools.slice(1, 4).map((t) => ({
       tool: t.namespacedName,
       score: t.score,
       description: t.description,
     }));
+
+    // Build related prompts/resources context
+    const related: Record<string, unknown> = {};
+    if (scoredPrompts.length > 0) {
+      related.prompts = scoredPrompts.map((p) => ({
+        name: p.name,
+        description: p.description,
+        arguments: p.arguments,
+        score: p.score,
+      }));
+    }
+    if (scoredResources.length > 0) {
+      related.resources = scoredResources.map((r) => ({
+        uri: r.uri,
+        name: r.name,
+        description: r.description,
+        mimeType: r.mimeType,
+        score: r.score,
+      }));
+    }
+
+    // If no tools matched but prompts/resources did, surface those
+    if (!best) {
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            cast: 'discovered',
+            intent,
+            hint: 'No executable tools matched, but related prompts/resources found.',
+            ...related,
+          }, null, 2),
+        }],
+      };
+    }
 
     // Step 2: Confirm mode — return the plan without executing
     if (confirm) {
@@ -546,6 +614,7 @@ export class Aggregator {
               inputSchema: best.inputSchema,
             },
             alternatives,
+            ...related,
             args: toolArgs,
             hint: 'Call cast again without confirm to execute, or use ch1tty/execute directly.',
           }, null, 2),
@@ -559,7 +628,7 @@ export class Aggregator {
       sessionId,
     );
 
-    // Return cast metadata + raw tool output
+    // Return cast metadata + related context + raw tool output
     return {
       content: [
         {
@@ -570,6 +639,7 @@ export class Aggregator {
             resolved: best.namespacedName,
             score: best.score,
             ...(alternatives.length > 0 ? { alternatives } : {}),
+            ...related,
           }),
         },
         ...result.content,
