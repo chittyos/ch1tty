@@ -193,6 +193,30 @@ export class Aggregator {
         description: 'Hot-reload servers.json without restarting the gateway',
         inputSchema: { type: 'object' },
       },
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}cast`,
+        description:
+          'Describe what you want done in natural language. Ch1tty resolves your intent to the right tool and executes it. ' +
+          'Sub-meta to master-meta — the gateway calling itself.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            intent: {
+              type: 'string',
+              description: 'Natural language description of what you want accomplished',
+            },
+            args: {
+              type: 'object',
+              description: 'Arguments to pass to the resolved tool (if known)',
+            },
+            confirm: {
+              type: 'boolean',
+              description: 'If true, return the execution plan without running it (default: false)',
+            },
+          },
+          required: ['intent'],
+        },
+      },
     ];
   }
 
@@ -206,6 +230,8 @@ export class Aggregator {
         return this.handleStatus();
       case 'reload':
         return this.handleReload();
+      case 'cast':
+        return this.handleCast(args, sessionId);
       default:
         return {
           content: [{ type: 'text', text: `Unknown tool: ch1tty/${toolName}` }],
@@ -463,6 +489,141 @@ export class Aggregator {
     }
   }
 
+  // ── Cast (sub-meta → master-meta) ───────────────────────────
+
+  private async handleCast(args: Record<string, unknown>, sessionId?: string): Promise<ToolCallResult> {
+    const intent = typeof args.intent === 'string' ? args.intent.trim() : '';
+    const toolArgs = (typeof args.args === 'object' && args.args !== null && !Array.isArray(args.args))
+      ? args.args as Record<string, unknown>
+      : {};
+    const confirm = args.confirm === true;
+
+    if (!intent) {
+      return {
+        content: [{ type: 'text', text: 'Missing required "intent". Describe what you want done.' }],
+        isError: true,
+      };
+    }
+
+    // Step 1: Score registry against intent (Ch1tty searching itself)
+    const registry = await this.getRegistry();
+    const scored = this.scoreIntent(intent, registry, sessionId);
+
+    if (scored.length === 0) {
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            cast: 'no_match',
+            intent,
+            hint: 'No tools matched your intent. Try ch1tty/search with different keywords.',
+          }, null, 2),
+        }],
+      };
+    }
+
+    const best = scored[0];
+    const alternatives = scored.slice(1, 4).map((t) => ({
+      tool: t.namespacedName,
+      score: t.score,
+      description: t.description,
+    }));
+
+    // Step 2: Confirm mode — return the plan without executing
+    if (confirm) {
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            cast: 'plan',
+            intent,
+            resolved: {
+              tool: best.namespacedName,
+              server: best.serverId,
+              category: best.category,
+              description: best.description,
+              score: best.score,
+              inputSchema: best.inputSchema,
+            },
+            alternatives,
+            args: toolArgs,
+            hint: 'Call cast again without confirm to execute, or use ch1tty/execute directly.',
+          }, null, 2),
+        }],
+      };
+    }
+
+    // Step 3: Execute (Ch1tty executing through itself)
+    const result = await this.handleExecute(
+      { tool: best.namespacedName, args: toolArgs },
+      sessionId,
+    );
+
+    // Return cast metadata + raw tool output
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify({
+            cast: 'executed',
+            intent,
+            resolved: best.namespacedName,
+            score: best.score,
+            ...(alternatives.length > 0 ? { alternatives } : {}),
+          }),
+        },
+        ...result.content,
+      ],
+      isError: result.isError,
+    };
+  }
+
+  /**
+   * Score registry tools against a natural language intent.
+   *
+   * v1: keyword matching + session affinity boost from coordinator.
+   * v2 hook: a "brain" backend (Alchemist/Ollama) can replace this with
+   * semantic scoring, arg extraction, and multi-step plan generation.
+   */
+  private scoreIntent(
+    intent: string,
+    registry: NamespacedTool[],
+    sessionId?: string,
+  ): Array<NamespacedTool & { score: number }> {
+    const terms = intent.toLowerCase().split(/\s+/).filter((t) => t.length > 2);
+    if (terms.length === 0) return [];
+
+    const affinityMap = sessionId
+      ? this.coordinator.getServerAffinity(sessionId)
+      : new Map<string, number>();
+
+    const scored = registry.map((tool) => {
+      const haystack = `${tool.namespacedName} ${tool.description} ${tool.serverName} ${tool.category}`.toLowerCase();
+
+      // Keyword match (0–1): fraction of intent terms found in tool metadata
+      const matchCount = terms.filter((term) => haystack.includes(term)).length;
+      const keywordScore = matchCount / terms.length;
+
+      // Affinity boost (0–0.2): exponential decay from last use, 10-min half-life
+      const affinityTs = affinityMap.get(tool.serverId);
+      const affinityScore = affinityTs
+        ? 0.2 * Math.exp(-(Date.now() - affinityTs) / (10 * 60 * 1000))
+        : 0;
+
+      // Exact server/tool name match bonus (0 or 0.3)
+      const nameBonus = terms.some((t) =>
+        tool.name.toLowerCase() === t || tool.serverId.toLowerCase() === t,
+      ) ? 0.3 : 0;
+
+      const score = Math.round((keywordScore + affinityScore + nameBonus) * 100) / 100;
+      return { ...tool, score };
+    });
+
+    return scored
+      .filter((t) => t.score > 0.1)
+      .sort((a, b) => b.score - a.score);
+  }
+
   // ── Public MCP interface ────────────────────────────────────
 
   async listAllTools(): Promise<{
@@ -482,7 +643,7 @@ export class Aggregator {
       return {
         content: [{
           type: 'text',
-          text: `Invalid tool name "${namespacedName}". Available tools: ch1tty/search, ch1tty/execute, ch1tty/status, ch1tty/reload`,
+          text: `Invalid tool name "${namespacedName}". Available tools: ch1tty/search, ch1tty/execute, ch1tty/status, ch1tty/reload, ch1tty/cast`,
         }],
         isError: true,
       };

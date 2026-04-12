@@ -2,7 +2,7 @@
 uri: chittycanon://docs/tech/procedure/ch1tty-dev-guide
 namespace: chittycanon://docs/tech
 type: procedure
-version: 3.0.0
+version: 4.1.0
 status: CERTIFIED
 registered_with: chittycanon://core/services/canon
 certifier: chittycanon://core/services/chittycertify
@@ -29,7 +29,7 @@ npm run dev     # Watch mode for development
 ## Architecture
 
 - **Entry**: `src/index.ts` — wires stdio + optional HTTP transport to the aggregator
-- **Aggregator**: `src/aggregator.ts` — slim-MCP surface: search/execute/status/reload meta-tools, internal tool registry, backend routing
+- **Aggregator**: `src/aggregator.ts` — slim-MCP surface: search/execute/status/reload/cast meta-tools, internal tool registry, backend routing
 - **HTTP Server**: `src/http-server.ts` — Streamable HTTP MCP transport on `/mcp`, health on `/health`, bearer auth
 - **ChildManager**: `src/child-manager.ts` — `Backend` for local stdio child processes
 - **RemoteProxy**: `src/remote-proxy.ts` — `Backend` for remote HTTP MCP endpoints
@@ -38,7 +38,7 @@ npm run dev     # Watch mode for development
 
 ## Slim-MCP Pattern
 
-Ch1tty exposes exactly 4 tools to clients:
+Ch1tty exposes exactly 5 tools to clients:
 
 | Tool | Purpose |
 |------|---------|
@@ -46,8 +46,11 @@ Ch1tty exposes exactly 4 tools to clients:
 | `ch1tty/execute` | Invoke any discovered tool by namespaced name + args |
 | `ch1tty/status` | Gateway status — servers, tool counts, uptime |
 | `ch1tty/reload` | Hot-reload `servers.json` without restart |
+| `ch1tty/cast` | Natural language intent → tool resolution → execution (sub-meta to master-meta) |
 
-The full backend tool registry (100+ tools across all servers) is never exposed in `tools/list`. Clients search on-demand, keeping context cost at ~4 tool definitions regardless of how many backends are connected.
+`cast` is the wizard layer: describe what you want, Ch1tty searches its own registry, scores matches against your intent + session context, and executes the best fit. Use `confirm: true` to preview the plan before firing. v1 uses keyword scoring + coordinator affinity; v2 will delegate to a brain backend (Alchemist/Ollama) for semantic resolution and multi-step chaining.
+
+The full backend tool registry (100+ tools across all servers) is never exposed in `tools/list`. Clients search on-demand, keeping context cost at ~5 tool definitions regardless of how many backends are connected.
 
 ## Key Patterns
 
@@ -97,7 +100,7 @@ CH1TTY_PORT=9099 CH1TTY_MCP_TOKEN=secret123 npm start
 ```
 
 Endpoints on `0.0.0.0:{port}`:
-- `GET /health` — `{"status":"ok","service":"ch1tty","version":"3.0.0"}`
+- `GET /health` — `{"status":"ok","service":"ch1tty","version":"4.1.0"}`
 - `GET /api/v1/status` — Full gateway status snapshot
 - `* /mcp` — **Streamable HTTP MCP endpoint** (bearer token required if `CH1TTY_MCP_TOKEN` is set)
 

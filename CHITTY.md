@@ -2,7 +2,7 @@
 uri: chittycanon://docs/tech/architecture/ch1tty
 namespace: chittycanon://docs/tech
 type: architecture
-version: 3.0.0
+version: 4.1.0
 status: CERTIFIED
 registered_with: chittycanon://core/services/canon
 title: "Ch1tty Architecture"
@@ -14,7 +14,7 @@ visibility: PUBLIC
 
 ## Architecture Summary
 
-Ch1tty is a Node.js MCP server that acts as a slim-MCP gateway. It exposes 4 tools (`search`, `execute`, `status`, `reload`) while internally maintaining a full registry of 100+ tools across multiple backends via the `Backend` interface:
+Ch1tty is a Node.js MCP server that acts as a slim-MCP gateway. It exposes 5 tools (`search`, `execute`, `status`, `reload`, `cast`) while internally maintaining a full registry of 100+ tools across multiple backends via the `Backend` interface:
 
 - **Local backends** (`ChildManager`): Spawned as child processes via `StdioClientTransport`
 - **Remote backends** (`RemoteProxy`): Reached via `StreamableHTTPClientTransport`
@@ -41,6 +41,7 @@ AI Client (Claude Code / Codex)
     ▼
   Ch1tty ─── search ──► Internal tool registry (cached)
     │         execute ─► Backend routing
+    │         cast ────► intent → search → execute (sub-meta)
     │
     ├── ChildManager ──► Local MCP servers (stdio children)
     │                    └ neon, context7, thinking, fs, playwright
@@ -51,7 +52,7 @@ AI Client (Claude Code / Codex)
 Remote AI Client (Claude web / ChatGPT / CF Agents)
     │ Streamable HTTP (/mcp)
     ▼
-  Ch1tty (same aggregator, same 4 tools)
+  Ch1tty (same aggregator, same 5 tools)
 ```
 
 ## Consumers
