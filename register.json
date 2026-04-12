@@ -1,9 +1,13 @@
 {
   "name": "ch1tty",
-  "description": "ChittyOS Universal MCP Gateway — slim-MCP surface (search/execute/status/reload) over all backends",
-  "version": "4.0.0",
+  "description": "ChittyOS Universal MCP Gateway — slim-MCP surface (search/execute/status/reload/cast) over all backends",
+  "version": "4.1.0",
   "base_url": "https://ch1tty.chitty.cc",
-  "endpoints": ["/health", "/api/v1/status"],
+  "tier": 2,
+  "domain": "ch1tty.chitty.cc",
+  "canonicalUri": "chittycanon://core/services/ch1tty",
+  "category": "platform",
+  "endpoints": ["/health", "/api/v1/status", "/mcp"],
   "schema": {
     "version": "1.0.0",
     "entities": ["Server", "Tool", "Resource", "Prompt"],
@@ -63,6 +67,20 @@
         "inputSchema": { "type": "object" },
         "http": { "method": "POST", "path": "/mcp" },
         "access": "write"
+      },
+      {
+        "name": "cast",
+        "description": "Natural language intent → tool resolution → execution. Describe what you want; Ch1tty searches, scores, and executes the best match.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "intent": { "type": "string", "description": "What you want to accomplish" },
+            "confirm": { "type": "boolean", "description": "Preview the plan before executing (default false)" }
+          },
+          "required": ["intent"]
+        },
+        "http": { "method": "POST", "path": "/mcp" },
+        "access": "readwrite"
       }
     ]
   }
