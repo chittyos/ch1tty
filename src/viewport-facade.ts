@@ -270,6 +270,7 @@ async function handleMemoryRecall(
   if (!resp.ok) {
     return {
       content: [{ type: 'text', text: JSON.stringify({ recalled: false, status: resp.status }) }],
+      isError: true,
     };
   }
 
@@ -297,6 +298,7 @@ async function handleMemoryPersist(
   if (!resp.ok) {
     return {
       content: [{ type: 'text', text: JSON.stringify({ persisted: false, status: resp.status }) }],
+      isError: true,
     };
   }
 
@@ -309,7 +311,8 @@ async function handleMemoryPersist(
 
 async function handleDoctrineSeed(): Promise<ToolCallResult> {
   const seed = await fetchDoctrineSeed();
-  return { content: [{ type: 'text', text: JSON.stringify(seed, null, 2) }] };
+  const isError = 'error' in seed;
+  return { content: [{ type: 'text', text: JSON.stringify(seed, null, 2) }], isError };
 }
 
 async function fetchDoctrineSeed(): Promise<Record<string, unknown>> {

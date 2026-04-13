@@ -79,7 +79,8 @@ export function getKeyPair(): KeyPair {
       log.info('Ed25519 keypair loaded from CH1TTY_PRIVATE_KEY');
       return cachedKeyPair;
     } catch (err) {
-      log.error(`Failed to load CH1TTY_PRIVATE_KEY: ${err}`);
+      // Key was set but malformed — throw, don't silently downgrade to ephemeral.
+      throw new Error(`CH1TTY_PRIVATE_KEY is set but invalid: ${err}`);
     }
   }
 
@@ -167,8 +168,10 @@ export async function signedFetch(
   const headers: Record<string, string> = {
     ...options.headers,
     ...signed,
-    'Content-Type': 'application/json',
   };
+  if (bodyStr) {
+    headers['Content-Type'] = 'application/json';
+  }
 
   if (options.onBehalfOf) {
     headers['X-On-Behalf-Of'] = options.onBehalfOf;
