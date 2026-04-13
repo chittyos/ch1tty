@@ -15,6 +15,11 @@ import { VERSION } from './utils.js';
 import { log } from './logger.js';
 import { SessionTracker } from './session.js';
 import { SessionCoordinator } from './coordinator.js';
+import {
+  VIEWPORT_SERVER_ID,
+  getViewportTools,
+  handleViewportCall,
+} from './viewport-facade.js';
 
 const SEPARATOR = '/';
 const META_SERVER_ID = 'ch1tty';
@@ -133,6 +138,22 @@ export class Aggregator {
       this.registry = results.flatMap((r) =>
         r.status === 'fulfilled' ? r.value : [],
       );
+
+      // Inject viewport-hydration virtual tools (doctrine-aligned session bootstrap).
+      // No real backend — routed in handleExecute via handleViewportCall.
+      for (const t of getViewportTools()) {
+        this.registry.push({
+          serverId: VIEWPORT_SERVER_ID,
+          serverName: 'Viewport Hydration',
+          category: 'ecosystem',
+          access: 'readwrite',
+          name: t.name,
+          namespacedName: `${VIEWPORT_SERVER_ID}${SEPARATOR}${t.name}`,
+          description: t.description ?? t.name,
+          inputSchema: t.inputSchema,
+        });
+      }
+
       this.registryExpiresAt = Date.now() + Aggregator.REGISTRY_TTL;
     })();
 
@@ -337,6 +358,20 @@ export class Aggregator {
 
     const serverId = toolName.slice(0, sepIndex);
     const name = toolName.slice(sepIndex + 1);
+
+    // Virtual backend: viewport-hydration (doctrine session bootstrap).
+    if (serverId === VIEWPORT_SERVER_ID) {
+      // Resolve session Person context for on-behalf-of signing
+      const personId = sessionId
+        ? this.coordinator.getEntityContext(sessionId)?.chittyId
+        : undefined;
+      const result = await handleViewportCall(name, toolArgs, personId);
+      if (sessionId) {
+        this.sessions.recordToolCall(sessionId, toolName);
+        this.coordinator.onToolCall(sessionId, toolName);
+      }
+      return result;
+    }
 
     const backend = this.backendFor(serverId);
     if (!backend) {
