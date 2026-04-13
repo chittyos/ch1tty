@@ -189,15 +189,23 @@ async function handleHydrate(
     resolveContext(sessionId, hints, sessionPersonId),
   ]);
 
+  if (doctrineResult.status === 'rejected') {
+    log.warn(`doctrine fetch failed during hydrate: ${doctrineResult.reason}`, VIEWPORT_SERVER_ID);
+  }
+  if (contextResult.status === 'rejected') {
+    log.warn(`context resolve failed during hydrate: ${contextResult.reason}`, VIEWPORT_SERVER_ID);
+  }
+
   const doctrine = doctrineResult.status === 'fulfilled' ? doctrineResult.value : null;
   const context = contextResult.status === 'fulfilled' ? contextResult.value : null;
+  const bothFailed = !doctrine && !context;
 
   const hydration = {
     gateway: CH1TTY_IDENTITY,
     platform,
     sessionId,
-    doctrine: doctrine ?? { error: 'advocate unreachable' },
-    context: context ?? { error: 'connect unreachable', minted: false },
+    doctrine: doctrine ?? { error: String(doctrineResult.status === 'rejected' ? doctrineResult.reason : 'advocate unreachable') },
+    context: context ?? { error: String(contextResult.status === 'rejected' ? contextResult.reason : 'connect unreachable'), minted: false },
     selfCheck: [
       'Am I using the correct ChittyID (not a freshly minted one)?',
       'Am I treating myself as Person (P), not Thing (T)?',
@@ -208,10 +216,11 @@ async function handleHydrate(
     timestamp: new Date().toISOString(),
   };
 
-  log.info(`Viewport hydrated: session=${sessionId} platform=${platform}`, VIEWPORT_SERVER_ID);
+  log.info(`Viewport hydrated: session=${sessionId} platform=${platform} bothFailed=${bothFailed}`, VIEWPORT_SERVER_ID);
 
   return {
     content: [{ type: 'text', text: JSON.stringify(hydration, null, 2) }],
+    ...(bothFailed ? { isError: true } : {}),
   };
 }
 
@@ -318,7 +327,7 @@ async function handleDoctrineSeed(): Promise<ToolCallResult> {
 async function fetchDoctrineSeed(): Promise<Record<string, unknown>> {
   const resp = await signedFetch(`${ADVOCATE_BASE}/seed`, { timeoutMs: 5_000 });
   if (!resp.ok) {
-    return { error: `advocate returned ${resp.status}` };
+    throw new Error(`advocate returned ${resp.status}`);
   }
   return await resp.json() as Record<string, unknown>;
 }

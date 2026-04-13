@@ -27,7 +27,7 @@ import * as crypto from 'node:crypto';
 
 // ── Ch1tty's own identity ─────────────────────────────────────
 
-/** Minted 2026-04-13 via id.chitty.cc/api/get-chittyid?type=P&region=1&jurisdiction=USA */
+/** Minted via id.chitty.cc/api/get-chittyid?type=P&region=1&jurisdiction=USA */
 export const CH1TTY_CHITTY_ID = '03-1-USA-4266-P-2604-0-02';
 
 export const CH1TTY_IDENTITY = {
@@ -41,7 +41,7 @@ export const CH1TTY_IDENTITY = {
 
 // ── Ed25519 keypair ───────────────────────────────────────────
 
-export interface KeyPair {
+interface KeyPair {
   publicKey: crypto.KeyObject;
   privateKey: crypto.KeyObject;
   publicKeyBase64: string;
@@ -108,8 +108,8 @@ export interface SignedHeaders {
  * Sign a request payload with ch1tty's identity.
  *
  * Signature covers: `${method}:${url}:${timestamp}:${bodyHash}`
- * This prevents replay (timestamp), tampering (bodyHash), and
- * misrouting (method+url).
+ * The receiving server can enforce timestamp windows (replay),
+ * verify body hash (tampering), and check method+url (misrouting).
  */
 export function signRequest(
   method: string,
@@ -117,6 +117,7 @@ export function signRequest(
   body?: string,
 ): SignedHeaders {
   const kp = getKeyPair();
+  method = method.toUpperCase();
   const timestamp = new Date().toISOString();
   const bodyHash = body
     ? crypto.createHash('sha256').update(body).digest('hex')
@@ -188,6 +189,11 @@ export async function signedFetch(
       body: bodyStr,
       signal: controller.signal,
     });
+  } catch (err) {
+    if (controller.signal.aborted) {
+      throw new Error(`Request to ${url} timed out after ${timeout}ms`);
+    }
+    throw err;
   } finally {
     clearTimeout(timer);
   }
