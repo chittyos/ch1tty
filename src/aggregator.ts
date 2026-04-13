@@ -543,6 +543,9 @@ export class Aggregator {
 
     // No matches across any surface
     if (scoredTools.length === 0 && scoredPrompts.length === 0 && scoredResources.length === 0) {
+      if (sessionId) {
+        this.coordinator.logEvent(sessionId, 'cast_no_match', 'cast', { intent });
+      }
       return {
         content: [{
           type: 'text',
@@ -584,6 +587,13 @@ export class Aggregator {
 
     // If no tools matched but prompts/resources did, surface those
     if (!best) {
+      if (sessionId) {
+        this.coordinator.logEvent(sessionId, 'cast_discovered', 'cast', {
+          intent,
+          prompts_found: scoredPrompts.length,
+          resources_found: scoredResources.length,
+        });
+      }
       return {
         content: [{
           type: 'text',
@@ -599,6 +609,16 @@ export class Aggregator {
 
     // Step 2: Confirm mode — return the plan without executing
     if (confirm) {
+      if (sessionId) {
+        this.coordinator.logEvent(sessionId, 'cast_plan', 'cast', {
+          intent,
+          resolved: best.namespacedName,
+          score: best.score,
+          alternatives: alternatives.length,
+          prompts_found: scoredPrompts.length,
+          resources_found: scoredResources.length,
+        });
+      }
       return {
         content: [{
           type: 'text',
@@ -623,6 +643,17 @@ export class Aggregator {
     }
 
     // Step 3: Execute (Ch1tty executing through itself)
+    if (sessionId) {
+      this.coordinator.logEvent(sessionId, 'cast_execute', 'cast', {
+        intent,
+        resolved: best.namespacedName,
+        score: best.score,
+        alternatives: alternatives.map((a) => a.tool),
+        prompts_found: scoredPrompts.length,
+        resources_found: scoredResources.length,
+      });
+    }
+
     const result = await this.handleExecute(
       { tool: best.namespacedName, args: toolArgs },
       sessionId,
