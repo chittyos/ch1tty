@@ -5,20 +5,21 @@
  *   "Sessions are viewports into persistent entities."
  *   "Identity lives in the coordination layer, not in the model."
  *
- * Session protocol on_start:
- *   1. resolve_identity_from_context
- *   2. never_mint_on_failure
- *   3. load_doctrine_seed
- *   4. inherit_trust_and_experience
- *   5. declare_substrate_platform
+ * Session protocol on_start (this facade covers steps 1-3):
+ *   1. resolve_identity_from_context  → viewport/resolve_context
+ *   2. never_mint_on_failure          → error-path behavior in resolve_context
+ *   3. load_doctrine_seed             → viewport/doctrine_seed
+ *   4. inherit_trust_and_experience   → (coordinator, not this facade)
+ *   5. declare_substrate_platform     → (coordinator, not this facade)
  *
- * Session protocol on_end:
- *   1. persist_experience_to_accumulator
- *   2. log_session_event_to_ledger
- *   3. queue_sync_to_chittyconnect
+ * Session protocol on_end (this facade covers step 1):
+ *   1. persist_experience_to_accumulator → viewport/memory_persist
+ *   2. log_session_event_to_ledger       → (coordinator + ledger, not this facade)
+ *   3. queue_sync_to_chittyconnect       → (coordinator, not this facade)
  *
  * This facade exposes those operations as tools routed through
- * ch1tty/execute → viewport/{tool}. Ch1tty authenticates to
+ * ch1tty/execute with tool names like viewport/hydrate,
+ * viewport/resolve_context, etc. Ch1tty authenticates to
  * ChittyConnect with its own ChittyID + Ed25519 signature.
  *
  * @canon chittycanon://doctrine/seed
@@ -122,6 +123,32 @@ const VIEWPORT_TOOLS: ToolEntry[] = [
   },
 ];
 
+// ── Helpers ───────────────────────────────────────────────────
+
+/** Safely parse JSON from a response, throwing a descriptive error if not valid JSON. */
+async function safeJson(resp: Response, label: string): Promise<Record<string, unknown>> {
+  const text = await resp.text();
+  try {
+    return JSON.parse(text) as Record<string, unknown>;
+  } catch {
+    throw new Error(`${label} returned 200 but body is not valid JSON: ${text.slice(0, 200)}`);
+  }
+}
+
+/** Read error body from a failed response for diagnostics. */
+async function errorDetail(resp: Response): Promise<string> {
+  try { return (await resp.text()).slice(0, 500); } catch { return ''; }
+}
+
+/** Validate that a required string arg exists. Returns an error ToolCallResult or null if valid. */
+function requireString(args: Record<string, unknown>, name: string, toolName: string): ToolCallResult | null {
+  if (typeof args[name] === 'string' && args[name]) return null;
+  return {
+    content: [{ type: 'text', text: `viewport/${toolName} requires a non-empty string "${name}" argument` }],
+    isError: true,
+  };
+}
+
 // ── Handlers ──────────────────────────────────────────────────
 
 export function getViewportTools(): ToolEntry[] {
@@ -179,6 +206,8 @@ async function handleHydrate(
   args: Record<string, unknown>,
   sessionPersonId?: string,
 ): Promise<ToolCallResult> {
+  const err = requireString(args, 'sessionId', 'hydrate');
+  if (err) return err;
   const sessionId = args.sessionId as string;
   const platform = (args.platform as string) ?? 'unknown';
   const hints = (args.hints as Record<string, unknown>) ?? {};
@@ -230,6 +259,8 @@ async function handleResolveContext(
   args: Record<string, unknown>,
   sessionPersonId?: string,
 ): Promise<ToolCallResult> {
+  const err = requireString(args, 'sessionId', 'resolve_context');
+  if (err) return err;
   const sessionId = args.sessionId as string;
   const hints = (args.hints as Record<string, unknown>) ?? {};
   const result = await resolveContext(sessionId, hints, sessionPersonId);
@@ -252,12 +283,13 @@ async function resolveContext(
   });
 
   if (!resp.ok) {
-    log.warn(`context/resolve returned ${resp.status}`, VIEWPORT_SERVER_ID);
+    const detail = await errorDetail(resp);
+    log.warn(`context/resolve returned ${resp.status}: ${detail}`, VIEWPORT_SERVER_ID);
     // Doctrine: never_mint_on_failure — return unresolved, don't invent identity
-    return { resolved: false, status: resp.status, minted: false };
+    return { resolved: false, status: resp.status, minted: false, ...(detail ? { detail } : {}) };
   }
 
-  return await resp.json() as Record<string, unknown>;
+  return await safeJson(resp, 'context/resolve');
 }
 
 // ── memory_recall ─────────────────────────────────────────────
@@ -266,6 +298,8 @@ async function handleMemoryRecall(
   args: Record<string, unknown>,
   sessionPersonId?: string,
 ): Promise<ToolCallResult> {
+  const err = requireString(args, 'query', 'memory_recall');
+  if (err) return err;
   const query = args.query as string;
   const scope = (args.scope as string) ?? 'entity';
 
@@ -277,13 +311,14 @@ async function handleMemoryRecall(
   });
 
   if (!resp.ok) {
+    log.warn(`memory/recall returned ${resp.status}`, VIEWPORT_SERVER_ID);
     return {
       content: [{ type: 'text', text: JSON.stringify({ recalled: false, status: resp.status }) }],
       isError: true,
     };
   }
 
-  const data = await resp.json();
+  const data = await safeJson(resp, 'memory/recall');
   return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
 }
 
@@ -293,6 +328,10 @@ async function handleMemoryPersist(
   args: Record<string, unknown>,
   sessionPersonId?: string,
 ): Promise<ToolCallResult> {
+  const errK = requireString(args, 'key', 'memory_persist');
+  if (errK) return errK;
+  const errV = requireString(args, 'value', 'memory_persist');
+  if (errV) return errV;
   const key = args.key as string;
   const value = args.value as string;
   const scope = (args.scope as string) ?? 'entity';
@@ -305,13 +344,14 @@ async function handleMemoryPersist(
   });
 
   if (!resp.ok) {
+    log.error(`memory/persist returned ${resp.status} for key=${key}`, VIEWPORT_SERVER_ID);
     return {
-      content: [{ type: 'text', text: JSON.stringify({ persisted: false, status: resp.status }) }],
+      content: [{ type: 'text', text: JSON.stringify({ persisted: false, status: resp.status, key }) }],
       isError: true,
     };
   }
 
-  const data = await resp.json();
+  const data = await safeJson(resp, 'memory/persist');
   log.info(`Memory persisted: key=${key} scope=${scope}`, VIEWPORT_SERVER_ID);
   return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
 }

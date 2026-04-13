@@ -137,7 +137,7 @@ export function signRequest(
 // ── Signed fetch ──────────────────────────────────────────────
 
 export interface SignedFetchOptions {
-  method?: string;
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   body?: string | Record<string, unknown>;
   headers?: Record<string, string>;
   /** The Person ChittyID this request is on behalf of (viewport carrier). */
