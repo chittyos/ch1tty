@@ -132,13 +132,17 @@ test('successful route parses high-confidence matches', async () => {
     assert.equal(result[1].tool.namespacedName, 'docket/status');
     assert.equal(brain.getStats().successes, 1);
 
-    // Verify the prompt shape
+    // Verify the full request shape — regression protection
     assert.equal(fake.requests.length, 1);
-    const req = fake.requests[0].body as { model: string; prompt: string; format: string; stream: boolean };
+    assert.equal(fake.requests[0].path, '/api/generate');
+    const req = fake.requests[0].body as { model: string; prompt: string; format: string; stream: boolean; options?: { temperature?: number } };
     assert.equal(req.format, 'json');
     assert.equal(req.stream, false);
+    assert.equal(req.model, 'llama3.2:3b');
+    assert.equal(req.options?.temperature, 0.1);
     assert.match(req.prompt, /evidence\/collect/);
-    assert.match(req.prompt, /pull case documents/);
+    // Query should be JSON-escaped in the prompt (prompt injection hardening)
+    assert.match(req.prompt, /"pull case documents"/);
   } finally {
     await fake.stop();
   }
@@ -290,6 +294,38 @@ test('candidates beyond maxCandidates are clamped from prompt', async () => {
   } finally {
     await fake.stop();
   }
+});
+
+test('confidence values are clamped to [0, 1]', async () => {
+  const fake = await startFakeOllama(async () => ({
+    status: 200,
+    body: JSON.stringify({
+      response: JSON.stringify({
+        matches: [
+          { tool: 'evidence/collect', confidence: 1.5, reason: 'over-confident' },
+          { tool: 'chitty/deploy', confidence: 0.8, reason: 'normal' },
+        ],
+      }),
+    }),
+  }));
+  try {
+    const brain = new OllamaBrain({ url: fake.url, timeoutMs: 2000 });
+    const result = await brain.route('deploy evidence', candidates());
+    assert.ok(result);
+    const overConfident = result.find((r) => r.tool.namespacedName === 'evidence/collect');
+    assert.ok(overConfident);
+    assert.equal(overConfident.confidence, 1, 'confidence > 1 should be clamped to 1');
+    assert.ok(overConfident.confidence <= 1);
+  } finally {
+    await fake.stop();
+  }
+});
+
+test('constructor clamps invalid config values', () => {
+  const brain = new OllamaBrain({ minConfidence: 1.5, maxCandidates: -1, timeoutMs: 0 });
+  assert.equal(brain.config.minConfidence, 1);
+  assert.equal(brain.config.maxCandidates, 1);
+  assert.equal(brain.config.timeoutMs, 100);
 });
 
 // ── Real Ollama smoke test (runs only if daemon is reachable) ──

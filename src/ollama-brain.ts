@@ -89,7 +89,12 @@ export class OllamaBrain {
   private totalLatencyMs = 0;
 
   constructor(config: Partial<OllamaBrainConfig> = {}) {
-    this.config = { ...DEFAULT_CONFIG, ...config };
+    const merged = { ...DEFAULT_CONFIG, ...config };
+    // Defensive clamp — prevent nonsense configs from silently breaking routing
+    merged.minConfidence = Math.max(0, Math.min(1, merged.minConfidence));
+    merged.maxCandidates = Math.max(1, merged.maxCandidates);
+    merged.timeoutMs = Math.max(100, merged.timeoutMs);
+    this.config = merged;
   }
 
   /**
@@ -132,24 +137,26 @@ export class OllamaBrain {
 
       if (!response.ok) {
         this.errors++;
-        log.debug(`Ollama returned HTTP ${response.status}`, undefined, { model: this.config.model });
+        const snippet = await response.text().catch(() => '').then((t) => t.slice(0, 200));
+        log.warn(`Ollama returned HTTP ${response.status}`, 'ollama-brain', { model: this.config.model, body: snippet });
         return null;
       }
 
       const payload = (await response.json()) as { response?: unknown };
       if (typeof payload.response !== 'string') {
         this.errors++;
+        log.warn(`Ollama response missing string "response" field`, 'ollama-brain', { keys: Object.keys(payload) });
         return null;
       }
 
       const parsed = this.safeParseJson(payload.response);
       if (!parsed) {
         this.errors++;
+        log.warn(`Ollama returned unparseable JSON`, 'ollama-brain', { snippet: String(payload.response).slice(0, 200) });
         return null;
       }
 
       const routed = this.extractRoutedTools(parsed, byName);
-      this.totalLatencyMs += Date.now() - startedAt;
 
       if (routed.length === 0) {
         this.emptyResults++;
@@ -161,14 +168,15 @@ export class OllamaBrain {
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
         this.timeouts++;
-        log.debug(`Ollama route timed out after ${this.config.timeoutMs}ms`);
+        log.warn(`Ollama route timed out after ${this.config.timeoutMs}ms`, 'ollama-brain');
       } else {
         this.errors++;
-        log.debug(`Ollama route error: ${String(err)}`);
+        log.warn(`Ollama route error: ${String(err)}`, 'ollama-brain');
       }
       return null;
     } finally {
       clearTimeout(timeoutHandle);
+      this.totalLatencyMs += Date.now() - startedAt;
     }
   }
 
@@ -179,7 +187,7 @@ export class OllamaBrain {
       timeouts: this.timeouts,
       errors: this.errors,
       emptyResults: this.emptyResults,
-      avgLatencyMs: this.successes > 0 ? Math.round(this.totalLatencyMs / this.successes) : 0,
+      avgLatencyMs: this.calls > 0 ? Math.round(this.totalLatencyMs / this.calls) : 0,
     };
   }
 
@@ -189,9 +197,14 @@ export class OllamaBrain {
     const list = candidates
       .map((c) => {
         const meta = c.category ? ` [${c.category}]` : '';
-        return `- ${c.namespacedName}${meta}: ${c.description || '(no description)'}`;
+        // Truncate descriptions to cap prompt size and limit injection surface from remote backends
+        const desc = (c.description || '(no description)').slice(0, 200).replace(/\n/g, ' ');
+        return `- ${c.namespacedName}${meta}: ${desc}`;
       })
       .join('\n');
+
+    // JSON.stringify the query to prevent prompt injection via newlines/control chars
+    const safeQuery = JSON.stringify(query);
 
     return `You are a tool router. Given a user query and a list of available tools, return only the tools whose purpose directly matches the query's intent.
 
@@ -207,7 +220,7 @@ Rules:
 Tools:
 ${list}
 
-Query: ${query}`;
+Query: ${safeQuery}`;
   }
 
   private safeParseJson(text: string): unknown {
