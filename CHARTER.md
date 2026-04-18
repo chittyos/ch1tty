@@ -53,10 +53,10 @@ Passthrough — returns union of all backend prompts, namespaced as `{serverId}/
 ## Dependencies
 
 ### Upstream (Ch1tty depends on)
-- `connect.chitty.cc/mcp` — ChittyConnect MCP surface (`chittycanon://core/services/chittyconnect`)
+- `mcp-portal.chitty.cc/mcp` — ChittyOS ecosystem MCP portal (`chittycanon://core/services/chittyconnect`), CF Access-protected
 - `chitty-mcp-token` — Auth token helper (1Password-backed, via `chittycanon://core/services/auth`)
 - Local MCP servers (filesystem, context7, sequential-thinking, etc.)
-- Cloudflare MCP endpoints (builds, autorag)
+- Cloudflare MCP endpoints (`mcp.cloudflare.com`, `autorag.mcp.cloudflare.com`, `browser.mcp.cloudflare.com`)
 
 ### Downstream (depends on Ch1tty)
 - Claude Code (via `.mcp.json`)

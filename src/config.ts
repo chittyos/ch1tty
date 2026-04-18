@@ -21,6 +21,8 @@ const SERVER_KEYS = new Set([
   'args',
   'endpoint',
   'authTokenKey',
+  'headers',
+  'envHeaders',
   'lazy',
   'enabled',
   'env',
@@ -28,6 +30,9 @@ const SERVER_KEYS = new Set([
 
 /**
  * Expand ~ to home directory and ${VAR} / $VAR to environment variable values.
+ *
+ * Throws if a referenced env var is unset — silent empty-string substitution was masking
+ * misconfigurations like `https://${HOST}/mcp` becoming `https:///mcp`.
  */
 export function interpolatePath(input: string): string {
   let result = input;
@@ -37,13 +42,26 @@ export function interpolatePath(input: string): string {
     result = homedir() + result.slice(1);
   }
 
-  // Expand ${VAR} and $VAR patterns
+  // Expand ${VAR} and $VAR patterns — fail loudly if the referenced var is unset.
   result = result.replace(/\$\{([^}]+)\}|\$([A-Za-z_][A-Za-z0-9_]*)/g, (_, braced, bare) => {
     const varName = braced || bare;
-    return process.env[varName] ?? '';
+    const value = process.env[varName];
+    if (value === undefined) {
+      throw new Error(`Config references unset environment variable: ${varName}`);
+    }
+    return value;
   });
 
   return result;
+}
+
+function interpolateHeaders(headers?: Record<string, string>): Record<string, string> | undefined {
+  if (!headers) return undefined;
+  const out: Record<string, string> = {};
+  for (const [k, v] of Object.entries(headers)) {
+    out[k] = interpolatePath(v);
+  }
+  return out;
 }
 
 function interpolateConfig(config: ServerConfig): ServerConfig {
@@ -54,9 +72,12 @@ function interpolateConfig(config: ServerConfig): ServerConfig {
       args: config.args?.map(interpolatePath),
     };
   }
+  // D2 — interpolate ${VAR} / $VAR in header values so literal-ish secrets work consistently.
+  // envHeaders are different (headerName -> envVarName lookup) and not interpolated here.
   return {
     ...config,
     endpoint: interpolatePath(config.endpoint),
+    headers: interpolateHeaders(config.headers),
   };
 }
 
@@ -141,6 +162,8 @@ function validateServerConfig(raw: unknown, index: number): ServerConfig {
   const args = assertOptionalStringArray(raw.args, `${prefix}.args`);
   const endpoint = assertOptionalString(raw.endpoint, `${prefix}.endpoint`);
   const authTokenKey = assertOptionalString(raw.authTokenKey, `${prefix}.authTokenKey`);
+  const headers = assertOptionalEnv(raw.headers, `${prefix}.headers`);
+  const envHeaders = assertOptionalEnv(raw.envHeaders, `${prefix}.envHeaders`);
   const lazy = assertOptionalBoolean(raw.lazy, `${prefix}.lazy`);
   const enabled = assertOptionalBoolean(raw.enabled, `${prefix}.enabled`);
   const env = assertOptionalEnv(raw.env, `${prefix}.env`);
@@ -175,6 +198,8 @@ function validateServerConfig(raw: unknown, index: number): ServerConfig {
     category: category as ServerCategory,
     endpoint,
     authTokenKey,
+    headers,
+    envHeaders,
     lazy,
     enabled,
   };

@@ -461,7 +461,7 @@ export class Aggregator {
       this.configs = newConfig.servers;
       this.rebuildBackends();
 
-      // Now shut down the old backends
+      // Now shut down the old backends — log any rejected shutdowns (C5).
       const seen = new Set<Backend>();
       const shutdowns: Promise<void>[] = [];
       for (const backend of oldBackends.values()) {
@@ -469,7 +469,12 @@ export class Aggregator {
         seen.add(backend);
         shutdowns.push(backend.shutdown());
       }
-      await Promise.allSettled(shutdowns);
+      const results = await Promise.allSettled(shutdowns);
+      for (const r of results) {
+        if (r.status === 'rejected') {
+          log.warn(`Reload: backend shutdown failed: ${r.reason}`);
+        }
+      }
 
       const result = {
         reloaded: true,
@@ -713,7 +718,9 @@ export class Aggregator {
       return {
         content: [{
           type: 'text',
-          text: `Invalid tool name "${namespacedName}". Available tools: ch1tty/search, ch1tty/execute, ch1tty/status, ch1tty/reload, ch1tty/cast`,
+          text:
+            `Invalid tool name "${namespacedName}". ` +
+            `Available tools: ch1tty/search, ch1tty/execute, ch1tty/status, ch1tty/reload, ch1tty/cast`,
         }],
         isError: true,
       };
@@ -842,7 +849,7 @@ export class Aggregator {
 
   async getPrompt(namespacedName: string, args?: Record<string, string>): Promise<{
     description?: string;
-    messages: Array<{ role: string; content: ContentItem }>;
+    messages: Array<{ role: 'user' | 'assistant'; content: ContentItem }>;
   }> {
     const sepIndex = namespacedName.indexOf(SEPARATOR);
     if (sepIndex === -1) {

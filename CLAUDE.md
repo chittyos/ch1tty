@@ -14,9 +14,22 @@ visibility: PUBLIC
 
 ## What This Is
 
-Ch1tty is the ChittyOS universal MCP gateway. It aggregates all MCP servers (local stdio children + remote HTTP endpoints) behind a **slim-MCP surface**: just 4 tools (`search`, `execute`, `status`, `reload`). Clients discover capabilities via `search` and invoke them via `execute` — the full tool registry stays internal, keeping context windows minimal.
+Ch1tty is the ChittyOS universal MCP gateway. It aggregates all MCP servers (local stdio children + remote HTTP endpoints) behind a **slim-MCP surface**: 5 tools (`search`, `execute`, `status`, `reload`, `cast`). Clients discover capabilities via `search`, invoke them via `execute`, or use `cast` for intent-driven resolution — the full tool registry stays internal, keeping context windows minimal.
 
 Dual transport: local clients connect via **stdio**, remote clients via **Streamable HTTP** at `/mcp`.
+
+### Architectural Guardrail (Do Not Drift)
+
+Treat Ch1tty as an orchestrator viewport, not a backend catalog.
+
+- Public MCP surface stays fixed at exactly 5 tools:
+  - `ch1tty/search`
+  - `ch1tty/execute`
+  - `ch1tty/status`
+  - `ch1tty/reload`
+  - `ch1tty/cast`
+- Session/fractal behavior is handled by SessionCoordinator + SessionTracker behind the meta-tools.
+- Backend namespace sprawl is controlled by config profiles; never expand public surface to include backend tools directly.
 
 ## Commands
 
@@ -67,6 +80,16 @@ The full backend tool registry (100+ tools across all servers) is never exposed 
 
 Set `CH1TTY_CONFIG` env var to use a custom servers.json path.
 
+### Strict Orchestrator Profile
+
+To run a clean orchestrator mode (minimal backend overlap), use:
+
+```bash
+CH1TTY_CONFIG=./servers.orchestrator.json npm start
+```
+
+`servers.orchestrator.json` is the canonical low-noise profile for production-oriented orchestration.
+
 ## Config Path Interpolation
 
 Paths in `command`, `args`, and `endpoint` fields support:
@@ -85,11 +108,33 @@ Add an entry to `servers.json`:
   "category": "ecosystem",
   "endpoint": "https://example.com/mcp",
   "authTokenKey": "my-token-key",
+  "headers": {
+    "X-Custom-Header": "literal-value",
+    "X-Interpolated": "${MY_ENV_VAR}"
+  },
+  "envHeaders": {
+    "CF-Access-Client-Id": "CF_ACCESS_CLIENT_ID",
+    "CF-Access-Client-Secret": "CF_ACCESS_CLIENT_SECRET"
+  },
   "lazy": true
 }
 ```
 
+- `headers` — literal header values; `${VAR}` / `$VAR` patterns are interpolated from `process.env` at load time (throws if unset).
+- `envHeaders` — maps header name → env var name; value is read from `process.env[name]` at connect time.
+- Precedence: explicit `Authorization` in `headers`/`envHeaders` wins over the `authTokenKey`-derived bearer token. If `authTokenKey` is set and token retrieval fails, the connection is refused (no silent fallback to unauthenticated).
+
 No code changes required. Call `ch1tty/reload` to pick up changes without restarting.
+
+## Split Architecture (Code-Mode + Focused Servers)
+
+Ch1tty mirrors the `github.com/cloudflare/mcp-server-cloudflare` pattern:
+
+- **Ch1tty** plays the **Code-Mode** role — one broad slim-MCP surface at `ch1tty.chitty.cc/mcp` with exactly 5 meta-tools, aggregating all ChittyOS backends. Used for cross-domain, intent-driven, discover-then-invoke work.
+- **`apps/*-mcp`** holds focused per-domain servers — one product per server, purpose-built, typed tools. First planned server: `apps/tasks-mcp/` (coordinated with `chittyentity/workers/chittyagent-tasks`, deploying to `tasks.chitty.cc/mcp`).
+- **`packages/`** holds shared code between the gateway and the focused servers (Backend interface, logger, transport glue).
+
+**Rule (binding):** New ChittyOS MCP capability → new focused server under `apps/`, registered as a backend in `servers.json`; never inline domain code in the ch1tty gateway. See `apps/README.md` for the planned server roster.
 
 ## HTTP Server
 
@@ -99,9 +144,10 @@ Set `CH1TTY_PORT` to enable the HTTP server with MCP transport:
 CH1TTY_PORT=9099 CH1TTY_MCP_TOKEN=secret123 npm start
 ```
 
-Endpoints on `0.0.0.0:{port}`:
-- `GET /health` — `{"status":"ok","service":"ch1tty","version":"4.1.0"}`
-- `GET /api/v1/status` — Full gateway status snapshot
+Endpoints on `{bindAddress}:{port}`:
+- `GET /health` — `{"status":"ok","service":"ch1tty","version":"<VERSION>"}` (VERSION sourced from `src/utils.ts`, not hardcoded in docs)
+- `GET /api/v1/status` — Full gateway status snapshot. Returns 500 + `{"error":"internal"}` on server-side failure (never a fake-ok envelope).
+- `GET /api/v1/sessions` — Active MCP session list (bearer-auth if configured)
 - `* /mcp` — **Streamable HTTP MCP endpoint** (bearer token required if `CH1TTY_MCP_TOKEN` is set)
 
 ### Environment Variables
@@ -109,10 +155,12 @@ Endpoints on `0.0.0.0:{port}`:
 | Variable | Purpose |
 |----------|---------|
 | `CH1TTY_PORT` | HTTP server port (enables HTTP transport) |
-| `CH1TTY_MCP_TOKEN` | Bearer token for `/mcp` endpoint auth |
+| `CH1TTY_MCP_TOKEN` | Bearer token for `/mcp` + `/api/v1/sessions` auth |
+| `CH1TTY_ALLOW_UNAUTH` | Set to `1` to allow starting HTTP server on non-loopback without a token (emits loud warning). Without this flag, the server refuses to bind. |
 | `CH1TTY_CONFIG` | Custom servers.json path |
 | `CH1TTY_ACCESS` | Filter servers by access level (read/write/readwrite) |
 | `CH1TTY_CATEGORY` | Filter servers by category |
+| `CH1TTY_LEDGER_DLQ` | Override the ledger dead-letter WAL path (default `~/.ch1tty/ledger.dlq.jsonl`) |
 
 ## Registration
 

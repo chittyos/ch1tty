@@ -100,3 +100,39 @@ test('loadConfigFromPath fails fast on invalid JSON with path in message', () =>
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test('validateServersConfig accepts headers and envHeaders for remote servers', () => {
+  const config = validateServersConfig({
+    servers: [
+      remoteServer({
+        headers: { 'X-Custom': 'value' },
+        envHeaders: { Authorization: 'MY_TOKEN_ENV' },
+      }),
+    ],
+  });
+  const server = config.servers[0];
+  assert.equal(server.type, 'remote');
+  if (server.type === 'remote') {
+    assert.deepEqual(server.headers, { 'X-Custom': 'value' });
+    assert.deepEqual(server.envHeaders, { Authorization: 'MY_TOKEN_ENV' });
+  }
+});
+
+test('validateServersConfig rejects non-string header values', () => {
+  assert.throws(
+    () => validateServersConfig({
+      servers: [remoteServer({ headers: { 'X-Bad': 123 } })],
+    }),
+    /headers\.X-Bad must be a string/,
+  );
+});
+
+test('validateServersConfig rejects unknown fields', () => {
+  assert.throws(
+    () => validateServersConfig({
+      servers: [remoteServer({ unknownField: 'oops' })],
+    }),
+    /unknownField is not a recognized field/,
+  );
+});
+
