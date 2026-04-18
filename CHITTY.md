@@ -102,7 +102,25 @@ The `apps/*-mcp` servers are **ch1tty's own focused surfaces**, not ChittyOS ser
 
 Clients pick based on need: cross-domain / intent-driven work goes through the ch1tty gateway; typed single-domain integrations can dial the focused surface directly.
 
-The pattern is **fractal** (memory: `project_fractal_architecture.md`) — each focused server itself exposes a slim-MCP viewport over its sub-primitives, so the Code-Mode-over-focused-surfaces shape repeats at every layer. See `apps/README.md` for the planned roster.
+The pattern is **fractal** (memory: `project_fractal_architecture.md`) — each focused server itself exposes a slim-MCP viewport over its sub-primitives, so the Code-Mode-over-focused-surfaces shape repeats at every layer. See `apps/README.md` for the current + planned roster.
+
+## Alchemical Self-Composition (The Intelligent MCP)
+
+Ch1tty is **greater than the sum of its registered backends**. Through the **Alchemist** daemon + **ContextConsciousness** memory layer (both living in ChittyConnect), ch1tty observes how its backends are composed in practice and can **spawn new MCP services from its existing ones** — making the `apps/*-mcp` roster an emergent output of use, not a static plan:
+
+1. **ContextConsciousness** records persistent patterns — which tools are invoked in sequence, which cross-backend workflows recur, which intents keep resolving through cast to the same composite path, which sessions keep reaching across the same ~3 backends
+2. **Alchemist** performs contextual routing/transformation over that pattern store — scoring when a recurring composite has coalesced into a distinct concern worth its own surface
+3. **Spawn** — a new focused MCP server materializes under `apps/*-mcp`, wrapping the composite as typed tools. What was an emergent cross-backend pattern becomes a first-class surface that `search` + `execute` can route to directly
+
+This is **ongoing intelligent design and decisioning** — ch1tty's topology evolves from use, not from upfront architectural decree. The fractal property makes this natural: the Code-Mode-over-focused-servers shape can replicate at any scale, so ch1tty grows new sub-surfaces without changing its 5-meta-tool public contract.
+
+Cross-references:
+- `project_alchemist_integration.md` — 3-layer cast pipeline (keyword → Ollama → Alchemist contextual routing)
+- `project_ch1tty_user_mirror.md` — "fission when the relationship outgrows the container" (spawn = fission)
+- `project_session_coordinator_vision.md` — session coordinator stages the memories/patterns that inform alchemy
+- `feedback_governance_looseness.md` — governance defines environment, patterns emerge; coordinator pays attention, doesn't control
+
+The "intelligent" in *intelligent MCP* refers to this capability, not to ch1tty being an LLM. Ch1tty itself doesn't reason — its intelligence is in the structure: a registered backend topology + a pattern-memory layer + an alchemical router that together decide, over time, what deserves to become its own surface.
 
 ## Certification
 

@@ -20,6 +20,8 @@ The meta-tools + SessionCoordinator + cast's intent resolution + (planned) brain
 
 Aggregation covers MCP servers of every shape: local stdio children, remote HTTP endpoints, ChittyOS services (via their own MCP surfaces), and arbitrary third-party MCP sources — all through the same `Backend` interface.
 
+Ch1tty is **the intelligent MCP**: through the Alchemist daemon + ContextConsciousness memory (in ChittyConnect), it observes how its backends are composed in practice and can spawn new MCP services from existing ones — promoting recurring cross-backend patterns into their own focused surfaces under `apps/*-mcp`. The intelligence is structural (topology + pattern memory + alchemical router), not an embedded LLM. See CHITTY.md § *Alchemical Self-Composition*.
+
 Dual transport: local clients connect via **stdio**, remote clients via **Streamable HTTP** at `/mcp`.
 
 ### Architectural Guardrail (Do Not Drift)

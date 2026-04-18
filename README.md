@@ -3,9 +3,11 @@
 
 # Ch1tty
 
-> One MCP surface for ChittyOS and beyond — five meta-tools over every registered source, usable from LLM chat, agent runtimes, or plain server-to-server backends.
+> The intelligent MCP — one surface that aggregates ChittyOS and beyond, *and grows new MCP services from its existing ones* through alchemical composition.
 
 Ch1tty is a **sibling** of ChittyOS, not one of its services. It registers with the ChittyOS registry like any other peer and brings ChittyOS (plus non-ChittyOS MCP sources) through a single slim-MCP surface: `search`, `execute`, `status`, `reload`, `cast`. The surface has **no single interaction modality** — the same endpoint serves LLM chat frontends, agent runtimes, service-to-service backends, and any other MCP client. The meta-tools + session coordinator + cast's intent resolution make the surface *agentic when a reasoning consumer is on the other end*, but the same API works as a plain MCP endpoint for programmatic callers.
+
+Ch1tty is **greater than the sum of its backends**. Through the Alchemist daemon + ContextConsciousness memory (in ChittyConnect), it watches how its registered services are composed in practice and can spawn new MCP services from existing ones — promoting recurring cross-backend patterns into their own focused surfaces under `apps/*-mcp`. See CHITTY.md for the self-composition mechanism.
 
 ## Canonical Contract
 
