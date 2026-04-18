@@ -93,8 +93,8 @@
       "lazy": true,
       "enabled": true
     },
+    {"_comment": "github: deprecated upstream — replace when GitHub ships official MCP"},
     {
-      "_comment": "deprecated upstream — replace when GitHub ships official MCP",
       "id": "github",
       "name": "GitHub API",
       "type": "local",
