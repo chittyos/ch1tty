@@ -14,7 +14,11 @@ visibility: PUBLIC
 
 ## What This Is
 
-Ch1tty is the ChittyOS universal MCP gateway. It aggregates all MCP servers (local stdio children + remote HTTP endpoints) behind a **slim-MCP surface**: 5 tools (`search`, `execute`, `status`, `reload`, `cast`). Clients discover capabilities via `search`, invoke them via `execute`, or use `cast` for intent-driven resolution — the full tool registry stays internal, keeping context windows minimal.
+Ch1tty is a **sibling** of ChittyOS — not a ChittyOS-internal service. It's one MCP surface that brings ChittyOS (and any other MCP source) through a single interface. The surface has **no single interaction modality** — the same endpoint serves LLM chat frontends, agent runtimes, and server-to-server backends. Whether it behaves agentically is decided by the consumer on the other end; ch1tty itself just exposes the 5 slim-MCP meta-tools (`search`, `execute`, `status`, `reload`, `cast`) plus the resources/prompts passthrough and lets the caller drive.
+
+The meta-tools + SessionCoordinator + cast's intent resolution + (planned) brain backend make the surface *agent-capable*: discover → reason → execute over the full aggregated registry, keeping client context minimal. Plain MCP clients use the same tools without any reasoning loop.
+
+Aggregation covers MCP servers of every shape: local stdio children, remote HTTP endpoints, ChittyOS services (via their own MCP surfaces), and arbitrary third-party MCP sources — all through the same `Backend` interface.
 
 Dual transport: local clients connect via **stdio**, remote clients via **Streamable HTTP** at `/mcp`.
 
@@ -126,15 +130,19 @@ Add an entry to `servers.json`:
 
 No code changes required. Call `ch1tty/reload` to pick up changes without restarting.
 
+## Sibling Relationship with ChittyOS
+
+Ch1tty and ChittyOS are **siblings**, not parent/child. ChittyOS is an ecosystem of services at `*.chitty.cc`; ch1tty is a peer system that registers with the ChittyOS registry like any other external participant. Ch1tty aggregates ChittyOS services alongside non-ChittyOS MCP backends — the gateway treats all sources equivalently through the `Backend` interface.
+
 ## Split Architecture (Code-Mode + Focused Servers)
 
-Ch1tty mirrors the `github.com/cloudflare/mcp-server-cloudflare` pattern:
+Ch1tty's **own** surface family mirrors the `github.com/cloudflare/mcp-server-cloudflare` pattern:
 
-- **Ch1tty** plays the **Code-Mode** role — one broad slim-MCP surface at `ch1tty.chitty.cc/mcp` with exactly 5 meta-tools, aggregating all ChittyOS backends. Used for cross-domain, intent-driven, discover-then-invoke work.
-- **`apps/*-mcp`** holds focused per-domain servers — one product per server, purpose-built, typed tools. First planned server: `apps/tasks-mcp/` (coordinated with `chittyentity/workers/chittyagent-tasks`, deploying to `tasks.chitty.cc/mcp`).
-- **`packages/`** holds shared code between the gateway and the focused servers (Backend interface, logger, transport glue).
+- **Ch1tty gateway** plays the **Code-Mode** role — one broad slim-MCP surface at `ch1tty.chitty.cc/mcp` with exactly 5 meta-tools, aggregating every registered backend (ChittyOS services + any other MCP source). Used for cross-domain, intent-driven, discover-then-invoke work.
+- **`apps/*-mcp`** holds ch1tty's own focused per-domain MCP surfaces — one concern per server, purpose-built typed tools. Many adapt a ChittyOS domain (e.g. `apps/tasks-mcp/` wraps `chittyentity/workers/chittyagent-tasks`, the canonical tasks service, as an MCP surface); others may wrap non-ChittyOS sources. The canonical backend service lives in its own repo; ch1tty's focused surface is a peer MCP translator.
+- **`packages/`** holds shared code between the gateway and the focused surfaces (Backend interface, logger, transport glue).
 
-**Rule (binding):** New ChittyOS MCP capability → new focused server under `apps/`, registered as a backend in `servers.json`; never inline domain code in the ch1tty gateway. See `apps/README.md` for the planned server roster.
+**Rule (binding):** New MCP surface ch1tty wants to expose → new focused server under `apps/`, registered as a backend in `servers.json`; never inline domain logic in the ch1tty gateway. Canonical domain state stays in its home service (e.g. chittyagent-tasks, ChittyLedger) — ch1tty only surfaces it via MCP. See `apps/README.md` for the planned server roster.
 
 ## HTTP Server
 

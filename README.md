@@ -3,7 +3,9 @@
 
 # Ch1tty
 
-> ChittyOS Universal MCP Gateway — slim-MCP: search, execute, and cast.
+> One MCP surface for ChittyOS and beyond — five meta-tools over every registered source, usable from LLM chat, agent runtimes, or plain server-to-server backends.
+
+Ch1tty is a **sibling** of ChittyOS, not one of its services. It registers with the ChittyOS registry like any other peer and brings ChittyOS (plus non-ChittyOS MCP sources) through a single slim-MCP surface: `search`, `execute`, `status`, `reload`, `cast`. The surface has **no single interaction modality** — the same endpoint serves LLM chat frontends, agent runtimes, service-to-service backends, and any other MCP client. The meta-tools + session coordinator + cast's intent resolution make the surface *agentic when a reasoning consumer is on the other end*, but the same API works as a plain MCP endpoint for programmatic callers.
 
 ## Canonical Contract
 

@@ -12,6 +12,16 @@ visibility: PUBLIC
 
 # CHITTY.md — Ch1tty
 
+## Identity
+
+Ch1tty is a **sibling** of ChittyOS — a peer that registers with the ChittyOS registry, not a ChittyOS-internal service. Its role is to bring all of ChittyOS (and any other MCP source it's registered against) through **one MCP surface** with no assumed interaction modality. The same endpoint serves:
+
+- **LLM chat frontends** (Claude.ai, ChatGPT, Claude Desktop, Claude Code) — where the reasoning loop on the other end turns `search` + `execute` + `cast` into a discover-reason-execute agent pattern
+- **Agent runtimes** (CF Agents, autonomous agents, daemons) — same meta-tools, agentic by virtue of the consumer
+- **Server-to-server integrations** — plain MCP over Streamable HTTP; no LLM needed, the client just uses the typed surface
+
+The 5 slim-MCP meta-tools (`search`, `execute`, `status`, `reload`, `cast`), the session coordinator, and (planned) the brain backend make the surface *agent-capable*. They do not require the consumer to be an agent — that's determined at the other end of the connection.
+
 ## Service Identity
 
 | Field | Value |
@@ -73,18 +83,26 @@ Remote AI Client (Claude web / ChatGPT / CF Agents)
 - OpenAI Codex (stdio)
 - Any MCP-compatible client
 
+## Sibling Relationship with ChittyOS
+
+Ch1tty and ChittyOS are **siblings**, not parent/child. ChittyOS is an ecosystem of services at `*.chitty.cc` (ChittyID, ChittyAuth, ChittyRegister, chittyagent-tasks, etc.); ch1tty is a peer system that exposes MCP surfaces — to itself, to ChittyOS, and to any other MCP ecosystem. Ch1tty registers **with** the ChittyOS registry (`register.chitty.cc`) like any other external participant; it is not *of* ChittyOS.
+
+Per memory `project_fractal_architecture.md` — "Ch1tty IS the system fractalized" — and `project_ch1tty_user_mirror.md` — ch1tty is a mirror to its user, co-evolving on its own axis.
+
 ## Split Architecture
 
-Ch1tty + its peer domain servers follow the `github.com/cloudflare/mcp-server-cloudflare` split pattern:
+Ch1tty's own surface family follows the `github.com/cloudflare/mcp-server-cloudflare` split pattern:
 
-| Role | ChittyOS instance | Surface |
-|------|-------------------|---------|
-| Code-Mode (broad) | **Ch1tty** | `ch1tty.chitty.cc/mcp` — 5 slim-MCP meta-tools over the full backend registry |
-| Focused per-domain (typed) | `apps/*-mcp` (planned), starting with `tasks.chitty.cc/mcp` | Purpose-built tools per product — `tasks`, later `ledger`, `session-coordinator`, `evidence`, etc. |
+| Role | Ch1tty surface | Endpoint |
+|------|----------------|----------|
+| Code-Mode (broad) | **Ch1tty gateway** (this repo's `src/`, future `apps/gateway/`) | `ch1tty.chitty.cc/mcp` — 5 slim-MCP meta-tools over the full backend registry |
+| Focused per-domain (typed) | `apps/*-mcp` (ch1tty-owned) | Purpose-built MCP surfaces. First populated: `apps/tasks-mcp/` wrapping the ChittyOS service at `chittyentity/workers/chittyagent-tasks`. Planned: `ledger-mcp`, `session-coordinator-mcp`, `evidence-mcp`, each wrapping or adapting a ChittyOS domain |
 
-Clients pick based on need: cross-domain / intent-driven work goes through ch1tty; typed single-domain integrations can dial the focused server directly.
+The `apps/*-mcp` servers are **ch1tty's own focused surfaces**, not ChittyOS services. Some adapt ChittyOS domain concerns (tasks, ledger, evidence) into typed MCP tools; others may expose non-ChittyOS sources. The canonical service (e.g. `chittyagent-tasks`) lives in its own ChittyOS repo; ch1tty's focused server is a peer MCP translator.
 
-The pattern is **fractal** (memory: `project_fractal_architecture.md`) — each focused server itself exposes a slim-MCP viewport over its sub-primitives, so the Code-Mode-over-focused-servers shape repeats at every layer. See `apps/README.md` for the planned roster.
+Clients pick based on need: cross-domain / intent-driven work goes through the ch1tty gateway; typed single-domain integrations can dial the focused surface directly.
+
+The pattern is **fractal** (memory: `project_fractal_architecture.md`) — each focused server itself exposes a slim-MCP viewport over its sub-primitives, so the Code-Mode-over-focused-surfaces shape repeats at every layer. See `apps/README.md` for the planned roster.
 
 ## Certification
 

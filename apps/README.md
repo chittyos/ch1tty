@@ -1,8 +1,10 @@
 # apps/
 
-Each subdirectory here is a **focused per-domain MCP server** in the ChittyOS ecosystem — one product/domain per server, purpose-built, typed tools.
+Each subdirectory here is one of **ch1tty's own focused per-domain MCP surfaces** — purpose-built, typed tools, one concern per server. These are ch1tty-owned code; many adapt a ChittyOS canonical service (e.g. `apps/tasks-mcp/` wraps `chittyentity/workers/chittyagent-tasks`), but the canonical state always lives in the home service's repo, not here.
 
-This mirrors `github.com/cloudflare/mcp-server-cloudflare`'s structure: 15 focused servers (workers-bindings, browser-rendering, autorag, etc.) + one broad **Code Mode** surface. Ch1tty (`src/` in this repo, not yet under `apps/gateway/`) plays the Code-Mode role — the slim-MCP viewport that aggregates all of these.
+Ch1tty is a sibling of ChittyOS, not a part of it — its `apps/*-mcp` surfaces are peer MCP translators that let the ch1tty gateway offer ChittyOS domains alongside non-ChittyOS sources through one MCP interface, usable from LLM chat, agent runtimes, or plain server-to-server callers.
+
+This mirrors `github.com/cloudflare/mcp-server-cloudflare`'s structure: 15 focused servers + one broad **Code Mode** surface. The ch1tty gateway (`src/` in this repo, future `apps/gateway/`) plays the Code-Mode role — the slim-MCP viewport that aggregates all of these.
 
 ## Current + planned focused servers
 
@@ -15,7 +17,7 @@ This mirrors `github.com/cloudflare/mcp-server-cloudflare`'s structure: 15 focus
 
 ## Rule
 
-> **New ChittyOS MCP capability → new focused server under `apps/`, registered as a backend in `servers.json`; never inline code in the ch1tty gateway.**
+> **New MCP surface ch1tty wants to expose → new focused server under `apps/`, registered as a backend in `servers.json`; never inline domain logic in the ch1tty gateway. Canonical state stays in the home service; the `apps/*-mcp` entry is just the MCP translation layer.**
 
 The gateway's public surface is fixed at the 5 slim-MCP meta-tools (`search`, `execute`, `status`, `reload`, `cast`). Domain features are discovered through `search` and invoked through `execute` against the appropriate focused server.
 
