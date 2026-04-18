@@ -9,7 +9,11 @@
       "type": "remote",
       "access": "readwrite",
       "category": "ecosystem",
-      "endpoint": "https://connect.chitty.cc/mcp",
+      "endpoint": "https://mcp-portal.chitty.cc/mcp",
+      "envHeaders": {
+        "CF-Access-Client-Id": "CHITTY_CF_ACCESS_CLIENT_ID",
+        "CF-Access-Client-Secret": "CHITTY_CF_ACCESS_CLIENT_SECRET"
+      },
       "authTokenKey": "chittymcp",
       "lazy": true,
       "enabled": true
@@ -20,7 +24,7 @@
       "type": "remote",
       "access": "readwrite",
       "category": "ecosystem",
-      "endpoint": "https://builds.mcp.cloudflare.com/mcp",
+      "endpoint": "https://mcp.cloudflare.com/mcp",
       "authTokenKey": "cloudflare-mcp",
       "lazy": true,
       "enabled": true
@@ -33,6 +37,17 @@
       "category": "search",
       "endpoint": "https://autorag.mcp.cloudflare.com/mcp",
       "authTokenKey": "chittyevidence-search",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "browser-rendering",
+      "name": "Cloudflare Browser Rendering",
+      "type": "remote",
+      "access": "read",
+      "category": "desktop",
+      "endpoint": "https://browser.mcp.cloudflare.com/mcp",
+      "authTokenKey": "cloudflare-browser-rendering",
       "lazy": true,
       "enabled": true
     },
