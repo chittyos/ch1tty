@@ -1,9 +1,8 @@
 {
-  // ChittyAgent MCP — OAuth-protected MCP portal gateway
+  // ChittyAgent Ch1tty — OAuth-protected slim-MCP gateway
   //
-  // Uses Agents SDK McpAgent + OAuthProvider to front the ch1tty
-  // gateway with MCP OAuth 2.1. Proxies tool calls to ch1tty.com/mcp
-  // (VM aggregator) + cloud agents (dispute, notes, orchestrator, ship).
+  // Proxies the 5 ch1tty meta-tools (search/execute/status/reload/cast)
+  // from ch1tty.chitty.cc/mcp with OAuth 2.1 for external clients.
   //
   // Deploy: wrangler deploy --env production
 
@@ -22,7 +21,7 @@
       ],
       "vars": {
         "SERVICE_NAME": "chittyagent-ch1tty",
-        "SERVICE_VERSION": "2.0.0",
+        "SERVICE_VERSION": "3.0.0",
         "CH1TTY_UPSTREAM": "https://ch1tty.chitty.cc/mcp"
       },
       "durable_objects": {
@@ -37,16 +36,7 @@
         {
           "binding": "OAUTH_KV",
           "id": "257ed804b1414a30aaec301cd6233089"
-        },
-        {
-          "binding": "POLICY_KV",
-          "id": "f8db621e10d545098457cf62d7284c31"
         }
-      ],
-      "services": [
-        { "binding": "AGENT_ORCHESTRATOR", "service": "chittyagent-orchestrator" }
-        // AGENT_ALCHEMIST removed — worker not yet deployed. Telemetry is fire-and-forget; ch1tty works without it.
-        // Re-add: { "binding": "AGENT_ALCHEMIST", "service": "chittyagent-alchemist" }
       ],
       "tail_consumers": [
         { "service": "chittytrack" }

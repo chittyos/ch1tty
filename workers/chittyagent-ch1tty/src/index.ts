@@ -1,17 +1,10 @@
 /**
  * ChittyAgent Ch1tty — OAuth-protected MCP portal gateway
  *
- * Uses Agents SDK McpAgent for MCP transport + @cloudflare/workers-oauth-provider
- * for OAuth 2.1 server. Proxies all tool calls to ch1tty.com/mcp + all
- * chittyentity cloud agents that expose MCP endpoints.
- *
- * Endpoints:
- *   GET  /health           — liveness
- *   GET  /api/v1/status    — service status
- *   *    /mcp              — MCP Streamable HTTP (OAuth-protected)
- *   GET  /authorize        — OAuth authorization
- *   POST /token            — OAuth token exchange
- *   POST /register         — OAuth dynamic client registration
+ * Proxies the 5 slim-MCP meta-tools from ch1tty.chitty.cc/mcp via direct
+ * MCP Streamable HTTP fetch. All backend tool aggregation is handled by
+ * the ch1tty gateway — this worker is just OAuth + transport for external
+ * clients (ChatGPT, etc).
  *
  * @canonical-uri chittycanon://core/services/chittyagent-ch1tty
  */
@@ -20,74 +13,146 @@ import { McpAgent } from "agents/mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { routeAgentRequest } from "agents";
 import OAuthProvider, { type OAuthHelpers } from "@cloudflare/workers-oauth-provider";
+import { z } from "zod";
 
 interface Env {
   MCP_OBJECT: DurableObjectNamespace;
   OAUTH_KV: KVNamespace;
-  POLICY_KV: KVNamespace;
-  AGENT_ORCHESTRATOR: Fetcher;
-  AGENT_ALCHEMIST: Fetcher;
   CH1TTY_UPSTREAM: string;
+  CH1TTY_MCP_TOKEN: string;
   SERVICE_NAME: string;
   SERVICE_VERSION: string;
   OAUTH_PROVIDER: OAuthHelpers;
 }
 
-// ── Policy engine: server-side hookify for all channels ──────────
-// Claude Code has client-side hooks. Every other channel gets
-// policy enforcement HERE, at the gateway layer.
-// Policies sync from orchestrator hook-registry KV.
+// ── MCP Streamable HTTP client ───────────────────────────────────
 
-interface PolicyRule {
-  id: string;
-  name: string;
-  enabled: boolean;
-  event: string;    // "tool_call" | "tool_result" | "prompt"
-  action: string;   // "block" | "suggest" | "log"
-  pattern: string;  // regex to match against tool name or content
-  body: string;     // message to return on block
+interface UpstreamSession {
+  url: string;
+  sessionId: string;
+  token: string;
 }
 
-async function loadPolicies(kv: KVNamespace): Promise<PolicyRule[]> {
-  try {
-    const raw = await kv.get("gateway:policies", { cacheTtl: 300 });
-    if (raw) return JSON.parse(raw);
-  } catch { /* best effort */ }
-  return [];
-}
+const MCP_ACCEPT = "application/json, text/event-stream";
 
-function evaluatePolicy(
-  policies: PolicyRule[],
-  toolName: string,
-  event: string,
-): { allowed: boolean; rule?: PolicyRule } {
-  for (const rule of policies) {
-    if (!rule.enabled || rule.event !== event) continue;
-    try {
-      const regex = new RegExp(rule.pattern, "i");
-      if (regex.test(toolName)) {
-        if (rule.action === "block") {
-          return { allowed: false, rule };
-        }
-      }
-    } catch { /* skip invalid regex */ }
+function parseSSE(body: string): unknown | null {
+  for (const line of body.split("\n")) {
+    if (line.startsWith("data: ")) {
+      try { return JSON.parse(line.slice(6)); } catch { /* skip */ }
+    }
   }
-  return { allowed: true };
+  return null;
 }
 
-// Agents with native MCP endpoints (McpAgent-based)
-const AGENT_MCP_UPSTREAMS = [
-  { id: "dispute", url: "https://dispute.agent.chitty.cc/mcp" },
-  { id: "notes", url: "https://notes.agent.chitty.cc/mcp" },
-  { id: "orchestrator", url: "https://orchestrator.agent.chitty.cc/mcp" },
-  { id: "ship", url: "https://ship.agent.chitty.cc/mcp" },
-  // Comms platform agents (PlatformAgent subclasses, migration 003)
-  //   { id: "quo", url: "https://quo.agent.chitty.cc/mcp" },
-  //   { id: "twilio", url: "https://twilio.agent.chitty.cc/mcp" },
-  //   { id: "bluebubbles", url: "https://bluebubbles.agent.chitty.cc/mcp" },
-] as const;
+async function mcpFetch(
+  url: string,
+  body: Record<string, unknown>,
+  token: string,
+  sessionId?: string,
+): Promise<{ data: unknown; sessionId?: string }> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    "Accept": MCP_ACCEPT,
+    "Authorization": `Bearer ${token}`,
+  };
+  if (sessionId) headers["Mcp-Session-Id"] = sessionId;
 
-// ── McpAgent: proxies tools from ch1tty + all cloud agents ───────
+  const res = await fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+  });
+
+  const newSessionId = res.headers.get("mcp-session-id") || sessionId;
+  const text = await res.text();
+
+  const ct = res.headers.get("content-type") || "";
+  let data: unknown;
+  if (ct.includes("text/event-stream")) {
+    data = parseSSE(text);
+  } else {
+    try { data = JSON.parse(text); } catch { data = null; }
+  }
+
+  return { data, sessionId: newSessionId || undefined };
+}
+
+async function initUpstream(url: string, token: string): Promise<UpstreamSession | null> {
+  try {
+    const { sessionId } = await mcpFetch(url, {
+      jsonrpc: "2.0",
+      method: "initialize",
+      params: {
+        protocolVersion: "2025-03-26",
+        capabilities: {},
+        clientInfo: { name: "chittyagent-ch1tty", version: "3.0.0" },
+      },
+      id: 1,
+    }, token);
+
+    if (!sessionId) return null;
+
+    await mcpFetch(url, {
+      jsonrpc: "2.0",
+      method: "notifications/initialized",
+    }, token, sessionId);
+
+    return { url, sessionId, token };
+  } catch {
+    return null;
+  }
+}
+
+async function callUpstreamTool(
+  session: UpstreamSession,
+  toolName: string,
+  args: Record<string, unknown>,
+): Promise<{ content: Array<{ type: "text"; text: string }> }> {
+  const { data } = await mcpFetch(session.url, {
+    jsonrpc: "2.0",
+    method: "tools/call",
+    params: { name: toolName, arguments: args },
+    id: Date.now(),
+  }, session.token, session.sessionId);
+
+  const result = data as {
+    result?: { content?: Array<{ type: string; text: string }> };
+    error?: { message: string };
+  };
+
+  if (result?.error) {
+    return { content: [{ type: "text" as const, text: `Error: ${result.error.message}` }] };
+  }
+
+  const content = result?.result?.content?.map(c => ({
+    type: "text" as const,
+    text: c.text,
+  })) || [{ type: "text" as const, text: "No result" }];
+
+  return { content };
+}
+
+// ── Zod schemas for the 5 slim-MCP tools ─────────────────────────
+
+const SearchSchema = {
+  query: z.string().optional().describe("Search keywords matched against tool names and descriptions"),
+  server: z.string().optional().describe("Filter by server id (e.g. \"neon\", \"chittyos\")"),
+  category: z.string().optional().describe("Filter by category (ecosystem, code, search, reasoning, desktop, documents, communication)"),
+  limit: z.number().optional().describe("Max results to return (default 20)"),
+};
+
+const ExecuteSchema = {
+  tool: z.string().describe("Namespaced tool name from search results (e.g. \"neon/list_projects\")"),
+  args: z.record(z.string(), z.unknown()).optional().describe("Arguments to pass to the tool"),
+};
+
+const CastSchema = {
+  intent: z.string().describe("Natural language description of what you want accomplished"),
+  args: z.record(z.string(), z.unknown()).optional().describe("Arguments to pass to the resolved tool (if known)"),
+  confirm: z.boolean().optional().describe("If true, return the execution plan without running it (default: false)"),
+};
+
+// ── McpAgent: proxies 5 slim-MCP tools from ch1tty gateway ──────
 
 export class ChittyMcpAgent extends McpAgent<Env> {
   server = new McpServer({
@@ -95,78 +160,127 @@ export class ChittyMcpAgent extends McpAgent<Env> {
     version: "3.0.0",
   });
 
-  private policies: PolicyRule[] = [];
+  private upstream: UpstreamSession | null = null;
+
+  // Lazy upstream connection — creates or reuses session
+  private async getUpstream(): Promise<UpstreamSession> {
+    if (this.upstream) {
+      // Test if session is still alive with a lightweight call
+      try {
+        const { data } = await mcpFetch(this.upstream.url, {
+          jsonrpc: "2.0",
+          method: "tools/list",
+          id: Date.now(),
+        }, this.upstream.token, this.upstream.sessionId);
+        const result = data as { result?: unknown; error?: unknown };
+        if (result?.result) return this.upstream;
+      } catch { /* session dead, reconnect */ }
+    }
+
+    const url = this.env.CH1TTY_UPSTREAM || "https://ch1tty.chitty.cc/mcp";
+    const token = this.env.CH1TTY_MCP_TOKEN || "";
+    const session = await initUpstream(url, token);
+    if (!session) {
+      throw new Error(`Failed to connect to upstream ${url} (token: ${token.length} chars)`);
+    }
+    this.upstream = session;
+    return session;
+  }
 
   async init() {
-    this.server.tool("gateway_status", "Returns gateway health", async () => {
-      return { content: [{ type: "text", text: JSON.stringify({ status: "ok", service: "chittyagent-ch1tty", mode: "standalone" }) }] };
-    });
+    const self = this;
 
-    this.server.tool("echo", "Echo back input", async () => {
-      return { content: [{ type: "text", text: "hello from ch1tty" }] };
-    });
-  }
-
-  // Pull latest policies from orchestrator hook-registry
-  private async syncPolicies(): Promise<void> {
-    try {
-      const res = await this.env.AGENT_ORCHESTRATOR.fetch(
-        new Request("https://internal/api/v1/registry/hooks"),
-      );
-      if (res.ok) {
-        const registry = await res.json() as { hooks?: Array<Record<string, unknown>> };
-        const hooks = registry.hooks || [];
-
-        // Convert hook-registry entries to gateway policy rules
-        const policies: PolicyRule[] = hooks
-          .filter((h) => h.enabled && (h.event === "tool_call" || h.event === "stop"))
-          .map((h) => ({
-            id: h.id as string,
-            name: h.name as string,
-            enabled: h.enabled as boolean,
-            event: "tool_call",
-            action: h.action as string,
-            pattern: h.pattern as string,
-            body: h.body as string,
-          }));
-
-        await this.env.POLICY_KV.put("gateway:policies", JSON.stringify(policies));
-        this.policies = policies;
+    const proxy = async (toolName: string, args: Record<string, unknown>) => {
+      try {
+        const session = await self.getUpstream();
+        return await callUpstreamTool(session, toolName, args);
+      } catch (e: unknown) {
+        return {
+          content: [{ type: "text" as const, text: `Error: ${String(e)}` }],
+          isError: true as const,
+        };
       }
-    } catch { /* best effort — use cached policies */ }
-  }
+    };
 
-  // Forward telemetry to Alchemist (fire-and-forget)
-  private logToolCall(toolName: string, success: boolean, error?: string): void {
-    try {
-      this.env.AGENT_ALCHEMIST.fetch(
-        new Request("https://internal/api/v1/hook-event", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "X-Agent-From": this.env.SERVICE_NAME },
-          body: JSON.stringify({
-            hook_type: "GatewayToolCall",
-            tool_name: toolName,
-            success,
-            error,
-            session_id: this.name, // DO instance name = session
-          }),
-        }),
-      ).catch(() => {});
-    } catch { /* fire and forget */ }
+    this.server.tool(
+      "search",
+      "Search the tool registry. Returns matching tool names, descriptions, and input schemas. Use before execute.",
+      SearchSchema,
+      async (args) => proxy("ch1tty/search", args),
+    );
+
+    this.server.tool(
+      "execute",
+      "Execute a tool by its namespaced name (serverId/toolName). Use search to discover available tools first.",
+      ExecuteSchema,
+      async (args) => proxy("ch1tty/execute", args),
+    );
+
+    this.server.tool(
+      "status",
+      "Gateway status — connected servers, tool counts, cache ages",
+      async () => proxy("ch1tty/status", {}),
+    );
+
+    this.server.tool(
+      "reload",
+      "Hot-reload servers.json without restarting the gateway",
+      async () => proxy("ch1tty/reload", {}),
+    );
+
+    this.server.tool(
+      "cast",
+      "Describe what you want done in natural language. Ch1tty searches its full surface, resolves intent, and executes the best tool match.",
+      CastSchema,
+      async (args) => proxy("ch1tty/cast", args),
+    );
+
+    // Diagnostics — doesn't need upstream
+    this.server.tool("gateway_status", "Returns gateway health, tests upstream connection, and reports any errors", async () => {
+      const upstreamUrl = self.env.CH1TTY_UPSTREAM || "https://ch1tty.chitty.cc/mcp";
+      const hasToken = !!self.env.CH1TTY_MCP_TOKEN;
+      let connectTest: string;
+      let connectError: string | null = null;
+
+      try {
+        const session = await self.getUpstream();
+        connectTest = "ok";
+      } catch (e: unknown) {
+        connectTest = "failed";
+        connectError = String(e);
+      }
+
+      return {
+        content: [{
+          type: "text" as const,
+          text: JSON.stringify({
+            status: "ok",
+            service: "chittyagent-ch1tty",
+            upstreamUrl,
+            hasToken,
+            tokenLength: self.env.CH1TTY_MCP_TOKEN?.length || 0,
+            upstreamConnected: !!self.upstream,
+            upstreamSessionId: self.upstream?.sessionId || null,
+            connectTest,
+            connectError,
+          }, null, 2),
+        }],
+      };
+    });
   }
 }
 
-// ── Non-MCP routes as ExportedHandler ────────────────────────────
+// ── Non-MCP routes ───────────────────────────────────────────────
 
 const DefaultHandler = {
-  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+  async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
     if (url.pathname === "/health") {
       return Response.json({
         status: "ok",
         service: "chittyagent-ch1tty",
-        version: env.SERVICE_VERSION || "1.0.0",
+        version: env.SERVICE_VERSION || "3.0.0",
       });
     }
 
@@ -174,24 +288,40 @@ const DefaultHandler = {
       return Response.json({
         status: "ok",
         service: "chittyagent-ch1tty",
-        version: env.SERVICE_VERSION || "2.0.0",
+        version: env.SERVICE_VERSION || "3.0.0",
         upstream: env.CH1TTY_UPSTREAM || "https://ch1tty.chitty.cc/mcp",
-        agents: AGENT_MCP_UPSTREAMS.map(a => a.id),
         transport: "streamable-http",
         auth: "oauth2.1",
+        hasToken: !!(env.CH1TTY_MCP_TOKEN),
+        tokenLength: env.CH1TTY_MCP_TOKEN?.length || 0,
       });
     }
 
-    // OAuth authorization endpoint — auto-approve for MCP clients
+    if (url.pathname === "/api/v1/upstream-test") {
+      const upstreamUrl = env.CH1TTY_UPSTREAM || "https://ch1tty.chitty.cc/mcp";
+      const token = env.CH1TTY_MCP_TOKEN || "";
+      try {
+        const session = await initUpstream(upstreamUrl, token);
+        if (!session) {
+          return Response.json({ error: "initUpstream returned null", hasToken: !!token, tokenLen: token.length, upstreamUrl });
+        }
+        const { data } = await mcpFetch(session.url, { jsonrpc: "2.0", method: "tools/list", id: 2 }, session.token, session.sessionId);
+        const toolsResult = data as { result?: { tools?: Array<{ name: string }> } };
+        const tools = toolsResult?.result?.tools || [];
+        return Response.json({ ok: true, sessionId: session.sessionId, toolCount: tools.length, tools: tools.map((t: { name: string }) => t.name) });
+      } catch (e: unknown) {
+        return Response.json({ error: String(e), hasToken: !!token, tokenLen: token.length, upstreamUrl }, { status: 500 });
+      }
+    }
+
     if (url.pathname === "/oauth/approve") {
       const oauthReq = await env.OAUTH_PROVIDER.parseAuthRequest(request);
       const { redirectTo } = await env.OAUTH_PROVIDER.completeAuthorization({
         request: oauthReq,
         userId: oauthReq.clientId,
+        metadata: { label: oauthReq.clientId },
         scope: oauthReq.scope,
-        props: {
-          clientId: oauthReq.clientId,
-        },
+        props: { clientId: oauthReq.clientId },
       });
       return Response.redirect(redirectTo, 302);
     }
@@ -202,8 +332,6 @@ const DefaultHandler = {
     return new Response("Not Found", { status: 404 });
   },
 };
-
-// ── OAuth Provider wrapping MCP + default routes ─────────────────
 
 export default new OAuthProvider({
   apiRoute: ["/mcp", "/sse"],
