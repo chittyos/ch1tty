@@ -28,7 +28,7 @@
       "durable_objects": {
         "bindings": [
           {
-            "name": "MCP_AGENT",
+            "name": "MCP_OBJECT",
             "class_name": "ChittyMcpAgent"
           }
         ]
@@ -57,7 +57,7 @@
   "durable_objects": {
     "bindings": [
       {
-        "name": "MCP_AGENT",
+        "name": "MCP_OBJECT",
         "class_name": "ChittyMcpAgent"
       }
     ]

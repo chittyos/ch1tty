@@ -22,7 +22,7 @@ import { routeAgentRequest } from "agents";
 import OAuthProvider, { type OAuthHelpers } from "@cloudflare/workers-oauth-provider";
 
 interface Env {
-  MCP_AGENT: DurableObjectNamespace;
+  MCP_OBJECT: DurableObjectNamespace;
   OAUTH_KV: KVNamespace;
   POLICY_KV: KVNamespace;
   AGENT_ORCHESTRATOR: Fetcher;
@@ -98,28 +98,13 @@ export class ChittyMcpAgent extends McpAgent<Env> {
   private policies: PolicyRule[] = [];
 
   async init() {
-    // Load gateway policies from KV (synced from orchestrator hook-registry)
-    this.policies = await loadPolicies(this.env.POLICY_KV);
+    this.server.tool("gateway_status", "Returns gateway health", async () => {
+      return { content: [{ type: "text", text: JSON.stringify({ status: "ok", service: "chittyagent-ch1tty", mode: "standalone" }) }] };
+    });
 
-    // Primary: ch1tty VM aggregator (Neon, Playwright, Filesystem, etc.)
-    const upstream = this.env.CH1TTY_UPSTREAM || "https://ch1tty.chitty.cc/mcp";
-    try {
-      await this.addMcpServer("ch1tty", upstream);
-    } catch (e) {
-      console.error("Failed to add ch1tty upstream:", e);
-    }
-
-    // Cloud agents with native MCP endpoints — best-effort, skip failures
-    for (const agent of AGENT_MCP_UPSTREAMS) {
-      try {
-        await this.addMcpServer(agent.id, agent.url);
-      } catch (e) {
-        console.error(`Failed to add agent ${agent.id}:`, e);
-      }
-    }
-
-    // Sync policies from orchestrator registry (background, best-effort)
-    this.syncPolicies().catch(() => {});
+    this.server.tool("echo", "Echo back input", async () => {
+      return { content: [{ type: "text", text: "hello from ch1tty" }] };
+    });
   }
 
   // Pull latest policies from orchestrator hook-registry
@@ -221,7 +206,7 @@ const DefaultHandler = {
 // ── OAuth Provider wrapping MCP + default routes ─────────────────
 
 export default new OAuthProvider({
-  apiRoute: "/mcp",
+  apiRoute: ["/mcp", "/sse"],
   apiHandler: ChittyMcpAgent.serve("/mcp"),
   defaultHandler: DefaultHandler,
   authorizeEndpoint: "/oauth/approve",
