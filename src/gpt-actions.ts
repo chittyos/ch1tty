@@ -140,8 +140,8 @@ components:
       type: oauth2
       flows:
         authorizationCode:
-          authorizationUrl: https://tty.chitty.cc/authorize
-          tokenUrl: https://tty.chitty.cc/token
+          authorizationUrl: https://tty.chitty.cc/v1/oauth/authorize
+          tokenUrl: https://tty.chitty.cc/v1/oauth/token
           scopes: {}
 
   schemas:

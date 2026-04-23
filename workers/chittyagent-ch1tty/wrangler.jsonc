@@ -1,0 +1,72 @@
+{
+  // ChittyAgent MCP — OAuth-protected MCP portal gateway
+  //
+  // Uses Agents SDK McpAgent + OAuthProvider to front the ch1tty
+  // gateway with MCP OAuth 2.1. Proxies tool calls to ch1tty.com/mcp
+  // (VM aggregator) + cloud agents (dispute, notes, orchestrator, ship).
+  //
+  // Deploy: wrangler deploy --env production
+
+  "name": "chittyagent-ch1tty",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-03-24",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "account_id": "0bc21e3a5a9de1a4cc843be9c3e98121",
+
+  "env": {
+    "production": {
+      "name": "chittyagent-ch1tty",
+      "routes": [
+        { "pattern": "ch1tty.agent.chitty.cc", "custom_domain": true },
+        { "pattern": "agent.ch1tty.com", "custom_domain": true }
+      ],
+      "vars": {
+        "SERVICE_NAME": "chittyagent-ch1tty",
+        "SERVICE_VERSION": "2.0.0",
+        "CH1TTY_UPSTREAM": "https://ch1tty.chitty.cc/mcp"
+      },
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "MCP_AGENT",
+            "class_name": "ChittyMcpAgent"
+          }
+        ]
+      },
+      "kv_namespaces": [
+        {
+          "binding": "OAUTH_KV",
+          "id": "257ed804b1414a30aaec301cd6233089"
+        },
+        {
+          "binding": "POLICY_KV",
+          "id": "f8db621e10d545098457cf62d7284c31"
+        }
+      ],
+      "services": [
+        { "binding": "AGENT_ORCHESTRATOR", "service": "chittyagent-orchestrator" }
+        // AGENT_ALCHEMIST removed — worker not yet deployed. Telemetry is fire-and-forget; ch1tty works without it.
+        // Re-add: { "binding": "AGENT_ALCHEMIST", "service": "chittyagent-alchemist" }
+      ],
+      "tail_consumers": [
+        { "service": "chittytrack" }
+      ]
+    }
+  },
+
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "MCP_AGENT",
+        "class_name": "ChittyMcpAgent"
+      }
+    ]
+  },
+
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["ChittyMcpAgent"]
+    }
+  ]
+}

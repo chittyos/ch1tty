@@ -42,6 +42,7 @@ async function main(): Promise<void> {
   if (httpPort && Number.isFinite(httpPort)) {
     httpServer = new HttpMcpServer(aggregator, {
       port: httpPort,
+      bindAddress: process.env.CH1TTY_BIND || undefined,
       mcpToken: process.env.CH1TTY_MCP_TOKEN,
     });
     await httpServer.start();

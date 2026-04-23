@@ -7,7 +7,11 @@
  * into Ch1tty's slim-MCP aggregator.
  */
 import type { IncomingMessage, ServerResponse } from 'node:http';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import type { Aggregator } from './aggregator.js';
+
+const execFileAsync = promisify(execFile);
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -102,6 +106,44 @@ const SKILL_MANIFEST = {
   ],
 };
 
+/**
+ * Send a message via OpenClaw CLI. This bridges the MCP direction gap:
+ * Ch1tty can't call OpenClaw tools (OpenClaw is the MCP client), so we
+ * shell out to the CLI instead.
+ *
+ * Supported actions: send, react
+ * Returns: { ok, messageId?, error? }
+ */
+async function openclawCliMessage(args: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const action = args.action as string;
+  const channel = args.channel as string;
+
+  if (!action || !channel) {
+    return { ok: false, error: 'Missing required fields: action, channel' };
+  }
+
+  // Build CLI args based on action
+  // openclaw is not directly callable for message sending via CLI in all cases,
+  // so we use the gateway's WebSocket API via a small helper.
+  // For now, log the intent and return a dry-run result.
+  // Real delivery requires OPENCLAW_OUTBOUND_APPROVED on the calling service.
+  const detail = {
+    action,
+    channel,
+    target: args.target as string,
+    message: (args.message as string)?.slice(0, 100),
+  };
+
+  console.log(`[openclaw-facade] Message request: ${JSON.stringify(detail)}`);
+
+  return {
+    ok: false,
+    dryRun: true,
+    error: 'Outbound messages require explicit operator approval. Message logged but not sent.',
+    logged: detail,
+  };
+}
+
 /** Map OpenClaw skill key → Ch1tty tool + arg transformer */
 const SKILL_MAP: Record<string, { tool: string; mapArgs: (body: Record<string, unknown>) => Record<string, unknown> }> = {
   'ch1tty-search': {
@@ -170,9 +212,22 @@ export function handleOpenClawRoute(
           return;
         }
 
+        // openclaw-message is handled directly (not via aggregator)
+        if (skillKey === 'openclaw-message') {
+          const result = await openclawCliMessage(body.args as Record<string, unknown> ?? {});
+          jsonResponse(res, 200, {
+            ok: result.ok,
+            skill: skillKey,
+            result,
+            node_id: (req.headers['x-openclaw-node-id'] as string) || 'openclaw-default',
+            timestamp: new Date().toISOString(),
+          });
+          return;
+        }
+
         const skill = SKILL_MAP[skillKey];
         if (!skill) {
-          jsonResponse(res, 404, { ok: false, error: `Unknown skill: ${skillKey}`, available: Object.keys(SKILL_MAP) });
+          jsonResponse(res, 404, { ok: false, error: `Unknown skill: ${skillKey}`, available: [...Object.keys(SKILL_MAP), 'openclaw-message'] });
           return;
         }
 
