@@ -514,12 +514,29 @@ export class Aggregator {
     const terms = intent.toLowerCase().split(/\s+/).filter((t) => t.length > 2);
 
     // Step 1: Score tools, prompts, and resources in parallel (Ch1tty searching itself)
-    const [registry, { prompts: allPrompts }, { resources: allResources }] = await Promise.all([
+    const [registryResult, promptsResult, resourcesResult] = await Promise.allSettled([
       this.getRegistry(),
-      this.listAllPrompts().catch(() => ({ prompts: [] as Array<{ name: string; description?: string; arguments?: Array<{ name: string; description?: string; required?: boolean }> }> })),
-      this.listAllResources().catch(() => ({ resources: [] as Array<{ uri: string; name: string; description?: string; mimeType?: string }> })),
+      this.listAllPrompts(),
+      this.listAllResources(),
     ]);
 
+    if (registryResult.status !== 'fulfilled') {
+      throw registryResult.reason;
+    }
+
+    const registry = registryResult.value;
+    const allPrompts = promptsResult.status === 'fulfilled'
+      ? promptsResult.value.prompts
+      : (() => {
+          log.warn('handleCast(): failed to list prompts; continuing with empty prompt set', promptsResult.reason);
+          return [] as Array<{ name: string; description?: string; arguments?: Array<{ name: string; description?: string; required?: boolean }> }>;
+        })();
+    const allResources = resourcesResult.status === 'fulfilled'
+      ? resourcesResult.value.resources
+      : (() => {
+          log.warn('handleCast(): failed to list resources; continuing with empty resource set', resourcesResult.reason);
+          return [] as Array<{ uri: string; name: string; description?: string; mimeType?: string }>;
+        })();
     const scoredTools = this.scoreIntent(intent, registry, sessionId);
 
     // Score prompts against intent
