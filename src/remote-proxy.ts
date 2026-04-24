@@ -53,6 +53,9 @@ export class RemoteProxy implements Backend {
         timeout: 10_000,
       });
       const token = stdout.trim();
+      if (!token) {
+        throw new Error(`chitty-mcp-token returned empty value for key '${config.authTokenKey}'`);
+      }
 
       this.tokenCaches.set(config.id, {
         token,
@@ -61,8 +64,11 @@ export class RemoteProxy implements Backend {
 
       return token;
     } catch (err) {
-      log.error(`Failed to get auth token: ${err}`, config.id);
-      return null;
+      // C2 — auth was explicitly requested (authTokenKey set). Do NOT silently fall back to
+      // an unauthenticated connection; surface the retrieval failure to callers so they see
+      // the real cause (1Password down, token rotated, CLI missing) rather than a downstream 401.
+      log.error(`Failed to get auth token (key '${config.authTokenKey}'): ${err}`, config.id);
+      throw new Error(`auth_token_unavailable: ${config.authTokenKey}`);
     }
   }
 
@@ -97,7 +103,7 @@ export class RemoteProxy implements Backend {
   private evict(serverId: string): void {
     const conn = this.connections.get(serverId);
     if (conn) {
-      conn.client.close().catch(() => {});
+      conn.client.close().catch((err) => log.warn(`Evict close failed: ${err}`, serverId));
       this.connections.delete(serverId);
       log.debug(`Evicted dead connection`, serverId);
     }
@@ -118,9 +124,16 @@ export class RemoteProxy implements Backend {
   }
 
   private async doConnect(config: RemoteServerConfig): Promise<RemoteConnection> {
-    const headers: Record<string, string> = {};
+    const headers: Record<string, string> = { ...(config.headers ?? {}) };
+    if (config.envHeaders) {
+      for (const [headerName, envVarName] of Object.entries(config.envHeaders)) {
+        const value = process.env[envVarName];
+        if (value) headers[headerName] = value;
+      }
+    }
+
     const token = await this.getAuthToken(config);
-    if (token) {
+    if (token && !headers.Authorization) {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
@@ -261,16 +274,31 @@ export class RemoteProxy implements Backend {
   async readResource(serverId: string, uri: string): Promise<{
     contents: Array<{ uri: string; mimeType?: string; text?: string; blob?: string }>;
   }> {
-    const conn = await this.connectWithReconnect(serverId);
-    const result = await conn.client.readResource({ uri });
-    return {
-      contents: result.contents.map((c) => ({
-        uri: c.uri,
-        mimeType: c.mimeType,
-        text: 'text' in c ? (c.text as string) : undefined,
-        blob: 'blob' in c ? (c.blob as string) : undefined,
-      })),
-    };
+    if (!this.breaker.isAllowed(serverId)) {
+      throw new Error(`readResource: circuit open for ${serverId}`);
+    }
+    try {
+      const conn = await this.connectWithReconnect(serverId);
+      const result = await withTimeout(
+        conn.client.readResource({ uri }),
+        CALL_TIMEOUT_MS,
+        `readResource ${serverId} ${uri}`,
+      );
+      this.breaker.recordSuccess(serverId);
+      return {
+        contents: result.contents.map((c) => ({
+          uri: c.uri,
+          mimeType: c.mimeType,
+          text: 'text' in c ? (c.text as string) : undefined,
+          blob: 'blob' in c ? (c.blob as string) : undefined,
+        })),
+      };
+    } catch (err) {
+      this.breaker.recordFailure(serverId);
+      this.evict(serverId);
+      log.error(`readResource error: ${err}`, serverId);
+      throw err;
+    }
   }
 
   async listPrompts(serverId: string): Promise<PromptEntry[]> {
@@ -313,17 +341,32 @@ export class RemoteProxy implements Backend {
 
   async getPrompt(serverId: string, name: string, promptArgs?: Record<string, string>): Promise<{
     description?: string;
-    messages: Array<{ role: string; content: ContentItem }>;
+    messages: Array<{ role: 'user' | 'assistant'; content: ContentItem }>;
   }> {
-    const conn = await this.connectWithReconnect(serverId);
-    const result = await conn.client.getPrompt({ name, arguments: promptArgs });
-    return {
-      description: result.description,
-      messages: result.messages.map((m) => ({
-        role: m.role,
-        content: m.content as ContentItem,
-      })),
-    };
+    if (!this.breaker.isAllowed(serverId)) {
+      throw new Error(`getPrompt: circuit open for ${serverId}`);
+    }
+    try {
+      const conn = await this.connectWithReconnect(serverId);
+      const result = await withTimeout(
+        conn.client.getPrompt({ name, arguments: promptArgs }),
+        CALL_TIMEOUT_MS,
+        `getPrompt ${serverId} ${name}`,
+      );
+      this.breaker.recordSuccess(serverId);
+      return {
+        description: result.description,
+        messages: result.messages.map((m) => ({
+          role: m.role,
+          content: m.content as ContentItem,
+        })),
+      };
+    } catch (err) {
+      this.breaker.recordFailure(serverId);
+      this.evict(serverId);
+      log.error(`getPrompt error: ${err}`, serverId);
+      throw err;
+    }
   }
 
   getStatus(serverId: string): BackendStatus {

@@ -193,6 +193,31 @@ export class Aggregator {
         description: 'Hot-reload servers.json without restarting the gateway',
         inputSchema: { type: 'object' },
       },
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}cast`,
+        description:
+          'Describe what you want done in natural language. Ch1tty searches its full surface — tools, prompts, and resources — ' +
+          'resolves intent, and executes the best tool match. Related prompts and resources are surfaced alongside. ' +
+          'Sub-meta to master-meta — the gateway calling itself.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            intent: {
+              type: 'string',
+              description: 'Natural language description of what you want accomplished',
+            },
+            args: {
+              type: 'object',
+              description: 'Arguments to pass to the resolved tool (if known)',
+            },
+            confirm: {
+              type: 'boolean',
+              description: 'If true, return the execution plan without running it (default: false)',
+            },
+          },
+          required: ['intent'],
+        },
+      },
     ];
   }
 
@@ -206,6 +231,8 @@ export class Aggregator {
         return this.handleStatus();
       case 'reload':
         return this.handleReload();
+      case 'cast':
+        return this.handleCast(args, sessionId);
       default:
         return {
           content: [{ type: 'text', text: `Unknown tool: ch1tty/${toolName}` }],
@@ -434,7 +461,7 @@ export class Aggregator {
       this.configs = newConfig.servers;
       this.rebuildBackends();
 
-      // Now shut down the old backends
+      // Now shut down the old backends — log any rejected shutdowns (C5).
       const seen = new Set<Backend>();
       const shutdowns: Promise<void>[] = [];
       for (const backend of oldBackends.values()) {
@@ -442,7 +469,12 @@ export class Aggregator {
         seen.add(backend);
         shutdowns.push(backend.shutdown());
       }
-      await Promise.allSettled(shutdowns);
+      const results = await Promise.allSettled(shutdowns);
+      for (const r of results) {
+        if (r.status === 'rejected') {
+          log.warn(`Reload: backend shutdown failed: ${r.reason}`);
+        }
+      }
 
       const result = {
         reloaded: true,
@@ -461,6 +493,227 @@ export class Aggregator {
         isError: true,
       };
     }
+  }
+
+  // ── Cast (sub-meta → master-meta) ───────────────────────────
+
+  private async handleCast(args: Record<string, unknown>, sessionId?: string): Promise<ToolCallResult> {
+    const intent = typeof args.intent === 'string' ? args.intent.trim() : '';
+    const toolArgs = (typeof args.args === 'object' && args.args !== null && !Array.isArray(args.args))
+      ? args.args as Record<string, unknown>
+      : {};
+    const confirm = args.confirm === true;
+
+    if (!intent) {
+      return {
+        content: [{ type: 'text', text: 'Missing required "intent". Describe what you want done.' }],
+        isError: true,
+      };
+    }
+
+    const terms = intent.toLowerCase().split(/\s+/).filter((t) => t.length > 2);
+
+    // Step 1: Score tools, prompts, and resources in parallel (Ch1tty searching itself)
+    const [registryResult, promptsResult, resourcesResult] = await Promise.allSettled([
+      this.getRegistry(),
+      this.listAllPrompts(),
+      this.listAllResources(),
+    ]);
+
+    if (registryResult.status !== 'fulfilled') {
+      throw registryResult.reason;
+    }
+
+    const registry = registryResult.value;
+    const allPrompts = promptsResult.status === 'fulfilled'
+      ? promptsResult.value.prompts
+      : (() => {
+          log.warn('handleCast(): failed to list prompts; continuing with empty prompt set', promptsResult.reason);
+          return [] as Array<{ name: string; description?: string; arguments?: Array<{ name: string; description?: string; required?: boolean }> }>;
+        })();
+    const allResources = resourcesResult.status === 'fulfilled'
+      ? resourcesResult.value.resources
+      : (() => {
+          log.warn('handleCast(): failed to list resources; continuing with empty resource set', resourcesResult.reason);
+          return [] as Array<{ uri: string; name: string; description?: string; mimeType?: string }>;
+        })();
+    const scoredTools = this.scoreIntent(intent, registry, sessionId);
+
+    // Score prompts against intent
+    const scoredPrompts = allPrompts
+      .map((p) => {
+        const haystack = `${p.name} ${p.description || ''}`.toLowerCase();
+        const matchCount = terms.filter((t) => haystack.includes(t)).length;
+        const score = terms.length > 0 ? Math.round((matchCount / terms.length) * 100) / 100 : 0;
+        return { ...p, score };
+      })
+      .filter((p) => p.score > 0.1)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5);
+
+    // Score resources against intent
+    const scoredResources = allResources
+      .map((r) => {
+        const haystack = `${r.uri} ${r.name} ${r.description || ''}`.toLowerCase();
+        const matchCount = terms.filter((t) => haystack.includes(t)).length;
+        const score = terms.length > 0 ? Math.round((matchCount / terms.length) * 100) / 100 : 0;
+        return { ...r, score };
+      })
+      .filter((r) => r.score > 0.1)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5);
+
+    // No matches across any surface
+    if (scoredTools.length === 0 && scoredPrompts.length === 0 && scoredResources.length === 0) {
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            cast: 'no_match',
+            intent,
+            hint: 'No tools, prompts, or resources matched your intent. Try ch1tty/search with different keywords.',
+          }, null, 2),
+        }],
+      };
+    }
+
+    const best = scoredTools[0];
+    const alternatives = scoredTools.slice(1, 4).map((t) => ({
+      tool: t.namespacedName,
+      score: t.score,
+      description: t.description,
+    }));
+
+    // Build related prompts/resources context
+    const related: Record<string, unknown> = {};
+    if (scoredPrompts.length > 0) {
+      related.prompts = scoredPrompts.map((p) => ({
+        name: p.name,
+        description: p.description,
+        arguments: p.arguments,
+        score: p.score,
+      }));
+    }
+    if (scoredResources.length > 0) {
+      related.resources = scoredResources.map((r) => ({
+        uri: r.uri,
+        name: r.name,
+        description: r.description,
+        mimeType: r.mimeType,
+        score: r.score,
+      }));
+    }
+
+    // If no tools matched but prompts/resources did, surface those
+    if (!best) {
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            cast: 'discovered',
+            intent,
+            hint: 'No executable tools matched, but related prompts/resources found.',
+            ...related,
+          }, null, 2),
+        }],
+      };
+    }
+
+    // Step 2: Confirm mode — return the plan without executing
+    if (confirm) {
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            cast: 'plan',
+            intent,
+            resolved: {
+              tool: best.namespacedName,
+              server: best.serverId,
+              category: best.category,
+              description: best.description,
+              score: best.score,
+              inputSchema: best.inputSchema,
+            },
+            alternatives,
+            ...related,
+            args: toolArgs,
+            hint: 'Call cast again without confirm to execute, or use ch1tty/execute directly.',
+          }, null, 2),
+        }],
+      };
+    }
+
+    // Step 3: Execute (Ch1tty executing through itself)
+    const result = await this.handleExecute(
+      { tool: best.namespacedName, args: toolArgs },
+      sessionId,
+    );
+
+    // Return cast metadata + related context + raw tool output
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify({
+            cast: 'executed',
+            intent,
+            resolved: best.namespacedName,
+            score: best.score,
+            ...(alternatives.length > 0 ? { alternatives } : {}),
+            ...related,
+          }),
+        },
+        ...result.content,
+      ],
+      isError: result.isError,
+    };
+  }
+
+  /**
+   * Score registry tools against a natural language intent.
+   *
+   * v1: keyword matching + session affinity boost from coordinator.
+   * v2 hook: a "brain" backend (Alchemist/Ollama) can replace this with
+   * semantic scoring, arg extraction, and multi-step plan generation.
+   */
+  private scoreIntent(
+    intent: string,
+    registry: NamespacedTool[],
+    sessionId?: string,
+  ): Array<NamespacedTool & { score: number }> {
+    const terms = intent.toLowerCase().split(/\s+/).filter((t) => t.length > 2);
+    if (terms.length === 0) return [];
+
+    const affinityMap = sessionId
+      ? this.coordinator.getServerAffinity(sessionId)
+      : new Map<string, number>();
+
+    const scored = registry.map((tool) => {
+      const haystack = `${tool.namespacedName} ${tool.description} ${tool.serverName} ${tool.category}`.toLowerCase();
+
+      // Keyword match (0–1): fraction of intent terms found in tool metadata
+      const matchCount = terms.filter((term) => haystack.includes(term)).length;
+      const keywordScore = matchCount / terms.length;
+
+      // Affinity boost (0–0.2): exponential decay from last use, 10-min half-life
+      const affinityTs = affinityMap.get(tool.serverId);
+      const affinityScore = affinityTs
+        ? 0.2 * Math.exp(-(Date.now() - affinityTs) / (10 * 60 * 1000))
+        : 0;
+
+      // Exact server/tool name match bonus (0 or 0.3)
+      const nameBonus = terms.some((t) =>
+        tool.name.toLowerCase() === t || tool.serverId.toLowerCase() === t,
+      ) ? 0.3 : 0;
+
+      const score = Math.round((keywordScore + affinityScore + nameBonus) * 100) / 100;
+      return { ...tool, score };
+    });
+
+    return scored
+      .filter((t) => t.score > 0.1)
+      .sort((a, b) => b.score - a.score);
   }
 
   // ── Public MCP interface ────────────────────────────────────
@@ -482,7 +735,9 @@ export class Aggregator {
       return {
         content: [{
           type: 'text',
-          text: `Invalid tool name "${namespacedName}". Available tools: ch1tty/search, ch1tty/execute, ch1tty/status, ch1tty/reload`,
+          text:
+            `Invalid tool name "${namespacedName}". ` +
+            `Available tools: ch1tty/search, ch1tty/execute, ch1tty/status, ch1tty/reload, ch1tty/cast`,
         }],
         isError: true,
       };
@@ -611,7 +866,7 @@ export class Aggregator {
 
   async getPrompt(namespacedName: string, args?: Record<string, string>): Promise<{
     description?: string;
-    messages: Array<{ role: string; content: ContentItem }>;
+    messages: Array<{ role: 'user' | 'assistant'; content: ContentItem }>;
   }> {
     const sepIndex = namespacedName.indexOf(SEPARATOR);
     if (sepIndex === -1) {

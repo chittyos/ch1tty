@@ -2,7 +2,7 @@
 uri: chittycanon://docs/tech/policy/ch1tty-charter
 namespace: chittycanon://docs/tech
 type: policy
-version: 3.0.0
+version: 4.1.0
 status: CERTIFIED
 registered_with: chittycanon://core/services/canon
 title: "Ch1tty Charter"
@@ -26,7 +26,7 @@ visibility: PUBLIC
 
 ## Purpose
 
-Universal MCP gateway with slim-MCP surface. Aggregates all MCP servers behind 4 tools: `search`, `execute`, `status`, `reload`. Clients discover and invoke capabilities on-demand instead of loading 100+ tool definitions into context.
+Universal MCP gateway with slim-MCP surface. Aggregates all MCP servers behind 5 tools: `search`, `execute`, `status`, `reload`, `cast`. Clients discover and invoke capabilities on-demand instead of loading 100+ tool definitions into context. `cast` is the wizard layer — intent in, execution out.
 
 Dual transport: stdio for local clients, Streamable HTTP for remote clients.
 
@@ -35,13 +35,14 @@ Dual transport: stdio for local clients, Streamable HTTP for remote clients.
 Ch1tty exposes the standard MCP protocol over stdio and HTTP:
 
 ### tools/list
-Returns exactly 4 meta-tools: `ch1tty/search`, `ch1tty/execute`, `ch1tty/status`, `ch1tty/reload`.
+Returns exactly 5 meta-tools: `ch1tty/search`, `ch1tty/execute`, `ch1tty/status`, `ch1tty/reload`, `ch1tty/cast`.
 
 ### tools/call
 - `ch1tty/search` — query internal tool registry by keyword, server, category
 - `ch1tty/execute` — invoke any backend tool by namespaced name
 - `ch1tty/status` — gateway status snapshot
 - `ch1tty/reload` — hot-reload servers.json
+- `ch1tty/cast` — natural language intent → tool resolution → execution (sub-meta calling master-meta)
 
 ### resources/list, resources/read
 Passthrough — returns union of all backend resources, namespaced as `{serverId}://{originalUri}`.
@@ -52,10 +53,10 @@ Passthrough — returns union of all backend prompts, namespaced as `{serverId}/
 ## Dependencies
 
 ### Upstream (Ch1tty depends on)
-- `connect.chitty.cc/mcp` — ChittyConnect MCP surface (`chittycanon://core/services/chittyconnect`)
+- `mcp-portal.chitty.cc/mcp` — ChittyOS ecosystem MCP portal (`chittycanon://core/services/chittyconnect`), CF Access-protected
 - `chitty-mcp-token` — Auth token helper (1Password-backed, via `chittycanon://core/services/auth`)
 - Local MCP servers (filesystem, context7, sequential-thinking, etc.)
-- Cloudflare MCP endpoints (builds, autorag)
+- Cloudflare MCP endpoints (`mcp.cloudflare.com`, `autorag.mcp.cloudflare.com`, `browser.mcp.cloudflare.com`)
 
 ### Downstream (depends on Ch1tty)
 - Claude Code (via `.mcp.json`)
@@ -67,7 +68,7 @@ Passthrough — returns union of all backend prompts, namespaced as `{serverId}/
 ## Scope Boundaries
 
 ### In Scope
-- Slim-MCP surface: search + execute + status + reload
+- Slim-MCP surface: search + execute + status + reload + cast
 - Internal tool registry with caching
 - Aggregating resources and prompts from all backends
 - Managing child process lifecycle
@@ -76,6 +77,6 @@ Passthrough — returns union of all backend prompts, namespaced as `{serverId}/
 - Config path interpolation (~ and env vars)
 
 ### Out of Scope
-- Tool composition or chaining
+- Multi-step tool chaining (v2: brain backend)
 - OAuth authorization server (handled by cloud Worker)
 - Pattern learning from usage

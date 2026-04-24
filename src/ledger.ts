@@ -11,8 +11,28 @@
  * @canon chittycanon://gov/governance#ledger-is-append-only
  */
 
+import { appendFileSync, mkdirSync } from 'node:fs';
+import { homedir } from 'node:os';
+import { dirname, join } from 'node:path';
 import { log } from './logger.js';
 import type { Backend, ToolCallResult } from './types.js';
+
+const DEAD_LETTER_PATH = process.env.CH1TTY_LEDGER_DLQ ?? join(homedir(), '.ch1tty', 'ledger.dlq.jsonl');
+
+/**
+ * Write entries to the dead-letter WAL for offline replay.
+ * Best-effort and synchronous (called from shutdown / drop paths).
+ */
+function writeDeadLetter(entries: LedgerEntry[]): void {
+  if (entries.length === 0) return;
+  try {
+    mkdirSync(dirname(DEAD_LETTER_PATH), { recursive: true });
+    const lines = entries.map((e) => JSON.stringify({ ...e, droppedAt: new Date().toISOString() })).join('\n') + '\n';
+    appendFileSync(DEAD_LETTER_PATH, lines, 'utf8');
+  } catch (err) {
+    log.error(`Ledger DLQ write failed (${DEAD_LETTER_PATH}): ${err}`);
+  }
+}
 
 // ── Types ─────────────────────────────────────────────────────
 
@@ -69,6 +89,8 @@ export class LedgerClient {
           log.debug(`Periodic flush error: ${err}`);
         });
       }, FLUSH_INTERVAL_MS);
+      // Don't keep the process alive just for background flushes (important for tests/CLI one-shots).
+      this.flushTimer.unref();
     }
   }
 
@@ -176,7 +198,9 @@ export class LedgerClient {
             failed.push(entry);
           } else {
             this.totalDropped++;
-            log.debug(`Ledger entry dropped after ${MAX_RETRIES} retries: ${entry.event_type}`);
+            // Canon: chittycanon://gov/governance#ledger-is-append-only — elevate to error + WAL.
+            log.error(`Ledger entry dropped after ${MAX_RETRIES} retries: ${entry.event_type} (session ${entry.session_id}) — written to DLQ`);
+            writeDeadLetter([entry]);
           }
         }
       }
@@ -235,8 +259,20 @@ export class LedgerClient {
         log.info(`Ledger shutdown: flushed ${flushed} entries`);
       }
       if (this.buffer.length > 0) {
-        log.warn(`Ledger shutdown: ${this.buffer.length} entries lost (backend unavailable)`);
+        // Append-only integrity — write remaining entries to DLQ instead of losing them.
+        const lost = this.buffer.length;
+        writeDeadLetter(this.buffer);
+        this.totalDropped += lost;
+        this.buffer = [];
+        log.error(`Ledger shutdown: ${lost} unflushed entries written to DLQ (${DEAD_LETTER_PATH})`);
       }
+    } else if (this.buffer.length > 0) {
+      // Never bound — still flush to DLQ so entries aren't lost on shutdown.
+      const lost = this.buffer.length;
+      writeDeadLetter(this.buffer);
+      this.totalDropped += lost;
+      this.buffer = [];
+      log.error(`Ledger shutdown: ${lost} entries never flushed (no backend bound) — written to DLQ`);
     }
   }
 }

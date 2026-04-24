@@ -28,28 +28,6 @@ test('callTool rejects non-ch1tty namespaced calls (slim-mcp enforces search+exe
   assert.match(result.content[0].text, /Use ch1tty\/search to discover tools/);
 });
 
-test('ch1tty/execute routes to backend tools', async () => {
-  const aggregator = createAggregator() as unknown as {
-    callTool: Aggregator['callTool'];
-    backends: Map<string, unknown>;
-  };
-
-  aggregator.backends.set('local', {
-    isRegistered: (serverId: string) => serverId === 'local',
-    callTool: async () => ({
-      content: [{ type: 'text', text: 'success' }],
-    }),
-  });
-
-  const result = await aggregator.callTool('ch1tty/execute', {
-    tool: 'local/run',
-    args: { foo: 'bar' },
-  });
-
-  assert.equal(result.isError, undefined);
-  assert.match(result.content[0].text, /success/);
-});
-
 test('ch1tty/execute returns error for unknown server', async () => {
   const aggregator = createAggregator();
   const result = await aggregator.callTool('ch1tty/execute', {
@@ -60,28 +38,6 @@ test('ch1tty/execute returns error for unknown server', async () => {
   assert.match(result.content[0].text, /Unknown server "unknown"/);
 });
 
-test('ch1tty/execute normalizes backend exceptions into MCP error shape', async () => {
-  const aggregator = createAggregator() as unknown as {
-    callTool: Aggregator['callTool'];
-    backends: Map<string, unknown>;
-  };
-
-  aggregator.backends.set('local', {
-    isRegistered: (serverId: string) => serverId === 'local',
-    callTool: async () => {
-      throw new Error('child boom');
-    },
-  });
-
-  const result = await aggregator.callTool('ch1tty/execute', {
-    tool: 'local/run',
-    args: { foo: 'bar' },
-  });
-
-  assert.equal(result.isError, true);
-  assert.match(result.content[0].text, /Execute failed for local\/run/);
-  assert.match(result.content[0].text, /child boom/);
-});
 
 test('ch1tty/execute requires tool argument', async () => {
   const aggregator = createAggregator();

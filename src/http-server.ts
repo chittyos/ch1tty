@@ -14,6 +14,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import type { Aggregator } from './aggregator.js';
 import { VERSION } from './utils.js';
+import { log } from './logger.js';
 
 export interface HttpServerOptions {
   port: number;
@@ -27,6 +28,7 @@ export class HttpMcpServer {
   private bindAddress: string;
   private mcpToken?: string;
   private sessions = new Map<string, { server: Server; transport: StreamableHTTPServerTransport }>();
+  private boundPort: number | null = null;
 
   constructor(private aggregator: Aggregator, options: HttpServerOptions) {
     this.port = options.port;
@@ -38,41 +40,53 @@ export class HttpMcpServer {
 
   private handleRequest(req: IncomingMessage, res: ServerResponse): void {
     const url = req.url ?? '/';
+    const path = url.split('?', 1)[0] ?? '/';
 
     // GPT Actions facade
-    if (url.startsWith('/gpt-actions')) {
+    if (path.startsWith('/gpt-actions')) {
       const sessionId = 'gpt-actions-' + (req.headers['x-conversation-id'] || 'default');
       if (handleGptAction(this.aggregator, sessionId, req, res, url)) return;
     }
 
     // OpenClaw facade
-    if (url.startsWith('/openclaw')) {
+    if (path.startsWith('/openclaw')) {
       if (handleOpenClawRoute(this.aggregator, req, res, url)) return;
     }
 
     // Health endpoints — no auth required
-    if (req.method === 'GET' && url === '/health') {
+    if (req.method === 'GET' && path === '/health') {
       res.setHeader('Content-Type', 'application/json');
       res.writeHead(200);
       res.end(JSON.stringify({ status: 'ok', service: 'ch1tty', version: VERSION }));
       return;
     }
 
-    if (req.method === 'GET' && url === '/api/v1/status') {
+    if (req.method === 'GET' && path === '/api/v1/status') {
       res.setHeader('Content-Type', 'application/json');
       try {
         const snapshot = this.aggregator.getStatusSnapshot();
         res.writeHead(200);
         res.end(JSON.stringify(snapshot));
-      } catch {
-        res.writeHead(200);
-        res.end(JSON.stringify({ status: 'ok', service: 'ch1tty', version: VERSION }));
+      } catch (err) {
+        // Never lie about health — log and surface a real 500 so monitors can detect the condition.
+        log.error(`Status snapshot failed: ${err}`);
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: 'internal', service: 'ch1tty', version: VERSION }));
       }
       return;
     }
 
+    // Sessions snapshot (operational)
+    if (req.method === 'GET' && path === '/api/v1/sessions') {
+      if (this.mcpToken && !this.checkAuth(req)) return this.unauthorized(res);
+      res.setHeader('Content-Type', 'application/json');
+      res.writeHead(200);
+      res.end(JSON.stringify({ sessions: this.aggregator.sessions.listSessions() }));
+      return;
+    }
+
     // MCP endpoint — bearer token required if configured
-    if (url === '/mcp') {
+    if (path === '/mcp') {
       if (this.mcpToken && !this.checkAuth(req)) {
         res.setHeader('Content-Type', 'application/json');
         res.writeHead(401);
@@ -94,6 +108,12 @@ export class HttpMcpServer {
     if (!auth) return false;
     const [scheme, token] = auth.split(' ', 2);
     return scheme?.toLowerCase() === 'bearer' && token === this.mcpToken;
+  }
+
+  private unauthorized(res: ServerResponse): void {
+    res.setHeader('Content-Type', 'application/json');
+    res.writeHead(401);
+    res.end(JSON.stringify({ error: 'unauthorized' }));
   }
 
   private async handleMcp(req: IncomingMessage, res: ServerResponse): Promise<void> {
@@ -130,11 +150,22 @@ export class HttpMcpServer {
           this.aggregator.sessions.remove(sid);
           this.aggregator.coordinator.onSessionEnd(sid);
         }
-        mcpServer.close().catch(() => {});
+        mcpServer.close().catch((err) => log.warn(`MCP server close failed: ${err}`, sid));
       };
 
-      await mcpServer.connect(transport);
-      await transport.handleRequest(req, res);
+      try {
+        await mcpServer.connect(transport);
+        await transport.handleRequest(req, res);
+      } catch (err) {
+        log.error(`MCP handler threw: ${err}`);
+        if (!res.headersSent) {
+          res.setHeader('Content-Type', 'application/json');
+          res.writeHead(500);
+          res.end(JSON.stringify({ error: 'internal', message: 'MCP handler failed' }));
+        } else if (!res.writableEnded) {
+          res.end();
+        }
+      }
       return;
     }
 
@@ -184,20 +215,42 @@ export class HttpMcpServer {
   }
 
   start(): Promise<void> {
+    // B2 — auth fail-closed guard. When no mcpToken is set, refuse to serve non-loopback
+    // unless CH1TTY_ALLOW_UNAUTH=1 is explicitly set. Emit a loud warning either way.
+    const loopback = this.bindAddress === '127.0.0.1' || this.bindAddress === '::1' || this.bindAddress === 'localhost';
+    if (!this.mcpToken) {
+      if (!loopback && process.env.CH1TTY_ALLOW_UNAUTH !== '1') {
+        return Promise.reject(new Error(
+          `Refusing to bind ${this.bindAddress}:${this.port} without CH1TTY_MCP_TOKEN. ` +
+          'Set CH1TTY_MCP_TOKEN, bind to loopback, or set CH1TTY_ALLOW_UNAUTH=1 to opt in.',
+        ));
+      }
+      log.warn(
+        `Starting HTTP server without CH1TTY_MCP_TOKEN — auth is DISABLED on ${this.bindAddress}:${this.port}. ` +
+        'All API routes and /mcp are publicly reachable.',
+      );
+    }
     return new Promise((resolve, reject) => {
       this.server.once('error', reject);
       this.server.listen(this.port, this.bindAddress, () => {
         this.server.removeListener('error', reject);
+        const addr = this.server.address();
+        this.boundPort = typeof addr === 'object' && addr ? addr.port : this.port;
         resolve();
       });
     });
   }
 
+  getPort(): number {
+    if (this.boundPort == null) return this.port;
+    return this.boundPort;
+  }
+
   async stop(): Promise<void> {
     // Close all MCP sessions
-    for (const [, session] of this.sessions) {
-      await session.transport.close().catch(() => {});
-      await session.server.close().catch(() => {});
+    for (const [sid, session] of this.sessions) {
+      await session.transport.close().catch((err) => log.warn(`Transport close failed: ${err}`, sid));
+      await session.server.close().catch((err) => log.warn(`Server close failed: ${err}`, sid));
     }
     this.sessions.clear();
 

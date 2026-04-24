@@ -38,10 +38,12 @@ test('interpolatePath expands bare $VAR patterns', () => {
   }
 });
 
-test('interpolatePath replaces undefined env vars with empty string', () => {
+test('interpolatePath throws when referencing an unset env var', () => {
   delete process.env.CH1TTY_UNDEFINED_VAR;
-  const result = interpolatePath('/path/${CH1TTY_UNDEFINED_VAR}/file');
-  assert.equal(result, '/path//file');
+  assert.throws(
+    () => interpolatePath('/path/${CH1TTY_UNDEFINED_VAR}/file'),
+    /unset environment variable: CH1TTY_UNDEFINED_VAR/,
+  );
 });
 
 test('interpolatePath leaves absolute paths unchanged', () => {
