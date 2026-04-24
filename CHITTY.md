@@ -28,7 +28,7 @@ The 5 slim-MCP meta-tools (`search`, `execute`, `status`, `reload`, `cast`), the
 |-------|-------|
 | Canonical URI | `chittycanon://core/services/ch1tty` |
 | Tier | 2 (Platform) |
-| Domain | `ch1tty.com` / local stdio |
+| Domain | `ch1tty.chitty.cc` / local stdio |
 | Certification | CERTIFIED (ChittyCertify) |
 
 ## Architecture Summary
