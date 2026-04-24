@@ -116,27 +116,6 @@ export class HttpMcpServer {
     res.end(JSON.stringify({ error: 'unauthorized' }));
   }
 
-  private methodNotAllowed(res: ServerResponse): void {
-    res.setHeader('Content-Type', 'application/json');
-    res.writeHead(405);
-    res.end(JSON.stringify({ error: 'method_not_allowed' }));
-  }
-
-  private async readJsonBody(req: IncomingMessage, limitBytes = 1024 * 1024): Promise<unknown> {
-    const chunks: Buffer[] = [];
-    let total = 0;
-    for await (const chunk of req) {
-      const buf = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
-      total += buf.length;
-      if (total > limitBytes) throw new Error('Body too large');
-      chunks.push(buf);
-    }
-    // Empty bodies on POST/PATCH are caller errors — don't silently coerce to {}.
-    if (chunks.length === 0) throw new Error('empty_body');
-    const raw = Buffer.concat(chunks).toString('utf8');
-    return JSON.parse(raw);
-  }
-
   private async handleMcp(req: IncomingMessage, res: ServerResponse): Promise<void> {
     // Get or create session from Mcp-Session-Id header
     const sessionId = req.headers['mcp-session-id'] as string | undefined;
