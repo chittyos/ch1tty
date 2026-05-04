@@ -42,7 +42,7 @@ test('unknown meta-tool returns error', async () => {
   assert.match(result.content[0].text, /Unknown tool: ch1tty\/nonexistent/);
 });
 
-test('listAllTools returns only slim-mcp meta-tools', async () => {
+test('listAllTools returns only the 5 slim-MCP meta-tools', async () => {
   const aggregator = createAggregator();
   const { tools } = await aggregator.listAllTools();
   const names = tools.map((t) => t.name);
@@ -52,6 +52,7 @@ test('listAllTools returns only slim-mcp meta-tools', async () => {
     'ch1tty/execute',
     'ch1tty/status',
     'ch1tty/reload',
+    'ch1tty/cast',
   ]);
 });
 

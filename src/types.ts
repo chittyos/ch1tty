@@ -28,6 +28,8 @@ export interface RemoteServerConfig extends BaseServerConfig {
   type: 'remote';
   endpoint: string;
   authTokenKey?: string;
+  headers?: Record<string, string>;
+  envHeaders?: Record<string, string>;
 }
 
 export type ServerConfig = LocalServerConfig | RemoteServerConfig;
@@ -112,7 +114,8 @@ export interface Backend {
   readResource(serverId: string, uri: string): Promise<{ contents: Array<{ uri: string; mimeType?: string; text?: string; blob?: string }> }>;
 
   listPrompts(serverId: string): Promise<PromptEntry[]>;
-  getPrompt(serverId: string, name: string, args?: Record<string, string>): Promise<{ description?: string; messages: Array<{ role: string; content: ContentItem }> }>;
+  getPrompt(serverId: string, name: string, args?: Record<string, string>): Promise<{ description?: string; messages: Array<{ role: 'user' | 'assistant'; content: ContentItem }> }>;
 
   shutdown(): Promise<void>;
 }
+

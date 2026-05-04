@@ -461,7 +461,7 @@ export class Aggregator {
       this.configs = newConfig.servers;
       this.rebuildBackends();
 
-      // Now shut down the old backends
+      // Now shut down the old backends — log any rejected shutdowns (C5).
       const seen = new Set<Backend>();
       const shutdowns: Promise<void>[] = [];
       for (const backend of oldBackends.values()) {
@@ -469,7 +469,12 @@ export class Aggregator {
         seen.add(backend);
         shutdowns.push(backend.shutdown());
       }
-      await Promise.allSettled(shutdowns);
+      const results = await Promise.allSettled(shutdowns);
+      for (const r of results) {
+        if (r.status === 'rejected') {
+          log.warn(`Reload: backend shutdown failed: ${r.reason}`);
+        }
+      }
 
       const result = {
         reloaded: true,
@@ -509,12 +514,29 @@ export class Aggregator {
     const terms = intent.toLowerCase().split(/\s+/).filter((t) => t.length > 2);
 
     // Step 1: Score tools, prompts, and resources in parallel (Ch1tty searching itself)
-    const [registry, { prompts: allPrompts }, { resources: allResources }] = await Promise.all([
+    const [registryResult, promptsResult, resourcesResult] = await Promise.allSettled([
       this.getRegistry(),
-      this.listAllPrompts().catch(() => ({ prompts: [] as Array<{ name: string; description?: string; arguments?: Array<{ name: string; description?: string; required?: boolean }> }> })),
-      this.listAllResources().catch(() => ({ resources: [] as Array<{ uri: string; name: string; description?: string; mimeType?: string }> })),
+      this.listAllPrompts(),
+      this.listAllResources(),
     ]);
 
+    if (registryResult.status !== 'fulfilled') {
+      throw registryResult.reason;
+    }
+
+    const registry = registryResult.value;
+    const allPrompts = promptsResult.status === 'fulfilled'
+      ? promptsResult.value.prompts
+      : (() => {
+          log.warn('handleCast(): failed to list prompts; continuing with empty prompt set', promptsResult.reason);
+          return [] as Array<{ name: string; description?: string; arguments?: Array<{ name: string; description?: string; required?: boolean }> }>;
+        })();
+    const allResources = resourcesResult.status === 'fulfilled'
+      ? resourcesResult.value.resources
+      : (() => {
+          log.warn('handleCast(): failed to list resources; continuing with empty resource set', resourcesResult.reason);
+          return [] as Array<{ uri: string; name: string; description?: string; mimeType?: string }>;
+        })();
     const scoredTools = this.scoreIntent(intent, registry, sessionId);
 
     // Score prompts against intent
@@ -713,7 +735,9 @@ export class Aggregator {
       return {
         content: [{
           type: 'text',
-          text: `Invalid tool name "${namespacedName}". Available tools: ch1tty/search, ch1tty/execute, ch1tty/status, ch1tty/reload, ch1tty/cast`,
+          text:
+            `Invalid tool name "${namespacedName}". ` +
+            `Available tools: ch1tty/search, ch1tty/execute, ch1tty/status, ch1tty/reload, ch1tty/cast`,
         }],
         isError: true,
       };
@@ -842,7 +866,7 @@ export class Aggregator {
 
   async getPrompt(namespacedName: string, args?: Record<string, string>): Promise<{
     description?: string;
-    messages: Array<{ role: string; content: ContentItem }>;
+    messages: Array<{ role: 'user' | 'assistant'; content: ContentItem }>;
   }> {
     const sepIndex = namespacedName.indexOf(SEPARATOR);
     if (sepIndex === -1) {

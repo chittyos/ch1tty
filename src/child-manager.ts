@@ -338,7 +338,7 @@ export class ChildManager implements Backend {
 
   async getPrompt(serverId: string, name: string, promptArgs?: Record<string, string>): Promise<{
     description?: string;
-    messages: Array<{ role: string; content: ContentItem }>;
+    messages: Array<{ role: 'user' | 'assistant'; content: ContentItem }>;
   }> {
     const conn = await this.spawnWithReconnect(serverId);
     const result = await conn.client.getPrompt({ name, arguments: promptArgs });
