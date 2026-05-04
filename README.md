@@ -37,3 +37,7 @@ This profile keeps only the intended orchestration backends enabled and reduces 
 Ch1tty aggregates all MCP servers behind 5 tools: `search`, `execute`, `status`, `reload`, `cast`. The full tool registry (100+ tools across local stdio children and remote HTTP endpoints) stays internal — clients discover capabilities via search, invoke them via execute, and can use cast as the intent-to-execution wizard layer, keeping context windows minimal.
 
 **Dual transport**: stdio for local clients, Streamable HTTP (`/mcp`) for remote clients.
+
+## MCP Host Standard
+
+The canonical external MCP host pattern and alias rules live in [docs/MCP_HOST_STANDARD.md](./docs/MCP_HOST_STANDARD.md).

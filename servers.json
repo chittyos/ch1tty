@@ -1,10 +1,10 @@
 {
   "servers": [
-
-    {"_comment": "── remote: HTTP endpoints (work everywhere) ──────────────────"},
-
     {
-      "_comment": "ChittyAgent-Tasks — enable once /mcp endpoint ships on tasks.chitty.cc (see chittyentity/workers/chittyagent-tasks). Currently exposes REST only."
+      "_comment": "\u2500\u2500 remote: HTTP endpoints (work everywhere) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500"
+    },
+    {
+      "_comment": "ChittyAgent-Tasks \u2014 enable once /mcp endpoint ships on tasks.chitty.cc (see chittyentity/workers/chittyagent-tasks). Currently exposes REST only."
     },
     {
       "id": "tasks",
@@ -65,7 +65,6 @@
       "lazy": true,
       "enabled": true
     },
-
     {
       "id": "cowork",
       "name": "Co-Work VM Bridge",
@@ -76,9 +75,9 @@
       "lazy": true,
       "enabled": true
     },
-
-    {"_comment": "── local: portable stdio servers (npx/uvx, no hardcoded paths) ─"},
-
+    {
+      "_comment": "\u2500\u2500 local: portable stdio servers (npx/uvx, no hardcoded paths) \u2500"
+    },
     {
       "id": "notion",
       "name": "Notion",
@@ -86,7 +85,10 @@
       "access": "readwrite",
       "category": "documents",
       "command": "npx",
-      "args": ["-y", "@notionhq/notion-mcp-server"],
+      "args": [
+        "-y",
+        "@notionhq/notion-mcp-server"
+      ],
       "env": {
         "NOTION_TOKEN": "op://ChittyOS-Integrations/notion/api_token"
       },
@@ -100,14 +102,19 @@
       "access": "readwrite",
       "category": "ecosystem",
       "command": "npx",
-      "args": ["-y", "@stripe/mcp"],
+      "args": [
+        "-y",
+        "@stripe/mcp"
+      ],
       "env": {
         "STRIPE_SECRET_KEY": "op://ChittyOS-Integrations/stripe/secret_key"
       },
       "lazy": true,
       "enabled": true
     },
-    {"_comment": "github: deprecated upstream — replace when GitHub ships official MCP"},
+    {
+      "_comment": "github: deprecated upstream \u2014 replace when GitHub ships official MCP"
+    },
     {
       "id": "github",
       "name": "GitHub API",
@@ -115,7 +122,10 @@
       "access": "readwrite",
       "category": "code",
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "op://ChittyOS-Integrations/github/personal_access_token"
       },
@@ -129,7 +139,11 @@
       "access": "readwrite",
       "category": "ecosystem",
       "command": "npx",
-      "args": ["-y", "@neondatabase/mcp-server-neon", "start"],
+      "args": [
+        "-y",
+        "@neondatabase/mcp-server-neon",
+        "start"
+      ],
       "env": {
         "NEON_API_KEY": "op://ChittyOS-Integrations/neon/api_key"
       },
@@ -143,7 +157,10 @@
       "access": "read",
       "category": "documents",
       "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp@latest"],
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@latest"
+      ],
       "lazy": true,
       "enabled": true
     },
@@ -154,7 +171,10 @@
       "access": "read",
       "category": "reasoning",
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
       "lazy": true,
       "enabled": true
     },
@@ -165,7 +185,12 @@
       "access": "readwrite",
       "category": "desktop",
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem", "~/projects", "~/Documents"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "~/projects",
+        "~/Documents"
+      ],
       "lazy": true,
       "enabled": true
     },
@@ -176,13 +201,16 @@
       "access": "readwrite",
       "category": "desktop",
       "command": "npx",
-      "args": ["-y", "@playwright/mcp@latest"],
+      "args": [
+        "-y",
+        "@playwright/mcp@latest"
+      ],
       "lazy": true,
       "enabled": true
     },
-
-    {"_comment": "── macOS: run on homelab, TODO: proxy via ChittyConnect ───────"},
-
+    {
+      "_comment": "\u2500\u2500 macOS: run on homelab, TODO: proxy via ChittyConnect \u2500\u2500\u2500\u2500\u2500\u2500\u2500"
+    },
     {
       "id": "chittymac",
       "name": "Apple Notes (macOS homelab)",
@@ -190,7 +218,9 @@
       "access": "readwrite",
       "category": "communication",
       "command": "node",
-      "args": ["~/Desktop/Projects/github.com/CHITTYOS/chittymac/build/server.js"],
+      "args": [
+        "~/Desktop/Projects/github.com/CHITTYOS/chittymac/build/server.js"
+      ],
       "env": {
         "NEON_DATABASE_URL": "op://Connect Serv - Production/NEON Notion DB - ChittyChain /password"
       },
@@ -204,13 +234,15 @@
       "access": "readwrite",
       "category": "communication",
       "command": "node",
-      "args": ["~/.config/claude/mcp-servers/chitty-imessage/build/index.js"],
+      "args": [
+        "~/.config/claude/mcp-servers/chitty-imessage/build/index.js"
+      ],
       "lazy": true,
       "enabled": false
     },
-
-    {"_comment": "── disabled: need local install or not yet ported ────────────"},
-
+    {
+      "_comment": "\u2500\u2500 disabled: need local install or not yet ported \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500"
+    },
     {
       "id": "serena",
       "name": "Source Code Analysis",
@@ -218,7 +250,12 @@
       "access": "readwrite",
       "category": "code",
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/oraios/serena", "serena", "start-mcp-server"],
+      "args": [
+        "--from",
+        "git+https://github.com/oraios/serena",
+        "serena",
+        "start-mcp-server"
+      ],
       "lazy": true,
       "enabled": false
     },
@@ -229,7 +266,9 @@
       "access": "readwrite",
       "category": "ecosystem",
       "command": "node",
-      "args": ["~/.config/claude/mcp-servers/chitty-quality/build/index.js"],
+      "args": [
+        "~/.config/claude/mcp-servers/chitty-quality/build/index.js"
+      ],
       "env": {
         "NEON_DATABASE_URL": "op://Private/Neon/database_url"
       },
@@ -243,7 +282,10 @@
       "access": "readwrite",
       "category": "desktop",
       "command": "npx",
-      "args": ["-y", "@wonderwhy-er/desktop-commander@latest"],
+      "args": [
+        "-y",
+        "@wonderwhy-er/desktop-commander@latest"
+      ],
       "lazy": true,
       "enabled": false
     },
@@ -254,7 +296,9 @@
       "access": "readwrite",
       "category": "desktop",
       "command": "node",
-      "args": ["~/Library/Application Support/Claude/Claude Extensions/ant.dir.ant.anthropic.chrome-control/server/index.js"],
+      "args": [
+        "~/Library/Application Support/Claude/Claude Extensions/ant.dir.ant.anthropic.chrome-control/server/index.js"
+      ],
       "lazy": true,
       "enabled": false
     },
@@ -265,7 +309,9 @@
       "access": "write",
       "category": "documents",
       "command": "node",
-      "args": ["~/Library/Application Support/Claude/Claude Extensions/ant.dir.gh.silverstein.pdf-filler-simple/server/index.js"],
+      "args": [
+        "~/Library/Application Support/Claude/Claude Extensions/ant.dir.gh.silverstein.pdf-filler-simple/server/index.js"
+      ],
       "lazy": true,
       "enabled": false
     }
