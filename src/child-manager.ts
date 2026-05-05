@@ -65,7 +65,7 @@ export class ChildManager implements Backend {
   private evict(serverId: string): void {
     const conn = this.children.get(serverId);
     if (conn) {
-      conn.client.close().catch(() => {});
+      conn.client.close().catch((err) => log.warn(`Evict close failed: ${err}`, serverId));
       this.children.delete(serverId);
       log.debug(`Evicted dead connection`, serverId);
     }
