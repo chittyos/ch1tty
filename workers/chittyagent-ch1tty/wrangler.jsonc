@@ -17,7 +17,9 @@
       "name": "chittyagent-ch1tty",
       "routes": [
         { "pattern": "ch1tty.agent.chitty.cc", "custom_domain": true },
-        { "pattern": "agent.ch1tty.com", "custom_domain": true }
+        { "pattern": "agent.ch1tty.com", "custom_domain": true },
+        { "pattern": "mcp.ch1tty.com", "custom_domain": true },
+        { "pattern": "sdk.chitty.cc", "custom_domain": true }
       ],
       "vars": {
         "SERVICE_NAME": "chittyagent-ch1tty",
