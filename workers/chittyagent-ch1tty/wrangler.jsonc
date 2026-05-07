@@ -1,0 +1,62 @@
+{
+  // ChittyAgent Ch1tty — OAuth-protected slim-MCP gateway
+  //
+  // Proxies the 5 ch1tty meta-tools (search/execute/status/reload/cast)
+  // from ch1tty.chitty.cc/mcp with OAuth 2.1 for external clients.
+  //
+  // Deploy: wrangler deploy --env production
+
+  "name": "chittyagent-ch1tty",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-03-24",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "account_id": "0bc21e3a5a9de1a4cc843be9c3e98121",
+
+  "env": {
+    "production": {
+      "name": "chittyagent-ch1tty",
+      "routes": [
+        { "pattern": "ch1tty.agent.chitty.cc", "custom_domain": true },
+        { "pattern": "agent.ch1tty.com", "custom_domain": true }
+      ],
+      "vars": {
+        "SERVICE_NAME": "chittyagent-ch1tty",
+        "SERVICE_VERSION": "3.0.0",
+        "CH1TTY_UPSTREAM": "https://ch1tty.chitty.cc/mcp"
+      },
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "MCP_OBJECT",
+            "class_name": "ChittyMcpAgent"
+          }
+        ]
+      },
+      "kv_namespaces": [
+        {
+          "binding": "OAUTH_KV",
+          "id": "257ed804b1414a30aaec301cd6233089"
+        }
+      ],
+      "tail_consumers": [
+        { "service": "chittytrack" }
+      ]
+    }
+  },
+
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "MCP_OBJECT",
+        "class_name": "ChittyMcpAgent"
+      }
+    ]
+  },
+
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["ChittyMcpAgent"]
+    }
+  ]
+}
