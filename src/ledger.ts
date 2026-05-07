@@ -86,7 +86,7 @@ export class LedgerClient {
     if (!this.flushTimer) {
       this.flushTimer = setInterval(() => {
         this.flush().catch((err) => {
-          log.debug(`Periodic flush error: ${err}`);
+          log.warn(`Periodic flush error: ${err}`);
         });
       }, FLUSH_INTERVAL_MS);
       // Don't keep the process alive just for background flushes (important for tests/CLI one-shots).
