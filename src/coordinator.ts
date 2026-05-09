@@ -54,6 +54,10 @@ export class SessionCoordinator {
 
   constructor(brainConfig: Partial<OllamaBrainConfig> = {}) {
     this.brain = new OllamaBrain(brainConfig);
+    // Fire-and-forget warmup so the model is loaded before the first cast.
+    // Cold-load on a 3B model exceeds the default route timeout (5s) and
+    // silently routes the first user-facing cast to the keyword fallback.
+    void this.brain.warmup().catch(() => {/* warmup is best-effort */});
   }
 
   /**
