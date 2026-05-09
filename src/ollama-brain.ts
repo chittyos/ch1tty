@@ -180,6 +180,53 @@ export class OllamaBrain {
     }
   }
 
+  /**
+   * Best-effort warm-start: issues a tiny generate call so Ollama loads the
+   * model into memory before the first real `route()`. Cold-loading a 3B
+   * model can take 11+ seconds, which exceeds the default route timeout
+   * and silently routes the first cast to the keyword fallback. Warming
+   * here makes the first user-facing cast hit the brain.
+   *
+   * Fail-quiet: a failure here does not change cast behavior — `route()`
+   * already falls back on every error mode. We do not increment any of
+   * the route counters; warmup is observability-neutral.
+   */
+  async warmup(timeoutMs = 60000): Promise<boolean> {
+    if (!this.config.enabled) return false;
+    const controller = new AbortController();
+    const timeoutHandle = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetch(`${this.config.url}/api/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: this.config.model,
+          prompt: 'ok',
+          stream: false,
+          options: { num_predict: 1, temperature: 0 },
+        }),
+        signal: controller.signal,
+      });
+      if (!response.ok) {
+        log.warn(`Ollama warmup HTTP ${response.status}`, 'ollama-brain', { model: this.config.model });
+        return false;
+      }
+      // Drain body to free the connection
+      await response.json().catch(() => null);
+      log.info(`Ollama brain warm: model="${this.config.model}"`, 'ollama-brain');
+      return true;
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        log.warn(`Ollama warmup timed out after ${timeoutMs}ms`, 'ollama-brain');
+      } else {
+        log.warn(`Ollama warmup error: ${String(err)}`, 'ollama-brain');
+      }
+      return false;
+    } finally {
+      clearTimeout(timeoutHandle);
+    }
+  }
+
   getStats(): OllamaBrainStats {
     return {
       calls: this.calls,
