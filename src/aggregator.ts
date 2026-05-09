@@ -15,6 +15,7 @@ import { VERSION } from './utils.js';
 import { log } from './logger.js';
 import { SessionTracker } from './session.js';
 import { SessionCoordinator } from './coordinator.js';
+import type { ToolCandidate } from './ollama-brain.js';
 
 const SEPARATOR = '/';
 const META_SERVER_ID = 'ch1tty';
@@ -537,7 +538,43 @@ export class Aggregator {
           log.warn('handleCast(): failed to list resources; continuing with empty resource set', resourcesResult.reason);
           return [] as Array<{ uri: string; name: string; description?: string; mimeType?: string }>;
         })();
-    const scoredTools = this.scoreIntent(intent, registry, sessionId);
+    // v2: Brain-first routing (Ollama/Alchemist via coordinator). Discovery-only —
+    // the brain ranks; execution still flows deterministically through handleExecute.
+    // Falls back to v1 keyword scoreIntent on null (brain disabled, timed out,
+    // unreachable, or returned no high-confidence matches). Per the canonical
+    // contract, callers MUST treat null as "fall back to literal search".
+    const candidates: ToolCandidate[] = registry.map((t) => ({
+      namespacedName: t.namespacedName,
+      description: t.description,
+      category: t.category,
+      serverName: t.serverName,
+    }));
+    const routed = await this.coordinator.routeIntent(intent, candidates);
+
+    let scoredTools: Array<NamespacedTool & { score: number }>;
+    let castRoute: 'brain' | 'fallback';
+    if (routed && routed.length > 0) {
+      const byName = new Map(registry.map((t) => [t.namespacedName, t]));
+      scoredTools = routed
+        .map((r) => {
+          const t = byName.get(r.tool.namespacedName);
+          return t ? { ...t, score: r.confidence } : null;
+        })
+        .filter((t): t is NamespacedTool & { score: number } => t !== null);
+      castRoute = 'brain';
+    } else {
+      scoredTools = this.scoreIntent(intent, registry, sessionId);
+      castRoute = 'fallback';
+    }
+
+    if (sessionId) {
+      this.coordinator.ledger.record(sessionId, 'cast_route', {
+        intent: intent.slice(0, 200),
+        route: castRoute,
+        confirm,
+        candidate_count: scoredTools.length,
+      });
+    }
 
     // Score prompts against intent
     const scoredPrompts = allPrompts
