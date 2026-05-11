@@ -21,8 +21,11 @@ visibility: PUBLIC
 | Name | Ch1tty |
 | ID | ch1tty |
 | Tier | 2 (Platform) |
-| Domain | Infrastructure / MCP Gateway |
+| Category | Infrastructure / MCP Gateway |
+| Domain | `ch1tty.chitty.cc` |
 | Status | Active |
+
+> **Note on infra**: This repo deploys as the local stdio gateway + optional HTTP server (`CH1TTY_PORT`). The public `ch1tty.chitty.cc` Worker (with `[[tail_consumers]] = chittytrack` and ChittyAuth-issued token validation) is fronted by `chittyagent-ch1tty` in a separate repo, which is why this repo has no `wrangler.toml`.
 
 ## Purpose
 
