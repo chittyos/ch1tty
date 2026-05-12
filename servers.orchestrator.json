@@ -1,0 +1,42 @@
+{
+  "servers": [
+    { "_comment": "Strict orchestrator profile: minimal lanes, deterministic behavior." },
+    {
+      "id": "chittyos",
+      "name": "ChittyOS Ecosystem",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "ecosystem",
+      "endpoint": "https://mcp-portal.chitty.cc/mcp",
+      "envHeaders": {
+        "CF-Access-Client-Id": "CHITTY_CF_ACCESS_CLIENT_ID",
+        "CF-Access-Client-Secret": "CHITTY_CF_ACCESS_CLIENT_SECRET"
+      },
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "cloudflare",
+      "name": "Cloudflare Platform",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "ecosystem",
+      "endpoint": "https://mcp.cloudflare.com/mcp",
+      "authTokenKey": "cloudflare-mcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "evidence",
+      "name": "Evidence Search",
+      "type": "remote",
+      "access": "read",
+      "category": "search",
+      "endpoint": "https://autorag.mcp.cloudflare.com/mcp",
+      "authTokenKey": "chittyevidence-search",
+      "lazy": true,
+      "enabled": false
+    }
+  ]
+}

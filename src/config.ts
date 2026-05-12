@@ -21,6 +21,8 @@ const SERVER_KEYS = new Set([
   'args',
   'endpoint',
   'authTokenKey',
+  'headers',
+  'envHeaders',
   'lazy',
   'enabled',
   'env',
@@ -141,6 +143,8 @@ function validateServerConfig(raw: unknown, index: number): ServerConfig {
   const args = assertOptionalStringArray(raw.args, `${prefix}.args`);
   const endpoint = assertOptionalString(raw.endpoint, `${prefix}.endpoint`);
   const authTokenKey = assertOptionalString(raw.authTokenKey, `${prefix}.authTokenKey`);
+  const headers = assertOptionalEnv(raw.headers, `${prefix}.headers`);
+  const envHeaders = assertOptionalEnv(raw.envHeaders, `${prefix}.envHeaders`);
   const lazy = assertOptionalBoolean(raw.lazy, `${prefix}.lazy`);
   const enabled = assertOptionalBoolean(raw.enabled, `${prefix}.enabled`);
   const env = assertOptionalEnv(raw.env, `${prefix}.env`);
@@ -175,6 +179,8 @@ function validateServerConfig(raw: unknown, index: number): ServerConfig {
     category: category as ServerCategory,
     endpoint,
     authTokenKey,
+    headers,
+    envHeaders,
     lazy,
     enabled,
   };

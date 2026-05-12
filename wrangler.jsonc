@@ -1,23 +1,42 @@
-/**
- * For more details on how to configure Wrangler, refer to:
- * https://developers.cloudflare.com/workers/wrangler/configuration/
- */
 {
-	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "ch1tty",
-	"main": "src/index.ts",
-	"compatibility_date": "2026-03-16",
-	"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
-	"assets": {
-		"binding": "ASSETS",
-		"directory": "./public"
-	},
-	"observability": {
-		"enabled": true
-	},
-	"ai": {
-		"binding": "AI"
-	},
-	"upload_source_maps": true,
-	"tail_consumers": [{ "service": "chittytrack" }]
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ch1tty",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-03-16",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "global_fetch_strictly_public"
+  ],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./public"
+  },
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "invocation_logs": true,
+      "destinations": [
+        "chittytrack-logs"
+      ]
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "destinations": [
+        "chittytrack-traces"
+      ],
+      "persist": false
+    }
+  },
+  "ai": {
+    "binding": "AI"
+  },
+  "upload_source_maps": true,
+  "tail_consumers": [
+    {
+      "service": "chittytrack"
+    }
+  ]
 }

@@ -2,7 +2,7 @@
 uri: chittycanon://docs/tech/procedure/ch1tty-dev-guide
 namespace: chittycanon://docs/tech
 type: procedure
-version: 3.0.0
+version: 4.1.0
 status: CERTIFIED
 registered_with: chittycanon://core/services/canon
 certifier: chittycanon://core/services/chittycertify
@@ -14,7 +14,7 @@ visibility: PUBLIC
 
 ## What This Is
 
-Ch1tty is the ChittyOS universal MCP gateway. It aggregates all MCP servers (local stdio children + remote HTTP endpoints) behind a **slim-MCP surface**: just 4 tools (`search`, `execute`, `status`, `reload`). Clients discover capabilities via `search` and invoke them via `execute` — the full tool registry stays internal, keeping context windows minimal.
+Ch1tty is the ChittyOS universal MCP gateway. It aggregates all MCP servers (local stdio children + remote HTTP endpoints) behind a **slim-MCP surface**: 5 tools (`search`, `execute`, `status`, `reload`, `cast`). Clients discover capabilities via `search`, invoke them via `execute`, or use `cast` for intent-driven resolution — the full tool registry stays internal, keeping context windows minimal.
 
 Dual transport: local clients connect via **stdio**, remote clients via **Streamable HTTP** at `/mcp`.
 
@@ -29,7 +29,7 @@ npm run dev     # Watch mode for development
 ## Architecture
 
 - **Entry**: `src/index.ts` — wires stdio + optional HTTP transport to the aggregator
-- **Aggregator**: `src/aggregator.ts` — slim-MCP surface: search/execute/status/reload meta-tools, internal tool registry, backend routing
+- **Aggregator**: `src/aggregator.ts` — slim-MCP surface: search/execute/status/reload/cast meta-tools, internal tool registry, backend routing
 - **HTTP Server**: `src/http-server.ts` — Streamable HTTP MCP transport on `/mcp`, health on `/health`, bearer auth
 - **ChildManager**: `src/child-manager.ts` — `Backend` for local stdio child processes
 - **RemoteProxy**: `src/remote-proxy.ts` — `Backend` for remote HTTP MCP endpoints
@@ -38,7 +38,7 @@ npm run dev     # Watch mode for development
 
 ## Slim-MCP Pattern
 
-Ch1tty exposes exactly 4 tools to clients:
+Ch1tty exposes exactly 5 tools to clients:
 
 | Tool | Purpose |
 |------|---------|
@@ -46,8 +46,17 @@ Ch1tty exposes exactly 4 tools to clients:
 | `ch1tty/execute` | Invoke any discovered tool by namespaced name + args |
 | `ch1tty/status` | Gateway status — servers, tool counts, uptime |
 | `ch1tty/reload` | Hot-reload `servers.json` without restart |
+| `ch1tty/cast` | Natural language intent → tool resolution → execution |
 
-The full backend tool registry (100+ tools across all servers) is never exposed in `tools/list`. Clients search on-demand, keeping context cost at ~4 tool definitions regardless of how many backends are connected.
+The full backend tool registry (100+ tools across all servers) is never exposed in `tools/list`. Clients search on-demand, keeping context cost at ~5 tool definitions regardless of how many backends are connected.
+
+### Architectural Guardrail (Do Not Drift)
+
+Treat Ch1tty as an orchestrator viewport, not a backend catalog.
+
+- Public MCP surface stays fixed at exactly 5 tools.
+- Session/fractal behavior is handled by SessionCoordinator + SessionTracker behind the meta-tools.
+- Backend namespace sprawl is controlled by config profiles; never expand public surface to include backend tools directly.
 
 ## Key Patterns
 
@@ -63,6 +72,12 @@ The full backend tool registry (100+ tools across all servers) is never exposed 
 ## Config Override
 
 Set `CH1TTY_CONFIG` env var to use a custom servers.json path.
+
+### Strict Orchestrator Profile
+
+```bash
+CH1TTY_CONFIG=./servers.orchestrator.json npm start
+```
 
 ## Config Path Interpolation
 

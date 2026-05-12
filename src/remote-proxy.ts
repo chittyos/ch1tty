@@ -118,9 +118,16 @@ export class RemoteProxy implements Backend {
   }
 
   private async doConnect(config: RemoteServerConfig): Promise<RemoteConnection> {
-    const headers: Record<string, string> = {};
+    const headers: Record<string, string> = { ...(config.headers ?? {}) };
+    if (config.envHeaders) {
+      for (const [headerName, envVarName] of Object.entries(config.envHeaders)) {
+        const value = process.env[envVarName];
+        if (value) headers[headerName] = value;
+      }
+    }
+
     const token = await this.getAuthToken(config);
-    if (token) {
+    if (token && !headers.Authorization) {
       headers['Authorization'] = `Bearer ${token}`;
     }
 

@@ -28,6 +28,8 @@ export interface RemoteServerConfig extends BaseServerConfig {
   type: 'remote';
   endpoint: string;
   authTokenKey?: string;
+  headers?: Record<string, string>;
+  envHeaders?: Record<string, string>;
 }
 
 export type ServerConfig = LocalServerConfig | RemoteServerConfig;
