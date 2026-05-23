@@ -15,7 +15,10 @@
 import { log } from './logger.js';
 import { LedgerClient } from './ledger.js';
 import { OllamaBrain, type OllamaBrainConfig, type RoutedTool, type ToolCandidate } from './ollama-brain.js';
+import { EmbeddingBrain, type EmbeddingBrainConfig } from './embedding-brain.js';
 import type { Backend, ToolCallResult } from './types.js';
+
+const USE_OLLAMA_BRAIN = process.env.CH1TTY_USE_OLLAMA_BRAIN === '1';
 
 // ── Types ─────────────────────────────────────────────────────
 
@@ -51,13 +54,16 @@ export class SessionCoordinator {
   private ecosystemServerId?: string;
   readonly ledger = new LedgerClient();
   readonly brain: OllamaBrain;
+  readonly embeddingBrain: EmbeddingBrain;
 
-  constructor(brainConfig: Partial<OllamaBrainConfig> = {}) {
+  constructor(brainConfig: Partial<OllamaBrainConfig> = {}, embedConfig: Partial<EmbeddingBrainConfig> = {}) {
     this.brain = new OllamaBrain(brainConfig);
-    // Fire-and-forget warmup so the model is loaded before the first cast.
-    // Cold-load on a 3B model exceeds the default route timeout (5s) and
-    // silently routes the first user-facing cast to the keyword fallback.
-    void this.brain.warmup().catch(() => {/* warmup is best-effort */});
+    this.embeddingBrain = new EmbeddingBrain(embedConfig);
+    // Warm the primary embedding brain so the first cast doesn't pay model-load latency.
+    void this.embeddingBrain.warmup().catch(() => {/* best-effort */});
+    if (USE_OLLAMA_BRAIN) {
+      void this.brain.warmup().catch(() => {/* best-effort */});
+    }
   }
 
   /**
@@ -71,11 +77,23 @@ export class SessionCoordinator {
    * "coordinator orchestrates, it does not accumulate".
    */
   async routeIntent(query: string, candidates: ToolCandidate[]): Promise<RoutedTool[] | null> {
-    const result = await this.brain.route(query, candidates);
-    if (result) {
-      log.debug(`Brain routed "${query.slice(0, 40)}" → ${result.length} candidate(s)`);
+    // Primary: vector-similarity (EmbeddingBrain). Median ~415ms warm on commodity
+    // hardware vs ~30s for the generative 3B model. See scripts/bench-embedding-brain.mjs.
+    const embedResult = await this.embeddingBrain.route(query, candidates);
+    if (embedResult && embedResult.length > 0) {
+      log.debug(`EmbeddingBrain routed "${query.slice(0, 40)}" → ${embedResult.length} candidate(s)`);
+      return embedResult;
     }
-    return result;
+    // Opt-in secondary: generative routing via Ollama. Only when explicitly enabled —
+    // it's accurate but slow, and caller still has keyword fallback on null.
+    if (USE_OLLAMA_BRAIN) {
+      const genResult = await this.brain.route(query, candidates);
+      if (genResult) {
+        log.debug(`OllamaBrain routed "${query.slice(0, 40)}" → ${genResult.length} candidate(s)`);
+        return genResult;
+      }
+    }
+    return null;
   }
 
   /** Register the ecosystem backend for coordinator's own tool calls. */
