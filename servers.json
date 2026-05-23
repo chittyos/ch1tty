@@ -317,7 +317,7 @@
       "type": "remote",
       "access": "readwrite",
       "category": "ecosystem",
-      "endpoint": "https://orchestrator.agent.chitty.cc/mcp",
+      "endpoint": "https://orchestrator.chitty.cc/mcp",
       "authTokenKey": "chittymcp",
       "lazy": false,
       "enabled": true
