@@ -49,6 +49,17 @@ export interface AggregatorOptions {
   focusProfilesPath?: string;
   /** Pre-loaded focus profiles (mainly for tests); otherwise loaded from path. */
   focusProfiles?: FocusProfiles;
+  /**
+   * Override how backends are constructed. Returns a real {@link Backend} for a
+   * given config. Defaults to ChildManager (local) / RemoteProxy (remote).
+   *
+   * This is the simulation seam: a harness can supply in-process fixture backends
+   * that implement the real Backend interface (real listTools/callTool) so the
+   * gateway can be driven through end-to-end scenarios without live credentials.
+   * It is NOT a module mock — the returned object is a real implementation of the
+   * interface, routed through the normal registerServer path.
+   */
+  backendFactory?: (config: ServerConfig) => Backend;
 }
 
 export class Aggregator {
@@ -59,6 +70,7 @@ export class Aggregator {
   private configPath?: string;
   private focusProfiles: FocusProfiles;
   private defaultFocus?: string;
+  private backendFactory?: (config: ServerConfig) => Backend;
   private startedAt = Date.now();
   readonly sessions = new SessionTracker();
   readonly coordinator = new SessionCoordinator();
@@ -74,6 +86,7 @@ export class Aggregator {
     this.categoryFilter = options?.categoryFilter;
     this.configPath = options?.configPath;
     this.defaultFocus = options?.focus;
+    this.backendFactory = options?.backendFactory;
     this.focusProfiles = options?.focusProfiles
       ?? loadFocusProfilesFromPath(options?.focusProfilesPath ?? resolveFocusProfilesPath());
     this.configs = configs;
@@ -114,7 +127,9 @@ export class Aggregator {
     const http = new RemoteProxy();
 
     for (const config of this.activeConfigs()) {
-      const backend = config.type === 'local' ? stdio : http;
+      const backend = this.backendFactory
+        ? this.backendFactory(config)
+        : config.type === 'local' ? stdio : http;
       backend.registerServer(config);
       this.backends.set(config.id, backend);
     }
