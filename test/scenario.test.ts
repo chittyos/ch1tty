@@ -110,12 +110,15 @@ test('scenario: finance focus — cast "list recent payments" resolves to stripe
 test('scenario: finance focus boosts stripe over other ecosystem tools', async () => {
   const { aggregator } = buildAggregator(FIXTURE_CONFIGS, undefined, { focus: 'finance' });
 
+  // "list" matches stripe/list_payments (in-focus with finance) AND neon/list_projects (out-of-focus).
+  // Using a query that crosses focus boundaries proves the boost actually changes ordering, not
+  // that stripe tools are alphabetically or lexically first for every possible query.
   const resultWithFocus = await aggregator.callTool('ch1tty/search', {
-    query: 'payment',
+    query: 'list',
     focus: 'finance',
   });
   const resultNoFocus = await aggregator.callTool('ch1tty/search', {
-    query: 'payment',
+    query: 'list',
     focus: 'none',
   });
 
@@ -125,11 +128,27 @@ test('scenario: finance focus boosts stripe over other ecosystem tools', async (
   const withFocus = parseSearch(resultWithFocus);
   const noFocus = parseSearch(resultNoFocus);
 
-  // With focus, stripe tools should appear first
-  assert.ok(withFocus.tools && withFocus.tools.length > 0, 'should return tools');
-  assert.ok(withFocus.tools![0].tool.startsWith('stripe/'), `first tool with finance focus should be stripe, got ${withFocus.tools![0].tool}`);
+  // With focus, finance in-focus tools (stripe, tasks) must rank before out-of-focus (neon)
+  const withTools = withFocus.tools ?? [];
+  assert.ok(withTools.length > 0, 'should return tools with focus');
+  assert.ok(
+    withTools[0].tool.startsWith('stripe/') || withTools[0].tool.startsWith('tasks/'),
+    `first tool with finance focus should be stripe or tasks, got ${withTools[0].tool}`,
+  );
+  assert.equal(withTools[0].inFocus, true, 'top result should be marked inFocus');
 
-  // Focus label should appear in both (finance via env, none clears it)
+  // Without focus, out-of-focus tools (neon) must appear — lens never hides them
+  const noFocusTools = noFocus.tools ?? [];
+  assert.ok(noFocusTools.some((t) => t.tool.startsWith('neon/')), 'neon must appear without focus');
+  assert.ok(!noFocusTools.some((t) => t.inFocus), 'no inFocus markers when focus is "none"');
+
+  // Verify the boost actually changed ordering: with focus, neon ranks below stripe/tasks
+  const withNeonIdx = withTools.findIndex((t) => t.tool.startsWith('neon/'));
+  const withStripeOrTasksIdx = withTools.findIndex((t) => t.tool.startsWith('stripe/') || t.tool.startsWith('tasks/'));
+  if (withNeonIdx !== -1 && withStripeOrTasksIdx !== -1) {
+    assert.ok(withStripeOrTasksIdx < withNeonIdx, 'finance focus must rank stripe/tasks before neon');
+  }
+
   assert.equal(withFocus.focus, 'finance');
   assert.equal(noFocus.focus, undefined);
 });
@@ -269,9 +288,12 @@ test('scenario: mis-resolution — "search documents" resolves to notion', async
 
 // ── Scenario 5: Focus is a lens, not a gate ───────────────────────────────────
 
-test('scenario: design focus — search "create" still returns non-desktop tools', async () => {
+test('scenario: design focus — search "create" still returns non-desktop tools (lens, not gate)', async () => {
   const { aggregator } = buildAggregator(FIXTURE_CONFIGS, undefined, { focus: 'design' });
 
+  // "create" matches neon/create_project, stripe/create_payment_intent, tasks/create_task,
+  // notion/create_page — all out-of-focus for design. Verifies the design focus lens does NOT
+  // filter out non-desktop tools when they match a keyword.
   const result = await aggregator.callTool('ch1tty/search', {
     query: 'create',
     focus: 'design',
@@ -281,23 +303,37 @@ test('scenario: design focus — search "create" still returns non-desktop tools
   assert.equal(result.isError, undefined);
   const data = parseSearch(result);
 
-  // All tools should appear (lens, not gate)
-  assert.ok((data.total ?? 0) > 3, `total should include non-desktop tools too, got ${data.total}`);
-
-  // Playwright tools should appear before non-desktop tools
+  // Non-desktop tools must appear — focus is a lens, not a gate
   const tools = data.tools ?? [];
-  const playwrightIdx = tools.findIndex((t) => t.tool.startsWith('playwright/'));
-  const neonIdx = tools.findIndex((t) => t.tool.startsWith('neon/'));
-  if (playwrightIdx !== -1 && neonIdx !== -1) {
-    assert.ok(
-      playwrightIdx < neonIdx,
-      `playwright (in-focus) should rank before neon (out-of-focus) — playwright at ${playwrightIdx}, neon at ${neonIdx}`,
-    );
-  }
+  assert.ok(tools.length > 0, 'should return matching tools');
+  assert.ok(
+    tools.some((t) => t.tool.startsWith('neon/') || t.tool.startsWith('stripe/') || t.tool.startsWith('notion/')),
+    'non-desktop tools (neon/stripe/notion) must appear even with design focus active',
+  );
+  // Non-desktop tools must NOT be marked inFocus
+  assert.ok(
+    !tools.some((t) => !t.tool.startsWith('playwright/') && t.inFocus),
+    'only playwright tools should be marked inFocus with design profile',
+  );
 
-  // Verify in-focus marker is set for playwright tools
-  const inFocusTools = tools.filter((t) => t.inFocus);
-  assert.ok(inFocusTools.every((t) => t.tool.startsWith('playwright/')), 'only playwright tools should be inFocus with design profile');
+  // Ranking check: search "browser" — matches playwright tools — verify they rank first and
+  // are marked inFocus when design focus is active.
+  const rankResult = await aggregator.callTool('ch1tty/search', {
+    query: 'browser',
+    focus: 'design',
+    limit: 50,
+  });
+  assert.equal(rankResult.isError, undefined);
+  const rankData = parseSearch(rankResult);
+  const rankTools = rankData.tools ?? [];
+  assert.ok(rankTools.length > 0, 'browser query should match playwright tools');
+  assert.ok(rankTools[0].tool.startsWith('playwright/'), `first result should be playwright, got ${rankTools[0].tool}`);
+  assert.equal(rankTools[0].inFocus, true, 'playwright result should be marked inFocus');
+  const inFocusTools = rankTools.filter((t) => t.inFocus);
+  assert.ok(
+    inFocusTools.every((t) => t.tool.startsWith('playwright/')),
+    'only playwright tools should be inFocus with design profile',
+  );
 });
 
 test('scenario: focus "none" clears an env-level default focus', async () => {
@@ -357,15 +393,15 @@ test('scenario: resilience — cast handles erroring backend gracefully', async 
 
   const { aggregator } = buildAggregator(FIXTURE_CONFIGS, fixture);
 
-  // cast should not throw — it should gracefully skip the broken backend
+  // cast should route to the healthy neon backend, not fail with no_match
   const result = await aggregator.callTool('ch1tty/cast', { intent: 'list database projects', confirm: true });
   assert.equal(result.isError, undefined);
   const cast = parseCast(result);
-  assert.ok(cast.cast === 'plan' || cast.cast === 'no_match', `unexpected cast state: ${cast.cast}`);
-  if (cast.cast === 'plan') {
-    const resolved = cast.resolved as { tool: string };
-    assert.equal(resolved.tool, 'neon/list_projects', `should resolve to neon, got ${resolved.tool}`);
-  }
+  // Accepting no_match would hide a regression where cast fails to route around the broken backend.
+  // neon/list_projects is healthy and matches the intent, so cast must resolve to it.
+  assert.equal(cast.cast, 'plan', `cast should resolve via healthy neon backend, got: ${cast.cast}`);
+  const resolved = cast.resolved as { tool: string };
+  assert.equal(resolved.tool, 'neon/list_projects', `should resolve to neon, got ${resolved.tool}`);
 });
 
 // ── Scenario 7: Cast confirm mode ────────────────────────────────────────────
@@ -401,8 +437,16 @@ test('scenario: cast without confirm executes and returns result', async () => {
   assert.equal(cast.cast, 'executed');
   assert.ok(cast.resolved, 'should include resolved tool');
 
-  // At least one backend call should have been made
-  assert.ok(fixture.getCallLog().length > 0, 'cast without confirm should execute a backend tool');
+  // Assert the specific tool executed — "list database projects" must resolve to neon/list_projects.
+  // Accepting "some tool ran" would hide mis-routing to another fixture tool.
+  // Note: in "executed" mode, resolved is a bare string (the namespaced tool name);
+  // in "plan" mode it's an object with a .tool property.
+  assert.equal(cast.resolved, 'neon/list_projects', `cast should execute neon/list_projects, got ${cast.resolved}`);
+
+  // Verify neon was actually called on the backend
+  const callLog = fixture.getCallLog();
+  assert.ok(callLog.length > 0, 'cast without confirm should execute a backend tool');
+  assert.ok(callLog.some((r) => r.serverId === 'neon'), 'neon backend must have been invoked');
 });
 
 // ── Scenario 8: Latency reporting ────────────────────────────────────────────
