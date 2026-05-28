@@ -354,6 +354,54 @@ test('circuit resets after success', async () => {
   }
 });
 
+test('half-open: only one concurrent probe is sent, others get null immediately', async () => {
+  let tripPhase = true;
+  // Slow success handler so concurrent callers actually race
+  const fake = await startFakeOllama(async (body) => {
+    if (tripPhase) return { status: 500, body: 'err' };
+    await new Promise((r) => setTimeout(r, 40));
+    const req = body as { input: string[] };
+    return { status: 200, body: JSON.stringify({ embeddings: req.input.map(() => oneHot(0)) }) };
+  });
+
+  try {
+    const brain = new EmbeddingBrain({
+      url: fake.url,
+      timeoutMs: 500,
+      circuitBreakerThreshold: 2,
+      circuitBreakerCooldownMs: 50,
+      minSimilarity: 0,
+    });
+
+    // Trip the circuit
+    await brain.route('q', candidates());
+    await brain.route('q', candidates());
+    assert.equal(brain.isCircuitOpen(), true, 'breaker must open after threshold failures');
+
+    // Wait for cooldown
+    await new Promise((r) => setTimeout(r, 60));
+    assert.equal(brain.isCircuitOpen(), false, 'circuit should be half-open after cooldown');
+
+    // Enter success phase and fire 5 concurrent callers
+    tripPhase = false;
+    const hitsBefore = fake.requests.length;
+    const results = await Promise.all(
+      Array.from({ length: 5 }, () => brain.route('query', candidates()))
+    );
+
+    const probeHits = fake.requests.length - hitsBefore;
+    // The 1 probe makes at most 2 server requests (query embed + candidates embed).
+    // The other 4 callers must get null without touching the server (0 requests each).
+    assert.ok(probeHits <= 2, `expected ≤2 probe requests (1 route call), got ${probeHits}`);
+    assert.ok(probeHits >= 1, 'probe must have reached the server');
+    const nonNullCount = results.filter((r) => r !== null).length;
+    assert.ok(nonNullCount <= 1, `at most 1 result should be non-null, got ${nonNullCount}`);
+    assert.equal(brain.isCircuitOpen(), false, 'successful probe should reset circuit');
+  } finally {
+    await fake.stop();
+  }
+});
+
 test('circuit not tripped by empty results (not a connectivity failure)', async () => {
   // Orthogonal vectors: cosine=0, below default minSimilarity=0.5 → empty results
   const fake = await startFakeOllama(orthogonalEmbedHandler());

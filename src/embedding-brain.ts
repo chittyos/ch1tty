@@ -97,6 +97,10 @@ export class EmbeddingBrain {
   // Circuit breaker state
   private consecutiveFailures = 0;
   private circuitOpenUntil = 0;
+  // Half-open sentinel: true while a single probe attempt is in flight.
+  // Concurrent callers that arrive during half-open get null immediately
+  // so only one probe is sent per cooldown expiry.
+  private probing = false;
 
   constructor(config: Partial<EmbeddingBrainConfig> = {}) {
     const merged = { ...DEFAULT_CONFIG, ...config };
@@ -127,7 +131,10 @@ export class EmbeddingBrain {
       if (Date.now() < this.circuitOpenUntil) {
         return null;
       }
-      // Cooldown expired — allow one probe attempt (half-open)
+      // Cooldown expired: half-open. Only one concurrent probe is allowed.
+      // Any other caller that arrives while the probe is in flight gets null.
+      if (this.probing) return null;
+      this.probing = true;
       log.debug(`EmbeddingBrain circuit half-open, probing`, 'embedding-brain');
     }
 
@@ -144,6 +151,7 @@ export class EmbeddingBrain {
       if (!queryVec || !candidateVecs) {
         // embedSingle / ensureCandidateVectors already incremented error/timeout counters
         this.recordCircuitFailure();
+        this.probing = false;
         return null;
       }
 
@@ -164,6 +172,7 @@ export class EmbeddingBrain {
         this.emptyResults++;
         // Empty results are not a connectivity failure — don't trip the breaker
         this.consecutiveFailures = 0;
+        this.probing = false;
         return null;
       }
 
@@ -171,12 +180,14 @@ export class EmbeddingBrain {
       this.successes++;
       this.consecutiveFailures = 0;
       this.circuitOpenUntil = 0;
+      this.probing = false;
       return scored.slice(0, this.config.topK);
     } catch (err) {
       // Defensive — embedSingle/ensure* already trap their own errors. This
       // is for cosine math or shape mismatches we don't expect.
       this.errors++;
       this.recordCircuitFailure();
+      this.probing = false;
       log.warn(`Embedding route unexpected error: ${String(err)}`, 'embedding-brain');
       return null;
     } finally {
