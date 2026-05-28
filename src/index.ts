@@ -39,6 +39,7 @@ async function main(): Promise<void> {
   }
 
   const aggregator = new Aggregator(config.servers, options);
+  aggregator.preWarmNonLazy();
 
   // HTTP server with MCP transport + health endpoints
   let httpServer: HttpMcpServer | null = null;

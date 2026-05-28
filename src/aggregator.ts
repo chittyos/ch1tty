@@ -171,6 +171,26 @@ export class Aggregator {
     return this.backends.get(serverId);
   }
 
+  /**
+   * Pre-warm non-lazy backends. For every active server with `lazy === false`, fires a
+   * background `listTools()` so the connection and tool cache are ready before the first
+   * real request arrives. Errors are logged and swallowed — a failed warmup does not
+   * crash the gateway; the backend reconnects lazily on the next real call.
+   */
+  preWarmNonLazy(): void {
+    for (const config of this.activeConfigs()) {
+      if (config.lazy === false) {
+        const backend = this.backends.get(config.id);
+        if (backend) {
+          log.debug(`Pre-warming non-lazy backend`, config.id);
+          void backend.listTools(config.id).catch((err) => {
+            log.warn(`Pre-warm failed for ${config.id}: ${err}`);
+          });
+        }
+      }
+    }
+  }
+
   // ── Internal tool registry ───────────────────────────────────
 
   private async refreshRegistry(): Promise<void> {
