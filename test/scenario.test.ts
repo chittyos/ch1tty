@@ -67,24 +67,12 @@ function buildAggregator(
   const aggregator = new Aggregator(configs, {
     focusProfiles: FOCUS_PROFILES,
     focus: opts?.focus,
+    embedEnabled: false,  // no Ollama in CI — skip warmup, fall back to keyword scoring
+    backendFactory: (config) => {
+      fixture.registerServer(config);
+      return fixture;
+    },
   });
-
-  // Inject the fixture backend by replacing the aggregator's internal backends.
-  // We do this by registering the fixture on each config's registered backend slot.
-  // Since the Backend interface drives all I/O, this is equivalent to real backends.
-  for (const config of configs) {
-    fixture.registerServer(config);
-  }
-
-  // Override the backends map via the public callTool surface:
-  // Aggregator creates ChildManager/RemoteProxy internally; we replace them by
-  // patching the private map through the "any" escape hatch — acceptable in tests
-  // since we're testing the routing/scoring layer, not the transport.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const agg = aggregator as any;
-  for (const config of configs) {
-    agg.backends.set(config.id, fixture);
-  }
 
   return { aggregator, fixture };
 }
