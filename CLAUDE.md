@@ -82,6 +82,16 @@ The full backend tool registry (100+ tools across all servers) is never exposed 
 - Graceful shutdown: SIGINT/SIGTERM → close all children → exit
 - Config supports `_comment` entries for inline documentation in servers.json
 
+## Focus Profiles (Soft Lens)
+
+A **focus profile** is a named bundle (`finance`, `governance`, `design`, …) that biases the registry toward one direction without hiding anything — a lens, not a gate. Profiles are data-driven in `focus-profiles.json` at repo root (loaded + validated like `servers.json`); each maps a name to relevant `categories` and/or `servers` plus an additive `boost` (default 0.5).
+
+It does **not** add a 6th public tool. Selection works two ways:
+- **Process default**: `CH1TTY_FOCUS=finance npm start`
+- **Per-call**: a `focus` parameter on `ch1tty/search` and `ch1tty/cast` overrides the default for that call; `focus: "none"` (or `""`) explicitly disables focus.
+
+When active, in-focus tools are additively boosted and re-sorted to the top of `search` and `cast` results (both the keyword fallback and brain routes); out-of-focus tools stay present and reachable. `ch1tty/status` reports the active focus + available profiles. Profiles may reference disabled/future server ids — they simply don't match until those servers exist.
+
 ## Config Override
 
 Set `CH1TTY_CONFIG` env var to use a custom servers.json path.
@@ -170,6 +180,8 @@ Endpoints on `{bindAddress}:{port}`:
 | `CH1TTY_CONFIG` | Custom servers.json path |
 | `CH1TTY_ACCESS` | Filter servers by access level (read/write/readwrite) |
 | `CH1TTY_CATEGORY` | Filter servers by category |
+| `CH1TTY_FOCUS` | Default focus profile name — a soft lens that biases `search`/`cast` ranking toward in-focus tools (e.g. `finance`, `governance`, `design`). Never hides out-of-focus tools. Per-call `focus` param on `search`/`cast` overrides it (`"none"` disables). |
+| `CH1TTY_FOCUS_PROFILES` | Custom focus-profiles.json path (default `focus-profiles.json` at repo root) |
 | `CH1TTY_LEDGER_DLQ` | Override the ledger dead-letter WAL path (default `~/.ch1tty/ledger.dlq.jsonl`) |
 
 ## Registration

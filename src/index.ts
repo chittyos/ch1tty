@@ -33,6 +33,10 @@ async function main(): Promise<void> {
   if (categoryEnv) {
     options.categoryFilter = categoryEnv as ServerCategory;
   }
+  const focusEnv = process.env.CH1TTY_FOCUS;
+  if (focusEnv) {
+    options.focus = focusEnv;
+  }
 
   const aggregator = new Aggregator(config.servers, options);
 
