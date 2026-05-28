@@ -338,8 +338,8 @@ test('circuit resets after success', async () => {
     await brain.route('query', candidates());
     assert.equal(brain.isCircuitOpen(), true);
 
-    // Wait for cooldown to expire
-    await new Promise((r) => setTimeout(r, 60));
+    // Wait for cooldown to expire (150ms >> 50ms cooldown to avoid 10ms-margin flakes)
+    await new Promise((r) => setTimeout(r, 150));
     assert.equal(brain.isCircuitOpen(), false, 'circuit should be closed after cooldown');
 
     // Now succeed — circuit should stay closed
@@ -378,8 +378,8 @@ test('half-open: only one concurrent probe is sent, others get null immediately'
     await brain.route('q', candidates());
     assert.equal(brain.isCircuitOpen(), true, 'breaker must open after threshold failures');
 
-    // Wait for cooldown
-    await new Promise((r) => setTimeout(r, 60));
+    // Wait for cooldown (150ms >> 50ms cooldown to avoid 10ms-margin flakes)
+    await new Promise((r) => setTimeout(r, 150));
     assert.equal(brain.isCircuitOpen(), false, 'circuit should be half-open after cooldown');
 
     // Enter success phase and fire 5 concurrent callers
