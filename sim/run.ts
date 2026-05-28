@@ -74,6 +74,11 @@ async function main(): Promise<void> {
 
   console.log(`\nResolution: ${passed}/${results.length} passed  |  total cast time ${Math.round(totalMs * 100) / 100}ms\n`);
 
+  const allReachable = reachable.githubUnderFinance && reachable.neonUnderDesign;
+  if (passed < results.length || !allReachable) {
+    process.exitCode = 1;
+  }
+
   // ── Artifact ────────────────────────────────────────────────
   const artifact = {
     generatedAt: new Date().toISOString(),

@@ -649,6 +649,21 @@ export class Aggregator {
           return t ? { ...t, score: r.confidence } : null;
         })
         .filter((t): t is NamespacedTool & { score: number } => t !== null);
+      // When focus is active, the brain may have truncated in-focus candidates
+      // to topK before the bias step can act. Augment with top keyword-scored
+      // in-focus tools from the full registry so none are invisible to the lens.
+      if (focus) {
+        const seen = new Set(scoredTools.map((t) => t.namespacedName));
+        let added = 0;
+        for (const t of this.scoreIntent(intent, registry, sessionId)) {
+          if (added >= 5) break;
+          if (!seen.has(t.namespacedName) && isInFocus(focus, t)) {
+            scoredTools.push(t);
+            seen.add(t.namespacedName);
+            added++;
+          }
+        }
+      }
       castRoute = 'brain';
     } else {
       scoredTools = this.scoreIntent(intent, registry, sessionId);
