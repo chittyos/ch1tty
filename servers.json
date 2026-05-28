@@ -76,6 +76,22 @@
       "enabled": true
     },
     {
+      "_comment": "github: official GitHub hosted MCP server (replaces deprecated @modelcontextprotocol/server-github). Auth via GITHUB_MCP_AUTHORIZATION env var holding 'Bearer <PAT>'; populate from op://ChittyOS-Integrations/github/personal_access_token (e.g. export GITHUB_MCP_AUTHORIZATION=\"Bearer $(op read op://ChittyOS-Integrations/github/personal_access_token)\"). The chitty-mcp-token broker has no 'github' key, so authTokenKey is not used here."
+    },
+    {
+      "id": "github",
+      "name": "GitHub API",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "code",
+      "endpoint": "https://api.githubcopilot.com/mcp/",
+      "envHeaders": {
+        "Authorization": "GITHUB_MCP_AUTHORIZATION"
+      },
+      "lazy": true,
+      "enabled": true
+    },
+    {
       "_comment": "── local: portable stdio servers (npx/uvx, no hardcoded paths) ─"
     },
     {
@@ -108,22 +124,6 @@
       ],
       "env": {
         "STRIPE_SECRET_KEY": "op://ChittyOS-Integrations/stripe/secret_key"
-      },
-      "lazy": true,
-      "enabled": true
-    },
-    {
-      "_comment": "github: official GitHub hosted MCP server (replaces deprecated @modelcontextprotocol/server-github). Auth via GITHUB_MCP_AUTHORIZATION env var holding 'Bearer <PAT>'; populate from op://ChittyOS-Integrations/github/personal_access_token (e.g. export GITHUB_MCP_AUTHORIZATION=\"Bearer $(op read op://ChittyOS-Integrations/github/personal_access_token)\"). The chitty-mcp-token broker has no 'github' key, so authTokenKey is not used here."
-    },
-    {
-      "id": "github",
-      "name": "GitHub API",
-      "type": "remote",
-      "access": "readwrite",
-      "category": "code",
-      "endpoint": "https://api.githubcopilot.com/mcp/",
-      "envHeaders": {
-        "Authorization": "GITHUB_MCP_AUTHORIZATION"
       },
       "lazy": true,
       "enabled": true

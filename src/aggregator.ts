@@ -104,7 +104,8 @@ export class Aggregator {
       const trimmed = perCall.trim();
       name = trimmed === '' || trimmed.toLowerCase() === 'none' ? undefined : trimmed;
     } else {
-      name = this.defaultFocus;
+      const def = typeof this.defaultFocus === 'string' ? this.defaultFocus.trim() : undefined;
+      name = !def || def.toLowerCase() === 'none' ? undefined : def;
     }
     return { name, profile: resolveFocus(this.focusProfiles, name) };
   }

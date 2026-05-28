@@ -128,8 +128,8 @@ export function loadFocusProfilesFromPath(path: string): FocusProfiles {
   let raw: string;
   try {
     raw = readFileSync(path, 'utf-8');
-  } catch {
-    // Missing file → no profiles. Focus is an opt-in lens.
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code !== 'ENOENT') throw err;
     return { profiles: {} };
   }
 
