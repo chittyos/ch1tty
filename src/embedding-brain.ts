@@ -36,6 +36,14 @@ export interface EmbeddingBrainConfig {
   maxCandidates: number;
   /** Top-k results returned. */
   topK: number;
+  /**
+   * After this many consecutive failures (timeouts or errors) the breaker
+   * opens and route() returns null immediately until the cooldown expires.
+   * Prevents every cast from paying the full timeoutMs when Ollama is down.
+   */
+  circuitBreakerThreshold: number;
+  /** How long (ms) the breaker stays open before allowing a probe attempt. */
+  circuitBreakerCooldownMs: number;
 }
 
 export interface EmbeddingBrainStats {
@@ -48,16 +56,22 @@ export interface EmbeddingBrainStats {
   cacheSize: number;
   cacheHits: number;
   cacheMisses: number;
+  circuitOpen: boolean;
+  circuitCooldownRemainingMs: number;
 }
 
 const DEFAULT_CONFIG: EmbeddingBrainConfig = {
   url: process.env.CH1TTY_EMBED_URL ?? process.env.CH1TTY_OLLAMA_URL ?? 'http://127.0.0.1:11434',
   model: process.env.CH1TTY_EMBED_MODEL ?? 'nomic-embed-text',
-  timeoutMs: Number(process.env.CH1TTY_EMBED_TIMEOUT_MS ?? 30000),
+  // 5s default: warm embed calls complete in ~300ms; 5s gives generous headroom while
+  // preventing the 30s hang-per-cast landmine when Ollama is unreachable but TCP connects.
+  timeoutMs: Number(process.env.CH1TTY_EMBED_TIMEOUT_MS ?? 5000),
   enabled: process.env.CH1TTY_EMBED_ENABLED !== 'false',
   minSimilarity: Number(process.env.CH1TTY_EMBED_MIN_SIMILARITY ?? 0.5),
   maxCandidates: Number(process.env.CH1TTY_EMBED_MAX_CANDIDATES ?? 200),
   topK: Number(process.env.CH1TTY_EMBED_TOP_K ?? 5),
+  circuitBreakerThreshold: Number(process.env.CH1TTY_EMBED_CIRCUIT_THRESHOLD ?? 3),
+  circuitBreakerCooldownMs: Number(process.env.CH1TTY_EMBED_CIRCUIT_COOLDOWN_MS ?? 60_000),
 };
 
 interface CachedVector {
@@ -80,6 +94,14 @@ export class EmbeddingBrain {
   private cacheMisses = 0;
   private totalLatencyMs = 0;
 
+  // Circuit breaker state
+  private consecutiveFailures = 0;
+  private circuitOpenUntil = 0;
+  // Half-open sentinel: true while a single probe attempt is in flight.
+  // Concurrent callers that arrive during half-open get null immediately
+  // so only one probe is sent per cooldown expiry.
+  private probing = false;
+
   constructor(config: Partial<EmbeddingBrainConfig> = {}) {
     const merged = { ...DEFAULT_CONFIG, ...config };
     merged.minSimilarity = Math.max(0, Math.min(1, merged.minSimilarity));
@@ -92,11 +114,29 @@ export class EmbeddingBrain {
   /**
    * Rank candidates by cosine similarity to the query. Returns null on any
    * failure mode — callers MUST fall back to the literal search path.
+   *
+   * Returns null immediately (no network call) when the circuit breaker is
+   * open. The breaker trips after `circuitBreakerThreshold` consecutive
+   * failures and stays open for `circuitBreakerCooldownMs`, then allows a
+   * single probe attempt. This prevents every cast from blocking for
+   * `timeoutMs` when Ollama is unreachable.
    */
   async route(query: string, candidates: ToolCandidate[]): Promise<RoutedTool[] | null> {
     if (!this.config.enabled) return null;
     if (!query.trim()) return null;
     if (candidates.length === 0) return null;
+
+    // Circuit breaker: open → return null immediately without attempting embed
+    if (this.circuitOpenUntil > 0) {
+      if (Date.now() < this.circuitOpenUntil) {
+        return null;
+      }
+      // Cooldown expired: half-open. Only one concurrent probe is allowed.
+      // Any other caller that arrives while the probe is in flight gets null.
+      if (this.probing) return null;
+      this.probing = true;
+      log.debug(`EmbeddingBrain circuit half-open, probing`, 'embedding-brain');
+    }
 
     const pruned = candidates.slice(0, this.config.maxCandidates);
     const startedAt = Date.now();
@@ -110,6 +150,8 @@ export class EmbeddingBrain {
 
       if (!queryVec || !candidateVecs) {
         // embedSingle / ensureCandidateVectors already incremented error/timeout counters
+        this.recordCircuitFailure();
+        this.probing = false;
         return null;
       }
 
@@ -128,21 +170,34 @@ export class EmbeddingBrain {
 
       if (scored.length === 0) {
         this.emptyResults++;
+        // Empty results are not a connectivity failure — don't trip the breaker
+        this.consecutiveFailures = 0;
+        this.probing = false;
         return null;
       }
 
       scored.sort((a, b) => b.confidence - a.confidence);
       this.successes++;
+      this.consecutiveFailures = 0;
+      this.circuitOpenUntil = 0;
+      this.probing = false;
       return scored.slice(0, this.config.topK);
     } catch (err) {
       // Defensive — embedSingle/ensure* already trap their own errors. This
       // is for cosine math or shape mismatches we don't expect.
       this.errors++;
+      this.recordCircuitFailure();
+      this.probing = false;
       log.warn(`Embedding route unexpected error: ${String(err)}`, 'embedding-brain');
       return null;
     } finally {
       this.totalLatencyMs += Date.now() - startedAt;
     }
+  }
+
+  /** Whether the circuit breaker is currently open (no embed calls will be attempted). */
+  isCircuitOpen(): boolean {
+    return this.circuitOpenUntil > 0 && Date.now() < this.circuitOpenUntil;
   }
 
   /**
@@ -158,6 +213,8 @@ export class EmbeddingBrain {
   }
 
   getStats(): EmbeddingBrainStats {
+    const now = Date.now();
+    const circuitOpen = this.circuitOpenUntil > 0 && now < this.circuitOpenUntil;
     return {
       calls: this.calls,
       successes: this.successes,
@@ -168,7 +225,20 @@ export class EmbeddingBrain {
       cacheSize: this.cache.size,
       cacheHits: this.cacheHits,
       cacheMisses: this.cacheMisses,
+      circuitOpen,
+      circuitCooldownRemainingMs: circuitOpen ? this.circuitOpenUntil - now : 0,
     };
+  }
+
+  private recordCircuitFailure(): void {
+    this.consecutiveFailures++;
+    if (this.consecutiveFailures >= this.config.circuitBreakerThreshold) {
+      this.circuitOpenUntil = Date.now() + this.config.circuitBreakerCooldownMs;
+      log.warn(
+        `EmbeddingBrain circuit open — ${this.consecutiveFailures} consecutive failures, cooldown ${this.config.circuitBreakerCooldownMs}ms`,
+        'embedding-brain',
+      );
+    }
   }
 
   // ── Helpers ─────────────────────────────────────────────────
