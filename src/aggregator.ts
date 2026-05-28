@@ -16,6 +16,14 @@ import { log } from './logger.js';
 import { SessionTracker } from './session.js';
 import { SessionCoordinator } from './coordinator.js';
 import type { ToolCandidate } from './ollama-brain.js';
+import {
+  applyFocusBias,
+  isInFocus,
+  loadFocusProfilesFromPath,
+  resolveFocus,
+  resolveFocusProfilesPath,
+} from './focus.js';
+import type { FocusProfile, FocusProfiles } from './focus.js';
 
 const SEPARATOR = '/';
 const META_SERVER_ID = 'ch1tty';
@@ -35,6 +43,23 @@ export interface AggregatorOptions {
   accessFilter?: ServerAccess;
   categoryFilter?: ServerCategory;
   configPath?: string;
+  /** Process-wide default focus profile name (from CH1TTY_FOCUS). */
+  focus?: string;
+  /** Override the focus-profiles file path (defaults to focus-profiles.json). */
+  focusProfilesPath?: string;
+  /** Pre-loaded focus profiles (mainly for tests); otherwise loaded from path. */
+  focusProfiles?: FocusProfiles;
+  /**
+   * Override how backends are constructed. Returns a real {@link Backend} for a
+   * given config. Defaults to ChildManager (local) / RemoteProxy (remote).
+   *
+   * This is the simulation seam: a harness can supply in-process fixture backends
+   * that implement the real Backend interface (real listTools/callTool) so the
+   * gateway can be driven through end-to-end scenarios without live credentials.
+   * It is NOT a module mock — the returned object is a real implementation of the
+   * interface, routed through the normal registerServer path.
+   */
+  backendFactory?: (config: ServerConfig) => Backend;
 }
 
 export class Aggregator {
@@ -43,6 +68,9 @@ export class Aggregator {
   private accessFilter?: ServerAccess;
   private categoryFilter?: ServerCategory;
   private configPath?: string;
+  private focusProfiles: FocusProfiles;
+  private defaultFocus?: string;
+  private backendFactory?: (config: ServerConfig) => Backend;
   private startedAt = Date.now();
   readonly sessions = new SessionTracker();
   readonly coordinator = new SessionCoordinator();
@@ -57,8 +85,41 @@ export class Aggregator {
     this.accessFilter = options?.accessFilter;
     this.categoryFilter = options?.categoryFilter;
     this.configPath = options?.configPath;
+    this.defaultFocus = options?.focus;
+    this.backendFactory = options?.backendFactory;
+    this.focusProfiles = options?.focusProfiles
+      ?? loadFocusProfilesFromPath(options?.focusProfilesPath ?? resolveFocusProfilesPath());
     this.configs = configs;
     this.rebuildBackends();
+  }
+
+  /**
+   * Resolve the active focus profile for a call. A per-call `focus` arg overrides
+   * the env/process default. The escape-hatch values "" / "none" explicitly mean
+   * "no focus" (override an env default); an absent arg falls back to the default.
+   */
+  private resolveActiveFocus(perCall: unknown): { name?: string; profile?: FocusProfile } {
+    let name: string | undefined;
+    if (typeof perCall === 'string') {
+      const trimmed = perCall.trim();
+      name = trimmed === '' || trimmed.toLowerCase() === 'none' ? undefined : trimmed;
+    } else {
+      const def = typeof this.defaultFocus === 'string' ? this.defaultFocus.trim() : undefined;
+      name = !def || def.toLowerCase() === 'none' ? undefined : def;
+    }
+    return { name, profile: resolveFocus(this.focusProfiles, name) };
+  }
+
+  /** The process-wide default focus, if set and known — for status reporting. */
+  private activeFocusSnapshot(): { active: string; categories: ServerCategory[]; servers: string[]; boost: number } | null {
+    const profile = resolveFocus(this.focusProfiles, this.defaultFocus);
+    if (!profile || !this.defaultFocus) return null;
+    return {
+      active: this.defaultFocus,
+      categories: profile.categories,
+      servers: profile.servers,
+      boost: profile.boost,
+    };
   }
 
   private rebuildBackends(): void {
@@ -67,7 +128,9 @@ export class Aggregator {
     const http = new RemoteProxy();
 
     for (const config of this.activeConfigs()) {
-      const backend = config.type === 'local' ? stdio : http;
+      const backend = this.backendFactory
+        ? this.backendFactory(config)
+        : config.type === 'local' ? stdio : http;
       backend.registerServer(config);
       this.backends.set(config.id, backend);
     }
@@ -168,6 +231,7 @@ export class Aggregator {
             query: { type: 'string', description: 'Search keywords matched against tool names and descriptions' },
             server: { type: 'string', description: 'Filter by server id (e.g. "neon", "chittyos")' },
             category: { type: 'string', description: 'Filter by category (ecosystem, code, search, reasoning, desktop, documents, communication)' },
+            focus: { type: 'string', description: 'Focus profile to bias results toward (e.g. "finance", "governance", "design"). A soft lens — out-of-focus tools still appear. Use "none" to override the env default. Overrides CH1TTY_FOCUS for this call.' },
             limit: { type: 'number', description: 'Max results to return (default 20)' },
           },
         },
@@ -215,6 +279,10 @@ export class Aggregator {
               type: 'boolean',
               description: 'If true, return the execution plan without running it (default: false)',
             },
+            focus: {
+              type: 'string',
+              description: 'Focus profile to bias resolution toward (e.g. "finance", "governance", "design"). A soft lens — out-of-focus tools stay candidates. Use "none" to override the env default. Overrides CH1TTY_FOCUS for this call.',
+            },
           },
           required: ['intent'],
         },
@@ -249,6 +317,7 @@ export class Aggregator {
     const serverFilter = typeof args.server === 'string' ? args.server : undefined;
     const categoryFilter = typeof args.category === 'string' ? args.category : undefined;
     const limit = typeof args.limit === 'number' ? args.limit : 20;
+    const { name: focusName, profile: focus } = this.resolveActiveFocus(args.focus);
 
     const registry = await this.getRegistry();
 
@@ -287,10 +356,15 @@ export class Aggregator {
 
     // If no filters at all, return a summary of available servers instead of all tools
     if (!query && !serverFilter && !categoryFilter) {
-      const serverSummary = this.activeConfigs().map((c) => {
+      let serverSummary = this.activeConfigs().map((c) => {
         const count = registry.filter((t) => t.serverId === c.id).length;
-        return { server: c.id, name: c.name, category: c.category, tools: count };
+        const inFocus = focus ? isInFocus(focus, { serverId: c.id, category: c.category }) : false;
+        return { server: c.id, name: c.name, category: c.category, tools: count, ...(focus ? { inFocus } : {}) };
       });
+      // Soft lens: surface in-focus servers first; out-of-focus stay listed.
+      if (focus) {
+        serverSummary = [...serverSummary].sort((a, b) => Number(b.inFocus) - Number(a.inFocus));
+      }
 
       const entity = sessionId ? this.coordinator.getEntityContext(sessionId) : undefined;
       return {
@@ -299,6 +373,7 @@ export class Aggregator {
           text: JSON.stringify({
             hint: 'Use query, server, or category to search for specific tools',
             ...(entity?.chittyId ? { entity: entity.chittyId, identityClass: entity.identityClass } : {}),
+            ...(focusName ? { focus: focusName } : {}),
             servers: serverSummary,
             totalTools: registry.length,
           }, null, 2),
@@ -306,9 +381,15 @@ export class Aggregator {
       };
     }
 
-    // Sort: boost tools from recently-used servers to the top
-    if (recentServerIds.size > 0) {
+    // Sort: focus lens first (soft, never filters), then recently-used servers.
+    // Stable on equal keys so within-bucket order is preserved. Out-of-focus and
+    // non-recent tools remain in the result set, just ranked lower.
+    const focused = (t: NamespacedTool): boolean => (focus ? isInFocus(focus, t) : false);
+    if (focus || recentServerIds.size > 0) {
       matches = [...matches].sort((a, b) => {
+        const aFocus = focused(a) ? 1 : 0;
+        const bFocus = focused(b) ? 1 : 0;
+        if (aFocus !== bFocus) return bFocus - aFocus;
         const aRecent = recentServerIds.has(a.serverId) ? 1 : 0;
         const bRecent = recentServerIds.has(b.serverId) ? 1 : 0;
         return bRecent - aRecent;
@@ -322,6 +403,7 @@ export class Aggregator {
       description: t.description,
       inputSchema: t.inputSchema,
       ...(recentServerIds.has(t.serverId) ? { recentlyUsed: true } : {}),
+      ...(focus && focused(t) ? { inFocus: true } : {}),
     }));
 
     return {
@@ -330,6 +412,7 @@ export class Aggregator {
         text: JSON.stringify({
           matches: results.length,
           total: matches.length,
+          ...(focusName ? { focus: focusName } : {}),
           ...(sessionId ? { sessionId } : {}),
           tools: results,
         }, null, 2),
@@ -404,6 +487,8 @@ export class Aggregator {
     totalTools: number;
     registryCached: boolean;
     activeSessions: number;
+    focus: { active: string; categories: ServerCategory[]; servers: string[]; boost: number } | null;
+    availableFocusProfiles: string[];
     coordinator: ReturnType<SessionCoordinator['getSnapshot']>;
     servers: ServerStatus[];
   } {
@@ -429,6 +514,8 @@ export class Aggregator {
       totalTools: statuses.reduce((sum, s) => sum + s.toolCount, 0),
       registryCached: Date.now() < this.registryExpiresAt,
       activeSessions: this.sessions.count,
+      focus: this.activeFocusSnapshot(),
+      availableFocusProfiles: Object.keys(this.focusProfiles.profiles),
       coordinator: this.coordinator.getSnapshot(),
       servers: statuses,
     };
@@ -504,6 +591,7 @@ export class Aggregator {
       ? args.args as Record<string, unknown>
       : {};
     const confirm = args.confirm === true;
+    const { name: focusName, profile: focus } = this.resolveActiveFocus(args.focus);
 
     if (!intent) {
       return {
@@ -561,10 +649,33 @@ export class Aggregator {
           return t ? { ...t, score: r.confidence } : null;
         })
         .filter((t): t is NamespacedTool & { score: number } => t !== null);
+      // When focus is active, the brain may have truncated in-focus candidates
+      // to topK before the bias step can act. Augment with top keyword-scored
+      // in-focus tools from the full registry so none are invisible to the lens.
+      if (focus) {
+        const seen = new Set(scoredTools.map((t) => t.namespacedName));
+        let added = 0;
+        for (const t of this.scoreIntent(intent, registry, sessionId)) {
+          if (added >= 5) break;
+          if (!seen.has(t.namespacedName) && isInFocus(focus, t)) {
+            scoredTools.push(t);
+            seen.add(t.namespacedName);
+            added++;
+          }
+        }
+      }
       castRoute = 'brain';
     } else {
       scoredTools = this.scoreIntent(intent, registry, sessionId);
       castRoute = 'fallback';
+    }
+
+    // Soft focus lens: additively boost in-focus candidates, then re-sort.
+    // Applies to both routes — brain confidences and keyword scores are both
+    // 0–1ish, so the profile boost (~0.5) lifts in-focus matches without erasing
+    // strong out-of-focus ones. Never filters — out-of-focus stays a candidate.
+    if (focus) {
+      scoredTools = applyFocusBias(focus, scoredTools);
     }
 
     if (sessionId) {
@@ -573,6 +684,7 @@ export class Aggregator {
         route: castRoute,
         confirm,
         candidate_count: scoredTools.length,
+        ...(focusName ? { focus: focusName } : {}),
       });
     }
 
@@ -664,6 +776,7 @@ export class Aggregator {
           text: JSON.stringify({
             cast: 'plan',
             intent,
+            ...(focusName ? { focus: focusName } : {}),
             resolved: {
               tool: best.namespacedName,
               server: best.serverId,
@@ -695,6 +808,7 @@ export class Aggregator {
           text: JSON.stringify({
             cast: 'executed',
             intent,
+            ...(focusName ? { focus: focusName } : {}),
             resolved: best.namespacedName,
             score: best.score,
             ...(alternatives.length > 0 ? { alternatives } : {}),

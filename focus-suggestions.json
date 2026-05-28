@@ -1,0 +1,149 @@
+{
+  "_comment": "Alchemist-surfaced suggestions catalog — cross-backend tool combos and pre-written /cast prompts, grouped by the three focus profiles (finance / governance / design) from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain lives on a server that was connected on the live gateway when this catalog was generated (ch1tty v4.1.0, 9/14 servers connected: evidence, browser-rendering, notion, github, context7, thinking, fs, playwright, orchestrator). `verified:false` means the chain references at least one config-present-but-not-connected server (stripe, neon, tasks, cloudflare, chittyos, cowork are lazy/disabled) — those tools are plausible per each backend's known surface but were NOT enumerated live. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only — no loader, no 6th public tool.",
+  "generatedFrom": {
+    "gateway": "ch1tty",
+    "version": "4.1.0",
+    "method": "live-gateway-enumeration",
+    "connectedServers": ["evidence", "browser-rendering", "notion", "github", "context7", "thinking", "fs", "playwright", "orchestrator"],
+    "notConnectedServers": ["chittyos", "cloudflare", "cowork", "stripe", "neon", "tasks"]
+  },
+  "profiles": {
+    "finance": {
+      "description": "Billing, payments, and financial ecosystem tools. NOTE: the two finance-tagged backends (stripe, tasks) were NOT connected on the live gateway at generation time — stripe is lazy/unspawned, tasks is disabled pending its /mcp endpoint. Every finance combo is therefore partly inferred (verified:false). Stripe tool names below follow the @stripe/mcp surface and are plausible but unverified. This is intentionally the smallest section.",
+      "combos": [
+        {
+          "name": "invoice-to-ledger-tracker",
+          "chain": ["stripe/list_invoices", "notion/API-post-page"],
+          "accomplishes": "Pull recent Stripe invoices and write each into a Notion finance tracker database as a page — turning billing state into a queryable, human-readable ledger view.",
+          "verified": false,
+          "notes": "stripe not connected (lazy); stripe/list_invoices inferred from @stripe/mcp surface. notion/API-post-page is verified."
+        },
+        {
+          "name": "new-customer-onboarding-record",
+          "chain": ["stripe/create_customer", "notion/API-post-page", "github/create_issue"],
+          "accomplishes": "Create a Stripe customer, log the customer record into Notion, and open a GitHub issue to track onboarding follow-up work — a three-backend chain spanning payments, docs, and engineering.",
+          "verified": false,
+          "notes": "stripe inferred (not connected). notion/API-post-page and github/create_issue verified."
+        },
+        {
+          "name": "payment-failure-triage",
+          "chain": ["stripe/list_payment_intents", "thinking/sequentialthinking", "notion/API-post-page"],
+          "accomplishes": "Enumerate failed/pending Stripe payment intents, reason over likely causes and remediation order with sequential-thinking, then record the triage plan as a Notion page.",
+          "verified": false,
+          "notes": "stripe inferred. thinking/sequentialthinking and notion/API-post-page verified."
+        }
+      ],
+      "prompts": [
+        { "text": "Pull this month's Stripe invoices and log them into my Notion finance tracker", "resolves_to": "invoice-to-ledger-tracker" },
+        { "text": "Onboard a new Stripe customer and open a GitHub issue to track their setup", "resolves_to": "new-customer-onboarding-record" },
+        { "text": "Triage my failed Stripe payments and write up a remediation plan in Notion", "resolves_to": "payment-failure-triage" },
+        { "text": "List all open Stripe subscriptions", "resolves_to": "stripe/list_subscriptions" }
+      ]
+    },
+    "governance": {
+      "description": "ChittyOS ecosystem governance, identity, evidence, and persistent state. Strongest verified section: notion, evidence, github, orchestrator, and thinking are all live; only chittyos/neon are inferred where named.",
+      "combos": [
+        {
+          "name": "rag-evidence-to-notion-brief",
+          "chain": ["evidence/list_rags", "evidence/ai_search", "notion/API-post-page"],
+          "accomplishes": "Discover the available AutoRAG vector stores, run an AI search across the evidence corpus, and persist the synthesized findings as a Notion brief — turning raw evidence retrieval into a governed, citable document.",
+          "verified": true,
+          "notes": "All three tools on connected servers (evidence, notion)."
+        },
+        {
+          "name": "issue-triage-to-governance-tracker",
+          "chain": ["github/list_issues", "thinking/sequentialthinking", "notion/API-post-page"],
+          "accomplishes": "List open GitHub issues across a repo, reason over prioritization and ownership with sequential-thinking, and write the prioritized backlog into a Notion governance/tracking database.",
+          "verified": true,
+          "notes": "github, thinking, notion all connected."
+        },
+        {
+          "name": "skill-discover-and-execute",
+          "chain": ["orchestrator/skill_search", "orchestrator/skill_execute", "notion/API-create-a-comment"],
+          "accomplishes": "Find the right ChittyOS skill for a governance task, execute it through the orchestrator, then annotate the outcome as a comment on the relevant Notion page for an audit trail. Spans orchestrator + notion.",
+          "verified": true,
+          "notes": "orchestrator and notion connected. (skill_search→skill_execute is same-backend, but the notion annotation makes the full chain cross-backend.)"
+        },
+        {
+          "name": "context-provisioning-audit",
+          "chain": ["orchestrator/provision_candidates", "orchestrator/provision_evaluate", "notion/API-post-page"],
+          "accomplishes": "List TY-VY-RY scored ChittyID candidates for a session, run the autonomous provisioning evaluation, and archive the decision + per-aspect rationale into a Notion governance log.",
+          "verified": true,
+          "notes": "orchestrator and notion connected."
+        },
+        {
+          "name": "agent-route-and-document",
+          "chain": ["orchestrator/agent_search", "orchestrator/agent_execute", "notion/API-patch-block-children"],
+          "accomplishes": "Find which ChittyAgent handles a domain task, route the request through the orchestrator's agent protocol, and append the result to an existing Notion page's body.",
+          "verified": true,
+          "notes": "orchestrator and notion connected."
+        },
+        {
+          "name": "evidence-backed-issue",
+          "chain": ["evidence/ai_search", "github/create_issue"],
+          "accomplishes": "Search the evidence corpus for prior art / supporting context, then open a GitHub issue pre-populated with the cited findings — grounding engineering work in governed evidence.",
+          "verified": true,
+          "notes": "evidence and github connected."
+        }
+      ],
+      "prompts": [
+        { "text": "Search the evidence store for everything about the closing disclosure and write me a Notion brief", "resolves_to": "rag-evidence-to-notion-brief" },
+        { "text": "Triage the open issues in the ch1tty repo and put a prioritized backlog in Notion", "resolves_to": "issue-triage-to-governance-tracker" },
+        { "text": "Find the compliance skill, run it, and log the result on the project's Notion page", "resolves_to": "skill-discover-and-execute" },
+        { "text": "Which ChittyID context should serve this session? Evaluate candidates and archive the decision", "resolves_to": "context-provisioning-audit" },
+        { "text": "Find the agent that handles Cloudflare DNS and route my zone-list request to it, then document the result", "resolves_to": "agent-route-and-document" },
+        { "text": "Search the evidence corpus for prior art and open a GitHub issue citing what you found", "resolves_to": "evidence-backed-issue" },
+        { "text": "List the available AutoRAG vector stores", "resolves_to": "evidence/list_rags" },
+        { "text": "Search my Notion workspace for the governance charter", "resolves_to": "notion/API-post-search" }
+      ]
+    },
+    "design": {
+      "description": "Browser rendering, automation, and desktop/visual work. Verified-strong: browser-rendering, playwright, fs all live; cowork is config-present but not connected.",
+      "combos": [
+        {
+          "name": "capture-archive-document",
+          "chain": ["browser-rendering/get_url_screenshot", "fs/write_file", "notion/API-patch-block-children"],
+          "accomplishes": "Screenshot a live URL via Cloudflare browser-rendering, save the image to the local filesystem, then embed/reference it in a Notion page — a capture→archive→document pipeline across three backends.",
+          "verified": true,
+          "notes": "browser-rendering, fs, notion all connected. fs/write_file verified present on the filesystem server."
+        },
+        {
+          "name": "visual-bug-report",
+          "chain": ["playwright/browser_navigate", "playwright/browser_snapshot", "github/create_issue"],
+          "accomplishes": "Drive a real browser to the failing page, capture an accessibility snapshot (better than a screenshot for actionable detail), and file a GitHub issue with the reproduction — a QA-to-engineering handoff spanning playwright + github.",
+          "verified": true,
+          "notes": "playwright and github connected."
+        },
+        {
+          "name": "page-to-markdown-archive",
+          "chain": ["browser-rendering/get_url_markdown", "fs/write_file"],
+          "accomplishes": "Convert any web page to clean Markdown via browser-rendering and save it locally — a lightweight content-capture combo for design references and competitive teardowns.",
+          "verified": true,
+          "notes": "browser-rendering and fs connected."
+        },
+        {
+          "name": "form-fill-and-screenshot-proof",
+          "chain": ["playwright/browser_navigate", "playwright/browser_fill_form", "playwright/browser_take_screenshot", "fs/write_file"],
+          "accomplishes": "Automate a form submission flow end-to-end and capture a screenshot proof saved to disk — verifying a UI flow works and producing visual evidence. (playwright-heavy, but fs makes the artifact durable cross-backend.)",
+          "verified": true,
+          "notes": "playwright and fs connected. Mostly single-backend; included because the fs persistence is the cross-backend value."
+        },
+        {
+          "name": "live-page-html-to-docs",
+          "chain": ["browser-rendering/get_url_html_content", "context7/get-library-docs", "notion/API-post-page"],
+          "accomplishes": "Fetch a live page's raw HTML, cross-reference the framework/library it uses against current docs via context7, and write an implementation note into Notion — useful for reverse-engineering a design pattern.",
+          "verified": true,
+          "notes": "browser-rendering, context7, notion all connected."
+        }
+      ],
+      "prompts": [
+        { "text": "Screenshot chitty.cc, save it locally, and add it to my Notion design board", "resolves_to": "capture-archive-document" },
+        { "text": "Open the broken checkout page in a browser, snapshot it, and file a GitHub bug with the repro", "resolves_to": "visual-bug-report" },
+        { "text": "Convert the competitor's pricing page to markdown and save it to my references folder", "resolves_to": "page-to-markdown-archive" },
+        { "text": "Test the signup form on staging and save a screenshot proving it submits", "resolves_to": "form-fill-and-screenshot-proof" },
+        { "text": "Grab the HTML of this landing page, check what UI framework it uses, and write up an implementation note in Notion", "resolves_to": "live-page-html-to-docs" },
+        { "text": "Take a full-page screenshot of my portfolio site", "resolves_to": "browser-rendering/get_url_screenshot" }
+      ]
+    }
+  }
+}

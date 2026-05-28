@@ -1,0 +1,23 @@
+{
+  "_comment": "Focus profiles — a soft lens over the tool registry, not a gate. Selecting a focus boosts in-focus tools (by category and/or server id) in search + cast ranking; out-of-focus tools stay reachable. Select via env CH1TTY_FOCUS=<name> or the per-call `focus` param on ch1tty/search and ch1tty/cast. Server ids and categories reference servers.json — profiles may name disabled/future servers (they simply won't match until present).",
+  "profiles": {
+    "finance": {
+      "description": "Billing, payments, and financial ecosystem tools",
+      "categories": ["ecosystem"],
+      "servers": ["stripe", "tasks"],
+      "boost": 0.5
+    },
+    "governance": {
+      "description": "ChittyOS ecosystem governance, identity, evidence, and persistent state",
+      "categories": ["ecosystem", "documents"],
+      "servers": ["chittyos", "neon", "notion", "evidence", "orchestrator"],
+      "boost": 0.5
+    },
+    "design": {
+      "description": "Browser rendering, automation, and desktop/visual work",
+      "categories": ["desktop"],
+      "servers": ["browser-rendering", "playwright", "cowork"],
+      "boost": 0.5
+    }
+  }
+}

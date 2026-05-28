@@ -8,6 +8,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "tsc --watch",
+    "sim": "CH1TTY_EMBED_ENABLED=false node --import tsx sim/run.ts",
     "test": "node --import tsx --test test/**/*.test.ts",
     "test:watch": "node --import tsx --test --watch test/**/*.test.ts"
   },
