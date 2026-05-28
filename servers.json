@@ -23,7 +23,7 @@
       "type": "remote",
       "access": "readwrite",
       "category": "ecosystem",
-      "endpoint": "https://mcp-portal.chitty.cc/mcp",
+      "endpoint": "https://mcp.chitty.cc/mcp",
       "envHeaders": {
         "CF-Access-Client-Id": "CHITTY_CF_ACCESS_CLIENT_ID",
         "CF-Access-Client-Secret": "CHITTY_CF_ACCESS_CLIENT_SECRET"
