@@ -183,6 +183,7 @@ Endpoints on `{bindAddress}:{port}`:
 | `CH1TTY_FOCUS` | Default focus profile name — a soft lens that biases `search`/`cast` ranking toward in-focus tools (e.g. `finance`, `governance`, `design`). Never hides out-of-focus tools. Per-call `focus` param on `search`/`cast` overrides it (`"none"` disables). |
 | `CH1TTY_FOCUS_PROFILES` | Custom focus-profiles.json path (default `focus-profiles.json` at repo root) |
 | `CH1TTY_LEDGER_DLQ` | Override the ledger dead-letter WAL path (default `~/.ch1tty/ledger.dlq.jsonl`) |
+| `CH1TTY_SPAWN_TIMEOUT_MS` | Override the local child-process spawn+connect timeout (default 30000ms). Lower it in test environments to avoid 30s waits when backends are unavailable. |
 
 ## Registration
 

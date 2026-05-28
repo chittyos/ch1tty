@@ -18,7 +18,10 @@ interface ChildConnection {
 }
 
 const TOOL_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-const SPAWN_TIMEOUT_MS = 30_000; // 30s to spawn + connect
+function spawnTimeoutMs(): number {
+  const v = parseInt(process.env.CH1TTY_SPAWN_TIMEOUT_MS ?? '', 10);
+  return Number.isFinite(v) && v > 0 ? v : 30_000;
+}
 const LIST_TIMEOUT_MS = 15_000; // 15s to list tools after connected
 const CALL_TIMEOUT_MS = 120_000; // 2 min for tool calls
 
@@ -74,13 +77,13 @@ export class ChildManager implements Backend {
   /** Spawn with auto-reconnect: on failure, evict stale connection and retry once. */
   private async spawnWithReconnect(serverId: string): Promise<ChildConnection> {
     try {
-      return await withTimeout(this.spawn(serverId), SPAWN_TIMEOUT_MS, `spawn ${serverId}`);
+      return await withTimeout(this.spawn(serverId), spawnTimeoutMs(), `spawn ${serverId}`);
     } catch (err) {
       // If we had a cached connection that went stale, evict and retry
       if (this.children.has(serverId)) {
         this.evict(serverId);
         log.info(`Reconnecting after stale connection`, serverId);
-        return await withTimeout(this.spawn(serverId), SPAWN_TIMEOUT_MS, `spawn ${serverId}`);
+        return await withTimeout(this.spawn(serverId), spawnTimeoutMs(), `spawn ${serverId}`);
       }
       throw err;
     }
