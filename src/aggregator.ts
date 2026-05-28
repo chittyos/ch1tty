@@ -60,6 +60,11 @@ export interface AggregatorOptions {
    * interface, routed through the normal registerServer path.
    */
   backendFactory?: (config: ServerConfig) => Backend;
+  /**
+   * Set to false to disable the embedding brain warmup — useful in tests and
+   * environments without a local Ollama instance. Defaults to env-driven behaviour.
+   */
+  embedEnabled?: boolean;
 }
 
 export class Aggregator {
@@ -73,7 +78,7 @@ export class Aggregator {
   private backendFactory?: (config: ServerConfig) => Backend;
   private startedAt = Date.now();
   readonly sessions = new SessionTracker();
-  readonly coordinator = new SessionCoordinator();
+  readonly coordinator: SessionCoordinator;
 
   // Internal tool registry — never exposed directly to clients
   private registry: NamespacedTool[] = [];
@@ -90,6 +95,8 @@ export class Aggregator {
     this.focusProfiles = options?.focusProfiles
       ?? loadFocusProfilesFromPath(options?.focusProfilesPath ?? resolveFocusProfilesPath());
     this.configs = configs;
+    const embedConfig = options?.embedEnabled === false ? { enabled: false } : {};
+    this.coordinator = new SessionCoordinator({}, embedConfig);
     this.rebuildBackends();
   }
 

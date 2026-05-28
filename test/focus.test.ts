@@ -155,7 +155,7 @@ const testProfiles = validateFocusProfiles({
 });
 
 test('status snapshot reports the active default focus', async () => {
-  const agg = new Aggregator(aggConfig, { focus: 'finance', focusProfiles: testProfiles });
+  const agg = new Aggregator(aggConfig, { focus: 'finance', focusProfiles: testProfiles, embedEnabled: false });
   const result = await agg.callTool('ch1tty/status');
   const status = JSON.parse(result.content[0].text);
   assert.equal(status.focus.active, 'finance');
@@ -165,19 +165,19 @@ test('status snapshot reports the active default focus', async () => {
 });
 
 test('status focus is null when no default focus is set', async () => {
-  const agg = new Aggregator(aggConfig, { focusProfiles: testProfiles });
+  const agg = new Aggregator(aggConfig, { focusProfiles: testProfiles, embedEnabled: false });
   const status = JSON.parse((await agg.callTool('ch1tty/status')).content[0].text);
   assert.equal(status.focus, null);
 });
 
 test('status focus is null for an unknown default focus (soft, no throw)', async () => {
-  const agg = new Aggregator(aggConfig, { focus: 'bogus', focusProfiles: testProfiles });
+  const agg = new Aggregator(aggConfig, { focus: 'bogus', focusProfiles: testProfiles, embedEnabled: false });
   const status = JSON.parse((await agg.callTool('ch1tty/status')).content[0].text);
   assert.equal(status.focus, null);
 });
 
 test('search server summary surfaces in-focus servers first and marks them', async () => {
-  const agg = new Aggregator(aggConfig, { focus: 'finance', focusProfiles: testProfiles });
+  const agg = new Aggregator(aggConfig, { focus: 'finance', focusProfiles: testProfiles, embedEnabled: false });
   const data = JSON.parse((await agg.callTool('ch1tty/search', {})).content[0].text);
   assert.equal(data.focus, 'finance');
   // stripe (ecosystem, in focus) ranks ahead of github/playwright (out of focus)
@@ -190,7 +190,7 @@ test('search server summary surfaces in-focus servers first and marks them', asy
 
 test('per-call focus param overrides the env/default focus', async () => {
   // Default focus is finance; per-call design must win.
-  const agg = new Aggregator(aggConfig, { focus: 'finance', focusProfiles: testProfiles });
+  const agg = new Aggregator(aggConfig, { focus: 'finance', focusProfiles: testProfiles, embedEnabled: false });
   const data = JSON.parse((await agg.callTool('ch1tty/search', { focus: 'design' })).content[0].text);
   assert.equal(data.focus, 'design');
   // playwright (desktop) now in focus and first
@@ -199,7 +199,7 @@ test('per-call focus param overrides the env/default focus', async () => {
 });
 
 test('per-call focus "none" overrides the default to no focus', async () => {
-  const agg = new Aggregator(aggConfig, { focus: 'finance', focusProfiles: testProfiles });
+  const agg = new Aggregator(aggConfig, { focus: 'finance', focusProfiles: testProfiles, embedEnabled: false });
   const data = JSON.parse((await agg.callTool('ch1tty/search', { focus: 'none' })).content[0].text);
   assert.equal(data.focus, undefined);
   // No inFocus markers when focus is explicitly off
