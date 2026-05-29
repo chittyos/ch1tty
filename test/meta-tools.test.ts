@@ -37,10 +37,11 @@ test('ch1tty/status includes embeddingBrain circuit stats in coordinator snapsho
   assert.equal(typeof coordinator.embeddingBrain.circuitOpen, 'boolean');
   assert.equal(typeof coordinator.embeddingBrain.circuitCooldownRemainingMs, 'number');
   assert.equal(typeof coordinator.embeddingBrain.calls, 'number');
-  // OllamaBrain stats also present (brain key)
+  // OllamaBrain stats also present (brain key) — circuit breaker parity with embeddingBrain
   assert.ok('brain' in coordinator, 'OllamaBrain stats present in coordinator snapshot');
   assert.equal(typeof coordinator.brain.calls, 'number');
   assert.equal(typeof coordinator.brain.circuitOpen, 'boolean');
+  assert.equal(typeof coordinator.brain.circuitCooldownRemainingMs, 'number');
 });
 
 test('ch1tty/status includes top-level brainHealth summary', async () => {
