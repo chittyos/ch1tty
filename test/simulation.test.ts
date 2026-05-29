@@ -76,13 +76,41 @@ test('focus reorders a cross-focus near-miss (lens flips the winner)', async () 
 test('out-of-focus tools stay reachable via search (lens, not gate)', async () => {
   const { aggregator } = buildSimAggregator();
   try {
+    // finance focus — code/communication tools still reachable
     assert.ok(
       await outOfFocusReachable(aggregator, 'pull request', 'finance', 'github/create_pull_request'),
       'github tool unreachable under finance focus',
     );
     assert.ok(
-      await outOfFocusReachable(aggregator, 'sql query', 'design', 'neon/run_sql'),
+      await outOfFocusReachable(aggregator, 'message', 'finance', 'imessage/send_message'),
+      'imessage tool unreachable under finance focus',
+    );
+    // design focus — code/finance tools still reachable
+    assert.ok(
+      await outOfFocusReachable(aggregator, 'sql', 'design', 'neon/run_sql'),
       'neon tool unreachable under design focus',
+    );
+    assert.ok(
+      await outOfFocusReachable(aggregator, 'invoice', 'design', 'stripe/create_invoice'),
+      'stripe tool unreachable under design focus',
+    );
+    // code focus — finance/communication tools still reachable
+    assert.ok(
+      await outOfFocusReachable(aggregator, 'invoice', 'code', 'stripe/create_invoice'),
+      'stripe tool unreachable under code focus',
+    );
+    assert.ok(
+      await outOfFocusReachable(aggregator, 'message', 'code', 'imessage/send_message'),
+      'imessage tool unreachable under code focus',
+    );
+    // communication focus — code/finance tools still reachable
+    assert.ok(
+      await outOfFocusReachable(aggregator, 'sql', 'communication', 'neon/run_sql'),
+      'neon tool unreachable under communication focus',
+    );
+    assert.ok(
+      await outOfFocusReachable(aggregator, 'invoice', 'communication', 'stripe/create_invoice'),
+      'stripe tool unreachable under communication focus',
     );
   } finally {
     await aggregator.shutdown();
