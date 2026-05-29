@@ -24,6 +24,12 @@
       "categories": ["code"],
       "servers": ["cloudflare", "context7", "neon", "fs", "quality", "serena"],
       "boost": 0.5
+    },
+    "communication": {
+      "description": "Cross-channel messaging, notes, and team communication",
+      "categories": ["communication"],
+      "servers": ["notion", "chittymac", "imessage"],
+      "boost": 0.5
     }
   }
 }

@@ -130,6 +130,20 @@ export const FIXTURE_TOOLS: Record<string, FixtureTool[]> = {
     { name: 'get-library-docs', description: 'Get documentation and code examples for a library from the Context7 context window' },
   ],
 
+  // ── communication / messaging ────────────────────────────────
+  chittymac: [
+    { name: 'search_notes', description: 'Search Apple Notes for notes matching a text query' },
+    { name: 'create_note', description: 'Create a new Apple Note in a folder' },
+    { name: 'list_notes', description: 'List recent Apple Notes in a folder or inbox' },
+    { name: 'get_note', description: 'Get the full content of an Apple Note by title or ID' },
+  ],
+  imessage: [
+    { name: 'send_message', description: 'Send an iMessage or SMS text to a contact or group chat' },
+    { name: 'list_conversations', description: 'List recent iMessage conversations with last message preview' },
+    // near-miss: a search tool that competes with chittymac/search_notes for "search messages"
+    { name: 'search_messages', description: 'Search iMessage conversation history by keyword or contact name' },
+  ],
+
   // ── cross-focus near-miss servers (must stay reachable) ──────
   // documents-category server holding a cross-focus near-miss for the design lens:
   // "render a document to pdf" matches this strongly, but it is OUT of the design

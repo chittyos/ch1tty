@@ -39,6 +39,8 @@ const CATEGORY_BY_SERVER: Record<string, ServerConfig['category']> = {
   github: 'code',
   context7: 'documents',
   pdf: 'documents',
+  chittymac: 'communication',
+  imessage: 'communication',
 };
 
 export function fixtureConfigs(): ServerConfig[] {
@@ -202,6 +204,29 @@ export const SCENARIOS: Scenario[] = [
     intent: 'get the library documentation and code examples for this package',
     expect: 'context7/get-library-docs',
     note: 'near-miss: notion/query_database (query + documents); context7 is in-focus via code profile servers list',
+  },
+
+  // ── communication focus ──────────────────────────────────────────────────────
+  {
+    id: 'comm.send-message',
+    focus: 'communication',
+    intent: 'send a text message to the team about the deployment status',
+    expect: 'imessage/send_message',
+    note: 'near-miss: cowork/start_session (session keyword, out-of-focus desktop)',
+  },
+  {
+    id: 'comm.search-notes',
+    focus: 'communication',
+    intent: 'search my Apple Notes for the design review meeting notes',
+    expect: 'chittymac/search_notes',
+    note: 'near-miss: imessage/search_messages (search keyword, same focus); Apple Notes specificity wins',
+  },
+  {
+    id: 'comm.create-doc',
+    focus: 'communication',
+    intent: 'create a new Notion page to document the team meeting',
+    expect: 'notion/create_page',
+    note: 'near-miss: chittymac/create_note (create + note keyword, same focus); Notion specificity wins',
   },
 ];
 
