@@ -4,16 +4,20 @@
       "_comment": "── remote: HTTP endpoints (work everywhere) ──────────────────"
     },
     {
-      "_comment": "ChittyAgent-Tasks — enable once /mcp endpoint ships on tasks.chitty.cc (see chittyentity/workers/chittyagent-tasks). Currently exposes REST only."
+      "_comment": "ChittyAgent-Tasks — apps/tasks-mcp local MCP surface wrapping the tasks.chitty.cc REST API. Enable once CHITTY_TASKS_TOKEN is set. Build: cd apps/tasks-mcp && npm ci && npm run build"
     },
     {
       "id": "tasks",
       "name": "ChittyAgent Tasks",
-      "type": "remote",
+      "type": "local",
       "access": "readwrite",
       "category": "ecosystem",
-      "endpoint": "https://tasks.chitty.cc/mcp",
-      "authTokenKey": "chittytasks",
+      "command": "node",
+      "args": ["./apps/tasks-mcp/dist/index.js"],
+      "env": {
+        "CHITTY_TASKS_URL": "https://tasks.chitty.cc",
+        "CHITTY_TASKS_TOKEN": "op://ChittyOS-Integrations/chittytasks/token"
+      },
       "lazy": true,
       "enabled": false
     },
