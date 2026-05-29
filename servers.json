@@ -22,6 +22,24 @@
       "enabled": false
     },
     {
+      "_comment": "ChittyLedger — apps/ledger-mcp local MCP surface wrapping the ledger.chitty.cc append-only ledger REST API. Enable once CHITTY_LEDGER_TOKEN is set. Build: cd apps/ledger-mcp && npm ci && npm run build"
+    },
+    {
+      "id": "ledger",
+      "name": "ChittyLedger",
+      "type": "local",
+      "access": "readwrite",
+      "category": "ecosystem",
+      "command": "node",
+      "args": ["./apps/ledger-mcp/dist/index.js"],
+      "env": {
+        "CHITTY_LEDGER_URL": "https://ledger.chitty.cc",
+        "CHITTY_LEDGER_TOKEN": "op://ChittyOS-Integrations/chittyledger/token"
+      },
+      "lazy": true,
+      "enabled": false
+    },
+    {
       "id": "chittyos",
       "name": "ChittyOS Ecosystem",
       "type": "remote",
