@@ -26,9 +26,9 @@
       "boost": 0.5
     },
     "communication": {
-      "description": "Cross-channel messaging, notes, and team communication",
+      "description": "Cross-channel messaging, notes, team communication, and follow-up task creation",
       "categories": ["communication"],
-      "servers": ["notion", "chittymac", "imessage"],
+      "servers": ["notion", "chittymac", "imessage", "tasks"],
       "boost": 0.5
     }
   }
