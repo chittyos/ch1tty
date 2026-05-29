@@ -20,9 +20,9 @@
       "boost": 0.5
     },
     "code": {
-      "description": "Software development — source control, deployment, library documentation, database, and code quality tools",
+      "description": "Software development — source control, deployment, library documentation, database, code quality, and technical documentation tools",
       "categories": ["code"],
-      "servers": ["cloudflare", "context7", "neon", "fs", "quality", "serena"],
+      "servers": ["cloudflare", "context7", "neon", "fs", "quality", "serena", "notion"],
       "boost": 0.5
     },
     "communication": {
