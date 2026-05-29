@@ -75,11 +75,12 @@ test('loadFocusProfilesFromPath throws on a present-but-malformed file', () => {
   }
 });
 
-test('repo focus-profiles.json loads and defines finance/governance/design', () => {
+test('repo focus-profiles.json loads and defines finance/governance/design/code', () => {
   const profiles = loadFocusProfilesFromPath(join(import.meta.dirname, '..', 'focus-profiles.json'));
   assert.ok(profiles.profiles.finance);
   assert.ok(profiles.profiles.governance);
   assert.ok(profiles.profiles.design);
+  assert.ok(profiles.profiles.code, 'code focus profile present');
   // Real server ids from servers.json
   assert.ok(profiles.profiles.finance.servers.includes('stripe'));
   assert.ok(profiles.profiles.design.servers.includes('playwright'));
@@ -88,6 +89,11 @@ test('repo focus-profiles.json loads and defines finance/governance/design', () 
   assert.ok(profiles.profiles.governance.servers.includes('session'), 'governance includes session');
   assert.ok(profiles.profiles.governance.servers.includes('ledger'), 'governance includes ledger');
   assert.ok(profiles.profiles.governance.servers.includes('chittyevidence'), 'governance pre-wires chittyevidence');
+  // code profile contents
+  assert.ok(profiles.profiles.code.categories.includes('code'), 'code profile covers code category');
+  assert.ok(profiles.profiles.code.servers.includes('context7'), 'code profile includes context7');
+  assert.ok(profiles.profiles.code.servers.includes('neon'), 'code profile includes neon');
+  assert.ok(profiles.profiles.code.servers.includes('cloudflare'), 'code profile includes cloudflare');
 });
 
 // ── resolveFocus (soft / lens-not-gate) ─────────────────────────

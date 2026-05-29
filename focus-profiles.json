@@ -18,6 +18,12 @@
       "categories": ["desktop"],
       "servers": ["browser-rendering", "playwright", "cowork"],
       "boost": 0.5
+    },
+    "code": {
+      "description": "Software development — source control, deployment, library documentation, database, and code quality tools",
+      "categories": ["code"],
+      "servers": ["cloudflare", "context7", "neon", "fs", "quality", "serena"],
+      "boost": 0.5
     }
   }
 }

@@ -37,6 +37,7 @@ const CATEGORY_BY_SERVER: Record<string, ServerConfig['category']> = {
   playwright: 'desktop',
   cowork: 'desktop',
   github: 'code',
+  context7: 'documents',
   pdf: 'documents',
 };
 
@@ -178,6 +179,29 @@ export const SCENARIOS: Scenario[] = [
     intent: 'render a web page document to a pdf file',
     expect: 'browser-rendering/render_page',
     note: 'cross-focus near-miss: pdf/render_pdf (documents) should win WITHOUT focus, lose WITH design focus',
+  },
+
+  // ── code focus ───────────────────────────────────────────────────────────────
+  {
+    id: 'code.create-pr',
+    focus: 'code',
+    intent: 'create a pull request to merge my feature branch',
+    expect: 'github/create_pull_request',
+    note: 'near-miss: tasks/create_task (create keyword), notion/create_page (create keyword)',
+  },
+  {
+    id: 'code.create-issue',
+    focus: 'code',
+    intent: 'open a GitHub issue for the bug I found in the repository',
+    expect: 'github/create_issue',
+    note: 'near-miss: tasks/create_task (create keyword)',
+  },
+  {
+    id: 'code.lookup-docs',
+    focus: 'code',
+    intent: 'get the library documentation and code examples for this package',
+    expect: 'context7/get-library-docs',
+    note: 'near-miss: notion/query_database (query + documents); context7 is in-focus via code profile servers list',
   },
 ];
 
