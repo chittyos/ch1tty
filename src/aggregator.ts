@@ -516,6 +516,7 @@ export class Aggregator {
     activeSessions: number;
     focus: { active: string; categories: ServerCategory[]; servers: string[]; boost: number } | null;
     availableFocusProfiles: string[];
+    brainHealth: { status: 'ok' | 'degraded'; embeddingCircuitOpen: boolean; ollamaCircuitOpen: boolean };
     coordinator: ReturnType<SessionCoordinator['getSnapshot']>;
     servers: ServerStatus[];
   } {
@@ -532,6 +533,10 @@ export class Aggregator {
       };
     });
 
+    const coordinatorSnap = this.coordinator.getSnapshot();
+    const embeddingCircuitOpen = coordinatorSnap.embeddingBrain.circuitOpen;
+    const ollamaCircuitOpen = coordinatorSnap.brain.circuitOpen;
+
     return {
       gateway: 'ch1tty',
       version: VERSION,
@@ -543,7 +548,12 @@ export class Aggregator {
       activeSessions: this.sessions.count,
       focus: this.activeFocusSnapshot(),
       availableFocusProfiles: Object.keys(this.focusProfiles.profiles),
-      coordinator: this.coordinator.getSnapshot(),
+      brainHealth: {
+        status: embeddingCircuitOpen || ollamaCircuitOpen ? 'degraded' : 'ok',
+        embeddingCircuitOpen,
+        ollamaCircuitOpen,
+      },
+      coordinator: coordinatorSnap,
       servers: statuses,
     };
   }

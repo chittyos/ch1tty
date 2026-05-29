@@ -40,10 +40,19 @@ test('GET /api/v1/status returns 200 without auth and real snapshot', async () =
   try {
     const res = await fetch(`${s.baseUrl}/api/v1/status`);
     assert.equal(res.status, 200);
-    const body = await res.json() as { gateway: string; totalServers: number; servers: unknown[] };
+    const body = await res.json() as {
+      gateway: string;
+      totalServers: number;
+      servers: unknown[];
+      brainHealth: { status: string; embeddingCircuitOpen: boolean; ollamaCircuitOpen: boolean };
+    };
     assert.equal(body.gateway, 'ch1tty');
     assert.equal(body.totalServers, 0);
     assert.ok(Array.isArray(body.servers));
+    assert.ok(body.brainHealth, 'brainHealth present in /api/v1/status');
+    assert.ok(body.brainHealth.status === 'ok' || body.brainHealth.status === 'degraded');
+    assert.equal(typeof body.brainHealth.embeddingCircuitOpen, 'boolean');
+    assert.equal(typeof body.brainHealth.ollamaCircuitOpen, 'boolean');
   } finally {
     await stop(s);
   }
