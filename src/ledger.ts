@@ -11,7 +11,7 @@
  * @canon chittycanon://gov/governance#ledger-is-append-only
  */
 
-import { appendFileSync, mkdirSync } from 'node:fs';
+import { appendFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { log } from './logger.js';
@@ -52,6 +52,8 @@ export interface LedgerStats {
   flushErrors: number;
   lastFlushAt: string | null;
   flushIntervalMs: number;
+  dlqPath: string;
+  dlqEntries: number;
 }
 
 // ── Config ────────────────────────────────────────────────────
@@ -235,6 +237,16 @@ export class LedgerClient {
   }
 
   /** Stats snapshot for status endpoint. */
+  /** Count entries currently in the dead-letter WAL file. Returns 0 if the file doesn't exist. */
+  dlqEntries(): number {
+    try {
+      const text = readFileSync(DEAD_LETTER_PATH, 'utf8');
+      return text.split('\n').filter((l) => l.trim().length > 0).length;
+    } catch {
+      return 0;
+    }
+  }
+
   getStats(): LedgerStats {
     return {
       buffered: this.buffer.length,
@@ -243,6 +255,8 @@ export class LedgerClient {
       flushErrors: this.flushErrors,
       lastFlushAt: this.lastFlushAt?.toISOString() ?? null,
       flushIntervalMs: FLUSH_INTERVAL_MS,
+      dlqPath: DEAD_LETTER_PATH,
+      dlqEntries: this.dlqEntries(),
     };
   }
 
