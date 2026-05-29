@@ -54,6 +54,14 @@ export interface OllamaBrainConfig {
   minConfidence: number;
   /** Hard cap on candidates sent to the model — protects prompt budget. */
   maxCandidates: number;
+  /**
+   * After this many consecutive failures (timeouts or errors) the breaker
+   * opens and route() returns null immediately until the cooldown expires.
+   * Prevents every cast from blocking for timeoutMs when Ollama is unreachable.
+   */
+  circuitBreakerThreshold: number;
+  /** How long (ms) the breaker stays open before allowing a probe attempt. */
+  circuitBreakerCooldownMs: number;
 }
 
 export interface OllamaBrainStats {
@@ -63,6 +71,8 @@ export interface OllamaBrainStats {
   errors: number;
   emptyResults: number;
   avgLatencyMs: number;
+  circuitOpen: boolean;
+  circuitCooldownRemainingMs: number;
 }
 
 // ── Defaults ──────────────────────────────────────────────────
@@ -74,6 +84,8 @@ const DEFAULT_CONFIG: OllamaBrainConfig = {
   enabled: process.env.CH1TTY_OLLAMA_ENABLED !== 'false',
   minConfidence: Number(process.env.CH1TTY_OLLAMA_MIN_CONFIDENCE ?? 0.75),
   maxCandidates: Number(process.env.CH1TTY_OLLAMA_MAX_CANDIDATES ?? 30),
+  circuitBreakerThreshold: Number(process.env.CH1TTY_OLLAMA_CIRCUIT_THRESHOLD ?? 3),
+  circuitBreakerCooldownMs: Number(process.env.CH1TTY_OLLAMA_CIRCUIT_COOLDOWN_MS ?? 60_000),
 };
 
 // ── Brain ─────────────────────────────────────────────────────
@@ -88,12 +100,23 @@ export class OllamaBrain {
   private emptyResults = 0;
   private totalLatencyMs = 0;
 
+  // Circuit breaker state
+  private consecutiveFailures = 0;
+  private circuitOpenUntil = 0;
+  private probing = false;
+
   constructor(config: Partial<OllamaBrainConfig> = {}) {
     const merged = { ...DEFAULT_CONFIG, ...config };
     // Defensive clamp — prevent nonsense configs from silently breaking routing
     merged.minConfidence = Math.max(0, Math.min(1, merged.minConfidence));
     merged.maxCandidates = Math.max(1, merged.maxCandidates);
     merged.timeoutMs = Math.max(100, merged.timeoutMs);
+    merged.circuitBreakerThreshold = Number.isFinite(merged.circuitBreakerThreshold)
+      ? Math.max(1, merged.circuitBreakerThreshold)
+      : 3;
+    merged.circuitBreakerCooldownMs = Number.isFinite(merged.circuitBreakerCooldownMs)
+      ? Math.max(100, merged.circuitBreakerCooldownMs)
+      : 60_000;
     this.config = merged;
   }
 
@@ -109,6 +132,20 @@ export class OllamaBrain {
     if (!this.config.enabled) return null;
     if (!query.trim()) return null;
     if (candidates.length === 0) return null;
+
+    // Circuit breaker: open → return null immediately without a network call.
+    // Trips after circuitBreakerThreshold consecutive failures; stays open for
+    // circuitBreakerCooldownMs before allowing a single half-open probe attempt.
+    if (this.circuitOpenUntil > 0) {
+      if (Date.now() < this.circuitOpenUntil) {
+        return null;
+      }
+      // Cooldown expired: half-open. Only one concurrent probe is allowed;
+      // all others get null immediately so only one Ollama call is in flight.
+      if (this.probing) return null;
+      this.probing = true;
+      log.debug(`OllamaBrain circuit half-open, probing`, 'ollama-brain');
+    }
 
     // Hard-cap candidate list — the prompt budget is finite and a 3B model
     // drowns in more than ~30 items regardless.
@@ -139,6 +176,8 @@ export class OllamaBrain {
         this.errors++;
         const snippet = await response.text().catch(() => '').then((t) => t.slice(0, 200));
         log.warn(`Ollama returned HTTP ${response.status}`, 'ollama-brain', { model: this.config.model, body: snippet });
+        this.recordCircuitFailure();
+        this.probing = false;
         return null;
       }
 
@@ -146,6 +185,8 @@ export class OllamaBrain {
       if (typeof payload.response !== 'string') {
         this.errors++;
         log.warn(`Ollama response missing string "response" field`, 'ollama-brain', { keys: Object.keys(payload) });
+        this.recordCircuitFailure();
+        this.probing = false;
         return null;
       }
 
@@ -153,6 +194,8 @@ export class OllamaBrain {
       if (!parsed) {
         this.errors++;
         log.warn(`Ollama returned unparseable JSON`, 'ollama-brain', { snippet: String(payload.response).slice(0, 200) });
+        this.recordCircuitFailure();
+        this.probing = false;
         return null;
       }
 
@@ -160,10 +203,20 @@ export class OllamaBrain {
 
       if (routed.length === 0) {
         this.emptyResults++;
+        // Empty results mean Ollama is reachable — clear failures and close the circuit.
+        // Without resetting circuitOpenUntil the breaker stays in perpetual half-open
+        // limbo (circuitOpenUntil in the past but != 0) whenever a half-open probe
+        // returns zero matches.
+        this.consecutiveFailures = 0;
+        this.circuitOpenUntil = 0;
+        this.probing = false;
         return null;
       }
 
       this.successes++;
+      this.consecutiveFailures = 0;
+      this.circuitOpenUntil = 0;
+      this.probing = false;
       return routed.sort((a, b) => b.confidence - a.confidence);
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
@@ -173,11 +226,18 @@ export class OllamaBrain {
         this.errors++;
         log.warn(`Ollama route error: ${String(err)}`, 'ollama-brain');
       }
+      this.recordCircuitFailure();
+      this.probing = false;
       return null;
     } finally {
       clearTimeout(timeoutHandle);
       this.totalLatencyMs += Date.now() - startedAt;
     }
+  }
+
+  /** Whether the circuit breaker is currently open (no Ollama calls will be attempted). */
+  isCircuitOpen(): boolean {
+    return this.circuitOpenUntil > 0 && Date.now() < this.circuitOpenUntil;
   }
 
   /**
@@ -228,6 +288,8 @@ export class OllamaBrain {
   }
 
   getStats(): OllamaBrainStats {
+    const now = Date.now();
+    const circuitOpen = this.circuitOpenUntil > 0 && now < this.circuitOpenUntil;
     return {
       calls: this.calls,
       successes: this.successes,
@@ -235,7 +297,20 @@ export class OllamaBrain {
       errors: this.errors,
       emptyResults: this.emptyResults,
       avgLatencyMs: this.calls > 0 ? Math.round(this.totalLatencyMs / this.calls) : 0,
+      circuitOpen,
+      circuitCooldownRemainingMs: circuitOpen ? this.circuitOpenUntil - now : 0,
     };
+  }
+
+  private recordCircuitFailure(): void {
+    this.consecutiveFailures++;
+    if (this.consecutiveFailures >= this.config.circuitBreakerThreshold) {
+      this.circuitOpenUntil = Date.now() + this.config.circuitBreakerCooldownMs;
+      log.warn(
+        `OllamaBrain circuit open — ${this.consecutiveFailures} consecutive failures, cooldown ${this.config.circuitBreakerCooldownMs}ms`,
+        'ollama-brain',
+      );
+    }
   }
 
   // ── Helpers ─────────────────────────────────────────────────

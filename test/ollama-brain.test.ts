@@ -328,6 +328,270 @@ test('constructor clamps invalid config values', () => {
   assert.equal(brain.config.timeoutMs, 100);
 });
 
+// ── Circuit breaker ───────────────────────────────────────────
+
+test('getStats includes circuitOpen and circuitCooldownRemainingMs', () => {
+  const brain = new OllamaBrain({ url: 'http://127.0.0.1:1' });
+  const stats = brain.getStats();
+  assert.equal(stats.circuitOpen, false);
+  assert.equal(stats.circuitCooldownRemainingMs, 0);
+});
+
+test('default circuitBreakerThreshold is 3', () => {
+  const brain = new OllamaBrain();
+  assert.equal(brain.config.circuitBreakerThreshold, Number(process.env.CH1TTY_OLLAMA_CIRCUIT_THRESHOLD ?? 3));
+});
+
+test('NaN circuitBreakerThreshold falls back to default 3', () => {
+  const brain = new OllamaBrain({ circuitBreakerThreshold: NaN });
+  assert.equal(brain.config.circuitBreakerThreshold, 3);
+});
+
+test('NaN circuitBreakerCooldownMs falls back to default 60000', () => {
+  const brain = new OllamaBrain({ circuitBreakerCooldownMs: NaN });
+  assert.equal(brain.config.circuitBreakerCooldownMs, 60_000);
+});
+
+test('default circuitBreakerCooldownMs is 60000', () => {
+  const brain = new OllamaBrain();
+  assert.equal(brain.config.circuitBreakerCooldownMs, Number(process.env.CH1TTY_OLLAMA_CIRCUIT_COOLDOWN_MS ?? 60_000));
+});
+
+test('circuit opens after threshold consecutive timeouts', async () => {
+  const fake = await startFakeOllama(async () => 'hang');
+  try {
+    const brain = new OllamaBrain({
+      url: fake.url,
+      timeoutMs: 100,
+      circuitBreakerThreshold: 3,
+      circuitBreakerCooldownMs: 60_000,
+    });
+
+    // Three timeouts trip the breaker
+    for (let i = 0; i < 3; i++) {
+      const r = await brain.route('any query', candidates());
+      assert.equal(r, null);
+    }
+
+    const stats = brain.getStats();
+    assert.equal(stats.circuitOpen, true);
+    assert.ok(stats.circuitCooldownRemainingMs > 0);
+    assert.equal(brain.isCircuitOpen(), true);
+  } finally {
+    await fake.stop();
+  }
+});
+
+test('open circuit returns null without making any network call', async () => {
+  const fake = await startFakeOllama(async () => 'hang');
+  try {
+    const brain = new OllamaBrain({
+      url: fake.url,
+      timeoutMs: 100,
+      circuitBreakerThreshold: 2,
+      circuitBreakerCooldownMs: 60_000,
+    });
+
+    // Trip the breaker
+    await brain.route('q', candidates());
+    await brain.route('q', candidates());
+    assert.equal(brain.isCircuitOpen(), true);
+    const callsBefore = fake.requests.length;
+
+    // These calls should return null immediately — no new network calls
+    await brain.route('q', candidates());
+    await brain.route('q', candidates());
+    assert.equal(fake.requests.length, callsBefore, 'open circuit must not make network calls');
+    assert.equal(brain.getStats().circuitOpen, true);
+  } finally {
+    await fake.stop();
+  }
+});
+
+test('circuit resets after a successful probe', async () => {
+  const fake = await startFakeOllama(async (_req, body) => {
+    const parsed = JSON.parse(body) as { prompt?: string };
+    // First two calls: hang (trips circuit); subsequent: succeed
+    if (fake.requests.length <= 2) return 'hang';
+    return {
+      status: 200,
+      body: JSON.stringify({
+        response: JSON.stringify({
+          matches: [{ tool: 'evidence/collect', confidence: 0.9, reason: 'test' }],
+        }),
+      }),
+    };
+    void parsed;
+  });
+  try {
+    const brain = new OllamaBrain({
+      url: fake.url,
+      timeoutMs: 100,
+      circuitBreakerThreshold: 2,
+      circuitBreakerCooldownMs: 50,
+    });
+
+    // Trip the breaker with two timeouts
+    await brain.route('q', candidates());
+    await brain.route('q', candidates());
+    assert.equal(brain.isCircuitOpen(), true);
+
+    // Wait for cooldown to expire
+    await new Promise((r) => setTimeout(r, 150));
+    assert.equal(brain.isCircuitOpen(), false, 'circuit should be half-open after cooldown');
+
+    // Now succeed — circuit should close
+    const result = await brain.route('collect documents', candidates());
+    assert.ok(result, 'expected successful probe result');
+    assert.equal(brain.isCircuitOpen(), false, 'success should keep circuit closed');
+    assert.equal(brain.getStats().circuitOpen, false);
+    assert.equal(brain.getStats().circuitCooldownRemainingMs, 0);
+  } finally {
+    await fake.stop();
+  }
+});
+
+test('empty results do not trip the circuit breaker', async () => {
+  const fake = await startFakeOllama(async () => ({
+    status: 200,
+    body: JSON.stringify({ response: JSON.stringify({ matches: [] }) }),
+  }));
+  try {
+    const brain = new OllamaBrain({
+      url: fake.url,
+      timeoutMs: 2000,
+      circuitBreakerThreshold: 2,
+      circuitBreakerCooldownMs: 60_000,
+    });
+
+    // Many empty results should not trip the breaker
+    for (let i = 0; i < 5; i++) {
+      const r = await brain.route('unrelated', candidates());
+      assert.equal(r, null);
+    }
+    assert.equal(brain.isCircuitOpen(), false, 'empty results should not trip the breaker');
+    assert.equal(brain.getStats().circuitOpen, false);
+  } finally {
+    await fake.stop();
+  }
+});
+
+test('empty half-open probe closes the circuit (no perpetual half-open limbo)', async () => {
+  const emptyFake = await startFakeOllama(async () => ({
+    status: 200,
+    body: JSON.stringify({ response: JSON.stringify({ matches: [] }) }),
+  }));
+  const errFake = await startFakeOllama(async () => ({ status: 500, body: 'err' }));
+  try {
+    // Trip the circuit
+    const brain = new OllamaBrain({
+      url: errFake.url,
+      timeoutMs: 2000,
+      circuitBreakerThreshold: 2,
+      circuitBreakerCooldownMs: 50,
+    });
+    await brain.route('q', candidates());
+    await brain.route('q', candidates());
+    assert.equal(brain.isCircuitOpen(), true, 'circuit must open');
+
+    // Wait for cooldown
+    await new Promise((r) => setTimeout(r, 150));
+    assert.equal(brain.isCircuitOpen(), false, 'circuit half-open after cooldown');
+
+    // Point at the empty-results server and probe
+    (brain as unknown as { config: { url: string } }).config.url = emptyFake.url;
+    const result = await brain.route('q', candidates());
+    assert.equal(result, null);
+
+    // circuitOpenUntil must now be cleared — isCircuitOpen() false AND getStats().circuitOpen false
+    assert.equal(brain.isCircuitOpen(), false, 'circuit must be closed after empty half-open probe');
+    assert.equal(brain.getStats().circuitOpen, false, 'getStats must report closed');
+
+    // Next call must proceed normally (not be short-circuited or stuck probing)
+    const result2 = await brain.route('q', candidates());
+    assert.equal(result2, null);
+    assert.equal(brain.getStats().emptyResults, 2, 'both calls counted as emptyResults');
+  } finally {
+    await emptyFake.stop();
+    await errFake.stop();
+  }
+});
+
+test('half-open: only one concurrent probe is sent, others get null immediately', async () => {
+  let serverHits = 0;
+  const fake = await startFakeOllama(async () => {
+    serverHits++;
+    // Delay so concurrent callers pile up before the first probe completes
+    await new Promise((r) => setTimeout(r, 50));
+    return {
+      status: 200,
+      body: JSON.stringify({
+        response: JSON.stringify({
+          matches: [{ tool: 'evidence/collect', confidence: 0.9, reason: 'probe' }],
+        }),
+      }),
+    };
+  });
+  try {
+    const brain = new OllamaBrain({
+      url: fake.url,
+      timeoutMs: 2000,
+      circuitBreakerThreshold: 2,
+      circuitBreakerCooldownMs: 50,
+    });
+
+    // Trip the circuit with two error responses
+    const errFake = await startFakeOllama(async () => ({ status: 500, body: 'err' }));
+    const errBrain = new OllamaBrain({
+      url: errFake.url,
+      timeoutMs: 2000,
+      circuitBreakerThreshold: 2,
+      circuitBreakerCooldownMs: 50,
+    });
+    await errBrain.route('q', candidates());
+    await errBrain.route('q', candidates());
+    assert.equal(errBrain.isCircuitOpen(), true, 'breaker must open after threshold failures');
+    await errFake.stop();
+
+    // Now test the probing sentinel on `brain` which is the recovering one
+    // Trip it first
+    const errFake2 = await startFakeOllama(async () => ({ status: 500, body: 'err' }));
+    const brain2 = new OllamaBrain({
+      url: errFake2.url,
+      timeoutMs: 2000,
+      circuitBreakerThreshold: 2,
+      circuitBreakerCooldownMs: 50,
+    });
+    await brain2.route('q', candidates());
+    await brain2.route('q', candidates());
+    assert.equal(brain2.isCircuitOpen(), true);
+    await errFake2.stop();
+
+    // Swap to the success-returning fake after cooldown
+    await new Promise((r) => setTimeout(r, 150));
+    assert.equal(brain2.isCircuitOpen(), false, 'circuit should be half-open after cooldown');
+
+    // Point brain2 at the recovering fake server
+    (brain2 as unknown as { config: { url: string } }).config.url = fake.url;
+
+    // Fire 5 concurrent probes — only ≤1 should hit the server
+    serverHits = 0;
+    const results = await Promise.all([
+      brain2.route('collect docs', candidates()),
+      brain2.route('collect docs', candidates()),
+      brain2.route('collect docs', candidates()),
+      brain2.route('collect docs', candidates()),
+      brain2.route('collect docs', candidates()),
+    ]);
+
+    assert.equal(serverHits, 1, `expected exactly 1 server hit during half-open, got ${serverHits}`);
+    const nonNull = results.filter((r) => r !== null);
+    assert.equal(nonNull.length, 1, `expected exactly 1 non-null result during half-open, got ${nonNull.length}`);
+  } finally {
+    await fake.stop();
+  }
+});
+
 // ── Real Ollama smoke test (runs only if daemon is reachable) ──
 
 test('real Ollama: routes a concrete query against a live daemon', async (t) => {
