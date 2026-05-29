@@ -228,6 +228,22 @@ export const SCENARIOS: Scenario[] = [
     expect: 'notion/create_page',
     note: 'near-miss: chittymac/create_note (create + note keyword, same focus); Notion specificity wins',
   },
+  {
+    id: 'comm.create-task',
+    focus: 'communication',
+    intent: 'create a follow-up task to track the deployment issue from the team message',
+    expect: 'tasks/create_task',
+    note: 'near-miss: imessage/send_message (message keyword), notion/create_page (create keyword); tasks in communication profile via servers list',
+  },
+
+  // ── governance follow-up scenarios ───────────────────────────
+  {
+    id: 'governance.evidence-ingest',
+    focus: 'governance',
+    intent: 'ingest a governance document into the evidence pipeline with chain of custody tracking',
+    expect: 'evidence/ingest_document',
+    note: 'near-miss: chittyevidence/ingest_document (same family, ingest+document but no pipeline/chain/custody keywords)',
+  },
 ];
 
 export interface CastPlan {
