@@ -1,15 +1,17 @@
 {
-  "_comment": "Alchemist-surfaced suggestions catalog — cross-backend tool combos and pre-written /cast prompts, grouped by the three focus profiles (finance / governance / design) from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain lives on a server that was connected on the live gateway when this catalog was generated (ch1tty v4.1.0, 9/14 servers connected: evidence, browser-rendering, notion, github, context7, thinking, fs, playwright, orchestrator). `verified:false` means the chain references at least one config-present-but-not-connected server (stripe, neon, tasks, cloudflare, chittyos, cowork are lazy/disabled) — those tools are plausible per each backend's known surface but were NOT enumerated live. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only — no loader, no 6th public tool.",
+  "_comment": "Alchemist-surfaced suggestions catalog — cross-backend tool combos and pre-written /cast prompts, grouped by the three focus profiles (finance / governance / design) from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain lives on a server that was connected on the live gateway when this catalog was generated (ch1tty v4.1.0, 9/18 servers connected: evidence, browser-rendering, notion, github, context7, thinking, fs, playwright, orchestrator). `verified:false` means the chain references at least one config-present-but-not-connected server — those tools are plausible per each backend's known source surface but were NOT enumerated live. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only — no loader, no 6th public tool. Updated 2026-05-29 to add cross-backend combos for the four new apps/*-mcp focused surfaces: tasks (tasks-mcp PR #56), ledger (ledger-mcp PR #57), session (session-coordinator-mcp PR #58), chittyevidence (evidence-mcp PR #59). All new-backend combos are verified:false (backends are in config as enabled:false pending token config).",
   "generatedFrom": {
     "gateway": "ch1tty",
     "version": "4.1.0",
-    "method": "live-gateway-enumeration",
+    "method": "live-gateway-enumeration + source-surface-inference",
     "connectedServers": ["evidence", "browser-rendering", "notion", "github", "context7", "thinking", "fs", "playwright", "orchestrator"],
-    "notConnectedServers": ["chittyos", "cloudflare", "cowork", "stripe", "neon", "tasks"]
+    "notConnectedServers": ["chittyos", "cloudflare", "cowork", "stripe", "neon", "tasks", "ledger", "session", "chittyevidence"],
+    "updatedAt": "2026-05-29",
+    "newBackendsNote": "tasks/ledger/session/chittyevidence are apps/*-mcp scaffolds (PRs #56-59); tool names sourced from src/index.ts; combos are plausible per source surface but unverified (backends disabled pending token config)"
   },
   "profiles": {
     "finance": {
-      "description": "Billing, payments, and financial ecosystem tools. NOTE: the two finance-tagged backends (stripe, tasks) were NOT connected on the live gateway at generation time — stripe is lazy/unspawned, tasks is disabled pending its /mcp endpoint. Every finance combo is therefore partly inferred (verified:false). Stripe tool names below follow the @stripe/mcp surface and are plausible but unverified. This is intentionally the smallest section.",
+      "description": "Billing, payments, and financial ecosystem tools — now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time — combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
       "combos": [
         {
           "name": "invoice-to-ledger-tracker",
@@ -31,17 +33,41 @@
           "accomplishes": "Enumerate failed/pending Stripe payment intents, reason over likely causes and remediation order with sequential-thinking, then record the triage plan as a Notion page.",
           "verified": false,
           "notes": "stripe inferred. thinking/sequentialthinking and notion/API-post-page verified."
+        },
+        {
+          "name": "invoice-to-immutable-ledger",
+          "chain": ["stripe/list_invoices", "ledger/append_entry"],
+          "accomplishes": "Pull recent Stripe invoices and append each as an immutable entry to the ChittyLedger — creating an auditable, append-only financial record that cannot be altered after the fact.",
+          "verified": false,
+          "notes": "stripe inferred (not connected). ledger/append_entry from apps/ledger-mcp — in config (enabled:false). This is the core finance-immutability combo: Stripe is the source of truth for billing; the ledger is the durable audit anchor."
+        },
+        {
+          "name": "billing-task-and-ledger",
+          "chain": ["tasks/create_task", "ledger/append_entry"],
+          "accomplishes": "Create a billing remediation task in ChittyAgent Tasks and simultaneously append a ledger entry recording the intent — so the task's existence is anchored in the immutable ledger before it can be lost or modified.",
+          "verified": false,
+          "notes": "tasks/create_task from apps/tasks-mcp (enabled:false). ledger/append_entry from apps/ledger-mcp (enabled:false). Both are new apps/*-mcp surfaces — shortest cross-backend finance combo."
+        },
+        {
+          "name": "ledger-to-finance-brief",
+          "chain": ["ledger/list_entries", "thinking/sequentialthinking", "notion/API-post-page"],
+          "accomplishes": "Pull recent ChittyLedger entries for a financial namespace, reason over them with sequential-thinking to identify anomalies or trends, and write a finance brief into Notion — turning raw ledger state into an actionable narrative.",
+          "verified": false,
+          "notes": "ledger/list_entries from apps/ledger-mcp (enabled:false). thinking/sequentialthinking and notion/API-post-page are verified on the live gateway."
         }
       ],
       "prompts": [
         { "text": "Pull this month's Stripe invoices and log them into my Notion finance tracker", "resolves_to": "invoice-to-ledger-tracker" },
         { "text": "Onboard a new Stripe customer and open a GitHub issue to track their setup", "resolves_to": "new-customer-onboarding-record" },
         { "text": "Triage my failed Stripe payments and write up a remediation plan in Notion", "resolves_to": "payment-failure-triage" },
-        { "text": "List all open Stripe subscriptions", "resolves_to": "stripe/list_subscriptions" }
+        { "text": "List all open Stripe subscriptions", "resolves_to": "stripe/list_subscriptions" },
+        { "text": "Pull Stripe invoices and append each to the immutable ledger for audit", "resolves_to": "invoice-to-immutable-ledger" },
+        { "text": "Create a billing task and lock in the intent on the ledger before it can be lost", "resolves_to": "billing-task-and-ledger" },
+        { "text": "Analyze recent ledger entries for anomalies and write a finance brief in Notion", "resolves_to": "ledger-to-finance-brief" }
       ]
     },
     "governance": {
-      "description": "ChittyOS ecosystem governance, identity, evidence, and persistent state. Strongest verified section: notion, evidence, github, orchestrator, and thinking are all live; only chittyos/neon are inferred where named.",
+      "description": "ChittyOS ecosystem governance, identity, evidence, and persistent state — now extended with ChittyAgent Tasks (tasks-mcp), ChittyLedger (ledger-mcp), Session Coordinator (session-mcp), and ChittyEvidence canonical document store (chittyevidence). Verified-strong combos remain: notion, evidence (AutoRAG), github, and thinking are live. New-backend combos (tasks/ledger/session/chittyevidence) are verified:false.",
       "combos": [
         {
           "name": "rag-evidence-to-notion-brief",
@@ -84,6 +110,34 @@
           "accomplishes": "Search the evidence corpus for prior art / supporting context, then open a GitHub issue pre-populated with the cited findings — grounding engineering work in governed evidence.",
           "verified": true,
           "notes": "evidence and github connected."
+        },
+        {
+          "name": "task-session-evidence",
+          "chain": ["tasks/create_task", "session/append_event", "chittyevidence/ingest_document"],
+          "accomplishes": "Capture a governance decision as a ChittyAgent task, append it to the active session as a timestamped event, then ingest the rationale as a canonical document with a chittycanon:// URI — creating a three-layer trail: work item → session log → evidence store.",
+          "verified": false,
+          "notes": "tasks, session, chittyevidence all in config (enabled:false). All three are new apps/*-mcp surfaces. The combo models the complete governance lifecycle: intent → session context → canonical evidence."
+        },
+        {
+          "name": "session-audit-to-notion",
+          "chain": ["session/list_sessions", "session/list_events", "thinking/sequentialthinking", "notion/API-post-page"],
+          "accomplishes": "List all active governance sessions, enumerate the events in each, reason over the event stream to identify patterns or anomalies, and render a session audit trail into Notion for human review.",
+          "verified": false,
+          "notes": "session/list_sessions and session/list_events from apps/session-coordinator-mcp (enabled:false). thinking and notion are verified live."
+        },
+        {
+          "name": "evidence-to-task-to-ledger",
+          "chain": ["chittyevidence/search_documents", "tasks/create_task", "ledger/append_entry"],
+          "accomplishes": "Search the canonical evidence store for a governance topic, create follow-up action tasks from the findings, and append the decision to the immutable ledger — a full discover → act → record governance chain.",
+          "verified": false,
+          "notes": "chittyevidence, tasks, ledger all in config (enabled:false). This is the high-value three-backend governance combo: evidence informs tasks; ledger anchors the decision."
+        },
+        {
+          "name": "ledger-review-to-brief",
+          "chain": ["ledger/list_entries", "thinking/sequentialthinking", "notion/API-post-page"],
+          "accomplishes": "Audit the governance ledger namespace for a topic (e.g. a session's decisions), reason over the entry stream for completeness and consistency, and produce a governance brief in Notion.",
+          "verified": false,
+          "notes": "ledger/list_entries from apps/ledger-mcp (enabled:false). thinking and notion are verified live."
         }
       ],
       "prompts": [
@@ -94,11 +148,15 @@
         { "text": "Find the agent that handles Cloudflare DNS and route my zone-list request to it, then document the result", "resolves_to": "agent-route-and-document" },
         { "text": "Search the evidence corpus for prior art and open a GitHub issue citing what you found", "resolves_to": "evidence-backed-issue" },
         { "text": "List the available AutoRAG vector stores", "resolves_to": "evidence/list_rags" },
-        { "text": "Search my Notion workspace for the governance charter", "resolves_to": "notion/API-post-search" }
+        { "text": "Search my Notion workspace for the governance charter", "resolves_to": "notion/API-post-search" },
+        { "text": "Capture this governance decision as a task, log it to the session, and ingest the rationale as a canonical evidence document", "resolves_to": "task-session-evidence" },
+        { "text": "Audit all active sessions and their events, then write a session report in Notion", "resolves_to": "session-audit-to-notion" },
+        { "text": "Search evidence for this topic, create action tasks from the findings, and lock the decision in the ledger", "resolves_to": "evidence-to-task-to-ledger" },
+        { "text": "Review the governance ledger for this session and write a brief summarizing all decisions", "resolves_to": "ledger-review-to-brief" }
       ]
     },
     "design": {
-      "description": "Browser rendering, automation, and desktop/visual work. Verified-strong: browser-rendering, playwright, fs all live; cowork is config-present but not connected.",
+      "description": "Browser rendering, automation, and desktop/visual work — now extended with ChittyEvidence (chittyevidence) for canonical archival of visual artifacts, and ChittyAgent Tasks (tasks-mcp) for turning design findings into tracked work items. Verified-strong: browser-rendering, playwright, fs all live. New-backend combos (chittyevidence, tasks) are verified:false.",
       "combos": [
         {
           "name": "capture-archive-document",
@@ -134,6 +192,20 @@
           "accomplishes": "Fetch a live page's raw HTML, cross-reference the framework/library it uses against current docs via context7, and write an implementation note into Notion — useful for reverse-engineering a design pattern.",
           "verified": true,
           "notes": "browser-rendering, context7, notion all connected."
+        },
+        {
+          "name": "screenshot-to-canonical-evidence",
+          "chain": ["browser-rendering/get_url_screenshot", "chittyevidence/ingest_document"],
+          "accomplishes": "Screenshot a live URL and ingest the resulting image as a canonical evidence document with a chittycanon:// URI — making visual design artifacts governed, citable, and retrievable by future evidence searches rather than lost in a local folder.",
+          "verified": false,
+          "notes": "browser-rendering is verified live. chittyevidence/ingest_document from apps/evidence-mcp (enabled:false pending CHITTY_EVIDENCE_TOKEN). The combo promotes ephemeral screenshots into governed design artifacts."
+        },
+        {
+          "name": "browser-test-to-task",
+          "chain": ["playwright/browser_navigate", "playwright/browser_snapshot", "tasks/create_task"],
+          "accomplishes": "Drive a live browser to a design target, capture an accessibility snapshot revealing the actual DOM state, and immediately create a tracked ChittyAgent task for any issues found — a direct QA-to-task pipeline that skips the GitHub issue detour when the issue is design/UX rather than engineering.",
+          "verified": false,
+          "notes": "playwright is verified live. tasks/create_task from apps/tasks-mcp (enabled:false). Shortest cross-backend design-to-work-tracking combo."
         }
       ],
       "prompts": [
@@ -142,7 +214,9 @@
         { "text": "Convert the competitor's pricing page to markdown and save it to my references folder", "resolves_to": "page-to-markdown-archive" },
         { "text": "Test the signup form on staging and save a screenshot proving it submits", "resolves_to": "form-fill-and-screenshot-proof" },
         { "text": "Grab the HTML of this landing page, check what UI framework it uses, and write up an implementation note in Notion", "resolves_to": "live-page-html-to-docs" },
-        { "text": "Take a full-page screenshot of my portfolio site", "resolves_to": "browser-rendering/get_url_screenshot" }
+        { "text": "Take a full-page screenshot of my portfolio site", "resolves_to": "browser-rendering/get_url_screenshot" },
+        { "text": "Screenshot this design URL and ingest it as a canonical evidence document with a chittycanon:// URI", "resolves_to": "screenshot-to-canonical-evidence" },
+        { "text": "Navigate to the staging site, snapshot the design, and create a tracked task for any issues found", "resolves_to": "browser-test-to-task" }
       ]
     }
   }
