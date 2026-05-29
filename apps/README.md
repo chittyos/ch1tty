@@ -11,7 +11,7 @@ This mirrors `github.com/cloudflare/mcp-server-cloudflare`'s structure: 15 focus
 | Directory | Status | Hostname | Role |
 |---|---|---|---|
 | `tasks-mcp/` | scaffolded — REST adapter wrapping `tasks.chitty.cc`; 6 typed tools; `enabled: false` until `CHITTY_TASKS_TOKEN` set | `tasks.chitty.cc/mcp` (future) | Inter-agent task queue |
-| `ledger-mcp/` | planned | `ledger.chitty.cc/mcp` | Canonical append-only ledger |
+| `ledger-mcp/` | scaffolded — REST adapter wrapping `ledger.chitty.cc`; 4 typed tools (list_namespaces, list_entries, get_entry, append_entry); `enabled: false` until `CHITTY_LEDGER_TOKEN` set | `ledger.chitty.cc/mcp` (future) | Canonical append-only ledger |
 | `session-coordinator-mcp/` | planned | `session.chitty.cc/mcp` | Cross-channel session state |
 | `evidence-mcp/` | planned | `evidence.chitty.cc/mcp` | Document ingest + canonical URIs |
 
