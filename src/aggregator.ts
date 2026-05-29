@@ -777,12 +777,15 @@ export class Aggregator {
       .slice(0, 5);
 
     // No matches across any surface
+    const resolvedBy: 'brain' | 'keyword' = castRoute === 'brain' ? 'brain' : 'keyword';
+
     if (scoredTools.length === 0 && scoredPrompts.length === 0 && scoredResources.length === 0) {
       return {
         content: [{
           type: 'text',
           text: JSON.stringify({
             cast: 'no_match',
+            resolvedBy,
             intent,
             hint: 'No tools, prompts, or resources matched your intent. Try ch1tty/search with different keywords.',
           }, null, 2),
@@ -824,6 +827,7 @@ export class Aggregator {
           type: 'text',
           text: JSON.stringify({
             cast: 'discovered',
+            resolvedBy,
             intent,
             hint: 'No executable tools matched, but related prompts/resources found.',
             ...related,
@@ -839,6 +843,7 @@ export class Aggregator {
           type: 'text',
           text: JSON.stringify({
             cast: 'plan',
+            resolvedBy,
             intent,
             ...(focusName ? { focus: focusName } : {}),
             resolved: {
@@ -871,6 +876,7 @@ export class Aggregator {
           type: 'text',
           text: JSON.stringify({
             cast: 'executed',
+            resolvedBy,
             intent,
             ...(focusName ? { focus: focusName } : {}),
             resolved: best.namespacedName,

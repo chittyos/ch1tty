@@ -521,3 +521,68 @@ test('scenario: status — reports no focus when none set', async () => {
   const status = JSON.parse(result.content[0].text as string) as { focus: null };
   assert.equal(status.focus, null, 'focus should be null when no default focus set');
 });
+
+// ── Scenario: resolvedBy observability ───────────────────────────────────────
+
+test('resolvedBy: cast plan mode includes resolvedBy field', async () => {
+  const { aggregator } = buildAggregator();
+
+  const result = await aggregator.callTool('ch1tty/cast', {
+    intent: 'list recent payments',
+    confirm: true,
+  });
+
+  const cast = parseCast(result);
+  assert.equal(cast.cast, 'plan');
+  assert.ok(
+    cast.resolvedBy === 'keyword' || cast.resolvedBy === 'brain',
+    `plan response must include resolvedBy 'keyword' or 'brain', got: ${cast.resolvedBy}`,
+  );
+});
+
+test('resolvedBy: cast executed mode includes resolvedBy field', async () => {
+  const { aggregator } = buildAggregator();
+
+  const result = await aggregator.callTool('ch1tty/cast', {
+    intent: 'list database projects',
+  });
+
+  const cast = parseCast(result);
+  assert.equal(cast.cast, 'executed');
+  assert.ok(
+    cast.resolvedBy === 'keyword' || cast.resolvedBy === 'brain',
+    `executed response must include resolvedBy 'keyword' or 'brain', got: ${cast.resolvedBy}`,
+  );
+});
+
+test('resolvedBy: cast no_match includes resolvedBy field', async () => {
+  const { aggregator } = buildAggregator();
+
+  // Use a nonsense intent that will not match any fixture tool
+  const result = await aggregator.callTool('ch1tty/cast', {
+    intent: 'xyzzy frobulate quux',
+    confirm: true,
+  });
+
+  const cast = parseCast(result);
+  assert.equal(cast.cast, 'no_match');
+  assert.ok(
+    cast.resolvedBy === 'keyword' || cast.resolvedBy === 'brain',
+    `no_match response must include resolvedBy 'keyword' or 'brain', got: ${cast.resolvedBy}`,
+  );
+});
+
+test('resolvedBy: keyword route produces resolvedBy=keyword (no brain in fixture env)', async () => {
+  const { aggregator } = buildAggregator();
+
+  const result = await aggregator.callTool('ch1tty/cast', {
+    intent: 'take screenshot of the page',
+    confirm: true,
+  });
+
+  const cast = parseCast(result);
+  assert.equal(cast.cast, 'plan');
+  // In tests, brain is disabled (no real Ollama/embedding endpoint).
+  // castRoute will always be 'fallback' → resolvedBy 'keyword'.
+  assert.equal(cast.resolvedBy, 'keyword', 'fixture env has no brain: resolvedBy must be keyword');
+});
