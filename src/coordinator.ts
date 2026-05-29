@@ -238,6 +238,7 @@ export class SessionCoordinator {
     boundEntity: boolean;
     ledger: ReturnType<LedgerClient['getStats']>;
     brain: ReturnType<OllamaBrain['getStats']>;
+    embeddingBrain: ReturnType<EmbeddingBrain['getStats']>;
     sessions: Array<{
       sessionId: string;
       entity?: string;
@@ -257,6 +258,7 @@ export class SessionCoordinator {
       boundEntity: sessions.some((s) => s.entity !== undefined),
       ledger: this.ledger.getStats(),
       brain: this.brain.getStats(),
+      embeddingBrain: this.embeddingBrain.getStats(),
       sessions,
     };
   }

@@ -26,6 +26,22 @@ test('ch1tty/status returns gateway status JSON', async () => {
   assert.equal(status.servers[1].id, 'remote');
 });
 
+test('ch1tty/status includes embeddingBrain circuit stats in coordinator snapshot', async () => {
+  const aggregator = createAggregator();
+  const result = await aggregator.callTool('ch1tty/status');
+
+  const status = JSON.parse(result.content[0].text);
+  const { coordinator } = status;
+  assert.ok(coordinator, 'coordinator key present');
+  assert.ok('embeddingBrain' in coordinator, 'embeddingBrain stats present in coordinator snapshot');
+  assert.equal(typeof coordinator.embeddingBrain.circuitOpen, 'boolean');
+  assert.equal(typeof coordinator.embeddingBrain.circuitCooldownRemainingMs, 'number');
+  assert.equal(typeof coordinator.embeddingBrain.calls, 'number');
+  // OllamaBrain stats also present (brain key)
+  assert.ok('brain' in coordinator, 'OllamaBrain stats present in coordinator snapshot');
+  assert.equal(typeof coordinator.brain.calls, 'number');
+});
+
 test('ch1tty/reload fails without configPath', async () => {
   const aggregator = createAggregator();
   const result = await aggregator.callTool('ch1tty/reload');
