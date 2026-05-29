@@ -14,8 +14,22 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { Aggregator } from '../src/aggregator.js';
+import { SessionCoordinator } from '../src/coordinator.js';
+import type { RoutedTool, ToolCandidate } from '../src/ollama-brain.js';
 import type { ServerConfig } from '../src/types.js';
 import { FixtureBackend, FIXTURE_SERVERS } from './fixture-backend.js';
+
+// Stub coordinator for testing brain-routing scenarios without a live Ollama endpoint.
+class StubCoordinator extends SessionCoordinator {
+  private stubbedResults: RoutedTool[] | null;
+  constructor(results: RoutedTool[] | null) {
+    super({}, { enabled: false });
+    this.stubbedResults = results;
+  }
+  override async routeIntent(_query: string, _candidates: ToolCandidate[]): Promise<RoutedTool[] | null> {
+    return this.stubbedResults;
+  }
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -585,4 +599,43 @@ test('resolvedBy: keyword route produces resolvedBy=keyword (no brain in fixture
   // In tests, brain is disabled (no real Ollama/embedding endpoint).
   // castRoute will always be 'fallback' → resolvedBy 'keyword'.
   assert.equal(cast.resolvedBy, 'keyword', 'fixture env has no brain: resolvedBy must be keyword');
+});
+
+test('resolvedBy: keyword-augmented tool wins after focus bias → resolvedBy=keyword despite brain route', async () => {
+  // Brain returns a neon tool (wrong domain for a payment intent) while finance focus is
+  // active. The keyword augmentation adds stripe/create_payment_intent (in-focus, 3/3 term
+  // match), which scores higher after focus bias. resolvedBy must track the winner's origin
+  // ('keyword'), not the overall castRoute ('brain').
+  const fixture = new FixtureBackend();
+  for (const [id, def] of Object.entries(FIXTURE_SERVERS)) {
+    fixture.defineServer(id, def);
+  }
+
+  const brainResults: RoutedTool[] = [{
+    tool: { namespacedName: 'neon/run_sql', description: 'Execute SQL on Neon database', category: 'code' },
+    confidence: 0.9,
+    reason: 'stub',
+  }];
+
+  const coordinator = new StubCoordinator(brainResults);
+  const aggregator = new Aggregator(FIXTURE_CONFIGS, {
+    focusProfiles: FOCUS_PROFILES,
+    focus: 'finance',
+    embedEnabled: false,
+    coordinator,
+    backendFactory: (config) => { fixture.registerServer(config); return fixture; },
+  });
+
+  // "create payment intent" → 3/3 keyword match for stripe/create_payment_intent
+  const result = await aggregator.callTool('ch1tty/cast', {
+    intent: 'create payment intent',
+    confirm: true,
+  });
+
+  const cast = parseCast(result);
+  assert.equal(cast.cast, 'plan', 'should resolve to a plan');
+  // The keyword-augmented stripe tool must win after focus boost over the brain's neon pick
+  assert.equal(cast.resolved?.tool, 'stripe/create_payment_intent', 'stripe tool must win after focus bias');
+  // Key assertion: resolvedBy must be keyword even though castRoute was brain
+  assert.equal(cast.resolvedBy, 'keyword', 'winner came from keyword augmentation — must report keyword not brain');
 });

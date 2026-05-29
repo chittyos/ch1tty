@@ -65,6 +65,12 @@ export interface AggregatorOptions {
    * environments without a local Ollama instance. Defaults to env-driven behaviour.
    */
   embedEnabled?: boolean;
+  /**
+   * Override the coordinator instance. Primarily for tests: pass a subclass that
+   * stubs routeIntent to simulate specific brain routing scenarios without a live
+   * Ollama/embedding endpoint.
+   */
+  coordinator?: SessionCoordinator;
 }
 
 export class Aggregator {
@@ -96,7 +102,7 @@ export class Aggregator {
       ?? loadFocusProfilesFromPath(options?.focusProfilesPath ?? resolveFocusProfilesPath());
     this.configs = configs;
     const embedConfig = options?.embedEnabled === false ? { enabled: false } : {};
-    this.coordinator = new SessionCoordinator({}, embedConfig);
+    this.coordinator = options?.coordinator ?? new SessionCoordinator({}, embedConfig);
     this.rebuildBackends();
   }
 
@@ -705,6 +711,7 @@ export class Aggregator {
 
     let scoredTools: Array<NamespacedTool & { score: number }>;
     let castRoute: 'brain' | 'fallback';
+    const keywordAugmented = new Set<string>();
     if (routed && routed.length > 0) {
       const byName = new Map(registry.map((t) => [t.namespacedName, t]));
       scoredTools = routed
@@ -724,6 +731,7 @@ export class Aggregator {
           if (!seen.has(t.namespacedName) && isInFocus(focus, t)) {
             scoredTools.push(t);
             seen.add(t.namespacedName);
+            keywordAugmented.add(t.namespacedName);
             added++;
           }
         }
@@ -777,7 +785,7 @@ export class Aggregator {
       .slice(0, 5);
 
     // No matches across any surface
-    const resolvedBy: 'brain' | 'keyword' = castRoute === 'brain' ? 'brain' : 'keyword';
+    let resolvedBy: 'brain' | 'keyword' = castRoute === 'brain' ? 'brain' : 'keyword';
 
     if (scoredTools.length === 0 && scoredPrompts.length === 0 && scoredResources.length === 0) {
       return {
@@ -794,6 +802,12 @@ export class Aggregator {
     }
 
     const best = scoredTools[0];
+    // Winner-aware refinement: brain path + focus augmentation can elevate a
+    // keyword-added tool to first place after focus bias. Report 'keyword' when
+    // the winning tool came from keyword augmentation, not brain ranking.
+    if (best && castRoute === 'brain' && keywordAugmented.has(best.namespacedName)) {
+      resolvedBy = 'keyword';
+    }
     const alternatives = scoredTools.slice(1, 4).map((t) => ({
       tool: t.namespacedName,
       score: t.score,
