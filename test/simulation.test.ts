@@ -112,6 +112,19 @@ test('out-of-focus tools stay reachable via search (lens, not gate)', async () =
       await outOfFocusReachable(aggregator, 'invoice', 'communication', 'stripe/create_invoice'),
       'stripe tool unreachable under communication focus',
     );
+    // governance focus (covers ecosystem+documents) — code/desktop/communication tools still reachable
+    assert.ok(
+      await outOfFocusReachable(aggregator, 'pull request', 'governance', 'github/create_pull_request'),
+      'github tool unreachable under governance focus',
+    );
+    assert.ok(
+      await outOfFocusReachable(aggregator, 'headless', 'governance', 'browser-rendering/render_page'),
+      'browser-rendering tool unreachable under governance focus',
+    );
+    assert.ok(
+      await outOfFocusReachable(aggregator, 'message', 'governance', 'imessage/send_message'),
+      'imessage tool unreachable under governance focus',
+    );
   } finally {
     await aggregator.shutdown();
   }
