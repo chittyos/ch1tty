@@ -58,6 +58,24 @@
       "enabled": false
     },
     {
+      "_comment": "ChittyEvidence — apps/evidence-mcp local MCP surface wrapping the evidence.chitty.cc document ingest + canonical URI REST API. Enable once CHITTY_EVIDENCE_TOKEN is set. Build: cd apps/evidence-mcp && npm ci && npm run build"
+    },
+    {
+      "id": "chittyevidence",
+      "name": "ChittyEvidence",
+      "type": "local",
+      "access": "readwrite",
+      "category": "ecosystem",
+      "command": "node",
+      "args": ["./apps/evidence-mcp/dist/index.js"],
+      "env": {
+        "CHITTY_EVIDENCE_URL": "https://evidence.chitty.cc",
+        "CHITTY_EVIDENCE_TOKEN": "op://ChittyOS-Integrations/chittyevidence/token"
+      },
+      "lazy": true,
+      "enabled": false
+    },
+    {
       "id": "chittyos",
       "name": "ChittyOS Ecosystem",
       "type": "remote",
