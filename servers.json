@@ -40,6 +40,24 @@
       "enabled": false
     },
     {
+      "_comment": "ChittyOS Session Coordinator — apps/session-coordinator-mcp local MCP surface wrapping the session.chitty.cc REST API. Enable once CHITTY_SESSION_TOKEN is set. Build: cd apps/session-coordinator-mcp && npm ci && npm run build"
+    },
+    {
+      "id": "session",
+      "name": "ChittyOS Session Coordinator",
+      "type": "local",
+      "access": "readwrite",
+      "category": "ecosystem",
+      "command": "node",
+      "args": ["./apps/session-coordinator-mcp/dist/index.js"],
+      "env": {
+        "CHITTY_SESSION_URL": "https://session.chitty.cc",
+        "CHITTY_SESSION_TOKEN": "op://ChittyOS-Integrations/chittysession/token"
+      },
+      "lazy": true,
+      "enabled": false
+    },
+    {
       "id": "chittyos",
       "name": "ChittyOS Ecosystem",
       "type": "remote",
