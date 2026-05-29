@@ -25,8 +25,11 @@ import { FIXTURE_TOOLS, FixtureBackend } from './fixture-backend.js';
 const CATEGORY_BY_SERVER: Record<string, ServerConfig['category']> = {
   stripe: 'ecosystem',
   tasks: 'ecosystem',
+  ledger: 'ecosystem',
+  session: 'ecosystem',
   chittyos: 'ecosystem',
   evidence: 'search',
+  chittyevidence: 'search',
   neon: 'ecosystem',
   notion: 'documents',
   orchestrator: 'ecosystem',
@@ -97,6 +100,14 @@ export const SCENARIOS: Scenario[] = [
     intent: 'record a payment charge against the customer',
     expect: 'stripe/record_charge',
   },
+  // apps/ledger-mcp in finance profile — append_entry vs billing/payment near-misses
+  {
+    id: 'finance.ledger-append',
+    focus: 'finance',
+    intent: 'append billing entry to ledger for payment audit',
+    expect: 'ledger/append_entry',
+    note: 'near-misses: tasks/record_billing_event (billing but task not ledger), stripe/record_charge (payment but not ledger)',
+  },
 
   // ── GOVERNANCE journey ───────────────────────────────────────
   {
@@ -117,6 +128,30 @@ export const SCENARIOS: Scenario[] = [
     focus: 'governance',
     intent: 'check the chittyledger for a recorded entry hash',
     expect: 'chittyos/check_ledger',
+  },
+  // apps/ledger-mcp tools — append_entry vs check_ledger (chittyos) and list_entries
+  {
+    id: 'governance.ledger-append',
+    focus: 'governance',
+    intent: 'append immutable ledger entry',
+    expect: 'ledger/append_entry',
+    note: 'near-misses: ledger/list_entries (same server, entry but no append), chittyos/check_ledger (ledger but read-only check)',
+  },
+  // apps/session-coordinator-mcp — create_session vs cowork/start_session
+  {
+    id: 'governance.session-create',
+    focus: 'governance',
+    intent: 'create new cross-agent coordination session for workflow tracking',
+    expect: 'session/create_session',
+    note: 'near-miss: cowork/start_session (also has "session" but for desktop collaboration, not cross-agent coordination)',
+  },
+  // apps/evidence-mcp (chittyevidence) vs evidence remote — full-text search discrimination
+  {
+    id: 'governance.evidence-search',
+    focus: 'governance',
+    intent: 'full-text search over evidence document corpus for audit records',
+    expect: 'chittyevidence/search_documents',
+    note: 'near-miss: evidence/search_fact_registry (same family, fact registry not corpus full-text)',
   },
 
   // ── DESIGN journey ───────────────────────────────────────────

@@ -50,6 +50,32 @@ export const FIXTURE_TOOLS: Record<string, FixtureTool[]> = {
     { name: 'record_billing_event', description: 'Record a billing event task for later invoice reconciliation' },
   ],
 
+  // ── ledger / ecosystem ───────────────────────────────────────
+  ledger: [
+    { name: 'list_namespaces', description: 'List all ledger namespaces in the ChittyLedger append-only store' },
+    { name: 'list_entries', description: 'List ledger entries in a namespace, with cursor pagination and since filter' },
+    { name: 'get_entry', description: 'Get a specific ledger entry by namespace and entry ID' },
+    { name: 'append_entry', description: 'Append an immutable entry to the ChittyLedger append-only ledger' },
+  ],
+  session: [
+    { name: 'list_sessions', description: 'List cross-agent coordination sessions by channel or status' },
+    { name: 'get_session', description: 'Get details of a specific coordination session by session ID' },
+    { name: 'create_session', description: 'Create a new cross-agent coordination session for tracking a workflow' },
+    { name: 'update_session', description: 'Update metadata or status of an existing coordination session' },
+    { name: 'close_session', description: 'Close a coordination session and mark it as completed' },
+    { name: 'append_event', description: 'Append an event to a coordination session event log' },
+    { name: 'list_events', description: 'List events in a coordination session event log' },
+  ],
+  // ── chittyevidence / search ───────────────────────────────────
+  // near-misses for the evidence server above — same family, different tools and IDs
+  chittyevidence: [
+    { name: 'ingest_document', description: 'Ingest a document into the evidence store and return its canonical chittycanon:// URI' },
+    { name: 'list_documents', description: 'List evidence documents by kind, tag, or time range with cursor pagination' },
+    { name: 'get_document', description: 'Get an evidence document by ID with full content and canonical URI' },
+    { name: 'search_documents', description: 'Full-text search over the evidence document corpus by query' },
+    { name: 'get_canonical_uri', description: 'Resolve an evidence document ID to its chittycanon:// canonical URI' },
+  ],
+
   // ── governance / ecosystem + documents ───────────────────────
   chittyos: [
     { name: 'query_registry', description: 'Query the ChittyOS service registry for registered services and agents' },
