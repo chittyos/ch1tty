@@ -40,6 +40,26 @@ test('ch1tty/status includes embeddingBrain circuit stats in coordinator snapsho
   // OllamaBrain stats also present (brain key)
   assert.ok('brain' in coordinator, 'OllamaBrain stats present in coordinator snapshot');
   assert.equal(typeof coordinator.brain.calls, 'number');
+  assert.equal(typeof coordinator.brain.circuitOpen, 'boolean');
+});
+
+test('ch1tty/status includes top-level brainHealth summary', async () => {
+  const aggregator = createAggregator();
+  const result = await aggregator.callTool('ch1tty/status');
+
+  const status = JSON.parse(result.content[0].text);
+  assert.ok('brainHealth' in status, 'brainHealth key present at top level');
+  const { brainHealth } = status;
+  assert.ok(
+    brainHealth.status === 'ok' || brainHealth.status === 'degraded',
+    `brainHealth.status must be 'ok' or 'degraded', got: ${brainHealth.status}`,
+  );
+  assert.equal(typeof brainHealth.embeddingCircuitOpen, 'boolean');
+  assert.equal(typeof brainHealth.ollamaCircuitOpen, 'boolean');
+  // Neither brain circuit is open at startup — no backends contacted
+  assert.equal(brainHealth.status, 'ok');
+  assert.equal(brainHealth.embeddingCircuitOpen, false);
+  assert.equal(brainHealth.ollamaCircuitOpen, false);
 });
 
 test('ch1tty/reload fails without configPath', async () => {
