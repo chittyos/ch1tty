@@ -63,6 +63,28 @@ test('ch1tty/status includes top-level brainHealth summary', async () => {
   assert.equal(brainHealth.ollamaCircuitOpen, false);
 });
 
+test('ch1tty/status includes top-level ledgerHealth summary', async () => {
+  const aggregator = createAggregator();
+  const result = await aggregator.callTool('ch1tty/status');
+
+  const status = JSON.parse(result.content[0].text);
+  assert.ok('ledgerHealth' in status, 'ledgerHealth key present at top level');
+  const { ledgerHealth } = status;
+  assert.ok(
+    ledgerHealth.status === 'ok' || ledgerHealth.status === 'warn' || ledgerHealth.status === 'degraded',
+    `ledgerHealth.status must be ok|warn|degraded, got: ${ledgerHealth.status}`,
+  );
+  assert.equal(typeof ledgerHealth.dropped, 'number');
+  assert.equal(typeof ledgerHealth.buffered, 'number');
+  assert.equal(typeof ledgerHealth.flushErrors, 'number');
+  assert.equal(typeof ledgerHealth.dlqEntries, 'number');
+  assert.equal(typeof ledgerHealth.dlqPath, 'string');
+  // Clean startup: no entries dropped, no DLQ backlog
+  assert.equal(ledgerHealth.status, 'ok');
+  assert.equal(ledgerHealth.dropped, 0);
+  assert.equal(ledgerHealth.dlqEntries, 0);
+});
+
 test('ch1tty/reload fails without configPath', async () => {
   const aggregator = createAggregator();
   const result = await aggregator.callTool('ch1tty/reload');

@@ -78,3 +78,39 @@ test('DLQ directory is created recursively if missing', async () => {
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test('dlqEntries returns 0 when DLQ file does not exist', async () => {
+  await withTempDlq(async (dlqPath) => {
+    const { LedgerClient } = await import(`../src/ledger.js?t=${Date.now()}`);
+    const client = new LedgerClient();
+    assert.equal(existsSync(dlqPath), false);
+    assert.equal(client.dlqEntries(), 0);
+  });
+});
+
+test('dlqEntries returns correct count after DLQ drain', async () => {
+  await withTempDlq(async (_dlqPath) => {
+    const { LedgerClient } = await import(`../src/ledger.js?t=${Date.now()}`);
+    const client = new LedgerClient();
+    client.record('sess-a', 'session_start', {});
+    client.record('sess-a', 'tool_call', { tool: 'x' });
+    client.record('sess-b', 'session_end', {});
+    await client.shutdown();
+    assert.equal(client.dlqEntries(), 3);
+  });
+});
+
+test('getStats includes dlqPath and dlqEntries', async () => {
+  await withTempDlq(async (dlqPath) => {
+    const { LedgerClient } = await import(`../src/ledger.js?t=${Date.now()}`);
+    const client = new LedgerClient();
+    const statsBefore = client.getStats();
+    assert.equal(statsBefore.dlqPath, dlqPath);
+    assert.equal(statsBefore.dlqEntries, 0, 'no DLQ entries before any drain');
+
+    client.record('sess-c', 'session_start', {});
+    await client.shutdown();
+    const statsAfter = client.getStats();
+    assert.equal(statsAfter.dlqEntries, 1, 'DLQ entry count reflects drained file');
+  });
+});

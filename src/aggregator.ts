@@ -517,6 +517,7 @@ export class Aggregator {
     focus: { active: string; categories: ServerCategory[]; servers: string[]; boost: number } | null;
     availableFocusProfiles: string[];
     brainHealth: { status: 'ok' | 'degraded'; embeddingCircuitOpen: boolean; ollamaCircuitOpen: boolean };
+    ledgerHealth: { status: 'ok' | 'warn' | 'degraded'; dropped: number; buffered: number; flushErrors: number; dlqEntries: number; dlqPath: string };
     coordinator: ReturnType<SessionCoordinator['getSnapshot']>;
     servers: ServerStatus[];
   } {
@@ -536,6 +537,9 @@ export class Aggregator {
     const coordinatorSnap = this.coordinator.getSnapshot();
     const embeddingCircuitOpen = coordinatorSnap.embeddingBrain.circuitOpen;
     const ollamaCircuitOpen = coordinatorSnap.brain.circuitOpen;
+    const ledgerStats = coordinatorSnap.ledger;
+    const ledgerDegraded = ledgerStats.dropped > 0 || ledgerStats.dlqEntries > 0;
+    const ledgerWarn = ledgerStats.buffered > 0 || ledgerStats.flushErrors > 0;
 
     return {
       gateway: 'ch1tty',
@@ -552,6 +556,14 @@ export class Aggregator {
         status: embeddingCircuitOpen || ollamaCircuitOpen ? 'degraded' : 'ok',
         embeddingCircuitOpen,
         ollamaCircuitOpen,
+      },
+      ledgerHealth: {
+        status: ledgerDegraded ? 'degraded' : ledgerWarn ? 'warn' : 'ok',
+        dropped: ledgerStats.dropped,
+        buffered: ledgerStats.buffered,
+        flushErrors: ledgerStats.flushErrors,
+        dlqEntries: ledgerStats.dlqEntries,
+        dlqPath: ledgerStats.dlqPath,
       },
       coordinator: coordinatorSnap,
       servers: statuses,

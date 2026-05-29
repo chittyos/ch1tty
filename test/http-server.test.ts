@@ -45,6 +45,7 @@ test('GET /api/v1/status returns 200 without auth and real snapshot', async () =
       totalServers: number;
       servers: unknown[];
       brainHealth: { status: string; embeddingCircuitOpen: boolean; ollamaCircuitOpen: boolean };
+      ledgerHealth: { status: string; dropped: number; buffered: number; flushErrors: number; dlqEntries: number; dlqPath: string };
     };
     assert.equal(body.gateway, 'ch1tty');
     assert.equal(body.totalServers, 0);
@@ -53,6 +54,13 @@ test('GET /api/v1/status returns 200 without auth and real snapshot', async () =
     assert.ok(body.brainHealth.status === 'ok' || body.brainHealth.status === 'degraded');
     assert.equal(typeof body.brainHealth.embeddingCircuitOpen, 'boolean');
     assert.equal(typeof body.brainHealth.ollamaCircuitOpen, 'boolean');
+    assert.ok(body.ledgerHealth, 'ledgerHealth present in /api/v1/status');
+    assert.ok(
+      body.ledgerHealth.status === 'ok' || body.ledgerHealth.status === 'warn' || body.ledgerHealth.status === 'degraded',
+    );
+    assert.equal(typeof body.ledgerHealth.dropped, 'number');
+    assert.equal(typeof body.ledgerHealth.dlqEntries, 'number');
+    assert.equal(typeof body.ledgerHealth.dlqPath, 'string');
   } finally {
     await stop(s);
   }
