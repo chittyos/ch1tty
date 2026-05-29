@@ -66,6 +66,71 @@ test('GET /api/v1/status returns 200 without auth and real snapshot', async () =
   }
 });
 
+test('GET /api/v1/health returns 200 with systemHealth at startup', async () => {
+  const s = await startServer('secret');
+  try {
+    const res = await fetch(`${s.baseUrl}/api/v1/health`);
+    assert.equal(res.status, 200);
+    const body = await res.json() as {
+      status: string;
+      service: string;
+      systemHealth: { status: string; brainDegraded: boolean; ledgerStatus: string };
+    };
+    assert.equal(body.status, 'ok');
+    assert.equal(body.service, 'ch1tty');
+    assert.ok(body.systemHealth, 'systemHealth present');
+    assert.equal(body.systemHealth.status, 'ok');
+    assert.equal(body.systemHealth.brainDegraded, false);
+    assert.equal(body.systemHealth.ledgerStatus, 'ok');
+  } finally {
+    await stop(s);
+  }
+});
+
+test('GET /api/v1/health requires no auth even when token is configured', async () => {
+  const s = await startServer('secret');
+  try {
+    const res = await fetch(`${s.baseUrl}/api/v1/health`);
+    assert.equal(res.status, 200, '/api/v1/health must be accessible without auth');
+  } finally {
+    await stop(s);
+  }
+});
+
+test('GET /api/v1/health returns 503 when systemHealth is degraded (ledger DLQ backlog)', async () => {
+  const s = await startServer();
+  try {
+    const orig = s.aggregator.getStatusSnapshot.bind(s.aggregator);
+    s.aggregator.getStatusSnapshot = () => ({
+      ...orig(),
+      systemHealth: { status: 'degraded' as const, brainDegraded: false, ledgerStatus: 'degraded' as const },
+    });
+    const res = await fetch(`${s.baseUrl}/api/v1/health`);
+    assert.equal(res.status, 503);
+    const body = await res.json() as { status: string };
+    assert.equal(body.status, 'degraded');
+  } finally {
+    await stop(s);
+  }
+});
+
+test('GET /api/v1/health returns 200 when brain circuit open (brain degraded is warn, not degraded)', async () => {
+  const s = await startServer();
+  try {
+    const orig = s.aggregator.getStatusSnapshot.bind(s.aggregator);
+    s.aggregator.getStatusSnapshot = () => ({
+      ...orig(),
+      systemHealth: { status: 'warn' as const, brainDegraded: true, ledgerStatus: 'ok' as const },
+    });
+    const res = await fetch(`${s.baseUrl}/api/v1/health`);
+    assert.equal(res.status, 200, 'brain circuit open must not cause 503 — keyword fallback still serves traffic');
+    const body = await res.json() as { status: string };
+    assert.equal(body.status, 'warn');
+  } finally {
+    await stop(s);
+  }
+});
+
 test('GET /api/v1/sessions returns 401 when token required and absent', async () => {
   const s = await startServer('secret');
   try {

@@ -516,6 +516,7 @@ export class Aggregator {
     activeSessions: number;
     focus: { active: string; categories: ServerCategory[]; servers: string[]; boost: number } | null;
     availableFocusProfiles: string[];
+    systemHealth: { status: 'ok' | 'warn' | 'degraded'; brainDegraded: boolean; ledgerStatus: 'ok' | 'warn' | 'degraded' };
     brainHealth: { status: 'ok' | 'degraded'; embeddingCircuitOpen: boolean; ollamaCircuitOpen: boolean };
     ledgerHealth: { status: 'ok' | 'warn' | 'degraded'; dropped: number; buffered: number; flushErrors: number; dlqEntries: number; dlqPath: string };
     coordinator: ReturnType<SessionCoordinator['getSnapshot']>;
@@ -538,8 +539,20 @@ export class Aggregator {
     const embeddingCircuitOpen = coordinatorSnap.embeddingBrain.circuitOpen;
     const ollamaCircuitOpen = coordinatorSnap.brain.circuitOpen;
     const ledgerStats = coordinatorSnap.ledger;
-    const ledgerDegraded = ledgerStats.dropped > 0 || ledgerStats.dlqEntries > 0;
-    const ledgerWarn = ledgerStats.buffered > 0 || ledgerStats.flushErrors > 0;
+    // P2: use DLQ backlog (current) not cumulative drops — an operator can clear the DLQ and
+    // the gateway recovers without restart; cumulative drops are observability-only.
+    const ledgerDegraded = ledgerStats.dlqEntries > 0;
+    const ledgerWarn = ledgerStats.dropped > 0 || ledgerStats.buffered > 0 || ledgerStats.flushErrors > 0;
+
+    const brainDegraded = embeddingCircuitOpen || ollamaCircuitOpen;
+    const ledgerStatus: 'ok' | 'warn' | 'degraded' = ledgerDegraded ? 'degraded' : ledgerWarn ? 'warn' : 'ok';
+    // P1: brain circuit open → warn, not degraded. Brain is optional (keyword fallback always
+    // available); opening a brain circuit must not drain load-balanced instances that can still serve.
+    const systemStatus: 'ok' | 'warn' | 'degraded' = ledgerStatus === 'degraded'
+      ? 'degraded'
+      : brainDegraded || ledgerStatus === 'warn'
+        ? 'warn'
+        : 'ok';
 
     return {
       gateway: 'ch1tty',
@@ -552,13 +565,14 @@ export class Aggregator {
       activeSessions: this.sessions.count,
       focus: this.activeFocusSnapshot(),
       availableFocusProfiles: Object.keys(this.focusProfiles.profiles),
+      systemHealth: { status: systemStatus, brainDegraded, ledgerStatus },
       brainHealth: {
-        status: embeddingCircuitOpen || ollamaCircuitOpen ? 'degraded' : 'ok',
+        status: brainDegraded ? 'degraded' : 'ok',
         embeddingCircuitOpen,
         ollamaCircuitOpen,
       },
       ledgerHealth: {
-        status: ledgerDegraded ? 'degraded' : ledgerWarn ? 'warn' : 'ok',
+        status: ledgerStatus,
         dropped: ledgerStats.dropped,
         buffered: ledgerStats.buffered,
         flushErrors: ledgerStats.flushErrors,
