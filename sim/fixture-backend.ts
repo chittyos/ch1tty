@@ -119,11 +119,18 @@ export const FIXTURE_TOOLS: Record<string, FixtureTool[]> = {
     { name: 'start_session', description: 'Start a Claude Co-Work desktop collaboration session' },
   ],
 
-  // ── out-of-focus servers (must stay reachable) ───────────────
+  // ── code / development ───────────────────────────────────────
   github: [
     { name: 'create_pull_request', description: 'Open a GitHub pull request from a branch' },
     { name: 'create_issue', description: 'Create a GitHub issue in a repository' },
   ],
+  context7: [
+    { name: 'resolve-library-id', description: 'Resolve a package name or description to a Context7-compatible library ID' },
+    // near-miss for governance.evidence-search: a "search library docs" tool competes with chittyevidence/search_documents
+    { name: 'get-library-docs', description: 'Get documentation and code examples for a library from the Context7 context window' },
+  ],
+
+  // ── cross-focus near-miss servers (must stay reachable) ──────
   // documents-category server holding a cross-focus near-miss for the design lens:
   // "render a document to pdf" matches this strongly, but it is OUT of the design
   // focus (design covers desktop + browser/playwright/cowork, not documents).
