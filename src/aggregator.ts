@@ -65,6 +65,12 @@ export interface AggregatorOptions {
    * environments without a local Ollama instance. Defaults to env-driven behaviour.
    */
   embedEnabled?: boolean;
+  /**
+   * Override the coordinator instance. Primarily for tests: pass a subclass that
+   * stubs routeIntent to simulate specific brain routing scenarios without a live
+   * Ollama/embedding endpoint.
+   */
+  coordinator?: SessionCoordinator;
 }
 
 export class Aggregator {
@@ -96,7 +102,7 @@ export class Aggregator {
       ?? loadFocusProfilesFromPath(options?.focusProfilesPath ?? resolveFocusProfilesPath());
     this.configs = configs;
     const embedConfig = options?.embedEnabled === false ? { enabled: false } : {};
-    this.coordinator = new SessionCoordinator({}, embedConfig);
+    this.coordinator = options?.coordinator ?? new SessionCoordinator({}, embedConfig);
     this.rebuildBackends();
   }
 
@@ -705,6 +711,7 @@ export class Aggregator {
 
     let scoredTools: Array<NamespacedTool & { score: number }>;
     let castRoute: 'brain' | 'fallback';
+    const keywordAugmented = new Set<string>();
     if (routed && routed.length > 0) {
       const byName = new Map(registry.map((t) => [t.namespacedName, t]));
       scoredTools = routed
@@ -724,6 +731,7 @@ export class Aggregator {
           if (!seen.has(t.namespacedName) && isInFocus(focus, t)) {
             scoredTools.push(t);
             seen.add(t.namespacedName);
+            keywordAugmented.add(t.namespacedName);
             added++;
           }
         }
@@ -777,12 +785,15 @@ export class Aggregator {
       .slice(0, 5);
 
     // No matches across any surface
+    let resolvedBy: 'brain' | 'keyword' = castRoute === 'brain' ? 'brain' : 'keyword';
+
     if (scoredTools.length === 0 && scoredPrompts.length === 0 && scoredResources.length === 0) {
       return {
         content: [{
           type: 'text',
           text: JSON.stringify({
             cast: 'no_match',
+            resolvedBy,
             intent,
             hint: 'No tools, prompts, or resources matched your intent. Try ch1tty/search with different keywords.',
           }, null, 2),
@@ -791,6 +802,12 @@ export class Aggregator {
     }
 
     const best = scoredTools[0];
+    // Winner-aware refinement: brain path + focus augmentation can elevate a
+    // keyword-added tool to first place after focus bias. Report 'keyword' when
+    // the winning tool came from keyword augmentation, not brain ranking.
+    if (best && castRoute === 'brain' && keywordAugmented.has(best.namespacedName)) {
+      resolvedBy = 'keyword';
+    }
     const alternatives = scoredTools.slice(1, 4).map((t) => ({
       tool: t.namespacedName,
       score: t.score,
@@ -824,6 +841,7 @@ export class Aggregator {
           type: 'text',
           text: JSON.stringify({
             cast: 'discovered',
+            resolvedBy,
             intent,
             hint: 'No executable tools matched, but related prompts/resources found.',
             ...related,
@@ -839,6 +857,7 @@ export class Aggregator {
           type: 'text',
           text: JSON.stringify({
             cast: 'plan',
+            resolvedBy,
             intent,
             ...(focusName ? { focus: focusName } : {}),
             resolved: {
@@ -871,6 +890,7 @@ export class Aggregator {
           type: 'text',
           text: JSON.stringify({
             cast: 'executed',
+            resolvedBy,
             intent,
             ...(focusName ? { focus: focusName } : {}),
             resolved: best.namespacedName,
