@@ -132,6 +132,13 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
   ],
 }));
 
+function missingArg(tool: string, field: string) {
+  return {
+    content: [{ type: 'text' as const, text: `${tool}: required argument "${field}" is missing or not a string` }],
+    isError: true,
+  };
+}
+
 server.setRequestHandler(CallToolRequestSchema, async (req) => {
   const { name, arguments: args = {} } = req.params;
   const a = args as Record<string, unknown>;
@@ -150,38 +157,45 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
         break;
 
       case 'get_session':
-        result = await client.getSession(a['id'] as string);
+        if (typeof a['id'] !== 'string' || !a['id']) return missingArg('get_session', 'id');
+        result = await client.getSession(a['id']);
         break;
 
       case 'create_session':
+        if (typeof a['channel'] !== 'string' || !a['channel']) return missingArg('create_session', 'channel');
         result = await client.createSession({
-          channel: a['channel'] as string,
+          channel: a['channel'],
           user_id: a['user_id'] as string | undefined,
           context: a['context'] as CreateSessionInput['context'],
         });
         break;
 
       case 'update_session':
-        result = await client.updateSession(a['id'] as string, {
+        if (typeof a['id'] !== 'string' || !a['id']) return missingArg('update_session', 'id');
+        result = await client.updateSession(a['id'], {
           status: a['status'] as UpdateSessionInput['status'],
           context: a['context'] as UpdateSessionInput['context'],
         });
         break;
 
       case 'close_session':
-        result = await client.closeSession(a['id'] as string);
+        if (typeof a['id'] !== 'string' || !a['id']) return missingArg('close_session', 'id');
+        result = await client.closeSession(a['id']);
         break;
 
       case 'append_event':
-        result = await client.appendEvent(a['session_id'] as string, {
-          type: a['type'] as string,
+        if (typeof a['session_id'] !== 'string' || !a['session_id']) return missingArg('append_event', 'session_id');
+        if (typeof a['type'] !== 'string' || !a['type']) return missingArg('append_event', 'type');
+        result = await client.appendEvent(a['session_id'], {
+          type: a['type'],
           payload: a['payload'] as AppendEventInput['payload'],
           actor: a['actor'] as string | undefined,
         });
         break;
 
       case 'list_events':
-        result = await client.listEvents(a['session_id'] as string, {
+        if (typeof a['session_id'] !== 'string' || !a['session_id']) return missingArg('list_events', 'session_id');
+        result = await client.listEvents(a['session_id'], {
           limit: a['limit'] as number | undefined,
           cursor: a['cursor'] as string | undefined,
         });
