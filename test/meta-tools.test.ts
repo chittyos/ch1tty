@@ -5,7 +5,7 @@ import type { ServerConfig } from '../src/types.js';
 
 function createAggregator(): Aggregator {
   const config: ServerConfig[] = [
-    { id: 'local', name: 'Local', type: 'local', access: 'readwrite', category: 'code', command: 'node' },
+    { id: 'local', name: 'Local', type: 'local', access: 'readwrite', category: 'code', command: 'ch1tty-test-no-such-server' },
     { id: 'remote', name: 'Remote', type: 'remote', access: 'read', category: 'search', endpoint: 'https://example.com/mcp' },
   ];
   return new Aggregator(config);

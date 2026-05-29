@@ -141,10 +141,13 @@ test('applyFocusBias does not erase a strong out-of-focus match', () => {
 
 // ── Aggregator integration ──────────────────────────────────────
 
+// Use a nonexistent command so spawn fails with ENOENT immediately (< 1ms) rather
+// than timing out waiting for the MCP connect handshake (30s). The focus tests
+// only check server ordering and inFocus markers — they don't need real tool lists.
 const aggConfig: ServerConfig[] = [
-  { id: 'stripe', name: 'Stripe', type: 'local', access: 'readwrite', category: 'ecosystem', command: 'node' },
-  { id: 'github', name: 'GitHub', type: 'local', access: 'readwrite', category: 'code', command: 'node' },
-  { id: 'playwright', name: 'Playwright', type: 'local', access: 'readwrite', category: 'desktop', command: 'node' },
+  { id: 'stripe', name: 'Stripe', type: 'local', access: 'readwrite', category: 'ecosystem', command: 'ch1tty-test-no-such-server' },
+  { id: 'github', name: 'GitHub', type: 'local', access: 'readwrite', category: 'code', command: 'ch1tty-test-no-such-server' },
+  { id: 'playwright', name: 'Playwright', type: 'local', access: 'readwrite', category: 'desktop', command: 'ch1tty-test-no-such-server' },
 ];
 
 const testProfiles = validateFocusProfiles({
