@@ -85,6 +85,28 @@ test('ch1tty/status includes top-level ledgerHealth summary', async () => {
   assert.equal(ledgerHealth.dlqEntries, 0);
 });
 
+test('ch1tty/status includes top-level systemHealth rollup', async () => {
+  const aggregator = createAggregator();
+  const result = await aggregator.callTool('ch1tty/status');
+
+  const status = JSON.parse(result.content[0].text);
+  assert.ok('systemHealth' in status, 'systemHealth key present at top level');
+  const { systemHealth } = status;
+  assert.ok(
+    systemHealth.status === 'ok' || systemHealth.status === 'warn' || systemHealth.status === 'degraded',
+    `systemHealth.status must be ok|warn|degraded, got: ${systemHealth.status}`,
+  );
+  assert.equal(typeof systemHealth.brainDegraded, 'boolean');
+  assert.ok(
+    systemHealth.ledgerStatus === 'ok' || systemHealth.ledgerStatus === 'warn' || systemHealth.ledgerStatus === 'degraded',
+    `systemHealth.ledgerStatus must be ok|warn|degraded, got: ${systemHealth.ledgerStatus}`,
+  );
+  // At startup: no circuits open, no ledger drops → system is ok
+  assert.equal(systemHealth.status, 'ok');
+  assert.equal(systemHealth.brainDegraded, false);
+  assert.equal(systemHealth.ledgerStatus, 'ok');
+});
+
 test('ch1tty/reload fails without configPath', async () => {
   const aggregator = createAggregator();
   const result = await aggregator.callTool('ch1tty/reload');

@@ -61,6 +61,21 @@ export class HttpMcpServer {
       return;
     }
 
+    if (req.method === 'GET' && path === '/api/v1/health') {
+      res.setHeader('Content-Type', 'application/json');
+      try {
+        const { systemHealth } = this.aggregator.getStatusSnapshot();
+        const httpStatus = systemHealth.status === 'degraded' ? 503 : 200;
+        res.writeHead(httpStatus);
+        res.end(JSON.stringify({ status: systemHealth.status, service: 'ch1tty', systemHealth }));
+      } catch (err) {
+        log.error(`Health check failed: ${err}`);
+        res.writeHead(503);
+        res.end(JSON.stringify({ status: 'degraded', service: 'ch1tty', error: 'internal' }));
+      }
+      return;
+    }
+
     if (req.method === 'GET' && path === '/api/v1/status') {
       res.setHeader('Content-Type', 'application/json');
       try {

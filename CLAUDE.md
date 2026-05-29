@@ -165,7 +165,8 @@ CH1TTY_PORT=9099 CH1TTY_MCP_TOKEN=secret123 npm start
 ```
 
 Endpoints on `{bindAddress}:{port}`:
-- `GET /health` — `{"status":"ok","service":"ch1tty","version":"<VERSION>"}` (VERSION sourced from `src/utils.ts`, not hardcoded in docs)
+- `GET /health` — `{"status":"ok","service":"ch1tty","version":"<VERSION>"}` (always 200; process-level ping only)
+- `GET /api/v1/health` — Liveness probe. Returns **200** if `systemHealth.status` is `ok` or `warn`; **503** if `degraded` (brain circuit open or ledger dropping entries). Body: `{"status":"ok|warn|degraded","service":"ch1tty","systemHealth":{...}}`. No auth required.
 - `GET /api/v1/status` — Full gateway status snapshot. Returns 500 + `{"error":"internal"}` on server-side failure (never a fake-ok envelope).
 - `GET /api/v1/sessions` — Active MCP session list (bearer-auth if configured)
 - `* /mcp` — **Streamable HTTP MCP endpoint** (bearer token required if `CH1TTY_MCP_TOKEN` is set)
