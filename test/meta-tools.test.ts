@@ -107,6 +107,51 @@ test('ch1tty/status includes top-level systemHealth rollup', async () => {
   assert.equal(systemHealth.ledgerStatus, 'ok');
 });
 
+test('systemHealth: brain circuit open produces warn, not degraded', async () => {
+  const aggregator = createAggregator();
+  // Simulate open brain circuits by patching the coordinator snapshot
+  const origSnap = aggregator.coordinator.getSnapshot.bind(aggregator.coordinator);
+  aggregator.coordinator.getSnapshot = () => {
+    const snap = origSnap();
+    return {
+      ...snap,
+      brain: { ...snap.brain, circuitOpen: true },
+      embeddingBrain: { ...snap.embeddingBrain, circuitOpen: true },
+    };
+  };
+  const result = await aggregator.callTool('ch1tty/status');
+  const { systemHealth } = JSON.parse(result.content[0].text);
+  assert.equal(systemHealth.brainDegraded, true);
+  assert.equal(systemHealth.status, 'warn', 'brain circuit open is warn — keyword fallback still serves traffic');
+});
+
+test('systemHealth: ledger DLQ backlog produces degraded', async () => {
+  const aggregator = createAggregator();
+  const origSnap = aggregator.coordinator.getSnapshot.bind(aggregator.coordinator);
+  aggregator.coordinator.getSnapshot = () => {
+    const snap = origSnap();
+    return { ...snap, ledger: { ...snap.ledger, dlqEntries: 3 } };
+  };
+  const result = await aggregator.callTool('ch1tty/status');
+  const { systemHealth } = JSON.parse(result.content[0].text);
+  assert.equal(systemHealth.status, 'degraded');
+  assert.equal(systemHealth.ledgerStatus, 'degraded');
+});
+
+test('systemHealth: cumulative ledger drops without DLQ backlog produce warn not degraded', async () => {
+  const aggregator = createAggregator();
+  const origSnap = aggregator.coordinator.getSnapshot.bind(aggregator.coordinator);
+  aggregator.coordinator.getSnapshot = () => {
+    const snap = origSnap();
+    return { ...snap, ledger: { ...snap.ledger, dropped: 5, dlqEntries: 0 } };
+  };
+  const result = await aggregator.callTool('ch1tty/status');
+  const { systemHealth } = JSON.parse(result.content[0].text);
+  assert.notEqual(systemHealth.status, 'degraded', 'cleared DLQ must not keep gateway degraded');
+  // dropped > 0 with no backlog → warn (ledger had issues but DLQ is cleared)
+  assert.equal(systemHealth.status, 'warn');
+});
+
 test('ch1tty/reload fails without configPath', async () => {
   const aggregator = createAggregator();
   const result = await aggregator.callTool('ch1tty/reload');

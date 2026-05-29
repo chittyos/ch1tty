@@ -97,18 +97,35 @@ test('GET /api/v1/health requires no auth even when token is configured', async 
   }
 });
 
-test('GET /api/v1/health returns 503 when systemHealth is degraded', async () => {
+test('GET /api/v1/health returns 503 when systemHealth is degraded (ledger DLQ backlog)', async () => {
   const s = await startServer();
   try {
     const orig = s.aggregator.getStatusSnapshot.bind(s.aggregator);
     s.aggregator.getStatusSnapshot = () => ({
       ...orig(),
-      systemHealth: { status: 'degraded' as const, brainDegraded: true, ledgerStatus: 'ok' as const },
+      systemHealth: { status: 'degraded' as const, brainDegraded: false, ledgerStatus: 'degraded' as const },
     });
     const res = await fetch(`${s.baseUrl}/api/v1/health`);
     assert.equal(res.status, 503);
     const body = await res.json() as { status: string };
     assert.equal(body.status, 'degraded');
+  } finally {
+    await stop(s);
+  }
+});
+
+test('GET /api/v1/health returns 200 when brain circuit open (brain degraded is warn, not degraded)', async () => {
+  const s = await startServer();
+  try {
+    const orig = s.aggregator.getStatusSnapshot.bind(s.aggregator);
+    s.aggregator.getStatusSnapshot = () => ({
+      ...orig(),
+      systemHealth: { status: 'warn' as const, brainDegraded: true, ledgerStatus: 'ok' as const },
+    });
+    const res = await fetch(`${s.baseUrl}/api/v1/health`);
+    assert.equal(res.status, 200, 'brain circuit open must not cause 503 — keyword fallback still serves traffic');
+    const body = await res.json() as { status: string };
+    assert.equal(body.status, 'warn');
   } finally {
     await stop(s);
   }

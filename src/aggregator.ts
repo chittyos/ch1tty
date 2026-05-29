@@ -539,14 +539,18 @@ export class Aggregator {
     const embeddingCircuitOpen = coordinatorSnap.embeddingBrain.circuitOpen;
     const ollamaCircuitOpen = coordinatorSnap.brain.circuitOpen;
     const ledgerStats = coordinatorSnap.ledger;
-    const ledgerDegraded = ledgerStats.dropped > 0 || ledgerStats.dlqEntries > 0;
-    const ledgerWarn = ledgerStats.buffered > 0 || ledgerStats.flushErrors > 0;
+    // P2: use DLQ backlog (current) not cumulative drops — an operator can clear the DLQ and
+    // the gateway recovers without restart; cumulative drops are observability-only.
+    const ledgerDegraded = ledgerStats.dlqEntries > 0;
+    const ledgerWarn = ledgerStats.dropped > 0 || ledgerStats.buffered > 0 || ledgerStats.flushErrors > 0;
 
     const brainDegraded = embeddingCircuitOpen || ollamaCircuitOpen;
     const ledgerStatus: 'ok' | 'warn' | 'degraded' = ledgerDegraded ? 'degraded' : ledgerWarn ? 'warn' : 'ok';
-    const systemStatus: 'ok' | 'warn' | 'degraded' = brainDegraded || ledgerStatus === 'degraded'
+    // P1: brain circuit open → warn, not degraded. Brain is optional (keyword fallback always
+    // available); opening a brain circuit must not drain load-balanced instances that can still serve.
+    const systemStatus: 'ok' | 'warn' | 'degraded' = ledgerStatus === 'degraded'
       ? 'degraded'
-      : ledgerStatus === 'warn'
+      : brainDegraded || ledgerStatus === 'warn'
         ? 'warn'
         : 'ok';
 
