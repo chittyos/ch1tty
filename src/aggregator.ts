@@ -575,6 +575,7 @@ export class Aggregator {
       const oldBackends = this.backends;
       this.configs = newConfig.servers;
       this.rebuildBackends();
+      this.preWarmNonLazy();
 
       // Now shut down the old backends — log any rejected shutdowns (C5).
       const seen = new Set<Backend>();
