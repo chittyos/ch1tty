@@ -83,6 +83,11 @@ test('repo focus-profiles.json loads and defines finance/governance/design', () 
   // Real server ids from servers.json
   assert.ok(profiles.profiles.finance.servers.includes('stripe'));
   assert.ok(profiles.profiles.design.servers.includes('playwright'));
+  // apps/*-mcp backends included in appropriate profiles
+  assert.ok(profiles.profiles.finance.servers.includes('ledger'), 'finance includes ledger');
+  assert.ok(profiles.profiles.governance.servers.includes('session'), 'governance includes session');
+  assert.ok(profiles.profiles.governance.servers.includes('ledger'), 'governance includes ledger');
+  assert.ok(profiles.profiles.governance.servers.includes('chittyevidence'), 'governance pre-wires chittyevidence');
 });
 
 // ── resolveFocus (soft / lens-not-gate) ─────────────────────────
