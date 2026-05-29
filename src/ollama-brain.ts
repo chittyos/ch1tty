@@ -111,8 +111,12 @@ export class OllamaBrain {
     merged.minConfidence = Math.max(0, Math.min(1, merged.minConfidence));
     merged.maxCandidates = Math.max(1, merged.maxCandidates);
     merged.timeoutMs = Math.max(100, merged.timeoutMs);
-    merged.circuitBreakerThreshold = Math.max(1, merged.circuitBreakerThreshold);
-    merged.circuitBreakerCooldownMs = Math.max(100, merged.circuitBreakerCooldownMs);
+    merged.circuitBreakerThreshold = Number.isFinite(merged.circuitBreakerThreshold)
+      ? Math.max(1, merged.circuitBreakerThreshold)
+      : 3;
+    merged.circuitBreakerCooldownMs = Number.isFinite(merged.circuitBreakerCooldownMs)
+      ? Math.max(100, merged.circuitBreakerCooldownMs)
+      : 60_000;
     this.config = merged;
   }
 
@@ -199,8 +203,12 @@ export class OllamaBrain {
 
       if (routed.length === 0) {
         this.emptyResults++;
-        // Empty results are not a connectivity failure — don't trip the breaker
+        // Empty results mean Ollama is reachable — clear failures and close the circuit.
+        // Without resetting circuitOpenUntil the breaker stays in perpetual half-open
+        // limbo (circuitOpenUntil in the past but != 0) whenever a half-open probe
+        // returns zero matches.
         this.consecutiveFailures = 0;
+        this.circuitOpenUntil = 0;
         this.probing = false;
         return null;
       }
