@@ -1,5 +1,5 @@
 {
-  "_comment": "Alchemist-surfaced suggestions catalog — cross-backend tool combos and pre-written /cast prompts, grouped by all five focus profiles from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain lives on a server that was connected on the live gateway when this catalog was generated (ch1tty v4.1.0, 9/18 servers connected: evidence, browser-rendering, notion, github, context7, thinking, fs, playwright, orchestrator). `verified:false` means the chain references at least one config-present-but-not-connected server — those tools are plausible per each backend's known source surface but were NOT enumerated live. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only — no loader, no 6th public tool. Updated 2026-05-30 to add code and communication focus profiles (PRs #71, #72), completing all 5 lenses. code combos: context7, neon, serena, cloudflare, fs, github, notion. communication combos: notion, chittymac, imessage, tasks. New combos that reference locally-available servers (github, notion, context7, neon, fs, thinking) are verified:true; combos referencing not-connected servers (serena, cloudflare/workers, chittymac, imessage, tasks) are verified:false.",
+  "_comment": "Alchemist-surfaced suggestions catalog — cross-backend tool combos and pre-written /cast prompts, grouped by all six focus profiles from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain lives on a server that was connected on the live gateway when this catalog was generated (ch1tty v4.1.0, 9/18 servers connected: evidence, browser-rendering, notion, github, context7, thinking, fs, playwright, orchestrator). `verified:false` means the chain references at least one config-present-but-not-connected server — those tools are plausible per each backend's known source surface but were NOT enumerated live. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only — no loader, no public tool beyond the existing 5. Updated 2026-05-30 to add code, communication, and ops focus profiles (PRs #71, #72, #80), completing all 6 lenses. code combos: context7, neon, serena, cloudflare, fs, github, notion. communication combos: notion, chittymac, imessage, tasks. ops combos: cloudflare, neon, github, orchestrator, fs, notion. New combos that reference locally-available servers (github, notion, context7, neon, fs, thinking, orchestrator) are verified:true; combos referencing not-connected servers (serena, cloudflare/workers, chittymac, imessage, tasks) are verified:false.",
   "generatedFrom": {
     "gateway": "ch1tty",
     "version": "4.1.0",
@@ -338,6 +338,63 @@
         { "text": "Broadcast the project update from Notion over iMessage and send me a desktop notification", "resolves_to": "imessage-and-notion-broadcast" },
         { "text": "Search my Notion workspace for notes about the deployment", "resolves_to": "notion/API-post-search" },
         { "text": "Create a follow-up task from this conversation", "resolves_to": "tasks/create_task" }
+      ]
+    },
+    "ops": {
+      "description": "Deployment, infrastructure monitoring, and DevOps tooling — Cloudflare Workers, database ops, source control, filesystem, and orchestration. Verified combos use github, context7, fs, notion, and orchestrator (connected at generation time); cloudflare and neon combos are verified:false (not connected at generation time).",
+      "combos": [
+        {
+          "name": "deploy-and-document",
+          "chain": ["cloudflare/deploy_worker", "notion/API-post-page"],
+          "accomplishes": "Deploy a Cloudflare Worker to production and immediately create a Notion deployment log page — so every release is timestamped and searchable in the team's workspace.",
+          "verified": false,
+          "notes": "cloudflare not connected at generation time. notion/API-post-page verified."
+        },
+        {
+          "name": "worker-logs-to-incident",
+          "chain": ["cloudflare/get_worker_logs", "thinking/sequentialthinking", "notion/API-post-page"],
+          "accomplishes": "Pull recent error logs from a deployed Cloudflare Worker, reason over root cause and remediation steps with sequential-thinking, then write a structured incident report into Notion.",
+          "verified": false,
+          "notes": "cloudflare not connected. thinking/sequentialthinking and notion/API-post-page verified."
+        },
+        {
+          "name": "db-backup-and-verify",
+          "chain": ["orchestrator/run_job", "neon/run_sql"],
+          "accomplishes": "Kick off a database backup job via the ChittyAgent Orchestrator and then run a verification SQL query on Neon to confirm the backup completed without data loss.",
+          "verified": false,
+          "notes": "orchestrator connected (verified); neon not connected (verified:false). A short chain for ops confidence after each backup."
+        },
+        {
+          "name": "failed-job-to-github-issue",
+          "chain": ["orchestrator/list_jobs", "github/create_issue"],
+          "accomplishes": "List recent orchestrator jobs, find the failed ones, and open a GitHub issue for each failure — turning automated job failures into traceable engineering work items.",
+          "verified": true,
+          "notes": "orchestrator and github both connected and verified."
+        },
+        {
+          "name": "pr-to-deploy-pipeline",
+          "chain": ["github/list_pull_requests", "cloudflare/deploy_worker", "notion/API-post-page"],
+          "accomplishes": "List merged pull requests, trigger a Cloudflare Worker deploy for the release, and create a Notion deployment page linking the PR number — a three-backend deploy pipeline from a single cast intent.",
+          "verified": false,
+          "notes": "github/list_pull_requests verified. cloudflare not connected. notion/API-post-page verified."
+        },
+        {
+          "name": "infra-health-snapshot",
+          "chain": ["orchestrator/list_jobs", "neon/list_projects", "notion/API-post-page"],
+          "accomplishes": "Pull recent orchestrator job outcomes and Neon project statuses, then write a consolidated infrastructure health snapshot into a Notion page — a periodic ops status report from two live backends.",
+          "verified": false,
+          "notes": "orchestrator verified. neon not connected. notion verified."
+        }
+      ],
+      "prompts": [
+        { "text": "Deploy the latest worker build to Cloudflare production and log the release in Notion", "resolves_to": "deploy-and-document" },
+        { "text": "Check worker error logs and write up an incident report in Notion", "resolves_to": "worker-logs-to-incident" },
+        { "text": "Run the database backup job and verify it completed successfully", "resolves_to": "db-backup-and-verify" },
+        { "text": "Find failed orchestrator jobs and open GitHub issues for each one", "resolves_to": "failed-job-to-github-issue" },
+        { "text": "List merged PRs, deploy the release to Cloudflare, and document it in Notion", "resolves_to": "pr-to-deploy-pipeline" },
+        { "text": "Write an infrastructure health snapshot covering job outcomes and database status into Notion", "resolves_to": "infra-health-snapshot" },
+        { "text": "List all deployed Cloudflare Workers and their last deploy date", "resolves_to": "cloudflare/list_workers" },
+        { "text": "Check the status of the last orchestrator job run", "resolves_to": "orchestrator/get_job_status" }
       ]
     }
   }

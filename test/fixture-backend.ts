@@ -584,6 +584,141 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
     ],
   },
 
+  cloudflare: {
+    tools: [
+      {
+        name: 'deploy_worker',
+        description: 'Deploy a Cloudflare Worker script to production or a named environment',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            script_name: { type: 'string' },
+            script: { type: 'string' },
+            environment: { type: 'string', enum: ['production', 'staging'] },
+          },
+          required: ['script_name', 'script'],
+        },
+        response: text(JSON.stringify({ id: 'worker-abc', name: 'my-worker', status: 'deployed', url: 'https://my-worker.example.workers.dev' })),
+      },
+      {
+        name: 'list_workers',
+        description: 'List all Cloudflare Workers deployed in the account',
+        inputSchema: {
+          type: 'object',
+          properties: { environment: { type: 'string' } },
+        },
+        response: text(JSON.stringify([
+          { id: 'worker-ch1tty', name: 'ch1tty-gateway', status: 'active', last_deployed: '2026-05-30T00:00:00Z' },
+          { id: 'worker-chittyauth', name: 'chittyauth', status: 'active', last_deployed: '2026-05-29T12:00:00Z' },
+        ])),
+      },
+      {
+        name: 'get_worker_logs',
+        description: 'Get recent logs and error traces from a deployed Cloudflare Worker for debugging',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            worker_name: { type: 'string' },
+            limit: { type: 'number' },
+          },
+          required: ['worker_name'],
+        },
+        response: text(JSON.stringify({
+          worker: 'ch1tty-gateway',
+          logs: [
+            { timestamp: '2026-05-30T03:00:00Z', level: 'info', message: 'Request handled in 45ms' },
+            { timestamp: '2026-05-30T02:59:00Z', level: 'error', message: 'Backend timeout: neon connection refused' },
+          ],
+        })),
+      },
+    ],
+  },
+
+  orchestrator: {
+    tools: [
+      {
+        name: 'run_job',
+        description: 'Run a scheduled or ad-hoc job via the ChittyAgent Orchestrator',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            job_name: { type: 'string' },
+            payload: { type: 'object' },
+          },
+          required: ['job_name'],
+        },
+        response: text(JSON.stringify({ job_id: 'job-xyz789', status: 'running', started_at: '2026-05-30T04:00:00Z' })),
+      },
+      {
+        name: 'get_job_status',
+        description: 'Get the current status and result of an orchestrator job by job ID',
+        inputSchema: {
+          type: 'object',
+          properties: { job_id: { type: 'string' } },
+          required: ['job_id'],
+        },
+        response: text(JSON.stringify({ job_id: 'job-xyz789', status: 'completed', result: { ok: true }, duration_ms: 1234 })),
+      },
+      {
+        name: 'list_jobs',
+        description: 'List recent orchestrator jobs with their status and outcome',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            status: { type: 'string', enum: ['running', 'completed', 'failed', 'all'] },
+            limit: { type: 'number' },
+          },
+        },
+        response: text(JSON.stringify([
+          { job_id: 'job-abc', job_name: 'db-backup', status: 'completed', duration_ms: 820 },
+          { job_id: 'job-def', job_name: 'cache-warm', status: 'failed', error: 'upstream timeout' },
+        ])),
+      },
+    ],
+  },
+
+  fs: {
+    tools: [
+      {
+        name: 'read_file',
+        description: 'Read the contents of a file from the filesystem',
+        inputSchema: {
+          type: 'object',
+          properties: { path: { type: 'string' } },
+          required: ['path'],
+        },
+        response: text(JSON.stringify({ path: '/home/user/ch1tty/servers.json', content: '{"servers":[...]}', size: 4096 })),
+      },
+      {
+        name: 'write_file',
+        description: 'Write content to a file on the filesystem',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            path: { type: 'string' },
+            content: { type: 'string' },
+          },
+          required: ['path', 'content'],
+        },
+        response: text(JSON.stringify({ path: '/tmp/deploy-report.md', written: true, bytes: 256 })),
+      },
+      {
+        name: 'list_directory',
+        description: 'List files and directories in a filesystem path',
+        inputSchema: {
+          type: 'object',
+          properties: { path: { type: 'string' } },
+          required: ['path'],
+        },
+        response: text(JSON.stringify([
+          { name: 'src', type: 'directory' },
+          { name: 'test', type: 'directory' },
+          { name: 'package.json', type: 'file', size: 692 },
+        ])),
+      },
+    ],
+  },
+
   chittymac: {
     tools: [
       {

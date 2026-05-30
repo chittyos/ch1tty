@@ -30,6 +30,12 @@
       "categories": ["communication"],
       "servers": ["notion", "chittymac", "imessage", "tasks"],
       "boost": 0.5
+    },
+    "ops": {
+      "description": "Deployment, infrastructure monitoring, and DevOps tooling — Cloudflare Workers, database ops, source control, filesystem, and orchestration",
+      "categories": ["ecosystem", "code"],
+      "servers": ["cloudflare", "neon", "github", "orchestrator", "fs", "quality"],
+      "boost": 0.5
     }
   }
 }
