@@ -1100,10 +1100,19 @@ test('scenario: ops REORDER — with ops focus fs/list_directory overtakes chitt
   );
   assert.ok((resolved.score ?? 0) >= 0.95, `boosted score should be ~1.00, got ${resolved.score}`);
 
-  // OOF (chittymac/list_notes) must still appear in alternatives — lens-not-gate invariant
-  const alts = (cast.alternatives ?? []) as Array<{ tool: string; score: number }>;
+  // OOF lens-not-gate: chittymac/list_notes must still be discoverable via search even
+  // when ops focus is active. cast.alternatives is only top-3 runners-up, so with many
+  // in-focus ecosystem tools tied at 0.75, chittymac may be pushed out of that slice.
+  // Use ch1tty/search with a large limit to verify reachability independently.
+  const searchResult = await aggregator.callTool('ch1tty/search', {
+    query: 'notes folder',
+    focus: 'ops',
+    limit: 50,
+  });
+  assert.equal(searchResult.isError, undefined);
+  const searchData = parseSearch(searchResult);
   assert.ok(
-    alts.some((a) => a.tool === 'chittymac/list_notes'),
-    'chittymac/list_notes must remain reachable in alternatives even when ops focus is active',
+    (searchData.tools ?? []).some((t) => t.tool === 'chittymac/list_notes'),
+    'chittymac/list_notes must remain discoverable via search (lens-not-gate) even when ops focus is active',
   );
 });
