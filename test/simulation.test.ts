@@ -125,6 +125,19 @@ test('out-of-focus tools stay reachable via search (lens, not gate)', async () =
       await outOfFocusReachable(aggregator, 'message', 'governance', 'imessage/send_message'),
       'imessage tool unreachable under governance focus',
     );
+    // ops focus (covers ecosystem+code) — desktop/communication/documents tools still reachable
+    assert.ok(
+      await outOfFocusReachable(aggregator, 'render page', 'ops', 'browser-rendering/render_page'),
+      'browser-rendering tool unreachable under ops focus',
+    );
+    assert.ok(
+      await outOfFocusReachable(aggregator, 'send message', 'ops', 'imessage/send_message'),
+      'imessage tool unreachable under ops focus',
+    );
+    assert.ok(
+      await outOfFocusReachable(aggregator, 'create page', 'ops', 'notion/create_page'),
+      'notion tool unreachable under ops focus',
+    );
   } finally {
     await aggregator.shutdown();
   }
