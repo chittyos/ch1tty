@@ -42,12 +42,12 @@ function buildFixture(): FixtureBackend {
   return fb;
 }
 
-function buildAgg(opts?: { accessFilter?: 'read' | 'write' | 'readwrite'; categoryFilter?: string }): Aggregator {
+function buildAgg(opts?: { accessFilter?: ServerConfig['access']; categoryFilter?: ServerConfig['category'] }): Aggregator {
   const fb = buildFixture();
   return new Aggregator(CONFIGS, {
     ledgerDlqPath: FILTER_DLQ,
     accessFilter: opts?.accessFilter,
-    categoryFilter: opts?.categoryFilter as ServerConfig['category'],
+    categoryFilter: opts?.categoryFilter,
     backendFactory: () => fb,
     focusProfiles: { profiles: {} },
     suggestionsCatalog: {},
