@@ -54,6 +54,10 @@ async function main(): Promise<void> {
     githubUnderGovernance: await outOfFocusReachable(aggregator, 'pull request', 'governance', 'github/create_pull_request'),
     browserRenderingUnderGovernance: await outOfFocusReachable(aggregator, 'headless', 'governance', 'browser-rendering/render_page'),
     imessageUnderGovernance: await outOfFocusReachable(aggregator, 'message', 'governance', 'imessage/send_message'),
+    // ops focus (ecosystem+code) — communication/desktop/documents tools still reachable
+    imessageUnderOps: await outOfFocusReachable(aggregator, 'message', 'ops', 'imessage/send_message'),
+    browserRenderingUnderOps: await outOfFocusReachable(aggregator, 'headless', 'ops', 'browser-rendering/render_page'),
+    notionUnderOps: await outOfFocusReachable(aggregator, 'page', 'ops', 'notion/create_page'),
   };
 
   // ── Report ──────────────────────────────────────────────────
