@@ -95,14 +95,14 @@ describe('SessionTracker', { concurrency: false }, () => {
     const tracker = new SessionTracker();
     tracker.getOrCreate('s1', 'stdio');
     for (let i = 0; i < 60; i++) {
-      tracker.recordToolCall('s1', `tool-${i}`);
+      tracker.recordToolCall('s1', `ch1tty/tool-${i}`);
     }
     const info = tracker.getOrCreate('s1', 'stdio').toInfo();
     // toolCalls counts all 60
     assert.equal(info.toolCalls, 60);
     // toInfo() returns last 10 of the capped 50
     assert.equal(info.recentTools.length, 10);
-    assert.equal(info.recentTools[0].tool, 'tool-50');
-    assert.equal(info.recentTools[9].tool, 'tool-59');
+    assert.equal(info.recentTools[0].tool, 'ch1tty/tool-50');
+    assert.equal(info.recentTools[9].tool, 'ch1tty/tool-59');
   });
 });
