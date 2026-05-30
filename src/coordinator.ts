@@ -52,11 +52,16 @@ export class SessionCoordinator {
   private contexts = new Map<string, SessionContext>();
   private ecosystemBackend?: Backend;
   private ecosystemServerId?: string;
-  readonly ledger = new LedgerClient();
+  readonly ledger: LedgerClient;
   readonly brain: OllamaBrain;
   readonly embeddingBrain: EmbeddingBrain;
 
-  constructor(brainConfig: Partial<OllamaBrainConfig> = {}, embedConfig: Partial<EmbeddingBrainConfig> = {}) {
+  constructor(
+    brainConfig: Partial<OllamaBrainConfig> = {},
+    embedConfig: Partial<EmbeddingBrainConfig> = {},
+    ledgerDlqPath?: string,
+  ) {
+    this.ledger = new LedgerClient(ledgerDlqPath);
     this.brain = new OllamaBrain(brainConfig);
     this.embeddingBrain = new EmbeddingBrain(embedConfig);
     // Warm the primary embedding brain so the first cast doesn't pay model-load latency.

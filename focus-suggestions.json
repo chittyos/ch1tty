@@ -1,13 +1,13 @@
 {
-  "_comment": "Alchemist-surfaced suggestions catalog — cross-backend tool combos and pre-written /cast prompts, grouped by the three focus profiles (finance / governance / design) from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain lives on a server that was connected on the live gateway when this catalog was generated (ch1tty v4.1.0, 9/18 servers connected: evidence, browser-rendering, notion, github, context7, thinking, fs, playwright, orchestrator). `verified:false` means the chain references at least one config-present-but-not-connected server — those tools are plausible per each backend's known source surface but were NOT enumerated live. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only — no loader, no 6th public tool. Updated 2026-05-29 to add cross-backend combos for the four new apps/*-mcp focused surfaces: tasks (tasks-mcp PR #56), ledger (ledger-mcp PR #57), session (session-coordinator-mcp PR #58), chittyevidence (evidence-mcp PR #59). All new-backend combos are verified:false (backends are in config as enabled:false pending token config).",
+  "_comment": "Alchemist-surfaced suggestions catalog — cross-backend tool combos and pre-written /cast prompts, grouped by all five focus profiles from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain lives on a server that was connected on the live gateway when this catalog was generated (ch1tty v4.1.0, 9/18 servers connected: evidence, browser-rendering, notion, github, context7, thinking, fs, playwright, orchestrator). `verified:false` means the chain references at least one config-present-but-not-connected server — those tools are plausible per each backend's known source surface but were NOT enumerated live. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only — no loader, no 6th public tool. Updated 2026-05-30 to add code and communication focus profiles (PRs #71, #72), completing all 5 lenses. code combos: context7, neon, serena, cloudflare, fs, github, notion. communication combos: notion, chittymac, imessage, tasks. New combos that reference locally-available servers (github, notion, context7, neon, fs, thinking) are verified:true; combos referencing not-connected servers (serena, cloudflare/workers, chittymac, imessage, tasks) are verified:false.",
   "generatedFrom": {
     "gateway": "ch1tty",
     "version": "4.1.0",
     "method": "live-gateway-enumeration + source-surface-inference",
     "connectedServers": ["evidence", "browser-rendering", "notion", "github", "context7", "thinking", "fs", "playwright", "orchestrator"],
-    "notConnectedServers": ["chittyos", "cloudflare", "cowork", "stripe", "neon", "tasks", "ledger", "session", "chittyevidence"],
-    "updatedAt": "2026-05-29",
-    "newBackendsNote": "tasks/ledger/session/chittyevidence are apps/*-mcp scaffolds (PRs #56-59); tool names sourced from src/index.ts; combos are plausible per source surface but unverified (backends disabled pending token config)"
+    "notConnectedServers": ["chittyos", "cloudflare", "cowork", "stripe", "neon", "tasks", "ledger", "session", "chittyevidence", "serena", "chittymac", "imessage"],
+    "updatedAt": "2026-05-30",
+    "newBackendsNote": "code profile adds serena (code intelligence) and cloudflare (workers deployment); communication profile adds chittymac (macOS notifications) and imessage (messaging) — all plausible per source surface but unverified (backends disabled or not connected at generation time)"
   },
   "profiles": {
     "finance": {
@@ -217,6 +217,127 @@
         { "text": "Take a full-page screenshot of my portfolio site", "resolves_to": "browser-rendering/get_url_screenshot" },
         { "text": "Screenshot this design URL and ingest it as a canonical evidence document with a chittycanon:// URI", "resolves_to": "screenshot-to-canonical-evidence" },
         { "text": "Navigate to the staging site, snapshot the design, and create a tracked task for any issues found", "resolves_to": "browser-test-to-task" }
+      ]
+    },
+    "code": {
+      "description": "Software development — source control, deployment, library documentation, database, and code quality tools. Verified-strong: github, context7, fs, notion all live. neon verified live. serena and cloudflare workers combos are verified:false (not connected at generation time).",
+      "combos": [
+        {
+          "name": "library-research-to-docs",
+          "chain": ["context7/resolve-library-id", "context7/get-library-docs", "notion/API-post-page"],
+          "accomplishes": "Resolve a library name to its canonical context7 ID, fetch the current API documentation, and write a usage note into Notion — turning live library docs into a durable, searchable implementation reference.",
+          "verified": true,
+          "notes": "context7 and notion both connected. context7/resolve-library-id and context7/get-library-docs verified live."
+        },
+        {
+          "name": "schema-branch-and-migrate",
+          "chain": ["neon/create_branch", "neon/run_sql", "neon/describe_table_schema"],
+          "accomplishes": "Create a Neon database branch for a schema change, apply the migration SQL, then describe the resulting table schema to confirm the change landed — a safe non-destructive schema migration workflow on a throwaway branch.",
+          "verified": true,
+          "notes": "neon connected. All three tools verified live on the gateway."
+        },
+        {
+          "name": "schema-to-notion-doc",
+          "chain": ["neon/describe_table_schema", "notion/API-post-page"],
+          "accomplishes": "Pull the current schema for a Neon table and write it as a Notion documentation page — keeping your data-model docs in sync with the live database without manual copy-paste.",
+          "verified": true,
+          "notes": "neon and notion both connected."
+        },
+        {
+          "name": "library-docs-to-github-issue",
+          "chain": ["context7/resolve-library-id", "context7/get-library-docs", "github/create_issue"],
+          "accomplishes": "Look up the latest docs for a library dependency, then open a GitHub issue pre-populated with the relevant API details — grounding an implementation task in current, accurate documentation rather than stale memory.",
+          "verified": true,
+          "notes": "context7 and github both connected."
+        },
+        {
+          "name": "code-search-and-file-context",
+          "chain": ["serena/search_code", "fs/read_file"],
+          "accomplishes": "Use Serena's code-intelligence search to locate a symbol or pattern across the workspace, then read the full file context around the match — a semantic-then-deep drill-down that avoids scanning files blindly.",
+          "verified": false,
+          "notes": "serena not connected (lazy, requires token). fs/read_file verified live."
+        },
+        {
+          "name": "db-branch-test-and-document",
+          "chain": ["neon/create_branch", "neon/run_sql", "notion/API-post-page"],
+          "accomplishes": "Branch the database, run a test query or migration against the branch, then write the outcome (schema diff, row counts, error trace) into a Notion page — a lightweight experiment-then-document pattern for database changes.",
+          "verified": true,
+          "notes": "neon and notion both connected."
+        },
+        {
+          "name": "workers-deploy-and-verify",
+          "chain": ["cloudflare/workers_scripts_upload", "cloudflare/workers_scripts_get"],
+          "accomplishes": "Upload a new Cloudflare Worker script and immediately fetch it back to verify the deployment landed correctly — a tight deploy→verify loop before any downstream tests run.",
+          "verified": false,
+          "notes": "cloudflare not connected (remote endpoint, requires token). Tool names inferred from cloudflare MCP surface."
+        }
+      ],
+      "prompts": [
+        { "text": "Look up the latest React docs and write an integration note into my Notion dev workspace", "resolves_to": "library-research-to-docs" },
+        { "text": "Create a Neon branch, run my migration, then describe the new schema", "resolves_to": "schema-branch-and-migrate" },
+        { "text": "Document the current users table schema as a Notion page", "resolves_to": "schema-to-notion-doc" },
+        { "text": "Fetch the Stripe SDK docs and open a GitHub issue with the implementation details", "resolves_to": "library-docs-to-github-issue" },
+        { "text": "Search for all usages of this function and show me the file context around each match", "resolves_to": "code-search-and-file-context" },
+        { "text": "Branch the database, run my test query, and log the results in Notion", "resolves_to": "db-branch-test-and-document" },
+        { "text": "Deploy this Worker script to Cloudflare and confirm the upload was successful", "resolves_to": "workers-deploy-and-verify" },
+        { "text": "What are the current Neon projects and branches?", "resolves_to": "neon/list_projects" }
+      ]
+    },
+    "communication": {
+      "description": "Cross-channel messaging, notes, team communication, and follow-up task creation. Verified-strong: notion connected. chittymac, imessage, and tasks are local MCP servers verified:false (not connected at generation time — require local daemon or token config).",
+      "combos": [
+        {
+          "name": "notion-note-to-task",
+          "chain": ["notion/API-post-search", "tasks/create_task"],
+          "accomplishes": "Search the Notion workspace for a note or meeting page, then create a ChittyAgent task from its action items — turning unstructured notes into tracked, prioritized work items without leaving the chat interface.",
+          "verified": false,
+          "notes": "notion/API-post-search verified live. tasks/create_task from apps/tasks-mcp (enabled:false pending token)."
+        },
+        {
+          "name": "imessage-thread-to-brief",
+          "chain": ["imessage/get_recent_messages", "thinking/sequentialthinking", "notion/API-post-page"],
+          "accomplishes": "Pull recent messages from an iMessage thread, use sequential-thinking to identify key decisions and action items, then write a summary brief into Notion — turning an async chat thread into a durable structured record.",
+          "verified": false,
+          "notes": "imessage not connected (requires local daemon). thinking and notion verified live."
+        },
+        {
+          "name": "task-to-imessage-notification",
+          "chain": ["tasks/list_tasks", "imessage/send_message"],
+          "accomplishes": "List open ChittyAgent tasks for a context and send a status summary as an iMessage — a pull-and-broadcast pattern for keeping stakeholders updated without a separate notification pipeline.",
+          "verified": false,
+          "notes": "tasks from apps/tasks-mcp (enabled:false). imessage not connected. Both are plausible per their source surfaces."
+        },
+        {
+          "name": "mac-notification-and-log",
+          "chain": ["chittymac/send_notification", "notion/API-post-page"],
+          "accomplishes": "Send a macOS system notification via ChittyMac and log the event as a timestamped Notion entry — useful for workflow checkpoints where a human must be alerted and the alert itself must be auditable.",
+          "verified": false,
+          "notes": "chittymac not connected (requires local ChittyMac daemon). notion/API-post-page verified live."
+        },
+        {
+          "name": "meeting-notes-to-tasks",
+          "chain": ["notion/API-retrieve-a-page", "thinking/sequentialthinking", "tasks/create_task"],
+          "accomplishes": "Fetch a Notion meeting-notes page, reason over the content to extract discrete action items, then create a ChittyAgent task for each — automated meeting-to-action-item extraction across docs and task management.",
+          "verified": false,
+          "notes": "notion/API-retrieve-a-page and thinking/sequentialthinking verified live. tasks/create_task from apps/tasks-mcp (enabled:false)."
+        },
+        {
+          "name": "imessage-and-notion-broadcast",
+          "chain": ["notion/API-post-search", "imessage/send_message", "chittymac/send_notification"],
+          "accomplishes": "Find the relevant Notion page for a project update, send its summary via iMessage to the stakeholders, and fire a macOS notification as a local confirmation — a three-channel broadcast from a single intent.",
+          "verified": false,
+          "notes": "notion/API-post-search verified. imessage and chittymac not connected."
+        }
+      ],
+      "prompts": [
+        { "text": "Search my Notion workspace for today's meeting notes and create tasks from the action items", "resolves_to": "notion-note-to-task" },
+        { "text": "Summarize my recent iMessage thread with the team and write it up as a Notion brief", "resolves_to": "imessage-thread-to-brief" },
+        { "text": "List my open tasks and send a status update via iMessage", "resolves_to": "task-to-imessage-notification" },
+        { "text": "Send me a macOS notification when this task completes and log it in Notion", "resolves_to": "mac-notification-and-log" },
+        { "text": "Extract the action items from last week's planning meeting in Notion and create tasks for each", "resolves_to": "meeting-notes-to-tasks" },
+        { "text": "Broadcast the project update from Notion over iMessage and send me a desktop notification", "resolves_to": "imessage-and-notion-broadcast" },
+        { "text": "Search my Notion workspace for notes about the deployment", "resolves_to": "notion/API-post-search" },
+        { "text": "Create a follow-up task from this conversation", "resolves_to": "tasks/create_task" }
       ]
     }
   }

@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { Aggregator } from '../src/aggregator.js';
 import { HttpMcpServer } from '../src/http-server.js';
 
@@ -10,7 +12,9 @@ interface Started {
 }
 
 async function startServer(token?: string): Promise<Started> {
-  const aggregator = new Aggregator([]);
+  const aggregator = new Aggregator([], {
+    ledgerDlqPath: join(tmpdir(), `ch1tty-test-http-${process.pid}.dlq.jsonl`),
+  });
   const server = new HttpMcpServer(aggregator, { port: 0, bindAddress: '127.0.0.1', mcpToken: token });
   await server.start();
   const baseUrl = `http://127.0.0.1:${server.getPort()}`;

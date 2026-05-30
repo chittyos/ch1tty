@@ -23,14 +23,14 @@ const DEAD_LETTER_PATH = process.env.CH1TTY_LEDGER_DLQ ?? join(homedir(), '.ch1t
  * Write entries to the dead-letter WAL for offline replay.
  * Best-effort and synchronous (called from shutdown / drop paths).
  */
-function writeDeadLetter(entries: LedgerEntry[]): void {
+function writeDeadLetter(entries: LedgerEntry[], dlqPath: string): void {
   if (entries.length === 0) return;
   try {
-    mkdirSync(dirname(DEAD_LETTER_PATH), { recursive: true });
+    mkdirSync(dirname(dlqPath), { recursive: true });
     const lines = entries.map((e) => JSON.stringify({ ...e, droppedAt: new Date().toISOString() })).join('\n') + '\n';
-    appendFileSync(DEAD_LETTER_PATH, lines, 'utf8');
+    appendFileSync(dlqPath, lines, 'utf8');
   } catch (err) {
-    log.error(`Ledger DLQ write failed (${DEAD_LETTER_PATH}): ${err}`);
+    log.error(`Ledger DLQ write failed (${dlqPath}): ${err}`);
   }
 }
 
@@ -71,12 +71,17 @@ export class LedgerClient {
   private flushing = false;
   private backend?: Backend;
   private serverId?: string;
+  readonly dlqPath: string;
 
   // Stats
   private totalFlushed = 0;
   private totalDropped = 0;
   private flushErrors = 0;
   private lastFlushAt: Date | null = null;
+
+  constructor(dlqPath?: string) {
+    this.dlqPath = dlqPath ?? DEAD_LETTER_PATH;
+  }
 
   /** Bind to the ecosystem backend for ledger writes. */
   bind(backend: Backend, serverId: string): void {
@@ -202,7 +207,7 @@ export class LedgerClient {
             this.totalDropped++;
             // Canon: chittycanon://gov/governance#ledger-is-append-only — elevate to error + WAL.
             log.error(`Ledger entry dropped after ${MAX_RETRIES} retries: ${entry.event_type} (session ${entry.session_id}) — written to DLQ`);
-            writeDeadLetter([entry]);
+            writeDeadLetter([entry], this.dlqPath);
           }
         }
       }
@@ -240,7 +245,7 @@ export class LedgerClient {
   /** Count entries currently in the dead-letter WAL file. Returns 0 if the file doesn't exist. */
   dlqEntries(): number {
     try {
-      const text = readFileSync(DEAD_LETTER_PATH, 'utf8');
+      const text = readFileSync(this.dlqPath, 'utf8');
       return text.split('\n').filter((l) => l.trim().length > 0).length;
     } catch {
       return 0;
@@ -255,7 +260,7 @@ export class LedgerClient {
       flushErrors: this.flushErrors,
       lastFlushAt: this.lastFlushAt?.toISOString() ?? null,
       flushIntervalMs: FLUSH_INTERVAL_MS,
-      dlqPath: DEAD_LETTER_PATH,
+      dlqPath: this.dlqPath,
       dlqEntries: this.dlqEntries(),
     };
   }
@@ -275,15 +280,15 @@ export class LedgerClient {
       if (this.buffer.length > 0) {
         // Append-only integrity — write remaining entries to DLQ instead of losing them.
         const lost = this.buffer.length;
-        writeDeadLetter(this.buffer);
+        writeDeadLetter(this.buffer, this.dlqPath);
         this.totalDropped += lost;
         this.buffer = [];
-        log.error(`Ledger shutdown: ${lost} unflushed entries written to DLQ (${DEAD_LETTER_PATH})`);
+        log.error(`Ledger shutdown: ${lost} unflushed entries written to DLQ (${this.dlqPath})`);
       }
     } else if (this.buffer.length > 0) {
       // Never bound — still flush to DLQ so entries aren't lost on shutdown.
       const lost = this.buffer.length;
-      writeDeadLetter(this.buffer);
+      writeDeadLetter(this.buffer, this.dlqPath);
       this.totalDropped += lost;
       this.buffer = [];
       log.error(`Ledger shutdown: ${lost} entries never flushed (no backend bound) — written to DLQ`);
