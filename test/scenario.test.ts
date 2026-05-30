@@ -834,3 +834,104 @@ test('resolvedBy: keyword-augmented tool wins after focus bias → resolvedBy=ke
   // Key assertion: resolvedBy must be keyword even though castRoute was brain
   assert.equal(cast.resolvedBy, 'keyword', 'winner came from keyword augmentation — must report keyword not brain');
 });
+
+// ── Scenario 12: Suggestions in cast:executed (real catalog) ─────────────────
+
+test('scenario: suggestions — finance focus cast:executed includes real catalog suggestions', async () => {
+  const { aggregator } = buildAggregator(FIXTURE_CONFIGS, undefined, { focus: 'finance' });
+
+  const result = await aggregator.callTool('ch1tty/cast', {
+    intent: 'list recent payments',
+  });
+
+  assert.equal(result.isError, undefined);
+  const cast = parseCast(result);
+  assert.equal(cast.cast, 'executed', `expected executed, got: ${cast.cast}`);
+  assert.ok(cast.suggestions, 'cast:executed with finance focus must include suggestions from real catalog');
+  const suggestions = cast.suggestions as { combos: Array<{ name: string; chain: string[] }>; prompts: Array<{ text: string }> };
+  assert.ok(Array.isArray(suggestions.combos) && suggestions.combos.length > 0, 'suggestions.combos must be non-empty');
+  assert.ok(Array.isArray(suggestions.prompts) && suggestions.prompts.length > 0, 'suggestions.prompts must be non-empty');
+  assert.equal(cast.focus, 'finance');
+
+  // All suggestion combos must reference at least one finance-relevant backend
+  const financeBackends = new Set(['stripe', 'tasks', 'ledger', 'notion', 'thinking']);
+  for (const combo of suggestions.combos) {
+    const servers = combo.chain.map((t) => t.split('/')[0]);
+    assert.ok(
+      servers.some((s) => financeBackends.has(s)),
+      `finance combo "${combo.name}" should reference a finance backend; chain: ${JSON.stringify(combo.chain)}`,
+    );
+  }
+});
+
+test('scenario: suggestions — cast:executed without focus has no suggestions field', async () => {
+  const { aggregator } = buildAggregator(FIXTURE_CONFIGS);
+
+  const result = await aggregator.callTool('ch1tty/cast', {
+    intent: 'list database projects',
+  });
+
+  assert.equal(result.isError, undefined);
+  const cast = parseCast(result);
+  assert.equal(cast.cast, 'executed', `expected executed, got: ${cast.cast}`);
+  assert.equal(cast.suggestions, undefined, 'cast:executed without focus must not include suggestions');
+});
+
+test('scenario: suggestions — governance focus cast:plan and cast:executed return same catalog suggestions', async () => {
+  const { aggregator: aggPlan } = buildAggregator(FIXTURE_CONFIGS, undefined, { focus: 'governance' });
+  const { aggregator: aggExec } = buildAggregator(FIXTURE_CONFIGS, undefined, { focus: 'governance' });
+
+  const planResult = await aggPlan.callTool('ch1tty/cast', {
+    intent: 'inspect database schema',
+    confirm: true,
+    focus: 'governance',
+  });
+  const execResult = await aggExec.callTool('ch1tty/cast', {
+    intent: 'inspect database schema',
+    focus: 'governance',
+  });
+
+  const plan = parseCast(planResult);
+  const exec = parseCast(execResult);
+
+  assert.equal(plan.cast, 'plan', `expected plan, got: ${plan.cast}`);
+  assert.equal(exec.cast, 'executed', `expected executed, got: ${exec.cast}`);
+
+  assert.ok(plan.suggestions, 'governance cast:plan must include suggestions');
+  assert.ok(exec.suggestions, 'governance cast:executed must include suggestions');
+
+  const planSugs = plan.suggestions as { combos: Array<{ name: string }>; prompts: Array<{ text: string }> };
+  const execSugs = exec.suggestions as { combos: Array<{ name: string }>; prompts: Array<{ text: string }> };
+
+  // Both paths hit the same getSuggestionsForFocus lookup — results must match
+  assert.deepEqual(
+    planSugs.combos.map((c) => c.name),
+    execSugs.combos.map((c) => c.name),
+    'cast:plan and cast:executed must return the same combo names from the catalog',
+  );
+  assert.deepEqual(
+    planSugs.prompts.map((p) => p.text),
+    execSugs.prompts.map((p) => p.text),
+    'cast:plan and cast:executed must return the same prompt texts from the catalog',
+  );
+});
+
+test('scenario: suggestions — per-call focus override propagates suggestions to cast:executed', async () => {
+  // Aggregator has no default focus, but per-call focus overrides it.
+  // Confirms that suggestions are tied to the resolved focus name (per-call wins).
+  const { aggregator } = buildAggregator(FIXTURE_CONFIGS); // no default focus
+
+  const result = await aggregator.callTool('ch1tty/cast', {
+    intent: 'list recent payments',
+    focus: 'finance',
+  });
+
+  assert.equal(result.isError, undefined);
+  const cast = parseCast(result);
+  assert.equal(cast.cast, 'executed', `expected executed, got: ${cast.cast}`);
+  assert.ok(cast.suggestions, 'per-call focus:finance must produce suggestions in cast:executed');
+  assert.equal(cast.focus, 'finance', 'focus field must report the per-call override');
+  const suggestions = cast.suggestions as { combos: unknown[]; prompts: unknown[] };
+  assert.ok(suggestions.combos.length > 0, 'per-call focus suggestions must have combos');
+  assert.ok(suggestions.prompts.length > 0, 'per-call focus suggestions must have prompts');
+});
