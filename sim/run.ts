@@ -35,11 +35,29 @@ async function main(): Promise<void> {
     if (sc.focus) probes.push(await runFocusBiasProbe(aggregator, sc));
   }
 
-  // 3) Out-of-focus reachability (lens, not gate): a code tool must remain
-  //    discoverable while a non-code focus is active.
-  const reachable = {
+  // 3) Out-of-focus reachability (lens, not gate): every focus must still surface
+  //    tools from other focus profiles when searched directly.
+  const reachable: Record<string, boolean> = {
+    // finance focus — code/communication/design tools still reachable
     githubUnderFinance: await outOfFocusReachable(aggregator, 'pull request', 'finance', 'github/create_pull_request'),
-    neonUnderDesign: await outOfFocusReachable(aggregator, 'sql query', 'design', 'neon/run_sql'),
+    imessageUnderFinance: await outOfFocusReachable(aggregator, 'message', 'finance', 'imessage/send_message'),
+    // design focus — code/finance tools still reachable
+    neonUnderDesign: await outOfFocusReachable(aggregator, 'sql', 'design', 'neon/run_sql'),
+    stripeUnderDesign: await outOfFocusReachable(aggregator, 'invoice', 'design', 'stripe/create_invoice'),
+    // code focus — finance/communication tools still reachable
+    stripeUnderCode: await outOfFocusReachable(aggregator, 'invoice', 'code', 'stripe/create_invoice'),
+    imessageUnderCode: await outOfFocusReachable(aggregator, 'message', 'code', 'imessage/send_message'),
+    // communication focus — code/finance tools still reachable
+    neonUnderCommunication: await outOfFocusReachable(aggregator, 'sql', 'communication', 'neon/run_sql'),
+    stripeUnderCommunication: await outOfFocusReachable(aggregator, 'invoice', 'communication', 'stripe/create_invoice'),
+    // governance focus — code/desktop/communication tools still reachable
+    githubUnderGovernance: await outOfFocusReachable(aggregator, 'pull request', 'governance', 'github/create_pull_request'),
+    browserRenderingUnderGovernance: await outOfFocusReachable(aggregator, 'headless', 'governance', 'browser-rendering/render_page'),
+    imessageUnderGovernance: await outOfFocusReachable(aggregator, 'message', 'governance', 'imessage/send_message'),
+    // ops focus (ecosystem+code) — communication/desktop/documents tools still reachable
+    imessageUnderOps: await outOfFocusReachable(aggregator, 'message', 'ops', 'imessage/send_message'),
+    browserRenderingUnderOps: await outOfFocusReachable(aggregator, 'headless', 'ops', 'browser-rendering/render_page'),
+    notionUnderOps: await outOfFocusReachable(aggregator, 'page', 'ops', 'notion/create_page'),
   };
 
   // ── Report ──────────────────────────────────────────────────
@@ -68,13 +86,17 @@ async function main(): Promise<void> {
     );
   }
 
-  console.log('\n--- out-of-focus reachability ---');
-  console.log(`  github under finance : ${reachable.githubUnderFinance ? 'reachable' : 'UNREACHABLE'}`);
-  console.log(`  neon under design    : ${reachable.neonUnderDesign ? 'reachable' : 'UNREACHABLE'}`);
+  console.log('\n--- out-of-focus reachability (lens, not gate) ---');
+  const oofEntries = Object.entries(reachable);
+  for (const [key, ok] of oofEntries) {
+    console.log(`  ${key.padEnd(36)}: ${ok ? 'reachable' : 'UNREACHABLE'}`);
+  }
+  const oofPassed = oofEntries.filter(([, ok]) => ok).length;
+  console.log(`  (${oofPassed}/${oofEntries.length} probes reachable)`);
 
   console.log(`\nResolution: ${passed}/${results.length} passed  |  total cast time ${Math.round(totalMs * 100) / 100}ms\n`);
 
-  const allReachable = reachable.githubUnderFinance && reachable.neonUnderDesign;
+  const allReachable = oofEntries.every(([, ok]) => ok);
   if (passed < results.length || !allReachable) {
     process.exitCode = 1;
   }
@@ -82,7 +104,11 @@ async function main(): Promise<void> {
   // ── Artifact ────────────────────────────────────────────────
   const artifact = {
     generatedAt: new Date().toISOString(),
-    summary: { resolution: { passed, total: results.length }, totalCastMs: Math.round(totalMs * 100) / 100 },
+    summary: {
+      resolution: { passed, total: results.length },
+      reachability: { passed: oofPassed, total: oofEntries.length },
+      totalCastMs: Math.round(totalMs * 100) / 100,
+    },
     scenarios: results,
     focusBiasProbes: probes,
     reachability: reachable,
