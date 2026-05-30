@@ -9,29 +9,27 @@ import assert from 'node:assert/strict';
 import test, { after } from 'node:test';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { writeFileSync, rmSync } from 'node:fs';
+import { writeFileSync, mkdtempSync, rmSync } from 'node:fs';
 import { Aggregator } from '../src/aggregator.js';
 import type { ServersConfig, ServerConfig } from '../src/types.js';
 import { FixtureBackend } from './fixture-backend.js';
 
-const TMP = tmpdir();
-const TEST_ID = process.pid;
+// Each test gets its own atomically-created temp directory, eliminating
+// predictable path construction (CodeQL CWE-377 / insecure-temp-file).
+const testDirs: string[] = [];
 
-// Each test gets a unique index for its temp files.
-let nextIdx = 0;
 function tempFiles(): { configPath: string; dlqPath: string } {
-  const idx = nextIdx++;
+  const dir = mkdtempSync(join(tmpdir(), 'ch1tty-reload-'));
+  testDirs.push(dir);
   return {
-    configPath: join(TMP, `ch1tty-reload-test-${TEST_ID}-${idx}.json`),
-    dlqPath: join(TMP, `ch1tty-reload-dlq-${TEST_ID}-${idx}.jsonl`),
+    configPath: join(dir, 'servers.json'),
+    dlqPath: join(dir, 'ledger.dlq.jsonl'),
   };
 }
 
 after(() => {
-  // Best-effort cleanup — temp OS handles this on reboot anyway.
-  for (let i = 0; i < nextIdx; i++) {
-    rmSync(join(TMP, `ch1tty-reload-test-${TEST_ID}-${i}.json`), { force: true });
-    rmSync(join(TMP, `ch1tty-reload-dlq-${TEST_ID}-${i}.jsonl`), { force: true });
+  for (const dir of testDirs) {
+    rmSync(dir, { recursive: true, force: true });
   }
 });
 
