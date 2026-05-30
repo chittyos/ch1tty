@@ -33,6 +33,8 @@ const CATEGORY_BY_SERVER: Record<string, ServerConfig['category']> = {
   neon: 'ecosystem',
   notion: 'documents',
   orchestrator: 'ecosystem',
+  cloudflare: 'ecosystem',
+  fs: 'ecosystem',
   'browser-rendering': 'desktop',
   playwright: 'desktop',
   cowork: 'desktop',
@@ -234,6 +236,36 @@ export const SCENARIOS: Scenario[] = [
     intent: 'create a follow-up task to track the deployment issue from the team message',
     expect: 'tasks/create_task',
     note: 'near-miss: imessage/send_message (message keyword), notion/create_page (create keyword); tasks in communication profile via servers list',
+  },
+
+  // ── ops journey ──────────────────────────────────────────────
+  {
+    id: 'ops.deploy-worker',
+    focus: 'ops',
+    intent: 'deploy the cloudflare worker script to production',
+    expect: 'cloudflare/deploy_worker',
+    note: 'near-misses: orchestrator/execute (execute keyword), orchestrator/run_job (run keyword)',
+  },
+  {
+    id: 'ops.list-workers',
+    focus: 'ops',
+    intent: 'list all deployed cloudflare workers and their status',
+    expect: 'cloudflare/list_workers',
+    note: 'near-misses: tasks/list_tasks (list keyword), orchestrator/list_jobs (list keyword)',
+  },
+  {
+    id: 'ops.run-backup-job',
+    focus: 'ops',
+    intent: 'run a scheduled database backup orchestrator job',
+    expect: 'orchestrator/run_job',
+    note: 'near-misses: neon/run_sql (run+database keywords), orchestrator/list_jobs (same server+orchestrator)',
+  },
+  {
+    id: 'ops.failed-jobs',
+    focus: 'ops',
+    intent: 'list recent failed orchestrator jobs for incident triage',
+    expect: 'orchestrator/list_jobs',
+    note: 'near-misses: tasks/list_tasks (list+tasks keyword), orchestrator/run_job (same server+job)',
   },
 
   // ── governance follow-up scenarios ───────────────────────────

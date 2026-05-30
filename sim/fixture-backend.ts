@@ -101,6 +101,22 @@ export const FIXTURE_TOOLS: Record<string, FixtureTool[]> = {
   orchestrator: [
     { name: 'search', description: 'Search the orchestrator capability index for skills and agents' },
     { name: 'execute', description: 'Execute a registered orchestrator capability by name' },
+    // ops-specific tools — included so ops scenarios can resolve to orchestrator
+    { name: 'run_job', description: 'Run a registered orchestrator job by name or ID' },
+    { name: 'get_job_status', description: 'Retrieve current result and outcome for an orchestrator job by job ID' },
+    { name: 'list_jobs', description: 'List recent orchestrator jobs, including any failures and completions' },
+  ],
+
+  // ── ops / ecosystem + code ───────────────────────────────────
+  cloudflare: [
+    { name: 'deploy_worker', description: 'Deploy a Cloudflare Worker script to production with routing configuration' },
+    { name: 'list_workers', description: 'List all deployed Cloudflare Workers with current route configurations' },
+    { name: 'get_worker_logs', description: 'Retrieve recent logs and errors from a deployed Cloudflare Worker' },
+  ],
+  fs: [
+    { name: 'read_file', description: 'Read the contents of a file from the filesystem by path' },
+    { name: 'write_file', description: 'Write or overwrite a file on the filesystem at the given path' },
+    { name: 'list_directory', description: 'List files and subdirectories in a filesystem directory path' },
   ],
 
   // ── design / desktop ─────────────────────────────────────────
