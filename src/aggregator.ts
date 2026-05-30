@@ -872,11 +872,12 @@ export class Aggregator {
       };
     }
 
+    const focusSuggestions = focusName
+      ? getSuggestionsForFocus(focusName, this.suggestionsCatalog)
+      : null;
+
     // Step 2: Confirm mode — return the plan without executing
     if (confirm) {
-      const focusSuggestions = focusName
-        ? getSuggestionsForFocus(focusName, this.suggestionsCatalog)
-        : null;
       return {
         content: [{
           type: 'text',
@@ -923,6 +924,7 @@ export class Aggregator {
             score: best.score,
             ...(alternatives.length > 0 ? { alternatives } : {}),
             ...related,
+            ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
           }),
         },
         ...result.content,

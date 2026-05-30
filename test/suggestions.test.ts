@@ -288,3 +288,154 @@ describe('cast plan includes suggestions', () => {
     }
   });
 });
+
+describe('cast executed includes suggestions', () => {
+  it('cast without confirm + active focus includes suggestions in executed response', async () => {
+    const { Aggregator } = await import('../src/aggregator.js');
+    const { FixtureBackend } = await import('./fixture-backend.js');
+
+    const fixture = new FixtureBackend();
+    fixture.defineServer('context7', {
+      tools: [
+        {
+          name: 'get-library-docs',
+          description: 'get library documentation for a package',
+          inputSchema: {},
+          response: { content: [{ type: 'text', text: 'docs result' }] },
+        },
+      ],
+    });
+
+    const agg = new Aggregator(
+      [{ id: 'context7', name: 'context7', type: 'remote', access: 'read', category: 'code', endpoint: 'https://unused.invalid/mcp', lazy: false }],
+      {
+        backendFactory: () => fixture,
+        embedEnabled: false,
+        focusProfiles: {
+          profiles: {
+            code: { description: 'code', categories: ['code'], servers: ['context7'], boost: 0.5 },
+          },
+        },
+        suggestionsCatalog: {
+          code: {
+            description: 'code suggestions',
+            combos: [
+              { name: 'exec-combo', chain: ['context7/get-library-docs', 'neon/run_sql'], accomplishes: 'exec test', verified: false },
+            ],
+            prompts: [
+              { text: 'Search library docs', resolves_to: 'exec-combo' },
+            ],
+          },
+        },
+      },
+    );
+
+    try {
+      const result = await agg.callTool('ch1tty/cast', {
+        intent: 'get library documentation',
+        focus: 'code',
+      }, 'test-exec-session-1');
+
+      assert.equal(result.isError, undefined);
+      const body = JSON.parse((result.content[0] as { type: string; text: string }).text);
+      assert.equal(body.cast, 'executed', `expected executed, got: ${JSON.stringify(body)}`);
+      assert.ok(body.suggestions, 'cast:executed should include suggestions when focus is active');
+      assert.ok(Array.isArray(body.suggestions.combos), 'suggestions.combos should be an array');
+      assert.ok(Array.isArray(body.suggestions.prompts), 'suggestions.prompts should be an array');
+      assert.equal(body.suggestions.combos[0].name, 'exec-combo');
+      assert.equal(body.suggestions.prompts[0].text, 'Search library docs');
+    } finally {
+      await agg.shutdown();
+    }
+  });
+
+  it('cast without confirm + no focus has no suggestions in executed response', async () => {
+    const { Aggregator } = await import('../src/aggregator.js');
+    const { FixtureBackend } = await import('./fixture-backend.js');
+
+    const fixture = new FixtureBackend();
+    fixture.defineServer('context7', {
+      tools: [
+        {
+          name: 'get-library-docs',
+          description: 'get library documentation for a package',
+          inputSchema: {},
+          response: { content: [{ type: 'text', text: 'docs result' }] },
+        },
+      ],
+    });
+
+    const agg = new Aggregator(
+      [{ id: 'context7', name: 'context7', type: 'remote', access: 'read', category: 'code', endpoint: 'https://unused.invalid/mcp', lazy: false }],
+      {
+        backendFactory: () => fixture,
+        embedEnabled: false,
+        suggestionsCatalog: {
+          code: {
+            description: 'code suggestions',
+            combos: [{ name: 'exec-combo', chain: ['context7/get-library-docs'], accomplishes: 'test', verified: false }],
+            prompts: [{ text: 'Search library docs', resolves_to: 'exec-combo' }],
+          },
+        },
+      },
+    );
+
+    try {
+      const result = await agg.callTool('ch1tty/cast', {
+        intent: 'get library documentation',
+      }, 'test-exec-session-2');
+
+      assert.equal(result.isError, undefined);
+      const body = JSON.parse((result.content[0] as { type: string; text: string }).text);
+      assert.equal(body.cast, 'executed', `expected executed, got: ${JSON.stringify(body)}`);
+      assert.equal(body.suggestions, undefined, 'cast:executed without focus should not include suggestions');
+    } finally {
+      await agg.shutdown();
+    }
+  });
+
+  it('cast without confirm + focus and empty catalog has no suggestions in executed response', async () => {
+    const { Aggregator } = await import('../src/aggregator.js');
+    const { FixtureBackend } = await import('./fixture-backend.js');
+
+    const fixture = new FixtureBackend();
+    fixture.defineServer('context7', {
+      tools: [
+        {
+          name: 'get-library-docs',
+          description: 'get library documentation for a package',
+          inputSchema: {},
+          response: { content: [{ type: 'text', text: 'docs result' }] },
+        },
+      ],
+    });
+
+    const agg = new Aggregator(
+      [{ id: 'context7', name: 'context7', type: 'remote', access: 'read', category: 'code', endpoint: 'https://unused.invalid/mcp', lazy: false }],
+      {
+        backendFactory: () => fixture,
+        embedEnabled: false,
+        focusProfiles: {
+          profiles: {
+            code: { description: 'code', categories: ['code'], servers: ['context7'], boost: 0.5 },
+          },
+        },
+        suggestionsCatalog: {},
+      },
+    );
+
+    try {
+      const result = await agg.callTool('ch1tty/cast', {
+        intent: 'get library documentation',
+        focus: 'code',
+      }, 'test-exec-session-3');
+
+      assert.equal(result.isError, undefined);
+      const body = JSON.parse((result.content[0] as { type: string; text: string }).text);
+      assert.equal(body.cast, 'executed', `expected executed, got: ${JSON.stringify(body)}`);
+      assert.equal(body.suggestions, undefined, 'empty catalog should produce no suggestions in executed response');
+    } finally {
+      await agg.shutdown();
+    }
+  });
+});
