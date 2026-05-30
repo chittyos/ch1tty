@@ -121,13 +121,17 @@ test('registryExpiresAt is 0 immediately after successful reload', async () => {
     embedEnabled: false,
   });
 
-  // Prime the registry — expiresAt should be well in the future
-  await searchTools(agg, 'alpha');
-  assert.ok(expiresAt(agg) > Date.now(), 'registry cached after first search');
+  try {
+    // Prime the registry — expiresAt should be well in the future
+    await searchTools(agg, 'alpha');
+    assert.ok(expiresAt(agg) > Date.now(), 'registry cached after first search');
 
-  // Reload resets it to 0
-  await agg.callTool('ch1tty/reload');
-  assert.equal(expiresAt(agg), 0, 'reload must zero registryExpiresAt');
+    // Reload resets it to 0
+    await agg.callTool('ch1tty/reload');
+    assert.equal(expiresAt(agg), 0, 'reload must zero registryExpiresAt');
+  } finally {
+    await agg.shutdown();
+  }
 });
 
 test('first search after reload triggers a new listTools call', async () => {
@@ -148,20 +152,24 @@ test('first search after reload triggers a new listTools call', async () => {
     embedEnabled: false,
   });
 
-  // Prime the cache
-  await searchTools(agg, 'alpha');
-  assert.equal(cb.listToolsCalls, 1, 'one fetch for priming');
+  try {
+    // Prime the cache
+    await searchTools(agg, 'alpha');
+    assert.equal(cb.listToolsCalls, 1, 'one fetch for priming');
 
-  // Second search should be cached — no new fetch
-  await searchTools(agg, 'alpha');
-  assert.equal(cb.listToolsCalls, 1, 'no fetch within TTL');
+    // Second search should be cached — no new fetch
+    await searchTools(agg, 'alpha');
+    assert.equal(cb.listToolsCalls, 1, 'no fetch within TTL');
 
-  // Reload invalidates registry
-  await agg.callTool('ch1tty/reload');
+    // Reload invalidates registry
+    await agg.callTool('ch1tty/reload');
 
-  // Next search MUST trigger a re-fetch
-  await searchTools(agg, 'alpha');
-  assert.equal(cb.listToolsCalls, 2, 'reload must force re-fetch on next search');
+    // Next search MUST trigger a re-fetch
+    await searchTools(agg, 'alpha');
+    assert.equal(cb.listToolsCalls, 2, 'reload must force re-fetch on next search');
+  } finally {
+    await agg.shutdown();
+  }
 });
 
 test('new server tools immediately visible after reload', async () => {
@@ -182,19 +190,23 @@ test('new server tools immediately visible after reload', async () => {
     embedEnabled: false,
   });
 
-  // Prime the registry — beta_tool must NOT be visible before reload
-  const before = await searchTools(agg, 'beta_tool');
-  assert.ok(!before.some((t) => t.includes('beta_tool')), 'beta_tool not visible before server added');
+  try {
+    // Prime the registry — beta_tool must NOT be visible before reload
+    const before = await searchTools(agg, 'beta_tool');
+    assert.ok(!before.some((t) => t.includes('beta_tool')), 'beta_tool not visible before server added');
 
-  // Add server 'beta' to both the config file and the fixture backend
-  fb.defineServer('beta', { tools: [makeTool('beta_tool', 'A beta tool')] });
-  writeConfig(configPath, [makeServerConfig('alpha'), makeServerConfig('beta')]);
+    // Add server 'beta' to both the config file and the fixture backend
+    fb.defineServer('beta', { tools: [makeTool('beta_tool', 'A beta tool')] });
+    writeConfig(configPath, [makeServerConfig('alpha'), makeServerConfig('beta')]);
 
-  await agg.callTool('ch1tty/reload');
+    await agg.callTool('ch1tty/reload');
 
-  // Immediately after reload, beta_tool must be visible (registry was cleared)
-  const after = await searchTools(agg, 'beta_tool');
-  assert.ok(after.some((t) => t.includes('beta_tool')), 'beta_tool must be visible immediately after reload');
+    // Immediately after reload, beta_tool must be visible (registry was cleared)
+    const after = await searchTools(agg, 'beta_tool');
+    assert.ok(after.some((t) => t.includes('beta_tool')), 'beta_tool must be visible immediately after reload');
+  } finally {
+    await agg.shutdown();
+  }
 });
 
 test('removed server tools not visible after reload', async () => {
@@ -216,17 +228,21 @@ test('removed server tools not visible after reload', async () => {
     embedEnabled: false,
   });
 
-  // Prime registry — both tools visible
-  const before = await searchTools(agg, 'beta_tool');
-  assert.ok(before.some((t) => t.includes('beta_tool')), 'beta_tool visible before removal');
+  try {
+    // Prime registry — both tools visible
+    const before = await searchTools(agg, 'beta_tool');
+    assert.ok(before.some((t) => t.includes('beta_tool')), 'beta_tool visible before removal');
 
-  // Remove server 'beta' from config
-  writeConfig(configPath, [makeServerConfig('alpha')]);
-  await agg.callTool('ch1tty/reload');
+    // Remove server 'beta' from config
+    writeConfig(configPath, [makeServerConfig('alpha')]);
+    await agg.callTool('ch1tty/reload');
 
-  // beta_tool must NOT be visible after reload removes the server
-  const after = await searchTools(agg, 'beta_tool');
-  assert.ok(!after.some((t) => t.includes('beta_tool')), 'beta_tool must not be visible after server removed');
+    // beta_tool must NOT be visible after reload removes the server
+    const after = await searchTools(agg, 'beta_tool');
+    assert.ok(!after.some((t) => t.includes('beta_tool')), 'beta_tool must not be visible after server removed');
+  } finally {
+    await agg.shutdown();
+  }
 });
 
 test('failed reload leaves registryExpiresAt intact', async () => {
@@ -247,22 +263,26 @@ test('failed reload leaves registryExpiresAt intact', async () => {
     embedEnabled: false,
   });
 
-  // Prime the registry
-  await searchTools(agg, 'alpha');
-  const cachedAt = expiresAt(agg);
-  assert.ok(cachedAt > Date.now(), 'registry is cached before failed reload');
+  try {
+    // Prime the registry
+    await searchTools(agg, 'alpha');
+    const cachedAt = expiresAt(agg);
+    assert.ok(cachedAt > Date.now(), 'registry is cached before failed reload');
 
-  // Write bad JSON — reload must fail
-  writeFileSync(configPath, '{ not valid json }', 'utf8');
-  const result = await agg.callTool('ch1tty/reload');
-  assert.equal(result.isError, true, 'reload must return isError on bad config');
+    // Write bad JSON — reload must fail
+    writeFileSync(configPath, '{ not valid json }', 'utf8');
+    const result = await agg.callTool('ch1tty/reload');
+    assert.equal(result.isError, true, 'reload must return isError on bad config');
 
-  // registryExpiresAt must remain unchanged (failed reload does NOT call rebuildBackends)
-  assert.equal(expiresAt(agg), cachedAt, 'failed reload must not alter registryExpiresAt');
+    // registryExpiresAt must remain unchanged (failed reload does NOT call rebuildBackends)
+    assert.equal(expiresAt(agg), cachedAt, 'failed reload must not alter registryExpiresAt');
 
-  // Registry still usable — no additional listTools call should be needed
-  const countBefore = cb.listToolsCalls;
-  const tools = await searchTools(agg, 'alpha');
-  assert.equal(cb.listToolsCalls, countBefore, 'cached registry still usable after failed reload');
-  assert.ok(tools.some((t) => t.includes('alpha_tool')), 'alpha_tool still visible after failed reload');
+    // Registry still usable — no additional listTools call should be needed
+    const countBefore = cb.listToolsCalls;
+    const tools = await searchTools(agg, 'alpha');
+    assert.equal(cb.listToolsCalls, countBefore, 'cached registry still usable after failed reload');
+    assert.ok(tools.some((t) => t.includes('alpha_tool')), 'alpha_tool still visible after failed reload');
+  } finally {
+    await agg.shutdown();
+  }
 });
