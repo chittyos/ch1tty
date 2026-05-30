@@ -1049,3 +1049,70 @@ test('scenario: ops focus — multi-step: list workers, inspect logs, document i
   assert.ok(toolNames.includes('cloudflare/get_worker_logs'), 'cloudflare/get_worker_logs must have been called');
   assert.ok(toolNames.includes('notion/create_page'), 'notion/create_page must have been called');
 });
+
+// ── Scenario 14: Ops REORDER probe ───────────────────────────────────────────
+
+test('scenario: ops REORDER — without focus chittymac/list_notes wins on raw keyword score', async () => {
+  // "list notes in filesystem folder" — terms: [list, notes, filesystem, folder]
+  // chittymac/list_notes matches list+notes+folder = 3/4 = 0.75 (OOF for ops)
+  // fs/list_directory matches list+filesystem = 2/4 = 0.50 (in-focus for ops)
+  // Without focus the higher raw score wins → chittymac/list_notes at 0.75
+  const { aggregator } = buildAggregator(FIXTURE_CONFIGS, undefined, { focus: 'none' });
+
+  const result = await aggregator.callTool('ch1tty/cast', {
+    intent: 'list notes in filesystem folder',
+    focus: 'none',
+    confirm: true,
+  });
+
+  assert.equal(result.isError, undefined);
+  const cast = parseCast(result);
+  const resolved = cast.resolved as { tool: string; score: number } | undefined;
+  assert.ok(resolved, 'cast should resolve a tool');
+  assert.equal(
+    resolved.tool,
+    'chittymac/list_notes',
+    `without focus chittymac/list_notes (score 0.75) should win; got ${resolved.tool} (score ${resolved.score})`,
+  );
+  assert.ok(Math.abs((resolved.score ?? 0) - 0.75) < 0.05, `raw score should be ~0.75, got ${resolved.score}`);
+});
+
+test('scenario: ops REORDER — with ops focus fs/list_directory overtakes chittymac/list_notes', async () => {
+  // With ops focus: fs is in-focus (servers list) → +0.50 boost
+  // fs/list_directory: 2/4 + 0.50 = 1.00 → wins
+  // chittymac/list_notes: 3/4 = 0.75, no boost (communication, OOF for ops) → loses
+  const { aggregator } = buildAggregator(FIXTURE_CONFIGS, undefined, { focus: 'ops' });
+
+  const result = await aggregator.callTool('ch1tty/cast', {
+    intent: 'list notes in filesystem folder',
+    focus: 'ops',
+    confirm: true,
+  });
+
+  assert.equal(result.isError, undefined);
+  const cast = parseCast(result);
+  const resolved = cast.resolved as { tool: string; score: number } | undefined;
+  assert.ok(resolved, 'cast should resolve a tool');
+  assert.equal(
+    resolved.tool,
+    'fs/list_directory',
+    `with ops focus fs/list_directory (score 1.00) should win; got ${resolved.tool} (score ${resolved.score})`,
+  );
+  assert.ok((resolved.score ?? 0) >= 0.95, `boosted score should be ~1.00, got ${resolved.score}`);
+
+  // OOF lens-not-gate: chittymac/list_notes must still be discoverable via search even
+  // when ops focus is active. cast.alternatives is only top-3 runners-up, so with many
+  // in-focus ecosystem tools tied at 0.75, chittymac may be pushed out of that slice.
+  // Use ch1tty/search with a large limit to verify reachability independently.
+  const searchResult = await aggregator.callTool('ch1tty/search', {
+    query: 'notes folder',
+    focus: 'ops',
+    limit: 50,
+  });
+  assert.equal(searchResult.isError, undefined);
+  const searchData = parseSearch(searchResult);
+  assert.ok(
+    (searchData.tools ?? []).some((t) => t.tool === 'chittymac/list_notes'),
+    'chittymac/list_notes must remain discoverable via search (lens-not-gate) even when ops focus is active',
+  );
+});

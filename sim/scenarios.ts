@@ -267,6 +267,17 @@ export const SCENARIOS: Scenario[] = [
     expect: 'orchestrator/list_jobs',
     note: 'near-misses: tasks/list_tasks (list+tasks keyword), orchestrator/run_job (same server+job)',
   },
+  {
+    // REORDER probe: cross-focus near-miss. Without focus, chittymac/list_notes
+    // (communication, OOF for ops) wins on raw keyword score — "list notes folder" = 3/4 = 0.75.
+    // With the ops focus, fs/list_directory gains +0.50 boost — "list filesystem" = 2/4 + 0.50 = 1.00
+    // — and flips to win. Confirms focus boost re-ranks an OOF leader without hiding it.
+    id: 'ops.listdir-reorder',
+    focus: 'ops',
+    intent: 'list notes in filesystem folder',
+    expect: 'fs/list_directory',
+    note: 'REORDER: without ops focus chittymac/list_notes wins (0.75); with ops focus fs/list_directory wins (1.00)',
+  },
 
   // ── governance follow-up scenarios ───────────────────────────
   {
