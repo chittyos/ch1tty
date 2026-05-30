@@ -83,11 +83,12 @@ test('routeIntent: returns embedding results when fake server responds', async (
   // query → oneHot(0), stripe → oneHot(0) (sim=1.0), others → orthogonal.
   // minSimilarity=0 so all pass; stripe wins because it has the highest similarity.
   const fake = await startFakeOllama((req) => {
+    // length===1: query embed or warmup (both single-input). CANDIDATES has 3
+    // items so the candidate batch always arrives with length 3, never 1.
     if (req.input.length === 1) {
-      // query embed (and warmup — both fine with oneHot(0))
       return { status: 200, body: embedBody([oneHot(0)]) };
     }
-    // candidate batch: stripe=oneHot(0), neon=oneHot(1), notion=oneHot(2)
+    // candidate batch (length 3): stripe=oneHot(0), neon=oneHot(1), notion=oneHot(2)
     return { status: 200, body: embedBody(req.input.map((_, i) => oneHot(i))) };
   });
 
@@ -113,6 +114,7 @@ test('routeIntent: results sorted by cosine similarity (highest first)', async (
   // query → oneHot(2); notion (pos 2) has sim=1.0, others have sim=0.
   // With minSimilarity=0, all three pass; notion must sort first.
   const fake = await startFakeOllama((req) => {
+    // length===1: query embed or warmup. CANDIDATES has 3 items so batch is always length 3.
     if (req.input.length === 1) {
       return { status: 200, body: embedBody([oneHot(2)]) };
     }
@@ -176,6 +178,7 @@ test('routeIntent: returns null when all similarities fall below minSimilarity',
   // query → oneHot(0); all candidates → oneHot(8..10) — orthogonal, sim=0.
   // Default minSimilarity=0.5 drops all → empty results → null.
   const fake = await startFakeOllama((req) => {
+    // length===1: query embed or warmup. CANDIDATES has 3 items so batch is always length 3.
     if (req.input.length === 1) {
       return { status: 200, body: embedBody([oneHot(0)]) };
     }
