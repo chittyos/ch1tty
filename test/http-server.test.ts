@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { rmSync } from 'node:fs';
 import { Aggregator } from '../src/aggregator.js';
 import { HttpMcpServer } from '../src/http-server.js';
 
@@ -7,19 +10,24 @@ interface Started {
   server: HttpMcpServer;
   aggregator: Aggregator;
   baseUrl: string;
+  dlqPath: string;
 }
 
 async function startServer(token?: string): Promise<Started> {
-  const aggregator = new Aggregator([]);
+  const dlqPath = join(tmpdir(), `ch1tty-test-http-${process.pid}.dlq.jsonl`);
+  const aggregator = new Aggregator([], {
+    ledgerDlqPath: dlqPath,
+  });
   const server = new HttpMcpServer(aggregator, { port: 0, bindAddress: '127.0.0.1', mcpToken: token });
   await server.start();
   const baseUrl = `http://127.0.0.1:${server.getPort()}`;
-  return { server, aggregator, baseUrl };
+  return { server, aggregator, baseUrl, dlqPath };
 }
 
 async function stop(s: Started): Promise<void> {
   await s.server.stop();
   await s.aggregator.shutdown();
+  rmSync(s.dlqPath, { force: true });
 }
 
 test('GET /health returns 200 without auth', async () => {

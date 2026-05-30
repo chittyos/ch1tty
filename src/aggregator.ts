@@ -24,6 +24,13 @@ import {
   resolveFocusProfilesPath,
 } from './focus.js';
 import type { FocusProfile, FocusProfiles } from './focus.js';
+import {
+  loadSuggestionsCatalog,
+  clearSuggestionsCache,
+  getSuggestionsForFocus,
+  resolveSuggestionsCatalogPath,
+} from './suggestions.js';
+import type { FocusSuggestions } from './suggestions.js';
 
 const SEPARATOR = '/';
 const META_SERVER_ID = 'ch1tty';
@@ -49,6 +56,10 @@ export interface AggregatorOptions {
   focusProfilesPath?: string;
   /** Pre-loaded focus profiles (mainly for tests); otherwise loaded from path. */
   focusProfiles?: FocusProfiles;
+  /** Override the focus-suggestions catalog path (defaults to focus-suggestions.json). */
+  suggestionsCatalogPath?: string;
+  /** Pre-loaded suggestions catalog (mainly for tests). */
+  suggestionsCatalog?: Record<string, FocusSuggestions>;
   /**
    * Override how backends are constructed. Returns a real {@link Backend} for a
    * given config. Defaults to ChildManager (local) / RemoteProxy (remote).
@@ -71,6 +82,12 @@ export interface AggregatorOptions {
    * Ollama/embedding endpoint.
    */
   coordinator?: SessionCoordinator;
+  /**
+   * Override the ledger DLQ path for this aggregator instance. Useful in tests to
+   * keep each test's dead-letter WAL isolated from the shared default path so that
+   * one test's ledger entries don't cause dlqEntries > 0 in another test's status check.
+   */
+  ledgerDlqPath?: string;
 }
 
 export class Aggregator {
@@ -80,6 +97,7 @@ export class Aggregator {
   private categoryFilter?: ServerCategory;
   private configPath?: string;
   private focusProfiles: FocusProfiles;
+  private suggestionsCatalog: Record<string, FocusSuggestions>;
   private defaultFocus?: string;
   private backendFactory?: (config: ServerConfig) => Backend;
   private startedAt = Date.now();
@@ -100,9 +118,11 @@ export class Aggregator {
     this.backendFactory = options?.backendFactory;
     this.focusProfiles = options?.focusProfiles
       ?? loadFocusProfilesFromPath(options?.focusProfilesPath ?? resolveFocusProfilesPath());
+    this.suggestionsCatalog = options?.suggestionsCatalog
+      ?? loadSuggestionsCatalog(options?.suggestionsCatalogPath ?? resolveSuggestionsCatalogPath());
     this.configs = configs;
     const embedConfig = options?.embedEnabled === false ? { enabled: false } : {};
-    this.coordinator = options?.coordinator ?? new SessionCoordinator({}, embedConfig);
+    this.coordinator = options?.coordinator ?? new SessionCoordinator({}, embedConfig, options?.ledgerDlqPath);
     this.rebuildBackends();
   }
 
@@ -607,6 +627,8 @@ export class Aggregator {
 
     try {
       const newConfig = loadConfigFromPath(this.configPath);
+      clearSuggestionsCache();
+      this.suggestionsCatalog = loadSuggestionsCatalog();
       const oldIds = new Set(this.configs.map((c) => c.id));
       const newIds = new Set(newConfig.servers.map((c) => c.id));
 
@@ -852,6 +874,9 @@ export class Aggregator {
 
     // Step 2: Confirm mode — return the plan without executing
     if (confirm) {
+      const focusSuggestions = focusName
+        ? getSuggestionsForFocus(focusName, this.suggestionsCatalog)
+        : null;
       return {
         content: [{
           type: 'text',
@@ -870,6 +895,7 @@ export class Aggregator {
             },
             alternatives,
             ...related,
+            ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
             args: toolArgs,
             hint: 'Call cast again without confirm to execute, or use ch1tty/execute directly.',
           }, null, 2),

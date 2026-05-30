@@ -1,14 +1,25 @@
 import assert from 'node:assert/strict';
-import test from 'node:test';
+import test, { after } from 'node:test';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { rmSync } from 'node:fs';
 import { Aggregator } from '../src/aggregator.js';
 import type { ServerConfig } from '../src/types.js';
+
+const META_DLQ_PATH = join(tmpdir(), `ch1tty-test-meta-${process.pid}.dlq.jsonl`);
+
+// Remove the temp DLQ file after all tests so a pid-reuse in a later run
+// won't observe stale dlqEntries and break the dlqEntries===0 assertion.
+after(() => { rmSync(META_DLQ_PATH, { force: true }); });
 
 function createAggregator(): Aggregator {
   const config: ServerConfig[] = [
     { id: 'local', name: 'Local', type: 'local', access: 'readwrite', category: 'code', command: 'ch1tty-test-no-such-server' },
     { id: 'remote', name: 'Remote', type: 'remote', access: 'read', category: 'search', endpoint: 'https://example.com/mcp' },
   ];
-  return new Aggregator(config);
+  // Use an isolated DLQ path so entries from other tests don't bleed into this
+  // test's ledger status checks (dlqEntries === 0 expects a clean slate).
+  return new Aggregator(config, { ledgerDlqPath: META_DLQ_PATH });
 }
 
 test('ch1tty/status returns gateway status JSON', async () => {
