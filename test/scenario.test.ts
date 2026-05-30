@@ -53,6 +53,18 @@ const FOCUS_PROFILES = {
       servers: ['playwright'],
       boost: 0.5,
     },
+    code: {
+      description: 'Software development — source control, library documentation, and database tools',
+      categories: ['code' as const],
+      servers: ['github', 'context7', 'neon'],
+      boost: 0.5,
+    },
+    communication: {
+      description: 'Cross-channel messaging, notes, and team communication',
+      categories: ['communication' as const],
+      servers: ['notion', 'chittymac', 'imessage', 'tasks'],
+      boost: 0.5,
+    },
   },
 };
 
@@ -64,6 +76,10 @@ const FIXTURE_CONFIGS: ServerConfig[] = [
   { id: 'chittyos', name: 'ChittyOS', type: 'remote', access: 'read', category: 'ecosystem', endpoint: 'https://fixture.chittyos' },
   { id: 'playwright', name: 'Playwright', type: 'remote', access: 'readwrite', category: 'desktop', endpoint: 'https://fixture.playwright' },
   { id: 'notion', name: 'Notion', type: 'remote', access: 'readwrite', category: 'documents', endpoint: 'https://fixture.notion' },
+  { id: 'github', name: 'GitHub', type: 'remote', access: 'readwrite', category: 'code', endpoint: 'https://fixture.github' },
+  { id: 'context7', name: 'Library Docs', type: 'remote', access: 'read', category: 'code', endpoint: 'https://fixture.context7' },
+  { id: 'imessage', name: 'iMessage', type: 'remote', access: 'readwrite', category: 'communication', endpoint: 'https://fixture.imessage' },
+  { id: 'chittymac', name: 'Apple Notes', type: 'remote', access: 'readwrite', category: 'communication', endpoint: 'https://fixture.chittymac' },
 ];
 
 function buildAggregator(
@@ -599,6 +615,185 @@ test('resolvedBy: keyword route produces resolvedBy=keyword (no brain in fixture
   // In tests, brain is disabled (no real Ollama/embedding endpoint).
   // castRoute will always be 'fallback' → resolvedBy 'keyword'.
   assert.equal(cast.resolvedBy, 'keyword', 'fixture env has no brain: resolvedBy must be keyword');
+});
+
+// ── Scenario 10: Code focus ───────────────────────────────────────────────────
+
+test('scenario: code focus — cast "create pull request" resolves to github', async () => {
+  const { aggregator } = buildAggregator(FIXTURE_CONFIGS, undefined, { focus: 'code' });
+
+  const result = await aggregator.callTool('ch1tty/cast', {
+    intent: 'create a pull request to merge the feature branch',
+    confirm: true,
+  });
+
+  assert.equal(result.isError, undefined);
+  const cast = parseCast(result);
+  assert.equal(cast.cast, 'plan');
+  const resolved = cast.resolved as { tool: string; score: number } | undefined;
+  assert.ok(resolved, 'cast should resolve a tool');
+  assert.equal(resolved.tool, 'github/create_pull_request', `expected github/create_pull_request, got ${resolved.tool}`);
+  assert.ok((resolved.score ?? 0) > 0.1, `score should be >0.1, got ${resolved.score}`);
+  assert.equal(cast.focus, 'code');
+});
+
+test('scenario: code focus boosts github over out-of-focus tools', async () => {
+  const { aggregator } = buildAggregator(FIXTURE_CONFIGS, undefined, { focus: 'code' });
+
+  const resultWithFocus = await aggregator.callTool('ch1tty/search', {
+    query: 'pull request',
+    focus: 'code',
+  });
+  const resultNoFocus = await aggregator.callTool('ch1tty/search', {
+    query: 'pull request',
+    focus: 'none',
+  });
+
+  assert.equal(resultWithFocus.isError, undefined);
+  assert.equal(resultNoFocus.isError, undefined);
+
+  const withFocus = parseSearch(resultWithFocus);
+  const noFocus = parseSearch(resultNoFocus);
+
+  // With code focus, github tools (in-focus) must rank first and be marked inFocus
+  const withTools = withFocus.tools ?? [];
+  assert.ok(withTools.length > 0, 'should return tools with code focus');
+  assert.ok(
+    withTools[0].tool.startsWith('github/'),
+    `first result with code focus should be github, got ${withTools[0].tool}`,
+  );
+  assert.equal(withTools[0].inFocus, true, 'top github result should be marked inFocus');
+
+  // Without focus, no inFocus markers
+  const noFocusTools = noFocus.tools ?? [];
+  assert.ok(!noFocusTools.some((t) => t.inFocus), 'no inFocus markers when focus is "none"');
+
+  assert.equal(withFocus.focus, 'code');
+  assert.equal(noFocus.focus, undefined);
+});
+
+test('scenario: code focus — multi-step: search library docs → execute → document in notion', async () => {
+  const { aggregator, fixture } = buildAggregator(FIXTURE_CONFIGS, undefined, { focus: 'code' });
+  const sessionId = 'scenario-session-code-001';
+
+  // Step 1: discover context7 tools for library documentation
+  const searchResult = await aggregator.callTool('ch1tty/search', { query: 'library documentation', server: 'context7' }, sessionId);
+  assert.equal(searchResult.isError, undefined);
+  const found = parseSearch(searchResult);
+  assert.ok(
+    found.tools && found.tools.some((t) => t.tool === 'context7/get-library-docs'),
+    'should find context7/get-library-docs',
+  );
+
+  // Step 2: get library docs
+  const docsResult = await aggregator.callTool('ch1tty/execute', {
+    tool: 'context7/get-library-docs',
+    args: { libraryId: '/modelcontextprotocol/typescript-sdk', topic: 'server setup' },
+  }, sessionId);
+  assert.equal(docsResult.isError, undefined);
+
+  // Step 3: create a notion page to document findings
+  const notionResult = await aggregator.callTool('ch1tty/execute', {
+    tool: 'notion/create_page',
+    args: { title: 'MCP SDK: server setup', content: docsResult.content[0].text },
+  }, sessionId);
+  assert.equal(notionResult.isError, undefined);
+  const page = JSON.parse(notionResult.content[0].text as string) as { id: string };
+  assert.ok(page.id, 'notion page should have an id');
+
+  // Verify call log shows both backend invocations
+  const toolNames = fixture.getCallLog().map((c) => `${c.serverId}/${c.tool}`);
+  assert.ok(toolNames.includes('context7/get-library-docs'), 'context7 should have been called');
+  assert.ok(toolNames.includes('notion/create_page'), 'notion should have been called');
+});
+
+// ── Scenario 11: Communication focus ─────────────────────────────────────────
+
+test('scenario: communication focus — cast "send iMessage" resolves to imessage', async () => {
+  const { aggregator } = buildAggregator(FIXTURE_CONFIGS, undefined, { focus: 'communication' });
+
+  // Contains "imessage" as a word → fires exact serverId nameBonus on imessage/send_message,
+  // ensuring it wins over other communication-profile tools with similar keyword scores.
+  const result = await aggregator.callTool('ch1tty/cast', {
+    intent: 'send text message via iMessage to team',
+    confirm: true,
+  });
+
+  assert.equal(result.isError, undefined);
+  const cast = parseCast(result);
+  assert.equal(cast.cast, 'plan');
+  const resolved = cast.resolved as { tool: string; score: number } | undefined;
+  assert.ok(resolved, 'cast should resolve a tool');
+  assert.equal(resolved.tool, 'imessage/send_message', `expected imessage/send_message, got ${resolved.tool}`);
+  assert.ok((resolved.score ?? 0) > 0.1, `score should be >0.1, got ${resolved.score}`);
+  assert.equal(cast.focus, 'communication');
+});
+
+test('scenario: communication focus — search "apple notes" marks chittymac tools inFocus', async () => {
+  const { aggregator } = buildAggregator(FIXTURE_CONFIGS, undefined, { focus: 'communication' });
+
+  // "apple notes" — both terms appear in chittymac descriptions ("Apple Notes"); search uses
+  // all-terms filter (every term must be present), so only chittymac tools match.
+  const resultWithFocus = await aggregator.callTool('ch1tty/search', {
+    query: 'apple notes',
+    focus: 'communication',
+  });
+  const resultNoFocus = await aggregator.callTool('ch1tty/search', {
+    query: 'apple notes',
+    focus: 'none',
+  });
+
+  assert.equal(resultWithFocus.isError, undefined);
+  assert.equal(resultNoFocus.isError, undefined);
+
+  const withFocus = parseSearch(resultWithFocus);
+  const noFocus = parseSearch(resultNoFocus);
+
+  // With communication focus, chittymac (Apple Notes) tools must rank first
+  const withTools = withFocus.tools ?? [];
+  assert.ok(withTools.length > 0, 'should return tools');
+  assert.ok(
+    withTools[0].tool.startsWith('chittymac/'),
+    `first result with communication focus should be chittymac, got ${withTools[0].tool}`,
+  );
+  assert.equal(withTools[0].inFocus, true, 'top chittymac result should be marked inFocus');
+
+  // Without focus, no inFocus markers
+  const noFocusTools = noFocus.tools ?? [];
+  assert.ok(!noFocusTools.some((t) => t.inFocus), 'no inFocus markers when focus is "none"');
+
+  assert.equal(withFocus.focus, 'communication');
+  assert.equal(noFocus.focus, undefined);
+});
+
+test('scenario: communication focus — multi-step: search meeting notes, create follow-up task', async () => {
+  const { aggregator, fixture } = buildAggregator(FIXTURE_CONFIGS, undefined, { focus: 'communication' });
+  const sessionId = 'scenario-session-comm-001';
+  fixture.clearCallLog();
+
+  // Step 1: search Apple Notes for meeting action items
+  const notesResult = await aggregator.callTool('ch1tty/execute', {
+    tool: 'chittymac/search_notes',
+    args: { query: 'team meeting action items' },
+  }, sessionId);
+  assert.equal(notesResult.isError, undefined);
+  const notes = JSON.parse(notesResult.content[0].text as string) as Array<{ id: string; title: string }>;
+  assert.ok(notes.length > 0, 'should return meeting notes');
+
+  // Step 2: create a follow-up task based on meeting notes
+  const taskResult = await aggregator.callTool('ch1tty/execute', {
+    tool: 'tasks/create_task',
+    args: { entity_id: 'team', title: 'Follow up on deployment action items from team meeting' },
+  }, sessionId);
+  assert.equal(taskResult.isError, undefined);
+  const task = JSON.parse(taskResult.content[0].text as string) as { id: string; status: string };
+  assert.equal(task.status, 'open', 'created task should be open');
+
+  // Both communication-profile backends (chittymac + tasks) were invoked
+  const calls = fixture.getCallLog();
+  const toolNames = calls.map((c) => `${c.serverId}/${c.tool}`);
+  assert.ok(toolNames.includes('chittymac/search_notes'), 'chittymac should have been called');
+  assert.ok(toolNames.includes('tasks/create_task'), 'tasks should have been called');
 });
 
 test('resolvedBy: keyword-augmented tool wins after focus bias → resolvedBy=keyword despite brain route', async () => {
