@@ -75,13 +75,14 @@ test('loadFocusProfilesFromPath throws on a present-but-malformed file', () => {
   }
 });
 
-test('repo focus-profiles.json loads and defines finance/governance/design/code/communication', () => {
+test('repo focus-profiles.json loads and defines finance/governance/design/code/communication/ops', () => {
   const profiles = loadFocusProfilesFromPath(join(import.meta.dirname, '..', 'focus-profiles.json'));
   assert.ok(profiles.profiles.finance);
   assert.ok(profiles.profiles.governance);
   assert.ok(profiles.profiles.design);
   assert.ok(profiles.profiles.code, 'code focus profile present');
   assert.ok(profiles.profiles.communication, 'communication focus profile present');
+  assert.ok(profiles.profiles.ops, 'ops focus profile present');
   // Real server ids from servers.json
   assert.ok(profiles.profiles.finance.servers.includes('stripe'));
   assert.ok(profiles.profiles.design.servers.includes('playwright'));
@@ -101,6 +102,13 @@ test('repo focus-profiles.json loads and defines finance/governance/design/code/
   assert.ok(profiles.profiles.communication.servers.includes('notion'), 'communication profile includes notion');
   assert.ok(profiles.profiles.communication.servers.includes('chittymac'), 'communication profile includes chittymac');
   assert.ok(profiles.profiles.communication.servers.includes('imessage'), 'communication profile includes imessage');
+  // ops profile contents
+  assert.ok(profiles.profiles.ops.categories.includes('ecosystem'), 'ops profile covers ecosystem category');
+  assert.ok(profiles.profiles.ops.categories.includes('code'), 'ops profile covers code category');
+  assert.ok(profiles.profiles.ops.servers.includes('cloudflare'), 'ops profile includes cloudflare');
+  assert.ok(profiles.profiles.ops.servers.includes('neon'), 'ops profile includes neon');
+  assert.ok(profiles.profiles.ops.servers.includes('github'), 'ops profile includes github');
+  assert.ok(profiles.profiles.ops.servers.includes('orchestrator'), 'ops profile includes orchestrator');
 });
 
 // ── resolveFocus (soft / lens-not-gate) ─────────────────────────

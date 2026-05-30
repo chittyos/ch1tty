@@ -65,6 +65,12 @@ const FOCUS_PROFILES = {
       servers: ['notion', 'chittymac', 'imessage', 'tasks'],
       boost: 0.5,
     },
+    ops: {
+      description: 'Deployment, infrastructure monitoring, and DevOps tooling',
+      categories: ['ecosystem' as const, 'code' as const],
+      servers: ['cloudflare', 'neon', 'github', 'orchestrator', 'fs'],
+      boost: 0.5,
+    },
   },
 };
 
@@ -80,6 +86,9 @@ const FIXTURE_CONFIGS: ServerConfig[] = [
   { id: 'context7', name: 'Library Docs', type: 'remote', access: 'read', category: 'code', endpoint: 'https://fixture.context7' },
   { id: 'imessage', name: 'iMessage', type: 'remote', access: 'readwrite', category: 'communication', endpoint: 'https://fixture.imessage' },
   { id: 'chittymac', name: 'Apple Notes', type: 'remote', access: 'readwrite', category: 'communication', endpoint: 'https://fixture.chittymac' },
+  { id: 'cloudflare', name: 'Cloudflare Platform', type: 'remote', access: 'readwrite', category: 'ecosystem', endpoint: 'https://fixture.cloudflare' },
+  { id: 'orchestrator', name: 'Orchestrator', type: 'remote', access: 'readwrite', category: 'ecosystem', endpoint: 'https://fixture.orchestrator' },
+  { id: 'fs', name: 'Filesystem', type: 'remote', access: 'readwrite', category: 'desktop', endpoint: 'https://fixture.fs' },
 ];
 
 function buildAggregator(
@@ -934,4 +943,106 @@ test('scenario: suggestions — per-call focus override propagates suggestions t
   const suggestions = cast.suggestions as { combos: unknown[]; prompts: unknown[] };
   assert.ok(suggestions.combos.length > 0, 'per-call focus suggestions must have combos');
   assert.ok(suggestions.prompts.length > 0, 'per-call focus suggestions must have prompts');
+});
+
+// ── Scenario 13: Ops focus ────────────────────────────────────────────────────
+
+test('scenario: ops focus — cast "deploy worker" resolves to cloudflare', async () => {
+  const { aggregator } = buildAggregator(FIXTURE_CONFIGS, undefined, { focus: 'ops' });
+
+  const result = await aggregator.callTool('ch1tty/cast', {
+    intent: 'deploy cloudflare worker script to production',
+    confirm: true,
+  });
+
+  assert.equal(result.isError, undefined);
+  const cast = parseCast(result);
+  assert.equal(cast.cast, 'plan');
+  const resolved = cast.resolved as { tool: string; score: number } | undefined;
+  assert.ok(resolved, 'cast should resolve a tool');
+  assert.equal(resolved.tool, 'cloudflare/deploy_worker', `expected cloudflare/deploy_worker, got ${resolved.tool}`);
+  assert.ok((resolved.score ?? 0) > 0.1, `score should be >0.1, got ${resolved.score}`);
+  assert.equal(cast.focus, 'ops');
+});
+
+test('scenario: ops focus boosts cloudflare over out-of-focus tools', async () => {
+  const { aggregator } = buildAggregator(FIXTURE_CONFIGS, undefined, { focus: 'ops' });
+
+  // "list workers" matches cloudflare/list_workers (in-focus) and should rank ahead of
+  // out-of-focus tools like imessage or chittymac with similar keyword scores.
+  const resultWithFocus = await aggregator.callTool('ch1tty/search', {
+    query: 'list workers',
+    focus: 'ops',
+  });
+  const resultNoFocus = await aggregator.callTool('ch1tty/search', {
+    query: 'list workers',
+    focus: 'none',
+  });
+
+  assert.equal(resultWithFocus.isError, undefined);
+  assert.equal(resultNoFocus.isError, undefined);
+
+  const withFocus = parseSearch(resultWithFocus);
+  const noFocus = parseSearch(resultNoFocus);
+
+  // With ops focus, cloudflare tools (in-focus) must rank first and be marked inFocus
+  const withTools = withFocus.tools ?? [];
+  assert.ok(withTools.length > 0, 'should return tools with ops focus');
+  assert.ok(
+    withTools[0].tool.startsWith('cloudflare/'),
+    `first result with ops focus should be cloudflare, got ${withTools[0].tool}`,
+  );
+  assert.equal(withTools[0].inFocus, true, 'top cloudflare result should be marked inFocus');
+
+  // Without focus, out-of-focus tools appear and no inFocus markers are set
+  const noFocusTools = noFocus.tools ?? [];
+  assert.ok(!noFocusTools.some((t) => t.inFocus), 'no inFocus markers when focus is "none"');
+
+  assert.equal(withFocus.focus, 'ops');
+  assert.equal(noFocus.focus, undefined);
+});
+
+test('scenario: ops focus — multi-step: list workers, inspect logs, document incident in notion', async () => {
+  const { aggregator, fixture } = buildAggregator(FIXTURE_CONFIGS, undefined, { focus: 'ops' });
+  const sessionId = 'scenario-session-ops-001';
+  fixture.clearCallLog();
+
+  // Step 1: list deployed workers to find the affected one
+  const workersResult = await aggregator.callTool('ch1tty/execute', {
+    tool: 'cloudflare/list_workers',
+    args: {},
+  }, sessionId);
+  assert.equal(workersResult.isError, undefined);
+  const workers = JSON.parse(workersResult.content[0].text as string) as Array<{ id: string; name: string; status: string }>;
+  assert.ok(workers.length > 0, 'should return deployed workers');
+  assert.ok(workers.some((w) => w.name === 'ch1tty-gateway'), 'ch1tty-gateway worker should be listed');
+
+  // Step 2: pull logs from the affected worker
+  const logsResult = await aggregator.callTool('ch1tty/execute', {
+    tool: 'cloudflare/get_worker_logs',
+    args: { worker_name: 'ch1tty-gateway', limit: 20 },
+  }, sessionId);
+  assert.equal(logsResult.isError, undefined);
+  const logData = JSON.parse(logsResult.content[0].text as string) as { worker: string; logs: Array<{ level: string; message: string }> };
+  assert.equal(logData.worker, 'ch1tty-gateway', 'logs should be for ch1tty-gateway');
+  const errors = logData.logs.filter((l) => l.level === 'error');
+  assert.ok(errors.length > 0, 'should surface error-level log entries');
+
+  // Step 3: create a Notion incident page documenting the issue
+  const incidentResult = await aggregator.callTool('ch1tty/execute', {
+    tool: 'notion/create_page',
+    args: {
+      title: `Incident: ${logData.worker} backend timeout`,
+      content: JSON.stringify({ errors, worker: logData.worker }),
+    },
+  }, sessionId);
+  assert.equal(incidentResult.isError, undefined);
+  const page = JSON.parse(incidentResult.content[0].text as string) as { id: string };
+  assert.ok(page.id, 'incident Notion page should have an id');
+
+  // Verify call log shows ops backends + notion were invoked
+  const toolNames = fixture.getCallLog().map((c) => `${c.serverId}/${c.tool}`);
+  assert.ok(toolNames.includes('cloudflare/list_workers'), 'cloudflare/list_workers must have been called');
+  assert.ok(toolNames.includes('cloudflare/get_worker_logs'), 'cloudflare/get_worker_logs must have been called');
+  assert.ok(toolNames.includes('notion/create_page'), 'notion/create_page must have been called');
 });
