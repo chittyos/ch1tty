@@ -37,6 +37,35 @@ jobs:
       - name: Verify servers.json is valid JSON
         run: node -e "JSON.parse(require(\"fs\").readFileSync(\"servers.json\",\"utf8\")); console.log(\"servers.json: valid\")"
 
+  apps-build-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: [tasks-mcp, ledger-mcp, session-coordinator-mcp, evidence-mcp]
+        node-version: [20, 22]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+          cache-dependency-path: apps/${{ matrix.app }}/package-lock.json
+
+      - name: Install dependencies (${{ matrix.app }})
+        working-directory: apps/${{ matrix.app }}
+        run: npm ci
+
+      - name: Build (${{ matrix.app }})
+        working-directory: apps/${{ matrix.app }}
+        run: npm run build
+
+      - name: Test (${{ matrix.app }})
+        working-directory: apps/${{ matrix.app }}
+        run: npm test
+
   security:
     runs-on: ubuntu-latest
     steps:
