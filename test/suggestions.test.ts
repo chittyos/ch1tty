@@ -174,21 +174,24 @@ describe('cast plan includes suggestions', () => {
       },
     );
 
-    const result = await agg.callTool('ch1tty/cast', {
-      intent: 'get library documentation',
-      confirm: true,
-      focus: 'code',
-    }, 'test-session');
+    try {
+      const result = await agg.callTool('ch1tty/cast', {
+        intent: 'get library documentation',
+        confirm: true,
+        focus: 'code',
+      }, 'test-session');
 
-    assert.equal(result.isError, undefined);
-    const body = JSON.parse((result.content[0] as { type: string; text: string }).text);
-    assert.equal(body.cast, 'plan', `expected plan, got: ${JSON.stringify(body)}`);
-    assert.ok(body.suggestions, 'cast:plan should include suggestions when focus is active');
-    assert.ok(Array.isArray(body.suggestions.combos), 'suggestions.combos should be an array');
-    assert.ok(Array.isArray(body.suggestions.prompts), 'suggestions.prompts should be an array');
-    assert.equal(body.suggestions.combos[0].name, 'test-combo');
-    assert.equal(body.suggestions.prompts[0].text, 'Look up library docs');
-    await agg.shutdown();
+      assert.equal(result.isError, undefined);
+      const body = JSON.parse((result.content[0] as { type: string; text: string }).text);
+      assert.equal(body.cast, 'plan', `expected plan, got: ${JSON.stringify(body)}`);
+      assert.ok(body.suggestions, 'cast:plan should include suggestions when focus is active');
+      assert.ok(Array.isArray(body.suggestions.combos), 'suggestions.combos should be an array');
+      assert.ok(Array.isArray(body.suggestions.prompts), 'suggestions.prompts should be an array');
+      assert.equal(body.suggestions.combos[0].name, 'test-combo');
+      assert.equal(body.suggestions.prompts[0].text, 'Look up library docs');
+    } finally {
+      await agg.shutdown();
+    }
   });
 
   it('cast confirm=true without focus has no suggestions field', async () => {
@@ -224,16 +227,19 @@ describe('cast plan includes suggestions', () => {
       },
     );
 
-    const result = await agg.callTool('ch1tty/cast', {
-      intent: 'get library documentation',
-      confirm: true,
-    }, 'test-session-2');
+    try {
+      const result = await agg.callTool('ch1tty/cast', {
+        intent: 'get library documentation',
+        confirm: true,
+      }, 'test-session-2');
 
-    assert.equal(result.isError, undefined);
-    const body = JSON.parse((result.content[0] as { type: string; text: string }).text);
-    assert.equal(body.cast, 'plan', `expected plan, got: ${JSON.stringify(body)}`);
-    assert.equal(body.suggestions, undefined, 'cast:plan without focus should not include suggestions');
-    await agg.shutdown();
+      assert.equal(result.isError, undefined);
+      const body = JSON.parse((result.content[0] as { type: string; text: string }).text);
+      assert.equal(body.cast, 'plan', `expected plan, got: ${JSON.stringify(body)}`);
+      assert.equal(body.suggestions, undefined, 'cast:plan without focus should not include suggestions');
+    } finally {
+      await agg.shutdown();
+    }
   });
 
   it('cast confirm=true with focus and empty catalog has no suggestions field', async () => {
@@ -266,16 +272,19 @@ describe('cast plan includes suggestions', () => {
       },
     );
 
-    const result = await agg.callTool('ch1tty/cast', {
-      intent: 'get library documentation',
-      confirm: true,
-      focus: 'code',
-    }, 'test-session-3');
+    try {
+      const result = await agg.callTool('ch1tty/cast', {
+        intent: 'get library documentation',
+        confirm: true,
+        focus: 'code',
+      }, 'test-session-3');
 
-    assert.equal(result.isError, undefined);
-    const body = JSON.parse((result.content[0] as { type: string; text: string }).text);
-    assert.equal(body.cast, 'plan', `expected plan, got: ${JSON.stringify(body)}`);
-    assert.equal(body.suggestions, undefined, 'empty catalog should produce no suggestions');
-    await agg.shutdown();
+      assert.equal(result.isError, undefined);
+      const body = JSON.parse((result.content[0] as { type: string; text: string }).text);
+      assert.equal(body.cast, 'plan', `expected plan, got: ${JSON.stringify(body)}`);
+      assert.equal(body.suggestions, undefined, 'empty catalog should produce no suggestions');
+    } finally {
+      await agg.shutdown();
+    }
   });
 });
