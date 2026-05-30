@@ -22,6 +22,12 @@ function makeDlq(): string {
 
 // Run sequentially — tests mutate process.env.CH1TTY_ALLOW_UNAUTH
 test('HttpMcpServer auth guard (CH1TTY_ALLOW_UNAUTH)', { concurrency: false }, async (t) => {
+  const ORIGINAL_ALLOW_UNAUTH = process.env['CH1TTY_ALLOW_UNAUTH'];
+  const restoreEnv = () => {
+    if (ORIGINAL_ALLOW_UNAUTH === undefined) delete process.env['CH1TTY_ALLOW_UNAUTH'];
+    else process.env['CH1TTY_ALLOW_UNAUTH'] = ORIGINAL_ALLOW_UNAUTH;
+  };
+
   await t.test('non-loopback + no token + no ALLOW_UNAUTH → rejects with informative message', async () => {
     const dlq = makeDlq();
     const agg = new Aggregator([], { ledgerDlqPath: dlq });
@@ -38,6 +44,7 @@ test('HttpMcpServer auth guard (CH1TTY_ALLOW_UNAUTH)', { concurrency: false }, a
         },
       );
     } finally {
+      restoreEnv();
       await agg.shutdown();
       rmSync(dlq, { force: true });
     }
@@ -53,7 +60,7 @@ test('HttpMcpServer auth guard (CH1TTY_ALLOW_UNAUTH)', { concurrency: false }, a
       assert.ok(srv.getPort() > 0, `expected ephemeral port, got ${srv.getPort()}`);
       await srv.stop();
     } finally {
-      delete process.env['CH1TTY_ALLOW_UNAUTH'];
+      restoreEnv();
       await agg.shutdown();
       rmSync(dlq, { force: true });
     }
@@ -69,6 +76,7 @@ test('HttpMcpServer auth guard (CH1TTY_ALLOW_UNAUTH)', { concurrency: false }, a
       assert.ok(srv.getPort() > 0, `expected ephemeral port, got ${srv.getPort()}`);
       await srv.stop();
     } finally {
+      restoreEnv();
       await agg.shutdown();
       rmSync(dlq, { force: true });
     }
@@ -84,6 +92,7 @@ test('HttpMcpServer auth guard (CH1TTY_ALLOW_UNAUTH)', { concurrency: false }, a
       assert.ok(srv.getPort() > 0, `expected ephemeral port, got ${srv.getPort()}`);
       await srv.stop();
     } finally {
+      restoreEnv();
       await agg.shutdown();
       rmSync(dlq, { force: true });
     }
@@ -99,6 +108,7 @@ test('HttpMcpServer auth guard (CH1TTY_ALLOW_UNAUTH)', { concurrency: false }, a
       assert.ok(srv.getPort() > 0, `expected ephemeral port, got ${srv.getPort()}`);
       await srv.stop();
     } finally {
+      restoreEnv();
       await agg.shutdown();
       rmSync(dlq, { force: true });
     }
@@ -116,7 +126,7 @@ test('HttpMcpServer auth guard (CH1TTY_ALLOW_UNAUTH)', { concurrency: false }, a
       assert.ok(srv.getPort() > 0, 'should bind when ALLOW_UNAUTH set at start() call time');
       await srv.stop();
     } finally {
-      delete process.env['CH1TTY_ALLOW_UNAUTH'];
+      restoreEnv();
       await agg.shutdown();
       rmSync(dlq, { force: true });
     }
@@ -136,7 +146,7 @@ test('HttpMcpServer auth guard (CH1TTY_ALLOW_UNAUTH)', { concurrency: false }, a
         },
       );
     } finally {
-      delete process.env['CH1TTY_ALLOW_UNAUTH'];
+      restoreEnv();
       await agg.shutdown();
       rmSync(dlq, { force: true });
     }
