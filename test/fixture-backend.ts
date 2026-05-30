@@ -439,4 +439,191 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
       { uri: 'notion://workspace', name: 'Notion Workspace', description: 'Full Notion workspace access' },
     ],
   },
+
+  github: {
+    tools: [
+      {
+        name: 'create_pull_request',
+        description: 'Create a GitHub pull request to merge a feature branch into the target branch',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            owner: { type: 'string' },
+            repo: { type: 'string' },
+            title: { type: 'string' },
+            head: { type: 'string' },
+            base: { type: 'string' },
+          },
+          required: ['owner', 'repo', 'title', 'head'],
+        },
+        response: text(JSON.stringify({ number: 42, html_url: 'https://github.com/org/repo/pull/42', state: 'open' })),
+      },
+      {
+        name: 'create_issue',
+        description: 'Create a GitHub issue for bug tracking or feature requests in a repository',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            owner: { type: 'string' },
+            repo: { type: 'string' },
+            title: { type: 'string' },
+            body: { type: 'string' },
+          },
+          required: ['owner', 'repo', 'title'],
+        },
+        response: text(JSON.stringify({ number: 7, html_url: 'https://github.com/org/repo/issues/7', state: 'open' })),
+      },
+      {
+        name: 'list_pull_requests',
+        description: 'List open pull requests in a GitHub repository',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            owner: { type: 'string' },
+            repo: { type: 'string' },
+            state: { type: 'string', enum: ['open', 'closed', 'all'] },
+          },
+          required: ['owner', 'repo'],
+        },
+        response: text(JSON.stringify([
+          { number: 41, title: 'feat: add code focus profile', state: 'open' },
+          { number: 42, title: 'fix: circuit breaker timing', state: 'open' },
+        ])),
+      },
+      {
+        name: 'search_code',
+        description: 'Search GitHub code repositories for source code patterns or function definitions',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: { type: 'string' },
+            language: { type: 'string' },
+          },
+          required: ['query'],
+        },
+        response: text(JSON.stringify({ total_count: 3, items: [{ path: 'src/aggregator.ts', score: 0.9 }] })),
+      },
+    ],
+  },
+
+  context7: {
+    tools: [
+      {
+        name: 'get-library-docs',
+        description: 'Get library documentation and code examples for a package by library ID',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            libraryId: { type: 'string' },
+            topic: { type: 'string' },
+          },
+          required: ['libraryId'],
+        },
+        response: text(JSON.stringify({
+          libraryId: '/modelcontextprotocol/typescript-sdk',
+          snippets: [
+            { content: 'const server = new McpServer({ name: "my-server", version: "1.0.0" });', description: 'Creating an MCP server' },
+            { content: 'server.tool("my-tool", async (args) => { ... })', description: 'Registering a tool handler' },
+          ],
+        })),
+      },
+      {
+        name: 'resolve-library-id',
+        description: 'Resolve a library name or npm package name to its context7 library ID',
+        inputSchema: {
+          type: 'object',
+          properties: { libraryName: { type: 'string' } },
+          required: ['libraryName'],
+        },
+        response: text(JSON.stringify({ libraryId: '/modelcontextprotocol/typescript-sdk', name: '@modelcontextprotocol/sdk' })),
+      },
+    ],
+  },
+
+  imessage: {
+    tools: [
+      {
+        name: 'send_message',
+        description: 'Send an iMessage or SMS text message to a contact or phone number',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            recipient: { type: 'string' },
+            message: { type: 'string' },
+          },
+          required: ['recipient', 'message'],
+        },
+        response: text(JSON.stringify({ delivered: true, timestamp: '2026-05-30T00:00:00Z' })),
+      },
+      {
+        name: 'search_messages',
+        description: 'Search iMessage chat history for a contact or keyword',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: { type: 'string' },
+            contact: { type: 'string' },
+          },
+          required: ['query'],
+        },
+        response: text(JSON.stringify([
+          { id: 'msg-1', text: 'Deployment went live at 10pm', timestamp: '2026-05-29T22:00:00Z' },
+        ])),
+      },
+      {
+        name: 'list_recent_messages',
+        description: 'List recent iMessage conversations and messages',
+        inputSchema: {
+          type: 'object',
+          properties: { limit: { type: 'number' } },
+        },
+        response: text(JSON.stringify([
+          { contact: 'team', lastMessage: 'Ready for code review', timestamp: '2026-05-30T00:00:00Z' },
+        ])),
+      },
+    ],
+  },
+
+  chittymac: {
+    tools: [
+      {
+        name: 'search_notes',
+        description: 'Search Apple Notes for content matching a query',
+        inputSchema: {
+          type: 'object',
+          properties: { query: { type: 'string' } },
+          required: ['query'],
+        },
+        response: text(JSON.stringify([
+          { id: 'note-1', title: 'Team meeting 2026-05-29', content: 'Action items: review PRs, update docs' },
+        ])),
+      },
+      {
+        name: 'create_note',
+        description: 'Create a new Apple Note with title and content',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            title: { type: 'string' },
+            content: { type: 'string' },
+            folder: { type: 'string' },
+          },
+          required: ['title'],
+        },
+        response: text(JSON.stringify({ id: 'note-new', title: 'New Note', created: true })),
+      },
+      {
+        name: 'list_notes',
+        description: 'List all Apple Notes in a folder',
+        inputSchema: {
+          type: 'object',
+          properties: { folder: { type: 'string' } },
+        },
+        response: text(JSON.stringify([
+          { id: 'note-1', title: 'Team meeting 2026-05-29', folder: 'Work' },
+          { id: 'note-2', title: 'Architecture decisions', folder: 'Work' },
+        ])),
+      },
+    ],
+  },
 };
