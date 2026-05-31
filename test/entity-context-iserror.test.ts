@@ -21,9 +21,21 @@
  */
 
 import assert from 'node:assert/strict';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import test from 'node:test';
 import { Aggregator } from '../src/aggregator.js';
 import type { Backend, BackendStatus, ContentItem, PromptEntry, ResourceEntry, ResourceTemplateEntry, ServerConfig, ToolCallResult, ToolEntry } from '../src/types.js';
+
+/** Create an isolated temp dir for a per-test ledger DLQ path and return cleanup. */
+function makeTmpLedger(): { ledgerDlqPath: string; cleanup: () => void } {
+  const dir = mkdtempSync(join(tmpdir(), 'ch1tty-gg-'));
+  return {
+    ledgerDlqPath: join(dir, 'ledger.dlq.jsonl'),
+    cleanup: () => rmSync(dir, { recursive: true, force: true }),
+  };
+}
 
 // ── Minimal static backend ──────────────────────────────────────────────────
 
@@ -81,8 +93,9 @@ function parseText(result: ToolCallResult): unknown {
 // ── Tests ──────────────────────────────────────────────────────────────────
 
 test('no-filter search: no sessionId → entity/identityClass absent from JSON', async () => {
+  const { ledgerDlqPath, cleanup } = makeTmpLedger();
   const backend = makeBackend(ALPHA_TOOLS, () => ({ content: [{ type: 'text', text: 'ok' }] }));
-  const agg = new Aggregator([ALPHA_CFG], { backendFactory: () => backend, embedEnabled: false });
+  const agg = new Aggregator([ALPHA_CFG], { backendFactory: () => backend, embedEnabled: false, ledgerDlqPath });
   try {
     const result = await agg.callTool('ch1tty/search', {});
     const data = parseText(result) as Record<string, unknown>;
@@ -92,12 +105,14 @@ test('no-filter search: no sessionId → entity/identityClass absent from JSON',
     assert.equal(data.identityClass, undefined, 'identityClass absent without sessionId');
   } finally {
     await agg.shutdown();
+    cleanup();
   }
 });
 
 test('no-filter search: sessionId with no entity (unstaged) → entity/identityClass absent', async () => {
+  const { ledgerDlqPath, cleanup } = makeTmpLedger();
   const backend = makeBackend(ALPHA_TOOLS, () => ({ content: [{ type: 'text', text: 'ok' }] }));
-  const agg = new Aggregator([ALPHA_CFG], { backendFactory: () => backend, embedEnabled: false });
+  const agg = new Aggregator([ALPHA_CFG], { backendFactory: () => backend, embedEnabled: false, ledgerDlqPath });
   try {
     // Create session via onSessionStart but don't inject entity
     const sessionId = 'sess-no-entity';
@@ -111,12 +126,14 @@ test('no-filter search: sessionId with no entity (unstaged) → entity/identityC
     assert.equal(data.identityClass, undefined, 'identityClass absent when no entity context');
   } finally {
     await agg.shutdown();
+    cleanup();
   }
 });
 
 test('no-filter search: sessionId with chittyId → entity and identityClass injected', async () => {
+  const { ledgerDlqPath, cleanup } = makeTmpLedger();
   const backend = makeBackend(ALPHA_TOOLS, () => ({ content: [{ type: 'text', text: 'ok' }] }));
-  const agg = new Aggregator([ALPHA_CFG], { backendFactory: () => backend, embedEnabled: false });
+  const agg = new Aggregator([ALPHA_CFG], { backendFactory: () => backend, embedEnabled: false, ledgerDlqPath });
   try {
     const sessionId = 'sess-with-entity';
     await agg.coordinator.onSessionStart(sessionId, 'http');
@@ -130,12 +147,14 @@ test('no-filter search: sessionId with chittyId → entity and identityClass inj
     assert.ok(data.servers, 'servers still present');
   } finally {
     await agg.shutdown();
+    cleanup();
   }
 });
 
 test('no-filter search: entity without chittyId (only identityClass) → both absent from JSON', async () => {
+  const { ledgerDlqPath, cleanup } = makeTmpLedger();
   const backend = makeBackend(ALPHA_TOOLS, () => ({ content: [{ type: 'text', text: 'ok' }] }));
-  const agg = new Aggregator([ALPHA_CFG], { backendFactory: () => backend, embedEnabled: false });
+  const agg = new Aggregator([ALPHA_CFG], { backendFactory: () => backend, embedEnabled: false, ledgerDlqPath });
   try {
     const sessionId = 'sess-no-chittyid';
     await agg.coordinator.onSessionStart(sessionId, 'http');
@@ -148,6 +167,7 @@ test('no-filter search: entity without chittyId (only identityClass) → both ab
     assert.equal(data.identityClass, undefined, 'identityClass absent when chittyId absent');
   } finally {
     await agg.shutdown();
+    cleanup();
   }
 });
 
