@@ -174,11 +174,12 @@ test('no-filter search: entity without chittyId (only identityClass) → both ab
 test('execute: backend returns isError:true directly → passthrough (not wrapped)', async () => {
   // The backend returns isError:true natively (not via an exception).
   // aggregator.ts:557: `return result;` — the result is returned AS-IS.
+  const { ledgerDlqPath, cleanup } = makeTmpLedger();
   const backend = makeBackend(ALPHA_TOOLS, () => ({
     content: [{ type: 'text', text: 'tool-level failure' }],
     isError: true,
   }));
-  const agg = new Aggregator([ALPHA_CFG], { backendFactory: () => backend, embedEnabled: false });
+  const agg = new Aggregator([ALPHA_CFG], { backendFactory: () => backend, embedEnabled: false, ledgerDlqPath });
   try {
     const result = await agg.callTool('ch1tty/execute', { tool: 'alpha/query', args: {} });
     assert.equal(result.isError, true, 'isError:true preserved from backend');
@@ -188,14 +189,16 @@ test('execute: backend returns isError:true directly → passthrough (not wrappe
     );
   } finally {
     await agg.shutdown();
+    cleanup();
   }
 });
 
 test('execute: backend returns ok result → isError absent (not injected)', async () => {
+  const { ledgerDlqPath, cleanup } = makeTmpLedger();
   const backend = makeBackend(ALPHA_TOOLS, () => ({
     content: [{ type: 'text', text: 'result data' }],
   }));
-  const agg = new Aggregator([ALPHA_CFG], { backendFactory: () => backend, embedEnabled: false });
+  const agg = new Aggregator([ALPHA_CFG], { backendFactory: () => backend, embedEnabled: false, ledgerDlqPath });
   try {
     const result = await agg.callTool('ch1tty/execute', { tool: 'alpha/query', args: {} });
     assert.equal(result.isError, undefined, 'isError absent on success');
@@ -205,12 +208,14 @@ test('execute: backend returns ok result → isError absent (not injected)', asy
     );
   } finally {
     await agg.shutdown();
+    cleanup();
   }
 });
 
 test('cast: backend isError:true propagates through executed cast result', async () => {
   // Verify aggregator.ts:966: `isError: result.isError` — the backend's isError
   // is forwarded through the cast wrapper to the caller.
+  const { ledgerDlqPath, cleanup } = makeTmpLedger();
   const backend = makeBackend(
     [
       { name: 'query_db', description: 'query database data', serverId: 'alpha', serverName: 'Alpha',
@@ -224,7 +229,7 @@ test('cast: backend isError:true propagates through executed cast result', async
   );
   const agg = new Aggregator(
     [{ ...ALPHA_CFG, id: 'alpha', name: 'Alpha' }],
-    { backendFactory: () => backend, embedEnabled: false },
+    { backendFactory: () => backend, embedEnabled: false, ledgerDlqPath },
   );
   try {
     // confirm:false so the tool actually executes
@@ -243,5 +248,6 @@ test('cast: backend isError:true propagates through executed cast result', async
     assert.ok(hasBackendContent, 'backend error content forwarded in cast result');
   } finally {
     await agg.shutdown();
+    cleanup();
   }
 });
