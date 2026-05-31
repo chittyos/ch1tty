@@ -65,18 +65,73 @@ export function clearSuggestionsCache(): void {
 }
 
 /**
+ * Score a combo against intent terms (3+ char tokens). Returns a fraction in [0,1]:
+ * number of terms found in the combined haystack (name + accomplishes + chain tools)
+ * divided by total term count. Zero when no terms or no matches.
+ */
+function scoreCombo(combo: SuggestedCombo, terms: string[]): number {
+  if (terms.length === 0) return 0;
+  const haystack = `${combo.name} ${combo.accomplishes} ${combo.chain.join(' ')}`.toLowerCase();
+  const matched = terms.filter((t) => haystack.includes(t)).length;
+  return matched / terms.length;
+}
+
+/**
+ * Score a prompt against intent terms. Same fraction scoring over text + resolves_to.
+ */
+function scorePrompt(prompt: SuggestedPrompt, terms: string[]): number {
+  if (terms.length === 0) return 0;
+  const haystack = `${prompt.text} ${prompt.resolves_to}`.toLowerCase();
+  const matched = terms.filter((t) => haystack.includes(t)).length;
+  return matched / terms.length;
+}
+
+/**
  * Return the top `maxCombos` combos and `maxPrompts` prompts for a focus name.
  * Returns null when the focus has no catalog entry.
+ *
+ * When `intent` is provided, combos and prompts are ranked by keyword relevance
+ * to the intent (3+ char terms matched against name/accomplishes/chain/text).
+ * Equal-scoring entries preserve catalog order (stable sort). When intent is
+ * absent or all scores are zero, catalog order is preserved exactly.
  */
 export function getSuggestionsForFocus(
   focusName: string,
   catalog: Record<string, FocusSuggestions>,
-  { maxCombos = 3, maxPrompts = 3 }: { maxCombos?: number; maxPrompts?: number } = {},
+  { maxCombos = 3, maxPrompts = 3, intent }: { maxCombos?: number; maxPrompts?: number; intent?: string } = {},
 ): { combos: SuggestedCombo[]; prompts: SuggestedPrompt[] } | null {
   const profile = catalog[focusName];
   if (!profile) return null;
+
+  const terms = intent
+    ? intent.toLowerCase().split(/\s+/).filter((t) => t.length > 2)
+    : [];
+
+  let combos = profile.combos;
+  let prompts = profile.prompts;
+
+  if (terms.length > 0) {
+    const comboScores = profile.combos.map((c) => scoreCombo(c, terms));
+    const promptScores = profile.prompts.map((p) => scorePrompt(p, terms));
+    const anyComboScored = comboScores.some((s) => s > 0);
+    const anyPromptScored = promptScores.some((s) => s > 0);
+
+    if (anyComboScored) {
+      combos = [...profile.combos]
+        .map((c, i) => ({ c, score: comboScores[i] }))
+        .sort((a, b) => b.score - a.score)
+        .map(({ c }) => c);
+    }
+    if (anyPromptScored) {
+      prompts = [...profile.prompts]
+        .map((p, i) => ({ p, score: promptScores[i] }))
+        .sort((a, b) => b.score - a.score)
+        .map(({ p }) => p);
+    }
+  }
+
   return {
-    combos: profile.combos.slice(0, maxCombos),
-    prompts: profile.prompts.slice(0, maxPrompts),
+    combos: combos.slice(0, maxCombos),
+    prompts: prompts.slice(0, maxPrompts),
   };
 }

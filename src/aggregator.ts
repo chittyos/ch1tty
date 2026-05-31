@@ -907,7 +907,7 @@ export class Aggregator {
     }
 
     const focusSuggestions = focusName
-      ? getSuggestionsForFocus(focusName, this.suggestionsCatalog)
+      ? getSuggestionsForFocus(focusName, this.suggestionsCatalog, { intent })
       : null;
 
     // Step 2: Confirm mode — return the plan without executing
