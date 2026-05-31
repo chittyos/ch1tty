@@ -15,7 +15,7 @@ interface LogEntry {
   [key: string]: unknown;
 }
 
-class Logger {
+export class Logger {
   private minLevel: number;
   private json: boolean;
 
