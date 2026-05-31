@@ -90,7 +90,7 @@ function makeAgg(b: ArithBackend, configs: ServerConfig[], label: string): Aggre
     embedEnabled: false,
     ledgerDlqPath: path,
     suggestionsCatalog: {},
-    coordinator: new KeywordOnlyCoordinator({}, { enabled: false }, path),
+    coordinator: new KeywordOnlyCoordinator({ enabled: false }, { enabled: false }, path),
   });
 }
 
