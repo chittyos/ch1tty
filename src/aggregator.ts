@@ -399,12 +399,24 @@ export class Aggregator {
     if (categoryFilter) {
       matches = matches.filter((t) => t.category === categoryFilter);
     }
+    let partialFallback = false;
     if (query) {
-      const terms = query.split(/\s+/);
-      matches = matches.filter((t) => {
+      const queryTerms = query.split(/\s+/).filter((t) => t.length > 0);
+      const andMatches = matches.filter((t) => {
         const haystack = `${t.namespacedName} ${t.description} ${t.serverName} ${t.category}`.toLowerCase();
-        return terms.every((term) => haystack.includes(term));
+        return queryTerms.every((term) => haystack.includes(term));
       });
+      // OR fallback: when AND produces nothing and there are multiple terms, return
+      // tools matching any term so callers get something useful rather than empty hands.
+      if (andMatches.length === 0 && queryTerms.length > 1) {
+        matches = matches.filter((t) => {
+          const haystack = `${t.namespacedName} ${t.description} ${t.serverName} ${t.category}`.toLowerCase();
+          return queryTerms.some((term) => haystack.includes(term));
+        });
+        partialFallback = true;
+      } else {
+        matches = andMatches;
+      }
     }
 
     // If no filters at all, return a summary of available servers instead of all tools
@@ -434,12 +446,32 @@ export class Aggregator {
       };
     }
 
-    // Sort: focus lens first (soft, never filters), then recently-used servers.
+    // Relevance scoring: fraction of query terms matched + exact name/server-id bonus.
+    // When query is present, results are ranked by relevance first; focus and recency
+    // are secondary tiebreakers so the most matching tool surfaces regardless of session state.
+    const relevanceMap = new Map<string, number>();
+    if (query) {
+      const queryTerms = query.split(/\s+/).filter((t) => t.length > 0);
+      for (const t of matches) {
+        const haystack = `${t.namespacedName} ${t.description} ${t.serverName} ${t.category}`.toLowerCase();
+        const matchCount = queryTerms.filter((term) => haystack.includes(term)).length;
+        const kwScore = queryTerms.length > 0 ? matchCount / queryTerms.length : 0;
+        const nameBonus = queryTerms.some((term) =>
+          t.name.toLowerCase() === term || t.serverId.toLowerCase() === term
+        ) ? 0.3 : 0;
+        relevanceMap.set(t.namespacedName, Math.round((kwScore + nameBonus) * 100) / 100);
+      }
+    }
+
+    // Sort: relevance first (when query), then focus lens, then recently-used servers.
     // Stable on equal keys so within-bucket order is preserved. Out-of-focus and
     // non-recent tools remain in the result set, just ranked lower.
     const focused = (t: NamespacedTool): boolean => (focus ? isInFocus(focus, t) : false);
-    if (focus || recentServerIds.size > 0) {
+    if (relevanceMap.size > 0 || focus || recentServerIds.size > 0) {
       matches = [...matches].sort((a, b) => {
+        const aRel = relevanceMap.get(a.namespacedName) ?? 0;
+        const bRel = relevanceMap.get(b.namespacedName) ?? 0;
+        if (aRel !== bRel) return bRel - aRel;
         const aFocus = focused(a) ? 1 : 0;
         const bFocus = focused(b) ? 1 : 0;
         if (aFocus !== bFocus) return bFocus - aFocus;
@@ -455,6 +487,7 @@ export class Aggregator {
       category: t.category,
       description: t.description,
       inputSchema: t.inputSchema,
+      ...(relevanceMap.size > 0 ? { score: relevanceMap.get(t.namespacedName) ?? 0 } : {}),
       ...(recentServerIds.has(t.serverId) ? { recentlyUsed: true } : {}),
       ...(focus && focused(t) ? { inFocus: true } : {}),
     }));
@@ -465,6 +498,7 @@ export class Aggregator {
         text: JSON.stringify({
           matches: results.length,
           total: matches.length,
+          ...(partialFallback ? { mode: 'partial' } : {}),
           ...(focusName ? { focus: focusName } : {}),
           ...(sessionId ? { sessionId } : {}),
           tools: results,
@@ -945,8 +979,12 @@ export class Aggregator {
     registry: NamespacedTool[],
     sessionId?: string,
   ): Array<NamespacedTool & { score: number }> {
+    // 3+ char terms drive the keyword fraction score; 2-char terms (e.g. "fs", "db")
+    // are excluded from the fraction denominator to avoid noise from prepositions like
+    // "of", "in", "to" — but they are still checked for exact name/serverId match bonus.
     const terms = intent.toLowerCase().split(/\s+/).filter((t) => t.length > 2);
-    if (terms.length === 0) return [];
+    const shortTerms = intent.toLowerCase().split(/\s+/).filter((t) => t.length === 2);
+    if (terms.length === 0 && shortTerms.length === 0) return [];
 
     const affinityMap = sessionId
       ? this.coordinator.getServerAffinity(sessionId)
@@ -957,7 +995,7 @@ export class Aggregator {
 
       // Keyword match (0–1): fraction of intent terms found in tool metadata
       const matchCount = terms.filter((term) => haystack.includes(term)).length;
-      const keywordScore = matchCount / terms.length;
+      const keywordScore = terms.length > 0 ? matchCount / terms.length : 0;
 
       // Affinity boost (0–0.2): exponential decay from last use, 10-min half-life
       const affinityTs = affinityMap.get(tool.serverId);
@@ -965,8 +1003,9 @@ export class Aggregator {
         ? 0.2 * Math.exp(-(Date.now() - affinityTs) / (10 * 60 * 1000))
         : 0;
 
-      // Exact server/tool name match bonus (0 or 0.3)
-      const nameBonus = terms.some((t) =>
+      // Exact name/serverId match bonus (0 or 0.3): checks both long and short terms
+      // so that e.g. "fs" in the intent awards the bonus for the "fs" server.
+      const nameBonus = [...terms, ...shortTerms].some((t) =>
         tool.name.toLowerCase() === t || tool.serverId.toLowerCase() === t,
       ) ? 0.3 : 0;
 
