@@ -14,10 +14,16 @@
  *   nameBonus     = 0.3 if any term/shortTerm exactly matches tool.name or tool.serverId
  *   score         = Math.round((kw + aff + name) * 100) / 100
  *   filter        = score > 0.1
+ *
+ * All Aggregator instances use KeywordOnlyCoordinator (routeIntent → null) so
+ * tests are hermetic under CH1TTY_USE_OLLAMA_BRAIN=1 or any other brain env var.
  */
 import assert from 'node:assert/strict';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { describe, it } from 'node:test';
 import { Aggregator } from '../src/aggregator.js';
+import { SessionCoordinator } from '../src/coordinator.js';
 import type {
   Backend,
   BackendStatus,
@@ -29,6 +35,16 @@ import type {
   ToolCallResult,
   ToolEntry,
 } from '../src/types.js';
+
+// Always returns null from routeIntent so keyword scoring is the only path
+// exercised, regardless of CH1TTY_USE_OLLAMA_BRAIN or embed env vars.
+class KeywordOnlyCoordinator extends SessionCoordinator {
+  override async routeIntent(): Promise<null> { return null; }
+}
+
+function dlq(label: string): string {
+  return join(tmpdir(), `ch1tty-arith-${label}-${Date.now()}.jsonl`);
+}
 
 // ── Minimal in-process backend for exact-arithmetic fixtures ─────────────────
 
@@ -67,6 +83,17 @@ function cfg(id: string, name: string, category: string): ServerConfig {
   return { id, name, type: 'remote', access: 'readwrite', category, endpoint: 'https://unused.invalid/mcp', lazy: false };
 }
 
+function makeAgg(b: ArithBackend, configs: ServerConfig[], label: string): Aggregator {
+  const path = dlq(label);
+  return new Aggregator(configs, {
+    backendFactory: () => b,
+    embedEnabled: false,
+    ledgerDlqPath: path,
+    suggestionsCatalog: {},
+    coordinator: new KeywordOnlyCoordinator({}, { enabled: false }, path),
+  });
+}
+
 function tool(name: string, description: string): ToolEntry {
   return { name, description, inputSchema: {} };
 }
@@ -84,10 +111,7 @@ describe('scoreIntent arithmetic — keyword fraction', () => {
     // haystack: "alpha/run_job execute background operations alpha server ecosystem"
     const b = new ArithBackend();
     b.set('alpha', [tool('run_job', 'execute background operations')]);
-    const agg = new Aggregator(
-      [cfg('alpha', 'Alpha Server', 'ecosystem')],
-      { backendFactory: () => b, embedEnabled: false, suggestionsCatalog: {} },
-    );
+    const agg = makeAgg(b, [cfg('alpha', 'Alpha Server', 'ecosystem')], 'kw-full');
     try {
       const body = await castPlan(agg, 'execute');
       assert.equal(body.cast, 'plan', `expected plan, got ${JSON.stringify(body)}`);
@@ -102,10 +126,7 @@ describe('scoreIntent arithmetic — keyword fraction', () => {
     // keywordScore: 1/2 = 0.5, nameBonus: 0 ("fetch_data" ≠ "fetch"; "beta" ≠ "fetch")
     const b = new ArithBackend();
     b.set('beta', [tool('fetch_data', 'fetch database records')]);
-    const agg = new Aggregator(
-      [cfg('beta', 'Beta Server', 'data')],
-      { backendFactory: () => b, embedEnabled: false, suggestionsCatalog: {} },
-    );
+    const agg = makeAgg(b, [cfg('beta', 'Beta Server', 'data')], 'kw-partial');
     try {
       const body = await castPlan(agg, 'fetch spreadsheets');
       assert.equal(body.cast, 'plan');
@@ -121,10 +142,7 @@ describe('scoreIntent arithmetic — keyword fraction', () => {
     // haystack: "delta/alpha_tool run alpha operations delta server ops"
     const b = new ArithBackend();
     b.set('delta', [tool('alpha_tool', 'run alpha operations')]);
-    const agg = new Aggregator(
-      [cfg('delta', 'Delta Server', 'ops')],
-      { backendFactory: () => b, embedEnabled: false, suggestionsCatalog: {} },
-    );
+    const agg = makeAgg(b, [cfg('delta', 'Delta Server', 'ops')], 'kw-round');
     try {
       const body = await castPlan(agg, 'alpha beta gamma');
       assert.equal(body.cast, 'plan');
@@ -144,10 +162,7 @@ describe('scoreIntent arithmetic — name bonus', () => {
       tool('search', 'search database records'),
       tool('query', 'query database entries'),
     ]);
-    const agg = new Aggregator(
-      [cfg('gamma', 'Gamma Server', 'database')],
-      { backendFactory: () => b, embedEnabled: false, suggestionsCatalog: {} },
-    );
+    const agg = makeAgg(b, [cfg('gamma', 'Gamma Server', 'database')], 'name-bonus');
     try {
       const body = await castPlan(agg, 'search database');
       assert.equal(body.cast, 'plan');
@@ -170,10 +185,7 @@ describe('scoreIntent arithmetic — name bonus', () => {
     // terms: ["neon", "execute"] → both match → keywordScore 1.0 + nameBonus 0.3 = 1.3
     const b = new ArithBackend();
     b.set('neon', [tool('alpha_proc', 'execute queries against the database')]);
-    const agg = new Aggregator(
-      [cfg('neon', 'Neon DB', 'database')],
-      { backendFactory: () => b, embedEnabled: false, suggestionsCatalog: {} },
-    );
+    const agg = makeAgg(b, [cfg('neon', 'Neon DB', 'database')], 'serverid-bonus');
     try {
       const body = await castPlan(agg, 'neon execute');
       assert.equal(body.cast, 'plan');
@@ -188,10 +200,7 @@ describe('scoreIntent arithmetic — name bonus', () => {
     // Both terms in haystack → keywordScore 1.0, nameBonus 0 → score 1.0
     const b = new ArithBackend();
     b.set('zeta', [tool('process_records', 'execute and process data operations')]);
-    const agg = new Aggregator(
-      [cfg('zeta', 'Zeta Service', 'data')],
-      { backendFactory: () => b, embedEnabled: false, suggestionsCatalog: {} },
-    );
+    const agg = makeAgg(b, [cfg('zeta', 'Zeta Service', 'data')], 'no-bonus');
     try {
       const body = await castPlan(agg, 'execute data');
       assert.equal(body.cast, 'plan');
@@ -213,10 +222,7 @@ describe('scoreIntent arithmetic — term length filtering', () => {
     // The 0.3 ≠ 1.3 distinction proves 2-char exclusion from fraction denominator.
     const b = new ArithBackend();
     b.set('fs', [tool('list_files', 'shows all files in the directory')]);
-    const agg = new Aggregator(
-      [cfg('fs', 'Filesystem', 'desktop')],
-      { backendFactory: () => b, embedEnabled: false, suggestionsCatalog: {} },
-    );
+    const agg = makeAgg(b, [cfg('fs', 'Filesystem', 'desktop')], 'shortterm');
     try {
       const body = await castPlan(agg, 'fs');
       assert.equal(body.cast, 'plan');
@@ -235,10 +241,7 @@ describe('scoreIntent arithmetic — term length filtering', () => {
     // terms = [], shortTerms = [] → scoreIntent returns [] immediately → cast: no_match
     const b = new ArithBackend();
     b.set('omega', [tool('do_something', 'does something useful')]);
-    const agg = new Aggregator(
-      [cfg('omega', 'Omega', 'ecosystem')],
-      { backendFactory: () => b, embedEnabled: false, suggestionsCatalog: {} },
-    );
+    const agg = makeAgg(b, [cfg('omega', 'Omega', 'ecosystem')], 'nomatch');
     try {
       const r = await agg.callTool('ch1tty/cast', { intent: 'a b', confirm: true });
       const body = JSON.parse((r.content[0] as { type: string; text: string }).text);
@@ -256,10 +259,7 @@ describe('scoreIntent arithmetic — threshold and sort', () => {
     const b = new ArithBackend();
     b.set('alpha', [tool('run_job', 'execute background operations')]);
     b.set('beta', [tool('fetch_data', 'retrieve stored records from database')]);
-    const agg = new Aggregator(
-      [cfg('alpha', 'Alpha', 'ecosystem'), cfg('beta', 'Beta', 'data')],
-      { backendFactory: () => b, embedEnabled: false, suggestionsCatalog: {} },
-    );
+    const agg = makeAgg(b, [cfg('alpha', 'Alpha', 'ecosystem'), cfg('beta', 'Beta', 'data')], 'threshold');
     try {
       const body = await castPlan(agg, 'execute');
       assert.equal(body.cast, 'plan');
@@ -286,10 +286,7 @@ describe('scoreIntent arithmetic — threshold and sort', () => {
       tool('list_tasks', 'list and manage tasks for the project'),
       tool('execute_job', 'run a background job in the queue'),
     ]);
-    const agg = new Aggregator(
-      [cfg('svc', 'Service', 'ecosystem')],
-      { backendFactory: () => b, embedEnabled: false, suggestionsCatalog: {} },
-    );
+    const agg = makeAgg(b, [cfg('svc', 'Service', 'ecosystem')], 'sort');
     try {
       const body = await castPlan(agg, 'tasks execute list');
       assert.equal(body.cast, 'plan');
