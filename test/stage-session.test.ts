@@ -65,7 +65,7 @@ describe('stageSession integration', () => {
   });
 
   it('no ecosystem backend → stagingComplete=true immediately, no entity', async () => {
-    const coord = new SessionCoordinator();
+    const coord = new SessionCoordinator({}, { enabled: false });
     await coord.onSessionStart('sess-no-ecosystem', 'http');
     await waitForStaging(coord, 'sess-no-ecosystem');
 
@@ -74,7 +74,7 @@ describe('stageSession integration', () => {
   });
 
   it('context_resolve returns chitty_id → entity populated on ctx', async () => {
-    const coord = new SessionCoordinator();
+    const coord = new SessionCoordinator({}, { enabled: false });
     const stub = new StubEcosystem();
 
     stub.setHandler('context_resolve', () => ({
@@ -98,7 +98,7 @@ describe('stageSession integration', () => {
   });
 
   it('context_resolve returns no chitty_id → stagingComplete=true but no entity', async () => {
-    const coord = new SessionCoordinator();
+    const coord = new SessionCoordinator({}, { enabled: false });
     const stub = new StubEcosystem();
 
     stub.setHandler('context_resolve', () => ({ status: 'unknown' }));
@@ -112,7 +112,7 @@ describe('stageSession integration', () => {
   });
 
   it('context_resolve + memory_recall → entity.recentMemories populated', async () => {
-    const coord = new SessionCoordinator();
+    const coord = new SessionCoordinator({}, { enabled: false });
     const stub = new StubEcosystem();
 
     stub.setHandler('context_resolve', () => ({
@@ -149,7 +149,7 @@ describe('stageSession integration', () => {
   });
 
   it('context_resolve throws → graceful fallback, stagingComplete=true, no entity', async () => {
-    const coord = new SessionCoordinator();
+    const coord = new SessionCoordinator({}, { enabled: false });
     const stub = new StubEcosystem();
 
     stub.setHandler('context_resolve', () => {
@@ -165,7 +165,7 @@ describe('stageSession integration', () => {
   });
 
   it('full staging: context_resolve + both memory_recalls populate memories and workstreams', async () => {
-    const coord = new SessionCoordinator();
+    const coord = new SessionCoordinator({}, { enabled: false });
     const stub = new StubEcosystem();
 
     stub.setHandler('context_resolve', () => ({
@@ -200,7 +200,7 @@ describe('stageSession integration', () => {
   });
 
   it('getSnapshot() reflects staged entity and stagingComplete=true', async () => {
-    const coord = new SessionCoordinator();
+    const coord = new SessionCoordinator({}, { enabled: false });
     const stub = new StubEcosystem();
 
     stub.setHandler('context_resolve', () => ({ chitty_id: 'snap-entity' }));
@@ -220,7 +220,7 @@ describe('stageSession integration', () => {
   });
 
   it('getEntityContext for unknown sessionId returns undefined (safe no-op)', async () => {
-    const coord = new SessionCoordinator();
+    const coord = new SessionCoordinator({}, { enabled: false });
     assert.equal(coord.getEntityContext('nonexistent-session'), undefined);
     assert.equal(coord.isStagingComplete('nonexistent-session'), false);
   });
