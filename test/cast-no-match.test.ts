@@ -18,11 +18,18 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
 import { Aggregator } from '../src/aggregator.js';
+import { SessionCoordinator } from '../src/coordinator.js';
 import { FixtureBackend } from './fixture-backend.js';
 import type { ServerConfig } from '../src/types.js';
 
 function dlqPath(label: string): string {
   return join(tmpdir(), `ch1tty-nomatch-${label}-${Date.now()}.jsonl`);
+}
+
+// Always returns null from routeIntent so keyword scoring is used regardless
+// of CH1TTY_USE_OLLAMA_BRAIN or any other env-var state in the test process.
+class KeywordOnlyCoordinator extends SessionCoordinator {
+  override async routeIntent(): Promise<null> { return null; }
 }
 
 function makeAgg(
@@ -42,11 +49,13 @@ function makeAgg(
       lazy: true,
     },
   ];
+  const path = dlqPath(serverId);
   const agg = new Aggregator(configs, {
     backendFactory: () => backend,
     embedEnabled: false,
-    ledgerDlqPath: dlqPath(serverId),
+    ledgerDlqPath: path,
     suggestionsCatalog: {},
+    coordinator: new KeywordOnlyCoordinator({}, { enabled: false }, path),
   });
   return { agg, backend };
 }
