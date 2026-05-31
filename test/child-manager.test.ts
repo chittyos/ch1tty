@@ -5,7 +5,10 @@
  * Uses a binary path inside a mkdtempSync-owned directory: guaranteed nonexistent
  * (no file is created there), not world-writable shared /tmp path.
  *
- * CH1TTY_SPAWN_TIMEOUT_MS is set low so each spawn-failure cycle is fast.
+ * Circuit-open tests spy on the private `spawn` method (TypeScript `private` is
+ * compile-time only; the method is reachable at runtime) to assert zero spawn
+ * attempts were made. This is necessary for listResources and listPrompts whose
+ * circuit-open and spawn-failure paths both return the same empty result.
  */
 import { describe, test, after } from 'node:test';
 import assert from 'node:assert/strict';
@@ -46,6 +49,23 @@ async function openCircuit(cm: ChildManagerType, serverId: string): Promise<void
   for (let i = 0; i < 5; i++) {
     await cm.listTools(serverId).catch(() => {});
   }
+}
+
+/**
+ * Install a spawn spy AFTER the circuit is already open.
+ * TypeScript `private` is compile-time only; the method is reachable at runtime.
+ * Returns a function that reports how many times `spawn` was invoked.
+ */
+function withSpawnSpy(cm: ChildManagerType): { spawnCalls: () => number } {
+  let calls = 0;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const target = cm as any;
+  const original = target.spawn.bind(cm);
+  target.spawn = async (serverId: string) => {
+    calls++;
+    return original(serverId);
+  };
+  return { spawnCalls: () => calls };
 }
 
 // ── Pure-logic paths ─────────────────────────────────────────────────────────
@@ -109,27 +129,33 @@ describe('ChildManager — pure-logic paths', { concurrency: false }, () => {
 });
 
 // ── Circuit-breaker integration ───────────────────────────────────────────────
-// Opens the circuit via 5 spawn failures, then verifies that subsequent calls
-// return the correct circuit-open response (empty / isError) without spawning.
-// Timing is not asserted — the return value is the meaningful invariant;
-// the < 30ms check was dropped per Codex P2 finding (brittle under CI load).
+// Opens the circuit via 5 spawn failures, then installs a spawn spy and verifies:
+// (a) the correct circuit-open response is returned, AND
+// (b) spawn was never called (the circuit check short-circuited before any spawn).
+//
+// The spawn spy is essential for listResources and listPrompts whose circuit-open
+// and spawn-failure paths both return the same empty result — without it the test
+// would pass even if the circuit check were removed.
 
 describe('ChildManager — circuit breaker integration', { concurrency: false }, () => {
-  test('listTools returns [] when circuit is open', async () => {
+  test('listTools returns [] and skips spawn when circuit is open', async () => {
     const cm = new ChildManager();
     cm.registerServer(localConfig('bad1'));
     await openCircuit(cm, 'bad1');
+    const { spawnCalls } = withSpawnSpy(cm);
 
     const result = await cm.listTools('bad1');
 
     assert.deepEqual(result, []);
+    assert.equal(spawnCalls(), 0, 'spawn must not be called when circuit is open');
     await cm.shutdown();
   });
 
-  test('callTool returns isError=true when circuit is open', async () => {
+  test('callTool returns isError=true and skips spawn when circuit is open', async () => {
     const cm = new ChildManager();
     cm.registerServer(localConfig('bad2'));
     await openCircuit(cm, 'bad2');
+    const { spawnCalls } = withSpawnSpy(cm);
 
     const result = await cm.callTool('bad2', 'some-tool', {});
 
@@ -140,28 +166,33 @@ describe('ChildManager — circuit breaker integration', { concurrency: false },
       (item as { type: 'text'; text: string }).text.includes('temporarily unavailable'),
       `unexpected message: ${(item as { type: 'text'; text: string }).text}`,
     );
+    assert.equal(spawnCalls(), 0, 'spawn must not be called when circuit is open');
     await cm.shutdown();
   });
 
-  test('listResources returns empty when circuit is open', async () => {
+  test('listResources returns empty and skips spawn when circuit is open', async () => {
     const cm = new ChildManager();
     cm.registerServer(localConfig('bad3'));
     await openCircuit(cm, 'bad3');
+    const { spawnCalls } = withSpawnSpy(cm);
 
     const result = await cm.listResources('bad3');
 
     assert.deepEqual(result, { resources: [], templates: [] });
+    assert.equal(spawnCalls(), 0, 'spawn must not be called when circuit is open');
     await cm.shutdown();
   });
 
-  test('listPrompts returns [] when circuit is open', async () => {
+  test('listPrompts returns [] and skips spawn when circuit is open', async () => {
     const cm = new ChildManager();
     cm.registerServer(localConfig('bad4'));
     await openCircuit(cm, 'bad4');
+    const { spawnCalls } = withSpawnSpy(cm);
 
     const result = await cm.listPrompts('bad4');
 
     assert.deepEqual(result, []);
+    assert.equal(spawnCalls(), 0, 'spawn must not be called when circuit is open');
     await cm.shutdown();
   });
 });
