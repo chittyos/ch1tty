@@ -85,7 +85,7 @@ async function openCircuit(proxy: RemoteProxy, serverId: string): Promise<void> 
     endpoint: 'http://127.0.0.1:1/mcp',
   });
   for (let i = 0; i < 5; i++) {
-    await proxy.callTool(serverId, 'any', {});
+    await proxy.callTool(serverId, 'any', {}).catch(() => {});
   }
 }
 
@@ -104,6 +104,7 @@ test('callTool: transport throw after connect → isError + connection evicted',
     // initialize succeeds (connection established), tools/call → 500 → SDK throws
     const result = await proxy.callTool('ct-ep', 'anything', {});
     assert.equal(result.isError, true);
+    assert.ok(result.content.length > 0, 'error result must have content');
     assert.match(result.content[0].text as string, /Remote call error/);
     // evict() called — connection must be gone
     assert.equal(proxy.getStatus('ct-ep').connected, false, 'connection must be evicted after callTool error');
@@ -176,15 +177,23 @@ test('listPrompts: transport throw after connect → [] + connection evicted', a
 
 test('listResources: unknown server returns empty immediately', async () => {
   const proxy = new RemoteProxy();
-  const result = await proxy.listResources('not-registered-lr');
-  assert.deepEqual(result.resources, []);
-  assert.deepEqual(result.templates, []);
+  try {
+    const result = await proxy.listResources('not-registered-lr');
+    assert.deepEqual(result.resources, []);
+    assert.deepEqual(result.templates, []);
+  } finally {
+    await proxy.shutdown();
+  }
 });
 
 test('listPrompts: unknown server returns empty immediately', async () => {
   const proxy = new RemoteProxy();
-  const result = await proxy.listPrompts('not-registered-lp');
-  assert.deepEqual(result, []);
+  try {
+    const result = await proxy.listPrompts('not-registered-lp');
+    assert.deepEqual(result, []);
+  } finally {
+    await proxy.shutdown();
+  }
 });
 
 // ---------------------------------------------------------------------------
