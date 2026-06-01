@@ -27,7 +27,7 @@
 import assert from 'node:assert/strict';
 import { describe, test, after } from 'node:test';
 import { mkdtempSync, rmSync } from 'node:fs';
-import { join } from 'node:path';
+import { isAbsolute, join } from 'node:path';
 import { tmpdir } from 'node:os';
 
 // ── Shared setup ──────────────────────────────────────────────────────────────
@@ -94,7 +94,7 @@ describe('resolveConfigPath', () => {
       delete process.env.CH1TTY_CONFIG;
       const result = resolveConfigPath();
       assert.ok(result.endsWith('servers.json'), `expected path to end with servers.json, got: ${result}`);
-      assert.ok(result.startsWith('/'), `expected absolute path, got: ${result}`);
+      assert.ok(isAbsolute(result), `expected absolute path, got: ${result}`);
     } finally {
       if (saved === undefined) delete process.env.CH1TTY_CONFIG;
       else process.env.CH1TTY_CONFIG = saved;
