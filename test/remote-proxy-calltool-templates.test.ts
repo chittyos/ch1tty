@@ -180,11 +180,14 @@ test('callTool success: passes arguments through to the remote tool', async () =
 
 test('callTool returns isError when circuit is open', async () => {
   const proxy = new RemoteProxy();
-  await openCircuit(proxy, 'dead-ct');
-  const result = await proxy.callTool('dead-ct', 'ping', {});
-  assert.equal(result.isError, true);
-  assert.match(result.content[0].text, /circuit open/);
-  await proxy.shutdown();
+  try {
+    await openCircuit(proxy, 'dead-ct');
+    const result = await proxy.callTool('dead-ct', 'ping', {});
+    assert.equal(result.isError, true);
+    assert.match(result.content[0].text, /circuit open/);
+  } finally {
+    await proxy.shutdown();
+  }
 });
 
 // ---------------------------------------------------------------------------
