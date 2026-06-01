@@ -41,9 +41,10 @@ import type {
 
 function makeCoord(): SessionCoordinator {
   const dlq = `/tmp/ch1tty-rr-${process.pid}-${Date.now()}.dlq`;
-  // { enabled: false } disables embeddingBrain.warmup() outbound calls — keeps tests
-  // network-free even if an Ollama server happens to be reachable in this environment.
-  return new SessionCoordinator({}, { enabled: false }, dlq);
+  // { enabled: false } on both configs disables OllamaBrain.warmup() and
+  // EmbeddingBrain.warmup() outbound calls — keeps tests network-free even when
+  // CH1TTY_USE_OLLAMA_BRAIN=1 or an Ollama/embed server is reachable.
+  return new SessionCoordinator({ enabled: false }, { enabled: false }, dlq);
 }
 
 /**
