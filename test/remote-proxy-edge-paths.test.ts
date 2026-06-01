@@ -207,6 +207,7 @@ test('callTool: circuit-open error message contains serverId', async () => {
     await openCircuit(proxy, 'ct-circuit-id');
     const result = await proxy.callTool('ct-circuit-id', 'ping', {});
     assert.equal(result.isError, true);
+    assert.ok(result.content.length > 0, 'error result must have content');
     assert.ok(
       (result.content[0].text as string).includes('ct-circuit-id'),
       `error message should contain serverId, got: ${result.content[0].text as string}`,
