@@ -41,10 +41,10 @@ function localConfig(id: string): LocalServerConfig {
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function makeFakeConn(opts: {
   readResourceFn?: (args: { uri: string }) => Promise<unknown>;
   getPromptFn?: (args: { name: string; arguments?: Record<string, string> }) => Promise<unknown>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 } = {}): any {
   return {
     client: {
