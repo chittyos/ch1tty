@@ -47,11 +47,10 @@ function makeServer(id: string, extra: Partial<ServerConfig> = {}): ServerConfig
 }
 
 function buildAgg(servers: ServerConfig[], configPath: string, dlqPath: string): Aggregator {
-  const fb = new FixtureBackend();
   return new Aggregator(servers, {
     configPath,
     ledgerDlqPath: dlqPath,
-    backendFactory: () => fb,
+    backendFactory: () => new FixtureBackend(),
     focusProfiles: { profiles: {} },
     suggestionsCatalog: {},
     embedEnabled: false,
@@ -98,10 +97,25 @@ test('enabled:false server excluded from status server list and search results',
     ],
   });
 
-  const agg = buildAgg(
+  // Seed a real tool for active-srv so the search assertion is falsifiable:
+  // if enabled:false filtering were broken, disabled-srv would gain a backend
+  // and (with the same factory) could also surface tools — distinguishing the two.
+  const agg = new Aggregator(
     [makeServer('active-srv'), makeServer('disabled-srv', { enabled: false })],
-    configPath,
-    dlqPath,
+    {
+      configPath,
+      ledgerDlqPath: dlqPath,
+      backendFactory: (cfg) => {
+        const fb = new FixtureBackend();
+        fb.defineServer(cfg.id, {
+          tools: [{ name: 'do_work', description: 'sentinel tool', inputSchema: { type: 'object', properties: {} }, response: { content: [{ type: 'text', text: 'ok' }] } }],
+        });
+        return fb;
+      },
+      focusProfiles: { profiles: {} },
+      suggestionsCatalog: {},
+      embedEnabled: false,
+    },
   );
   try {
     // ch1tty/status — disabled server must not appear in server list
@@ -113,7 +127,12 @@ test('enabled:false server excluded from status server list and search results',
     assert.ok(ids.includes('active-srv'), 'active-srv must appear in status');
     assert.ok(!ids.includes('disabled-srv'), 'disabled-srv must not appear in status');
 
-    // ch1tty/search with server filter — disabled server returns nothing
+    // ch1tty/search for active-srv returns its seeded tool — proves search is working
+    const activeResult = await agg.callTool('ch1tty/search', { server: 'active-srv' });
+    const activeData = JSON.parse(activeResult.content[0].text as string) as { tools: unknown[] };
+    assert.ok(activeData.tools.length > 0, 'active-srv must have tools in search — confirms search is working');
+
+    // ch1tty/search with disabled server filter — no backend exists for disabled-srv
     const searchResult = await agg.callTool('ch1tty/search', { server: 'disabled-srv' });
     const searchData = JSON.parse(searchResult.content[0].text as string) as { tools: unknown[] };
     assert.equal(searchData.tools.length, 0, 'disabled server has no tools in search results');
