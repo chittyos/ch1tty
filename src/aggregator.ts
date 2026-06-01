@@ -669,8 +669,8 @@ export class Aggregator {
       const added = newConfig.servers.filter((c) => !oldIds.has(c.id));
       const removed = this.configs.filter((c) => !newIds.has(c.id));
 
-      // Build new backends before shutting down old ones (atomic swap)
-      const oldBackends = this.backends;
+      // Snapshot old backends before rebuilding — rebuildBackends() mutates this.backends in place
+      const oldBackends = new Map(this.backends);
       this.configs = newConfig.servers;
       this.rebuildBackends();
       this.preWarmNonLazy();
