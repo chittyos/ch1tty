@@ -4,18 +4,33 @@
  * Covered paths (remote-proxy.ts:43–73):
  *   1. Cache hit: unexpired pre-populated entry → cached token sent in
  *      Authorization header; chitty-mcp-token exec is never attempted.
- *   2. No cache + chitty-mcp-token unavailable → auth_token_unavailable →
- *      listTools returns [] + connection not established.
+ *   2. No cache + chitty-mcp-token unavailable → auth_token_unavailable error
+ *      text surfaced in callTool response (not a transport error).
  *   3. Expired cache entry → code falls through to exec → same unavailable
- *      path → listTools returns [] (expired entries are not used).
+ *      path → auth_token_unavailable in callTool response.
  *   4. Each auth failure increments the circuit breaker failure counter, so
  *      repeated auth errors eventually open the circuit.
+ *
+ * Tests 2–4 control process.env.PATH to guarantee chitty-mcp-token is never
+ * found regardless of the host environment, making the suite deterministic.
+ * Tests 2–3 use callTool (which surfaces the exact error string) rather than
+ * listTools (which silently returns [] for both auth failures AND transport
+ * failures), so a regression that falls back to unauthenticated would fail.
  */
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createServer, type Server as HttpServer, type IncomingMessage, type ServerResponse } from 'node:http';
+import { mkdtempSync, rmdirSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import type { AddressInfo } from 'node:net';
 import { RemoteProxy } from '../src/remote-proxy.js';
+
+// Empty temp directory used as PATH in tests 2–4 so chitty-mcp-token is
+// never found, regardless of what is installed on the host or CI image.
+const EMPTY_BIN_DIR = mkdtempSync(join(tmpdir(), 'ch1tty-pp-test-'));
+// Removed after the test file finishes.
+process.on('exit', () => { try { rmdirSync(EMPTY_BIN_DIR); } catch { /* ignore */ } });
 
 // ---------------------------------------------------------------------------
 // Minimal MCP fixture that captures request headers and handles initialize +
@@ -143,10 +158,12 @@ test('authTokenKey cache hit: pre-cached token used, connection succeeds with co
 });
 
 // ---------------------------------------------------------------------------
-// 2. No cache, chitty-mcp-token unavailable → auth_token_unavailable
+// 2. No cache, chitty-mcp-token unavailable → auth_token_unavailable in error
 // ---------------------------------------------------------------------------
 
-test('authTokenKey no cache, chitty-mcp-token unavailable → listTools returns []', async () => {
+test('authTokenKey no cache, chitty-mcp-token unavailable → callTool error contains auth_token_unavailable', async () => {
+  const origPath = process.env.PATH;
+  process.env.PATH = EMPTY_BIN_DIR;
   const proxy = new RemoteProxy();
   try {
     proxy.registerServer({
@@ -155,25 +172,34 @@ test('authTokenKey no cache, chitty-mcp-token unavailable → listTools returns 
       type: 'remote',
       access: 'read',
       category: 'code',
-      // endpoint is irrelevant — doConnect throws before the network call
       endpoint: 'http://127.0.0.1:1/mcp',
       authTokenKey: 'nonexistent-auth-key',
     });
 
-    const tools = await proxy.listTools('no-cache-tok');
+    // callTool surfaces the exact error string — distinguishable from a plain
+    // transport failure ("connect ECONNREFUSED") at the assertion level.
+    const result = await proxy.callTool('no-cache-tok', 'any_tool', {});
 
-    assert.deepEqual(tools, [], 'auth_token_unavailable must cause listTools to return []');
+    assert.equal(result.isError, true, 'auth failure must surface as isError:true');
+    assert.match(
+      result.content[0].text,
+      /auth_token_unavailable/,
+      `error text must identify auth_token_unavailable, not a transport error; got: ${result.content[0].text}`,
+    );
     assert.equal(proxy.getStatus('no-cache-tok').connected, false, 'connection must not be established');
   } finally {
+    process.env.PATH = origPath;
     await proxy.shutdown();
   }
 });
 
 // ---------------------------------------------------------------------------
-// 3. Expired cache: code falls through to exec → same unavailable path
+// 3. Expired cache: code falls through to exec → same auth_token_unavailable
 // ---------------------------------------------------------------------------
 
-test('authTokenKey expired cache: re-tries exec → auth_token_unavailable → listTools returns []', async () => {
+test('authTokenKey expired cache: re-tries exec → auth_token_unavailable in callTool error', async () => {
+  const origPath = process.env.PATH;
+  process.env.PATH = EMPTY_BIN_DIR;
   const proxy = new RemoteProxy();
   try {
     proxy.registerServer({
@@ -191,11 +217,17 @@ test('authTokenKey expired cache: re-tries exec → auth_token_unavailable → l
       expiresAt: Date.now() - 1,
     });
 
-    const tools = await proxy.listTools('expired-tok');
+    const result = await proxy.callTool('expired-tok', 'any_tool', {});
 
-    assert.deepEqual(tools, [], 'expired cache entry must trigger re-exec → fail → []');
+    assert.equal(result.isError, true, 'expired cache must cause isError:true');
+    assert.match(
+      result.content[0].text,
+      /auth_token_unavailable/,
+      `expired cache must surface auth_token_unavailable, not a transport error; got: ${result.content[0].text}`,
+    );
     assert.equal(proxy.getStatus('expired-tok').connected, false, 'connection must not be established');
   } finally {
+    process.env.PATH = origPath;
     await proxy.shutdown();
   }
 });
@@ -205,6 +237,8 @@ test('authTokenKey expired cache: re-tries exec → auth_token_unavailable → l
 // ---------------------------------------------------------------------------
 
 test('authTokenKey auth failure: each listTools failure advances circuit breaker failure count', async () => {
+  const origPath = process.env.PATH;
+  process.env.PATH = EMPTY_BIN_DIR;
   const proxy = new RemoteProxy();
   try {
     proxy.registerServer({
@@ -227,6 +261,7 @@ test('authTokenKey auth failure: each listTools failure advances circuit breaker
       `expected circuit failures >= 2 after 2 auth errors; got ${state.failures}`,
     );
   } finally {
+    process.env.PATH = origPath;
     await proxy.shutdown();
   }
 });
