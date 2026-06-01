@@ -185,6 +185,7 @@ Endpoints on `{bindAddress}:{port}`:
 | `CH1TTY_FOCUS_PROFILES` | Custom focus-profiles.json path (default `focus-profiles.json` at repo root) |
 | `CH1TTY_LEDGER_DLQ` | Override the ledger dead-letter WAL path (default `~/.ch1tty/ledger.dlq.jsonl`) |
 | `CH1TTY_SPAWN_TIMEOUT_MS` | Override the local child-process spawn+connect timeout (default 30000ms). Lower it in test environments to avoid 30s waits when backends are unavailable. |
+| `CH1TTY_REMOTE_TIMEOUT_MS` | Override all remote proxy timeouts (connect: 15s, list: 15s, call: 120s) to the given value in milliseconds. Lower it in test environments to avoid long waits when remote backends are slow or hanging. |
 | `CH1TTY_OLLAMA_CIRCUIT_THRESHOLD` | Consecutive failures before OllamaBrain circuit opens (default 3). |
 | `CH1TTY_OLLAMA_CIRCUIT_COOLDOWN_MS` | How long OllamaBrain circuit stays open before a half-open probe (default 60000ms). |
 

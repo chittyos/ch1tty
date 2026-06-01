@@ -24,9 +24,21 @@ interface RemoteConnection {
 
 const TOOL_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 const TOKEN_CACHE_TTL = 11 * 60 * 60 * 1000; // 11 hours (tokens last 12hr)
-const CONNECT_TIMEOUT_MS = 15_000;
-const LIST_TIMEOUT_MS = 15_000;
-const CALL_TIMEOUT_MS = 120_000; // 2 min for tool calls
+
+// Read at call time so CH1TTY_REMOTE_TIMEOUT_MS can be set before the first call
+// (same pattern as CH1TTY_SPAWN_TIMEOUT_MS in child-manager.ts).
+function getConnectTimeoutMs(): number {
+  const v = parseInt(process.env.CH1TTY_REMOTE_TIMEOUT_MS ?? '', 10);
+  return Number.isFinite(v) && v > 0 ? v : 15_000;
+}
+function getListTimeoutMs(): number {
+  const v = parseInt(process.env.CH1TTY_REMOTE_TIMEOUT_MS ?? '', 10);
+  return Number.isFinite(v) && v > 0 ? v : 15_000;
+}
+function getCallTimeoutMs(): number {
+  const v = parseInt(process.env.CH1TTY_REMOTE_TIMEOUT_MS ?? '', 10);
+  return Number.isFinite(v) && v > 0 ? v : 120_000; // 2 min for tool calls
+}
 
 export class RemoteProxy implements Backend {
   private configs = new Map<string, RemoteServerConfig>();
@@ -112,12 +124,12 @@ export class RemoteProxy implements Backend {
   /** Connect with auto-reconnect: on failure, evict stale connection and retry once. */
   private async connectWithReconnect(serverId: string): Promise<RemoteConnection> {
     try {
-      return await withTimeout(this.connect(serverId), CONNECT_TIMEOUT_MS, `connect ${serverId}`);
+      return await withTimeout(this.connect(serverId), getConnectTimeoutMs(), `connect ${serverId}`);
     } catch (err) {
       if (this.connections.has(serverId)) {
         this.evict(serverId);
         log.info(`Reconnecting after stale connection`, serverId);
-        return await withTimeout(this.connect(serverId), CONNECT_TIMEOUT_MS, `connect ${serverId}`);
+        return await withTimeout(this.connect(serverId), getConnectTimeoutMs(), `connect ${serverId}`);
       }
       throw err;
     }
@@ -173,7 +185,7 @@ export class RemoteProxy implements Backend {
 
       const result = await withTimeout(
         conn.client.listTools(),
-        LIST_TIMEOUT_MS,
+        getListTimeoutMs(),
         `listTools ${serverId}`,
       );
 
@@ -214,7 +226,7 @@ export class RemoteProxy implements Backend {
       const conn = await this.connectWithReconnect(serverId);
       const result = await withTimeout(
         conn.client.callTool({ name: toolName, arguments: args }),
-        CALL_TIMEOUT_MS,
+        getCallTimeoutMs(),
         `callTool ${serverId}/${toolName}`,
       );
       this.breaker.recordSuccess(serverId);
@@ -244,8 +256,8 @@ export class RemoteProxy implements Backend {
       const conn = await this.connectWithReconnect(serverId);
 
       const [resResult, tmplResult] = await Promise.allSettled([
-        withTimeout(conn.client.listResources(), LIST_TIMEOUT_MS, `listResources ${serverId}`),
-        withTimeout(conn.client.listResourceTemplates(), LIST_TIMEOUT_MS, `listResourceTemplates ${serverId}`),
+        withTimeout(conn.client.listResources(), getListTimeoutMs(), `listResources ${serverId}`),
+        withTimeout(conn.client.listResourceTemplates(), getListTimeoutMs(), `listResourceTemplates ${serverId}`),
       ]);
 
       const resources: ResourceEntry[] = resResult.status === 'fulfilled'
@@ -281,7 +293,7 @@ export class RemoteProxy implements Backend {
       const conn = await this.connectWithReconnect(serverId);
       const result = await withTimeout(
         conn.client.readResource({ uri }),
-        CALL_TIMEOUT_MS,
+        getCallTimeoutMs(),
         `readResource ${serverId} ${uri}`,
       );
       this.breaker.recordSuccess(serverId);
@@ -316,7 +328,7 @@ export class RemoteProxy implements Backend {
       const conn = await this.connectWithReconnect(serverId);
       const result = await withTimeout(
         conn.client.listPrompts(),
-        LIST_TIMEOUT_MS,
+        getListTimeoutMs(),
         `listPrompts ${serverId}`,
       );
 
@@ -350,7 +362,7 @@ export class RemoteProxy implements Backend {
       const conn = await this.connectWithReconnect(serverId);
       const result = await withTimeout(
         conn.client.getPrompt({ name, arguments: promptArgs }),
-        CALL_TIMEOUT_MS,
+        getCallTimeoutMs(),
         `getPrompt ${serverId} ${name}`,
       );
       this.breaker.recordSuccess(serverId);
