@@ -12,20 +12,67 @@
  *       • onToolCall with a tool name that has no slash (the `if (sep > 0)` branch → no affinity)
  *       • onToolCall count accumulation in toolPatterns
  *       • getToolPatterns sort order + limit parameter
- *       • logDecision (all params, minimal params)
- *       • logEvent (with and without custom eventType)
+ *       • logDecision payload — event_type, decision, reasoning, topic
+ *       • logEvent payload — custom eventType, default 'event', metadata spread
  *       • getSnapshot fields (activeSessions, sessions array, boundEntity)
  *
  * All tests use a real in-process coordinator with no ecosystem backend (no network).
+ * Embedding warmup is disabled ({enabled:false}) so makeCoord() makes no outbound calls.
  */
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { SessionCoordinator } from '../src/coordinator.js';
+import type {
+  Backend,
+  BackendStatus,
+  ContentItem,
+  PromptEntry,
+  ResourceEntry,
+  ResourceTemplateEntry,
+  ServerConfig,
+  ToolCallResult,
+  ToolEntry,
+} from '../src/types.js';
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
 function makeCoord(): SessionCoordinator {
   const dlq = `/tmp/ch1tty-rr-${process.pid}-${Date.now()}.dlq`;
-  return new SessionCoordinator({}, {}, dlq);
+  // { enabled: false } disables embeddingBrain.warmup() outbound calls — keeps tests
+  // network-free even if an Ollama server happens to be reachable in this environment.
+  return new SessionCoordinator({}, { enabled: false }, dlq);
+}
+
+/**
+ * Minimal Backend that captures every `chitty_ledger_record` call so tests
+ * can assert on event_type + metadata without inspecting private ledger state.
+ */
+class LedgerCapture implements Backend {
+  readonly ledgerCalls: Array<Record<string, unknown>> = [];
+
+  async callTool(_sid: string, tool: string, args: Record<string, unknown> = {}): Promise<ToolCallResult> {
+    if (tool === 'chitty_ledger_record') this.ledgerCalls.push(args);
+    return { content: [{ type: 'text', text: 'null' }] };
+  }
+
+  registerServer(_cfg: ServerConfig): void {}
+  isRegistered(_id: string): boolean { return true; }
+  getStatus(_id: string): BackendStatus { return { connected: true, toolCount: 0, toolCacheAge: null }; }
+  async listTools(_id: string): Promise<ToolEntry[]> { return []; }
+  async listResources(_id: string): Promise<{ resources: ResourceEntry[]; templates: ResourceTemplateEntry[] }> {
+    return { resources: [], templates: [] };
+  }
+  async readResource(_id: string, _uri: string): Promise<{ contents: Array<{ uri: string; mimeType?: string; text?: string; blob?: string }> }> {
+    return { contents: [] };
+  }
+  async listPrompts(_id: string): Promise<PromptEntry[]> { return []; }
+  async getPrompt(_id: string, _name: string): Promise<{ description?: string; messages: Array<{ role: 'user' | 'assistant'; content: ContentItem }> }> {
+    return { messages: [] };
+  }
+  async shutdown(): Promise<void> {}
 }
 
 // ---------------------------------------------------------------------------
@@ -110,75 +157,133 @@ test('onToolCall: unknown sessionId is a safe no-op', () => {
 });
 
 // ---------------------------------------------------------------------------
-// logDecision
+// logDecision — payload verified via LedgerCapture flush
 // ---------------------------------------------------------------------------
 
-test('logDecision: full params → entry buffered in ledger', async () => {
+test('logDecision: full params — event_type=decision + all metadata fields flushed', async () => {
   const coord = makeCoord();
+  const capture = new LedgerCapture();
   const sid = 'rr-decision-full';
   await coord.onSessionStart(sid, 'stdio');
 
-  const before = coord.ledger.getStats().buffered;
-  coord.logDecision(sid, 'use embedding brain', 'faster than ollama', 'routing');
-  const after = coord.ledger.getStats().buffered;
+  // Bind stub and drain the session_start entry so subsequent asserts are clean
+  coord.ledger.bind(capture, 'ecosystem');
+  await coord.ledger.flush();
+  const callsBefore = capture.ledgerCalls.length;
 
-  assert.ok(after > before, 'logDecision must buffer at least one ledger entry');
+  coord.logDecision(sid, 'use embedding brain', 'faster than ollama', 'routing');
+  await coord.ledger.flush();
+
+  const newCalls = capture.ledgerCalls.slice(callsBefore);
+  const entry = newCalls.find((c) => c['event_type'] === 'decision');
+  assert.ok(entry, 'a "decision" entry must be flushed');
+  const meta = entry!['metadata'] as Record<string, unknown>;
+  assert.equal(meta['decision'], 'use embedding brain');
+  assert.equal(meta['reasoning'], 'faster than ollama');
+  assert.equal(meta['topic'], 'routing');
 });
 
-test('logDecision: minimal params (no reasoning or topic) → no throw, entry buffered', async () => {
+test('logDecision: minimal params — decision present, no reasoning or topic in metadata', async () => {
   const coord = makeCoord();
+  const capture = new LedgerCapture();
   const sid = 'rr-decision-minimal';
   await coord.onSessionStart(sid, 'stdio');
 
-  const before = coord.ledger.getStats().buffered;
-  assert.doesNotThrow(() => coord.logDecision(sid, 'skip staging'));
-  const after = coord.ledger.getStats().buffered;
-  assert.ok(after > before, 'minimal logDecision still buffers entry');
+  coord.ledger.bind(capture, 'ecosystem');
+  await coord.ledger.flush();
+  const callsBefore = capture.ledgerCalls.length;
+
+  coord.logDecision(sid, 'skip staging');
+  await coord.ledger.flush();
+
+  const entry = capture.ledgerCalls.slice(callsBefore).find((c) => c['event_type'] === 'decision');
+  assert.ok(entry, 'decision entry must be flushed');
+  const meta = entry!['metadata'] as Record<string, unknown>;
+  assert.equal(meta['decision'], 'skip staging');
+  assert.equal(meta['reasoning'], undefined, 'no reasoning key when not passed');
+  assert.equal(meta['topic'], undefined, 'no topic key when not passed');
 });
 
-test('logDecision: unknown sessionId buffers entry with undefined entityId (no throw)', () => {
-  // recordToLedger is called even when ctx is undefined — ledger handles null entityId gracefully
+test('logDecision: unknown sessionId — entry still flushed with correct decision', async () => {
+  // recordToLedger works even when ctx is undefined (entityId is undefined — ledger allows it)
   const coord = makeCoord();
-  const before = coord.ledger.getStats().buffered;
-  assert.doesNotThrow(() => coord.logDecision('no-such-session', 'arbitrary decision'));
-  const after = coord.ledger.getStats().buffered;
-  assert.ok(after > before, 'logDecision for unknown session still records to ledger');
+  const capture = new LedgerCapture();
+  coord.ledger.bind(capture, 'ecosystem');
+  await coord.ledger.flush();
+  const callsBefore = capture.ledgerCalls.length;
+
+  coord.logDecision('no-such-session', 'arbitrary decision');
+  await coord.ledger.flush();
+
+  const entry = capture.ledgerCalls.slice(callsBefore).find((c) => c['event_type'] === 'decision');
+  assert.ok(entry, 'logDecision for unknown session must still flush');
+  const meta = entry!['metadata'] as Record<string, unknown>;
+  assert.equal(meta['decision'], 'arbitrary decision');
 });
 
 // ---------------------------------------------------------------------------
-// logEvent
+// logEvent — payload verified via LedgerCapture flush
 // ---------------------------------------------------------------------------
 
-test('logEvent: custom eventType is used', async () => {
+test('logEvent: custom eventType is used — event_type and metadata verified in flushed entry', async () => {
   const coord = makeCoord();
+  const capture = new LedgerCapture();
   const sid = 'rr-event-custom';
   await coord.onSessionStart(sid, 'stdio');
 
-  const before = coord.ledger.getStats().buffered;
+  coord.ledger.bind(capture, 'ecosystem');
+  await coord.ledger.flush();
+  const callsBefore = capture.ledgerCalls.length;
+
   coord.logEvent(sid, 'focus switched to finance', 'focus_change', { from: 'ops', to: 'finance' });
-  const after = coord.ledger.getStats().buffered;
-  assert.ok(after > before, 'logEvent with custom eventType must buffer an entry');
+  await coord.ledger.flush();
+
+  const entry = capture.ledgerCalls.slice(callsBefore).find((c) => c['event_type'] === 'focus_change');
+  assert.ok(entry, '"focus_change" event_type must be used');
+  const meta = entry!['metadata'] as Record<string, unknown>;
+  assert.equal(meta['action'], 'focus switched to finance');
+  assert.equal(meta['from'], 'ops');
+  assert.equal(meta['to'], 'finance');
 });
 
-test('logEvent: no eventType defaults to "event" (entry still buffered)', async () => {
+test('logEvent: no eventType defaults to "event" — event_type verified in flushed entry', async () => {
   const coord = makeCoord();
+  const capture = new LedgerCapture();
   const sid = 'rr-event-default';
   await coord.onSessionStart(sid, 'stdio');
 
-  const before = coord.ledger.getStats().buffered;
+  coord.ledger.bind(capture, 'ecosystem');
+  await coord.ledger.flush();
+  const callsBefore = capture.ledgerCalls.length;
+
   coord.logEvent(sid, 'backend came online');
-  const after = coord.ledger.getStats().buffered;
-  assert.ok(after > before, 'logEvent without eventType must buffer an entry');
+  await coord.ledger.flush();
+
+  const entry = capture.ledgerCalls.slice(callsBefore).find((c) => c['event_type'] === 'event');
+  assert.ok(entry, 'default event_type must be "event"');
+  const meta = entry!['metadata'] as Record<string, unknown>;
+  assert.equal(meta['action'], 'backend came online');
 });
 
-test('logEvent: metadata spread works without throw', async () => {
+test('logEvent: metadata spread — all extra fields present in flushed entry', async () => {
   const coord = makeCoord();
+  const capture = new LedgerCapture();
   const sid = 'rr-event-meta';
   await coord.onSessionStart(sid, 'stdio');
 
-  assert.doesNotThrow(() =>
-    coord.logEvent(sid, 'spawn complete', 'spawn', { server: 'tasks-mcp', pid: 12345, latency_ms: 42 }),
-  );
+  coord.ledger.bind(capture, 'ecosystem');
+  await coord.ledger.flush();
+  const callsBefore = capture.ledgerCalls.length;
+
+  coord.logEvent(sid, 'spawn complete', 'spawn', { server: 'tasks-mcp', pid: 12345, latency_ms: 42 });
+  await coord.ledger.flush();
+
+  const entry = capture.ledgerCalls.slice(callsBefore).find((c) => c['event_type'] === 'spawn');
+  assert.ok(entry, '"spawn" entry must be flushed');
+  const meta = entry!['metadata'] as Record<string, unknown>;
+  assert.equal(meta['server'], 'tasks-mcp');
+  assert.equal(meta['pid'], 12345);
+  assert.equal(meta['latency_ms'], 42);
 });
 
 // ---------------------------------------------------------------------------
