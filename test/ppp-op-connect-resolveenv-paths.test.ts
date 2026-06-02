@@ -76,14 +76,16 @@ function fakeBinDir(whoamiExitCode: number, vaultListExitCode: number, readOutpu
 } {
   const dir = mkdtempSync(join(tmpdir(), 'ch1tty-fake-op-'));
   const script = join(dir, 'op');
-  // Minimal fake: exits per sub-command, echoes readOutput for 'read'
+  // Base64-encode readOutput so the embedded shell literal is always safe,
+  // regardless of single quotes or special characters in the value.
+  const encoded = Buffer.from(readOutput, 'utf8').toString('base64');
   writeFileSync(
     script,
     `#!/bin/sh
 case "$1" in
   whoami) exit ${whoamiExitCode} ;;
   vault)  exit ${vaultListExitCode} ;;
-  read)   printf '%s' '${readOutput}'; exit 0 ;;
+  read)   printf '%s' '${encoded}' | base64 -d; exit 0 ;;
   *)      exit 1 ;;
 esac
 `,
