@@ -26,17 +26,25 @@ import { OllamaBrain, type ToolCandidate } from '../src/ollama-brain.js';
 
 type WarmupHandler = (body: string) => Promise<{ status: number; body: string } | 'hang'>;
 
-async function startFakeWarmup(handler: WarmupHandler): Promise<{
+interface FakeServer {
   url: string;
   stop: () => Promise<void>;
   hits: () => number;
-}> {
+  lastRequest: () => { path: string; body: unknown } | null;
+}
+
+async function startFakeWarmup(handler: WarmupHandler): Promise<FakeServer> {
   let hitCount = 0;
+  let lastReq: { path: string; body: unknown } | null = null;
+
   const server = http.createServer((req, res) => {
     let raw = '';
     req.on('data', (chunk: Buffer) => { raw += chunk.toString('utf8'); });
     req.on('end', () => {
       hitCount++;
+      let parsed: unknown;
+      try { parsed = JSON.parse(raw); } catch { parsed = raw; }
+      lastReq = { path: req.url ?? '/', body: parsed };
       handler(raw).then((result) => {
         if (result === 'hang') return;
         res.writeHead(result.status, { 'Content-Type': 'application/json' });
@@ -58,7 +66,7 @@ async function startFakeWarmup(handler: WarmupHandler): Promise<{
       server.close((err) => (err ? reject(err) : resolve()));
     });
 
-  return { url, stop, hits: () => hitCount };
+  return { url, stop, hits: () => hitCount, lastRequest: () => lastReq };
 }
 
 function candidates(): ToolCandidate[] {
@@ -104,7 +112,18 @@ test('OllamaBrain.warmup(): HTTP 200 OK → drains body, returns true', async ()
     const result = await brain.warmup(3000);
 
     assert.equal(result, true, 'warmup must return true on HTTP 200');
-    assert.equal(fake.hits(), 1, 'exactly one request to /api/generate');
+    assert.equal(fake.hits(), 1, 'exactly one request made during warmup');
+
+    // Verify the warmup request targeted the correct endpoint with the expected shape
+    const req = fake.lastRequest();
+    assert.ok(req !== null, 'a request must have been recorded');
+    assert.equal(req.path, '/api/generate', 'warmup must call /api/generate, not /api/embed or other');
+    const body = req.body as { model?: string; prompt?: string; stream?: boolean; options?: { num_predict?: number; temperature?: number } };
+    assert.equal(body.model, 'llama3.2:3b', 'warmup request must use the configured model');
+    assert.equal(body.prompt, 'ok', 'warmup prompt must be the sentinel "ok" string');
+    assert.equal(body.stream, false, 'warmup must disable streaming');
+    assert.equal(body.options?.num_predict, 1, 'warmup must request num_predict: 1 to minimise model output');
+
     // warmup is observability-neutral — route stats must stay zero
     assert.equal(brain.getStats().calls, 0, 'warmup must not increment route calls');
     assert.equal(brain.getStats().successes, 0, 'warmup must not increment successes');
@@ -205,21 +224,32 @@ test('OllamaBrain.route(): matches array with null/number/string items → non-o
   }
 });
 
-// ── 7. extractRoutedTools: non-finite confidence (NaN, Infinity) → item skipped ─
+// ── 7. extractRoutedTools: non-finite confidence (Infinity) → item skipped ───────
+//
+// JSON.stringify(NaN) = "null" and JSON.stringify(Infinity) = "null" — both
+// become null after serialisation, which fails the earlier `typeof !== 'number'`
+// guard rather than the `!Number.isFinite()` guard we want to exercise.
+//
+// Solution: build the inner JSON string by hand using numeric literals that
+// JSON.parse will evaluate to Infinity. JSON allows arbitrarily large number
+// literals; values that exceed Number.MAX_VALUE (~1.8e308) are mapped to
+// Infinity by the JavaScript parser. So `JSON.parse('{"n":1e309}').n === Infinity`
+// is true, and `!Number.isFinite(Infinity)` fires the guard we're testing.
 
-test('OllamaBrain.route(): NaN and Infinity confidence values → filtered by !Number.isFinite guard', async () => {
+test('OllamaBrain.route(): Infinity confidence (via 1e309 JSON literal) → filtered by !Number.isFinite guard', async () => {
+  // Hand-craft the inner response string so the confidence values survive JSON
+  // round-tripping as actual Infinity in JavaScript (not null).
+  const innerJson =
+    '{"matches":[' +
+    '{"tool":"neon/run_sql","confidence":1e309,"reason":"overflow-to-Infinity"},' +
+    '{"tool":"neon/run_sql","confidence":-1e309,"reason":"overflow-to-neg-Infinity"},' +
+    '{"tool":"notion/search","confidence":0.82,"reason":"valid match"}' +
+    ']}';
+
   const fake = await startFakeWarmup(async () => ({
     status: 200,
-    body: JSON.stringify({
-      response: JSON.stringify({
-        matches: [
-          { tool: 'neon/run_sql', confidence: NaN, reason: 'nan confidence' },
-          { tool: 'neon/run_sql', confidence: Infinity, reason: 'infinite confidence' },
-          { tool: 'neon/run_sql', confidence: -Infinity, reason: 'neg-infinite confidence' },
-          { tool: 'notion/search', confidence: 0.82, reason: 'valid match' },
-        ],
-      }),
-    }),
+    // Outer envelope: standard JSON. Inner `response` field is the hand-crafted string.
+    body: JSON.stringify({ response: innerJson }),
   }));
 
   try {
@@ -232,7 +262,7 @@ test('OllamaBrain.route(): NaN and Infinity confidence values → filtered by !N
     const result = await brain.route('search something', candidates());
 
     assert.ok(result !== null, 'valid item must produce a non-null result');
-    assert.equal(result.length, 1, 'NaN/±Infinity items must be filtered; only finite-confidence item passes');
+    assert.equal(result.length, 1, '±Infinity confidence items must be filtered; only finite-confidence item passes');
     assert.equal(result[0]!.tool.namespacedName, 'notion/search', 'only the finite-confidence item must survive');
     assert.equal(result[0]!.confidence, 0.82);
   } finally {
