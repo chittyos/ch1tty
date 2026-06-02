@@ -26,6 +26,7 @@
  */
 
 import assert from 'node:assert/strict';
+import { after } from 'node:test';
 import test from 'node:test';
 import {
   createServer,
@@ -36,7 +37,7 @@ import {
 import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
 
 import { loadConfigFromPath, validateServersConfig } from '../src/config.js';
 import { RemoteProxy } from '../src/remote-proxy.js';
@@ -51,9 +52,13 @@ process.env.CH1TTY_REMOTE_TIMEOUT_MS = '3000';
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
+// Single OS-created temp directory (mkdtempSync is atomic — no TOCTOU race)
+const TEMP_DIR = mkdtempSync(join(tmpdir(), 'ch1tty-fff-'));
+after(() => rmSync(TEMP_DIR, { recursive: true, force: true }));
+
 let _ctr = 0;
 function tmpPath(ext: string): string {
-  return join(tmpdir(), `ch1tty-fff-${process.pid}-${++_ctr}.${ext}`);
+  return join(TEMP_DIR, `${++_ctr}.${ext}`);
 }
 
 // ── 1. loadConfigFromPath: invalid JSON → throws ─────────────────────────────
