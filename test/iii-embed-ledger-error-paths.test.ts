@@ -17,7 +17,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import http from 'node:http';
 import type { AddressInfo } from 'node:net';
-import { writeFileSync, rmSync } from 'node:fs';
+import { writeFileSync, mkdtempSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { EmbeddingBrain } from '../src/embedding-brain.js';
@@ -171,9 +171,11 @@ test('embed: vector index 0 valid, index 1 is a string → inner type guard fire
 // ── 6. writeDeadLetter catch block ────────────────────────────────────────────
 
 test('LedgerClient.shutdown: DLQ mkdirSync throws ENOTDIR → catch swallows, dropped counter still set', async () => {
-  // Create a regular FILE at the path that should be a directory for the DLQ parent.
-  // mkdirSync(dirname(badDlqPath)) will try to traverse this file as a directory component → ENOTDIR.
-  const blockingFile = join(tmpdir(), `ch1tty-iii-block-${Date.now()}-${process.pid}`);
+  // Use mkdtempSync to get a guaranteed-unique temp directory (avoids TOCTOU).
+  // Inside it, create a regular FILE at the name that mkdirSync would need to be a directory.
+  // mkdirSync(dirname(badDlqPath)) tries to traverse that file as a directory → ENOTDIR.
+  const tmpDir = mkdtempSync(join(tmpdir(), 'ch1tty-iii-block-'));
+  const blockingFile = join(tmpDir, 'blocking');
   writeFileSync(blockingFile, 'i-am-a-file-not-a-dir\n');
   const badDlqPath = join(blockingFile, 'subdir', 'ledger.dlq.jsonl');
 
@@ -192,6 +194,6 @@ test('LedgerClient.shutdown: DLQ mkdirSync throws ENOTDIR → catch swallows, dr
     assert.equal(ledger.getStats().buffered, 0, 'buffer cleared after shutdown');
     assert.equal(ledger.getStats().dropped, 1, 'dropped counter incremented despite write failure');
   } finally {
-    rmSync(blockingFile, { force: true });
+    rmSync(tmpDir, { recursive: true, force: true });
   }
 });
