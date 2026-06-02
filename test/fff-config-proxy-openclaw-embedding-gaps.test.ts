@@ -128,6 +128,9 @@ test('RemoteProxy.connectWithReconnect: stale entry → evict + retry (reconnect
       });
       throw new Error('simulated first-connect failure');
     }
+    // Mimic real connect: store the new connection before returning it
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (proxy as any).connections.set(serverId, cleanConn);
     return cleanConn;
   };
 
@@ -139,12 +142,12 @@ test('RemoteProxy.connectWithReconnect: stale entry → evict + retry (reconnect
     `connect must be called at least twice for reconnect; got ${connectCalls}`,
   );
 
-  // After eviction the stale entry must be gone (evict() deletes from the map)
+  // The new connection must be in the map (stale evicted, fresh conn established)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   assert.equal(
-    (proxy as any).connections.has('fff-reconnect'),
-    false,
-    'stale connection must be removed from the map after eviction',
+    (proxy as any).connections.get('fff-reconnect'),
+    cleanConn,
+    'new connection must be stored after successful reconnect (stale entry replaced)',
   );
 
   await proxy.shutdown();
