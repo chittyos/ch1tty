@@ -1,5 +1,5 @@
 /**
- * MMM batch — six uncovered branches in OllamaBrain
+ * MMM batch — seven uncovered branches in OllamaBrain
  *
  * OllamaBrain.warmup() paths (lines 254–288):
  *   1. enabled: false → returns false immediately without any network call.
