@@ -21,6 +21,9 @@ import type { AddressInfo } from 'node:net';
 import { Aggregator } from '../src/aggregator.js';
 import { HttpMcpServer } from '../src/http-server.js';
 import { RemoteProxy } from '../src/remote-proxy.js';
+import { SessionCoordinator } from '../src/coordinator.js';
+import { FixtureBackend } from './fixture-backend.js';
+import type { ServerConfig } from '../src/types.js';
 
 // ── Shared HTTP + MCP helpers (mirror of http-mcp-protocol.test.ts) ────────
 
@@ -95,14 +98,13 @@ test('dddd: resources/list over HTTP MCP → ListResourcesRequestSchema handler 
   try {
     const { sessionId, protocolVersion } = await initSession(s.baseUrl);
     const body = await mcpRequest(s.baseUrl, sessionId, protocolVersion, 10, 'resources/list') as {
-      jsonrpc: string; id: number; result?: { resources: unknown[] }; error?: unknown;
+      jsonrpc: string; id: number; result: { resources: unknown[] }; error?: unknown;
     };
     assert.equal(body.jsonrpc, '2.0');
     assert.equal(body.id, 10);
-    // No backends → empty list (result.resources is []) or MCP error; either way handler executed
-    if (body.result) {
-      assert.ok(Array.isArray(body.result.resources), 'resources is an array');
-    }
+    // No backends → listAllResources succeeds with an empty array; assert no error + result shape.
+    assert.equal(body.error, undefined, 'resources/list must not return a JSON-RPC error');
+    assert.ok(Array.isArray(body.result.resources), 'result.resources is an array');
   } finally {
     await stop(s);
   }
@@ -113,13 +115,13 @@ test('dddd: resources/templates/list over HTTP MCP → ListResourceTemplatesRequ
   try {
     const { sessionId, protocolVersion } = await initSession(s.baseUrl);
     const body = await mcpRequest(s.baseUrl, sessionId, protocolVersion, 11, 'resources/templates/list') as {
-      jsonrpc: string; id: number; result?: { resourceTemplates: unknown[] }; error?: unknown;
+      jsonrpc: string; id: number; result: { resourceTemplates: unknown[] }; error?: unknown;
     };
     assert.equal(body.jsonrpc, '2.0');
     assert.equal(body.id, 11);
-    if (body.result) {
-      assert.ok(Array.isArray(body.result.resourceTemplates), 'resourceTemplates is an array');
-    }
+    // No backends → listAllResourceTemplates succeeds with an empty array.
+    assert.equal(body.error, undefined, 'resources/templates/list must not return a JSON-RPC error');
+    assert.ok(Array.isArray(body.result.resourceTemplates), 'result.resourceTemplates is an array');
   } finally {
     await stop(s);
   }
@@ -129,14 +131,19 @@ test('dddd: resources/read over HTTP MCP → ReadResourceRequestSchema handler b
   const s = await startServer();
   try {
     const { sessionId, protocolVersion } = await initSession(s.baseUrl);
-    // With no backends, readResource throws → MCP SDK returns JSON-RPC error; handler body still executes.
+    // readResource("test://dummy-resource") parses serverId="test", finds no backend, throws
+    // "Unknown server \"test\" in resource URI: test://dummy-resource".
+    // The MCP SDK wraps the throw into a JSON-RPC error; this confirms the handler body ran.
     const body = await mcpRequest(s.baseUrl, sessionId, protocolVersion, 12, 'resources/read', {
       uri: 'test://dummy-resource',
     }) as { jsonrpc: string; id: number; result?: unknown; error?: { code: number; message: string } };
     assert.equal(body.jsonrpc, '2.0');
     assert.equal(body.id, 12);
-    // Unknown server → error response expected
     assert.ok(body.error, 'error expected for unknown resource server');
+    assert.ok(
+      body.error.message.includes('Unknown server'),
+      `error.message must come from aggregator.readResource, got: "${body.error.message}"`,
+    );
   } finally {
     await stop(s);
   }
@@ -147,13 +154,13 @@ test('dddd: prompts/list over HTTP MCP → ListPromptsRequestSchema handler body
   try {
     const { sessionId, protocolVersion } = await initSession(s.baseUrl);
     const body = await mcpRequest(s.baseUrl, sessionId, protocolVersion, 13, 'prompts/list') as {
-      jsonrpc: string; id: number; result?: { prompts: unknown[] }; error?: unknown;
+      jsonrpc: string; id: number; result: { prompts: unknown[] }; error?: unknown;
     };
     assert.equal(body.jsonrpc, '2.0');
     assert.equal(body.id, 13);
-    if (body.result) {
-      assert.ok(Array.isArray(body.result.prompts), 'prompts is an array');
-    }
+    // No backends → listAllPrompts succeeds with an empty array.
+    assert.equal(body.error, undefined, 'prompts/list must not return a JSON-RPC error');
+    assert.ok(Array.isArray(body.result.prompts), 'result.prompts is an array');
   } finally {
     await stop(s);
   }
@@ -163,15 +170,19 @@ test('dddd: prompts/get over HTTP MCP → GetPromptRequestSchema handler body (h
   const s = await startServer();
   try {
     const { sessionId, protocolVersion } = await initSession(s.baseUrl);
-    // With no backends, getPrompt throws → MCP SDK returns JSON-RPC error; handler body still executes.
+    // getPrompt("test-server/test-prompt") parses serverId="test-server", finds no backend, throws
+    // "Unknown server \"test-server\" for prompt: test-server/test-prompt".
     const body = await mcpRequest(s.baseUrl, sessionId, protocolVersion, 14, 'prompts/get', {
       name: 'test-server/test-prompt',
       arguments: {},
     }) as { jsonrpc: string; id: number; result?: unknown; error?: { code: number; message: string } };
     assert.equal(body.jsonrpc, '2.0');
     assert.equal(body.id, 14);
-    // Unknown server → error response expected
     assert.ok(body.error, 'error expected for unknown prompt server');
+    assert.ok(
+      body.error.message.includes('Unknown server'),
+      `error.message must come from aggregator.getPrompt, got: "${body.error.message}"`,
+    );
   } finally {
     await stop(s);
   }
@@ -259,22 +270,61 @@ test('dddd: chitty-mcp-token success → tokenCaches.set() + return token (remot
 
 // ── Test: cast with args.args as plain object ────────────────────────────────
 
+// Keyword-only coordinator: bypasses Ollama so tests are deterministic.
+class KeywordOnlyCoordinator extends SessionCoordinator {
+  override async routeIntent(): Promise<null> { return null; }
+}
+
 test('dddd: cast with args.args plain object → toolArgs truthy branch (aggregator.ts:717)', async () => {
+  // Register a fixture tool whose description matches the intent terms so cast reaches
+  // the confirm-plan block where toolArgs is embedded in the response (not no_match).
+  const backend = new FixtureBackend();
+  backend.defineServer('dddd-db', {
+    tools: [{
+      name: 'search_projects',
+      description: 'search database for projects',
+      inputSchema: { type: 'object', properties: { query: { type: 'string' }, limit: { type: 'number' } } },
+      response: { content: [{ type: 'text', text: '[]' }] },
+    }],
+  });
+
+  const serverConfig: ServerConfig = {
+    id: 'dddd-db',
+    name: 'DDDD DB',
+    type: 'remote',
+    access: 'readwrite',
+    category: 'ecosystem',
+    endpoint: 'https://dddd-db.test/mcp',
+    lazy: true,
+  };
+
   const dlqPath = join(tmpdir(), `ch1tty-dddd-cast-${process.pid}.jsonl`);
-  const agg = new Aggregator([], { ledgerDlqPath: dlqPath });
+  const agg = new Aggregator([serverConfig], {
+    backendFactory: () => backend,
+    embedEnabled: false,
+    ledgerDlqPath: dlqPath,
+    suggestionsCatalog: {},
+    coordinator: new KeywordOnlyCoordinator({}, { enabled: false }, dlqPath),
+  });
+
   try {
-    // Pass args.args as a valid plain object — this takes the truthy branch at aggregator.ts:717.
-    // Use confirm: true so cast returns a plan rather than executing (no backends needed).
+    // args.args is a valid plain object → toolArgs = args.args (aggregator.ts:717 truthy branch).
+    // confirm: true returns the plan containing args: toolArgs without executing.
     const result = await agg.callTool('ch1tty/cast', {
       intent: 'search for database projects',
       args: { query: 'test-query', limit: 5 },
       confirm: true,
     });
-    assert.ok(result, 'cast returns a result');
+
     assert.ok(Array.isArray(result.content), 'result.content is an array');
-    // With no backends, cast finds no tools and returns a no_match or plan response.
-    const text = result.content[0]?.text;
-    assert.ok(typeof text === 'string', 'result has text content');
+    const plan = JSON.parse(result.content[0]!.text as string) as {
+      cast: string;
+      args: Record<string, unknown>;
+    };
+    assert.equal(plan.cast, 'plan', 'cast should resolve to a plan, not no_match');
+    // toolArgs was built from args.args → plan.args must carry the supplied values
+    assert.deepEqual(plan.args, { query: 'test-query', limit: 5 },
+      'plan.args must equal the args.args object passed in (aggregator.ts:717 truthy branch)');
   } finally {
     await agg.shutdown();
     rmSync(dlqPath, { force: true });
