@@ -150,6 +150,17 @@
       "enabled": true
     },
     {
+      "id": "linear",
+      "name": "Linear",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "code",
+      "endpoint": "https://mcp.linear.app/mcp",
+      "authTokenKey": "linear-mcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
       "_comment": "── local: portable stdio servers (npx/uvx, no hardcoded paths) ─"
     },
     {
