@@ -66,14 +66,18 @@ test('ffff: bind() wires backend and starts flush timer without throwing', async
 
 test('ffff: bind() called twice only creates one timer (idempotent)', async () => {
   const { dlqPath, cleanup } = tempDlq();
-  const client = new LedgerClient(dlqPath);
-  const backend = fakeBackend(okCallTool);
-  client.bind(backend, 'ledger-svc');
-  client.bind(backend, 'ledger-svc'); // second call — timer already set, skip
-  const stats = client.getStats();
-  assert.equal(stats.buffered, 0);
-  await client.shutdown();
-  cleanup();
+  try {
+    const client = new LedgerClient(dlqPath);
+    const backend = fakeBackend(okCallTool);
+    client.bind(backend, 'ledger-svc');
+    const timer1 = (client as unknown as { flushTimer: unknown }).flushTimer;
+    client.bind(backend, 'ledger-svc'); // second call — timer already set, skip
+    const timer2 = (client as unknown as { flushTimer: unknown }).flushTimer;
+    assert.strictEqual(timer1, timer2, 'second bind() must not replace the existing timer');
+    await client.shutdown();
+  } finally {
+    cleanup();
+  }
 });
 
 test('ffff: unbind() clears timer and backend — subsequent flush() is no-op', async () => {
@@ -269,50 +273,59 @@ test('ffff: record() drops oldest entries when buffer exceeds MAX_BUFFER_SIZE (5
 
 test('ffff: shutdown() with bound backend flushes entries and clears timer', async () => {
   const { dlqPath, cleanup } = tempDlq();
-  let flushed = 0;
-  const client = new LedgerClient(dlqPath);
-  client.bind(fakeBackend(async () => { flushed++; return { content: [] }; }), 'ledger-svc');
-  client.record('sess', 'session_start', {});
-  client.record('sess', 'session_end', {});
-  await client.shutdown();
-  assert.equal(flushed, 2, 'both entries flushed during shutdown');
-  assert.equal(client.getStats().buffered, 0, 'buffer empty after shutdown');
-  assert.equal(existsSync(dlqPath), false, 'no DLQ needed when all flushed');
-  cleanup();
+  try {
+    let flushed = 0;
+    const client = new LedgerClient(dlqPath);
+    client.bind(fakeBackend(async () => { flushed++; return { content: [] }; }), 'ledger-svc');
+    client.record('sess', 'session_start', {});
+    client.record('sess', 'session_end', {});
+    await client.shutdown();
+    assert.equal(flushed, 2, 'both entries flushed during shutdown');
+    assert.equal(client.getStats().buffered, 0, 'buffer empty after shutdown');
+    assert.equal(existsSync(dlqPath), false, 'no DLQ needed when all flushed');
+  } finally {
+    cleanup();
+  }
 });
 
 test('ffff: shutdown() writes remaining entries to DLQ when backend always fails', async () => {
   const { dlqPath, cleanup } = tempDlq();
-  const client = new LedgerClient(dlqPath);
-  client.bind(fakeBackend(failCallTool), 'ledger-svc');
-  client.record('sess', 'session_start', { user: 'carol' });
-  await client.shutdown();
-  // flushAll breaks on first 0-return, then shutdown writes buffer to DLQ
-  assert.ok(existsSync(dlqPath), 'DLQ written for remaining entries');
-  const lines = readFileSync(dlqPath, 'utf8').trim().split('\n').filter(Boolean);
-  assert.ok(lines.length >= 1, 'at least one DLQ entry');
-  cleanup();
+  try {
+    const client = new LedgerClient(dlqPath);
+    client.bind(fakeBackend(failCallTool), 'ledger-svc');
+    client.record('sess', 'session_start', { user: 'carol' });
+    await client.shutdown();
+    // flushAll breaks on first 0-return, then shutdown writes buffer to DLQ
+    assert.ok(existsSync(dlqPath), 'DLQ written for remaining entries');
+    const lines = readFileSync(dlqPath, 'utf8').trim().split('\n').filter(Boolean);
+    assert.ok(lines.length >= 1, 'at least one DLQ entry');
+  } finally {
+    cleanup();
+  }
 });
 
 // ── writeDeadLetter error path ────────────────────────────────────────────────
 
 test('ffff: writeDeadLetter error path — mkdirSync failure logs error without crashing', async () => {
   const dir = mkdtempSync(join(tmpdir(), 'ch1tty-led-err-'));
-  // Create a regular FILE at the directory name so mkdirSync(dir/blocker) fails with ENOTDIR
-  const blockerPath = join(dir, 'blocker');
-  writeFileSync(blockerPath, 'i-am-a-file');
-  // dlqPath whose dirname is a file path component that can't be created as a dir
-  const dlqPath = join(blockerPath, 'ledger.dlq.jsonl');
+  try {
+    // Create a regular FILE at the directory name so mkdirSync(dir/blocker) fails with ENOTDIR
+    const blockerPath = join(dir, 'blocker');
+    writeFileSync(blockerPath, 'i-am-a-file');
+    // dlqPath whose dirname is a file path component that can't be created as a dir
+    const dlqPath = join(blockerPath, 'ledger.dlq.jsonl');
 
-  const client = new LedgerClient(dlqPath);
-  client.record('sess', 'evt', {});
-  // shutdown() calls writeDeadLetter which tries mkdirSync(dirname(dlqPath)) = blockerPath
-  // blockerPath is a FILE → mkdirSync throws EEXIST/ENOTDIR → caught, log.error called
-  await assert.doesNotReject(
-    () => client.shutdown(),
-    'shutdown must not throw even when DLQ write fails',
-  );
-  // DLQ file should NOT have been written (the write failed)
-  assert.equal(existsSync(dlqPath), false, 'DLQ file not created when directory creation fails');
-  rmSync(dir, { recursive: true, force: true });
+    const client = new LedgerClient(dlqPath);
+    client.record('sess', 'evt', {});
+    // shutdown() calls writeDeadLetter which tries mkdirSync(dirname(dlqPath)) = blockerPath
+    // blockerPath is a FILE → mkdirSync throws EEXIST/ENOTDIR → caught, log.error called
+    await assert.doesNotReject(
+      () => client.shutdown(),
+      'shutdown must not throw even when DLQ write fails',
+    );
+    // DLQ file should NOT have been written (the write failed)
+    assert.equal(existsSync(dlqPath), false, 'DLQ file not created when directory creation fails');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
