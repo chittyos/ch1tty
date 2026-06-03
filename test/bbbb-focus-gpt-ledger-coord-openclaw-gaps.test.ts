@@ -315,17 +315,19 @@ test('ledger bind: periodic flush rejection is swallowed by .catch handler', asy
     throw new Error('periodic flush failure');
   };
 
-  capturedCallback!(); // executes lines 95-97 directly
+  try {
+    capturedCallback!(); // executes lines 95-97 directly
 
-  // Step 3: drain the microtask queue so the .catch handler fires
-  await new Promise<void>((r) => setImmediate(r));
-  await Promise.resolve();
+    // Step 3: drain the microtask queue so the .catch handler fires
+    await new Promise<void>((r) => setImmediate(r));
+    await Promise.resolve();
 
-  assert.ok(flushCallCount > 0, 'flush must have been called via the captured callback');
-  // Reaching here means the .catch swallowed the rejection (no unhandled rejection thrown)
-
-  ledger.unbind();
-  rmSync(dlq, { force: true });
+    assert.ok(flushCallCount > 0, 'flush must have been called via the captured callback');
+    // Reaching here means the .catch swallowed the rejection (no unhandled rejection thrown)
+  } finally {
+    ledger.unbind();
+    rmSync(dlq, { force: true });
+  }
 });
 
 // ── 9. coordinator.ts:124 — stageSession rejection caught by onSessionStart ───
