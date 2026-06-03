@@ -22,16 +22,15 @@ import assert from 'node:assert/strict';
 import test, { after } from 'node:test';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
 import { Aggregator } from '../src/aggregator.js';
 
-const DLQ = join(tmpdir(), `ch1tty-hhhh-${process.pid}.dlq.jsonl`);
-const BAD_CONFIG = join(tmpdir(), `ch1tty-hhhh-bad-cfg-${process.pid}.json`);
+// mkdtempSync is atomic — no TOCTOU race; all temp artifacts live inside it
+const TEMP_DIR = mkdtempSync(join(tmpdir(), 'ch1tty-hhhh-'));
+const DLQ = join(TEMP_DIR, 'ledger.dlq.jsonl');
+const BAD_CONFIG = join(TEMP_DIR, 'bad-cfg.json');
 
-after(() => {
-  rmSync(DLQ, { force: true });
-  rmSync(BAD_CONFIG, { force: true });
-});
+after(() => { rmSync(TEMP_DIR, { recursive: true, force: true }); });
 
 // ── 1. handleReload catch path (aggregator.ts:706) ─────────────────────────
 
