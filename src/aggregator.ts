@@ -34,6 +34,7 @@ import type { FocusSuggestions } from './suggestions.js';
 
 const SEPARATOR = '/';
 const META_SERVER_ID = 'ch1tty';
+const META_TOOL_VERBS: ReadonlySet<string> = new Set(['search', 'execute', 'status', 'reload', 'cast']);
 
 interface NamespacedTool {
   serverId: string;
@@ -1032,7 +1033,8 @@ export class Aggregator {
   }
 
   async callTool(namespacedName: string, args: Record<string, unknown> = {}, sessionId?: string): Promise<ToolCallResult> {
-    const sepIndex = namespacedName.indexOf(SEPARATOR);
+    const normalized = this.normalizeToolName(namespacedName);
+    const sepIndex = normalized.indexOf(SEPARATOR);
     if (sepIndex === -1) {
       return {
         content: [{
@@ -1045,8 +1047,8 @@ export class Aggregator {
       };
     }
 
-    const serverId = namespacedName.slice(0, sepIndex);
-    const toolName = namespacedName.slice(sepIndex + 1);
+    const serverId = normalized.slice(0, sepIndex);
+    const toolName = normalized.slice(sepIndex + 1);
 
     if (serverId !== META_SERVER_ID) {
       return {
@@ -1059,6 +1061,33 @@ export class Aggregator {
     }
 
     return this.handleMetaTool(toolName, args, sessionId);
+  }
+
+  // Some MCP clients (notably OpenAI ASDK link wrappers) rewrite `/` to `.`
+  // on the outbound path or strip the `ch1tty/` namespace. Older ASDK
+  // manifests also exposed a stale `gateway_status` alias. Normalize all of
+  // these to the canonical `ch1tty/<verb>` so a client-side packaging quirk
+  // does not make the gateway look broken.
+  private normalizeToolName(raw: string): string {
+    if (!raw) return raw;
+    let name = raw;
+    const prefix = `${META_SERVER_ID}${SEPARATOR}`;
+    // "Ch1tty/ch1tty/<verb>" or "ch1tty/ch1tty/<verb>" -> "ch1tty/<verb>"
+    const doubled = name.toLowerCase();
+    if (doubled.startsWith(`${prefix}${META_SERVER_ID}`)) {
+      name = name.slice(prefix.length);
+    }
+    // Dot-notation: "ch1tty.<verb>" -> "ch1tty/<verb>"
+    if (name.toLowerCase().startsWith(`${META_SERVER_ID}.`)) {
+      name = `${prefix}${name.slice(META_SERVER_ID.length + 1)}`;
+    }
+    // Stale alias from older ASDK manifests.
+    if (name === 'gateway_status') name = `${prefix}status`;
+    // Bare verb (no namespace) -> namespace it.
+    if (!name.includes(SEPARATOR) && !name.includes('.') && META_TOOL_VERBS.has(name)) {
+      name = `${prefix}${name}`;
+    }
+    return name;
   }
 
   // ── Resources (passthrough — low cardinality, fine to expose) ─
