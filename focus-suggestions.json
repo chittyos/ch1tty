@@ -1,5 +1,5 @@
 {
-  "_comment": "Alchemist-surfaced suggestions catalog — cross-backend tool combos and pre-written /cast prompts, grouped by all six focus profiles from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain lives on a server that was connected on the live gateway when this catalog was generated (ch1tty v4.1.0, 9/18 servers connected: evidence, browser-rendering, notion, github, context7, thinking, fs, playwright, orchestrator). `verified:false` means the chain references at least one config-present-but-not-connected server — those tools are plausible per each backend's known source surface but were NOT enumerated live. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only — no loader, no public tool beyond the existing 5. Updated 2026-05-30 to add code, communication, and ops focus profiles (PRs #71, #72, #80), completing all 6 lenses. code combos: context7, neon, serena, cloudflare, fs, github, notion. communication combos: notion, chittymac, imessage, tasks. ops combos: cloudflare, neon, github, orchestrator, fs, notion. New combos that reference locally-available servers (github, notion, context7, neon, fs, thinking, orchestrator) are verified:true; combos referencing not-connected servers (serena, cloudflare/workers, chittymac, imessage, tasks) are verified:false.",
+  "_comment": "Alchemist-surfaced suggestions catalog — cross-backend tool combos and pre-written /cast prompts, grouped by all six focus profiles from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain lives on a server that was connected on the live gateway when this catalog was generated (ch1tty v4.1.0, 9/18 servers connected: evidence, browser-rendering, notion, github, context7, thinking, fs, playwright, orchestrator). `verified:false` means the chain references at least one config-present-but-not-connected server — those tools are plausible per each backend's known source surface but were NOT enumerated live. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only — no loader, no public tool beyond the existing 5. Updated 2026-05-30 to add code, communication, and ops focus profiles (PRs #71, #72, #80), completing all 6 lenses. Updated 2026-06-03 to add Linear MCP (linear) to code and governance profiles — Linear combos are verified:false (requires authTokenKey: linear-mcp). code combos: context7, neon, serena, cloudflare, fs, github, notion, linear. communication combos: notion, chittymac, imessage, tasks. ops combos: cloudflare, neon, github, orchestrator, fs, notion. New combos that reference locally-available servers (github, notion, context7, neon, fs, thinking, orchestrator) are verified:true; combos referencing not-connected servers (serena, cloudflare/workers, chittymac, imessage, tasks, linear) are verified:false.",
   "generatedFrom": {
     "gateway": "ch1tty",
     "version": "4.1.0",
@@ -138,6 +138,13 @@
           "accomplishes": "Audit the governance ledger namespace for a topic (e.g. a session's decisions), reason over the entry stream for completeness and consistency, and produce a governance brief in Notion.",
           "verified": false,
           "notes": "ledger/list_entries from apps/ledger-mcp (enabled:false). thinking and notion are verified live."
+        },
+        {
+          "name": "linear-sprint-to-governance-brief",
+          "chain": ["linear/list_projects", "thinking/sequentialthinking", "notion/API-post-page"],
+          "accomplishes": "List active Linear projects and their completion status, reason over blockers and priorities with sequential-thinking, and write a sprint governance brief into Notion — turning engineering issue-tracker state into a governed, stakeholder-readable record.",
+          "verified": false,
+          "notes": "linear uses mcp.linear.app/mcp (requires authTokenKey: linear-mcp). thinking/sequentialthinking and notion/API-post-page are verified live."
         }
       ],
       "prompts": [
@@ -152,7 +159,8 @@
         { "text": "Capture this governance decision as a task, log it to the session, and ingest the rationale as a canonical evidence document", "resolves_to": "task-session-evidence" },
         { "text": "Audit all active sessions and their events, then write a session report in Notion", "resolves_to": "session-audit-to-notion" },
         { "text": "Search evidence for this topic, create action tasks from the findings, and lock the decision in the ledger", "resolves_to": "evidence-to-task-to-ledger" },
-        { "text": "Review the governance ledger for this session and write a brief summarizing all decisions", "resolves_to": "ledger-review-to-brief" }
+        { "text": "Review the governance ledger for this session and write a brief summarizing all decisions", "resolves_to": "ledger-review-to-brief" },
+        { "text": "Summarize our Linear sprint status and write a governance brief to Notion", "resolves_to": "linear-sprint-to-governance-brief" }
       ]
     },
     "design": {
@@ -270,6 +278,20 @@
           "accomplishes": "Upload a new Cloudflare Worker script and immediately fetch it back to verify the deployment landed correctly — a tight deploy→verify loop before any downstream tests run.",
           "verified": false,
           "notes": "cloudflare not connected (remote endpoint, requires token). Tool names inferred from cloudflare MCP surface."
+        },
+        {
+          "name": "linear-issue-to-github-pr",
+          "chain": ["linear/list_issues", "github/create_pull_request"],
+          "accomplishes": "List Linear issues assigned to the current sprint, then open a GitHub pull request for each — keeping issue tracking and code review in sync without manual cross-tool copy-paste.",
+          "verified": false,
+          "notes": "linear backend uses Linear's hosted MCP (mcp.linear.app/mcp); tool names follow Linear MCP's snake_case surface but require auth (authTokenKey: linear-mcp). github/create_pull_request is verified."
+        },
+        {
+          "name": "linear-bug-to-library-context",
+          "chain": ["linear/get_issue", "context7/resolve-library-id", "context7/get-library-docs"],
+          "accomplishes": "Fetch a Linear bug report, resolve the affected library via Context7, and load the library's API docs — giving a developer immediate reference context to reproduce and fix the issue without leaving the terminal.",
+          "verified": false,
+          "notes": "linear inferred (auth required); context7/resolve-library-id and context7/get-library-docs verified."
         }
       ],
       "prompts": [
@@ -280,7 +302,9 @@
         { "text": "Search for all usages of this function and show me the file context around each match", "resolves_to": "code-search-and-file-context" },
         { "text": "Branch the database, run my test query, and log the results in Notion", "resolves_to": "db-branch-test-and-document" },
         { "text": "Deploy this Worker script to Cloudflare and confirm the upload was successful", "resolves_to": "workers-deploy-and-verify" },
-        { "text": "What are the current Neon projects and branches?", "resolves_to": "neon/list_projects" }
+        { "text": "What are the current Neon projects and branches?", "resolves_to": "neon/list_projects" },
+        { "text": "List my open Linear issues and open GitHub PRs for the ones ready to ship", "resolves_to": "linear-issue-to-github-pr" },
+        { "text": "Fetch the Linear bug report and load the relevant library docs so I can fix it", "resolves_to": "linear-bug-to-library-context" }
       ]
     },
     "communication": {

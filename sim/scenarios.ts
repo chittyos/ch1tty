@@ -39,6 +39,7 @@ const CATEGORY_BY_SERVER: Record<string, ServerConfig['category']> = {
   playwright: 'desktop',
   cowork: 'desktop',
   github: 'code',
+  linear: 'code',
   context7: 'documents',
   pdf: 'documents',
   chittymac: 'communication',
@@ -206,6 +207,13 @@ export const SCENARIOS: Scenario[] = [
     intent: 'get the library documentation and code examples for this package',
     expect: 'context7/get-library-docs',
     note: 'near-miss: notion/query_database (query + documents); context7 is in-focus via code profile servers list',
+  },
+  {
+    id: 'code.linear-search-issues',
+    focus: 'code',
+    intent: 'search Linear for open issues assigned to me in this sprint',
+    expect: 'linear/list_issues',
+    note: 'linear is in-focus via code profile servers list; near-miss: github/create_issue (issue keyword)',
   },
 
   // ── communication focus ──────────────────────────────────────────────────────

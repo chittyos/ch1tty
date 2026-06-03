@@ -97,6 +97,8 @@ test('repo focus-profiles.json loads and defines finance/governance/design/code/
   assert.ok(profiles.profiles.code.servers.includes('neon'), 'code profile includes neon');
   assert.ok(profiles.profiles.code.servers.includes('cloudflare'), 'code profile includes cloudflare');
   assert.ok(profiles.profiles.code.servers.includes('notion'), 'code profile includes notion (technical docs)');
+  assert.ok(profiles.profiles.code.servers.includes('linear'), 'code profile includes linear (issue tracking)');
+  assert.ok(profiles.profiles.governance.servers.includes('linear'), 'governance profile includes linear (sprint/project governance)');
   // communication profile contents
   assert.ok(profiles.profiles.communication.categories.includes('communication'), 'communication profile covers communication category');
   assert.ok(profiles.profiles.communication.servers.includes('notion'), 'communication profile includes notion');
