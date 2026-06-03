@@ -3,26 +3,17 @@ import test from 'node:test';
 import { mkdtempSync, readFileSync, rmSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { LedgerClient } from '../src/ledger.js';
 
-async function withTempDlq<T>(fn: (dlqPath: string) => Promise<T>): Promise<T> {
+function tempDlq(): { dlqPath: string; dir: string } {
   const dir = mkdtempSync(join(tmpdir(), 'ch1tty-ledger-test-'));
-  const dlqPath = join(dir, 'ledger.dlq.jsonl');
-  const original = process.env.CH1TTY_LEDGER_DLQ;
-  process.env.CH1TTY_LEDGER_DLQ = dlqPath;
-  try {
-    return await fn(dlqPath);
-  } finally {
-    if (original === undefined) delete process.env.CH1TTY_LEDGER_DLQ;
-    else process.env.CH1TTY_LEDGER_DLQ = original;
-    rmSync(dir, { recursive: true, force: true });
-  }
+  return { dlqPath: join(dir, 'ledger.dlq.jsonl'), dir };
 }
 
 test('shutdown drains buffer to DLQ when no backend was ever bound', async () => {
-  await withTempDlq(async (dlqPath) => {
-    // Module reads CH1TTY_LEDGER_DLQ at import time, so re-import after env mutation.
-    const { LedgerClient } = await import(`../src/ledger.js?t=${Date.now()}`);
-    const client = new LedgerClient();
+  const { dlqPath, dir } = tempDlq();
+  try {
+    const client = new LedgerClient(dlqPath);
 
     client.record('sess-1', 'session_start', { user: 'test' });
     client.record('sess-1', 'custom_event', { detail: 'a' });
@@ -47,63 +38,66 @@ test('shutdown drains buffer to DLQ when no backend was ever bound', async () =>
     const stats = client.getStats();
     assert.equal(stats.buffered, 0, 'buffer cleared after DLQ drain');
     assert.equal(stats.dropped, 3, 'all entries counted as dropped');
-  });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test('shutdown without bound backend and empty buffer does not create DLQ file', async () => {
-  await withTempDlq(async (dlqPath) => {
-    const { LedgerClient } = await import(`../src/ledger.js?t=${Date.now()}`);
-    const client = new LedgerClient();
+  const { dlqPath, dir } = tempDlq();
+  try {
+    const client = new LedgerClient(dlqPath);
     await client.shutdown();
     assert.equal(existsSync(dlqPath), false, 'no DLQ file created when nothing to drain');
-  });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test('DLQ directory is created recursively if missing', async () => {
   const dir = mkdtempSync(join(tmpdir(), 'ch1tty-ledger-mkdir-'));
   const dlqPath = join(dir, 'nested', 'subdir', 'ledger.dlq.jsonl');
-  const original = process.env.CH1TTY_LEDGER_DLQ;
-  process.env.CH1TTY_LEDGER_DLQ = dlqPath;
   try {
-    const { LedgerClient } = await import(`../src/ledger.js?t=${Date.now()}`);
-    const client = new LedgerClient();
+    const client = new LedgerClient(dlqPath);
     client.record('sess-x', 'evt', {});
     await client.shutdown();
     assert.ok(existsSync(dlqPath), 'nested DLQ path created via mkdirSync recursive');
     const content = readFileSync(dlqPath, 'utf8');
     assert.match(content, /sess-x/);
   } finally {
-    if (original === undefined) delete process.env.CH1TTY_LEDGER_DLQ;
-    else process.env.CH1TTY_LEDGER_DLQ = original;
     rmSync(dir, { recursive: true, force: true });
   }
 });
 
 test('dlqEntries returns 0 when DLQ file does not exist', async () => {
-  await withTempDlq(async (dlqPath) => {
-    const { LedgerClient } = await import(`../src/ledger.js?t=${Date.now()}`);
-    const client = new LedgerClient();
+  const { dlqPath, dir } = tempDlq();
+  try {
+    const client = new LedgerClient(dlqPath);
     assert.equal(existsSync(dlqPath), false);
     assert.equal(client.dlqEntries(), 0);
-  });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test('dlqEntries returns correct count after DLQ drain', async () => {
-  await withTempDlq(async (_dlqPath) => {
-    const { LedgerClient } = await import(`../src/ledger.js?t=${Date.now()}`);
-    const client = new LedgerClient();
+  const { dlqPath, dir } = tempDlq();
+  try {
+    const client = new LedgerClient(dlqPath);
     client.record('sess-a', 'session_start', {});
     client.record('sess-a', 'tool_call', { tool: 'x' });
     client.record('sess-b', 'session_end', {});
     await client.shutdown();
     assert.equal(client.dlqEntries(), 3);
-  });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test('getStats includes dlqPath and dlqEntries', async () => {
-  await withTempDlq(async (dlqPath) => {
-    const { LedgerClient } = await import(`../src/ledger.js?t=${Date.now()}`);
-    const client = new LedgerClient();
+  const { dlqPath, dir } = tempDlq();
+  try {
+    const client = new LedgerClient(dlqPath);
     const statsBefore = client.getStats();
     assert.equal(statsBefore.dlqPath, dlqPath);
     assert.equal(statsBefore.dlqEntries, 0, 'no DLQ entries before any drain');
@@ -112,5 +106,7 @@ test('getStats includes dlqPath and dlqEntries', async () => {
     await client.shutdown();
     const statsAfter = client.getStats();
     assert.equal(statsAfter.dlqEntries, 1, 'DLQ entry count reflects drained file');
-  });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
