@@ -141,7 +141,7 @@
         },
         {
           "name": "linear-sprint-to-governance-brief",
-          "chain": ["linear/listProjects", "thinking/sequentialthinking", "notion/API-post-page"],
+          "chain": ["linear/list_projects", "thinking/sequentialthinking", "notion/API-post-page"],
           "accomplishes": "List active Linear projects and their completion status, reason over blockers and priorities with sequential-thinking, and write a sprint governance brief into Notion — turning engineering issue-tracker state into a governed, stakeholder-readable record.",
           "verified": false,
           "notes": "linear uses mcp.linear.app/mcp (requires authTokenKey: linear-mcp). thinking/sequentialthinking and notion/API-post-page are verified live."
@@ -281,14 +281,14 @@
         },
         {
           "name": "linear-issue-to-github-pr",
-          "chain": ["linear/searchIssues", "github/create_pull_request"],
-          "accomplishes": "Search Linear for issues assigned to the current sprint, then open a GitHub pull request for each — keeping issue tracking and code review in sync without manual cross-tool copy-paste.",
+          "chain": ["linear/list_issues", "github/create_pull_request"],
+          "accomplishes": "List Linear issues assigned to the current sprint, then open a GitHub pull request for each — keeping issue tracking and code review in sync without manual cross-tool copy-paste.",
           "verified": false,
-          "notes": "linear backend uses Linear's hosted MCP (mcp.linear.app/mcp); tool names are plausible per Linear's MCP surface but require auth (authTokenKey: linear-mcp). github/create_pull_request is verified."
+          "notes": "linear backend uses Linear's hosted MCP (mcp.linear.app/mcp); tool names follow Linear MCP's snake_case surface but require auth (authTokenKey: linear-mcp). github/create_pull_request is verified."
         },
         {
           "name": "linear-bug-to-library-context",
-          "chain": ["linear/getIssue", "context7/resolve-library-id", "context7/get-library-docs"],
+          "chain": ["linear/get_issue", "context7/resolve-library-id", "context7/get-library-docs"],
           "accomplishes": "Fetch a Linear bug report, resolve the affected library via Context7, and load the library's API docs — giving a developer immediate reference context to reproduce and fix the issue without leaving the terminal.",
           "verified": false,
           "notes": "linear inferred (auth required); context7/resolve-library-id and context7/get-library-docs verified."
@@ -303,7 +303,7 @@
         { "text": "Branch the database, run my test query, and log the results in Notion", "resolves_to": "db-branch-test-and-document" },
         { "text": "Deploy this Worker script to Cloudflare and confirm the upload was successful", "resolves_to": "workers-deploy-and-verify" },
         { "text": "What are the current Neon projects and branches?", "resolves_to": "neon/list_projects" },
-        { "text": "Find my open Linear issues and open GitHub PRs for the ones ready to ship", "resolves_to": "linear-issue-to-github-pr" },
+        { "text": "List my open Linear issues and open GitHub PRs for the ones ready to ship", "resolves_to": "linear-issue-to-github-pr" },
         { "text": "Fetch the Linear bug report and load the relevant library docs so I can fix it", "resolves_to": "linear-bug-to-library-context" }
       ]
     },

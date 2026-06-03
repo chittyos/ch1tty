@@ -212,7 +212,7 @@ export const SCENARIOS: Scenario[] = [
     id: 'code.linear-search-issues',
     focus: 'code',
     intent: 'search Linear for open issues assigned to me in this sprint',
-    expect: 'linear/searchIssues',
+    expect: 'linear/list_issues',
     note: 'linear is in-focus via code profile servers list; near-miss: github/create_issue (issue keyword)',
   },
 
