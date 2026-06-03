@@ -140,6 +140,12 @@ export const FIXTURE_TOOLS: Record<string, FixtureTool[]> = {
     { name: 'create_pull_request', description: 'Open a GitHub pull request from a branch' },
     { name: 'create_issue', description: 'Create a GitHub issue in a repository' },
   ],
+  linear: [
+    { name: 'searchIssues', description: 'Search Linear issues by keyword, assignee, or project' },
+    { name: 'getIssue', description: 'Get full details of a Linear issue by ID or identifier' },
+    { name: 'createIssue', description: 'Create a new Linear issue in a team or project' },
+    { name: 'listProjects', description: 'List active Linear projects with status and completion' },
+  ],
   context7: [
     { name: 'resolve-library-id', description: 'Resolve a package name or description to a Context7-compatible library ID' },
     // near-miss for governance.evidence-search: a "search library docs" tool competes with chittyevidence/search_documents

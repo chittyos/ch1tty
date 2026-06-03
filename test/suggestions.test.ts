@@ -108,7 +108,7 @@ describe('suggestions catalog', () => {
 
   it('code profile combos reference code-relevant backends', () => {
     const catalog = freshCatalog();
-    const codeServers = new Set(['context7', 'neon', 'fs', 'github', 'notion', 'serena', 'cloudflare']);
+    const codeServers = new Set(['context7', 'neon', 'fs', 'github', 'notion', 'serena', 'cloudflare', 'linear']);
     for (const combo of catalog['code'].combos) {
       const servers = combo.chain.map((t) => t.split('/')[0]);
       const relevant = servers.some((s) => codeServers.has(s));
