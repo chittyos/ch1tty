@@ -80,6 +80,7 @@ test('refreshRegistry: tool with no description falls back to tool name in regis
     backendFactory: () => backend,
     spawnTimeoutMs: 500,
     remoteTimeoutMs: 500,
+    embedEnabled: false,
   });
 
   // Search forces refreshRegistry
