@@ -4,3 +4,4 @@ dist/
 pnpm-lock.yaml
 sim/results/
 sim/results.latest.json
+coverage/
