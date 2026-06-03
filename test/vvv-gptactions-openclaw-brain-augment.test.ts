@@ -140,11 +140,17 @@ test('openclaw: ch1tty-session persist → mapArgs takes persist branch → chit
     assert.equal(body.ok, true);
     assert.equal(body.skill, 'ch1tty-session');
 
-    // Verify the persist branch was taken: fixture must have been called with persist tool
+    // Verify the persist branch was taken: search the full call log so the assertion
+    // is robust against any incidental tool calls the coordinator may make before/after.
     const calls = fb.getCallLog();
-    assert.ok(calls.length > 0, 'fixture backend must have been invoked');
-    assert.equal(calls[0].tool, 'chitty_memory_persist', 'persist action must route to chitty_memory_persist, not recall');
-    assert.equal(calls[0].serverId, 'chittyos');
+    assert.ok(
+      calls.some((c) => c.serverId === 'chittyos' && c.tool === 'chitty_memory_persist'),
+      'persist action must route to chitty_memory_persist, not recall',
+    );
+    assert.ok(
+      !calls.some((c) => c.tool === 'chitty_memory_recall'),
+      'recall tool must not be invoked for persist action',
+    );
   } finally {
     await stop(s);
   }
