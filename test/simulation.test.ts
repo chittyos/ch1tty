@@ -22,6 +22,7 @@ const {
   outOfFocusReachable,
   runFocusBiasProbe,
   runScenario,
+  surfaceMisresolutions,
 } = await import('../sim/scenarios.js');
 
 test('cast resolves every scenario to its expected in-focus tool', async () => {
@@ -137,6 +138,43 @@ test('out-of-focus tools stay reachable via search (lens, not gate)', async () =
     assert.ok(
       await outOfFocusReachable(aggregator, 'create page', 'ops', 'notion/create_page'),
       'notion tool unreachable under ops focus',
+    );
+  } finally {
+    await aggregator.shutdown();
+  }
+});
+
+test('no uncorrectable mis-resolutions (focus must fix every OOF intruder)', async () => {
+  // Run every focused scenario WITHOUT focus to find cases where the wrong tool wins.
+  // Classify each as corrected-by-focus or uncorrectable. Uncorrectable = scoring bug.
+  // Focus-correctable mis-resolutions are diagnostic but expected (that is the point of focus).
+  const { aggregator } = buildSimAggregator();
+  try {
+    const events = await surfaceMisresolutions(aggregator);
+    const uncorrected = events.filter((e) => !e.correctedByFocus);
+
+    // Print the mis-resolution report regardless of outcome for diagnostic visibility.
+    if (events.length > 0) {
+      const corrected = events.filter((e) => e.correctedByFocus);
+      for (const e of corrected) {
+        console.log(
+          `  [mis-resolution corrected] ${e.id}: "${e.noFocusTop}" wins without focus → ` +
+          `"${e.expected}" wins with ${e.focus} focus`,
+        );
+      }
+      for (const e of uncorrected) {
+        console.log(
+          `  [UNCORRECTED MIS-RESOLUTION] ${e.id}: "${e.noFocusTop}" wins BOTH with and without ` +
+          `${e.focus} focus — expected "${e.expected}"`,
+        );
+      }
+    }
+
+    assert.equal(
+      uncorrected.length,
+      0,
+      `${uncorrected.length} uncorrectable mis-resolution(s): ` +
+      uncorrected.map((e) => `${e.id}(expected=${e.expected},got=${e.noFocusTop})`).join(', '),
     );
   } finally {
     await aggregator.shutdown();

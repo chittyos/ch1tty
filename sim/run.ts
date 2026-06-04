@@ -14,7 +14,9 @@ import {
   outOfFocusReachable,
   runFocusBiasProbe,
   runScenario,
+  surfaceMisresolutions,
   type FocusBiasProbe,
+  type MisresolutionEvent,
   type ScenarioResult,
 } from './scenarios.js';
 
@@ -35,7 +37,11 @@ async function main(): Promise<void> {
     if (sc.focus) probes.push(await runFocusBiasProbe(aggregator, sc));
   }
 
-  // 3) Out-of-focus reachability (lens, not gate): every focus must still surface
+  // 3) Mis-resolution surface: run each focused scenario WITHOUT focus to find
+  //    cases where the wrong tool wins, then classify as correctable/uncorrectable.
+  const misresolutions: MisresolutionEvent[] = await surfaceMisresolutions(aggregator);
+
+  // 4) Out-of-focus reachability (lens, not gate): every focus must still surface
   //    tools from other focus profiles when searched directly.
   const reachable: Record<string, boolean> = {
     // finance focus — code/communication/design tools still reachable
@@ -86,6 +92,21 @@ async function main(): Promise<void> {
     );
   }
 
+  console.log('\n--- mis-resolution surface ---');
+  if (misresolutions.length === 0) {
+    console.log('  (all focused scenarios resolve correctly without focus — no mis-resolutions)');
+  } else {
+    const corrected = misresolutions.filter((m) => m.correctedByFocus);
+    const uncorrected = misresolutions.filter((m) => !m.correctedByFocus);
+    for (const m of corrected) {
+      console.log(`  [CORRECTED] ${m.id}: "${m.noFocusTop}" wins without focus → "${m.expected}" wins with ${m.focus} focus`);
+    }
+    for (const m of uncorrected) {
+      console.log(`  [UNCORRECTED] ${m.id}: "${m.noFocusTop}" wins both with and without ${m.focus} focus (expected "${m.expected}")`);
+    }
+    console.log(`  (${corrected.length} corrected by focus, ${uncorrected.length} uncorrected)`);
+  }
+
   console.log('\n--- out-of-focus reachability (lens, not gate) ---');
   const oofEntries = Object.entries(reachable);
   for (const [key, ok] of oofEntries) {
@@ -97,7 +118,8 @@ async function main(): Promise<void> {
   console.log(`\nResolution: ${passed}/${results.length} passed  |  total cast time ${Math.round(totalMs * 100) / 100}ms\n`);
 
   const allReachable = oofEntries.every(([, ok]) => ok);
-  if (passed < results.length || !allReachable) {
+  const uncorrectedMisresolutions = misresolutions.filter((m) => !m.correctedByFocus);
+  if (passed < results.length || !allReachable || uncorrectedMisresolutions.length > 0) {
     process.exitCode = 1;
   }
 
@@ -107,10 +129,16 @@ async function main(): Promise<void> {
     summary: {
       resolution: { passed, total: results.length },
       reachability: { passed: oofPassed, total: oofEntries.length },
+      misresolutions: {
+        total: misresolutions.length,
+        corrected: misresolutions.filter((m) => m.correctedByFocus).length,
+        uncorrected: uncorrectedMisresolutions.length,
+      },
       totalCastMs: Math.round(totalMs * 100) / 100,
     },
     scenarios: results,
     focusBiasProbes: probes,
+    misresolutions,
     reachability: reachable,
   };
   const outDir = resolve(__dirname, 'results');
