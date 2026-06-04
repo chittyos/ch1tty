@@ -212,7 +212,7 @@
         },
         {
           "name": "live-page-html-to-docs",
-          "chain": ["browser-rendering/get_url_html_content", "context7/query-docs", "notion/API-post-page"],
+          "chain": ["browser-rendering/get_url_html_content", "context7/get-library-docs", "notion/API-post-page"],
           "accomplishes": "Fetch a live page's raw HTML, cross-reference the framework/library it uses against current docs via context7, and write an implementation note into Notion — useful for reverse-engineering a design pattern.",
           "verified": true,
           "notes": "browser-rendering, context7, notion all connected. Verified 2026-06-04."
@@ -264,7 +264,7 @@
       "combos": [
         {
           "name": "library-research-to-docs",
-          "chain": ["context7/resolve-library-id", "context7/query-docs", "notion/API-post-page"],
+          "chain": ["context7/resolve-library-id", "context7/get-library-docs", "notion/API-post-page"],
           "accomplishes": "Resolve a library name to its canonical context7 ID, fetch the current API documentation, and write a usage note into Notion — turning live library docs into a durable, searchable implementation reference.",
           "verified": true,
           "notes": "context7 and notion both connected. Verified 2026-06-04. Cast: 'research library docs and save findings' resolves to context7/resolve-library-id (score 0.31)."
@@ -285,7 +285,7 @@
         },
         {
           "name": "library-docs-to-github-issue",
-          "chain": ["context7/resolve-library-id", "context7/query-docs", "github/create_issue"],
+          "chain": ["context7/resolve-library-id", "context7/get-library-docs", "github/create_issue"],
           "accomplishes": "Look up the latest docs for a library dependency, then open a GitHub issue pre-populated with the relevant API details — grounding an implementation task in current, accurate documentation rather than stale memory.",
           "verified": false,
           "notes": "context7 verified. github NOT connected (0 tools, 2026-06-04). Previously verified:true."
@@ -320,14 +320,14 @@
         },
         {
           "name": "linear-bug-to-library-context",
-          "chain": ["linear/get_issue", "context7/resolve-library-id", "context7/query-docs"],
+          "chain": ["linear/get_issue", "context7/resolve-library-id", "context7/get-library-docs"],
           "accomplishes": "Fetch a Linear bug report, resolve the affected library via Context7, and load the library's API docs — giving a developer immediate reference context to reproduce and fix the issue without leaving the terminal.",
           "verified": false,
-          "notes": "linear inferred (auth required); context7/resolve-library-id and context7/query-docs verified."
+          "notes": "linear inferred (auth required); context7/resolve-library-id and context7/get-library-docs verified."
         },
         {
           "name": "context7-docs-to-file",
-          "chain": ["context7/resolve-library-id", "context7/query-docs", "fs/write_file"],
+          "chain": ["context7/resolve-library-id", "context7/get-library-docs", "fs/write_file"],
           "accomplishes": "Resolve a library name, fetch its current API documentation, and write the result to a local file for offline reference or inclusion in a project's docs folder — a verified three-backend chain spanning docs-resolution + filesystem persistence.",
           "verified": true,
           "notes": "context7 and fs both connected (2026-06-04). New combo this run. Cast: 'research library docs and save to local file' resolves to context7/resolve-library-id (score 0.31) with fs alternatives confirmed in resolution path."
@@ -341,7 +341,7 @@
         },
         {
           "name": "evidence-library-cross-ref",
-          "chain": ["evidence/ai_search", "context7/resolve-library-id", "context7/query-docs"],
+          "chain": ["evidence/ai_search", "context7/resolve-library-id", "context7/get-library-docs"],
           "accomplishes": "Search the evidence corpus for prior art on a library or technology decision, then pull the current API documentation for the same library — correlating historical ChittyOS usage patterns with live upstream docs to ground implementation choices.",
           "verified": true,
           "notes": "evidence and context7 both connected (2026-06-04). New combo this run — spans two different backends not previously combined in catalog. No prior evidence+context7 chain existed."
