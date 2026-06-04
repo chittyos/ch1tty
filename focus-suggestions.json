@@ -447,17 +447,17 @@
         },
         {
           "name": "db-backup-and-verify",
-          "chain": ["orchestrator/skill_execute", "neon/run_sql"],
-          "accomplishes": "Execute a database backup skill via the ChittyOS Orchestrator and verify the backup completed with a SQL query on Neon — confirms the skill ran and data is intact.",
+          "chain": ["orchestrator/skill_search", "orchestrator/skill_execute", "neon/run_sql"],
+          "accomplishes": "Search for the registered database backup skill by intent, execute it via the orchestrator using the discovered skill ID, then run a verification SQL query on Neon to confirm the backup completed without data loss.",
           "verified": false,
-          "notes": "orchestrator NOT connected (0 tools, 2026-06-04). neon not connected. Both verified:false. skill_execute is the real API equivalent of the deprecated run_job."
+          "notes": "orchestrator NOT connected (0 tools, 2026-06-04). neon not connected. Both verified:false. skill_search first to resolve the skill ID; skill_execute then runs it."
         },
         {
-          "name": "agent-incidents-to-github-issues",
+          "name": "agent-binding-audit-to-issue",
           "chain": ["orchestrator/agent_list", "github/create_issue"],
-          "accomplishes": "List all ChittyAgent agents with binding status and capabilities, identify degraded or inactive agents, and open a GitHub issue for each incident — turning orchestrator health state into traceable engineering work items.",
+          "accomplishes": "List all ChittyAgent agents with binding status, capabilities, domains, and tool counts, then open a GitHub issue to record unbound or unconfigured agents found during the audit — a binding-state inventory, not a health check.",
           "verified": false,
-          "notes": "orchestrator NOT connected (0 tools, 2026-06-04). github NOT connected (0 tools, 2026-06-04). agent_list is the real API equivalent of the deprecated list_jobs."
+          "notes": "orchestrator NOT connected (0 tools, 2026-06-04). github NOT connected (0 tools, 2026-06-04). agent_list returns binding status (bound/unbound) and capabilities, not runtime health or degraded-state signals."
         },
         {
           "name": "pr-to-deploy-pipeline",
@@ -492,7 +492,7 @@
         { "text": "Deploy the latest worker build to Cloudflare production and log the release in Notion", "resolves_to": "deploy-and-document" },
         { "text": "Check worker error logs and write up an incident report in Notion", "resolves_to": "worker-logs-to-incident" },
         { "text": "Run the database backup job and verify it completed successfully", "resolves_to": "db-backup-and-verify" },
-        { "text": "Find degraded or inactive orchestrator agents and open GitHub issues for each incident", "resolves_to": "agent-incidents-to-github-issues" },
+        { "text": "Audit unbound or unconfigured orchestrator agents and open a GitHub issue to track the findings", "resolves_to": "agent-binding-audit-to-issue" },
         { "text": "List merged PRs, deploy the release to Cloudflare, and document it in Notion", "resolves_to": "pr-to-deploy-pipeline" },
         { "text": "Write an infrastructure health snapshot covering job outcomes and database status into Notion", "resolves_to": "infra-health-snapshot" },
         { "text": "List all deployed Cloudflare Workers and their last deploy date", "resolves_to": "cloudflare/list_workers" },
