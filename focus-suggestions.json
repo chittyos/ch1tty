@@ -494,7 +494,7 @@
         { "text": "Run the database backup job and verify it completed successfully", "resolves_to": "db-backup-and-verify" },
         { "text": "Audit unbound or unconfigured orchestrator agents and open a GitHub issue to track the findings", "resolves_to": "agent-binding-audit-to-issue" },
         { "text": "List merged PRs, deploy the release to Cloudflare, and document it in Notion", "resolves_to": "pr-to-deploy-pipeline" },
-        { "text": "Write an infrastructure health snapshot covering job outcomes and database status into Notion", "resolves_to": "infra-health-snapshot" },
+        { "text": "Write an infrastructure health snapshot covering agent binding status and database project status into Notion", "resolves_to": "infra-health-snapshot" },
         { "text": "List all deployed Cloudflare Workers and their last deploy date", "resolves_to": "cloudflare/list_workers" },
         { "text": "Get the current orchestrator provisioning state and active session binding", "resolves_to": "orchestrator/provision_status" },
         { "text": "Fetch the deployment runbook from the docs site and save it locally", "resolves_to": "page-content-to-runbook" },
