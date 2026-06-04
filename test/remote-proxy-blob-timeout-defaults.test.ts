@@ -3,10 +3,10 @@
  *
  * 1. getConnectTimeoutMs / getListTimeoutMs / getCallTimeoutMs DEFAULT-VALUE branches
  *    (lines 31–32, 35–36, 39–40):
- *    When CH1TTY_REMOTE_TIMEOUT_MS is 0 (not > 0), parseInt returns 0 and the guard
- *    `Number.isFinite(v) && v > 0` is false, so the 15_000 / 120_000 fallbacks execute.
- *    A real fixture that responds immediately is used so the 15_000 ms default never
- *    actually fires — we just need the code path, not a real timeout wait.
+ *    When CH1TTY_REMOTE_TIMEOUT_MS is unset, `process.env.CH1TTY_REMOTE_TIMEOUT_MS ?? ''`
+ *    yields an empty string, `parseInt('')` becomes NaN, NaN is not finite, so the
+ *    15_000 / 120_000 fallbacks execute. A real fixture that responds immediately is used
+ *    so the 15_000 ms default never actually fires — we just need the code path.
  *
  * 2. readResource blob content mapping (lines 304–305):
  *    `text: 'text' in c ? c.text : undefined` — FALSE branch when content has no text.
@@ -58,6 +58,12 @@ function startFixture(opts: FixtureOpts = {}): Promise<Fixture> {
     if (req.method !== 'POST') {
       req.resume();
       res.writeHead(405);
+      res.end();
+      return;
+    }
+    if (req.url !== '/mcp') {
+      req.resume();
+      res.writeHead(404);
       res.end();
       return;
     }
@@ -120,11 +126,11 @@ function startFixture(opts: FixtureOpts = {}): Promise<Fixture> {
 
 // ---------------------------------------------------------------------------
 // §1  Timeout DEFAULT-VALUE branches (lines 31–32, 35–36, 39–40)
-//     CH1TTY_REMOTE_TIMEOUT_MS='0' → parseInt=0 → not > 0 → fallback 15_000 / 120_000.
+//     CH1TTY_REMOTE_TIMEOUT_MS unset → `?? ''` → parseInt('') = NaN → fallback 15_000 / 120_000.
 //     Fixture responds immediately, so the 15_000 ms default never fires.
 // ---------------------------------------------------------------------------
 
-test('listTools with CH1TTY_REMOTE_TIMEOUT_MS=0: connect+list use 15_000 fallback (lines 31-32, 35-36)', async () => {
+test('listTools with CH1TTY_REMOTE_TIMEOUT_MS unset: connect+list use 15_000 fallback (lines 31-32, 35-36)', async () => {
   const fixture = await startFixture({
     tools: [{ name: 'ping', description: 'Ping', inputSchema: { type: 'object', properties: {} } }],
   });
@@ -147,7 +153,7 @@ test('listTools with CH1TTY_REMOTE_TIMEOUT_MS=0: connect+list use 15_000 fallbac
   }
 });
 
-test('callTool with CH1TTY_REMOTE_TIMEOUT_MS=0: connect+call use 15_000/120_000 fallback (lines 31-32, 39-40)', async () => {
+test('callTool with CH1TTY_REMOTE_TIMEOUT_MS unset: connect+call use 15_000/120_000 fallback (lines 31-32, 39-40)', async () => {
   const fixture = await startFixture();
   const proxy = new RemoteProxy();
   try {
