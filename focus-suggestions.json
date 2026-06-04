@@ -4,10 +4,10 @@
     "gateway": "ch1tty",
     "version": "4.1.0",
     "method": "live-gateway-enumeration + cast-probe-driven combo discovery",
-    "connectedServers": ["evidence", "browser-rendering", "notion", "context7", "thinking", "fs", "playwright"],
-    "notConnectedServers": ["chittyos", "cloudflare", "cowork", "stripe", "neon", "tasks", "ledger", "session", "chittyevidence", "serena", "chittymac", "imessage", "github", "orchestrator"],
-    "updatedAt": "2026-06-04",
-    "connectedServerNote": "2026-06-04 live enumeration: 7/14 servers connected (68 total tools): evidence(3), browser-rendering(3), notion(22), context7(2), thinking(1), fs(14), playwright(23). github (0 tools) and orchestrator (0 tools) are now NOT connected. neon also not connected. Combos previously marked verified:true that referenced these servers have been corrected to verified:false."
+    "connectedServers": ["thinking", "orchestrator"],
+    "notConnectedServers": ["evidence", "browser-rendering", "notion", "context7", "fs", "playwright", "chittyos", "cloudflare", "cowork", "stripe", "neon", "tasks", "ledger", "session", "chittyevidence", "serena", "chittymac", "imessage", "github", "linear"],
+    "updatedAt": "2026-06-04T13:15Z",
+    "connectedServerNote": "2026-06-04 second enumeration via mcp__Ch1tty__search: 2 backends confirmed reachable — thinking (1 tool: sequentialthinking) and orchestrator (13 tools: provision_evaluate, provision_bind, provision_fork, provision_status, provision_candidates, skill_list, skill_search, skill_execute, skill_register, agent_list, agent_search, agent_execute, agent_register). All other servers not responding in this session. ops combos using stale orchestrator tool names (run_job → skill_execute, list_jobs → agent_list / skill_list) corrected. 2 new verified:true combos added spanning orchestrator + thinking."
   },
   "profiles": {
     "finance": {
@@ -140,6 +140,13 @@
           "notes": "ledger/list_entries from apps/ledger-mcp (enabled:false). thinking and notion are verified live."
         },
         {
+          "name": "provision-reason-audit",
+          "chain": ["orchestrator/provision_candidates", "thinking/sequentialthinking", "orchestrator/provision_evaluate"],
+          "accomplishes": "List TY-VY-RY scored ChittyID candidates for a session, reason over their scores with sequential-thinking to flag conflicts or unexpected rankings before committing, then run the autonomous provisioning evaluation — a review-before-bind governance pattern that adds a human-readable reasoning step to the automated decision.",
+          "verified": true,
+          "notes": "orchestrator (provision_candidates, provision_evaluate) and thinking (sequentialthinking) both confirmed reachable 2026-06-04. Cross-backend: orchestrator supplies the provisioning decision layer; thinking provides an interstitial audit step. This is the governance equivalent of skill-search-and-reason — a plan/review step before committing a significant identity decision."
+        },
+        {
           "name": "linear-sprint-to-governance-brief",
           "chain": ["linear/list_projects", "thinking/sequentialthinking", "notion/API-post-page"],
           "accomplishes": "List active Linear projects and their completion status, reason over blockers and priorities with sequential-thinking, and write a sprint governance brief into Notion — turning engineering issue-tracker state into a governed, stakeholder-readable record.",
@@ -175,6 +182,7 @@
         { "text": "Search evidence for this topic, create action tasks from the findings, and lock the decision in the ledger", "resolves_to": "evidence-to-task-to-ledger" },
         { "text": "Review the governance ledger for this session and write a brief summarizing all decisions", "resolves_to": "ledger-review-to-brief" },
         { "text": "Summarize our Linear sprint status and write a governance brief to Notion", "resolves_to": "linear-sprint-to-governance-brief" },
+        { "text": "List ChittyID candidates for this session, reason over their scores, then run the provisioning evaluation", "resolves_to": "provision-reason-audit" },
         { "text": "Search the evidence store for architecture decisions and reason over them to produce a Notion brief", "resolves_to": "evidence-reasoning-brief" },
         { "text": "List all available AutoRAG knowledge bases and save the inventory to a file", "resolves_to": "rag-survey-to-file" }
       ]
@@ -447,17 +455,17 @@
         },
         {
           "name": "db-backup-and-verify",
-          "chain": ["orchestrator/run_job", "neon/run_sql"],
-          "accomplishes": "Kick off a database backup job via the ChittyAgent Orchestrator and then run a verification SQL query on Neon to confirm the backup completed without data loss.",
+          "chain": ["orchestrator/skill_execute", "neon/run_sql"],
+          "accomplishes": "Execute a database backup skill via the ChittyAgent Orchestrator and then run a verification SQL query on Neon to confirm the backup completed without data loss.",
           "verified": false,
-          "notes": "orchestrator NOT connected (0 tools, 2026-06-04). neon not connected. Both verified:false."
+          "notes": "orchestrator connected (13 tools, 2026-06-04); skill_execute is the real tool (run_job was stale — orchestrator uses skill/agent model, not a job-queue). neon not connected. verified:false until neon reconnects."
         },
         {
-          "name": "failed-job-to-github-issue",
-          "chain": ["orchestrator/list_jobs", "github/create_issue"],
-          "accomplishes": "List recent orchestrator jobs, find the failed ones, and open a GitHub issue for each failure — turning automated job failures into traceable engineering work items.",
+          "name": "degraded-agent-to-github-issue",
+          "chain": ["orchestrator/agent_list", "github/create_issue"],
+          "accomplishes": "List agents in the ChittyAgent ecosystem (including their binding and operational status), find degraded or unbound agents, and open a GitHub issue for each — surfacing infrastructure failures as traceable engineering work items.",
           "verified": false,
-          "notes": "orchestrator NOT connected (0 tools, 2026-06-04). github NOT connected (0 tools, 2026-06-04). Previously verified:true."
+          "notes": "orchestrator connected (13 tools, 2026-06-04); agent_list is the real tool (list_jobs was stale — orchestrator uses skill/agent model). github not connected. verified:false until github reconnects. Renamed from failed-job-to-github-issue to reflect actual semantics."
         },
         {
           "name": "pr-to-deploy-pipeline",
@@ -468,10 +476,17 @@
         },
         {
           "name": "infra-health-snapshot",
-          "chain": ["orchestrator/list_jobs", "neon/list_projects", "notion/API-post-page"],
-          "accomplishes": "Pull recent orchestrator job outcomes and Neon project statuses, then write a consolidated infrastructure health snapshot into a Notion page — a periodic ops status report from two live backends.",
+          "chain": ["orchestrator/skill_list", "neon/list_projects", "notion/API-post-page"],
+          "accomplishes": "List all available ChittyOS skills and Neon project statuses, then write a consolidated infrastructure health snapshot into a Notion page — a periodic ops status report spanning orchestration, database, and documentation backends.",
           "verified": false,
-          "notes": "orchestrator NOT connected (2026-06-04). neon not connected. notion verified."
+          "notes": "orchestrator connected (13 tools, 2026-06-04); skill_list is the real tool (list_jobs was stale). neon not connected. notion not connected in this session. verified:false until neon + notion reconnect."
+        },
+        {
+          "name": "skill-search-and-reason",
+          "chain": ["orchestrator/skill_search", "thinking/sequentialthinking", "orchestrator/skill_execute"],
+          "accomplishes": "Search the ChittyOS skill registry for skills matching an ops intent, reason over the ranked matches with sequential-thinking to pick the safest execution order and flag conflicts, then execute the chosen skill — a plan-before-fire ops pattern across two live backends.",
+          "verified": true,
+          "notes": "orchestrator (skill_search, skill_execute) and thinking (sequentialthinking) both confirmed reachable 2026-06-04 via mcp__Ch1tty__search. Cross-backend: orchestrator supplies the skill catalog and execution layer; thinking provides the interstitial reasoning step. Novel pattern — no prior orchestrator+thinking combo existed in catalog."
         },
         {
           "name": "page-content-to-runbook",
@@ -491,12 +506,13 @@
       "prompts": [
         { "text": "Deploy the latest worker build to Cloudflare production and log the release in Notion", "resolves_to": "deploy-and-document" },
         { "text": "Check worker error logs and write up an incident report in Notion", "resolves_to": "worker-logs-to-incident" },
-        { "text": "Run the database backup job and verify it completed successfully", "resolves_to": "db-backup-and-verify" },
-        { "text": "Find failed orchestrator jobs and open GitHub issues for each one", "resolves_to": "failed-job-to-github-issue" },
+        { "text": "Execute the database backup skill and verify it completed successfully with a SQL check", "resolves_to": "db-backup-and-verify" },
+        { "text": "List agents in the ecosystem, find any that are degraded or unbound, and open GitHub issues for each", "resolves_to": "degraded-agent-to-github-issue" },
         { "text": "List merged PRs, deploy the release to Cloudflare, and document it in Notion", "resolves_to": "pr-to-deploy-pipeline" },
-        { "text": "Write an infrastructure health snapshot covering job outcomes and database status into Notion", "resolves_to": "infra-health-snapshot" },
-        { "text": "List all deployed Cloudflare Workers and their last deploy date", "resolves_to": "cloudflare/list_workers" },
-        { "text": "Check the status of the last orchestrator job run", "resolves_to": "orchestrator/get_job_status" },
+        { "text": "List all ChittyOS skills and Neon projects, then write an infrastructure health snapshot to Notion", "resolves_to": "infra-health-snapshot" },
+        { "text": "Search for the right ops skill, reason over the options, then execute the chosen skill", "resolves_to": "skill-search-and-reason" },
+        { "text": "List all deployed Cloudflare Workers", "resolves_to": "cloudflare/list_workers" },
+        { "text": "Check the current orchestrator provisioning status", "resolves_to": "orchestrator/provision_status" },
         { "text": "Fetch the deployment runbook from the docs site and save it locally", "resolves_to": "page-content-to-runbook" },
         { "text": "Scan the codebase for worker entry points and Dockerfiles, then write an ops inventory to Notion", "resolves_to": "codebase-scan-to-notion" }
       ]
