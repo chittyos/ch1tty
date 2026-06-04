@@ -853,7 +853,7 @@
           "notes": "orchestrator connected (2026-06-04). Replaces stale run_job/neon chain \u2014 real API uses skill_search + skill_execute. Pure orchestrator, no external deps."
         },
         {
-          "name": "failed-job-to-github-issue",
+          "name": "agent-incident-triage",
           "chain": [
             "orchestrator/agent_list",
             "thinking/sequentialthinking",
@@ -943,14 +943,14 @@
         },
         {
           "text": "List all ChittyAgent agents, triage their status, and write an incident analysis to a local file",
-          "resolves_to": "failed-job-to-github-issue"
+          "resolves_to": "agent-incident-triage"
         },
         {
           "text": "List merged PRs, deploy the release to Cloudflare, and document it in Notion",
           "resolves_to": "pr-to-deploy-pipeline"
         },
         {
-          "text": "Write an infrastructure health snapshot covering job outcomes and database status into Notion",
+          "text": "Enumerate all ChittyAgent agents and available skills and write the orchestrator registry snapshot to a local file",
           "resolves_to": "infra-health-snapshot"
         },
         {
@@ -959,7 +959,7 @@
         },
         {
           "text": "List all available orchestrator skills and their triggers and execution types",
-          "resolves_to": "orchestrator/get_job_status"
+          "resolves_to": "infra-health-snapshot"
         },
         {
           "text": "Fetch the deployment runbook from the docs site and save it locally",
