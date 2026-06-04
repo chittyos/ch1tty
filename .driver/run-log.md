@@ -33,6 +33,13 @@
 
 ## Run log
 
+### 2026-06-04T18:30Z (context-resume check-in)
+
+- PR #184 CI: all 3 checks green (CodeQL ✅, Analyze/actions ✅, Analyze/javascript-typescript ✅).
+- `mergeable_state: blocked` — branch protection requires human review approval. Code + CI clean; nothing actionable.
+- No new review events received since last push. CodeRabbit: no findings. Codex P2 thread: outdated (addressed).
+- Status: **waiting for human merge approval on #184**.
+
 ### 2026-06-04T18:15Z
 
 - Startup: `npm ci` + `npm run build` → clean. `npm test` → 913 pass, 0 fail, 2 skip (Ollama unreachable, expected).
