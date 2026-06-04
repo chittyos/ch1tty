@@ -10,11 +10,11 @@
       "context7",
       "evidence",
       "fs",
-      "notion",
       "playwright",
       "thinking"
     ],
     "notConnectedServers": [
+      "notion",
       "chittyos",
       "cloudflare",
       "cowork",
