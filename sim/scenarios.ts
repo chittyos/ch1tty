@@ -410,3 +410,57 @@ export async function outOfFocusReachable(
   if (!text || text.type !== 'text') return false;
   return text.text.includes(expectTool);
 }
+
+/**
+ * A mis-resolution event: a scenario where the correct tool is NOT the top
+ * resolution when run without focus. May or may not be corrected by applying focus.
+ */
+export interface MisresolutionEvent {
+  id: string;
+  intent: string;
+  focus: string;
+  expected: string;
+  /** Tool that won without focus (the "intruder"). */
+  noFocusTop: string | null;
+  noFocusExpectedScore: number | null;
+  noFocusTopScore: number | null;
+  /** Whether applying focus corrects the resolution (expected tool wins). */
+  correctedByFocus: boolean;
+  withFocusTop: string | null;
+}
+
+/**
+ * Surface mis-resolutions across all focused scenarios: run each scenario
+ * without focus, identify cases where the wrong tool wins, and classify them
+ * as focus-correctable or uncorrectable. Uncorrectable mis-resolutions mean
+ * the correct tool loses even with focus applied — a genuine scoring bug.
+ *
+ * Returns ONLY scenarios that mis-resolve without focus. Focus-correct
+ * resolutions (expected tool already wins without focus) are not returned —
+ * they are not mis-resolutions.
+ */
+export async function surfaceMisresolutions(
+  aggregator: Aggregator,
+): Promise<MisresolutionEvent[]> {
+  const events: MisresolutionEvent[] = [];
+  for (const sc of SCENARIOS) {
+    if (!sc.focus) continue;
+    const without = await castPlan(aggregator, sc.intent, 'none');
+    const noFocusTop = without.resolved?.tool ?? null;
+    if (noFocusTop === sc.expect) continue; // already resolves correctly without focus
+    const withF = await castPlan(aggregator, sc.intent, sc.focus);
+    const withFocusTop = withF.resolved?.tool ?? null;
+    events.push({
+      id: sc.id,
+      intent: sc.intent,
+      focus: sc.focus,
+      expected: sc.expect,
+      noFocusTop,
+      noFocusExpectedScore: scoreOf(without, sc.expect),
+      noFocusTopScore: without.resolved?.score ?? null,
+      correctedByFocus: withFocusTop === sc.expect,
+      withFocusTop,
+    });
+  }
+  return events;
+}
