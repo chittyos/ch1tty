@@ -99,12 +99,22 @@ export const FIXTURE_TOOLS: Record<string, FixtureTool[]> = {
     { name: 'create_invoice_page', description: 'Create a Notion page documenting an invoice record' },
   ],
   orchestrator: [
-    { name: 'search', description: 'Search the orchestrator capability index for skills and agents' },
-    { name: 'execute', description: 'Execute a registered orchestrator capability by name' },
-    // ops-specific tools — included so ops scenarios can resolve to orchestrator
-    { name: 'run_job', description: 'Run a registered orchestrator job by name or ID' },
-    { name: 'get_job_status', description: 'Retrieve current result and outcome for an orchestrator job by job ID' },
-    { name: 'list_jobs', description: 'List recent orchestrator jobs, including any failures and completions' },
+    // Provisioning layer — identity/session binding
+    { name: 'provision_evaluate', description: 'Evaluate which ChittyID context entity should serve this session with TY-VY-RY scoring for identity, connectivity, and authority' },
+    { name: 'provision_bind', description: 'Bind a session to a ChittyID context after provision_evaluate decision — executes the provisioning action' },
+    { name: 'provision_fork', description: 'Fork a specialist context from an existing generalist entity inheriting domain strengths' },
+    { name: 'provision_status', description: 'Get current provisioning state: active session binding, TY-VY-RY profile, recent decisions audit trail' },
+    { name: 'provision_candidates', description: 'List TY-VY-RY scored candidates for session hints without making a provisioning decision — for review or override' },
+    // Skill layer — find and execute registered ChittyOS skills
+    { name: 'skill_list', description: 'List all available skills in the ChittyOS ecosystem with names, descriptions, triggers, and execution type' },
+    { name: 'skill_search', description: 'Search for skills by intent, keyword, or trigger — returns ranked matches with relevance scores for skill discovery' },
+    { name: 'skill_execute', description: 'Execute a registered skill by ID or name with arguments — delegates to skill MCP server, agent worker, or returns local instructions' },
+    { name: 'skill_register', description: 'Register or update a skill in the skill index with triggers, plugin, and execution type' },
+    // Agent layer — discover and route to specialist agents
+    { name: 'agent_list', description: 'List all agents in the ChittyAgent ecosystem with binding status, capabilities, domains, and tool counts' },
+    { name: 'agent_search', description: 'Search for agents by capability, domain, or keyword — find which agent handles a specific task' },
+    { name: 'agent_execute', description: 'Execute a request on an agent through the orchestrator using the agent protocol envelope with focal trust gating' },
+    { name: 'agent_register', description: 'Register or update agent metadata in the index including capabilities, descriptions, and tool counts' },
   ],
 
   // ── ops / ecosystem + code ───────────────────────────────────

@@ -447,17 +447,17 @@
         },
         {
           "name": "db-backup-and-verify",
-          "chain": ["orchestrator/run_job", "neon/run_sql"],
-          "accomplishes": "Kick off a database backup job via the ChittyAgent Orchestrator and then run a verification SQL query on Neon to confirm the backup completed without data loss.",
+          "chain": ["orchestrator/skill_search", "orchestrator/skill_execute", "neon/run_sql"],
+          "accomplishes": "Search for the registered database backup skill by intent, execute it via the orchestrator using the discovered skill ID, then run a verification SQL query on Neon to confirm the backup completed without data loss.",
           "verified": false,
-          "notes": "orchestrator NOT connected (0 tools, 2026-06-04). neon not connected. Both verified:false."
+          "notes": "orchestrator NOT connected (0 tools, 2026-06-04). neon not connected. Both verified:false. skill_search first to resolve the skill ID; skill_execute then runs it."
         },
         {
-          "name": "failed-job-to-github-issue",
-          "chain": ["orchestrator/list_jobs", "github/create_issue"],
-          "accomplishes": "List recent orchestrator jobs, find the failed ones, and open a GitHub issue for each failure — turning automated job failures into traceable engineering work items.",
+          "name": "agent-binding-audit-to-issue",
+          "chain": ["orchestrator/agent_list", "github/create_issue"],
+          "accomplishes": "List all ChittyAgent agents with binding status, capabilities, domains, and tool counts, then open a GitHub issue to record unbound or unconfigured agents found during the audit — a binding-state inventory, not a health check.",
           "verified": false,
-          "notes": "orchestrator NOT connected (0 tools, 2026-06-04). github NOT connected (0 tools, 2026-06-04). Previously verified:true."
+          "notes": "orchestrator NOT connected (0 tools, 2026-06-04). github NOT connected (0 tools, 2026-06-04). agent_list returns binding status (bound/unbound) and capabilities, not runtime health or degraded-state signals."
         },
         {
           "name": "pr-to-deploy-pipeline",
@@ -468,10 +468,10 @@
         },
         {
           "name": "infra-health-snapshot",
-          "chain": ["orchestrator/list_jobs", "neon/list_projects", "notion/API-post-page"],
-          "accomplishes": "Pull recent orchestrator job outcomes and Neon project statuses, then write a consolidated infrastructure health snapshot into a Notion page — a periodic ops status report from two live backends.",
+          "chain": ["orchestrator/agent_list", "neon/list_projects", "notion/API-post-page"],
+          "accomplishes": "List all ChittyAgent agents with binding status and capabilities, pull Neon project statuses, then write a consolidated infrastructure health snapshot into a Notion page — a periodic ops status report from two live backends.",
           "verified": false,
-          "notes": "orchestrator NOT connected (2026-06-04). neon not connected. notion verified."
+          "notes": "orchestrator NOT connected (2026-06-04). neon not connected. notion verified. agent_list is the real API equivalent of the deprecated list_jobs."
         },
         {
           "name": "page-content-to-runbook",
@@ -492,11 +492,11 @@
         { "text": "Deploy the latest worker build to Cloudflare production and log the release in Notion", "resolves_to": "deploy-and-document" },
         { "text": "Check worker error logs and write up an incident report in Notion", "resolves_to": "worker-logs-to-incident" },
         { "text": "Run the database backup job and verify it completed successfully", "resolves_to": "db-backup-and-verify" },
-        { "text": "Find failed orchestrator jobs and open GitHub issues for each one", "resolves_to": "failed-job-to-github-issue" },
+        { "text": "Audit unbound or unconfigured orchestrator agents and open a GitHub issue to track the findings", "resolves_to": "agent-binding-audit-to-issue" },
         { "text": "List merged PRs, deploy the release to Cloudflare, and document it in Notion", "resolves_to": "pr-to-deploy-pipeline" },
-        { "text": "Write an infrastructure health snapshot covering job outcomes and database status into Notion", "resolves_to": "infra-health-snapshot" },
+        { "text": "Write an infrastructure health snapshot covering agent binding status and database project status into Notion", "resolves_to": "infra-health-snapshot" },
         { "text": "List all deployed Cloudflare Workers and their last deploy date", "resolves_to": "cloudflare/list_workers" },
-        { "text": "Check the status of the last orchestrator job run", "resolves_to": "orchestrator/get_job_status" },
+        { "text": "Get the current orchestrator provisioning state and active session binding", "resolves_to": "orchestrator/provision_status" },
         { "text": "Fetch the deployment runbook from the docs site and save it locally", "resolves_to": "page-content-to-runbook" },
         { "text": "Scan the codebase for worker entry points and Dockerfiles, then write an ops inventory to Notion", "resolves_to": "codebase-scan-to-notion" }
       ]
