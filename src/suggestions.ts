@@ -64,26 +64,16 @@ export function clearSuggestionsCache(): void {
   _catalogPath = null;
 }
 
-/**
- * Score a combo against intent terms (3+ char tokens). Returns a fraction in [0,1]:
- * number of terms found in the combined haystack (name + accomplishes + chain tools)
- * divided by total term count. Zero when no terms or no matches.
- */
+/** Score a combo against non-empty intent terms. Fraction of terms found in name+accomplishes+chain. */
 function scoreCombo(combo: SuggestedCombo, terms: string[]): number {
-  if (terms.length === 0) return 0;
   const haystack = `${combo.name} ${combo.accomplishes} ${combo.chain.join(' ')}`.toLowerCase();
-  const matched = terms.filter((t) => haystack.includes(t)).length;
-  return matched / terms.length;
+  return terms.filter((t) => haystack.includes(t)).length / terms.length;
 }
 
-/**
- * Score a prompt against intent terms. Same fraction scoring over text + resolves_to.
- */
+/** Score a prompt against non-empty intent terms. Fraction of terms found in text+resolves_to. */
 function scorePrompt(prompt: SuggestedPrompt, terms: string[]): number {
-  if (terms.length === 0) return 0;
   const haystack = `${prompt.text} ${prompt.resolves_to}`.toLowerCase();
-  const matched = terms.filter((t) => haystack.includes(t)).length;
-  return matched / terms.length;
+  return terms.filter((t) => haystack.includes(t)).length / terms.length;
 }
 
 /**
