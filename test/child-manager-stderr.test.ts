@@ -16,6 +16,7 @@ import { tmpdir } from 'node:os';
 
 // Set before import — ChildManager reads this at call time (not module load).
 // 2 000 ms gives the child script 800 ms to write stderr before we hit timeout.
+const prevSpawnTimeout = process.env.CH1TTY_SPAWN_TIMEOUT_MS;
 process.env.CH1TTY_SPAWN_TIMEOUT_MS = '2000';
 
 const { ChildManager } = await import('../src/child-manager.js');
@@ -24,6 +25,10 @@ import type { LocalServerConfig } from '../src/types.js';
 
 const dir = mkdtempSync(join(tmpdir(), 'ch1tty-cm-stderr-'));
 after(() => rmSync(dir, { recursive: true, force: true }));
+after(() => {
+  if (prevSpawnTimeout === undefined) delete process.env.CH1TTY_SPAWN_TIMEOUT_MS;
+  else process.env.CH1TTY_SPAWN_TIMEOUT_MS = prevSpawnTimeout;
+});
 
 test('doSpawn: stderr data from child process is forwarded via log.childStderr', async (t) => {
   // Script writes a recognisable marker to stderr then idles 800 ms so the
@@ -50,6 +55,9 @@ test('doSpawn: stderr data from child process is forwarded via log.childStderr',
   });
 
   const cm = new ChildManager();
+  t.after(async () => {
+    await cm.shutdown();
+  });
   const config: LocalServerConfig = {
     id: 'cm-stderr-test',
     name: 'Stderr Test Server',
@@ -77,6 +85,4 @@ test('doSpawn: stderr data from child process is forwarded via log.childStderr',
     logged.some((e) => e.id === 'cm-stderr-test' && e.data.includes('child-test-stderr-line')),
     `log.childStderr was not called with expected data. Captured: ${JSON.stringify(logged)}`,
   );
-
-  await cm.shutdown();
 });
