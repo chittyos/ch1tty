@@ -453,11 +453,11 @@
           "notes": "orchestrator reconnected; skill_execute is the real tool (run_job was stale). neon still not connected. verified:false until neon reconnects."
         },
         {
-          "name": "failed-job-to-github-issue",
+          "name": "degraded-agent-to-github-issue",
           "chain": ["orchestrator/agent_list", "github/create_issue"],
           "accomplishes": "List agents in the ChittyAgent ecosystem (including their binding and operational status), find degraded/unbound agents, and open a GitHub issue for each one — surfacing infrastructure failures as traceable engineering work items.",
           "verified": false,
-          "notes": "orchestrator reconnected; agent_list is the real tool (list_jobs was stale — orchestrator uses skill/agent model, not job queue). github still NOT connected. verified:false until github reconnects."
+          "notes": "orchestrator reconnected; agent_list is the real tool (list_jobs was stale — orchestrator uses skill/agent model, not job queue). github still NOT connected. verified:false until github reconnects. Renamed from failed-job-to-github-issue to reflect actual semantics (agents, not job queue)."
         },
         {
           "name": "pr-to-deploy-pipeline",
@@ -467,11 +467,11 @@
           "notes": "github NOT connected (2026-06-04). cloudflare not connected. notion/API-post-page verified."
         },
         {
-          "name": "infra-health-snapshot",
+          "name": "infra-capability-snapshot",
           "chain": ["orchestrator/skill_list", "neon/list_projects", "notion/API-post-page"],
-          "accomplishes": "List all available ChittyOS skills and Neon database projects, then write a consolidated infrastructure health snapshot into a Notion page — a periodic ops status report spanning orchestration capabilities and database state.",
+          "accomplishes": "List all available ChittyOS skills and Neon database projects, then write a consolidated infrastructure capability catalog into a Notion page — a periodic ops inventory spanning orchestration skills and database state.",
           "verified": false,
-          "notes": "orchestrator reconnected; skill_list is the real tool (list_jobs was stale). neon still not connected. notion verified. verified:false until neon reconnects."
+          "notes": "orchestrator reconnected; skill_list is the real tool (list_jobs was stale). neon still not connected. notion verified. verified:false until neon reconnects. Renamed from infra-health-snapshot to reflect actual output (capability catalog, not job outcomes)."
         },
         {
           "name": "skill-search-execute-to-notion",
@@ -506,9 +506,9 @@
         { "text": "Deploy the latest worker build to Cloudflare production and log the release in Notion", "resolves_to": "deploy-and-document" },
         { "text": "Check worker error logs and write up an incident report in Notion", "resolves_to": "worker-logs-to-incident" },
         { "text": "Run the database backup job and verify it completed successfully", "resolves_to": "db-backup-and-verify" },
-        { "text": "Find failed orchestrator jobs and open GitHub issues for each one", "resolves_to": "failed-job-to-github-issue" },
+        { "text": "Find degraded or unbound ChittyAgent agents and open a GitHub issue for each one", "resolves_to": "degraded-agent-to-github-issue" },
         { "text": "List merged PRs, deploy the release to Cloudflare, and document it in Notion", "resolves_to": "pr-to-deploy-pipeline" },
-        { "text": "Write an infrastructure health snapshot covering job outcomes and database status into Notion", "resolves_to": "infra-health-snapshot" },
+        { "text": "Catalog available ChittyOS skills and Neon database projects into a Notion ops page", "resolves_to": "infra-capability-snapshot" },
         { "text": "List all deployed Cloudflare Workers and their last deploy date", "resolves_to": "cloudflare/list_workers" },
         { "text": "Check the current provisioning status and active ChittyID binding for this session", "resolves_to": "orchestrator/provision_status" },
         { "text": "Find the right skill for this ops task and execute it, then log the outcome in Notion", "resolves_to": "skill-search-execute-to-notion" },
