@@ -1,13 +1,13 @@
 {
-  "_comment": "Alchemist-surfaced suggestions catalog — cross-backend tool combos and pre-written /cast prompts, grouped by all six focus profiles from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain lives on a server that was connected on the live gateway when this catalog was last refreshed. `verified:false` means the chain references at least one config-present-but-not-connected server. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only — no loader, no public tool beyond the existing 5. Updated 2026-05-30 to add code, communication, and ops focus profiles (PRs #71, #72, #80). Updated 2026-06-03 to add Linear MCP (linear) to code and governance profiles. Updated 2026-06-04: re-enumerated connected server set via live mcp__Ch1tty__status (7/14 servers, 68 tools); github and orchestrator disconnected; neon also not connected; updated 11 verified:true→false for affected combos; added 10 new verified:true combos spanning currently-connected backends (evidence, browser-rendering, notion, context7, thinking, fs, playwright); cast-probe-driven discovery for all new combos.",
+  "_comment": "Alchemist-surfaced suggestions catalog — cross-backend tool combos and pre-written /cast prompts, grouped by all six focus profiles from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain lives on a server that was connected on the live gateway when this catalog was last refreshed. `verified:false` means the chain references at least one config-present-but-not-connected server. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only — no loader, no public tool beyond the existing 5. Updated 2026-05-30 to add code, communication, and ops focus profiles (PRs #71, #72, #80). Updated 2026-06-03 to add Linear MCP (linear) to code and governance profiles. Updated 2026-06-04: re-enumerated connected server set via live mcp__Ch1tty__status (7/14 servers, 68 tools); github and orchestrator disconnected; neon also not connected; updated 11 verified:true→false for affected combos; added 10 new verified:true combos spanning currently-connected backends (evidence, browser-rendering, notion, context7, thinking, fs, playwright); cast-probe-driven discovery for all new combos. Updated 2026-06-04 (orchestrator reconnect): orchestrator back online with 13 tools (provisioning: provision_evaluate/bind/fork/status/candidates; skills: skill_list/search/execute/register; agents: agent_list/search/execute/register); 3 governance combos flipped verified:false→true (skill-discover-and-execute, context-provisioning-audit, agent-route-and-document); 3 ops combos corrected to real tool names (run_job→skill_execute, list_jobs→agent_list/skill_list); 2 new verified:true ops combos added (skill-search-execute-to-notion, provision-ops-decision); 1 ops prompt corrected (get_job_status→provision_status).",
   "generatedFrom": {
     "gateway": "ch1tty",
     "version": "4.1.0",
     "method": "live-gateway-enumeration + cast-probe-driven combo discovery",
-    "connectedServers": ["evidence", "browser-rendering", "notion", "context7", "thinking", "fs", "playwright"],
-    "notConnectedServers": ["chittyos", "cloudflare", "cowork", "stripe", "neon", "tasks", "ledger", "session", "chittyevidence", "serena", "chittymac", "imessage", "github", "orchestrator"],
+    "connectedServers": ["evidence", "browser-rendering", "notion", "context7", "thinking", "fs", "playwright", "orchestrator"],
+    "notConnectedServers": ["chittyos", "cloudflare", "cowork", "stripe", "neon", "tasks", "ledger", "session", "chittyevidence", "serena", "chittymac", "imessage", "github"],
     "updatedAt": "2026-06-04",
-    "connectedServerNote": "2026-06-04 live enumeration: 7/14 servers connected (68 total tools): evidence(3), browser-rendering(3), notion(22), context7(2), thinking(1), fs(14), playwright(23). github (0 tools) and orchestrator (0 tools) are now NOT connected. neon also not connected. Combos previously marked verified:true that referenced these servers have been corrected to verified:false."
+    "connectedServerNote": "2026-06-04 (second enumeration): 8/15 servers connected (81 total tools): evidence(3), browser-rendering(3), notion(22), context7(2), thinking(1), fs(14), playwright(23), orchestrator(13: provision_evaluate/bind/fork/status/candidates, skill_list/search/execute/register, agent_list/search/execute/register). github still not connected. neon still not connected."
   },
   "profiles": {
     "finance": {
@@ -67,7 +67,7 @@
       ]
     },
     "governance": {
-      "description": "ChittyOS ecosystem governance, identity, evidence, and persistent state — extended with ChittyAgent Tasks (tasks-mcp), ChittyLedger (ledger-mcp), Session Coordinator (session-mcp), and ChittyEvidence canonical document store (chittyevidence). Verified-strong (2026-06-04): evidence, notion, thinking, fs live. github and orchestrator NOT connected — corrected to verified:false. New verified:true combos: evidence-reasoning-brief (evidence+thinking+notion) and rag-survey-to-file (evidence+fs).",
+      "description": "ChittyOS ecosystem governance, identity, evidence, and persistent state — extended with ChittyAgent Tasks (tasks-mcp), ChittyLedger (ledger-mcp), Session Coordinator (session-mcp), and ChittyEvidence canonical document store (chittyevidence). Verified-strong (2026-06-04): evidence, notion, thinking, fs live. github still NOT connected. Orchestrator reconnected (13 tools) — skill-discover-and-execute, context-provisioning-audit, and agent-route-and-document restored to verified:true.",
       "combos": [
         {
           "name": "rag-evidence-to-notion-brief",
@@ -87,22 +87,22 @@
           "name": "skill-discover-and-execute",
           "chain": ["orchestrator/skill_search", "orchestrator/skill_execute", "notion/API-create-a-comment"],
           "accomplishes": "Find the right ChittyOS skill for a governance task, execute it through the orchestrator, then annotate the outcome as a comment on the relevant Notion page for an audit trail. Spans orchestrator + notion.",
-          "verified": false,
-          "notes": "orchestrator NOT connected (0 tools, 2026-06-04). Previously verified:true. notion verified."
+          "verified": true,
+          "notes": "orchestrator reconnected (2026-06-04): skill_search and skill_execute confirmed in live tool list. notion/API-create-a-comment verified."
         },
         {
           "name": "context-provisioning-audit",
           "chain": ["orchestrator/provision_candidates", "orchestrator/provision_evaluate", "notion/API-post-page"],
           "accomplishes": "List TY-VY-RY scored ChittyID candidates for a session, run the autonomous provisioning evaluation, and archive the decision + per-aspect rationale into a Notion governance log.",
-          "verified": false,
-          "notes": "orchestrator NOT connected (0 tools, 2026-06-04). Previously verified:true. notion verified."
+          "verified": true,
+          "notes": "orchestrator reconnected (2026-06-04): provision_candidates and provision_evaluate confirmed in live tool list. notion/API-post-page verified."
         },
         {
           "name": "agent-route-and-document",
           "chain": ["orchestrator/agent_search", "orchestrator/agent_execute", "notion/API-patch-block-children"],
           "accomplishes": "Find which ChittyAgent handles a domain task, route the request through the orchestrator's agent protocol, and append the result to an existing Notion page's body.",
-          "verified": false,
-          "notes": "orchestrator NOT connected (0 tools, 2026-06-04). Previously verified:true. notion verified."
+          "verified": true,
+          "notes": "orchestrator reconnected (2026-06-04): agent_search and agent_execute confirmed in live tool list. notion/API-patch-block-children verified."
         },
         {
           "name": "evidence-backed-issue",
@@ -429,7 +429,7 @@
       ]
     },
     "ops": {
-      "description": "Deployment, infrastructure monitoring, and DevOps tooling — Cloudflare Workers, database ops, source control, filesystem, and orchestration. github and orchestrator NOT connected (2026-06-04) — failed-job-to-github-issue corrected to verified:false. cloudflare and neon also not connected. New verified:true combos: page-content-to-runbook (browser-rendering+fs) and codebase-scan-to-notion (fs+notion).",
+      "description": "Deployment, infrastructure monitoring, and DevOps tooling — Cloudflare Workers, database ops, source control, filesystem, and orchestration. Orchestrator reconnected (2026-06-04) — stale tool names (run_job, list_jobs) corrected to real names (skill_execute, agent_list, skill_list); 2 new verified:true combos added (skill-search-execute-to-notion, provision-ops-decision). github still NOT connected. cloudflare and neon also not connected.",
       "combos": [
         {
           "name": "deploy-and-document",
@@ -447,17 +447,17 @@
         },
         {
           "name": "db-backup-and-verify",
-          "chain": ["orchestrator/run_job", "neon/run_sql"],
-          "accomplishes": "Kick off a database backup job via the ChittyAgent Orchestrator and then run a verification SQL query on Neon to confirm the backup completed without data loss.",
+          "chain": ["orchestrator/skill_execute", "neon/run_sql"],
+          "accomplishes": "Kick off a database backup skill via the ChittyAgent Orchestrator and then run a verification SQL query on Neon to confirm the backup completed without data loss.",
           "verified": false,
-          "notes": "orchestrator NOT connected (0 tools, 2026-06-04). neon not connected. Both verified:false."
+          "notes": "orchestrator reconnected; skill_execute is the real tool (run_job was stale). neon still not connected. verified:false until neon reconnects."
         },
         {
           "name": "failed-job-to-github-issue",
-          "chain": ["orchestrator/list_jobs", "github/create_issue"],
-          "accomplishes": "List recent orchestrator jobs, find the failed ones, and open a GitHub issue for each failure — turning automated job failures into traceable engineering work items.",
+          "chain": ["orchestrator/agent_list", "github/create_issue"],
+          "accomplishes": "List agents in the ChittyAgent ecosystem (including their binding and operational status), find degraded/unbound agents, and open a GitHub issue for each one — surfacing infrastructure failures as traceable engineering work items.",
           "verified": false,
-          "notes": "orchestrator NOT connected (0 tools, 2026-06-04). github NOT connected (0 tools, 2026-06-04). Previously verified:true."
+          "notes": "orchestrator reconnected; agent_list is the real tool (list_jobs was stale — orchestrator uses skill/agent model, not job queue). github still NOT connected. verified:false until github reconnects."
         },
         {
           "name": "pr-to-deploy-pipeline",
@@ -468,10 +468,24 @@
         },
         {
           "name": "infra-health-snapshot",
-          "chain": ["orchestrator/list_jobs", "neon/list_projects", "notion/API-post-page"],
-          "accomplishes": "Pull recent orchestrator job outcomes and Neon project statuses, then write a consolidated infrastructure health snapshot into a Notion page — a periodic ops status report from two live backends.",
+          "chain": ["orchestrator/skill_list", "neon/list_projects", "notion/API-post-page"],
+          "accomplishes": "List all available ChittyOS skills and Neon database projects, then write a consolidated infrastructure health snapshot into a Notion page — a periodic ops status report spanning orchestration capabilities and database state.",
           "verified": false,
-          "notes": "orchestrator NOT connected (2026-06-04). neon not connected. notion verified."
+          "notes": "orchestrator reconnected; skill_list is the real tool (list_jobs was stale). neon still not connected. notion verified. verified:false until neon reconnects."
+        },
+        {
+          "name": "skill-search-execute-to-notion",
+          "chain": ["orchestrator/skill_search", "orchestrator/skill_execute", "notion/API-post-page"],
+          "accomplishes": "Search the ChittyOS skill registry for the right ops skill by intent (e.g. 'deploy', 'backup', 'rotate-secrets'), execute it through the orchestrator, and write the outcome as a Notion ops log page — turning skill discovery into a governed, auditable operation.",
+          "verified": true,
+          "notes": "orchestrator reconnected (2026-06-04): skill_search and skill_execute confirmed in live tool list. notion/API-post-page verified. New verified:true ops combo spanning orchestrator + notion."
+        },
+        {
+          "name": "provision-ops-decision",
+          "chain": ["orchestrator/provision_evaluate", "orchestrator/provision_bind", "notion/API-post-page"],
+          "accomplishes": "Evaluate which ChittyID entity (TY-VY-RY scored) should handle this ops session, bind the session to that entity, and record the provisioning decision + scores in a Notion ops page — so context identity is auditable for every ops workflow.",
+          "verified": true,
+          "notes": "orchestrator reconnected (2026-06-04): provision_evaluate and provision_bind confirmed in live tool list. notion/API-post-page verified. New verified:true ops combo spanning orchestrator + notion."
         },
         {
           "name": "page-content-to-runbook",
@@ -496,7 +510,9 @@
         { "text": "List merged PRs, deploy the release to Cloudflare, and document it in Notion", "resolves_to": "pr-to-deploy-pipeline" },
         { "text": "Write an infrastructure health snapshot covering job outcomes and database status into Notion", "resolves_to": "infra-health-snapshot" },
         { "text": "List all deployed Cloudflare Workers and their last deploy date", "resolves_to": "cloudflare/list_workers" },
-        { "text": "Check the status of the last orchestrator job run", "resolves_to": "orchestrator/get_job_status" },
+        { "text": "Check the current provisioning status and active ChittyID binding for this session", "resolves_to": "orchestrator/provision_status" },
+        { "text": "Find the right skill for this ops task and execute it, then log the outcome in Notion", "resolves_to": "skill-search-execute-to-notion" },
+        { "text": "Evaluate and bind the right ChittyID context for this ops session and document the decision in Notion", "resolves_to": "provision-ops-decision" },
         { "text": "Fetch the deployment runbook from the docs site and save it locally", "resolves_to": "page-content-to-runbook" },
         { "text": "Scan the codebase for worker entry points and Dockerfiles, then write an ops inventory to Notion", "resolves_to": "codebase-scan-to-notion" }
       ]
