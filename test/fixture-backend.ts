@@ -637,42 +637,56 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
   orchestrator: {
     tools: [
       {
-        name: 'run_job',
-        description: 'Run a scheduled or ad-hoc job via the ChittyAgent Orchestrator',
+        name: 'skill_search',
+        description: 'Search for skills by intent, keyword, or trigger — returns ranked matches with relevance scores for skill discovery',
         inputSchema: {
           type: 'object',
           properties: {
-            job_name: { type: 'string' },
-            payload: { type: 'object' },
-          },
-          required: ['job_name'],
-        },
-        response: text(JSON.stringify({ job_id: 'job-xyz789', status: 'running', started_at: '2026-05-30T04:00:00Z' })),
-      },
-      {
-        name: 'get_job_status',
-        description: 'Get the current status and result of an orchestrator job by job ID',
-        inputSchema: {
-          type: 'object',
-          properties: { job_id: { type: 'string' } },
-          required: ['job_id'],
-        },
-        response: text(JSON.stringify({ job_id: 'job-xyz789', status: 'completed', result: { ok: true }, duration_ms: 1234 })),
-      },
-      {
-        name: 'list_jobs',
-        description: 'List recent orchestrator jobs with their status and outcome',
-        inputSchema: {
-          type: 'object',
-          properties: {
-            status: { type: 'string', enum: ['running', 'completed', 'failed', 'all'] },
+            query: { type: 'string' },
             limit: { type: 'number' },
+          },
+          required: ['query'],
+        },
+        response: text(JSON.stringify([{ id: 'chittyos-devops:chitty-deploy', name: 'chitty-deploy', score: 0.92 }])),
+      },
+      {
+        name: 'skill_execute',
+        description: 'Execute a registered skill by ID or name with arguments — delegates to skill MCP server, agent worker, or returns local instructions',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            skill_id: { type: 'string' },
+            args: { type: 'object' },
+          },
+          required: ['skill_id'],
+        },
+        response: text(JSON.stringify({ ok: true, skill_id: 'chittyos-devops:chitty-deploy', result: { deployed: true } })),
+      },
+      {
+        name: 'agent_list',
+        description: 'List all agents in the ChittyAgent ecosystem with binding status, capabilities, domains, and tool counts',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            status_filter: { type: 'string', enum: ['bound', 'unbound', 'all'] },
           },
         },
         response: text(JSON.stringify([
-          { job_id: 'job-abc', job_name: 'db-backup', status: 'completed', duration_ms: 820 },
-          { job_id: 'job-def', job_name: 'cache-warm', status: 'failed', error: 'upstream timeout' },
+          { id: 'cloudflare', status: 'bound', capabilities: ['deploy', 'dns'], tools: 14 },
+          { id: 'notion', status: 'bound', capabilities: ['pages', 'databases'], tools: 22 },
         ])),
+      },
+      {
+        name: 'provision_evaluate',
+        description: 'Evaluate which ChittyID context entity should serve this session with TY-VY-RY scoring for identity, connectivity, and authority',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            intent: { type: 'string' },
+            support_type: { type: 'string' },
+          },
+        },
+        response: text(JSON.stringify({ session_id: 'sess-abc123', decision: 'bind_existing', candidate: 'chittyagent-devops', ty: 4.2, vy: 3.8, ry: 4.0 })),
       },
     ],
   },
