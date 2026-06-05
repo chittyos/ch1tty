@@ -1326,11 +1326,12 @@
           "chain": [
             "evidence/ai_search",
             "orchestrator/skill_search",
-            "context7/resolve-library-id"
+            "context7/resolve-library-id",
+            "context7/query-docs"
           ],
-          "accomplishes": "Search the evidence corpus for prior art on a technical decision or library choice, find the ChittyOS skill most relevant to acting on those findings, then resolve the library's canonical ID in context7 \u2014 a three-backend discovery chain that bridges historical evidence, ecosystem skills, and live library documentation.",
+          "accomplishes": "Search the evidence corpus for prior art on a technical decision or library choice, find the ChittyOS skill most relevant to acting on those findings, resolve the library's canonical ID in context7, then fetch the live documentation \u2014 a four-backend discovery chain that bridges historical evidence, ecosystem skills, and authoritative upstream docs.",
           "verified": true,
-          "notes": "All 3 tools confirmed live 2026-06-05 seventeenth-pass. evidence/ai_search (chittyevidence-search) confirmed; orchestrator/skill_search returned compliance/deploy skills; context7/resolve-library-id confirmed. Distinct from evidence-library-cross-ref (evidence\u2192context7 directly, no orchestrator skill step) and evidence-library-research (adds query-docs+fs). First three-backend chain spanning evidence+orchestrator+context7."
+          "notes": "All 4 tools confirmed live 2026-06-05 seventeenth-pass. evidence/ai_search confirmed; orchestrator/skill_search returned compliance/deploy skills; context7/resolve-library-id + context7/query-docs confirmed. Fixed in review: chain originally stopped at resolve-library-id (incomplete). Distinct from evidence-library-cross-ref (evidence\u2192context7 directly, no orchestrator skill step) and evidence-library-research (adds fs write). First four-step chain spanning evidence+orchestrator+context7."
         },
         {
           "name": "agent-search-library-docs",
