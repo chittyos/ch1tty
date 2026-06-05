@@ -12,7 +12,7 @@
 - [x] **B** — GitHub MCP migration: `servers.json` `github` entry → remote `https://api.githubcopilot.com/mcp/` with `envHeaders: {Authorization: GITHUB_MCP_AUTHORIZATION}`
 - [x] **C** — Focus-profile layer: `focus-profiles.json` (6 profiles) + `CH1TTY_FOCUS` env + `focus` param on search/cast + `ch1tty/status` reports active focus; tested in `test/focus.test.ts`
 - [x] **D** — Scenario testing: `sim/scenarios.ts` harness + `test/simulation.test.ts` + multi-step scenario coverage for mis-resolutions, failure resilience, and lens-not-gate verification per focus
-- [x] **E** — Alchemist catalog: `focus-suggestions.json` — 84 combos, 30 verified (36%); all 6 profiles have ≥1 verified combo; Notion board summary **BLOCKED** (token); 54 unverified (39 Notion-API-401, 15 other auth-gated)
+- [x] **E** — Alchemist catalog: `focus-suggestions.json` — 103 combos, 42 verified (41%); all 6 profiles have ≥1 verified combo; Notion board summary **BLOCKED** (token); 61 unverified (39 Notion-API-401, ~22 other auth-gated)
 
 ## Open PRs (human review needed)
 
@@ -155,3 +155,25 @@
 - Branch: `auto/E-eleventh-pass-catalog`. PR#198 (to be created). CI in progress.
 - **Workstream status**: A ✓ B ✓ C ✓ D ✓ E (in-flight, 99/38; 61 combos unverified)
 - **Next run**: Merge PR#198 if CI green. Remaining unverified: 39 Notion-blocked (human must run `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`), ~22 auth-gated (stripe/neon/cloudflare/github/linear/cloudflare-builds). Consider marking E done once PR#198 merged — further progress blocked on auth tokens a human must provide.
+
+### 2026-06-05T11:15Z
+
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass, 0 fail, 2 skip.
+- Fetched all branches. main at `cdf783d` (eleventh-pass not yet merged — PR#198 still open). Checked out `auto/E-eleventh-pass-catalog`.
+- Notion MCP: still 401 (token still invalid). 39 Notion combos blocked.
+- Ch1tty status: connectedServers=0 initially; cast probes confirmed lazy spawn of fs, thinking, context7, evidence, orchestrator, browser-rendering, playwright. github/linear/cloudflare/neon not connected.
+- Ran cast probes to discover new verifiable cross-backend pairings not yet in catalog:
+  - `evidence/ai_search` (0.8) ✓, `orchestrator/skill_search` (1.13) ✓, `orchestrator/agent_list` (0.97) ✓
+  - `orchestrator/provision_candidates/evaluate/bind` confirmed live (toolCount: 13) ✓
+  - `playwright/browser_navigate` (1.05) ✓, `playwright/browser_snapshot` (0.78) ✓
+  - `thinking/sequentialthinking` (1.18) ✓, `fs/write_file` (0.83) ✓
+- Catalog twelfth-pass (focus-suggestions.json):
+  - Added `evidence-skill-discovery` (governance, verified): evidence/ai_search → orchestrator/skill_search → thinking → fs/write_file — NEW evidence+orchestrator pairing
+  - Added `playwright-evidence-overlay` (governance, verified): playwright/navigate → browser_snapshot → evidence/ai_search → fs/write_file — NEW playwright+evidence pairing
+  - Added `full-provision-audit` (ops, verified): orchestrator/provision_candidates → evaluate → bind → fs/write_file — extends provision-evaluate-and-bind with file output
+  - Added `orchestrator-evidence-landscape` (ops, verified): orchestrator/agent_list → evidence/ai_search → thinking → fs/write_file — NEW orchestrator-agent+evidence pairing
+  - Catalog: 99→103 combos, 38→42 verified (+4)
+- Build clean. Tests: 938 pass / 0 fail / 2 skip.
+- Branch: `auto/E-twelfth-pass-catalog`. PR#199 open (base: main). CI showing push-event runs with 0 jobs (pull_request event not firing in remote env — known infra pattern); tests confirmed locally.
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E (in-flight, 103/42; 61 combos unverified)
+- **Next run**: Merge PR#198 + PR#199 once CI resolves. All remaining unverified combos blocked on auth tokens. Human must provide: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` (unblocks 39 combos) plus stripe/neon/cloudflare/github/linear tokens for remaining 22. Consider marking E done — JSON deliverable complete, further verification is human-action-gated.
