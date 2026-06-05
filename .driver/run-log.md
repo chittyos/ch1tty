@@ -47,3 +47,10 @@
 - Created branch `auto/E-catalog-fifth-pass`, PR to follow.
 - Build clean post-changes. Follow-up commit also updated TypeScript test files: `test/fixture-backend.ts`, `test/scenario.test.ts`, `test/suggestions.test.ts` (context7 tool name fix). Build clean post-changes.
 - **Next run**: Check if PR #192 (100% branch coverage) merged; if E workstream catalog reaches satisfactory coverage (43/76); consider closing workstream E and marking all done. Notion board summary remains the one open thread.
+
+### 2026-06-05T05:15Z (PR #193 review response)
+
+- PR #192 confirmed merged (`f0ad162`). PR #193 (`auto/E-catalog-fifth-pass`) open, all CI green, `mergeable_state:blocked` due to 3 unresolved Codex review threads.
+- Codex P2 (focus-suggestions.json:110): legitimate finding — 8 fifth-pass Notion-write-step combos were `verified:true` despite Notion API returning 401 in run env. Fixed: set all 8 to `verified:false`; updated `_comment` and `connectedServerNote` to say "35 verified" (down from 43). Affected: `financial-context-brief`, `financial-doc-analysis`, `web-capture-evidence-to-brief`, `codebase-context-reasoning`, `a11y-snapshot-to-notion-audit`, `notion-knowledge-synthesis`, `web-capture-to-notion-note`, `provision-bind-and-document`.
+- Codex P2 (focus-suggestions.json:828) and Codex P2 (test/scenario.test.ts:702): already fixed in prior commits (21a344e, 2ee2573); threads were stale — resolving.
+- Build clean, tests pass. Pushing fix commit to PR #193.
