@@ -1,8 +1,8 @@
 {
-  "_comment": "Alchemist-surfaced suggestions catalog \u2014 cross-backend tool combos and pre-written /cast prompts, grouped by all six focus profiles from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain was confirmed on a connected server at the time that specific combo was written/verified; connectivity changes since then are noted in per-combo notes. `verified:false` means the chain references at least one config-present-but-not-connected server. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only \u2014 no loader, no public tool beyond the existing 5. Updated 2026-05-30 to add code, communication, and ops focus profiles (PRs #71, #72, #80). Updated 2026-06-03 to add Linear MCP (linear) to code and governance profiles. Updated 2026-06-04: re-enumerated connected server set. Updated 2026-06-05: notion reconnected; fixed tool names; 13 combos newly verified (31/65 total). Updated 2026-06-05 fifth-pass: +11 combos (76 total); Notion combos verified:false (401). Updated 2026-06-05 seventh-pass: +4 combos (84 total, 30 verified). Updated 2026-06-05 eighth-pass: +2 ops cloudflare-builds combos (86 total, 30 verified). Updated 2026-06-05 ninth-pass: +8 combos covering cloudflare-builds chains, linear workflows, a11y audit, and codebase+evidence governance (94 total, 30 verified). Updated 2026-06-05 eleventh-pass: +3 combos, +5 verifications (99 total, 38 verified) using evidence, browser-rendering, orchestrator backends. Updated 2026-06-05 twelfth-pass: +4 verified combos (103 total, 42 verified) \u2014 evidence+orchestrator and playwright+evidence NEW pairings. Updated 2026-06-05 thirteenth-pass: +6 verified combos (109 total, 48 verified) \u2014 skill-landscape, specialist-fork, skill-category-deep-dive (ops) + repo-size-profile, library-to-skill-integration-guide, size-aware-architecture (code); first use of orchestrator/provision_fork + fs/list_directory_with_sizes in combos. Updated 2026-06-05 fourteenth-pass: +6 verified combos (115 total, 54 verified) \u2014 code-file-quality-analysis, library-search-to-reasoning (code); page-screenshot-design-analysis, interactive-design-flow-analysis (design); web-comm-html-brief (communication); financial-page-screenshot-analysis (finance); first use of browser-rendering/get_url_screenshot in design and finance, first use of playwright/browser_click in catalog. Updated 2026-06-05 fifteenth-pass: +6 verified combos (121 total, 60 verified) \u2014 finance-agent-skill-pipeline (finance; first agent_search\u2192skill_search\u2192skill_execute finance chain), evidence-finance-brief (finance; evidence RAG search), comm-skill-execute-log (communication; channel skill dispatch), evidence-rag-skill-audit (governance; 5-tool evidence+skill audit), agent-navigator-ux-review (design; orchestrator\u2192playwright UX review), evidence-agent-triage (ops; 5-tool evidence+orchestrator incident triage). Confirmed live this session: orchestrator/agent_search (0.7), orchestrator/skill_execute (action:local_invoke), evidence/list_rags (3 RAGs), evidence/ai_search (with rag_id, VERIFIED property evidence). browser-rendering 401 in this session. Updated 2026-06-05 sixteenth-pass: +6 verified combos (127 total, 66 verified) \u2014 legal-skill-evidence-reasoning and dispute-agent-evidence-brief (governance; first skill_search+evidence+reasoning legal chains), compliance-skill-evidence-check (ops; first skill_search+evidence+skill_execute compliance chain), code-review-skill-fs-chain (code; first skill_search+fs+skill_execute code-review chain), cashflow-skill-evidence-reasoning (finance; skill-entry evidence+reasoning finance variant), playwright-evidence-ux-analysis (design; first playwright/browser_navigate+evidence+reasoning UX chain). Newly confirmed: orchestrator/skill_list (54 skills), orchestrator/agent_list (28 agents including dispute, ship, autobot, alchemist). browser-rendering still 401.",
+  "_comment": "Alchemist-surfaced suggestions catalog \u2014 cross-backend tool combos and pre-written /cast prompts, grouped by all six focus profiles from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain was confirmed on a connected server at the time that specific combo was written/verified; connectivity changes since then are noted in per-combo notes. `verified:false` means the chain references at least one config-present-but-not-connected server. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only \u2014 no loader, no public tool beyond the existing 5. Updated 2026-05-30 to add code, communication, and ops focus profiles (PRs #71, #72, #80). Updated 2026-06-03 to add Linear MCP (linear) to code and governance profiles. Updated 2026-06-04: re-enumerated connected server set. Updated 2026-06-05: notion reconnected; fixed tool names; 13 combos newly verified (31/65 total). Updated 2026-06-05 fifth-pass: +11 combos (76 total); Notion combos verified:false (401). Updated 2026-06-05 seventh-pass: +4 combos (84 total, 30 verified). Updated 2026-06-05 eighth-pass: +2 ops cloudflare-builds combos (86 total, 30 verified). Updated 2026-06-05 ninth-pass: +8 combos covering cloudflare-builds chains, linear workflows, a11y audit, and codebase+evidence governance (94 total, 30 verified). Updated 2026-06-05 eleventh-pass: +3 combos, +5 verifications (99 total, 38 verified) using evidence, browser-rendering, orchestrator backends. Updated 2026-06-05 twelfth-pass: +4 verified combos (103 total, 42 verified) \u2014 evidence+orchestrator and playwright+evidence NEW pairings. Updated 2026-06-05 thirteenth-pass: +6 verified combos (109 total, 48 verified) \u2014 skill-landscape, specialist-fork, skill-category-deep-dive (ops) + repo-size-profile, library-to-skill-integration-guide, size-aware-architecture (code); first use of orchestrator/provision_fork + fs/list_directory_with_sizes in combos. Updated 2026-06-05 fourteenth-pass: +6 verified combos (115 total, 54 verified) \u2014 code-file-quality-analysis, library-search-to-reasoning (code); page-screenshot-design-analysis, interactive-design-flow-analysis (design); web-comm-html-brief (communication); financial-page-screenshot-analysis (finance); first use of browser-rendering/get_url_screenshot in design and finance, first use of playwright/browser_click in catalog. Updated 2026-06-05 fifteenth-pass: +6 verified combos (121 total, 60 verified) \u2014 finance-agent-skill-pipeline (finance; first agent_search\u2192skill_search\u2192skill_execute finance chain), evidence-finance-brief (finance; evidence RAG search), comm-skill-execute-log (communication; channel skill dispatch), evidence-rag-skill-audit (governance; 5-tool evidence+skill audit), agent-navigator-ux-review (design; orchestrator\u2192playwright UX review), evidence-agent-triage (ops; 5-tool evidence+orchestrator incident triage). Confirmed live this session: orchestrator/agent_search (0.7), orchestrator/skill_execute (action:local_invoke), evidence/list_rags (3 RAGs), evidence/ai_search (with rag_id, VERIFIED property evidence). browser-rendering 401 in this session. Updated 2026-06-05 sixteenth-pass: +6 verified combos (127 total, 66 verified) \u2014 legal-skill-evidence-reasoning and dispute-agent-evidence-brief (governance; first skill_search+evidence+reasoning legal chains), compliance-skill-evidence-check (ops; first skill_search+evidence+skill_execute compliance chain), code-review-skill-fs-chain (code; first skill_search+fs+skill_execute code-review chain), cashflow-skill-evidence-reasoning (finance; skill-entry evidence+reasoning finance variant), playwright-evidence-ux-analysis (design; first playwright/browser_navigate+evidence+reasoning UX chain). Newly confirmed: orchestrator/skill_list (54 skills), orchestrator/agent_list (28 agents including dispute, ship, autobot, alchemist). browser-rendering still 401. Updated 2026-06-05 seventeenth-pass: +6 verified combos (133 total, 72 verified) \u2014 agent-search-evidence-reasoning and provision-candidates-reasoning (governance; first agent_search+evidence+thinking without fs; first minimal orchestrator+thinking 2-step), skill-deploy-context7-docs and evidence-skill-library-docs and agent-search-library-docs (code; first orchestrator/skill_search\u2192context7 and evidence\u2192orchestrator\u2192context7 and agent_search\u2192context7 chains), skill-context7-ops-research (ops; first skill_list\u2192context7\u2192fs chain). Confirmed live 2026-06-05: orchestrator/agent_list (28 agents), orchestrator/agent_search (dispute agent 0.7), orchestrator/skill_search (chitty-deploy 0.8, chittyos-compliance 0.8, wrangler-audit 0.8), orchestrator/skill_execute (action:local_invoke), orchestrator/provision_candidates (candidates_found:0, would_decide:mint_new), orchestrator/skill_list (54 skills), context7/resolve-library-id (MCP TypeScript SDK resolved), context7/query-docs (StreamableHTTPClientTransport snippets returned), evidence/ai_search (chittyevidence-search confirms), evidence/list_rags (3 RAGs), thinking/sequentialthinking (confirmed), fs/write_file (confirmed). notion 401 (auth broken). browser-rendering 401 (auth-gated). Blocker: Notion board cannot be read/updated until op://ChittyOS-Integrations/notion/api_token is rotated.",
   "generatedFrom": {
     "gateway": "ch1tty",
-    "version": "16th-pass",
+    "version": "17th-pass",
     "method": "live-gateway-enumeration + cast-probe-driven combo discovery",
     "connectedServers": [
       "orchestrator",
@@ -32,7 +32,7 @@
       "notion"
     ],
     "updatedAt": "2026-06-05",
-    "connectedServerNote": "2026-06-05 sixteenth-pass: +6 verified combos (127 total, 66 verified). Confirmed live tools: orchestrator/agent_search, orchestrator/skill_search, orchestrator/skill_execute, orchestrator/agent_list, orchestrator/skill_list, orchestrator/provision_candidates; evidence/list_rags (3 RAGs: chittyevidence-ksn, re-evidence-search, chittyevidence-search), evidence/ai_search (with rag_id, returns property evidence facts); context7/resolve-library-id; fs/read_text_file, fs/write_file; thinking/sequentialthinking; playwright/browser_navigate, playwright/browser_screenshot. browser-rendering still 401 (auth-gated). notion still 401. Remaining 61 unverified: Notion-blocked + stripe/neon/cloudflare/github/linear/cloudflare-builds.",
+    "connectedServerNote": "2026-06-05 seventeenth-pass: +6 verified combos (133 total, 72 verified). Confirmed live tools this session: orchestrator/agent_list (28 agents), orchestrator/agent_search (dispute 0.7, storage 0.4), orchestrator/skill_search (chitty-deploy 0.8, chittyos-compliance 0.8, wrangler-audit 0.8, code-review 0.5), orchestrator/skill_execute (action:local_invoke for chitty-deploy and chittyos-compliance), orchestrator/skill_list (54 skills), orchestrator/provision_candidates (candidates_found:0, would_decide:mint_new); context7/resolve-library-id (MCP TypeScript SDK resolved to /modelcontextprotocol/typescript-sdk, score 84.4), context7/query-docs (StreamableHTTPClientTransport code snippets returned); evidence/list_rags (3 RAGs), evidence/ai_search (chittyevidence-search returns context); thinking/sequentialthinking (confirmed); fs/list_directory, fs/write_file (confirmed). NOTE: context7/get-library-docs returns 'Tool not found' — correct name is context7/query-docs (fixed in prior passes). orchestrator/provision_evaluate errors in this session ('Cannot read properties of undefined'). notion 401 (auth broken, 0 tools listed). browser-rendering 401 (auth-gated). Remaining unverified: Notion-blocked (39) + github/tasks/ledger/linear/cloudflare/stripe/etc.",
     "date": "2026-06-05",
     "verifiedSemantics": "verified:true means every tool in the chain was confirmed on a live connected server at the time that specific combo was written \u2014 it is a historical record, not a live reachability guarantee. connectedServers/notConnectedServers reflect this session only. Per-combo notes record which session performed the verification."
   },
@@ -586,6 +586,27 @@
           "accomplishes": "Search for the dispute agent in the ChittyOS registry, retrieve relevant KSN evidence documents via RAG, and write a structured dispute evidence brief to a local file \u2014 a lightweight three-backend governance chain for per-matter evidence gathering.",
           "verified": true,
           "notes": "All 3 tools confirmed live 2026-06-05 sixteenth-pass. orchestrator/agent_search returned chittyagent-dispute (0.7 relevance); evidence/ai_search (chittyevidence-ksn) confirmed RAG results; fs/write_file confirmed. Complements evidence-agent-triage (ops) \u2014 this chain focuses on dispute agent + KSN RAG + local write vs the ops variant that adds orchestrator provisioning."
+        },
+        {
+          "name": "agent-search-evidence-reasoning",
+          "chain": [
+            "orchestrator/agent_search",
+            "evidence/ai_search",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Search the ChittyAgent registry for the agent best suited to a governance domain, retrieve relevant evidence documents from the RAG corpus to ground the decision in context, then reason through the approach and implications \u2014 a three-backend governance chain that ends in structured reasoning rather than a file write.",
+          "verified": true,
+          "notes": "All 3 tools confirmed live 2026-06-05 seventeenth-pass. orchestrator/agent_search returned chittyagent-dispute (0.7) for 'governance legal dispute evidence'; evidence/ai_search (chittyevidence-search) confirmed returning context; thinking/sequentialthinking confirmed. Distinct from dispute-agent-evidence-brief (ends at fs/write_file) and capability-landscape-report (agent_search\u2192skill_search\u2192thinking, no evidence step). First agent_search\u2192evidence\u2192thinking chain in catalog."
+        },
+        {
+          "name": "provision-candidates-reasoning",
+          "chain": [
+            "orchestrator/provision_candidates",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "List TY-VY-RY scored ChittyID candidate entities for the current session context, then reason through which candidate to bind using sequential thinking \u2014 a two-step governance identity-resolution chain that surfaces the evaluation logic without committing to a binding.",
+          "verified": true,
+          "notes": "Both tools confirmed live 2026-06-05 seventeenth-pass. orchestrator/provision_candidates returned candidates_found:0, would_decide:mint_new (confirms tool is live and responsive); thinking/sequentialthinking confirmed. Shortest orchestrator+thinking governance combo \u2014 useful when you want to reason about provisioning before executing provision_evaluate+provision_bind. NOTE: provision_evaluate errored in this session ('Cannot read properties of undefined') \u2014 this combo deliberately stops at provision_candidates."
         }
       ],
       "prompts": [
@@ -692,6 +713,14 @@
         {
           "text": "Find the dispute agent, pull KSN evidence documents, and write a dispute evidence brief",
           "resolves_to": "dispute-agent-evidence-brief"
+        },
+        {
+          "text": "Find the best agent for this governance domain, search evidence for context, and reason about the approach",
+          "resolves_to": "agent-search-evidence-reasoning"
+        },
+        {
+          "text": "List the provisioning candidates for this session and reason about which identity context to bind",
+          "resolves_to": "provision-candidates-reasoning"
         }
       ]
     },
@@ -1280,6 +1309,40 @@
           "accomplishes": "Search the skill registry for the code-review skill, read the target source file from the local filesystem, then invoke the skill for a structured code quality review \u2014 a three-backend chain spanning skill discovery, file I/O, and orchestrated execution.",
           "verified": true,
           "notes": "All 3 tools confirmed live 2026-06-05 sixteenth-pass. orchestrator/skill_search returned code-review (claude-official plugin, 0.8 relevance); fs/read_text_file confirmed; orchestrator/skill_execute returned action:local_invoke for chittyos-devops:chitty-health (same action path). First use of skill_search+fs+skill_execute in a single code-review chain."
+        },
+        {
+          "name": "skill-deploy-context7-docs",
+          "chain": [
+            "orchestrator/skill_search",
+            "context7/resolve-library-id",
+            "context7/query-docs"
+          ],
+          "accomplishes": "Search the ChittyOS skill registry for a deployment skill (e.g. chitty-deploy, wrangler-audit), then immediately resolve the target platform's library and fetch its current documentation \u2014 grounding the skill's execution context in authoritative upstream docs. Skill-first complement to library-to-skill-integration-guide (which starts with library lookup).",
+          "verified": true,
+          "notes": "All 3 tools confirmed live 2026-06-05 seventeenth-pass. orchestrator/skill_search returned chitty-deploy (0.8) and wrangler-audit (0.8) for 'deploy workers wrangler'; context7/resolve-library-id returned /modelcontextprotocol/typescript-sdk with high benchmark; context7/query-docs returned transport connection snippets. First orchestrator/skill_search\u2192context7 chain in catalog \u2014 reverse of library-to-skill-integration-guide direction."
+        },
+        {
+          "name": "evidence-skill-library-docs",
+          "chain": [
+            "evidence/ai_search",
+            "orchestrator/skill_search",
+            "context7/resolve-library-id",
+            "context7/query-docs"
+          ],
+          "accomplishes": "Search the evidence corpus for prior art on a technical decision or library choice, find the ChittyOS skill most relevant to acting on those findings, resolve the library's canonical ID in context7, then fetch the live documentation \u2014 a four-backend discovery chain that bridges historical evidence, ecosystem skills, and authoritative upstream docs.",
+          "verified": true,
+          "notes": "All 4 tools confirmed live 2026-06-05 seventeenth-pass. evidence/ai_search confirmed; orchestrator/skill_search returned compliance/deploy skills; context7/resolve-library-id + context7/query-docs confirmed. Fixed in review: chain originally stopped at resolve-library-id (incomplete). Distinct from evidence-library-cross-ref (evidence\u2192context7 directly, no orchestrator skill step) and evidence-library-research (adds fs write). First four-step chain spanning evidence+orchestrator+context7."
+        },
+        {
+          "name": "agent-search-library-docs",
+          "chain": [
+            "orchestrator/agent_search",
+            "context7/resolve-library-id",
+            "context7/query-docs"
+          ],
+          "accomplishes": "Search the ChittyAgent registry for the specialized agent handling a specific service or domain (e.g. neon agent, cloudflare agent, dispute agent), then immediately resolve that service's library ID in context7 and fetch its API documentation \u2014 connecting agent discovery to authoritative SDK reference.",
+          "verified": true,
+          "notes": "All 3 tools confirmed live 2026-06-05 seventeenth-pass. orchestrator/agent_search returned dispute (0.7), storage (0.4) for governance query; context7/resolve-library-id confirmed; context7/query-docs confirmed. Distinct from skill-deploy-context7-docs (which uses skill_search not agent_search). First agent_search\u2192context7 chain in catalog."
         }
       ],
       "prompts": [
@@ -1370,6 +1433,18 @@
         {
           "text": "Find the code-review skill, read the target file, and invoke the skill for a structured review",
           "resolves_to": "code-review-skill-fs-chain"
+        },
+        {
+          "text": "Find the deploy skill for this project and look up the target platform's current library docs",
+          "resolves_to": "skill-deploy-context7-docs"
+        },
+        {
+          "text": "Search evidence for how we've handled this technology before, find the relevant skill, then resolve the library for docs lookup",
+          "resolves_to": "evidence-skill-library-docs"
+        },
+        {
+          "text": "Find the agent that handles this service domain and immediately pull its SDK documentation",
+          "resolves_to": "agent-search-library-docs"
         }
       ]
     },
@@ -1869,6 +1944,18 @@
           "accomplishes": "Find the chittyos-compliance skill (audits ChittyOS services against canonical standards), query the evidence RAG for prior audit findings and compliance documentation, then execute the compliance skill \u2014 a three-backend ops chain for evidence-informed service auditing.",
           "verified": true,
           "notes": "All 3 tools confirmed live 2026-06-05 sixteenth-pass. orchestrator/skill_search returned chittyos-compliance (chittyos-devops plugin, triggers: /chittyos-compliance, audit, certify); evidence/ai_search (chittyevidence-search) confirmed returning case endpoint facts; orchestrator/skill_execute confirmed returning action:local_invoke. First use of skill_search+evidence+skill_execute in a single ops chain."
+        },
+        {
+          "name": "skill-context7-ops-research",
+          "chain": [
+            "orchestrator/skill_list",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "fs/write_file"
+          ],
+          "accomplishes": "Enumerate all 54 ecosystem skills to surface which deployment and infrastructure technologies are covered, then resolve a specific platform's library ID in context7 and fetch its current docs, saving the combined skill-inventory-plus-documentation to a local file \u2014 an ops research chain linking what skills exist to what the underlying platform's API actually says.",
+          "verified": true,
+          "notes": "All 4 tools confirmed live 2026-06-05 seventeenth-pass. orchestrator/skill_list returned 54 skills (confirmed); context7/resolve-library-id confirmed (MCP TS SDK at benchmark 84.4); context7/query-docs confirmed (StreamableHTTPClientTransport snippets); fs/write_file confirmed. First orchestrator/skill_list\u2192context7 chain in catalog \u2014 combines registry enumeration with docs lookup."
         }
       ],
       "prompts": [
@@ -1955,6 +2042,10 @@
         {
           "text": "Find the compliance skill, check it against prior audit evidence, and execute a service compliance check",
           "resolves_to": "compliance-skill-evidence-check"
+        },
+        {
+          "text": "List all ecosystem skills, then look up Cloudflare Workers docs and save the combined ops reference to a file",
+          "resolves_to": "skill-context7-ops-research"
         }
       ]
     }
