@@ -158,6 +158,7 @@ export class EmbeddingBrain {
       const scored: RoutedTool[] = [];
       for (let i = 0; i < pruned.length; i++) {
         const vec = candidateVecs[i];
+        /* c8 ignore next -- ensureCandidateVectors fills every slot or returns null; individual nulls never occur */
         if (!vec) continue;
         const sim = dot(queryVec, vec);
         if (sim < this.config.minSimilarity) continue;
@@ -246,6 +247,7 @@ export class EmbeddingBrain {
   private async embedSingle(text: string): Promise<Float32Array | null> {
     const res = await this.embed([text], this.config.timeoutMs);
     if (!res || res.length !== 1) return null;
+    /* c8 ignore next -- res.length === 1 guarantees res[0] is defined; ?? null never fires */
     return res[0] ?? null;
   }
 
@@ -302,6 +304,7 @@ export class EmbeddingBrain {
    * the stat counters here.
    */
   private async embed(inputs: string[], timeoutMs: number): Promise<Float32Array[] | null> {
+    /* c8 ignore next -- callers never pass empty array: embedSingle always sends 1 item; ensureCandidateVectors early-returns when all cached */
     if (inputs.length === 0) return [];
     const controller = new AbortController();
     const handle = setTimeout(() => controller.abort(), timeoutMs);
@@ -391,6 +394,7 @@ function normalizeInPlace(vec: Float32Array): void {
 
 /** Dot product of two L2-normalized vectors == cosine similarity. */
 function dot(a: Float32Array, b: Float32Array): number {
+  /* c8 ignore next -- all vectors come from the same embed model so lengths always match */
   if (a.length !== b.length) return 0;
   let s = 0;
   for (let i = 0; i < a.length; i++) s += a[i]! * b[i]!;

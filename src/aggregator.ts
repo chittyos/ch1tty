@@ -489,6 +489,7 @@ export class Aggregator {
       category: t.category,
       description: t.description,
       inputSchema: t.inputSchema,
+      /* c8 ignore next -- every tool in matches was scored into relevanceMap; ?? 0 never fires when size > 0 */
       ...(relevanceMap.size > 0 ? { score: relevanceMap.get(t.namespacedName) ?? 0 } : {}),
       ...(recentServerIds.has(t.serverId) ? { recentlyUsed: true } : {}),
       ...(focus && focused(t) ? { inFocus: true } : {}),
