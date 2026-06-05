@@ -634,6 +634,73 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
     ],
   },
 
+  'cloudflare-builds': {
+    tools: [
+      {
+        name: 'workers_builds_list_builds',
+        description: 'List recent Cloudflare Workers Builds build runs with status, timestamps, and error summaries for a Worker',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            workerId: { type: 'string' },
+            page: { type: 'number' },
+            perPage: { type: 'number' },
+          },
+          required: [],
+        },
+        response: text(JSON.stringify([
+          { buildUUID: 'uuid-abc', worker: 'ch1tty-gateway', status: 'success', triggered_at: '2026-06-05T06:00:00Z', duration_ms: 45000 },
+          { buildUUID: 'uuid-xyz', worker: 'ch1tty-gateway', status: 'failed', triggered_at: '2026-06-04T22:00:00Z', error: 'Build command exited with code 1' },
+        ])),
+      },
+      {
+        name: 'workers_builds_get_build',
+        description: 'Get details of a specific Cloudflare Workers Builds build run including configuration, status, and deployment outcome',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            buildUUID: { type: 'string' },
+          },
+          required: ['buildUUID'],
+        },
+        response: text(JSON.stringify({
+          buildUUID: 'uuid-xyz',
+          worker: 'ch1tty-gateway',
+          status: 'failed',
+          triggered_at: '2026-06-04T22:00:00Z',
+          error: 'Build command exited with code 1',
+        })),
+      },
+      {
+        name: 'workers_builds_get_build_logs',
+        description: 'Get build logs from a specific Cloudflare Workers Builds run for debugging failed builds and deployment errors',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            buildUUID: { type: 'string' },
+          },
+          required: ['buildUUID'],
+        },
+        response: text(JSON.stringify({
+          buildUUID: 'uuid-xyz',
+          logs: 'Error: Build command exited with code 1\nnpm ERR! missing script: build',
+        })),
+      },
+      {
+        name: 'workers_builds_set_active_worker',
+        description: 'Set the active Worker ID for subsequent Workers Builds API calls in this session',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            workerId: { type: 'string' },
+          },
+          required: ['workerId'],
+        },
+        response: text(JSON.stringify({ workerId: 'ch1tty-gateway', status: 'active' })),
+      },
+    ],
+  },
+
   orchestrator: {
     tools: [
       {
