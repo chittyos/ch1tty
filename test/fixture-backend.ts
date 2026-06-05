@@ -515,7 +515,7 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
           type: 'object',
           properties: {
             libraryId: { type: 'string' },
-            topic: { type: 'string' },
+            query: { type: 'string' },
           },
           required: ['libraryId'],
         },

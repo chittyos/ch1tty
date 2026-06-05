@@ -700,7 +700,7 @@ test('scenario: code focus — multi-step: search library docs → execute → d
   // Step 2: get library docs
   const docsResult = await aggregator.callTool('ch1tty/execute', {
     tool: 'context7/query-docs',
-    args: { libraryId: '/modelcontextprotocol/typescript-sdk', topic: 'server setup' },
+    args: { libraryId: '/modelcontextprotocol/typescript-sdk', query: 'server setup' },
   }, sessionId);
   assert.equal(docsResult.isError, undefined);
 
