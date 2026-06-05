@@ -10,11 +10,16 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   SCENARIOS,
+  buildDegradedAggregator,
   buildSimAggregator,
   outOfFocusReachable,
+  runDegradedCastScenario,
+  runDegradedSearchScenario,
+  runExecuteErrorScenario,
   runFocusBiasProbe,
   runScenario,
   surfaceMisresolutions,
+  type FailureScenarioResult,
   type FocusBiasProbe,
   type MisresolutionEvent,
   type ScenarioResult,
@@ -66,6 +71,46 @@ async function main(): Promise<void> {
     notionUnderOps: await outOfFocusReachable(aggregator, 'page', 'ops', 'notion/create_page'),
   };
 
+  // 5) Failure scenarios: execute-level error propagation + degraded-backend graceful degradation.
+  // Each uses a fresh aggregator with targeted failure injections so the main aggregator is unaffected.
+  const failures: FailureScenarioResult[] = [];
+
+  {
+    const { aggregator: fa } = buildDegradedAggregator({ toolErrors: ['neon/run_sql'] });
+    try {
+      failures.push(await runExecuteErrorScenario(fa, 'neon/run_sql', { project_id: 'p1', sql: 'SELECT 1' }));
+    } finally {
+      await fa.shutdown();
+    }
+  }
+  {
+    const { aggregator: fa } = buildDegradedAggregator({ degradedServers: ['github'] });
+    try {
+      failures.push(await runDegradedSearchScenario(fa, {
+        id: 'degraded-search.github-down',
+        query: 'issues project',
+        focus: 'code',
+        degradedServer: 'github',
+        expectToolFromOther: 'linear/list_issues',
+      }));
+    } finally {
+      await fa.shutdown();
+    }
+  }
+  {
+    const { aggregator: fa } = buildDegradedAggregator({ degradedServers: ['stripe'] });
+    try {
+      failures.push(await runDegradedCastScenario(fa, {
+        id: 'degraded-cast.stripe-down',
+        intent: 'create an invoice for the customer with line items',
+        focus: 'finance',
+        degradedServer: 'stripe',
+      }));
+    } finally {
+      await fa.shutdown();
+    }
+  }
+
   // ── Report ──────────────────────────────────────────────────
   const passed = results.filter((r) => r.pass).length;
   const totalMs = results.reduce((s, r) => s + r.ms, 0);
@@ -115,11 +160,18 @@ async function main(): Promise<void> {
   const oofPassed = oofEntries.filter(([, ok]) => ok).length;
   console.log(`  (${oofPassed}/${oofEntries.length} probes reachable)`);
 
+  console.log('\n--- failure scenarios ---');
+  const failuresPassed = failures.filter((f) => f.pass).length;
+  for (const f of failures) {
+    console.log(`[${f.pass ? 'PASS' : 'FAIL'}] ${f.id} (${f.ms}ms): ${f.detail}`);
+  }
+  console.log(`  (${failuresPassed}/${failures.length} passed)`);
+
   console.log(`\nResolution: ${passed}/${results.length} passed  |  total cast time ${Math.round(totalMs * 100) / 100}ms\n`);
 
   const allReachable = oofEntries.every(([, ok]) => ok);
   const uncorrectedMisresolutions = misresolutions.filter((m) => !m.correctedByFocus);
-  if (passed < results.length || !allReachable || uncorrectedMisresolutions.length > 0) {
+  if (passed < results.length || !allReachable || uncorrectedMisresolutions.length > 0 || failuresPassed < failures.length) {
     process.exitCode = 1;
   }
 
@@ -134,12 +186,14 @@ async function main(): Promise<void> {
         corrected: misresolutions.filter((m) => m.correctedByFocus).length,
         uncorrected: uncorrectedMisresolutions.length,
       },
+      failures: { passed: failuresPassed, total: failures.length },
       totalCastMs: Math.round(totalMs * 100) / 100,
     },
     scenarios: results,
     focusBiasProbes: probes,
     misresolutions,
     reachability: reachable,
+    failures,
   };
   const outDir = resolve(__dirname, 'results');
   mkdirSync(outDir, { recursive: true });

@@ -464,3 +464,158 @@ export async function surfaceMisresolutions(
   }
   return events;
 }
+
+// ── Failure scenarios ──────────────────────────────────────────────────────────
+// Tests for execute-level error propagation and degraded-backend graceful
+// degradation. These exercise the aggregator's error-handling paths, not just
+// its resolution paths.
+
+export interface FailureScenarioResult {
+  id: string;
+  description: string;
+  pass: boolean;
+  ms: number;
+  detail: string;
+}
+
+/**
+ * Build an Aggregator with failure injections for targeted failure testing.
+ * `degradedServers` have their listTools throw (backend connectivity loss).
+ * `toolErrors` (`serverId/toolName`) have their callTool return isError: true.
+ */
+export function buildDegradedAggregator(opts: {
+  degradedServers?: string[];
+  toolErrors?: string[];
+}): { aggregator: Aggregator; backend: FixtureBackend } {
+  const backend = new FixtureBackend();
+  for (const s of opts.degradedServers ?? []) backend.setDegraded(s);
+  for (const te of opts.toolErrors ?? []) {
+    const sep = te.lastIndexOf('/');
+    if (sep > 0) backend.setToolError(te.slice(0, sep), te.slice(sep + 1));
+  }
+  const aggregator = new Aggregator(fixtureConfigs(), {
+    backendFactory: () => backend,
+  });
+  return { aggregator, backend };
+}
+
+/**
+ * Execute a tool that has been injected to fail; verify isError is propagated
+ * through the aggregator's execute path unchanged.
+ */
+export async function runExecuteErrorScenario(
+  aggregator: Aggregator,
+  tool: string,
+  args: Record<string, unknown> = {},
+): Promise<FailureScenarioResult> {
+  const id = `execute-error:${tool}`;
+  const t0 = performance.now();
+  const result = await aggregator.callTool('ch1tty/execute', { tool, args });
+  const ms = Math.round((performance.now() - t0) * 100) / 100;
+  const pass = result.isError === true;
+  return {
+    id,
+    description: `execute ${tool} with error injection → isError propagated`,
+    pass,
+    ms,
+    detail: pass
+      ? 'isError=true propagated correctly'
+      : `expected isError=true, got isError=${JSON.stringify(result.isError)}`,
+  };
+}
+
+/**
+ * Search with a degraded backend; verify no crash and a specific tool from a
+ * working server still appears in results (lens remains, degraded tools absent).
+ */
+export async function runDegradedSearchScenario(
+  aggregator: Aggregator,
+  opts: {
+    id: string;
+    query: string;
+    focus?: string;
+    degradedServer: string;
+    expectToolFromOther: string;
+  },
+): Promise<FailureScenarioResult> {
+  const t0 = performance.now();
+  try {
+    const result = await aggregator.callTool('ch1tty/search', {
+      query: opts.query,
+      focus: opts.focus,
+      limit: 50,
+    });
+    const ms = Math.round((performance.now() - t0) * 100) / 100;
+    if (result.isError) {
+      return {
+        id: opts.id,
+        description: `search "${opts.query}" with ${opts.degradedServer} degraded`,
+        pass: false,
+        ms,
+        detail: `search returned isError`,
+      };
+    }
+    const text = result.content.find((c) => c.type === 'text');
+    const body = text?.type === 'text' ? text.text : '';
+    const hasExpected = body.includes(opts.expectToolFromOther);
+    return {
+      id: opts.id,
+      description: `search "${opts.query}" with ${opts.degradedServer} degraded — ${opts.expectToolFromOther} reachable`,
+      pass: hasExpected,
+      ms,
+      detail: hasExpected
+        ? `"${opts.expectToolFromOther}" found in results`
+        : `"${opts.expectToolFromOther}" absent`,
+    };
+  } catch (err) {
+    const ms = Math.round((performance.now() - t0) * 100) / 100;
+    return {
+      id: opts.id,
+      description: `search with ${opts.degradedServer} degraded`,
+      pass: false,
+      ms,
+      detail: `unexpected throw: ${(err as Error).message}`,
+    };
+  }
+}
+
+/**
+ * Cast with a degraded backend; verify no crash and the resolved tool does
+ * not come from the degraded server (its tools are absent from the registry).
+ */
+export async function runDegradedCastScenario(
+  aggregator: Aggregator,
+  opts: {
+    id: string;
+    intent: string;
+    focus?: string;
+    degradedServer: string;
+  },
+): Promise<FailureScenarioResult> {
+  const t0 = performance.now();
+  try {
+    const plan = await castPlan(aggregator, opts.intent, opts.focus);
+    const ms = Math.round((performance.now() - t0) * 100) / 100;
+    const resolved = plan.resolved?.tool ?? null;
+    const fromDegraded = resolved?.startsWith(`${opts.degradedServer}/`) ?? false;
+    const pass = !fromDegraded;
+    return {
+      id: opts.id,
+      description: `cast "${opts.intent.slice(0, 40)}" with ${opts.degradedServer} degraded — graceful fallback`,
+      pass,
+      ms,
+      detail: pass
+        ? `resolved to ${resolved ?? '(null)'} — degraded server excluded`
+        : `resolved to ${resolved} — should not resolve to degraded ${opts.degradedServer}`,
+    };
+  } catch (err) {
+    const ms = Math.round((performance.now() - t0) * 100) / 100;
+    return {
+      id: opts.id,
+      description: `cast with ${opts.degradedServer} degraded`,
+      pass: false,
+      ms,
+      detail: `unexpected throw: ${(err as Error).message}`,
+    };
+  }
+}

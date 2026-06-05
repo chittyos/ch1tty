@@ -191,6 +191,21 @@ export class FixtureBackend implements Backend {
   /** Records of callTool invocations, for harness inspection. */
   readonly calls: Array<{ serverId: string; toolName: string; args?: Record<string, unknown> }> = [];
 
+  /** Servers whose listTools will throw (simulates connectivity loss). */
+  private readonly _degraded = new Set<string>();
+  /** Tools (`serverId/toolName`) whose callTool returns isError: true. */
+  private readonly _toolErrors = new Set<string>();
+
+  /** Mark a server as degraded — listTools will throw for this server. */
+  setDegraded(serverId: string): void {
+    this._degraded.add(serverId);
+  }
+
+  /** Mark a specific tool as failing — callTool will return isError: true. */
+  setToolError(serverId: string, toolName: string): void {
+    this._toolErrors.add(`${serverId}/${toolName}`);
+  }
+
   registerServer(config: ServerConfig): void {
     this.configs.set(config.id, config);
   }
@@ -201,10 +216,13 @@ export class FixtureBackend implements Backend {
 
   getStatus(serverId: string): BackendStatus {
     const tools = FIXTURE_TOOLS[serverId] ?? [];
-    return { connected: this.configs.has(serverId), toolCount: tools.length, toolCacheAge: 0 };
+    return { connected: this.configs.has(serverId) && !this._degraded.has(serverId), toolCount: tools.length, toolCacheAge: 0 };
   }
 
   async listTools(serverId: string): Promise<ToolEntry[]> {
+    if (this._degraded.has(serverId)) {
+      throw new Error(`[sim] backend "${serverId}" is degraded`);
+    }
     const tools = FIXTURE_TOOLS[serverId] ?? [];
     return tools.map((t) => ({
       name: t.name,
@@ -215,6 +233,12 @@ export class FixtureBackend implements Backend {
 
   async callTool(serverId: string, toolName: string, args?: Record<string, unknown>): Promise<ToolCallResult> {
     this.calls.push({ serverId, toolName, args });
+    if (this._toolErrors.has(`${serverId}/${toolName}`)) {
+      return {
+        content: [{ type: 'text', text: `[sim] tool ${serverId}/${toolName} returned an error` } as ContentItem],
+        isError: true,
+      };
+    }
     const known = (FIXTURE_TOOLS[serverId] ?? []).some((t) => t.name === toolName);
     if (!known) {
       return {
