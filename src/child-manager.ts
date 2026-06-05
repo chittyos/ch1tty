@@ -178,7 +178,7 @@ export class ChildManager implements Backend {
     }
 
     await client.connect(transport);
-    /* c8 ignore next -- false-else of if(stderr) above: transport always provides stderr; doSpawn success path covered by integration */
+    /* c8 ignore next -- doSpawn success path covered by integration tests; unit tests verify error handling only */
     return { client, transport, toolCache: null, resourceCache: null, promptCache: null };
   }
 
