@@ -1,5 +1,5 @@
 {
-  "_comment": "Alchemist-surfaced suggestions catalog — cross-backend tool combos and pre-written /cast prompts, grouped by all six focus profiles from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain was confirmed on a connected server at the time that specific combo was written/verified; connectivity changes since then are noted in per-combo notes. `verified:false` means the chain references at least one config-present-but-not-connected server. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only — no loader, no public tool beyond the existing 5. Updated 2026-05-30 to add code, communication, and ops focus profiles (PRs #71, #72, #80). Updated 2026-06-03 to add Linear MCP (linear) to code and governance profiles. Updated 2026-06-04: re-enumerated connected server set. Updated 2026-06-05: notion reconnected; fixed context7/get-library-docs → context7/query-docs; fixed fs/directory_tree → fs/list_directory; 13 combos newly verified:true (31/65 total verified). Updated 2026-06-05 fifth-pass: +11 combos (76 total); 8 of the 11 new Notion-write-step combos set verified:false because Notion API was returning 401 (invalid token) in the run environment; 35 verified.",
+  "_comment": "Alchemist-surfaced suggestions catalog — cross-backend tool combos and pre-written /cast prompts, grouped by all six focus profiles from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain was confirmed on a connected server at the time that specific combo was written/verified; connectivity changes since then are noted in per-combo notes. `verified:false` means the chain references at least one config-present-but-not-connected server. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only — no loader, no public tool beyond the existing 5. Updated 2026-05-30 to add code, communication, and ops focus profiles (PRs #71, #72, #80). Updated 2026-06-03 to add Linear MCP (linear) to code and governance profiles. Updated 2026-06-04: re-enumerated connected server set. Updated 2026-06-05: notion reconnected; fixed context7/get-library-docs → context7/query-docs; fixed fs/directory_tree → fs/list_directory; 13 combos newly verified:true (31/65 total verified). Updated 2026-06-05 fifth-pass: +11 combos (76 total); ALL 21 Notion-tool combos set verified:false — Notion API returning 401 (invalid token) in run environment; 22 verified.",
   "generatedFrom": {
     "gateway": "ch1tty",
     "version": "4.1.0",
@@ -30,7 +30,7 @@
       "github"
     ],
     "updatedAt": "2026-06-05",
-    "connectedServerNote": "2026-06-05 fifth-pass: +11 combos (76 total, 35 verified). New combos use only the 8 currently-connected backends. Tool names verified live via cast probes: playwright/browser_take_screenshot, playwright/browser_snapshot, fs/read_text_file (not deprecated read_file). finance and communication profiles now have connected-server-only combos for the first time. NOTE: 8 Notion-write-step combos from this pass remain verified:false — Notion MCP is connected but API returning 401 (invalid token) in run environment; restore via op://ChittyOS-Integrations/notion/api_token."
+    "connectedServerNote": "2026-06-05 fifth-pass: +11 combos (76 total, 22 verified). New combos use only the 8 currently-connected backends. Tool names verified live via cast probes: playwright/browser_take_screenshot, playwright/browser_snapshot, fs/read_text_file (not deprecated read_file). finance and communication profiles now have connected-server-only combos for the first time. NOTE: All 21 Notion-tool combos (across all profiles) are verified:false — Notion MCP is connected but API returning 401 (invalid token) in run environment; restore via op://ChittyOS-Integrations/notion/api_token."
   },
   "profiles": {
     "finance": {
@@ -172,8 +172,8 @@
             "notion/API-post-page"
           ],
           "accomplishes": "Discover the available AutoRAG vector stores, run an AI search across the evidence corpus, and persist the synthesized findings as a Notion brief — turning raw evidence retrieval into a governed, citable document.",
-          "verified": true,
-          "notes": "evidence/list_rags, evidence/ai_search, and notion/API-post-page all confirmed connected (2026-06-05). notion reconnected this pass."
+          "verified": false,
+          "notes": "evidence/list_rags, evidence/ai_search, and notion/API-post-page all confirmed connected (2026-06-05). notion reconnected this pass Note: Notion API returning 401 (invalid token) in last recorded run environment — all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "issue-triage-to-governance-tracker",
@@ -194,8 +194,8 @@
             "notion/API-create-a-comment"
           ],
           "accomplishes": "Find the right ChittyOS skill for a governance task, execute it through the orchestrator, then annotate the outcome as a comment on the relevant Notion page for an audit trail. Spans orchestrator + notion.",
-          "verified": true,
-          "notes": "orchestrator/skill_search, orchestrator/skill_execute, and notion/API-create-a-comment all confirmed connected (2026-06-05). notion reconnected this pass."
+          "verified": false,
+          "notes": "orchestrator/skill_search, orchestrator/skill_execute, and notion/API-create-a-comment all confirmed connected (2026-06-05). notion reconnected this pass Note: Notion API returning 401 (invalid token) in last recorded run environment — all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "context-provisioning-audit",
@@ -205,8 +205,8 @@
             "notion/API-post-page"
           ],
           "accomplishes": "List TY-VY-RY scored ChittyID candidates for a session, run the autonomous provisioning evaluation, and archive the decision + per-aspect rationale into a Notion governance log.",
-          "verified": true,
-          "notes": "orchestrator/provision_candidates, orchestrator/provision_evaluate, and notion/API-post-page all confirmed connected (2026-06-05). notion reconnected this pass."
+          "verified": false,
+          "notes": "orchestrator/provision_candidates, orchestrator/provision_evaluate, and notion/API-post-page all confirmed connected (2026-06-05). notion reconnected this pass Note: Notion API returning 401 (invalid token) in last recorded run environment — all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "agent-route-and-document",
@@ -216,8 +216,8 @@
             "notion/API-patch-block-children"
           ],
           "accomplishes": "Find which ChittyAgent handles a domain task, route the request through the orchestrator's agent protocol, and append the result to an existing Notion page's body.",
-          "verified": true,
-          "notes": "orchestrator/agent_search, orchestrator/agent_execute, and notion/API-patch-block-children all confirmed connected (2026-06-05). notion reconnected this pass."
+          "verified": false,
+          "notes": "orchestrator/agent_search, orchestrator/agent_execute, and notion/API-patch-block-children all confirmed connected (2026-06-05). notion reconnected this pass Note: Notion API returning 401 (invalid token) in last recorded run environment — all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "evidence-backed-issue",
@@ -293,8 +293,8 @@
             "notion/API-post-page"
           ],
           "accomplishes": "AI-search the evidence corpus for a governance topic, reason over the findings with sequential-thinking to synthesize insights and flag gaps, then write a structured brief into Notion. Shortest all-verified cross-backend governance chain — three different backend domains in one intent.",
-          "verified": true,
-          "notes": "evidence/ai_search, thinking/sequentialthinking, and notion/API-post-page all confirmed connected (2026-06-05). notion reconnected this pass."
+          "verified": false,
+          "notes": "evidence/ai_search, thinking/sequentialthinking, and notion/API-post-page all confirmed connected (2026-06-05). notion reconnected this pass Note: Notion API returning 401 (invalid token) in last recorded run environment — all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "rag-survey-to-file",
@@ -472,8 +472,8 @@
             "notion/API-patch-block-children"
           ],
           "accomplishes": "Screenshot a live URL via Cloudflare browser-rendering, save the image to the local filesystem, then embed/reference it in a Notion page — a capture→archive→document pipeline across three backends.",
-          "verified": true,
-          "notes": "browser-rendering/get_url_screenshot, fs/write_file, and notion/API-patch-block-children all confirmed connected (2026-06-05)."
+          "verified": false,
+          "notes": "browser-rendering/get_url_screenshot, fs/write_file, and notion/API-patch-block-children all confirmed connected (2026-06-05) Note: Notion API returning 401 (invalid token) in last recorded run environment — all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "visual-bug-report",
@@ -516,8 +516,8 @@
             "notion/API-post-page"
           ],
           "accomplishes": "Fetch a live page's raw HTML, cross-reference the framework/library it uses against current docs via context7, and write an implementation note into Notion — useful for reverse-engineering a design pattern.",
-          "verified": true,
-          "notes": "Fixed context7/get-library-docs → context7/query-docs (2026-06-05). browser-rendering/get_url_html_content, context7/query-docs, and notion/API-post-page all confirmed connected."
+          "verified": false,
+          "notes": "Fixed context7/get-library-docs → context7/query-docs (2026-06-05). browser-rendering/get_url_html_content, context7/query-docs, and notion/API-post-page all confirmed connected Note: Notion API returning 401 (invalid token) in last recorded run environment — all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "screenshot-to-canonical-evidence",
@@ -548,8 +548,8 @@
             "notion/API-post-page"
           ],
           "accomplishes": "Navigate to a design target URL, capture a full-page screenshot, and post it as a new Notion page for team review — a three-step visual documentation pipeline driven from a single cast intent.",
-          "verified": true,
-          "notes": "playwright/browser_navigate, playwright/browser_take_screenshot, and notion/API-post-page all confirmed connected (2026-06-05)."
+          "verified": false,
+          "notes": "playwright/browser_navigate, playwright/browser_take_screenshot, and notion/API-post-page all confirmed connected (2026-06-05) Note: Notion API returning 401 (invalid token) in last recorded run environment — all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "page-markdown-to-notion-brief",
@@ -559,8 +559,8 @@
             "notion/API-post-page"
           ],
           "accomplishes": "Convert a live URL to clean Markdown via browser-rendering, reason over the content with sequential-thinking to extract key design patterns or decisions, then write the synthesized brief into Notion — deeper than a raw archive, more governed than a manual note.",
-          "verified": true,
-          "notes": "browser-rendering/get_url_markdown, thinking/sequentialthinking, and notion/API-post-page all confirmed connected (2026-06-05)."
+          "verified": false,
+          "notes": "browser-rendering/get_url_markdown, thinking/sequentialthinking, and notion/API-post-page all confirmed connected (2026-06-05) Note: Notion API returning 401 (invalid token) in last recorded run environment — all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "screenshot-to-file",
@@ -677,8 +677,8 @@
             "notion/API-post-page"
           ],
           "accomplishes": "Resolve a library name to its canonical context7 ID, fetch the current API documentation, and write a usage note into Notion — turning live library docs into a durable, searchable implementation reference.",
-          "verified": true,
-          "notes": "Fixed context7/get-library-docs → context7/query-docs (2026-06-05). context7/resolve-library-id, context7/query-docs, and notion/API-post-page all confirmed connected."
+          "verified": false,
+          "notes": "Fixed context7/get-library-docs → context7/query-docs (2026-06-05). context7/resolve-library-id, context7/query-docs, and notion/API-post-page all confirmed connected Note: Notion API returning 401 (invalid token) in last recorded run environment — all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "schema-branch-and-migrate",
@@ -783,8 +783,8 @@
             "notion/API-post-page"
           ],
           "accomplishes": "List the top-level project directory contents, reason over the structure with sequential-thinking to identify architectural patterns or concerns, and write a technical architecture note into Notion — a codebase-to-doc pipeline using locally-available backends. Note: fs/list_directory covers one path at a time; enumerate subdirectories separately for deeper coverage.",
-          "verified": true,
-          "notes": "Fixed fs/directory_tree → fs/list_directory (2026-06-05); list_directory is single-level (not recursive). fs/list_directory, thinking/sequentialthinking, and notion/API-post-page all confirmed connected."
+          "verified": false,
+          "notes": "Fixed fs/directory_tree → fs/list_directory (2026-06-05); list_directory is single-level (not recursive). fs/list_directory, thinking/sequentialthinking, and notion/API-post-page all confirmed connected Note: Notion API returning 401 (invalid token) in last recorded run environment — all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "evidence-library-cross-ref",
@@ -974,8 +974,8 @@
             "notion/API-post-page"
           ],
           "accomplishes": "Read a Notion meeting-notes or discussion page, reason over the content with sequential-thinking to extract key decisions, commitments, and open questions, then write a clean summary page — automated meeting distillation using only verified-live backends.",
-          "verified": true,
-          "notes": "notion/API-retrieve-a-page, thinking/sequentialthinking, and notion/API-post-page all confirmed connected (2026-06-05). notion reconnected this pass."
+          "verified": false,
+          "notes": "notion/API-retrieve-a-page, thinking/sequentialthinking, and notion/API-post-page all confirmed connected (2026-06-05). notion reconnected this pass Note: Notion API returning 401 (invalid token) in last recorded run environment — all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "notion-knowledge-synthesis",
@@ -1133,8 +1133,8 @@
             "notion/API-post-page"
           ],
           "accomplishes": "Walk the project directory tree, search for files matching an ops-relevant pattern (e.g. Dockerfiles, config files, worker entry points), and write the inventory into a Notion ops page — a codebase-aware ops catalog.",
-          "verified": true,
-          "notes": "Fixed fs/directory_tree → fs/list_directory (2026-06-05). fs/list_directory, fs/search_files, and notion/API-post-page all confirmed connected."
+          "verified": false,
+          "notes": "Fixed fs/directory_tree → fs/list_directory (2026-06-05). fs/list_directory, fs/search_files, and notion/API-post-page all confirmed connected Note: Notion API returning 401 (invalid token) in last recorded run environment — all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "skill-search-and-run",
