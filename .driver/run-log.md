@@ -12,19 +12,20 @@
 - [x] **B** — GitHub MCP migration: `servers.json` `github` entry → remote `https://api.githubcopilot.com/mcp/` with `envHeaders: {Authorization: GITHUB_MCP_AUTHORIZATION}`
 - [x] **C** — Focus-profile layer: `focus-profiles.json` (6 profiles) + `CH1TTY_FOCUS` env + `focus` param on search/cast + `ch1tty/status` reports active focus; tested in `test/focus.test.ts`
 - [x] **D** — Scenario testing: `sim/scenarios.ts` harness + `test/simulation.test.ts` + multi-step scenario coverage for mis-resolutions, failure resilience, and lens-not-gate verification per focus
-- [ ] **E** — Alchemist catalog: `focus-suggestions.json` — 80 combos, 26 verified (32%); Notion board summary **BLOCKED** (token); 54 unverified (39 Notion-API-401, 15 other disabled servers)
+- [x] **E** — Alchemist catalog: `focus-suggestions.json` — 84 combos, 30 verified (36%); all 6 profiles have ≥1 verified combo; Notion board summary **BLOCKED** (token); 54 unverified (39 Notion-API-401, 15 other auth-gated)
 
 ## Open PRs (human review needed)
 
 | PR  | Title | Status |
 |-----|-------|--------|
-| #193 | feat(E): catalog sixth-pass — 26/80 verified combos | Open, CI pending |
+| #193 | feat(E): catalog sixth-pass — 26/80 verified combos | Merged 2026-06-05 |
 | #190 | build(deps): bump hono + vitest (dependabot) | Open |
+| #194 (pending) | feat(E): catalog seventh-pass — 30/84 verified (finance+comm first verified) | In-flight this run |
 
 ## Blockers
 
 1. **Notion API token** — `op://ChittyOS-Integrations/notion/api_token` not resolvable in remote container. Blocks: E Notion board summary. Human must run: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` then restart ch1tty.
-2. **GitHub/Stripe/Neon/Linear/Cloudflare backends** — auth tokens not available in remote container; 33 catalog combos remain `verified:false` until these connect.
+2. **GitHub/Stripe/Neon/Linear/Cloudflare backends** — auth tokens not available in remote container; 15 auth-gated catalog combos remain `verified:false` until these connect (plus 39 Notion-tool combos blocked by `NOTION_TOKEN`).
 
 ## Run log
 
@@ -74,3 +75,22 @@
 - Catalog: 76→80 combos, 22→26 verified (32%). 54 unverified: 39 Notion-tool (blocked: NOTION_TOKEN) + 15 other-disabled-servers (stripe/neon/cloudflare/github/etc.).
 - Build clean. Committed + pushing to PR#193.
 - **Next run**: Merge PR#193 if CI green. E workstream deliverable (catalog JSON) is complete; Notion board summary blocked on token. Consider marking E done and adding human action item for NOTION_TOKEN.
+
+### 2026-06-05T06:45Z
+
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 937 pass, 0 fail, 2 skip.
+- Fetched all branches. PR#193 confirmed merged to main (`00000d9`). All workstreams A–D confirmed done on main.
+- Ch1tty status: connectedServers=0 initially; lazy spawn confirmed via cast probes — fs, thinking, context7, playwright all available.
+- Workstream E: PR#193 merged (sixth-pass: 80 combos, 26 verified). finance/communication still had 0 verified combos each.
+- Ran 6 cast confirm probes to identify new combo candidates using available non-auth backends:
+  - finance: `fs/read_text_file` (1.0 read intent) ✓, `fs/search_files` (0.56) ✓, `fs/read_multiple_files` (0.50) ✓, `thinking/sequentialthinking` (0.50) ✓
+  - communication: `playwright/browser_navigate` (0.33) ✓, `playwright/browser_take_screenshot` (0.50) ✓, `playwright/browser_snapshot` (0.33) ✓
+- Added 4 new `verified:true` combos (seventh-pass, no auth-gated backends):
+  - finance: `local-finance-doc-analysis` (fs/read_text_file → thinking/sequentialthinking)
+  - finance: `multi-finance-doc-synthesis` (fs/search_files → fs/read_multiple_files → thinking/sequentialthinking)
+  - communication: `web-comm-state-analysis` (playwright/browser_navigate → playwright/browser_take_screenshot → thinking/sequentialthinking)
+  - communication: `web-comm-snapshot-analysis` (playwright/browser_navigate → playwright/browser_snapshot → thinking/sequentialthinking)
+- Catalog: 80→84 combos, 26→30 verified (36%). All 6 focus profiles now have ≥1 verified combo.
+- Marked workstream E as complete in run log (JSON deliverable done; Notion board summary is human-action blocker only).
+- Build clean. Tests: 937 pass, 0 fail. Branch: `auto/E-catalog-finance-comm-verified`. PR open for review.
+- **Next run**: All 5 workstreams done. If any new workstream is defined, start it. Otherwise consider gap: Notion board summary (token needed), Dependabot PR#190 (hono/vitest bump — review for merge). Human action: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` to verify 39 remaining Notion-blocked combos.
