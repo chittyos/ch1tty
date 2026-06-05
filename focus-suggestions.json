@@ -1285,22 +1285,22 @@
         {
           "name": "build-status-to-worker-logs",
           "chain": [
-            "cloudflare-builds/list_builds",
+            "cloudflare-builds/workers_builds_list_builds",
             "cloudflare/get_worker_logs"
           ],
-          "accomplishes": "List recent Cloudflare Workers Builds runs to find the latest build outcome, then retrieve logs from the deployed Worker to correlate build success or failure with runtime behavior — closing the feedback loop between CI and production.",
+          "accomplishes": "List recent Workers Builds runs to identify the latest build outcome, then retrieve the deployed Worker's runtime logs to correlate build success or failure with live production behavior — closing the CI-to-production feedback loop.",
           "verified": false,
-          "notes": "cloudflare-builds not connected (auth via cloudflare-builds-mcp: op://ChittyOS-Integrations/cloudflare-builds-mcp/token). cloudflare not connected in remote container. Both are ops-focus servers."
+          "notes": "cloudflare-builds not connected (auth via cloudflare-builds-mcp: op://ChittyOS-Integrations/cloudflare-builds-mcp/token). cloudflare not connected in remote container. Both are ops-focus servers. Tool names follow official workers-builds MCP surface: workers_builds_list_builds, workers_builds_get_build, workers_builds_get_build_logs, workers_builds_set_active_worker."
         },
         {
-          "name": "reconfigure-and-redeploy",
+          "name": "rollback-and-verify",
           "chain": [
-            "cloudflare-builds/update_build_config",
-            "cloudflare-builds/trigger_build"
+            "cloudflare-builds/workers_builds_set_active_worker",
+            "cloudflare/get_worker_logs"
           ],
-          "accomplishes": "Update the Workers Builds deploy command (e.g. add --env production flag) and immediately trigger a new build run — the two-step config-then-deploy pattern used to fix Chittyentity dashboard config drift (see chittyentity#336).",
+          "accomplishes": "Roll back a Cloudflare Worker to a previously-stable build version via Workers Builds set_active_worker, then pull the Worker's live runtime logs to confirm the rollback resolved the production incident.",
           "verified": false,
-          "notes": "cloudflare-builds not connected in remote container. Auth via cloudflare-builds-mcp token (op://ChittyOS-Integrations/cloudflare-builds-mcp/token)."
+          "notes": "cloudflare-builds not connected in remote container. Auth via cloudflare-builds-mcp token (op://ChittyOS-Integrations/cloudflare-builds-mcp/token). workers_builds_set_active_worker is the official tool for activating a specific build version."
         }
       ],
       "prompts": [

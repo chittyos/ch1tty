@@ -1119,10 +1119,10 @@ test('scenario: ops REORDER — with ops focus fs/list_directory overtakes chitt
 });
 
 test('scenario: ops focus — cast "list recent build runs" resolves to cloudflare-builds', async () => {
-  // cloudflare-builds/list_builds wins on keyword specificity over cloudflare/list_workers:
+  // workers_builds_list_builds wins on keyword specificity over cloudflare/list_workers:
   // intent matches "list", "recent", "build", "runs", "status", "cloudflare", "workers", "builds" → score ~0.875
   // cloudflare/list_workers matches "list", "cloudflare", "workers" → score ~0.375
-  // Both are ops-boosted (+0.5, ecosystem category), so cloudflare-builds/list_builds wins overall.
+  // Both are ops-boosted (+0.5, ecosystem category), so workers_builds_list_builds wins overall.
   const { aggregator } = buildAggregator(FIXTURE_CONFIGS, undefined, { focus: 'ops' });
 
   const result = await aggregator.callTool('ch1tty/cast', {
@@ -1137,8 +1137,8 @@ test('scenario: ops focus — cast "list recent build runs" resolves to cloudfla
   assert.ok(resolved, 'cast should resolve a tool');
   assert.equal(
     resolved.tool,
-    'cloudflare-builds/list_builds',
-    `expected cloudflare-builds/list_builds; got ${resolved.tool} (score ${resolved.score})`,
+    'cloudflare-builds/workers_builds_list_builds',
+    `expected cloudflare-builds/workers_builds_list_builds; got ${resolved.tool} (score ${resolved.score})`,
   );
   assert.ok((resolved.score ?? 0) >= 1.0, `boosted score should be ≥1.0, got ${resolved.score}`);
 

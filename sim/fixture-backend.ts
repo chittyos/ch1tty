@@ -124,11 +124,10 @@ export const FIXTURE_TOOLS: Record<string, FixtureTool[]> = {
     { name: 'get_worker_logs', description: 'Retrieve recent logs and errors from a deployed Cloudflare Worker' },
   ],
   'cloudflare-builds': [
-    { name: 'list_builds', description: 'List recent Cloudflare Workers Builds runs for a Worker with build status, timestamps, and error summaries' },
-    { name: 'get_build', description: 'Get details of a specific Cloudflare Workers build run including logs and deployment outcome' },
-    { name: 'trigger_build', description: 'Trigger a new Cloudflare Workers build and deploy run for a configured Worker project' },
-    { name: 'get_build_config', description: 'Get the build configuration for a Cloudflare Worker including build command and deploy command settings' },
-    { name: 'update_build_config', description: 'Update the build or deploy command configuration for a Cloudflare Worker project in Workers Builds' },
+    { name: 'workers_builds_list_builds', description: 'List recent Cloudflare Workers Builds build runs with status, timestamps, and error summaries for a Worker' },
+    { name: 'workers_builds_get_build', description: 'Get details of a specific Cloudflare Workers Builds build run including configuration, status, and deployment outcome' },
+    { name: 'workers_builds_get_build_logs', description: 'Get build logs from a specific Cloudflare Workers Builds run for debugging failed builds and deployment errors' },
+    { name: 'workers_builds_set_active_worker', description: 'Set the active deployed version of a Cloudflare Worker project via Workers Builds to roll back or promote a build' },
   ],
   fs: [
     { name: 'read_file', description: 'Read the contents of a file from the filesystem by path' },

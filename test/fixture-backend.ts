@@ -637,8 +637,8 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
   'cloudflare-builds': {
     tools: [
       {
-        name: 'list_builds',
-        description: 'List recent Cloudflare Workers Builds runs for a Worker with build status, timestamps, and error summaries',
+        name: 'workers_builds_list_builds',
+        description: 'List recent Cloudflare Workers Builds build runs with status, timestamps, and error summaries for a Worker',
         inputSchema: {
           type: 'object',
           properties: {
@@ -653,28 +653,33 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
         ])),
       },
       {
-        name: 'trigger_build',
-        description: 'Trigger a new Cloudflare Workers build and deploy run for a configured Worker project',
+        name: 'workers_builds_get_build_logs',
+        description: 'Get build logs from a specific Cloudflare Workers Builds run for debugging failed builds and deployment errors',
         inputSchema: {
           type: 'object',
-          properties: { worker_name: { type: 'string' } },
-          required: ['worker_name'],
+          properties: {
+            build_id: { type: 'string' },
+            worker_name: { type: 'string' },
+          },
+          required: ['build_id'],
         },
-        response: text(JSON.stringify({ id: 'build-new', status: 'queued', worker: 'ch1tty-gateway' })),
+        response: text(JSON.stringify({
+          build_id: 'build-xyz',
+          logs: 'Error: Build command exited with code 1\nnpm ERR! missing script: build',
+        })),
       },
       {
-        name: 'update_build_config',
-        description: 'Update the build or deploy command configuration for a Cloudflare Worker project in Workers Builds',
+        name: 'workers_builds_set_active_worker',
+        description: 'Set the active deployed version of a Cloudflare Worker project via Workers Builds to roll back or promote a build',
         inputSchema: {
           type: 'object',
           properties: {
             worker_name: { type: 'string' },
-            build_command: { type: 'string' },
-            deploy_command: { type: 'string' },
+            build_id: { type: 'string' },
           },
-          required: ['worker_name'],
+          required: ['worker_name', 'build_id'],
         },
-        response: text(JSON.stringify({ worker: 'ch1tty-gateway', updated: true, deploy_command: 'wrangler deploy --env production' })),
+        response: text(JSON.stringify({ worker: 'ch1tty-gateway', active_build: 'build-abc', status: 'active' })),
       },
     ],
   },

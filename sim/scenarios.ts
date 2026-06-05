@@ -291,15 +291,15 @@ export const SCENARIOS: Scenario[] = [
     id: 'ops.build-status',
     focus: 'ops',
     intent: 'list recent build runs and check build status for the cloudflare workers builds pipeline',
-    expect: 'cloudflare-builds/list_builds',
-    note: 'near-misses: cloudflare/list_workers (list+workers but not build+runs+status), orchestrator/agent_list (list keyword). Both are ecosystem so both get ops boost; cloudflare-builds/list_builds wins on keyword specificity.',
+    expect: 'cloudflare-builds/workers_builds_list_builds',
+    note: 'near-misses: cloudflare/list_workers (list+workers but not build+runs+status+timestamps), orchestrator/agent_list (list keyword). Both are ecosystem so both get ops boost; workers_builds_list_builds wins on keyword specificity.',
   },
   {
-    id: 'ops.update-build-config',
+    id: 'ops.build-logs',
     focus: 'ops',
-    intent: 'update the deploy command configuration for the production worker builds project',
-    expect: 'cloudflare-builds/update_build_config',
-    note: 'near-miss: cloudflare/deploy_worker (deploy+worker+production but not update+command+config). cloudflare-builds/update_build_config matches update+deploy+command+configuration+worker+builds.',
+    intent: 'get the build logs for the failed cloudflare workers builds run to diagnose the deployment error',
+    expect: 'cloudflare-builds/workers_builds_get_build_logs',
+    note: 'near-misses: cloudflare/get_worker_logs (logs+worker+cloudflare but "build logs" not "worker logs"), cloudflare-builds/workers_builds_get_build (get+build but not logs+failed+diagnose+errors).',
   },
 
   // ── governance follow-up scenarios ───────────────────────────
