@@ -2084,16 +2084,17 @@
           "notes": "18th-pass 2026-06-05: provision_fork (0.66 score confirmed), provision_bind (confirmed via prior sessions), evidence/ai_search (0.48 score), thinking (confirmed). First combo to continue after fork+bind with evidence lookup — extends specialist-fork-and-bind (fork→bind only) with evidence enrichment and reasoning."
         },
         {
-          "name": "agent-evidence-ops-runbook",
+          "name": "agent-evidence-skill-ops-triage",
           "chain": [
             "orchestrator/agent_list",
             "evidence/ai_search",
+            "orchestrator/skill_list",
             "thinking/sequentialthinking",
             "fs/write_file"
           ],
-          "accomplishes": "Inventory all registered agents (finding ops-relevant ones like cloudflare, scrape, resolve), search evidence for incident context and historical failure patterns, reason over agent capabilities against the evidence to determine runbook steps, and write a targeted ops runbook — extending the existing agent-inventory-to-file pattern with evidence enrichment and reasoning before the write.",
+          "accomplishes": "Inventory all registered agents to understand which systems are active in the ops topology, search evidence for incident context and historical failure patterns, cross-reference the full skill registry to identify available remediation and ops skills, reason over agents + evidence + skills together to determine triage steps, and write an ops triage report — a 5-tool chain that extends orchestrator-evidence-landscape by adding skill discovery before reasoning.",
           "verified": true,
-          "notes": "orchestrator/agent_list (direct execute 2026-06-05, 28 agents confirmed), evidence/ai_search (cast score 0.48 confirmed), thinking/sequentialthinking (direct execute confirmed), fs/write_file (cast score 0.50 confirmed). Novel: extends existing agent-inventory-to-file (agent_list→fs) with evidence enrichment + reasoning; first ops combo using agent_list as the entry point for evidence-backed reasoning."
+          "notes": "orchestrator/agent_list (direct execute 2026-06-05, 28 agents confirmed), evidence/ai_search (cast score 0.48 confirmed), orchestrator/skill_list (direct execute 2026-06-05, 54 skills confirmed), thinking/sequentialthinking (direct execute confirmed), fs/write_file (cast score 0.50 confirmed). Novel vs orchestrator-evidence-landscape (12th-pass, 4-tool agent_list→evidence→thinking→fs): this 5-tool variant inserts skill_list between evidence and thinking, enabling cross-reference of both agent capabilities AND available skills against the evidence corpus."
         }
       ],
       "prompts": [
