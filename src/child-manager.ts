@@ -169,6 +169,7 @@ export class ChildManager implements Backend {
 
     // Log child stderr
     const stderr = transport.stderr;
+    /* c8 ignore next -- StdioClientTransport always provides stderr when stderr:'pipe' */
     if (stderr) {
       const readable = stderr as import('node:stream').Readable;
       readable.on('data', (chunk: Buffer) => {
