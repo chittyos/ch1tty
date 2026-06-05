@@ -1,8 +1,8 @@
 {
-  "_comment": "Alchemist-surfaced suggestions catalog — cross-backend tool combos and pre-written /cast prompts, grouped by all six focus profiles from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain was confirmed on a connected server at the time that specific combo was written/verified; connectivity changes since then are noted in per-combo notes. `verified:false` means the chain references at least one config-present-but-not-connected server. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only — no loader, no public tool beyond the existing 5. Updated 2026-05-30 to add code, communication, and ops focus profiles (PRs #71, #72, #80). Updated 2026-06-03 to add Linear MCP (linear) to code and governance profiles. Updated 2026-06-04: re-enumerated connected server set. Updated 2026-06-05: notion reconnected; fixed context7/get-library-docs → context7/query-docs; fixed fs/directory_tree → fs/list_directory; 13 combos newly verified:true (31/65 total verified). Updated 2026-06-05 fifth-pass: +11 combos (76 total); ALL 21 Notion-tool combos set verified:false — Notion API returning 401 (invalid token) in run environment; 22 verified.",
+  "_comment": "Alchemist-surfaced suggestions catalog \u2014 cross-backend tool combos and pre-written /cast prompts, grouped by all six focus profiles from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain was confirmed on a connected server at the time that specific combo was written/verified; connectivity changes since then are noted in per-combo notes. `verified:false` means the chain references at least one config-present-but-not-connected server. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only \u2014 no loader, no public tool beyond the existing 5. Updated 2026-05-30 to add code, communication, and ops focus profiles (PRs #71, #72, #80). Updated 2026-06-03 to add Linear MCP (linear) to code and governance profiles. Updated 2026-06-04: re-enumerated connected server set. Updated 2026-06-05: notion reconnected; fixed context7/get-library-docs \u2192 context7/query-docs; fixed fs/directory_tree \u2192 fs/list_directory; 13 combos newly verified:true (31/65 total verified). Updated 2026-06-05 fifth-pass: +11 combos (76 total); ALL 21 Notion-tool combos set verified:false \u2014 Notion API returning 401 (invalid token) in run environment; 22 verified.",
   "generatedFrom": {
     "gateway": "ch1tty",
-    "version": "4.1.0",
+    "version": "6th-pass",
     "method": "live-gateway-enumeration + cast-probe-driven combo discovery",
     "connectedServers": [
       "orchestrator",
@@ -30,11 +30,12 @@
       "github"
     ],
     "updatedAt": "2026-06-05",
-    "connectedServerNote": "2026-06-05 fifth-pass: +11 combos (76 total, 22 verified). New combos use only the 8 currently-connected backends. Tool names verified live via cast probes: playwright/browser_take_screenshot, playwright/browser_snapshot, fs/read_text_file (not deprecated read_file). finance and communication profiles now have connected-server-only combos for the first time. NOTE: All 21 Notion-tool combos (across all profiles) are verified:false — Notion MCP is connected but API returning 401 (invalid token) in run environment; restore via op://ChittyOS-Integrations/notion/api_token."
+    "connectedServerNote": "2026-06-05 fifth-pass: +11 combos (76 total, 22 verified). New combos use only the 8 currently-connected backends. Tool names verified live via cast probes: playwright/browser_take_screenshot, playwright/browser_snapshot, fs/read_text_file (not deprecated read_file). finance and communication profiles now have connected-server-only combos for the first time. NOTE: All 21 Notion-tool combos (across all profiles) are verified:false \u2014 Notion MCP is connected but API returning 401 (invalid token) in run environment; restore via op://ChittyOS-Integrations/notion/api_token.",
+    "date": "2026-06-05"
   },
   "profiles": {
     "finance": {
-      "description": "Billing, payments, and financial ecosystem tools — now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time — combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
+      "description": "Billing, payments, and financial ecosystem tools \u2014 now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time \u2014 combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
       "combos": [
         {
           "name": "invoice-to-ledger-tracker",
@@ -42,7 +43,7 @@
             "stripe/list_invoices",
             "notion/API-post-page"
           ],
-          "accomplishes": "Pull recent Stripe invoices and write each into a Notion finance tracker database as a page — turning billing state into a queryable, human-readable ledger view.",
+          "accomplishes": "Pull recent Stripe invoices and write each into a Notion finance tracker database as a page \u2014 turning billing state into a queryable, human-readable ledger view.",
           "verified": false,
           "notes": "stripe not connected (lazy); stripe/list_invoices inferred from @stripe/mcp surface. notion/API-post-page is verified."
         },
@@ -53,7 +54,7 @@
             "notion/API-post-page",
             "github/create_issue"
           ],
-          "accomplishes": "Create a Stripe customer, log the customer record into Notion, and open a GitHub issue to track onboarding follow-up work — a three-backend chain spanning payments, docs, and engineering.",
+          "accomplishes": "Create a Stripe customer, log the customer record into Notion, and open a GitHub issue to track onboarding follow-up work \u2014 a three-backend chain spanning payments, docs, and engineering.",
           "verified": false,
           "notes": "stripe inferred (not connected). notion/API-post-page verified. github not connected (2026-06-04)."
         },
@@ -74,9 +75,9 @@
             "stripe/list_invoices",
             "ledger/append_entry"
           ],
-          "accomplishes": "Pull recent Stripe invoices and append each as an immutable entry to the ChittyLedger — creating an auditable, append-only financial record that cannot be altered after the fact.",
+          "accomplishes": "Pull recent Stripe invoices and append each as an immutable entry to the ChittyLedger \u2014 creating an auditable, append-only financial record that cannot be altered after the fact.",
           "verified": false,
-          "notes": "stripe inferred (not connected). ledger/append_entry from apps/ledger-mcp — in config (enabled:false). This is the core finance-immutability combo: Stripe is the source of truth for billing; the ledger is the durable audit anchor."
+          "notes": "stripe inferred (not connected). ledger/append_entry from apps/ledger-mcp \u2014 in config (enabled:false). This is the core finance-immutability combo: Stripe is the source of truth for billing; the ledger is the durable audit anchor."
         },
         {
           "name": "billing-task-and-ledger",
@@ -84,9 +85,9 @@
             "tasks/create_task",
             "ledger/append_entry"
           ],
-          "accomplishes": "Create a billing remediation task in ChittyAgent Tasks and simultaneously append a ledger entry recording the intent — so the task's existence is anchored in the immutable ledger before it can be lost or modified.",
+          "accomplishes": "Create a billing remediation task in ChittyAgent Tasks and simultaneously append a ledger entry recording the intent \u2014 so the task's existence is anchored in the immutable ledger before it can be lost or modified.",
           "verified": false,
-          "notes": "tasks/create_task from apps/tasks-mcp (enabled:false). ledger/append_entry from apps/ledger-mcp (enabled:false). Both are new apps/*-mcp surfaces — shortest cross-backend finance combo."
+          "notes": "tasks/create_task from apps/tasks-mcp (enabled:false). ledger/append_entry from apps/ledger-mcp (enabled:false). Both are new apps/*-mcp surfaces \u2014 shortest cross-backend finance combo."
         },
         {
           "name": "ledger-to-finance-brief",
@@ -95,7 +96,7 @@
             "thinking/sequentialthinking",
             "notion/API-post-page"
           ],
-          "accomplishes": "Pull recent ChittyLedger entries for a financial namespace, reason over them with sequential-thinking to identify anomalies or trends, and write a finance brief into Notion — turning raw ledger state into an actionable narrative.",
+          "accomplishes": "Pull recent ChittyLedger entries for a financial namespace, reason over them with sequential-thinking to identify anomalies or trends, and write a finance brief into Notion \u2014 turning raw ledger state into an actionable narrative.",
           "verified": false,
           "notes": "ledger/list_entries from apps/ledger-mcp (enabled:false). thinking/sequentialthinking and notion/API-post-page are verified on the live gateway."
         },
@@ -106,9 +107,9 @@
             "thinking/sequentialthinking",
             "notion/API-post-page"
           ],
-          "accomplishes": "Search RAG evidence for financial and billing context (Chitty pricing docs, payment patterns, ledger policy), reason about implications and action items, create a structured finance brief in Notion — a useful fallback until stripe/ledger/tasks backends connect",
+          "accomplishes": "Search RAG evidence for financial and billing context (Chitty pricing docs, payment patterns, ledger policy), reason about implications and action items, create a structured finance brief in Notion \u2014 a useful fallback until stripe/ledger/tasks backends connect",
           "verified": false,
-          "notes": "All 3 tools confirmed on live connected servers (evidence, thinking, notion). Verified 2026-06-05 fifth-pass. Works as a research-only finance workflow until Stripe/ledger are connected. Caveat (2026-06-05 fifth-pass env): Notion API returning 401 (invalid token) — tool is registered in connected Notion MCP but write calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
+          "notes": "All 3 tools confirmed on live connected servers (evidence, thinking, notion). Verified 2026-06-05 fifth-pass. Works as a research-only finance workflow until Stripe/ledger are connected. Caveat (2026-06-05 fifth-pass env): Notion API returning 401 (invalid token) \u2014 tool is registered in connected Notion MCP but write calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "financial-doc-analysis",
@@ -119,7 +120,7 @@
           ],
           "accomplishes": "Read financial documents or data exports from filesystem (CSV/JSON billing reports, ledger snapshots), reason about key metrics, anomalies, and action items, document structured summary in Notion",
           "verified": false,
-          "notes": "All 3 tools confirmed on live connected servers (fs, thinking, notion). Verified 2026-06-05 fifth-pass. Works with locally-synced financial data files. Caveat (2026-06-05 fifth-pass env): Notion API returning 401 (invalid token) — tool is registered in connected Notion MCP but write calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
+          "notes": "All 3 tools confirmed on live connected servers (fs, thinking, notion). Verified 2026-06-05 fifth-pass. Works with locally-synced financial data files. Caveat (2026-06-05 fifth-pass env): Notion API returning 401 (invalid token) \u2014 tool is registered in connected Notion MCP but write calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         }
       ],
       "prompts": [
@@ -162,7 +163,7 @@
       ]
     },
     "governance": {
-      "description": "ChittyOS ecosystem governance, identity, evidence, and persistent state — extended with ChittyAgent Tasks (tasks-mcp), ChittyLedger (ledger-mcp), Session Coordinator (session-mcp), and ChittyEvidence canonical document store (chittyevidence). Verified-strong (2026-06-04): evidence, notion, thinking, fs live. github and orchestrator NOT connected — corrected to verified:false. New verified:true combos: evidence-reasoning-brief (evidence+thinking+notion) and rag-survey-to-file (evidence+fs).",
+      "description": "ChittyOS ecosystem governance, identity, evidence, and persistent state \u2014 extended with ChittyAgent Tasks (tasks-mcp), ChittyLedger (ledger-mcp), Session Coordinator (session-mcp), and ChittyEvidence canonical document store (chittyevidence). Verified-strong (2026-06-04): evidence, notion, thinking, fs live. github and orchestrator NOT connected \u2014 corrected to verified:false. New verified:true combos: evidence-reasoning-brief (evidence+thinking+notion) and rag-survey-to-file (evidence+fs).",
       "combos": [
         {
           "name": "rag-evidence-to-notion-brief",
@@ -171,9 +172,9 @@
             "evidence/ai_search",
             "notion/API-post-page"
           ],
-          "accomplishes": "Discover the available AutoRAG vector stores, run an AI search across the evidence corpus, and persist the synthesized findings as a Notion brief — turning raw evidence retrieval into a governed, citable document.",
+          "accomplishes": "Discover the available AutoRAG vector stores, run an AI search across the evidence corpus, and persist the synthesized findings as a Notion brief \u2014 turning raw evidence retrieval into a governed, citable document.",
           "verified": false,
-          "notes": "evidence/list_rags, evidence/ai_search, and notion/API-post-page all confirmed connected (2026-06-05). notion reconnected this pass Note: Notion API returning 401 (invalid token) in last recorded run environment — all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
+          "notes": "evidence/list_rags, evidence/ai_search, and notion/API-post-page all confirmed connected (2026-06-05). notion reconnected this pass Note: Notion API returning 401 (invalid token) in last recorded run environment \u2014 all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "issue-triage-to-governance-tracker",
@@ -195,7 +196,7 @@
           ],
           "accomplishes": "Find the right ChittyOS skill for a governance task, execute it through the orchestrator, then annotate the outcome as a comment on the relevant Notion page for an audit trail. Spans orchestrator + notion.",
           "verified": false,
-          "notes": "orchestrator/skill_search, orchestrator/skill_execute, and notion/API-create-a-comment all confirmed connected (2026-06-05). notion reconnected this pass Note: Notion API returning 401 (invalid token) in last recorded run environment — all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
+          "notes": "orchestrator/skill_search, orchestrator/skill_execute, and notion/API-create-a-comment all confirmed connected (2026-06-05). notion reconnected this pass Note: Notion API returning 401 (invalid token) in last recorded run environment \u2014 all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "context-provisioning-audit",
@@ -206,7 +207,7 @@
           ],
           "accomplishes": "List TY-VY-RY scored ChittyID candidates for a session, run the autonomous provisioning evaluation, and archive the decision + per-aspect rationale into a Notion governance log.",
           "verified": false,
-          "notes": "orchestrator/provision_candidates, orchestrator/provision_evaluate, and notion/API-post-page all confirmed connected (2026-06-05). notion reconnected this pass Note: Notion API returning 401 (invalid token) in last recorded run environment — all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
+          "notes": "orchestrator/provision_candidates, orchestrator/provision_evaluate, and notion/API-post-page all confirmed connected (2026-06-05). notion reconnected this pass Note: Notion API returning 401 (invalid token) in last recorded run environment \u2014 all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "agent-route-and-document",
@@ -217,7 +218,7 @@
           ],
           "accomplishes": "Find which ChittyAgent handles a domain task, route the request through the orchestrator's agent protocol, and append the result to an existing Notion page's body.",
           "verified": false,
-          "notes": "orchestrator/agent_search, orchestrator/agent_execute, and notion/API-patch-block-children all confirmed connected (2026-06-05). notion reconnected this pass Note: Notion API returning 401 (invalid token) in last recorded run environment — all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
+          "notes": "orchestrator/agent_search, orchestrator/agent_execute, and notion/API-patch-block-children all confirmed connected (2026-06-05). notion reconnected this pass Note: Notion API returning 401 (invalid token) in last recorded run environment \u2014 all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "evidence-backed-issue",
@@ -225,7 +226,7 @@
             "evidence/ai_search",
             "github/create_issue"
           ],
-          "accomplishes": "Search the evidence corpus for prior art / supporting context, then open a GitHub issue pre-populated with the cited findings — grounding engineering work in governed evidence.",
+          "accomplishes": "Search the evidence corpus for prior art / supporting context, then open a GitHub issue pre-populated with the cited findings \u2014 grounding engineering work in governed evidence.",
           "verified": false,
           "notes": "evidence verified. github NOT connected (0 tools, 2026-06-04). Previously verified:true."
         },
@@ -236,9 +237,9 @@
             "session/append_event",
             "chittyevidence/ingest_document"
           ],
-          "accomplishes": "Capture a governance decision as a ChittyAgent task, append it to the active session as a timestamped event, then ingest the rationale as a canonical document with a chittycanon:// URI — creating a three-layer trail: work item → session log → evidence store.",
+          "accomplishes": "Capture a governance decision as a ChittyAgent task, append it to the active session as a timestamped event, then ingest the rationale as a canonical document with a chittycanon:// URI \u2014 creating a three-layer trail: work item \u2192 session log \u2192 evidence store.",
           "verified": false,
-          "notes": "tasks, session, chittyevidence all in config (enabled:false). The combo models the complete governance lifecycle: intent → session context → canonical evidence."
+          "notes": "tasks, session, chittyevidence all in config (enabled:false). The combo models the complete governance lifecycle: intent \u2192 session context \u2192 canonical evidence."
         },
         {
           "name": "session-audit-to-notion",
@@ -259,7 +260,7 @@
             "tasks/create_task",
             "ledger/append_entry"
           ],
-          "accomplishes": "Search the canonical evidence store for a governance topic, create follow-up action tasks from the findings, and append the decision to the immutable ledger — a full discover → act → record governance chain.",
+          "accomplishes": "Search the canonical evidence store for a governance topic, create follow-up action tasks from the findings, and append the decision to the immutable ledger \u2014 a full discover \u2192 act \u2192 record governance chain.",
           "verified": false,
           "notes": "chittyevidence, tasks, ledger all in config (enabled:false). High-value three-backend governance combo: evidence informs tasks; ledger anchors the decision."
         },
@@ -281,7 +282,7 @@
             "thinking/sequentialthinking",
             "notion/API-post-page"
           ],
-          "accomplishes": "List active Linear projects and their completion status, reason over blockers and priorities with sequential-thinking, and write a sprint governance brief into Notion — turning engineering issue-tracker state into a governed, stakeholder-readable record.",
+          "accomplishes": "List active Linear projects and their completion status, reason over blockers and priorities with sequential-thinking, and write a sprint governance brief into Notion \u2014 turning engineering issue-tracker state into a governed, stakeholder-readable record.",
           "verified": false,
           "notes": "linear uses mcp.linear.app/mcp (requires authTokenKey: linear-mcp). thinking/sequentialthinking and notion/API-post-page are verified live."
         },
@@ -292,9 +293,9 @@
             "thinking/sequentialthinking",
             "notion/API-post-page"
           ],
-          "accomplishes": "AI-search the evidence corpus for a governance topic, reason over the findings with sequential-thinking to synthesize insights and flag gaps, then write a structured brief into Notion. Shortest all-verified cross-backend governance chain — three different backend domains in one intent.",
+          "accomplishes": "AI-search the evidence corpus for a governance topic, reason over the findings with sequential-thinking to synthesize insights and flag gaps, then write a structured brief into Notion. Shortest all-verified cross-backend governance chain \u2014 three different backend domains in one intent.",
           "verified": false,
-          "notes": "evidence/ai_search, thinking/sequentialthinking, and notion/API-post-page all confirmed connected (2026-06-05). notion reconnected this pass Note: Notion API returning 401 (invalid token) in last recorded run environment — all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
+          "notes": "evidence/ai_search, thinking/sequentialthinking, and notion/API-post-page all confirmed connected (2026-06-05). notion reconnected this pass Note: Notion API returning 401 (invalid token) in last recorded run environment \u2014 all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "rag-survey-to-file",
@@ -302,7 +303,7 @@
             "evidence/list_rags",
             "fs/write_file"
           ],
-          "accomplishes": "Enumerate all available AutoRAG vector stores and save the inventory to a local file — a discovery-then-archive pattern for documenting what evidence knowledge bases exist without requiring Notion access.",
+          "accomplishes": "Enumerate all available AutoRAG vector stores and save the inventory to a local file \u2014 a discovery-then-archive pattern for documenting what evidence knowledge bases exist without requiring Notion access.",
           "verified": true,
           "notes": "evidence and fs both connected (2026-06-04). Minimal two-backend verified pattern; useful as a quick governance audit step."
         },
@@ -313,9 +314,9 @@
             "orchestrator/skill_execute",
             "fs/write_file"
           ],
-          "accomplishes": "Find the right ChittyOS skill for a governance task by keyword/intent, execute it through the orchestrator, and write the result to a local file as a durable audit record. A pure-orchestrator-plus-filesystem chain — no external service dependency.",
+          "accomplishes": "Find the right ChittyOS skill for a governance task by keyword/intent, execute it through the orchestrator, and write the result to a local file as a durable audit record. A pure-orchestrator-plus-filesystem chain \u2014 no external service dependency.",
           "verified": true,
-          "notes": "orchestrator (skill_search, skill_execute) and fs (write_file) — all connected 2026-06-04."
+          "notes": "orchestrator (skill_search, skill_execute) and fs (write_file) \u2014 all connected 2026-06-04."
         },
         {
           "name": "provision-evaluate-and-bind",
@@ -323,9 +324,9 @@
             "orchestrator/provision_evaluate",
             "orchestrator/provision_bind"
           ],
-          "accomplishes": "Evaluate which ChittyID context entity should serve a session using TY-VY-RY scoring, then execute the binding decision — the full ChittyID provisioning flow in two sequential orchestrator calls.",
+          "accomplishes": "Evaluate which ChittyID context entity should serve a session using TY-VY-RY scoring, then execute the binding decision \u2014 the full ChittyID provisioning flow in two sequential orchestrator calls.",
           "verified": true,
-          "notes": "Pure orchestrator chain — provision_evaluate and provision_bind both confirmed live 2026-06-04."
+          "notes": "Pure orchestrator chain \u2014 provision_evaluate and provision_bind both confirmed live 2026-06-04."
         },
         {
           "name": "evidence-search-reason-write",
@@ -334,7 +335,7 @@
             "thinking/sequentialthinking",
             "fs/write_file"
           ],
-          "accomplishes": "Search the AutoRAG evidence store for relevant documents, reason through the findings with sequential thinking to synthesise an analysis or audit summary, then write the final report to a file — a three-backend research-to-document chain.",
+          "accomplishes": "Search the AutoRAG evidence store for relevant documents, reason through the findings with sequential thinking to synthesise an analysis or audit summary, then write the final report to a file \u2014 a three-backend research-to-document chain.",
           "verified": true,
           "notes": "evidence/search, thinking/sequentialthinking, and fs/write_file all confirmed on connected servers (2026-06-04 third pass)."
         },
@@ -345,7 +346,7 @@
             "orchestrator/provision_evaluate",
             "fs/write_file"
           ],
-          "accomplishes": "Enumerate provisioning candidates from the orchestrator, run the evaluation step to score each candidate, then write the ranked evaluation report to a file — a two-backend governance audit chain.",
+          "accomplishes": "Enumerate provisioning candidates from the orchestrator, run the evaluation step to score each candidate, then write the ranked evaluation report to a file \u2014 a two-backend governance audit chain.",
           "verified": true,
           "notes": "orchestrator/provision_candidates and orchestrator/provision_evaluate confirmed via live status (13 orchestrator tools connected, 2026-06-04 third pass). fs/write_file confirmed connected."
         },
@@ -359,7 +360,7 @@
           ],
           "accomplishes": "Navigate to a web resource, capture screenshot proof, search RAG evidence for related context, then create a Notion brief combining screenshot and evidence findings",
           "verified": false,
-          "notes": "All 4 tools confirmed on live connected servers (playwright, evidence, notion). 2026-06-05 fifth-pass verification. Caveat (2026-06-05 fifth-pass env): Notion API returning 401 (invalid token) — tool is registered in connected Notion MCP but write calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
+          "notes": "All 4 tools confirmed on live connected servers (playwright, evidence, notion). 2026-06-05 fifth-pass verification. Caveat (2026-06-05 fifth-pass env): Notion API returning 401 (invalid token) \u2014 tool is registered in connected Notion MCP but write calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "codebase-context-reasoning",
@@ -371,7 +372,7 @@
           ],
           "accomplishes": "Survey a project directory, read key source files, reason through architecture and governance implications, document structured findings in Notion",
           "verified": false,
-          "notes": "All 4 tools confirmed on live connected servers (fs, thinking, notion). Uses read_text_file (not deprecated read_file). 2026-06-05 fifth-pass verification. Caveat (2026-06-05 fifth-pass env): Notion API returning 401 (invalid token) — tool is registered in connected Notion MCP but write calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
+          "notes": "All 4 tools confirmed on live connected servers (fs, thinking, notion). Uses read_text_file (not deprecated read_file). 2026-06-05 fifth-pass verification. Caveat (2026-06-05 fifth-pass env): Notion API returning 401 (invalid token) \u2014 tool is registered in connected Notion MCP but write calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         }
       ],
       "prompts": [
@@ -462,7 +463,7 @@
       ]
     },
     "design": {
-      "description": "Browser rendering, automation, and desktop/visual work — extended with ChittyEvidence (chittyevidence) for canonical archival of visual artifacts, and ChittyAgent Tasks (tasks-mcp) for turning design findings into tracked work items. Verified-strong (2026-06-04): browser-rendering, playwright, fs, notion all live. github NOT connected — visual-bug-report corrected to verified:false. New combos: playwright-capture-to-notion and page-markdown-to-notion-brief (both verified:true).",
+      "description": "Browser rendering, automation, and desktop/visual work \u2014 extended with ChittyEvidence (chittyevidence) for canonical archival of visual artifacts, and ChittyAgent Tasks (tasks-mcp) for turning design findings into tracked work items. Verified-strong (2026-06-04): browser-rendering, playwright, fs, notion all live. github NOT connected \u2014 visual-bug-report corrected to verified:false. New combos: playwright-capture-to-notion and page-markdown-to-notion-brief (both verified:true).",
       "combos": [
         {
           "name": "capture-archive-document",
@@ -471,9 +472,9 @@
             "fs/write_file",
             "notion/API-patch-block-children"
           ],
-          "accomplishes": "Screenshot a live URL via Cloudflare browser-rendering, save the image to the local filesystem, then embed/reference it in a Notion page — a capture→archive→document pipeline across three backends.",
+          "accomplishes": "Screenshot a live URL via Cloudflare browser-rendering, save the image to the local filesystem, then embed/reference it in a Notion page \u2014 a capture\u2192archive\u2192document pipeline across three backends.",
           "verified": false,
-          "notes": "browser-rendering/get_url_screenshot, fs/write_file, and notion/API-patch-block-children all confirmed connected (2026-06-05) Note: Notion API returning 401 (invalid token) in last recorded run environment — all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
+          "notes": "browser-rendering/get_url_screenshot, fs/write_file, and notion/API-patch-block-children all confirmed connected (2026-06-05) Note: Notion API returning 401 (invalid token) in last recorded run environment \u2014 all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "visual-bug-report",
@@ -482,7 +483,7 @@
             "playwright/browser_snapshot",
             "github/create_issue"
           ],
-          "accomplishes": "Drive a real browser to the failing page, capture an accessibility snapshot (better than a screenshot for actionable detail), and file a GitHub issue with the reproduction — a QA-to-engineering handoff spanning playwright + github.",
+          "accomplishes": "Drive a real browser to the failing page, capture an accessibility snapshot (better than a screenshot for actionable detail), and file a GitHub issue with the reproduction \u2014 a QA-to-engineering handoff spanning playwright + github.",
           "verified": false,
           "notes": "playwright verified. github NOT connected (0 tools, 2026-06-04). Previously verified:true."
         },
@@ -492,7 +493,7 @@
             "browser-rendering/get_url_markdown",
             "fs/write_file"
           ],
-          "accomplishes": "Convert any web page to clean Markdown via browser-rendering and save it locally — a lightweight content-capture combo for design references and competitive teardowns.",
+          "accomplishes": "Convert any web page to clean Markdown via browser-rendering and save it locally \u2014 a lightweight content-capture combo for design references and competitive teardowns.",
           "verified": true,
           "notes": "browser-rendering and fs connected. Verified 2026-06-04."
         },
@@ -504,7 +505,7 @@
             "playwright/browser_take_screenshot",
             "fs/write_file"
           ],
-          "accomplishes": "Automate a form submission flow end-to-end and capture a screenshot proof saved to disk — verifying a UI flow works and producing visual evidence. (playwright-heavy, but fs makes the artifact durable cross-backend.)",
+          "accomplishes": "Automate a form submission flow end-to-end and capture a screenshot proof saved to disk \u2014 verifying a UI flow works and producing visual evidence. (playwright-heavy, but fs makes the artifact durable cross-backend.)",
           "verified": true,
           "notes": "playwright and fs connected. Verified 2026-06-04."
         },
@@ -515,9 +516,9 @@
             "context7/query-docs",
             "notion/API-post-page"
           ],
-          "accomplishes": "Fetch a live page's raw HTML, cross-reference the framework/library it uses against current docs via context7, and write an implementation note into Notion — useful for reverse-engineering a design pattern.",
+          "accomplishes": "Fetch a live page's raw HTML, cross-reference the framework/library it uses against current docs via context7, and write an implementation note into Notion \u2014 useful for reverse-engineering a design pattern.",
           "verified": false,
-          "notes": "Fixed context7/get-library-docs → context7/query-docs (2026-06-05). browser-rendering/get_url_html_content, context7/query-docs, and notion/API-post-page all confirmed connected Note: Notion API returning 401 (invalid token) in last recorded run environment — all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
+          "notes": "Fixed context7/get-library-docs \u2192 context7/query-docs (2026-06-05). browser-rendering/get_url_html_content, context7/query-docs, and notion/API-post-page all confirmed connected Note: Notion API returning 401 (invalid token) in last recorded run environment \u2014 all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "screenshot-to-canonical-evidence",
@@ -525,7 +526,7 @@
             "browser-rendering/get_url_screenshot",
             "chittyevidence/ingest_document"
           ],
-          "accomplishes": "Screenshot a live URL and ingest the resulting image as a canonical evidence document with a chittycanon:// URI — making visual design artifacts governed, citable, and retrievable by future evidence searches rather than lost in a local folder.",
+          "accomplishes": "Screenshot a live URL and ingest the resulting image as a canonical evidence document with a chittycanon:// URI \u2014 making visual design artifacts governed, citable, and retrievable by future evidence searches rather than lost in a local folder.",
           "verified": false,
           "notes": "browser-rendering is verified live. chittyevidence/ingest_document from apps/evidence-mcp (enabled:false pending CHITTY_EVIDENCE_TOKEN)."
         },
@@ -547,9 +548,9 @@
             "playwright/browser_take_screenshot",
             "notion/API-post-page"
           ],
-          "accomplishes": "Navigate to a design target URL, capture a full-page screenshot, and post it as a new Notion page for team review — a three-step visual documentation pipeline driven from a single cast intent.",
+          "accomplishes": "Navigate to a design target URL, capture a full-page screenshot, and post it as a new Notion page for team review \u2014 a three-step visual documentation pipeline driven from a single cast intent.",
           "verified": false,
-          "notes": "playwright/browser_navigate, playwright/browser_take_screenshot, and notion/API-post-page all confirmed connected (2026-06-05) Note: Notion API returning 401 (invalid token) in last recorded run environment — all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
+          "notes": "playwright/browser_navigate, playwright/browser_take_screenshot, and notion/API-post-page all confirmed connected (2026-06-05) Note: Notion API returning 401 (invalid token) in last recorded run environment \u2014 all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "page-markdown-to-notion-brief",
@@ -558,9 +559,9 @@
             "thinking/sequentialthinking",
             "notion/API-post-page"
           ],
-          "accomplishes": "Convert a live URL to clean Markdown via browser-rendering, reason over the content with sequential-thinking to extract key design patterns or decisions, then write the synthesized brief into Notion — deeper than a raw archive, more governed than a manual note.",
+          "accomplishes": "Convert a live URL to clean Markdown via browser-rendering, reason over the content with sequential-thinking to extract key design patterns or decisions, then write the synthesized brief into Notion \u2014 deeper than a raw archive, more governed than a manual note.",
           "verified": false,
-          "notes": "browser-rendering/get_url_markdown, thinking/sequentialthinking, and notion/API-post-page all confirmed connected (2026-06-05) Note: Notion API returning 401 (invalid token) in last recorded run environment — all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
+          "notes": "browser-rendering/get_url_markdown, thinking/sequentialthinking, and notion/API-post-page all confirmed connected (2026-06-05) Note: Notion API returning 401 (invalid token) in last recorded run environment \u2014 all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "screenshot-to-file",
@@ -568,7 +569,7 @@
             "browser-rendering/get_url_screenshot",
             "fs/write_file"
           ],
-          "accomplishes": "Capture a full-page screenshot of any URL via the headless browser-rendering service, then write the image data to a local file — a minimal two-backend visual archiving chain.",
+          "accomplishes": "Capture a full-page screenshot of any URL via the headless browser-rendering service, then write the image data to a local file \u2014 a minimal two-backend visual archiving chain.",
           "verified": true,
           "notes": "browser-rendering/get_url_screenshot confirmed from live cast probe (2026-06-04). fs/write_file confirmed connected."
         },
@@ -579,7 +580,7 @@
             "playwright/browser_take_screenshot",
             "fs/write_file"
           ],
-          "accomplishes": "Navigate to a URL with a full Playwright browser instance (supports auth flows, JS-heavy pages), take a screenshot at the current rendered state, then persist the screenshot to disk — playwright + fs two-backend chain.",
+          "accomplishes": "Navigate to a URL with a full Playwright browser instance (supports auth flows, JS-heavy pages), take a screenshot at the current rendered state, then persist the screenshot to disk \u2014 playwright + fs two-backend chain.",
           "verified": true,
           "notes": "playwright/browser_navigate and playwright/browser_take_screenshot confirmed via live cast probes (2026-06-04). fs/write_file confirmed connected."
         },
@@ -593,7 +594,7 @@
           ],
           "accomplishes": "Navigate to a page, capture the accessibility tree snapshot (richer than screenshot for structural analysis), reason about UX/a11y issues and improvements, document the audit in Notion",
           "verified": false,
-          "notes": "All 4 tools confirmed. browser_snapshot is preferred over screenshot for accessibility analysis (returns structured DOM tree). 2026-06-05 fifth-pass verification. Caveat (2026-06-05 fifth-pass env): Notion API returning 401 (invalid token) — tool is registered in connected Notion MCP but write calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
+          "notes": "All 4 tools confirmed. browser_snapshot is preferred over screenshot for accessibility analysis (returns structured DOM tree). 2026-06-05 fifth-pass verification. Caveat (2026-06-05 fifth-pass env): Notion API returning 401 (invalid token) \u2014 tool is registered in connected Notion MCP but write calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "page-html-analysis-to-file",
@@ -667,7 +668,7 @@
       ]
     },
     "code": {
-      "description": "Software development — source control, deployment, library documentation, database, and code quality tools. Verified-strong (2026-06-04): context7, fs, notion, evidence all live. github NOT connected — library-docs-to-github-issue corrected to verified:false. neon NOT connected — schema-branch-and-migrate, schema-to-notion-doc, db-branch-test-and-document corrected to verified:false. New verified:true combos: context7-docs-to-file, fs-survey-and-document, evidence-library-cross-ref.",
+      "description": "Software development \u2014 source control, deployment, library documentation, database, and code quality tools. Verified-strong (2026-06-04): context7, fs, notion, evidence all live. github NOT connected \u2014 library-docs-to-github-issue corrected to verified:false. neon NOT connected \u2014 schema-branch-and-migrate, schema-to-notion-doc, db-branch-test-and-document corrected to verified:false. New verified:true combos: context7-docs-to-file, fs-survey-and-document, evidence-library-cross-ref.",
       "combos": [
         {
           "name": "library-research-to-docs",
@@ -676,9 +677,9 @@
             "context7/query-docs",
             "notion/API-post-page"
           ],
-          "accomplishes": "Resolve a library name to its canonical context7 ID, fetch the current API documentation, and write a usage note into Notion — turning live library docs into a durable, searchable implementation reference.",
+          "accomplishes": "Resolve a library name to its canonical context7 ID, fetch the current API documentation, and write a usage note into Notion \u2014 turning live library docs into a durable, searchable implementation reference.",
           "verified": false,
-          "notes": "Fixed context7/get-library-docs → context7/query-docs (2026-06-05). context7/resolve-library-id, context7/query-docs, and notion/API-post-page all confirmed connected Note: Notion API returning 401 (invalid token) in last recorded run environment — all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
+          "notes": "Fixed context7/get-library-docs \u2192 context7/query-docs (2026-06-05). context7/resolve-library-id, context7/query-docs, and notion/API-post-page all confirmed connected Note: Notion API returning 401 (invalid token) in last recorded run environment \u2014 all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "schema-branch-and-migrate",
@@ -687,7 +688,7 @@
             "neon/run_sql",
             "neon/describe_table_schema"
           ],
-          "accomplishes": "Create a Neon database branch for a schema change, apply the migration SQL, then describe the resulting table schema to confirm the change landed — a safe non-destructive schema migration workflow on a throwaway branch.",
+          "accomplishes": "Create a Neon database branch for a schema change, apply the migration SQL, then describe the resulting table schema to confirm the change landed \u2014 a safe non-destructive schema migration workflow on a throwaway branch.",
           "verified": false,
           "notes": "neon NOT connected (0 tools, 2026-06-04). Previously verified:true. Re-enable when NEON_API_KEY is available."
         },
@@ -697,7 +698,7 @@
             "neon/describe_table_schema",
             "notion/API-post-page"
           ],
-          "accomplishes": "Pull the current schema for a Neon table and write it as a Notion documentation page — keeping your data-model docs in sync with the live database without manual copy-paste.",
+          "accomplishes": "Pull the current schema for a Neon table and write it as a Notion documentation page \u2014 keeping your data-model docs in sync with the live database without manual copy-paste.",
           "verified": false,
           "notes": "neon NOT connected (0 tools, 2026-06-04). notion verified. Previously verified:true."
         },
@@ -708,7 +709,7 @@
             "context7/query-docs",
             "github/create_issue"
           ],
-          "accomplishes": "Look up the latest docs for a library dependency, then open a GitHub issue pre-populated with the relevant API details — grounding an implementation task in current, accurate documentation rather than stale memory.",
+          "accomplishes": "Look up the latest docs for a library dependency, then open a GitHub issue pre-populated with the relevant API details \u2014 grounding an implementation task in current, accurate documentation rather than stale memory.",
           "verified": false,
           "notes": "context7 verified. github NOT connected (0 tools, 2026-06-04). Previously verified:true."
         },
@@ -718,7 +719,7 @@
             "serena/search_code",
             "fs/read_text_file"
           ],
-          "accomplishes": "Use Serena's code-intelligence search to locate a symbol or pattern across the workspace, then read the full file context around the match — a semantic-then-deep drill-down that avoids scanning files blindly.",
+          "accomplishes": "Use Serena's code-intelligence search to locate a symbol or pattern across the workspace, then read the full file context around the match \u2014 a semantic-then-deep drill-down that avoids scanning files blindly.",
           "verified": false,
           "notes": "serena not connected (lazy, requires token). fs/read_text_file verified live."
         },
@@ -729,7 +730,7 @@
             "neon/run_sql",
             "notion/API-post-page"
           ],
-          "accomplishes": "Branch the database, run a test query or migration against the branch, then write the outcome into a Notion page — a lightweight experiment-then-document pattern for database changes.",
+          "accomplishes": "Branch the database, run a test query or migration against the branch, then write the outcome into a Notion page \u2014 a lightweight experiment-then-document pattern for database changes.",
           "verified": false,
           "notes": "neon NOT connected (0 tools, 2026-06-04). notion verified. Previously verified:true."
         },
@@ -739,7 +740,7 @@
             "cloudflare/workers_scripts_upload",
             "cloudflare/workers_scripts_get"
           ],
-          "accomplishes": "Upload a new Cloudflare Worker script and immediately fetch it back to verify the deployment landed correctly — a tight deploy→verify loop before any downstream tests run.",
+          "accomplishes": "Upload a new Cloudflare Worker script and immediately fetch it back to verify the deployment landed correctly \u2014 a tight deploy\u2192verify loop before any downstream tests run.",
           "verified": false,
           "notes": "cloudflare not connected (remote endpoint, requires token). Tool names inferred from cloudflare MCP surface."
         },
@@ -749,7 +750,7 @@
             "linear/list_issues",
             "github/create_pull_request"
           ],
-          "accomplishes": "List Linear issues assigned to the current sprint, then open a GitHub pull request for each — keeping issue tracking and code review in sync without manual cross-tool copy-paste.",
+          "accomplishes": "List Linear issues assigned to the current sprint, then open a GitHub pull request for each \u2014 keeping issue tracking and code review in sync without manual cross-tool copy-paste.",
           "verified": false,
           "notes": "linear requires authTokenKey: linear-mcp. github NOT connected (2026-06-04)."
         },
@@ -760,7 +761,7 @@
             "context7/resolve-library-id",
             "context7/query-docs"
           ],
-          "accomplishes": "Fetch a Linear bug report, resolve the affected library via Context7, and load the library's API docs — giving a developer immediate reference context to reproduce and fix the issue without leaving the terminal.",
+          "accomplishes": "Fetch a Linear bug report, resolve the affected library via Context7, and load the library's API docs \u2014 giving a developer immediate reference context to reproduce and fix the issue without leaving the terminal.",
           "verified": false,
           "notes": "linear inferred (auth required); context7/resolve-library-id and context7/query-docs verified."
         },
@@ -771,9 +772,9 @@
             "context7/query-docs",
             "fs/write_file"
           ],
-          "accomplishes": "Resolve a library name, fetch its current API documentation, and write the result to a local file for offline reference or inclusion in a project's docs folder — a verified three-backend chain spanning docs-resolution + filesystem persistence.",
+          "accomplishes": "Resolve a library name, fetch its current API documentation, and write the result to a local file for offline reference or inclusion in a project's docs folder \u2014 a verified three-backend chain spanning docs-resolution + filesystem persistence.",
           "verified": true,
-          "notes": "context7 and fs both connected (2026-06-04). New combo this run. Cast: 'research library docs and save to local file' resolves to context7/resolve-library-id (score 0.31) with fs alternatives confirmed in resolution path. Fixed context7/get-library-docs → context7/query-docs (2026-06-05)."
+          "notes": "context7 and fs both connected (2026-06-04). New combo this run. Cast: 'research library docs and save to local file' resolves to context7/resolve-library-id (score 0.31) with fs alternatives confirmed in resolution path. Fixed context7/get-library-docs \u2192 context7/query-docs (2026-06-05)."
         },
         {
           "name": "fs-survey-and-document",
@@ -782,9 +783,9 @@
             "thinking/sequentialthinking",
             "notion/API-post-page"
           ],
-          "accomplishes": "List the top-level project directory contents, reason over the structure with sequential-thinking to identify architectural patterns or concerns, and write a technical architecture note into Notion — a codebase-to-doc pipeline using locally-available backends. Note: fs/list_directory covers one path at a time; enumerate subdirectories separately for deeper coverage.",
+          "accomplishes": "List the top-level project directory contents, reason over the structure with sequential-thinking to identify architectural patterns or concerns, and write a technical architecture note into Notion \u2014 a codebase-to-doc pipeline using locally-available backends. Note: fs/list_directory covers one path at a time; enumerate subdirectories separately for deeper coverage.",
           "verified": false,
-          "notes": "Fixed fs/directory_tree → fs/list_directory (2026-06-05); list_directory is single-level (not recursive). fs/list_directory, thinking/sequentialthinking, and notion/API-post-page all confirmed connected Note: Notion API returning 401 (invalid token) in last recorded run environment — all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
+          "notes": "Fixed fs/directory_tree \u2192 fs/list_directory (2026-06-05); list_directory is single-level (not recursive). fs/list_directory, thinking/sequentialthinking, and notion/API-post-page all confirmed connected Note: Notion API returning 401 (invalid token) in last recorded run environment \u2014 all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "evidence-library-cross-ref",
@@ -793,9 +794,9 @@
             "context7/resolve-library-id",
             "context7/query-docs"
           ],
-          "accomplishes": "Search the evidence corpus for prior art on a library or technology decision, then pull the current API documentation for the same library — correlating historical ChittyOS usage patterns with live upstream docs to ground implementation choices.",
+          "accomplishes": "Search the evidence corpus for prior art on a library or technology decision, then pull the current API documentation for the same library \u2014 correlating historical ChittyOS usage patterns with live upstream docs to ground implementation choices.",
           "verified": true,
-          "notes": "evidence and context7 both connected (2026-06-04). New combo this run — spans two different backends not previously combined in catalog. No prior evidence+context7 chain existed. Fixed context7/get-library-docs → context7/query-docs (2026-06-05)."
+          "notes": "evidence and context7 both connected (2026-06-04). New combo this run \u2014 spans two different backends not previously combined in catalog. No prior evidence+context7 chain existed. Fixed context7/get-library-docs \u2192 context7/query-docs (2026-06-05)."
         },
         {
           "name": "docs-to-thinking",
@@ -804,9 +805,9 @@
             "context7/query-docs",
             "thinking/sequentialthinking"
           ],
-          "accomplishes": "Resolve a library name to its Context7 ID, retrieve authoritative docs and code examples, then pass the documentation through sequential thinking to plan an integration, pick the right API, or reason through a technical decision — context7 + thinking two-backend chain.",
+          "accomplishes": "Resolve a library name to its Context7 ID, retrieve authoritative docs and code examples, then pass the documentation through sequential thinking to plan an integration, pick the right API, or reason through a technical decision \u2014 context7 + thinking two-backend chain.",
           "verified": true,
-          "notes": "context7/resolve-library-id and context7/query-docs confirmed via live cast probes. thinking/sequentialthinking confirmed at score 0.8 in reasoning cast (2026-06-04 third pass). Fixed context7/get-library-docs → context7/query-docs (2026-06-05)."
+          "notes": "context7/resolve-library-id and context7/query-docs confirmed via live cast probes. thinking/sequentialthinking confirmed at score 0.8 in reasoning cast (2026-06-04 third pass). Fixed context7/get-library-docs \u2192 context7/query-docs (2026-06-05)."
         },
         {
           "name": "codebase-architecture-report",
@@ -831,6 +832,27 @@
           "accomplishes": "Search RAG evidence for project-specific context, resolve and fetch authoritative library documentation for the relevant tool/framework, save combined research findings to file",
           "verified": true,
           "notes": "All 4 tools confirmed on live connected servers (evidence, context7, fs). Extends existing evidence-library-cross-ref with a file output step. 2026-06-05 fifth-pass verification."
+        },
+        {
+          "name": "search-to-library-docs",
+          "chain": [
+            "fs/search_files",
+            "context7/resolve-library-id",
+            "context7/query-docs"
+          ],
+          "accomplishes": "Search the codebase for files matching a pattern to identify which library is in use, then resolve its canonical context7 ID and fetch current API documentation \u2014 connecting a code scan directly to authoritative library reference.",
+          "verified": true,
+          "notes": "All 3 steps confirmed via live cast probes (2026-06-05): fs/search_files (score 0.67), context7/resolve-library-id (0.67), context7/query-docs (0.75). No Notion dependency \u2014 verified independently of Notion API status."
+        },
+        {
+          "name": "tree-to-architecture-thinking",
+          "chain": [
+            "fs/directory_tree",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Get a full recursive JSON tree view of the project, then use sequential thinking to reason through the architecture \u2014 identifying module boundaries, dependency patterns, and structural concerns.",
+          "verified": true,
+          "notes": "Both steps confirmed via live cast probes (2026-06-05): fs/directory_tree (score 0.50), thinking/sequentialthinking (score 0.55). No Notion dependency \u2014 verified independently of Notion API status."
         }
       ],
       "prompts": [
@@ -901,7 +923,7 @@
       ]
     },
     "communication": {
-      "description": "Cross-channel messaging, notes, team communication, and follow-up task creation. Verified-strong (2026-06-04): notion and thinking connected. chittymac, imessage, and tasks are local MCP servers verified:false (not connected — require local daemon or token config). New verified:true combo: notion-reasoning-summary (notion + thinking).",
+      "description": "Cross-channel messaging, notes, team communication, and follow-up task creation. Verified-strong (2026-06-04): notion and thinking connected. chittymac, imessage, and tasks are local MCP servers verified:false (not connected \u2014 require local daemon or token config). New verified:true combo: notion-reasoning-summary (notion + thinking).",
       "combos": [
         {
           "name": "notion-note-to-task",
@@ -909,7 +931,7 @@
             "notion/API-post-search",
             "tasks/create_task"
           ],
-          "accomplishes": "Search the Notion workspace for a note or meeting page, then create a ChittyAgent task from its action items — turning unstructured notes into tracked, prioritized work items without leaving the chat interface.",
+          "accomplishes": "Search the Notion workspace for a note or meeting page, then create a ChittyAgent task from its action items \u2014 turning unstructured notes into tracked, prioritized work items without leaving the chat interface.",
           "verified": false,
           "notes": "notion/API-post-search verified live. tasks/create_task from apps/tasks-mcp (enabled:false pending token)."
         },
@@ -920,7 +942,7 @@
             "thinking/sequentialthinking",
             "notion/API-post-page"
           ],
-          "accomplishes": "Pull recent messages from an iMessage thread, use sequential-thinking to identify key decisions and action items, then write a summary brief into Notion — turning an async chat thread into a durable structured record.",
+          "accomplishes": "Pull recent messages from an iMessage thread, use sequential-thinking to identify key decisions and action items, then write a summary brief into Notion \u2014 turning an async chat thread into a durable structured record.",
           "verified": false,
           "notes": "imessage not connected (requires local daemon). thinking and notion verified live."
         },
@@ -930,7 +952,7 @@
             "tasks/list_tasks",
             "imessage/send_message"
           ],
-          "accomplishes": "List open ChittyAgent tasks for a context and send a status summary as an iMessage — a pull-and-broadcast pattern for keeping stakeholders updated without a separate notification pipeline.",
+          "accomplishes": "List open ChittyAgent tasks for a context and send a status summary as an iMessage \u2014 a pull-and-broadcast pattern for keeping stakeholders updated without a separate notification pipeline.",
           "verified": false,
           "notes": "tasks from apps/tasks-mcp (enabled:false). imessage not connected. Both are plausible per their source surfaces."
         },
@@ -940,7 +962,7 @@
             "chittymac/send_notification",
             "notion/API-post-page"
           ],
-          "accomplishes": "Send a macOS system notification via ChittyMac and log the event as a timestamped Notion entry — useful for workflow checkpoints where a human must be alerted and the alert itself must be auditable.",
+          "accomplishes": "Send a macOS system notification via ChittyMac and log the event as a timestamped Notion entry \u2014 useful for workflow checkpoints where a human must be alerted and the alert itself must be auditable.",
           "verified": false,
           "notes": "chittymac not connected (requires local ChittyMac daemon). notion/API-post-page verified live."
         },
@@ -951,7 +973,7 @@
             "thinking/sequentialthinking",
             "tasks/create_task"
           ],
-          "accomplishes": "Fetch a Notion meeting-notes page, reason over the content to extract discrete action items, then create a ChittyAgent task for each — automated meeting-to-action-item extraction across docs and task management.",
+          "accomplishes": "Fetch a Notion meeting-notes page, reason over the content to extract discrete action items, then create a ChittyAgent task for each \u2014 automated meeting-to-action-item extraction across docs and task management.",
           "verified": false,
           "notes": "notion/API-retrieve-a-page and thinking/sequentialthinking verified live. tasks/create_task from apps/tasks-mcp (enabled:false)."
         },
@@ -962,7 +984,7 @@
             "imessage/send_message",
             "chittymac/send_notification"
           ],
-          "accomplishes": "Find the relevant Notion page for a project update, send its summary via iMessage to the stakeholders, and fire a macOS notification as a local confirmation — a three-channel broadcast from a single intent.",
+          "accomplishes": "Find the relevant Notion page for a project update, send its summary via iMessage to the stakeholders, and fire a macOS notification as a local confirmation \u2014 a three-channel broadcast from a single intent.",
           "verified": false,
           "notes": "notion/API-post-search verified. imessage and chittymac not connected."
         },
@@ -973,9 +995,9 @@
             "thinking/sequentialthinking",
             "notion/API-post-page"
           ],
-          "accomplishes": "Read a Notion meeting-notes or discussion page, reason over the content with sequential-thinking to extract key decisions, commitments, and open questions, then write a clean summary page — automated meeting distillation using only verified-live backends.",
+          "accomplishes": "Read a Notion meeting-notes or discussion page, reason over the content with sequential-thinking to extract key decisions, commitments, and open questions, then write a clean summary page \u2014 automated meeting distillation using only verified-live backends.",
           "verified": false,
-          "notes": "notion/API-retrieve-a-page, thinking/sequentialthinking, and notion/API-post-page all confirmed connected (2026-06-05). notion reconnected this pass Note: Notion API returning 401 (invalid token) in last recorded run environment — all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
+          "notes": "notion/API-retrieve-a-page, thinking/sequentialthinking, and notion/API-post-page all confirmed connected (2026-06-05). notion reconnected this pass Note: Notion API returning 401 (invalid token) in last recorded run environment \u2014 all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "notion-knowledge-synthesis",
@@ -985,9 +1007,9 @@
             "thinking/sequentialthinking",
             "notion/API-post-page"
           ],
-          "accomplishes": "Search Notion for existing knowledge pages on a topic, retrieve their content, reason about common themes, gaps, and connections, synthesize a new summary page — useful for async team briefs and knowledge consolidation",
+          "accomplishes": "Search Notion for existing knowledge pages on a topic, retrieve their content, reason about common themes, gaps, and connections, synthesize a new summary page \u2014 useful for async team briefs and knowledge consolidation",
           "verified": false,
-          "notes": "All 4 tools confirmed: API-post-search confirmed connected; API-retrieve-a-page in verified notion-reasoning-summary; thinking and API-post-page confirmed. 2026-06-05 fifth-pass verification. Caveat (2026-06-05 fifth-pass env): Notion API returning 401 (invalid token) — tool is registered in connected Notion MCP but write calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
+          "notes": "All 4 tools confirmed: API-post-search confirmed connected; API-retrieve-a-page in verified notion-reasoning-summary; thinking and API-post-page confirmed. 2026-06-05 fifth-pass verification. Caveat (2026-06-05 fifth-pass env): Notion API returning 401 (invalid token) \u2014 tool is registered in connected Notion MCP but write calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "web-capture-to-notion-note",
@@ -996,9 +1018,9 @@
             "playwright/browser_take_screenshot",
             "notion/API-post-page"
           ],
-          "accomplishes": "Navigate to a web resource, capture a screenshot for visual reference, create a Notion note with the screenshot — useful for visual handoffs, async team updates, and capturing state of external tools",
+          "accomplishes": "Navigate to a web resource, capture a screenshot for visual reference, create a Notion note with the screenshot \u2014 useful for visual handoffs, async team updates, and capturing state of external tools",
           "verified": false,
-          "notes": "All 3 tools confirmed on live connected servers (playwright, notion). 2026-06-05 fifth-pass verification. Caveat (2026-06-05 fifth-pass env): Notion API returning 401 (invalid token) — tool is registered in connected Notion MCP but write calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
+          "notes": "All 3 tools confirmed on live connected servers (playwright, notion). 2026-06-05 fifth-pass verification. Caveat (2026-06-05 fifth-pass env): Notion API returning 401 (invalid token) \u2014 tool is registered in connected Notion MCP but write calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         }
       ],
       "prompts": [
@@ -1049,7 +1071,7 @@
       ]
     },
     "ops": {
-      "description": "Deployment, infrastructure monitoring, and DevOps tooling — Cloudflare Workers, database ops, source control, filesystem, and orchestration. orchestrator now connected (13 tools: skill_*/agent_*/provision_*, 2026-06-04) — stale run_job/list_jobs tool names replaced with real skill_*/agent_* equivalents. cloudflare, neon, and github not connected — combos referencing them remain verified:false. New verified:true combos added using orchestrator + fs + thinking.",
+      "description": "Deployment, infrastructure monitoring, and DevOps tooling \u2014 Cloudflare Workers, database ops, source control, filesystem, and orchestration. orchestrator now connected (13 tools: skill_*/agent_*/provision_*, 2026-06-04) \u2014 stale run_job/list_jobs tool names replaced with real skill_*/agent_* equivalents. cloudflare, neon, and github not connected \u2014 combos referencing them remain verified:false. New verified:true combos added using orchestrator + fs + thinking.",
       "combos": [
         {
           "name": "deploy-and-document",
@@ -1057,7 +1079,7 @@
             "cloudflare/deploy_worker",
             "notion/API-post-page"
           ],
-          "accomplishes": "Deploy a Cloudflare Worker to production and immediately create a Notion deployment log page — so every release is timestamped and searchable in the team's workspace.",
+          "accomplishes": "Deploy a Cloudflare Worker to production and immediately create a Notion deployment log page \u2014 so every release is timestamped and searchable in the team's workspace.",
           "verified": false,
           "notes": "cloudflare not connected at generation time. notion/API-post-page verified."
         },
@@ -1078,9 +1100,9 @@
             "orchestrator/skill_search",
             "orchestrator/skill_execute"
           ],
-          "accomplishes": "Search the ChittyAgent skill registry for a database backup skill, then execute it through the orchestrator — dispatching the backup operation via the registered skill. Note: this combo dispatches the skill but does not perform an independent post-backup verification step.",
+          "accomplishes": "Search the ChittyAgent skill registry for a database backup skill, then execute it through the orchestrator \u2014 dispatching the backup operation via the registered skill. Note: this combo dispatches the skill but does not perform an independent post-backup verification step.",
           "verified": true,
-          "notes": "orchestrator connected (2026-06-04). Replaces stale run_job/neon chain. Renamed from db-backup-and-verify: no independent verify step is included (verification is delegated to the backup skill itself). — real API uses skill_search + skill_execute. Pure orchestrator, no external deps."
+          "notes": "orchestrator connected (2026-06-04). Replaces stale run_job/neon chain. Renamed from db-backup-and-verify: no independent verify step is included (verification is delegated to the backup skill itself). \u2014 real API uses skill_search + skill_execute. Pure orchestrator, no external deps."
         },
         {
           "name": "agent-incident-triage",
@@ -1089,9 +1111,9 @@
             "thinking/sequentialthinking",
             "fs/write_file"
           ],
-          "accomplishes": "Enumerate all ChittyAgent agents with their binding status and capabilities, reason over the agent inventory with sequential-thinking to identify gaps or anomalies in agent coverage, and write a structured inventory audit report to a local file — an ops audit of agent registration state, not a real-time health probe.",
+          "accomplishes": "Enumerate all ChittyAgent agents with their binding status and capabilities, reason over the agent inventory with sequential-thinking to identify gaps or anomalies in agent coverage, and write a structured inventory audit report to a local file \u2014 an ops audit of agent registration state, not a real-time health probe.",
           "verified": true,
-          "notes": "orchestrator (agent_list), thinking, and fs — all connected 2026-06-04. Replaces stale list_jobs/github chain. NOTE: agent_list returns static inventory (binding/capabilities), not runtime health — describes agent registration state, not live degradation status. — real API uses agent_list."
+          "notes": "orchestrator (agent_list), thinking, and fs \u2014 all connected 2026-06-04. Replaces stale list_jobs/github chain. NOTE: agent_list returns static inventory (binding/capabilities), not runtime health \u2014 describes agent registration state, not live degradation status. \u2014 real API uses agent_list."
         },
         {
           "name": "pr-to-deploy-pipeline",
@@ -1100,7 +1122,7 @@
             "cloudflare/deploy_worker",
             "notion/API-post-page"
           ],
-          "accomplishes": "List merged pull requests, trigger a Cloudflare Worker deploy for the release, and create a Notion deployment page linking the PR number — a three-backend deploy pipeline from a single cast intent.",
+          "accomplishes": "List merged pull requests, trigger a Cloudflare Worker deploy for the release, and create a Notion deployment page linking the PR number \u2014 a three-backend deploy pipeline from a single cast intent.",
           "verified": false,
           "notes": "github NOT connected (2026-06-04). cloudflare not connected. notion/API-post-page verified."
         },
@@ -1111,9 +1133,9 @@
             "orchestrator/skill_list",
             "fs/write_file"
           ],
-          "accomplishes": "Pull the full ChittyAgent registry: enumerate all agents (binding status, capabilities, domains) and all available skills (triggers, execution type, descriptions) — then write a combined infrastructure health snapshot to a local file. A complete orchestrator registry dump in two API calls.",
+          "accomplishes": "Pull the full ChittyAgent registry: enumerate all agents (binding status, capabilities, domains) and all available skills (triggers, execution type, descriptions) \u2014 then write a combined infrastructure health snapshot to a local file. A complete orchestrator registry dump in two API calls.",
           "verified": true,
-          "notes": "orchestrator (agent_list, skill_list) and fs — all connected 2026-06-04. Replaces stale list_jobs/neon/notion chain. Pure orchestrator+fs."
+          "notes": "orchestrator (agent_list, skill_list) and fs \u2014 all connected 2026-06-04. Replaces stale list_jobs/neon/notion chain. Pure orchestrator+fs."
         },
         {
           "name": "page-content-to-runbook",
@@ -1121,7 +1143,7 @@
             "browser-rendering/get_url_markdown",
             "fs/write_file"
           ],
-          "accomplishes": "Fetch public deployment documentation or runbook pages as clean Markdown and save them to a local file — a pull-and-archive pattern for keeping ops runbooks current without manual copy-paste from browser to editor.",
+          "accomplishes": "Fetch public deployment documentation or runbook pages as clean Markdown and save them to a local file \u2014 a pull-and-archive pattern for keeping ops runbooks current without manual copy-paste from browser to editor.",
           "verified": true,
           "notes": "browser-rendering and fs both connected (2026-06-04). New combo this run. Minimal two-backend ops pattern."
         },
@@ -1132,9 +1154,9 @@
             "fs/search_files",
             "notion/API-post-page"
           ],
-          "accomplishes": "Walk the project directory tree, search for files matching an ops-relevant pattern (e.g. Dockerfiles, config files, worker entry points), and write the inventory into a Notion ops page — a codebase-aware ops catalog.",
+          "accomplishes": "Walk the project directory tree, search for files matching an ops-relevant pattern (e.g. Dockerfiles, config files, worker entry points), and write the inventory into a Notion ops page \u2014 a codebase-aware ops catalog.",
           "verified": false,
-          "notes": "Fixed fs/directory_tree → fs/list_directory (2026-06-05). fs/list_directory, fs/search_files, and notion/API-post-page all confirmed connected Note: Notion API returning 401 (invalid token) in last recorded run environment — all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
+          "notes": "Fixed fs/directory_tree \u2192 fs/list_directory (2026-06-05). fs/list_directory, fs/search_files, and notion/API-post-page all confirmed connected Note: Notion API returning 401 (invalid token) in last recorded run environment \u2014 all notion tool calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "skill-search-and-run",
@@ -1143,9 +1165,9 @@
             "orchestrator/skill_execute",
             "fs/write_file"
           ],
-          "accomplishes": "Discover the most relevant ChittyOS skill for an intent, execute it via the orchestrator, and persist the output to a local file — a complete search-run-record pipeline driven entirely from natural language.",
+          "accomplishes": "Discover the most relevant ChittyOS skill for an intent, execute it via the orchestrator, and persist the output to a local file \u2014 a complete search-run-record pipeline driven entirely from natural language.",
           "verified": true,
-          "notes": "orchestrator (skill_search, skill_execute) and fs (write_file) — all connected 2026-06-04."
+          "notes": "orchestrator (skill_search, skill_execute) and fs (write_file) \u2014 all connected 2026-06-04."
         },
         {
           "name": "agent-inventory-to-file",
@@ -1155,7 +1177,7 @@
           ],
           "accomplishes": "List all agents in the ChittyAgent ecosystem with their binding status, capabilities, and tool counts, then write the inventory to a local file for offline ops review or change-detection tracking.",
           "verified": true,
-          "notes": "orchestrator (agent_list) and fs — both connected 2026-06-04. Simplest orchestrator+fs combo."
+          "notes": "orchestrator (agent_list) and fs \u2014 both connected 2026-06-04. Simplest orchestrator+fs combo."
         },
         {
           "name": "page-to-runbook-via-thinking",
@@ -1164,7 +1186,7 @@
             "thinking/sequentialthinking",
             "fs/write_file"
           ],
-          "accomplishes": "Fetch any URL as clean markdown (status page, incident post-mortem, deployment guide), reason through the ops implications with sequential thinking, then write the resulting runbook or action plan to a file — browser-rendering + thinking + fs three-backend chain.",
+          "accomplishes": "Fetch any URL as clean markdown (status page, incident post-mortem, deployment guide), reason through the ops implications with sequential thinking, then write the resulting runbook or action plan to a file \u2014 browser-rendering + thinking + fs three-backend chain.",
           "verified": true,
           "notes": "browser-rendering/get_url_markdown confirmed from existing verified combo page-to-markdown-archive. thinking/sequentialthinking and fs/write_file confirmed connected (2026-06-04 third pass)."
         },
@@ -1178,7 +1200,27 @@
           ],
           "accomplishes": "Discover provision candidates for a session, evaluate and score them, bind the best fit, then document the provisioning decision and rationale in a Notion page",
           "verified": false,
-          "notes": "All 4 tools confirmed: provision_candidates/evaluate/bind from existing verified combos; notion/API-post-page confirmed. 2026-06-05 fifth-pass verification. Caveat (2026-06-05 fifth-pass env): Notion API returning 401 (invalid token) — tool is registered in connected Notion MCP but write calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
+          "notes": "All 4 tools confirmed: provision_candidates/evaluate/bind from existing verified combos; notion/API-post-page confirmed. 2026-06-05 fifth-pass verification. Caveat (2026-06-05 fifth-pass env): Notion API returning 401 (invalid token) \u2014 tool is registered in connected Notion MCP but write calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
+        },
+        {
+          "name": "config-search-to-ops-analysis",
+          "chain": [
+            "fs/search_files",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Recursively search for configuration, deployment, or infrastructure files matching a pattern, then use sequential thinking to analyze the operational surface \u2014 identifying risks, dependencies, and runbook-relevant patterns.",
+          "verified": true,
+          "notes": "Both steps confirmed via live cast probes (2026-06-05): fs/search_files (score 0.67), thinking/sequentialthinking (score 0.55). No Notion dependency \u2014 verified independently of Notion API status."
+        },
+        {
+          "name": "project-tree-to-ops-reasoning",
+          "chain": [
+            "fs/directory_tree",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Inventory the full project directory tree as a recursive JSON structure, then reason through it from an operations lens \u2014 surfaces which directories hold sensitive configs, where build artifacts live, and what the deployment surface looks like.",
+          "verified": true,
+          "notes": "Both steps confirmed via live cast probes (2026-06-05): fs/directory_tree (score 0.50), thinking/sequentialthinking (score 0.55). Same backends as tree-to-architecture-thinking but ops focus context \u2014 deployment/risk reasoning vs. architectural design. No Notion dependency."
         }
       ],
       "prompts": [
