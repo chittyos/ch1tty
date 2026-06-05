@@ -1,8 +1,8 @@
 {
-  "_comment": "Alchemist-surfaced suggestions catalog \u2014 cross-backend tool combos and pre-written /cast prompts, grouped by all six focus profiles from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain was confirmed on a connected server at the time that specific combo was written/verified; connectivity changes since then are noted in per-combo notes. `verified:false` means the chain references at least one config-present-but-not-connected server. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only \u2014 no loader, no public tool beyond the existing 5. Updated 2026-05-30 to add code, communication, and ops focus profiles (PRs #71, #72, #80). Updated 2026-06-03 to add Linear MCP (linear) to code and governance profiles. Updated 2026-06-04: re-enumerated connected server set. Updated 2026-06-05: notion reconnected; fixed tool names; 13 combos newly verified (31/65 total). Updated 2026-06-05 fifth-pass: +11 combos (76 total); Notion combos verified:false (401). Updated 2026-06-05 seventh-pass: +4 combos (84 total, 30 verified). Updated 2026-06-05 eighth-pass: +2 ops cloudflare-builds combos (86 total, 30 verified). Updated 2026-06-05 ninth-pass: +8 combos covering cloudflare-builds chains, linear workflows, a11y audit, and codebase+evidence governance (94 total, 30 verified).",
+  "_comment": "Alchemist-surfaced suggestions catalog \u2014 cross-backend tool combos and pre-written /cast prompts, grouped by all six focus profiles from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain was confirmed on a connected server at the time that specific combo was written/verified; connectivity changes since then are noted in per-combo notes. `verified:false` means the chain references at least one config-present-but-not-connected server. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only \u2014 no loader, no public tool beyond the existing 5. Updated 2026-05-30 to add code, communication, and ops focus profiles (PRs #71, #72, #80). Updated 2026-06-03 to add Linear MCP (linear) to code and governance profiles. Updated 2026-06-04: re-enumerated connected server set. Updated 2026-06-05: notion reconnected; fixed tool names; 13 combos newly verified (31/65 total). Updated 2026-06-05 fifth-pass: +11 combos (76 total); Notion combos verified:false (401). Updated 2026-06-05 seventh-pass: +4 combos (84 total, 30 verified). Updated 2026-06-05 eighth-pass: +2 ops cloudflare-builds combos (86 total, 30 verified). Updated 2026-06-05 ninth-pass: +8 combos covering cloudflare-builds chains, linear workflows, a11y audit, and codebase+evidence governance (94 total, 30 verified). Updated 2026-06-05 eleventh-pass: +3 combos, +2 verifications (99 total, 35 verified) using evidence, browser-rendering, orchestrator backends.",
   "generatedFrom": {
     "gateway": "ch1tty",
-    "version": "10th-pass",
+    "version": "11th-pass",
     "method": "live-gateway-enumeration + cast-probe-driven combo discovery",
     "connectedServers": [
       "orchestrator",
@@ -32,7 +32,7 @@
       "linear"
     ],
     "updatedAt": "2026-06-05",
-    "connectedServerNote": "2026-06-05 tenth-pass: +2 combos +1 verification (96 total, 33 verified). Verified a11y-audit-to-file (design \u2014 was added unverified in 9th-pass); added library-docs-to-file (code \u2014 context7\u2192thinking\u2192fs/write, new research-to-file pattern); added web-snapshot-report (communication \u2014 playwright\u2192snapshot\u2192thinking\u2192fs/write, extends web-comm-snapshot-analysis with output). All 3 new/updated combos verified via cast probes on live connected servers (playwright, context7, thinking, fs). Previously: 9th-pass +8 combos (94 total, 30 verified) \u2014 all unverified (auth-gated backends). Remaining unverified (63): Notion 401 (NOTION_TOKEN via op://ChittyOS-Integrations/notion/api_token) + auth-gated backends (stripe/neon/cloudflare/github/linear/cloudflare-builds/evidence/browser-rendering/orchestrator).",
+    "connectedServerNote": "2026-06-05 eleventh-pass: +3 combos +2 verifications (99 total, 38 verified). Verified financial-page-brief (finance) and codebase-evidence-governance-audit (governance) \u2014 both are fully local/connected-only chains. Added 3 new verified cross-backend combos: rag-aware-governance-report (evidence x2+thinking+fs), capability-landscape-report (orchestrator agent+skill search+thinking+fs), web-evidence-cross-reference (browser-rendering+evidence+thinking+fs). Evidence backend newly confirmed live (evidence/search: 1.3, evidence/ai_search: 1.3, evidence/list_rags: 1.05); browser-rendering live (get_url_markdown: 0.6, get_url_html_content: 0.6); orchestrator live (skill_search: 0.75, agent_search: 0.75). Notion still 401 (39 combos blocked). Previous: 10th-pass +2 combos +1 verification (96 total, 33 verified).",
     "date": "2026-06-05"
   },
   "profiles": {
@@ -153,8 +153,8 @@
             "fs/write_file"
           ],
           "accomplishes": "Fetch a financial report page, dashboard, or investor doc as clean markdown via the browser-rendering service, reason over key data points, anomalies, and trends with sequential-thinking, then write a finance brief to a local file \u2014 useful for quickly digesting external financial data without manual extraction.",
-          "verified": false,
-          "notes": "browser-rendering not connected in container (auth-gated). thinking and fs accessible. Complements the finance profile's local-doc combos with a web-fetch variant that pulls external financial pages."
+          "verified": true,
+          "notes": "All 3 tools confirmed on live connected servers. 2026-06-05 eleventh-pass cast probes: browser-rendering/get_url_markdown (0.6 as alternative), thinking/sequentialthinking (1.18), fs/write_file (0.83). browser-rendering confirmed connected (toolCount: 3). Extends page-to-markdown-archive (ends at fs/write_file) with reasoning step. No auth-gated backends required."
         }
       ],
       "prompts": [
@@ -438,8 +438,32 @@
             "fs/write_file"
           ],
           "accomplishes": "Survey the local codebase structure, read key config and architecture files, search the evidence corpus for relevant governance policies or prior audits, reason over compliance gaps between what the code does and what policy requires, then write a governance audit report \u2014 binding local codebase state to the external evidence/policy corpus.",
-          "verified": false,
-          "notes": "evidence (autorag.mcp.cloudflare.com) not connected in container (auth-gated). fs and thinking accessible. Strongest new cross-backend governance combo: codebase read + external evidence search + reasoning."
+          "verified": true,
+          "notes": "All 5 tools confirmed on live connected servers. 2026-06-05 eleventh-pass cast probes: fs/list_directory, fs/read_text_file (fs server: toolCount 14), evidence/ai_search (1.3), thinking/sequentialthinking (1.18), fs/write_file (0.83). evidence backend confirmed connected (toolCount: 3). 5-tool cross-domain chain: codebase survey then evidence context then reasoning then output. No auth-gated backends required."
+        },
+        {
+          "name": "rag-aware-governance-report",
+          "chain": [
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "List all available AutoRAG vector stores to discover relevant knowledge bases, run an AI-powered semantic search across the most relevant one, reason over the findings with sequential thinking to surface governance insights, then write a structured evidence-backed report to a local file.",
+          "verified": true,
+          "notes": "All 4 tools confirmed on live connected servers. 2026-06-05 eleventh-pass cast probes: evidence/list_rags (1.05), evidence/ai_search (1.3), thinking/sequentialthinking (1.18), fs/write_file (0.83). Extends rag-survey-to-file (list_rags then write) with deep search and reasoning. No auth-gated backends required."
+        },
+        {
+          "name": "capability-landscape-report",
+          "chain": [
+            "orchestrator/agent_search",
+            "orchestrator/skill_search",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search the ChittyOS agent registry by capability or domain to discover which agents are available, then search the skill registry for related skills and triggers, reason over the combined capability landscape with sequential thinking to identify coverage gaps or redundancies, then write a structured capability audit to a local file.",
+          "verified": true,
+          "notes": "All 4 tools confirmed on live connected servers. 2026-06-05 eleventh-pass cast probes: orchestrator/agent_search (0.75), orchestrator/skill_search (0.75), thinking/sequentialthinking (1.18), fs/write_file (0.83). orchestrator backend confirmed connected (toolCount: 13). Cross-backend: orchestrator plus thinking plus fs. No auth-gated backends required."
         }
       ],
       "prompts": [
@@ -970,6 +994,18 @@
           "accomplishes": "Resolve a library or framework name to its context7 library ID, query current documentation and code examples, reason over the relevant API surface and design patterns with sequential thinking, then write a structured technical summary to a local file \u2014 turning on-demand library research into a persistent, queryable reference.",
           "verified": true,
           "notes": "All 4 tools confirmed on live connected servers. 2026-06-05 tenth-pass cast probes: context7/resolve-library-id (1.10), context7/query-docs (0.90 as alternative), thinking/sequentialthinking (1.18), fs/write_file (0.83 as alternative). Extends search-to-library-docs (ends at query-docs) with reasoning + file output. context7 available via npx (lazy spawn, no auth required). No auth-gated backends required."
+        },
+        {
+          "name": "web-evidence-cross-reference",
+          "chain": [
+            "browser-rendering/get_url_html_content",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Fetch the full HTML content of a web page via Cloudflare browser rendering, run an AI-powered semantic search against the evidence base to find related documents and prior research, reason over the combined web context and evidence with sequential thinking to surface insights or gaps, then write a structured cross-reference report to a local file.",
+          "verified": true,
+          "notes": "All 4 tools confirmed on live connected servers. 2026-06-05 eleventh-pass cast probes: browser-rendering/get_url_html_content (0.6), evidence/ai_search (1.3), thinking/sequentialthinking (1.18), fs/write_file (0.83). Cross-domain: browser-rendering plus evidence plus thinking plus fs, 4 distinct backends. No auth-gated backends required."
         }
       ],
       "prompts": [
