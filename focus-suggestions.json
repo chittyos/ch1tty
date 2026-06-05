@@ -1,8 +1,8 @@
 {
-  "_comment": "Alchemist-surfaced suggestions catalog \u2014 cross-backend tool combos and pre-written /cast prompts, grouped by all six focus profiles from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain was confirmed on a connected server at the time that specific combo was written/verified; connectivity changes since then are noted in per-combo notes. `verified:false` means the chain references at least one config-present-but-not-connected server. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only \u2014 no loader, no public tool beyond the existing 5. Updated 2026-05-30 to add code, communication, and ops focus profiles (PRs #71, #72, #80). Updated 2026-06-03 to add Linear MCP (linear) to code and governance profiles. Updated 2026-06-04: re-enumerated connected server set. Updated 2026-06-05: notion reconnected; fixed tool names; 13 combos newly verified (31/65 total). Updated 2026-06-05 fifth-pass: +11 combos (76 total); Notion combos verified:false (401). Updated 2026-06-05 seventh-pass: +4 combos (84 total, 30 verified). Updated 2026-06-05 eighth-pass: +2 ops cloudflare-builds combos (86 total, 30 verified). Updated 2026-06-05 ninth-pass: +8 combos covering cloudflare-builds chains, linear workflows, a11y audit, and codebase+evidence governance (94 total, 30 verified). Updated 2026-06-05 eleventh-pass: +3 combos, +5 verifications (99 total, 38 verified) using evidence, browser-rendering, orchestrator backends. Updated 2026-06-05 twelfth-pass: +4 verified combos (103 total, 42 verified) \u2014 evidence+orchestrator and playwright+evidence NEW pairings. Updated 2026-06-05 thirteenth-pass: +6 verified combos (109 total, 48 verified) \u2014 skill-landscape, specialist-fork, skill-category-deep-dive (ops) + repo-size-profile, library-to-skill-integration-guide, size-aware-architecture (code); first use of orchestrator/provision_fork + fs/list_directory_with_sizes in combos.",
+  "_comment": "Alchemist-surfaced suggestions catalog \u2014 cross-backend tool combos and pre-written /cast prompts, grouped by all six focus profiles from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain was confirmed on a connected server at the time that specific combo was written/verified; connectivity changes since then are noted in per-combo notes. `verified:false` means the chain references at least one config-present-but-not-connected server. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only \u2014 no loader, no public tool beyond the existing 5. Updated 2026-05-30 to add code, communication, and ops focus profiles (PRs #71, #72, #80). Updated 2026-06-03 to add Linear MCP (linear) to code and governance profiles. Updated 2026-06-04: re-enumerated connected server set. Updated 2026-06-05: notion reconnected; fixed tool names; 13 combos newly verified (31/65 total). Updated 2026-06-05 fifth-pass: +11 combos (76 total); Notion combos verified:false (401). Updated 2026-06-05 seventh-pass: +4 combos (84 total, 30 verified). Updated 2026-06-05 eighth-pass: +2 ops cloudflare-builds combos (86 total, 30 verified). Updated 2026-06-05 ninth-pass: +8 combos covering cloudflare-builds chains, linear workflows, a11y audit, and codebase+evidence governance (94 total, 30 verified). Updated 2026-06-05 eleventh-pass: +3 combos, +5 verifications (99 total, 38 verified) using evidence, browser-rendering, orchestrator backends. Updated 2026-06-05 twelfth-pass: +4 verified combos (103 total, 42 verified) \u2014 evidence+orchestrator and playwright+evidence NEW pairings. Updated 2026-06-05 thirteenth-pass: +6 verified combos (109 total, 48 verified) \u2014 skill-landscape, specialist-fork, skill-category-deep-dive (ops) + repo-size-profile, library-to-skill-integration-guide, size-aware-architecture (code); first use of orchestrator/provision_fork + fs/list_directory_with_sizes in combos. Updated 2026-06-05 fourteenth-pass: +6 verified combos (115 total, 54 verified) \u2014 code-file-quality-analysis, library-search-to-reasoning (code); page-screenshot-design-analysis, interactive-design-flow-analysis (design); web-comm-html-brief (communication); financial-page-screenshot-analysis (finance); first use of browser-rendering/get_url_screenshot in design and finance, first use of playwright/browser_click in catalog.",
   "generatedFrom": {
     "gateway": "ch1tty",
-    "version": "13th-pass",
+    "version": "14th-pass",
     "method": "live-gateway-enumeration + cast-probe-driven combo discovery",
     "connectedServers": [
       "orchestrator",
@@ -32,7 +32,7 @@
       "linear"
     ],
     "updatedAt": "2026-06-05",
-    "connectedServerNote": "2026-06-05 twelfth-pass: +4 verified combos (103 total, 42 verified). Added evidence-skill-discovery (evidence/ai_search + orchestrator/skill_search + thinking + fs \u2014 NEW evidence+orchestrator pairing); playwright-evidence-overlay (playwright/browser_navigate + playwright/browser_snapshot + evidence/ai_search + fs \u2014 NEW playwright+evidence pairing); full-provision-audit (orchestrator/provision_candidates + provision_evaluate + provision_bind + fs/write_file \u2014 extends provision-evaluate-and-bind with file output); orchestrator-evidence-landscape (orchestrator/agent_list + evidence/ai_search + thinking + fs/write_file \u2014 NEW orchestrator-agent+evidence pairing). Confirmed live this session: cast probes evidence/ai_search (0.8), orchestrator/skill_list (1.13), orchestrator/agent_list (0.97), playwright/browser_navigate (1.05), playwright/browser_snapshot (0.78), thinking (1.18), fs/write_file (0.83). Notion still 401 (39 combos blocked). Previous: eleventh-pass +3 combos +5 verifications (99 total, 38 verified).",
+    "connectedServerNote": "2026-06-05 fourteenth-pass: +6 verified combos (115 total, 54 verified). Added code-file-quality-analysis (fs/search_files + fs/read_text_file + thinking + fs/write_file), library-search-to-reasoning (fs/search_files + context7/resolve-library-id + context7/query-docs + thinking); page-screenshot-design-analysis (browser-rendering/get_url_screenshot + thinking + fs/write_file \u2014 first get_url_screenshot in design), interactive-design-flow-analysis (playwright/browser_navigate + playwright/browser_click + playwright/browser_take_screenshot + thinking \u2014 FIRST browser_click in catalog); web-comm-html-brief (browser-rendering/get_url_html_content + thinking + fs/write_file \u2014 first get_url_html_content in communication); financial-page-screenshot-analysis (browser-rendering/get_url_screenshot + thinking + fs/write_file). Confirmed live this session: fs/search_files (0.42), fs/read_text_file (0.36), fs/move_file (0.42), browser-rendering/get_url_screenshot (0.33), browser-rendering/get_url_html_content (0.20), playwright/browser_click (0.30), thinking/sequentialthinking, context7/resolve-library-id (0.50). Notion still 401 (39 combos blocked). Remaining unverified: auth-gated backends (stripe/linear/cloudflare/github/neon/cloudflare-builds ~17 combos) + disabled apps (tasks/ledger/session/chittyevidence ~8 combos).",
     "date": "2026-06-05"
   },
   "profiles": {
@@ -155,6 +155,17 @@
           "accomplishes": "Fetch a financial report page, dashboard, or investor doc as clean markdown via the browser-rendering service, reason over key data points, anomalies, and trends with sequential-thinking, then write a finance brief to a local file \u2014 useful for quickly digesting external financial data without manual extraction.",
           "verified": true,
           "notes": "All 3 tools confirmed on live connected servers. 2026-06-05 eleventh-pass cast probes: browser-rendering/get_url_markdown (0.6 as alternative), thinking/sequentialthinking (1.18), fs/write_file (0.83). browser-rendering confirmed connected (toolCount: 3). Extends page-to-markdown-archive (ends at fs/write_file) with reasoning step. No auth-gated backends required."
+        },
+        {
+          "name": "financial-page-screenshot-analysis",
+          "chain": [
+            "browser-rendering/get_url_screenshot",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Capture a screenshot of a financial dashboard or reporting page, analyze the visible financial indicators and chart data with reasoning, write a financial snapshot \u2014 captures visual dashboard state vs existing financial-page-brief which fetches as markdown.",
+          "verified": true,
+          "notes": "All 3 tools confirmed 2026-06-05: browser-rendering/get_url_screenshot (0.33), thinking/sequentialthinking (0.40), fs/write_file (confirmed). Novel: uses screenshot (visual) vs existing financial-page-brief which uses get_url_markdown."
         }
       ],
       "prompts": [
@@ -201,6 +212,10 @@
         {
           "text": "Find all invoice exports in this directory and synthesize a cross-period financial summary",
           "resolves_to": "multi-finance-doc-synthesis"
+        },
+        {
+          "text": "Screenshot this financial dashboard and analyze the visible metrics",
+          "resolves_to": "financial-page-screenshot-analysis"
         }
       ]
     },
@@ -741,6 +756,29 @@
           "accomplishes": "Navigate to a target page with Playwright, capture its full accessibility snapshot (ARIA roles, labels, interactive elements), reason over WCAG 2.1 compliance gaps and severity levels with sequential-thinking, then write a structured a11y audit report to a local file.",
           "verified": true,
           "notes": "All 4 tools confirmed on live connected servers. 2026-06-05 tenth-pass cast probes: playwright/browser_navigate (1.05), playwright/browser_snapshot (0.78 \u2014 resolves directly), thinking/sequentialthinking (1.18), fs/write_file (0.83 as alternative for write intent). Extends a11y-snapshot-to-notion-audit (same first two steps) with reasoning + file output instead of Notion. playwright available via npx (lazy spawn, no auth required)."
+        },
+        {
+          "name": "page-screenshot-design-analysis",
+          "chain": [
+            "browser-rendering/get_url_screenshot",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Get a page screenshot via browser-rendering's screenshot tool, analyze visual design elements and hierarchy with reasoning, write a design assessment report \u2014 complements existing page-html-analysis-to-file by using the visual/screenshot surface rather than HTML markup.",
+          "verified": true,
+          "notes": "All 3 tools confirmed 2026-06-05: browser-rendering/get_url_screenshot (0.33), thinking/sequentialthinking (0.44), fs/write_file (0.30). Novel: first use of browser-rendering/get_url_screenshot in design profile."
+        },
+        {
+          "name": "interactive-design-flow-analysis",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_click",
+            "playwright/browser_take_screenshot",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Navigate to a page, click an interactive element, capture the resulting state as a screenshot, then reason about the interaction design quality \u2014 the first catalog chain to include playwright/browser_click, enabling interactive UX testing.",
+          "verified": true,
+          "notes": "All 4 tools confirmed 2026-06-05: playwright/browser_navigate (1.05), playwright/browser_click (0.30), playwright/browser_take_screenshot (0.29), thinking/sequentialthinking (confirmed). Novel: first browser_click usage in catalog."
         }
       ],
       "prompts": [
@@ -799,6 +837,14 @@
         {
           "text": "Fetch the HTML of this page, analyse the DOM structure, and save the analysis to a file",
           "resolves_to": "page-html-analysis-to-file"
+        },
+        {
+          "text": "Screenshot this page and analyze its visual design hierarchy",
+          "resolves_to": "page-screenshot-design-analysis"
+        },
+        {
+          "text": "Navigate to this page, click the signup button, and analyze the interaction flow",
+          "resolves_to": "interactive-design-flow-analysis"
         }
       ]
     },
@@ -1072,6 +1118,30 @@
           "accomplishes": "Survey directory sizes to identify heavy modules and storage hot-spots, then get recursive tree structure for full architectural context, reason about bloat, refactor priorities, and dependency weight \u2014 size-aware complement to tree-to-architecture-thinking",
           "verified": true,
           "notes": "fs/list_directory_with_sizes and fs/directory_tree both confirmed live via cast (score 0.66) 2026-06-05; thinking confirmed live; distinct from tree-to-architecture-thinking by leading with size data before tree"
+        },
+        {
+          "name": "code-file-quality-analysis",
+          "chain": [
+            "fs/search_files",
+            "fs/read_text_file",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search source files by pattern, read a key file, analyze code quality patterns with sequential reasoning, then write a findings report \u2014 a 4-step chain that adds targeted file read and written output to the existing search\u2192think pattern.",
+          "verified": true,
+          "notes": "All 4 tools confirmed 2026-06-05: fs/search_files (0.42), fs/read_text_file (0.36), thinking/sequentialthinking, fs/write_file (0.30). Novel: 4-step chain not in catalog; adds file read + output vs existing 2-step search\u2192think."
+        },
+        {
+          "name": "library-search-to-reasoning",
+          "chain": [
+            "fs/search_files",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Search codebase for library import patterns, resolve the library in context7, fetch current documentation, then reason about upgrade paths or usage best practices \u2014 extends the existing search-to-library-docs chain with a reasoning step.",
+          "verified": true,
+          "notes": "All 4 tools confirmed 2026-06-05: fs/search_files (0.42), context7/resolve-library-id (0.50), context7/query-docs (confirmed), thinking/sequentialthinking (confirmed). Novel: adds reasoning over existing search-to-library-docs 3-step chain."
         }
       ],
       "prompts": [
@@ -1150,6 +1220,14 @@
         {
           "text": "Show me the sizes of all directories in this repo, then get the full tree structure, and reason about which parts are architecturally bloated",
           "resolves_to": "size-aware-architecture-analysis"
+        },
+        {
+          "text": "Search for TypeScript files in this codebase, read a key one, analyze its quality, and write a report",
+          "resolves_to": "code-file-quality-analysis"
+        },
+        {
+          "text": "Find where React is used in this codebase, look up its current documentation, and reason about upgrade considerations",
+          "resolves_to": "library-search-to-reasoning"
         }
       ]
     },
@@ -1286,6 +1364,17 @@
           "accomplishes": "Navigate to a web-based communication or collaboration tool, capture a structured accessibility snapshot (ARIA roles, thread counts, message previews), reason over communication state and priority action items, then write a summary report to a local file \u2014 persisting the analysis for async review or as a daily digest artifact.",
           "verified": true,
           "notes": "All 4 tools confirmed on live connected servers. 2026-06-05 tenth-pass cast probes: playwright/browser_navigate (1.05), playwright/browser_snapshot (0.78), thinking/sequentialthinking (1.18), fs/write_file (0.83 as alternative). Extends web-comm-snapshot-analysis (ends at thinking) with file output step. playwright available via npx (lazy spawn, no auth required). No auth-gated backends required."
+        },
+        {
+          "name": "web-comm-html-brief",
+          "chain": [
+            "browser-rendering/get_url_html_content",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Fetch a communication platform page's raw HTML, extract communication channel patterns and key feature structures with reasoning, write a structured platform analysis brief \u2014 uses HTML content for richer structural analysis vs markdown or screenshot.",
+          "verified": true,
+          "notes": "All 3 tools confirmed 2026-06-05: browser-rendering/get_url_html_content (0.20 as alternative), thinking/sequentialthinking (confirmed), fs/write_file (confirmed). Novel: first browser-rendering/get_url_html_content in communication profile."
         }
       ],
       "prompts": [
@@ -1340,6 +1429,10 @@
         {
           "text": "Navigate to my email and capture a structured snapshot of my inbox state",
           "resolves_to": "web-comm-snapshot-analysis"
+        },
+        {
+          "text": "Fetch the HTML of this communication platform page and analyze its structure",
+          "resolves_to": "web-comm-html-brief"
         }
       ]
     },
