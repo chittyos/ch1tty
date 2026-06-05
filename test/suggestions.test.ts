@@ -136,7 +136,7 @@ describe('cast plan includes suggestions', () => {
     fixture.defineServer('context7', {
       tools: [
         {
-          name: 'get-library-docs',
+          name: 'query-docs',
           description: 'get library documentation for a package',
           inputSchema: {},
           response: { content: [{ type: 'text', text: 'docs result' }] },
@@ -164,7 +164,7 @@ describe('cast plan includes suggestions', () => {
           code: {
             description: 'code suggestions',
             combos: [
-              { name: 'test-combo', chain: ['context7/get-library-docs', 'neon/run_sql'], accomplishes: 'test', verified: false },
+              { name: 'test-combo', chain: ['context7/query-docs', 'neon/run_sql'], accomplishes: 'test', verified: false },
             ],
             prompts: [
               { text: 'Look up library docs', resolves_to: 'test-combo' },
@@ -202,7 +202,7 @@ describe('cast plan includes suggestions', () => {
     fixture.defineServer('context7', {
       tools: [
         {
-          name: 'get-library-docs',
+          name: 'query-docs',
           description: 'get library documentation for a package',
           inputSchema: {},
           response: { content: [{ type: 'text', text: 'docs result' }] },
@@ -219,7 +219,7 @@ describe('cast plan includes suggestions', () => {
           code: {
             description: 'code suggestions',
             combos: [
-              { name: 'test-combo', chain: ['context7/get-library-docs', 'neon/run_sql'], accomplishes: 'test', verified: false },
+              { name: 'test-combo', chain: ['context7/query-docs', 'neon/run_sql'], accomplishes: 'test', verified: false },
             ],
             prompts: [{ text: 'Look up library docs', resolves_to: 'test-combo' }],
           },
@@ -250,7 +250,7 @@ describe('cast plan includes suggestions', () => {
     fixture.defineServer('context7', {
       tools: [
         {
-          name: 'get-library-docs',
+          name: 'query-docs',
           description: 'get library documentation for a package',
           inputSchema: {},
           response: { content: [{ type: 'text', text: 'docs result' }] },
@@ -298,7 +298,7 @@ describe('cast executed includes suggestions', () => {
     fixture.defineServer('context7', {
       tools: [
         {
-          name: 'get-library-docs',
+          name: 'query-docs',
           description: 'get library documentation for a package',
           inputSchema: {},
           response: { content: [{ type: 'text', text: 'docs result' }] },
@@ -320,7 +320,7 @@ describe('cast executed includes suggestions', () => {
           code: {
             description: 'code suggestions',
             combos: [
-              { name: 'exec-combo', chain: ['context7/get-library-docs', 'neon/run_sql'], accomplishes: 'exec test', verified: false },
+              { name: 'exec-combo', chain: ['context7/query-docs', 'neon/run_sql'], accomplishes: 'exec test', verified: false },
             ],
             prompts: [
               { text: 'Search library docs', resolves_to: 'exec-combo' },
@@ -357,7 +357,7 @@ describe('cast executed includes suggestions', () => {
     fixture.defineServer('context7', {
       tools: [
         {
-          name: 'get-library-docs',
+          name: 'query-docs',
           description: 'get library documentation for a package',
           inputSchema: {},
           response: { content: [{ type: 'text', text: 'docs result' }] },
@@ -373,7 +373,7 @@ describe('cast executed includes suggestions', () => {
         suggestionsCatalog: {
           code: {
             description: 'code suggestions',
-            combos: [{ name: 'exec-combo', chain: ['context7/get-library-docs'], accomplishes: 'test', verified: false }],
+            combos: [{ name: 'exec-combo', chain: ['context7/query-docs'], accomplishes: 'test', verified: false }],
             prompts: [{ text: 'Search library docs', resolves_to: 'exec-combo' }],
           },
         },
@@ -402,7 +402,7 @@ describe('cast executed includes suggestions', () => {
     fixture.defineServer('context7', {
       tools: [
         {
-          name: 'get-library-docs',
+          name: 'query-docs',
           description: 'get library documentation for a package',
           inputSchema: {},
           response: { content: [{ type: 'text', text: 'docs result' }] },

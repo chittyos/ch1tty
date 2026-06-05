@@ -509,15 +509,15 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
   context7: {
     tools: [
       {
-        name: 'get-library-docs',
+        name: 'query-docs',
         description: 'Get library documentation and code examples for a package by library ID',
         inputSchema: {
           type: 'object',
           properties: {
             libraryId: { type: 'string' },
-            topic: { type: 'string' },
+            query: { type: 'string' },
           },
-          required: ['libraryId'],
+          required: ['libraryId', 'query'],
         },
         response: text(JSON.stringify({
           libraryId: '/modelcontextprotocol/typescript-sdk',
