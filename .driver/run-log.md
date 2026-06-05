@@ -336,3 +336,35 @@
 - **Next run**: Merge PR#209 if CI green. All remaining 61 unverified are auth-gated. For a 22nd pass, novel entry points remain: autobot agent (no skills matching "autobot" at high relevance yet), helper agent (architectural-navigation), market/registry agents. Human auth actions still needed:
   1. `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` — unblocks 39 notion combos
   2. Stripe/Neon/Cloudflare/GitHub/Linear tokens — unblocks remaining 22 combos
+
+### 2026-06-05T22:15Z — 22nd-pass run
+
+**What happened this run:**
+- Startup: `npm ci` clean, `npm run build` clean (0 errors), `npm test` → 938 pass / 0 fail / 2 skip ✓
+- Fetched all branches. No open PRs at start of run — PR#209 (21st-pass) already merged. main at `bbe86b6` (159 combos, 98 verified).
+- Pulled main. Read run-log — all workstreams A–E confirmed done; 22nd-pass recommended for novel agents: registry, canon, market, helper.
+- Notion MCP: still 401 (token still invalid). orchestrator: connected (toolCount: 13), evidence: connected, fs/thinking/context7 available.
+- Probed live backends for 22nd-pass novel chains:
+  - `orchestrator/agent_search("registry directory certified services catalog read-only")` → chittyagent-registry (0.7, service-catalog + tool-registry + read-only-directory, **bound**) ✓ — FIRST use in catalog
+  - `orchestrator/agent_search("canon canonicalization URI document lifecycle validate ontology")` → chittyagent-canon (0.7, uri-validation + document-lifecycle + jcs-canonicalization + ontology, **bound**) ✓ — FIRST use in catalog
+  - `orchestrator/agent_search("market artifact plugin install publish lifecycle")` → chittyagent-market (0.7, artifact-management + marketplace + plugin-install + plugin-publish, **bound**) ✓ — FIRST use in catalog
+  - `orchestrator/agent_search("helper architectural navigation service discovery intent classification")` → chittyagent-helper (0.7, service-discovery + architectural-navigation + intent-classification, **bound**) ✓ — FIRST use in catalog
+  - `orchestrator/skill_search("registry chitty-register manage service registry")` → chittyos-devops:chitty-register (0.8 relevance) ✓ — FIRST use in catalog
+  - `orchestrator/skill_search("compliance audit scaffold certify monitor services")` → chittyos-devops:chittyos-compliance (0.8 relevance) ✓ — also confirmed 'workflow:market' (0.8)
+  - `orchestrator/agent_list` → 28 real agents confirmed ✓. `evidence/list_rags` → 3 RAGs confirmed ✓. `evidence/ai_search` → live data confirmed ✓. `thinking`, `context7`, `fs` all confirmed ✓.
+  - Also discovered novel agents not yet used: scrape (0.4, browser automation job queue, bound), dispute (0.36, multi-domain lifecycle, bound), storage (unbound), ship (unbound)
+- Added 7 new `verified:true` combos (22nd-pass):
+  - **governance/registry-catalog-evidence-brief**: FIRST use of registry agent — agent_search(registry) → agent_list → evidence/ai_search → thinking → write_file
+  - **governance/canon-uri-evidence-governance**: FIRST use of canon agent — agent_search(canon) → list_rags → ai_search → thinking → write_file
+  - **governance/triple-agent-ecosystem-topology**: FIRST triple-agent-search chain — registry + canon + market agents in sequence → thinking → write_file
+  - **ops/market-registry-skill-audit**: FIRST use of market agent — agent_search(market) → skill_search(chitty-register) → skill_search(chittyos-compliance) → thinking → write_file
+  - **ops/compliance-registry-ecosystem-snapshot**: skill-first pattern inversion — skill_search(compliance) → agent_search(registry) → agent_list → thinking → write_file
+  - **code/helper-architectural-nav-docs**: FIRST use of helper agent — agent_search(helper) → skill_search(chitty-register) → context7 × 2 → write_file
+  - **code/registry-agent-skill-mcp-docs**: registry agent + registry skill + context7 docs — agent_search(registry) → skill_search(chitty-register) → context7 × 2 → write_file
+- Catalog: 159 → 166 total, 98 → 105 verified (61% → 63%). All 4 novel agents introduced this pass: registry, canon, market, helper.
+- Build clean. Tests: 938 pass / 0 fail / 2 skip ✓.
+- Branch: `auto/E-catalog-twenty-second-pass`. PR to be created.
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E (in-flight; 166/105 verified; 61 unverified — all auth-gated)
+- **Next run**: Merge this PR if CI green. Novel agents for 23rd pass: scrape (0.4 relevance — lower confidence, worth probing), dispute agent (0.36), storage agent (unbound — skip). For 23rd pass consider: agent combos using `ship` skill (known 0.8 relevance), `feature-dev` skill, `build-mcp-server` skill. Also: `workflow:market` skill (0.8) hasn't been used as a chain step yet. Human auth actions:
+  1. `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` — unblocks 39 notion combos
+  2. Stripe/Neon/Cloudflare/GitHub/Linear tokens — unblocks remaining 22 combos
