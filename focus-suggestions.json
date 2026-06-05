@@ -155,6 +155,17 @@
           "accomplishes": "Fetch a financial report page, dashboard, or investor doc as clean markdown via the browser-rendering service, reason over key data points, anomalies, and trends with sequential-thinking, then write a finance brief to a local file \u2014 useful for quickly digesting external financial data without manual extraction.",
           "verified": true,
           "notes": "All 3 tools confirmed on live connected servers. 2026-06-05 eleventh-pass cast probes: browser-rendering/get_url_markdown (0.6 as alternative), thinking/sequentialthinking (1.18), fs/write_file (0.83). browser-rendering confirmed connected (toolCount: 3). Extends page-to-markdown-archive (ends at fs/write_file) with reasoning step. No auth-gated backends required."
+        },
+        {
+          "name": "financial-page-screenshot-analysis",
+          "chain": [
+            "browser-rendering/get_url_screenshot",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Capture a screenshot of a financial dashboard or reporting page, analyze the visible financial indicators and chart data with reasoning, write a financial snapshot \u2014 captures visual dashboard state vs existing financial-page-brief which fetches as markdown.",
+          "verified": true,
+          "notes": "All 3 tools confirmed 2026-06-05: browser-rendering/get_url_screenshot (0.33), thinking/sequentialthinking (0.40), fs/write_file (confirmed). Novel: uses screenshot (visual) vs existing financial-page-brief which uses get_url_markdown."
         }
       ],
       "prompts": [
@@ -741,6 +752,29 @@
           "accomplishes": "Navigate to a target page with Playwright, capture its full accessibility snapshot (ARIA roles, labels, interactive elements), reason over WCAG 2.1 compliance gaps and severity levels with sequential-thinking, then write a structured a11y audit report to a local file.",
           "verified": true,
           "notes": "All 4 tools confirmed on live connected servers. 2026-06-05 tenth-pass cast probes: playwright/browser_navigate (1.05), playwright/browser_snapshot (0.78 \u2014 resolves directly), thinking/sequentialthinking (1.18), fs/write_file (0.83 as alternative for write intent). Extends a11y-snapshot-to-notion-audit (same first two steps) with reasoning + file output instead of Notion. playwright available via npx (lazy spawn, no auth required)."
+        },
+        {
+          "name": "page-screenshot-design-analysis",
+          "chain": [
+            "browser-rendering/get_url_screenshot",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Get a page screenshot via browser-rendering's screenshot tool, analyze visual design elements and hierarchy with reasoning, write a design assessment report \u2014 complements existing page-html-analysis-to-file by using the visual/screenshot surface rather than HTML markup.",
+          "verified": true,
+          "notes": "All 3 tools confirmed 2026-06-05: browser-rendering/get_url_screenshot (0.33), thinking/sequentialthinking (0.44), fs/write_file (0.30). Novel: first use of browser-rendering/get_url_screenshot in design profile."
+        },
+        {
+          "name": "interactive-design-flow-analysis",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_click",
+            "playwright/browser_take_screenshot",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Navigate to a page, click an interactive element, capture the resulting state as a screenshot, then reason about the interaction design quality \u2014 the first catalog chain to include playwright/browser_click, enabling interactive UX testing.",
+          "verified": true,
+          "notes": "All 4 tools confirmed 2026-06-05: playwright/browser_navigate (1.05), playwright/browser_click (0.30), playwright/browser_take_screenshot (0.29), thinking/sequentialthinking (confirmed). Novel: first browser_click usage in catalog."
         }
       ],
       "prompts": [
@@ -1072,6 +1106,30 @@
           "accomplishes": "Survey directory sizes to identify heavy modules and storage hot-spots, then get recursive tree structure for full architectural context, reason about bloat, refactor priorities, and dependency weight \u2014 size-aware complement to tree-to-architecture-thinking",
           "verified": true,
           "notes": "fs/list_directory_with_sizes and fs/directory_tree both confirmed live via cast (score 0.66) 2026-06-05; thinking confirmed live; distinct from tree-to-architecture-thinking by leading with size data before tree"
+        },
+        {
+          "name": "code-file-quality-analysis",
+          "chain": [
+            "fs/search_files",
+            "fs/read_text_file",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search source files by pattern, read a key file, analyze code quality patterns with sequential reasoning, then write a findings report \u2014 a 4-step chain that adds targeted file read and written output to the existing search\u2192think pattern.",
+          "verified": true,
+          "notes": "All 4 tools confirmed 2026-06-05: fs/search_files (0.42), fs/read_text_file (0.36), thinking/sequentialthinking, fs/write_file (0.30). Novel: 4-step chain not in catalog; adds file read + output vs existing 2-step search\u2192think."
+        },
+        {
+          "name": "library-search-to-reasoning",
+          "chain": [
+            "fs/search_files",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Search codebase for library import patterns, resolve the library in context7, fetch current documentation, then reason about upgrade paths or usage best practices \u2014 extends the existing search-to-library-docs chain with a reasoning step.",
+          "verified": true,
+          "notes": "All 4 tools confirmed 2026-06-05: fs/search_files (0.42), context7/resolve-library-id (0.50), context7/query-docs (confirmed), thinking/sequentialthinking (confirmed). Novel: adds reasoning over existing search-to-library-docs 3-step chain."
         }
       ],
       "prompts": [
@@ -1286,6 +1344,17 @@
           "accomplishes": "Navigate to a web-based communication or collaboration tool, capture a structured accessibility snapshot (ARIA roles, thread counts, message previews), reason over communication state and priority action items, then write a summary report to a local file \u2014 persisting the analysis for async review or as a daily digest artifact.",
           "verified": true,
           "notes": "All 4 tools confirmed on live connected servers. 2026-06-05 tenth-pass cast probes: playwright/browser_navigate (1.05), playwright/browser_snapshot (0.78), thinking/sequentialthinking (1.18), fs/write_file (0.83 as alternative). Extends web-comm-snapshot-analysis (ends at thinking) with file output step. playwright available via npx (lazy spawn, no auth required). No auth-gated backends required."
+        },
+        {
+          "name": "web-comm-html-brief",
+          "chain": [
+            "browser-rendering/get_url_html_content",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Fetch a communication platform page's raw HTML, extract communication channel patterns and key feature structures with reasoning, write a structured platform analysis brief \u2014 uses HTML content for richer structural analysis vs markdown or screenshot.",
+          "verified": true,
+          "notes": "All 3 tools confirmed 2026-06-05: browser-rendering/get_url_html_content (0.20 as alternative), thinking/sequentialthinking (confirmed), fs/write_file (confirmed). Novel: first browser-rendering/get_url_html_content in communication profile."
         }
       ],
       "prompts": [
