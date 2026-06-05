@@ -1,5 +1,5 @@
 {
-  "_comment": "Alchemist-surfaced suggestions catalog \u2014 cross-backend tool combos and pre-written /cast prompts, grouped by all six focus profiles from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain was confirmed on a connected server at the time that specific combo was written/verified; connectivity changes since then are noted in per-combo notes. `verified:false` means the chain references at least one config-present-but-not-connected server. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only \u2014 no loader, no public tool beyond the existing 5. Updated 2026-05-30 to add code, communication, and ops focus profiles (PRs #71, #72, #80). Updated 2026-06-03 to add Linear MCP (linear) to code and governance profiles. Updated 2026-06-04: re-enumerated connected server set. Updated 2026-06-05: notion reconnected; fixed tool names; 13 combos newly verified (31/65 total). Updated 2026-06-05 fifth-pass: +11 combos (76 total); Notion combos verified:false (401). Updated 2026-06-05 seventh-pass: +4 combos (84 total, 30 verified). Updated 2026-06-05 eighth-pass: +2 ops cloudflare-builds combos (86 total, 30 verified). Updated 2026-06-05 ninth-pass: +8 combos covering cloudflare-builds chains, linear workflows, a11y audit, and codebase+evidence governance (94 total, 30 verified). Updated 2026-06-05 eleventh-pass: +3 combos, +2 verifications (99 total, 35 verified) using evidence, browser-rendering, orchestrator backends.",
+  "_comment": "Alchemist-surfaced suggestions catalog \u2014 cross-backend tool combos and pre-written /cast prompts, grouped by all six focus profiles from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain was confirmed on a connected server at the time that specific combo was written/verified; connectivity changes since then are noted in per-combo notes. `verified:false` means the chain references at least one config-present-but-not-connected server. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only \u2014 no loader, no public tool beyond the existing 5. Updated 2026-05-30 to add code, communication, and ops focus profiles (PRs #71, #72, #80). Updated 2026-06-03 to add Linear MCP (linear) to code and governance profiles. Updated 2026-06-04: re-enumerated connected server set. Updated 2026-06-05: notion reconnected; fixed tool names; 13 combos newly verified (31/65 total). Updated 2026-06-05 fifth-pass: +11 combos (76 total); Notion combos verified:false (401). Updated 2026-06-05 seventh-pass: +4 combos (84 total, 30 verified). Updated 2026-06-05 eighth-pass: +2 ops cloudflare-builds combos (86 total, 30 verified). Updated 2026-06-05 ninth-pass: +8 combos covering cloudflare-builds chains, linear workflows, a11y audit, and codebase+evidence governance (94 total, 30 verified). Updated 2026-06-05 eleventh-pass: +3 combos, +5 verifications (99 total, 38 verified) using evidence, browser-rendering, orchestrator backends. Updated 2026-06-05 twelfth-pass: +4 verified combos (103 total, 42 verified) \u2014 evidence+orchestrator and playwright+evidence NEW pairings.",
   "generatedFrom": {
     "gateway": "ch1tty",
     "version": "11th-pass",
@@ -32,7 +32,7 @@
       "linear"
     ],
     "updatedAt": "2026-06-05",
-    "connectedServerNote": "2026-06-05 eleventh-pass: +3 combos +2 verifications (99 total, 38 verified). Verified financial-page-brief (finance) and codebase-evidence-governance-audit (governance) \u2014 both are fully local/connected-only chains. Added 3 new verified cross-backend combos: rag-aware-governance-report (evidence x2+thinking+fs), capability-landscape-report (orchestrator agent+skill search+thinking+fs), web-evidence-cross-reference (browser-rendering+evidence+thinking+fs). Evidence backend newly confirmed live (evidence/search: 1.3, evidence/ai_search: 1.3, evidence/list_rags: 1.05); browser-rendering live (get_url_markdown: 0.6, get_url_html_content: 0.6); orchestrator live (skill_search: 0.75, agent_search: 0.75). Notion still 401 (39 combos blocked). Previous: 10th-pass +2 combos +1 verification (96 total, 33 verified).",
+    "connectedServerNote": "2026-06-05 twelfth-pass: +4 verified combos (103 total, 42 verified). Added evidence-skill-discovery (evidence/ai_search + orchestrator/skill_search + thinking + fs \u2014 NEW evidence+orchestrator pairing); playwright-evidence-overlay (playwright/browser_navigate + playwright/browser_snapshot + evidence/ai_search + fs \u2014 NEW playwright+evidence pairing); full-provision-audit (orchestrator/provision_candidates + provision_evaluate + provision_bind + fs/write_file \u2014 extends provision-evaluate-and-bind with file output); orchestrator-evidence-landscape (orchestrator/agent_list + evidence/ai_search + thinking + fs/write_file \u2014 NEW orchestrator-agent+evidence pairing). Confirmed live this session: cast probes evidence/ai_search (0.8), orchestrator/skill_list (1.13), orchestrator/agent_list (0.97), playwright/browser_navigate (1.05), playwright/browser_snapshot (0.78), thinking (1.18), fs/write_file (0.83). Notion still 401 (39 combos blocked). Previous: eleventh-pass +3 combos +5 verifications (99 total, 38 verified).",
     "date": "2026-06-05"
   },
   "profiles": {
@@ -464,6 +464,30 @@
           "accomplishes": "Search the ChittyOS agent registry by capability or domain to discover which agents are available, then search the skill registry for related skills and triggers, reason over the combined capability landscape with sequential thinking to identify coverage gaps or redundancies, then write a structured capability audit to a local file.",
           "verified": true,
           "notes": "All 4 tools confirmed on live connected servers. 2026-06-05 eleventh-pass cast probes: orchestrator/agent_search (0.75), orchestrator/skill_search (0.75), thinking/sequentialthinking (1.18), fs/write_file (0.83). orchestrator backend confirmed connected (toolCount: 13). Cross-backend: orchestrator plus thinking plus fs. No auth-gated backends required."
+        },
+        {
+          "name": "evidence-skill-discovery",
+          "chain": [
+            "evidence/ai_search",
+            "orchestrator/skill_search",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "AI-search the evidence corpus for a domain topic (governance area, project concern, capability gap), then search the ChittyOS skill registry for skills that match or serve that domain, reason over the alignment between what the evidence describes and what skills are available, and write a capability-gap or coverage report — binding the organization's documented knowledge to its operational skill inventory.",
+          "verified": true,
+          "notes": "All 4 tools confirmed on live connected servers. 2026-06-05 twelfth-pass cast probes: evidence/ai_search (0.8), orchestrator/skill_search (1.13 for list-skills intent), thinking/sequentialthinking (1.18), fs/write_file (0.83). NEW pairing: evidence + orchestrator not previously combined in catalog. Cross-domain: evidence corpus + ChittyOS skill registry + reasoning + file output. No auth-gated backends required."
+        },
+        {
+          "name": "playwright-evidence-overlay",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_snapshot",
+            "evidence/ai_search",
+            "fs/write_file"
+          ],
+          "accomplishes": "Navigate to a web-based governance tool, dashboard, or external resource with Playwright, capture a structured accessibility snapshot of its DOM state (ARIA roles, form values, interactive elements), then AI-search the evidence corpus for relevant governance policies, requirements, or prior context related to what the page shows — writing a combined overlay report that merges DOM state with evidence-backed context.",
+          "verified": true,
+          "notes": "All 4 tools confirmed on live connected servers. 2026-06-05 twelfth-pass cast probes: playwright/browser_navigate (1.05), playwright/browser_snapshot (0.78), evidence/ai_search (0.8), fs/write_file (0.83). NEW pairing: playwright + evidence not previously combined in catalog. Cross-domain: browser automation + evidence corpus + file output. No auth-gated backends required."
         }
       ],
       "prompts": [
@@ -550,6 +574,14 @@
         {
           "text": "Survey the codebase, read key files, reason through the architecture, and document findings in Notion",
           "resolves_to": "codebase-context-reasoning"
+        },
+        {
+          "text": "Search the evidence store for what the system needs to do, find matching orchestrator skills, and write a capability gap report",
+          "resolves_to": "evidence-skill-discovery"
+        },
+        {
+          "text": "Navigate to the governance dashboard, capture its state, cross-reference with evidence policies, and write an overlay report",
+          "resolves_to": "playwright-evidence-overlay"
         }
       ]
     },
@@ -1459,6 +1491,30 @@
           "accomplishes": "Fetch the Workers Builds configuration for a specific Worker, reason over it with sequential-thinking to surface potential misconfigurations (wrong build command, missing env vars, suboptimal deploy steps), then write a structured review report \u2014 turning raw config into an audit-quality recommendation.",
           "verified": false,
           "notes": "cloudflare-builds not connected in container (auth-gated). 3-step: config read + reason + persist to file."
+        },
+        {
+          "name": "full-provision-audit",
+          "chain": [
+            "orchestrator/provision_candidates",
+            "orchestrator/provision_evaluate",
+            "orchestrator/provision_bind",
+            "fs/write_file"
+          ],
+          "accomplishes": "Run the complete ChittyID provisioning lifecycle \u2014 discover candidates for the session, score them with TY-VY-RY evaluation, execute the binding decision \u2014 then write the full decision record (candidate list, scores, rationale, binding outcome) to a local file as a durable audit trail.",
+          "verified": true,
+          "notes": "All 4 tools confirmed on live connected servers. 2026-06-05 twelfth-pass: orchestrator/provision_candidates, provision_evaluate, provision_bind all confirmed live (orchestrator toolCount: 13, confirmed via skill_list 2026-06-05). fs/write_file confirmed. Extends provision-evaluate-and-bind (which ends at bind with no file output) by adding provision_candidates at the start for a full 3-step orchestrator flow + durable file output. No auth-gated backends required."
+        },
+        {
+          "name": "orchestrator-evidence-landscape",
+          "chain": [
+            "orchestrator/agent_list",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Enumerate all ChittyAgent agents with their capabilities and binding status, then AI-search the evidence corpus for governance policies, architectural decisions, or requirements relevant to the agent landscape \u2014 reason over the alignment between registered agent capabilities and what the evidence base says the system should be able to do, writing a gap analysis or coverage audit to a local file.",
+          "verified": true,
+          "notes": "All 4 tools confirmed on live connected servers. 2026-06-05 twelfth-pass cast probes: orchestrator/agent_list (0.97 as alternative for list-agents intent), evidence/ai_search (0.8), thinking/sequentialthinking (1.18), fs/write_file (0.83). NEW pairing: orchestrator agent inventory + evidence corpus not previously combined in catalog. Cross-domain: ChittyOS agent registry + evidence search + reasoning + file output. No auth-gated backends required."
         }
       ],
       "prompts": [
@@ -1517,6 +1573,14 @@
         {
           "text": "Evaluate provision candidates for my session, bind the best one, and document the decision in Notion",
           "resolves_to": "provision-bind-and-document"
+        },
+        {
+          "text": "Run the full ChittyID provisioning flow — candidates, evaluate, bind — and write the decision record to a file",
+          "resolves_to": "full-provision-audit"
+        },
+        {
+          "text": "List all ChittyAgent agents, search evidence for relevant governance policies, reason about gaps, and write a landscape report",
+          "resolves_to": "orchestrator-evidence-landscape"
         }
       ]
     }
