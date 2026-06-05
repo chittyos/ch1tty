@@ -1,8 +1,8 @@
 {
-  "_comment": "Alchemist-surfaced suggestions catalog \u2014 cross-backend tool combos and pre-written /cast prompts, grouped by all six focus profiles from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain was confirmed on a connected server at the time that specific combo was written/verified; connectivity changes since then are noted in per-combo notes. `verified:false` means the chain references at least one config-present-but-not-connected server. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only \u2014 no loader, no public tool beyond the existing 5. Updated 2026-05-30 to add code, communication, and ops focus profiles (PRs #71, #72, #80). Updated 2026-06-03 to add Linear MCP (linear) to code and governance profiles. Updated 2026-06-04: re-enumerated connected server set. Updated 2026-06-05: notion reconnected; fixed tool names; 13 combos newly verified (31/65 total). Updated 2026-06-05 fifth-pass: +11 combos (76 total); Notion combos verified:false (401). Updated 2026-06-05 seventh-pass: +4 combos (84 total, 30 verified). Updated 2026-06-05 eighth-pass: +2 ops cloudflare-builds combos (86 total, 30 verified). Updated 2026-06-05 ninth-pass: +8 combos covering cloudflare-builds chains, linear workflows, a11y audit, and codebase+evidence governance (94 total, 30 verified). Updated 2026-06-05 eleventh-pass: +3 combos, +5 verifications (99 total, 38 verified) using evidence, browser-rendering, orchestrator backends. Updated 2026-06-05 twelfth-pass: +4 verified combos (103 total, 42 verified) \u2014 evidence+orchestrator and playwright+evidence NEW pairings.",
+  "_comment": "Alchemist-surfaced suggestions catalog \u2014 cross-backend tool combos and pre-written /cast prompts, grouped by all six focus profiles from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain was confirmed on a connected server at the time that specific combo was written/verified; connectivity changes since then are noted in per-combo notes. `verified:false` means the chain references at least one config-present-but-not-connected server. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only \u2014 no loader, no public tool beyond the existing 5. Updated 2026-05-30 to add code, communication, and ops focus profiles (PRs #71, #72, #80). Updated 2026-06-03 to add Linear MCP (linear) to code and governance profiles. Updated 2026-06-04: re-enumerated connected server set. Updated 2026-06-05: notion reconnected; fixed tool names; 13 combos newly verified (31/65 total). Updated 2026-06-05 fifth-pass: +11 combos (76 total); Notion combos verified:false (401). Updated 2026-06-05 seventh-pass: +4 combos (84 total, 30 verified). Updated 2026-06-05 eighth-pass: +2 ops cloudflare-builds combos (86 total, 30 verified). Updated 2026-06-05 ninth-pass: +8 combos covering cloudflare-builds chains, linear workflows, a11y audit, and codebase+evidence governance (94 total, 30 verified). Updated 2026-06-05 eleventh-pass: +3 combos, +5 verifications (99 total, 38 verified) using evidence, browser-rendering, orchestrator backends. Updated 2026-06-05 twelfth-pass: +4 verified combos (103 total, 42 verified) \u2014 evidence+orchestrator and playwright+evidence NEW pairings. Updated 2026-06-05 thirteenth-pass: +6 verified combos (109 total, 48 verified) \u2014 skill-landscape, specialist-fork, skill-category-deep-dive (ops) + repo-size-profile, library-to-skill-integration-guide, size-aware-architecture (code); first use of orchestrator/provision_fork + fs/list_directory_with_sizes in combos.",
   "generatedFrom": {
     "gateway": "ch1tty",
-    "version": "12th-pass",
+    "version": "13th-pass",
     "method": "live-gateway-enumeration + cast-probe-driven combo discovery",
     "connectedServers": [
       "orchestrator",
@@ -473,7 +473,7 @@
             "thinking/sequentialthinking",
             "fs/write_file"
           ],
-          "accomplishes": "AI-search the evidence corpus for a domain topic (governance area, project concern, capability gap), then search the ChittyOS skill registry for skills that match or serve that domain, reason over the alignment between what the evidence describes and what skills are available, and write a capability-gap or coverage report — binding the organization's documented knowledge to its operational skill inventory.",
+          "accomplishes": "AI-search the evidence corpus for a domain topic (governance area, project concern, capability gap), then search the ChittyOS skill registry for skills that match or serve that domain, reason over the alignment between what the evidence describes and what skills are available, and write a capability-gap or coverage report \u2014 binding the organization's documented knowledge to its operational skill inventory.",
           "verified": true,
           "notes": "All 4 tools confirmed on live connected servers. 2026-06-05 twelfth-pass cast probes: evidence/ai_search (0.8), orchestrator/skill_search (1.13 for list-skills intent), thinking/sequentialthinking (1.18), fs/write_file (0.83). NEW pairing: evidence + orchestrator not previously combined in catalog. Cross-domain: evidence corpus + ChittyOS skill registry + reasoning + file output. No auth-gated backends required."
         },
@@ -485,7 +485,7 @@
             "evidence/ai_search",
             "fs/write_file"
           ],
-          "accomplishes": "Navigate to a web-based governance tool, dashboard, or external resource with Playwright, capture a structured accessibility snapshot of its DOM state (ARIA roles, form values, interactive elements), then AI-search the evidence corpus for relevant governance policies, requirements, or prior context related to what the page shows — writing a combined overlay report that merges DOM state with evidence-backed context.",
+          "accomplishes": "Navigate to a web-based governance tool, dashboard, or external resource with Playwright, capture a structured accessibility snapshot of its DOM state (ARIA roles, form values, interactive elements), then AI-search the evidence corpus for relevant governance policies, requirements, or prior context related to what the page shows \u2014 writing a combined overlay report that merges DOM state with evidence-backed context.",
           "verified": true,
           "notes": "All 4 tools confirmed on live connected servers. 2026-06-05 twelfth-pass cast probes: playwright/browser_navigate (1.05), playwright/browser_snapshot (0.78), evidence/ai_search (0.8), fs/write_file (0.83). NEW pairing: playwright + evidence not previously combined in catalog. Cross-domain: browser automation + evidence corpus + file output. No auth-gated backends required."
         }
@@ -1038,6 +1038,40 @@
           "accomplishes": "Fetch the full HTML content of a web page via Cloudflare browser rendering, run an AI-powered semantic search against the evidence base to find related documents and prior research, reason over the combined web context and evidence with sequential thinking to surface insights or gaps, then write a structured cross-reference report to a local file.",
           "verified": true,
           "notes": "All 4 tools confirmed on live connected servers. 2026-06-05 eleventh-pass cast probes: browser-rendering/get_url_html_content (0.6), evidence/ai_search (1.3), thinking/sequentialthinking (1.18), fs/write_file (0.83). Cross-domain: browser-rendering plus evidence plus thinking plus fs, 4 distinct backends. No auth-gated backends required."
+        },
+        {
+          "name": "repo-size-profile-report",
+          "chain": [
+            "fs/list_directory_with_sizes",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Survey a repository directory listing with sizes, reason about large artifacts, bloated directories, and cleanup opportunities, write a storage profile and priority cleanup report \u2014 uses the size-aware directory listing for targeted analysis",
+          "verified": true,
+          "notes": "fs/list_directory_with_sizes confirmed live (returned directory listing with sizes) 2026-06-05; thinking/sequentialthinking and fs/write_file confirmed live this pass"
+        },
+        {
+          "name": "library-to-skill-integration-guide",
+          "chain": [
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "orchestrator/skill_search",
+            "fs/write_file"
+          ],
+          "accomplishes": "Resolve a library ID, fetch its documentation and code examples, search ecosystem skills that compose with or use that library, write an integration guide linking library usage to ChittyOS capabilities \u2014 cross-domain: documents + ecosystem + desktop",
+          "verified": true,
+          "notes": "context7/resolve-library-id and context7/query-docs confirmed live 2026-06-05; orchestrator/skill_search confirmed live (cast score 0.76); fs/write_file confirmed live; novel 4-backend chain spanning documents+ecosystem+desktop categories"
+        },
+        {
+          "name": "size-aware-architecture-analysis",
+          "chain": [
+            "fs/list_directory_with_sizes",
+            "fs/directory_tree",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Survey directory sizes to identify heavy modules and storage hot-spots, then get recursive tree structure for full architectural context, reason about bloat, refactor priorities, and dependency weight \u2014 size-aware complement to tree-to-architecture-thinking",
+          "verified": true,
+          "notes": "fs/list_directory_with_sizes and fs/directory_tree both confirmed live via cast (score 0.66) 2026-06-05; thinking confirmed live; distinct from tree-to-architecture-thinking by leading with size data before tree"
         }
       ],
       "prompts": [
@@ -1104,6 +1138,18 @@
         {
           "text": "Search evidence for project context, look up the library docs, and save combined research to a file",
           "resolves_to": "evidence-library-research"
+        },
+        {
+          "text": "Survey directory sizes in this project, reason about what's taking up the most space and what can be cleaned up, write a storage profile report",
+          "resolves_to": "repo-size-profile-report"
+        },
+        {
+          "text": "Resolve the MCP TypeScript SDK library, fetch its docs, find ChittyOS skills that use it, and write an integration guide",
+          "resolves_to": "library-to-skill-integration-guide"
+        },
+        {
+          "text": "Show me the sizes of all directories in this repo, then get the full tree structure, and reason about which parts are architecturally bloated",
+          "resolves_to": "size-aware-architecture-analysis"
         }
       ]
     },
@@ -1515,6 +1561,39 @@
           "accomplishes": "Enumerate all ChittyAgent agents with their capabilities and binding status, then AI-search the evidence corpus for governance policies, architectural decisions, or requirements relevant to the agent landscape \u2014 reason over the alignment between registered agent capabilities and what the evidence base says the system should be able to do, writing a gap analysis or coverage audit to a local file.",
           "verified": true,
           "notes": "All 4 tools confirmed on live connected servers. 2026-06-05 twelfth-pass cast probes: orchestrator/agent_list (0.97 as alternative for list-agents intent), evidence/ai_search (0.8), thinking/sequentialthinking (1.18), fs/write_file (0.83). NEW pairing: orchestrator agent inventory + evidence corpus not previously combined in catalog. Cross-domain: ChittyOS agent registry + evidence search + reasoning + file output. No auth-gated backends required."
+        },
+        {
+          "name": "skill-landscape-analysis",
+          "chain": [
+            "orchestrator/skill_list",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Enumerate all 54 ChittyOS ecosystem skills via orchestrator, reason about which ones apply to a given task category, write a prioritized skill-selection report \u2014 spans ecosystem registry + reasoning + filesystem output",
+          "verified": true,
+          "notes": "orchestrator/skill_list confirmed live (returned 54 skills) 2026-06-05; thinking/sequentialthinking and fs/write_file confirmed live this pass"
+        },
+        {
+          "name": "specialist-fork-and-bind",
+          "chain": [
+            "orchestrator/provision_fork",
+            "orchestrator/provision_bind"
+          ],
+          "accomplishes": "Fork a domain-specialist ChittyID context from a generalist parent entity (inheriting relevant expertise, pruning non-domain strengths), then bind the session to that fork \u2014 provisioning a focused agent context in one two-step flow",
+          "verified": true,
+          "notes": "orchestrator/provision_fork confirmed live via cast (score 0.78) 2026-06-05; orchestrator/provision_bind confirmed live as cast alternative; both part of the same orchestrator backend"
+        },
+        {
+          "name": "skill-category-deep-dive",
+          "chain": [
+            "orchestrator/skill_list",
+            "orchestrator/skill_search",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "List all ecosystem skills (54 total), search and filter to a specific domain (devops, finance, legal), reason about how they compose for a complex task, write a capability deep-dive \u2014 4-step orchestrator+reasoning chain for strategic skill selection",
+          "verified": true,
+          "notes": "orchestrator/skill_list and orchestrator/skill_search both confirmed live 2026-06-05; thinking and fs confirmed live; extends infra-health-snapshot with reasoning layer"
         }
       ],
       "prompts": [
@@ -1575,12 +1654,24 @@
           "resolves_to": "provision-bind-and-document"
         },
         {
-          "text": "Run the full ChittyID provisioning flow — candidates, evaluate, bind — and write the decision record to a file",
+          "text": "Run the full ChittyID provisioning flow \u2014 candidates, evaluate, bind \u2014 and write the decision record to a file",
           "resolves_to": "full-provision-audit"
         },
         {
           "text": "List all ChittyAgent agents, search evidence for relevant governance policies, reason about gaps, and write a landscape report",
           "resolves_to": "orchestrator-evidence-landscape"
+        },
+        {
+          "text": "List all ChittyOS ecosystem skills, reason about which ones cover deployment and infrastructure tasks, and write a prioritized skill selection guide to a file",
+          "resolves_to": "skill-landscape-analysis"
+        },
+        {
+          "text": "Fork a specialist legal analysis context from my generalist agent and bind this session to it",
+          "resolves_to": "specialist-fork-and-bind"
+        },
+        {
+          "text": "List all skills, filter to devops capabilities, reason about how they chain together for a zero-downtime deployment, and write the capability analysis",
+          "resolves_to": "skill-category-deep-dive"
         }
       ]
     }
