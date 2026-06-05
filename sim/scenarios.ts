@@ -34,6 +34,7 @@ const CATEGORY_BY_SERVER: Record<string, ServerConfig['category']> = {
   notion: 'documents',
   orchestrator: 'ecosystem',
   cloudflare: 'ecosystem',
+  'cloudflare-builds': 'ecosystem',
   fs: 'ecosystem',
   'browser-rendering': 'desktop',
   playwright: 'desktop',
@@ -285,6 +286,20 @@ export const SCENARIOS: Scenario[] = [
     intent: 'list notes in filesystem folder',
     expect: 'fs/list_directory',
     note: 'REORDER: without ops focus chittymac/list_notes wins (0.75); with ops focus fs/list_directory wins (1.00)',
+  },
+  {
+    id: 'ops.build-status',
+    focus: 'ops',
+    intent: 'list recent build runs and check build status for the cloudflare workers builds pipeline',
+    expect: 'cloudflare-builds/list_builds',
+    note: 'near-misses: cloudflare/list_workers (list+workers but not build+runs+status), orchestrator/agent_list (list keyword). Both are ecosystem so both get ops boost; cloudflare-builds/list_builds wins on keyword specificity.',
+  },
+  {
+    id: 'ops.update-build-config',
+    focus: 'ops',
+    intent: 'update the deploy command configuration for the production worker builds project',
+    expect: 'cloudflare-builds/update_build_config',
+    note: 'near-miss: cloudflare/deploy_worker (deploy+worker+production but not update+command+config). cloudflare-builds/update_build_config matches update+deploy+command+configuration+worker+builds.',
   },
 
   // ── governance follow-up scenarios ───────────────────────────

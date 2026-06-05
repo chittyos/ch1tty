@@ -634,6 +634,51 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
     ],
   },
 
+  'cloudflare-builds': {
+    tools: [
+      {
+        name: 'list_builds',
+        description: 'List recent Cloudflare Workers Builds runs for a Worker with build status, timestamps, and error summaries',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            worker_name: { type: 'string' },
+            limit: { type: 'number' },
+          },
+          required: ['worker_name'],
+        },
+        response: text(JSON.stringify([
+          { id: 'build-abc', worker: 'ch1tty-gateway', status: 'success', triggered_at: '2026-06-05T06:00:00Z', duration_ms: 45000 },
+          { id: 'build-xyz', worker: 'ch1tty-gateway', status: 'failed', triggered_at: '2026-06-04T22:00:00Z', error: 'Build command exited with code 1' },
+        ])),
+      },
+      {
+        name: 'trigger_build',
+        description: 'Trigger a new Cloudflare Workers build and deploy run for a configured Worker project',
+        inputSchema: {
+          type: 'object',
+          properties: { worker_name: { type: 'string' } },
+          required: ['worker_name'],
+        },
+        response: text(JSON.stringify({ id: 'build-new', status: 'queued', worker: 'ch1tty-gateway' })),
+      },
+      {
+        name: 'update_build_config',
+        description: 'Update the build or deploy command configuration for a Cloudflare Worker project in Workers Builds',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            worker_name: { type: 'string' },
+            build_command: { type: 'string' },
+            deploy_command: { type: 'string' },
+          },
+          required: ['worker_name'],
+        },
+        response: text(JSON.stringify({ worker: 'ch1tty-gateway', updated: true, deploy_command: 'wrangler deploy --env production' })),
+      },
+    ],
+  },
+
   orchestrator: {
     tools: [
       {

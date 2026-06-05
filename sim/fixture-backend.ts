@@ -123,6 +123,13 @@ export const FIXTURE_TOOLS: Record<string, FixtureTool[]> = {
     { name: 'list_workers', description: 'List all deployed Cloudflare Workers with current route configurations' },
     { name: 'get_worker_logs', description: 'Retrieve recent logs and errors from a deployed Cloudflare Worker' },
   ],
+  'cloudflare-builds': [
+    { name: 'list_builds', description: 'List recent Cloudflare Workers Builds runs for a Worker with build status, timestamps, and error summaries' },
+    { name: 'get_build', description: 'Get details of a specific Cloudflare Workers build run including logs and deployment outcome' },
+    { name: 'trigger_build', description: 'Trigger a new Cloudflare Workers build and deploy run for a configured Worker project' },
+    { name: 'get_build_config', description: 'Get the build configuration for a Cloudflare Worker including build command and deploy command settings' },
+    { name: 'update_build_config', description: 'Update the build or deploy command configuration for a Cloudflare Worker project in Workers Builds' },
+  ],
   fs: [
     { name: 'read_file', description: 'Read the contents of a file from the filesystem by path' },
     { name: 'write_file', description: 'Write or overwrite a file on the filesystem at the given path' },

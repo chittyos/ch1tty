@@ -1,8 +1,8 @@
 {
-  "_comment": "Alchemist-surfaced suggestions catalog — cross-backend tool combos and pre-written /cast prompts, grouped by all six focus profiles from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain was confirmed on a connected server at the time that specific combo was written/verified; connectivity changes since then are noted in per-combo notes. `verified:false` means the chain references at least one config-present-but-not-connected server. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only — no loader, no public tool beyond the existing 5. Updated 2026-05-30 to add code, communication, and ops focus profiles (PRs #71, #72, #80). Updated 2026-06-03 to add Linear MCP (linear) to code and governance profiles. Updated 2026-06-04: re-enumerated connected server set. Updated 2026-06-05: notion reconnected; fixed context7/get-library-docs → context7/query-docs; fixed fs/directory_tree → fs/list_directory; 13 combos newly verified:true (31/65 total verified). Updated 2026-06-05 fifth-pass: +11 combos (76 total); ALL 21 Notion-tool combos set verified:false — Notion API returning 401 (invalid token) in run environment; 22 verified. Updated 2026-06-05 seventh-pass: +4 combos (80➒84 total, 26→30 verified). New finance combos (local-finance-doc-analysis, multi-finance-doc-synthesis) and communication combos (web-comm-state-analysis, web-comm-snapshot-analysis) all use only fs/thinking/playwright — no auth-gated backends. First verified combos for finance and communication profiles.",
+  "_comment": "Alchemist-surfaced suggestions catalog — cross-backend tool combos and pre-written /cast prompts, grouped by all six focus profiles from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain was confirmed on a connected server at the time that specific combo was written/verified; connectivity changes since then are noted in per-combo notes. `verified:false` means the chain references at least one config-present-but-not-connected server. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only — no loader, no public tool beyond the existing 5. Updated 2026-05-30 to add code, communication, and ops focus profiles (PRs #71, #72, #80). Updated 2026-06-03 to add Linear MCP (linear) to code and governance profiles. Updated 2026-06-04: re-enumerated connected server set. Updated 2026-06-05: notion reconnected; fixed context7/get-library-docs → context7/query-docs; fixed fs/directory_tree → fs/list_directory; 13 combos newly verified:true (31/65 total verified). Updated 2026-06-05 fifth-pass: +11 combos (76 total); ALL 21 Notion-tool combos set verified:false — Notion API returning 401 (invalid token) in run environment; 22 verified. Updated 2026-06-05 seventh-pass: +4 combos (80➒84 total, 26→30 verified). New finance combos (local-finance-doc-analysis, multi-finance-doc-synthesis) and communication combos (web-comm-state-analysis, web-comm-snapshot-analysis) all use only fs/thinking/playwright — no auth-gated backends. First verified combos for finance and communication profiles. Updated 2026-06-05 eighth-pass: +2 ops combos for cloudflare-builds (build-status-to-worker-logs, reconfigure-and-redeploy); 84→86 combos, 30 verified.",
   "generatedFrom": {
     "gateway": "ch1tty",
-    "version": "7th-pass",
+    "version": "8th-pass",
     "method": "live-gateway-enumeration + cast-probe-driven combo discovery",
     "connectedServers": [
       "orchestrator",
@@ -17,6 +17,7 @@
     "notConnectedServers": [
       "chittyos",
       "cloudflare",
+      "cloudflare-builds",
       "cowork",
       "stripe",
       "neon",
@@ -30,7 +31,7 @@
       "github"
     ],
     "updatedAt": "2026-06-05",
-    "connectedServerNote": "2026-06-05 seventh-pass: +4 combos (84 total, 30 verified). 2 new finance combos verified (local file read/analyze + multi-file search/synthesize using fs+thinking). 2 new communication combos verified (web browser navigate+screenshot+thinking, navigate+snapshot+thinking using playwright+thinking). All 4 use only the currently-connected non-auth-gated backends (fs, thinking, playwright). Finance (2 verified) and communication (2 verified) now have at least one verified path each. Remaining unverified: 39 Notion-tool (blocked: NOTION_TOKEN via op://ChittyOS-Integrations/notion/api_token) + 15 other-auth-gated (stripe/neon/cloudflare/github/etc.).",
+    "connectedServerNote": "2026-06-05 eighth-pass: +2 ops combos for cloudflare-builds (build-status-to-worker-logs, reconfigure-and-redeploy); 84→86 combos, 30 verified (35%). cloudflare-builds not connected (auth via cloudflare-builds-mcp token). Remaining unverified: 39 Notion-tool (blocked: NOTION_TOKEN) + 17 other-auth-gated (includes new cloudflare-builds combos).",
     "date": "2026-06-05"
   },
   "profiles": {
@@ -1280,6 +1281,26 @@
           "accomplishes": "Inventory the full project directory tree as a recursive JSON structure, then reason through it from an operations lens — surfaces which directories hold sensitive configs, where build artifacts live, and what the deployment surface looks like.",
           "verified": true,
           "notes": "Both steps confirmed via live cast probes (2026-06-05): fs/directory_tree (score 0.50), thinking/sequentialthinking (score 0.55). Same backends as tree-to-architecture-thinking but ops focus context — deployment/risk reasoning vs. architectural design. No Notion dependency."
+        },
+        {
+          "name": "build-status-to-worker-logs",
+          "chain": [
+            "cloudflare-builds/list_builds",
+            "cloudflare/get_worker_logs"
+          ],
+          "accomplishes": "List recent Cloudflare Workers Builds runs to find the latest build outcome, then retrieve logs from the deployed Worker to correlate build success or failure with runtime behavior — closing the feedback loop between CI and production.",
+          "verified": false,
+          "notes": "cloudflare-builds not connected (auth via cloudflare-builds-mcp: op://ChittyOS-Integrations/cloudflare-builds-mcp/token). cloudflare not connected in remote container. Both are ops-focus servers."
+        },
+        {
+          "name": "reconfigure-and-redeploy",
+          "chain": [
+            "cloudflare-builds/update_build_config",
+            "cloudflare-builds/trigger_build"
+          ],
+          "accomplishes": "Update the Workers Builds deploy command (e.g. add --env production flag) and immediately trigger a new build run — the two-step config-then-deploy pattern used to fix Chittyentity dashboard config drift (see chittyentity#336).",
+          "verified": false,
+          "notes": "cloudflare-builds not connected in remote container. Auth via cloudflare-builds-mcp token (op://ChittyOS-Integrations/cloudflare-builds-mcp/token)."
         }
       ],
       "prompts": [
