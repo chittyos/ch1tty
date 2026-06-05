@@ -22,6 +22,7 @@ function jsonResponse(res: ServerResponse, status: number, data: unknown): void 
 
 async function readBody(req: IncomingMessage): Promise<Record<string, unknown>> {
   const chunks: Buffer[] = [];
+  /* c8 ignore next -- Node.js HTTP chunks are always Buffer, never string */
   for await (const chunk of req) chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
   const raw = Buffer.concat(chunks).toString('utf-8');
   if (!raw) return {};

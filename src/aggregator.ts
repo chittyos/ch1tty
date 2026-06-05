@@ -249,6 +249,7 @@ export class Aggregator {
 
       const results = await Promise.allSettled(toolPromises);
       this.registry = results.flatMap((r) =>
+        /* c8 ignore next -- each toolPromise has its own try/catch, so rejected never occurs */
         r.status === 'fulfilled' ? r.value : [],
       );
       this.registryExpiresAt = Date.now() + Aggregator.REGISTRY_TTL;
@@ -1115,6 +1116,7 @@ export class Aggregator {
 
     const results = await Promise.allSettled(resourcePromises);
     return {
+      /* c8 ignore next -- each resourcePromise has its own try/catch, so rejected never occurs */
       resources: results.flatMap((r) => r.status === 'fulfilled' ? r.value : []),
     };
   }
@@ -1142,6 +1144,7 @@ export class Aggregator {
 
     const results = await Promise.allSettled(templatePromises);
     return {
+      /* c8 ignore next -- each templatePromise has its own try/catch, so rejected never occurs */
       resourceTemplates: results.flatMap((r) => r.status === 'fulfilled' ? r.value : []),
     };
   }
@@ -1191,6 +1194,7 @@ export class Aggregator {
 
     const results = await Promise.allSettled(promptPromises);
     return {
+      /* c8 ignore next -- each promptPromise has its own try/catch, so rejected never occurs */
       prompts: results.flatMap((r) => r.status === 'fulfilled' ? r.value : []),
     };
   }
