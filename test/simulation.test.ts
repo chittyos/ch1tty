@@ -18,8 +18,12 @@ process.env.CH1TTY_EMBED_ENABLED = 'false';
 
 const {
   SCENARIOS,
+  buildDegradedAggregator,
   buildSimAggregator,
   outOfFocusReachable,
+  runDegradedCastScenario,
+  runDegradedSearchScenario,
+  runExecuteErrorScenario,
   runFocusBiasProbe,
   runScenario,
   surfaceMisresolutions,
@@ -176,6 +180,49 @@ test('no uncorrectable mis-resolutions (focus must fix every OOF intruder)', asy
       `${uncorrected.length} uncorrectable mis-resolution(s): ` +
       uncorrected.map((e) => `${e.id}(expected=${e.expected},got=${e.noFocusTop})`).join(', '),
     );
+  } finally {
+    await aggregator.shutdown();
+  }
+});
+
+test('execute-level error propagated when tool fails', async () => {
+  const { aggregator } = buildDegradedAggregator({ toolErrors: ['neon/run_sql'] });
+  try {
+    const r = await runExecuteErrorScenario(aggregator, 'neon/run_sql', { project_id: 'p1', sql: 'SELECT 1' });
+    assert.ok(r.pass, r.detail);
+  } finally {
+    await aggregator.shutdown();
+  }
+});
+
+test('degraded backend: search does not crash, working-server tools reachable', async () => {
+  // github degraded — linear still provides code-category tools in the registry
+  const { aggregator } = buildDegradedAggregator({ degradedServers: ['github'] });
+  try {
+    const r = await runDegradedSearchScenario(aggregator, {
+      id: 'degraded-search.github-down',
+      query: 'issues project',
+      focus: 'code',
+      degradedServer: 'github',
+      expectToolFromOther: 'linear/list_issues',
+    });
+    assert.ok(r.pass, r.detail);
+  } finally {
+    await aggregator.shutdown();
+  }
+});
+
+test('degraded backend: cast does not crash, resolves without degraded server tools', async () => {
+  // stripe degraded — cast for invoice must not crash and must not resolve to stripe/*
+  const { aggregator } = buildDegradedAggregator({ degradedServers: ['stripe'] });
+  try {
+    const r = await runDegradedCastScenario(aggregator, {
+      id: 'degraded-cast.stripe-down',
+      intent: 'create an invoice for the customer with line items',
+      focus: 'finance',
+      degradedServer: 'stripe',
+    });
+    assert.ok(r.pass, r.detail);
   } finally {
     await aggregator.shutdown();
   }
