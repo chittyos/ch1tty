@@ -11,7 +11,7 @@
 - [x] **A** — Gateway up/refreshed/tested: build clean, 937 pass/0 fail, 100% branch coverage, 5 meta-tools confirmed. PR#192 merged 2026-06-05.
 - [x] **B** — GitHub MCP migration: `servers.json` `github` entry → remote `https://api.githubcopilot.com/mcp/` with `envHeaders: {Authorization: GITHUB_MCP_AUTHORIZATION}`
 - [x] **C** — Focus-profile layer: `focus-profiles.json` (6 profiles) + `CH1TTY_FOCUS` env + `focus` param on search/cast + `ch1tty/status` reports active focus; tested in `test/focus.test.ts`
-- [x] **D** — Scenario testing: `sim/scenarios.ts` harness + `test/simulation.test.ts` + multi-step scenario coverage for mis-resolutions, failure resilience, and lens-not-gate verification per focus
+- [x] **D** — Scenario testing: `sim/scenarios.ts` harness + `test/simulation.test.ts` + multi-step scenario coverage for mis-resolutions, failure resilience, and lens-not-gate verification per focus. Sim: 29/29 scenarios pass (confirmed this run).
 - [x] **E** — Alchemist catalog: `focus-suggestions.json` — 103 combos, 42 verified (41%); all 6 profiles have ≥1 verified combo; Notion board summary **BLOCKED** (token); 61 unverified (39 Notion-API-401, ~22 other auth-gated)
 
 ## Open PRs (human review needed)
@@ -367,4 +367,37 @@
 - **Workstream status**: A ✓ B ✓ C ✓ D ✓ E (in-flight; 166/105 verified; 61 unverified — all auth-gated)
 - **Next run**: Merge this PR if CI green. Novel agents for 23rd pass: scrape (0.4 relevance — lower confidence, worth probing), dispute agent (0.36), storage agent (unbound — skip). For 23rd pass consider: agent combos using `ship` skill (known 0.8 relevance), `feature-dev` skill, `build-mcp-server` skill. Also: `workflow:market` skill (0.8) hasn't been used as a chain step yet. Human auth actions:
   1. `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` — unblocks 39 notion combos
+  2. Stripe/Neon/Cloudflare/GitHub/Linear tokens — unblocks remaining 22 combos
+
+---
+
+### 2026-06-05T23:20Z — twenty-third-pass catalog (PR#211)
+
+- **Workstream advanced**: E (Alchemist catalog, 23rd pass)
+- **Startup checks**: Build clean (0 errors). Tests: 938 pass / 0 fail / 2 skip. Sim: 29/29 scenarios, 14/14 reachability, 3/3 failures — all green. Workstreams A–D confirmed done.
+- **Notion board**: Still 401 (token unavailable) — using this file as substitute.
+- **Merged PR#210** (twenty-second-pass, 166 combos / 105 verified) — squash merged at start of run.
+- **Execute probes (23rd pass)** — confirmed live via Ch1tty MCP connector:
+  - `orchestrator/agent_search("autobot autonomous feature ship merge pull request")` → chittyagent-autobot (0.7, feature-orchestration+canonical-workflow+ship-automation, **unbound**) ✓ — FIRST use in catalog
+  - `orchestrator/agent_search("ship development wrap-up branch cleanup checkpoint")` → chittyagent-ship (0.7, dev-wrap-up+preflight-checks+branch-management, **unbound**) ✓ — FIRST use in catalog
+  - `orchestrator/agent_search("cleaner disk cleanup storage optimization")` → chittyagent-cleaner (0.7, disk-cleanup+file-analysis+storage-optimization, **bound**) ✓ — FIRST use in catalog
+  - `orchestrator/agent_search("storage document r2 bucket")` → chittyagent-storage (0.7, r2-management+legal-holds+classification, **unbound**) ✓ — FIRST use in catalog  
+  - `orchestrator/skill_search("code review deploy build")` → pr-review:review-pr (0.47) + chittyos-devops:chitty-deploy (0.8) ✓
+  - `orchestrator/skill_search("agents sdk migrate cloudflare workers")` → chittyos-devops:agents-sdk-migrate (0.7) ✓
+  - `orchestrator/skill_search("pipeline cloudflare r2 bucket storage document ingest")` → chittyos-legal:pipeline-submit (0.8) + chittyos-legal:evidence-collect (0.47) ✓
+  - `orchestrator/skill_execute(pr-review)`, `skill_execute(chitty-deploy)`, `skill_execute(agents-sdk-migrate)`, `skill_execute(evidence-collect)`, `skill_execute(pipeline-submit)` — all returned `action:local_invoke` ✓
+- Added 7 new `verified:true` combos (23rd-pass), fixing a test failure (`code profile combos reference code-relevant backends`) during development:
+  - **code/pr-review-skill-context7-brief**: FIRST use of pr-review:review-pr — skill_search(pr-review) → skill_execute(pr-review) → context7 × 2 → fs
+  - **code/autobot-ship-deploy**: FIRST use of chittyagent-autobot — agent_search(autobot) + agent_search(ship) + skill_execute(chitty-deploy) → cloudflare/list_workers
+  - **code/agents-sdk-migration-plan**: FIRST use of agents-sdk-migrate — skill_execute(agents-sdk-migrate) → context7 × 2 → thinking → fs (6-tool chain)
+  - **ops/ship-deploy-pipeline-report**: FIRST use of chittyagent-ship in ops — agent_search(ship) + chitty-deploy skill + cloudflare-builds list → fs
+  - **ops/cleaner-storage-ops-audit**: FIRST use of chittyagent-cleaner — dual-agent: cleaner + storage → thinking → fs
+  - **governance/evidence-pipeline-chain-of-custody**: FIRST two-skill legal pipeline — evidence-collect → pipeline-submit → evidence/ai_search → fs
+  - **governance/storage-agent-legal-hold-audit**: FIRST use of chittyagent-storage in governance — storage agent + evidence + thinking → fs
+- Catalog: 166 → 173 total, 105 → 112 verified (63% → 65%). 61 unverified remain (auth-gated).
+- Build clean. Tests: 938 pass / 0 fail / 2 skip ✓.
+- Branch: `auto/E-catalog-twenty-third-pass`. PR#211 open; CI in progress (CodeQL); subscribed for activity.
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E (in-flight; 173/112 verified; 61 unverified — all auth-gated)
+- **Next run**: Merge PR#211 if CI green. For 24th pass consider: (1) `workflow:machine-management` skill (0.36) not yet in catalog; (2) `chittycommand-alpha:data-ingestion` skill (0.36) not yet in catalog; (3) `scrape` agent (0.4, browser automation job queue, bound) not yet in catalog; (4) `chittyagent-neon` (database ops) as entry point for code/ops combos pairing with neon tools. Human auth actions:
+  1. `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` — unblocks 39 Notion combos
   2. Stripe/Neon/Cloudflare/GitHub/Linear tokens — unblocks remaining 22 combos
