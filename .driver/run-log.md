@@ -300,3 +300,39 @@
 - Build clean. Tests: 938 pass / 0 fail / 2 skip. Branch: `auto/E-catalog-twentieth-pass`. PR#208 open. CI in_progress.
 - **Workstream status**: A ✓ B ✓ C ✓ D ✓ E (catalog JSON deliverable complete; 91/152 verified; further verification human-auth-gated)
 - **Next run**: Merge PR#208 if CI green + no blocking reviews. All remaining unverified combos need auth tokens. Human action: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` to unblock 39 Notion combos. Consider: new patterns to explore with orchestrator/agent_execute (appears in catalog but no verified combo uses it yet).
+
+### 2026-06-05T21:00Z — 21st-pass run
+
+**What happened this run:**
+- Startup: build clean (0 errors), tests 938 pass / 0 fail / 2 skip ✓
+- PR #208 (twentieth-pass, 152/91): all 3 CI checks green (CodeQL ✓, Analyze-actions ✓, Analyze-javascript-typescript ✓). Squash-merged to main.
+- Pulled main (cedba25 — contains 20 passes worth of catalog work).
+- Ch1tty status: 15 servers, 3 connected (orchestrator, evidence, fs). 196 active sessions.
+- Probed live backends for 21st-pass novel chains:
+  - `orchestrator/agent_list` → 28 agents (including alchemist, autobot, ship, ch1tty, helper, registry as novel entry points) ✓
+  - `orchestrator/skill_list` → 54 skills (including recommendation-engine, ux-observer, domain-knowledge, obligation-tracker, cashflow-planner as novel entry points) ✓
+  - `orchestrator/skill_search("obligation tracker cashflow planner")` → obligation-tracker (0.8) + cashflow-planner (0.8) ✓
+  - `orchestrator/skill_search("recommendation engine actions suggest")` → recommendation-engine (0.8) ✓
+  - `orchestrator/skill_search("ux observer engagement patterns insights")` → ux-observer (0.8) ✓
+  - `orchestrator/skill_search("domain knowledge ecosystem navigation")` → domain-knowledge (0.7) ✓
+  - `orchestrator/skill_search("cast mcp route orchestration intent")` → cast (0.8) ✓
+  - `orchestrator/skill_search("build mcp server scaffold plugin")` → build-mcp-server (0.8), chittyos-compliance (0.8) ✓
+  - `orchestrator/agent_search("alchemist pattern observation mcp composition")` → alchemist (0.7) ✓
+  - `orchestrator/agent_search("ch1tty gateway mcp aggregation")` → ch1tty (0.7) ✓
+  - `orchestrator/agent_search("project development ship workflow automation")` → ship (0.7) ✓
+  - `evidence/ai_search(re-evidence-search, "cash flow finance planning ROTH")` → ROTH IRA $17/month ✓
+  - `evidence/ai_search(chittyevidence-search, "property real estate evidence")` → Purchase Agreement confirmed ✓
+- 7 new verified combos added (152→159 total, 91→98 verified):
+  - finance/obligation-cashflow-evidence-plan (dual skill_search: obligation + cashflow → evidence)
+  - governance/multi-rag-cross-synthesis (FIRST dual-RAG chain: re-evidence-search + chittyevidence-search)
+  - code/ch1tty-self-discovery-docs (ch1tty discovers itself via agent_search → cast skill → MCP SDK docs)
+  - design/alchemist-scaffold-proposal (alchemist agent → build-mcp-server skill → evidence)
+  - communication/ux-observer-domain-evidence-report (ux-observer → domain-knowledge → evidence)
+  - ops/recommendation-evidence-agent-dispatch (recommendation-engine → RAG → agent_list)
+  - ops/directory-ship-agent-routing-guide (directory_tree → agent_search(ship) → evidence)
+- Build clean post-update. Tests: 938 pass / 0 fail / 2 skip ✓
+- Branch: `auto/E-catalog-twenty-first-pass`. PR#209 open.
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E (in-flight; 159/98 verified; 61 unverified — all auth-gated)
+- **Next run**: Merge PR#209 if CI green. All remaining 61 unverified are auth-gated. For a 22nd pass, novel entry points remain: autobot agent (no skills matching "autobot" at high relevance yet), helper agent (architectural-navigation), market/registry agents. Human auth actions still needed:
+  1. `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` — unblocks 39 notion combos
+  2. Stripe/Neon/Cloudflare/GitHub/Linear tokens — unblocks remaining 22 combos
