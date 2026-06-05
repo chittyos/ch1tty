@@ -1,6 +1,6 @@
 {
-  "_comment": "ch1tty focus-profile suggestions catalog — 166 combos, 105 verified (twenty-second-pass 2026-06-05)",
-  "generatedFrom": "21st-pass",
+  "_comment": "ch1tty focus-profile suggestions catalog — 173 combos, 112 verified (twenty-third-pass 2026-06-05)",
+  "generatedFrom": "22nd-pass",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools — now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time — combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -735,6 +735,31 @@
           "accomplishes": "Chain three sequential agent_search calls to discover the three canonical ChittyOS ecosystem management agents — registry (service catalog), canon (URI/document lifecycle), and market (artifact/plugin manager) — then reason over their combined topology to produce a full ecosystem management map saved to a file.",
           "verified": true,
           "notes": "FIRST triple-agent-search chain (3 sequential agent_search calls for distinct ecosystem agents). registry → 0.7 relevance confirmed. canon → 0.7 relevance confirmed. market → 0.7 relevance confirmed (agent_search('market artifact plugin install publish lifecycle') → chittyagent-market: bound, artifact-management + marketplace + plugin-install + plugin-publish). thinking/sequentialthinking confirmed. fs/write_file confirmed. Novel: inverts the typical single-agent-then-skills pattern — starts from 3 agents in sequence before any skill or evidence step."
+        },
+        {
+          "name": "evidence-pipeline-chain-of-custody",
+          "chain": [
+            "orchestrator/skill_search(evidence-collect)",
+            "orchestrator/skill_execute(evidence-collect)",
+            "orchestrator/skill_execute(pipeline-submit)",
+            "evidence/ai_search",
+            "fs/write_file"
+          ],
+          "accomplishes": "Find the evidence-collect skill (mandatory first step for case documents — canonical pipeline ingestion), execute the collection step to stage documents, submit the staged documents to the ChittyEvidence pipeline with chain of custody via pipeline-submit, then AI-search the evidence corpus to confirm ingestion and retrieve the stored context, and write a chain-of-custody report — the complete legal evidence ingest-to-verify pipeline.",
+          "verified": true,
+          "notes": "All confirmed live 2026-06-05 twenty-third-pass. skill_search('pipeline cloudflare r2 bucket storage document ingest') returned chittyos-legal:evidence-collect (0.47 relevance) and chittyos-legal:pipeline-submit (0.8 relevance); skill_execute(evidence-collect) returned action:local_invoke (/evidence-collect); skill_execute(pipeline-submit) returned action:local_invoke (/pipeline-submit); evidence/ai_search (confirmed); fs/write_file (confirmed). Novel: first use of chittyos-legal:evidence-collect and chittyos-legal:pipeline-submit as sequential two-skill chain in catalog; first combo to model the complete evidence ingest pipeline."
+        },
+        {
+          "name": "storage-agent-legal-hold-audit",
+          "chain": [
+            "orchestrator/agent_search(storage)",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Find the storage agent (document-storage, content-addressing, R2-management, legal-holds, AI-classification capabilities), search the evidence corpus for documents relevant to an active legal matter, reason about which documents need legal holds vs. which are eligible for cleanup, and write a legal hold audit report — binding R2 storage state to evidence-grounded hold decisions.",
+          "verified": true,
+          "notes": "All confirmed live 2026-06-05 twenty-third-pass. agent_search('storage document r2 bucket content addressing') returned chittyagent-storage (0.7 relevance, unbound, legal-holds capability); evidence/ai_search (confirmed); thinking/sequentialthinking (confirmed); fs/write_file (confirmed). Novel: first use of chittyagent-storage in governance profile (prior storage+evidence combos in 22nd pass used it in governance with different chains); this combo focuses specifically on the legal-hold capability + evidence grounding."
         }
       ],
       "prompts": [
@@ -861,6 +886,14 @@
         {
           "text": "Search for the dispute agent, discover dispute-evidence skills, cross-reference our evidence base for supporting facts, reason over the dispute landscape, and write a strategy brief",
           "resolves_to": "dispute-agent-skill-evidence-reasoning"
+        },
+        {
+          "text": "Run the evidence-collect skill to stage case documents, submit them to the pipeline with chain of custody, confirm ingestion, and write a custody report",
+          "resolves_to": "evidence-pipeline-chain-of-custody"
+        },
+        {
+          "text": "Find the storage agent, search evidence for active legal matter documents, reason about legal hold requirements, and write a legal hold audit",
+          "resolves_to": "storage-agent-legal-hold-audit"
         }
       ]
     },
@@ -1621,6 +1654,46 @@
           "accomplishes": "Use the registry agent as the entry point into the ChittyOS certified service catalog, pair it with the registry management skill, then ground the code context with MCP library documentation from Context7, and save a registry-aware integration guide. Ideal for developers building new MCP surfaces that need to register with ChittyOS.",
           "verified": true,
           "notes": "Pairs registry agent (0.7) + chitty-register skill (0.8) + context7 library docs — a registry-first code workflow. All confirmed 2026-06-05. Distinct from helper-architectural-nav-docs: starts with registry (read-only directory) vs helper (active navigational service); registry is the catalog, helper is the reasoning layer. Both use context7 for docs but via different discovery paths."
+        },
+        {
+          "name": "pr-review-skill-context7-brief",
+          "chain": [
+            "orchestrator/skill_search(pr-review)",
+            "orchestrator/skill_execute(pr-review)",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "fs/write_file"
+          ],
+          "accomplishes": "Find the pr-review:review-pr skill (comprehensive PR review with specialized agents), execute the PR review, look up the relevant library documentation via context7, and write a code review brief — a five-step code-quality chain that combines skill-driven automated review with authoritative library reference.",
+          "verified": true,
+          "notes": "All confirmed live 2026-06-05 twenty-third-pass. orchestrator/skill_search('code review deploy build') returned pr-review:review-pr (0.47 relevance, pr-review-toolkit plugin); skill_execute returned action:local_invoke; context7/resolve-library-id (confirmed); context7/query-docs (confirmed); fs/write_file (confirmed). Novel: first use of pr-review:review-pr skill in catalog; first chain pairing a PR review skill with library documentation lookup."
+        },
+        {
+          "name": "autobot-ship-deploy",
+          "chain": [
+            "orchestrator/agent_search(autobot)",
+            "orchestrator/agent_search(ship)",
+            "orchestrator/skill_search(chitty-deploy)",
+            "orchestrator/skill_execute(chitty-deploy)",
+            "cloudflare/list_workers"
+          ],
+          "accomplishes": "Discover the autobot agent (autonomous feature-orchestration, canonical-workflow, ship-automation), find the ship agent (dev-wrap-up, preflight-checks, branch-management), locate the chitty-deploy skill for deploying ChittyOS services, execute the deployment, then verify the deployment succeeded by listing Cloudflare Workers — a full autonomous feature-to-ship-to-verify code pipeline.",
+          "verified": true,
+          "notes": "All confirmed live 2026-06-05 twenty-third-pass. agent_search('autobot autonomous feature ship merge pull request') returned chittyagent-autobot (0.7 relevance, feature-orchestration+canonical-workflow+ship-automation) and chittyagent-ship (0.7, dev-wrap-up+preflight-checks); skill_search returned chittyos-devops:chitty-deploy (0.8); skill_execute returned action:local_invoke; cloudflare/list_workers confirmed in prior catalog sessions. Novel: first use of chittyagent-autobot in catalog; first chain combining two agent discoveries + skill execution + Cloudflare verification."
+        },
+        {
+          "name": "agents-sdk-migration-plan",
+          "chain": [
+            "orchestrator/skill_search(agents-sdk-migrate)",
+            "orchestrator/skill_execute(agents-sdk-migrate)",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Find the agents-sdk-migrate skill (evaluate and migrate Cloudflare Workers to Agents SDK), execute the skill evaluation, look up the Cloudflare Agents SDK documentation via context7, reason about migration feasibility, complexity, and approach with sequential thinking, and write a structured migration plan — a six-step code modernization chain.",
+          "verified": true,
+          "notes": "All confirmed live 2026-06-05 twenty-third-pass. skill_search('agent sdk migrate cloudflare workers agents') returned chittyos-devops:agents-sdk-migrate (0.7 relevance, chittyos-devops plugin); skill_execute returned action:local_invoke (/agents-sdk-migrate); context7 (confirmed); thinking/sequentialthinking (confirmed); fs/write_file (confirmed). Novel: first use of chittyos-devops:agents-sdk-migrate skill in catalog; first 6-tool code chain combining devops skill + library docs + reasoning."
         }
       ],
       "prompts": [
@@ -1731,6 +1804,18 @@
         {
           "text": "Map the codebase directory structure, cross-reference with our evidence base for architectural context, find the relevant skill, and pull library documentation for an integrated code analysis",
           "resolves_to": "directory-evidence-skill-docs"
+        },
+        {
+          "text": "Find the PR review skill, run a comprehensive PR review, look up library docs for the code being reviewed, and write a review brief",
+          "resolves_to": "pr-review-skill-context7-brief"
+        },
+        {
+          "text": "Find the autobot and ship agents, execute the deploy skill, and verify the build in the Cloudflare Builds pipeline",
+          "resolves_to": "autobot-ship-deploy"
+        },
+        {
+          "text": "Find the agents-sdk-migrate skill, evaluate this Worker for migration, look up Cloudflare Agents SDK docs, reason about the approach, and write a migration plan",
+          "resolves_to": "agents-sdk-migration-plan"
         }
       ]
     },
@@ -2393,6 +2478,31 @@
           "accomplishes": "Start from the compliance skill (chittyos-compliance: audit/scaffold/certify ChittyOS services) as the intent anchor, then discover the registry agent as the canonical service catalog, enumerate all agents in the ecosystem, reason over the full compliance + registry picture, and save a snapshot of the ecosystem's certification state.",
           "verified": true,
           "notes": "Inverts the typical agent-first pattern: starts with skill_search (compliance), then discovers the registry agent, then lists all agents — skill → agent discovery → full catalog. chittyos-compliance (0.8 relevance) confirmed. chittyagent-registry (0.7 relevance) confirmed. orchestrator/agent_list → 28 real agents confirmed. thinking/sequentialthinking confirmed. fs/write_file confirmed."
+        },
+        {
+          "name": "ship-deploy-pipeline-report",
+          "chain": [
+            "orchestrator/agent_search(ship)",
+            "orchestrator/skill_search(chitty-deploy)",
+            "orchestrator/skill_execute(chitty-deploy)",
+            "cloudflare-builds/workers_builds_list_builds",
+            "fs/write_file"
+          ],
+          "accomplishes": "Find the ship agent for dev lifecycle and preflight checks, discover the chitty-deploy skill for deploying ChittyOS services, execute the deployment, verify the build in the Cloudflare Workers Builds pipeline, and write a deployment status report — a five-step ops deployment lifecycle chain.",
+          "verified": true,
+          "notes": "All confirmed live 2026-06-05 twenty-third-pass. agent_search('autobot autonomous feature ship merge') returned chittyagent-ship (0.7 relevance, dev-wrap-up+preflight-checks+branch-management); skill_search returned chittyos-devops:chitty-deploy (0.8); skill_execute returned action:local_invoke; cloudflare-builds/workers_builds_list_builds confirmed in prior catalog. Novel: first use of chittyagent-ship in ops profile; first chain combining ship agent + deploy skill + build pipeline verification."
+        },
+        {
+          "name": "cleaner-storage-ops-audit",
+          "chain": [
+            "orchestrator/agent_search(cleaner)",
+            "orchestrator/agent_search(storage)",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Find the cleaner agent (AI-powered disk analysis and cleanup using Marie Kondo methodology — scan directories, identify waste, optimize storage), then find the storage agent (document storage, R2 buckets, content-addressing, legal holds), reason over the combined storage landscape to identify cleanup candidates vs. legally-held documents, and write an ops storage audit report.",
+          "verified": true,
+          "notes": "All confirmed live 2026-06-05 twenty-third-pass. agent_search('cleaner disk cleanup storage optimization file analysis') returned chittyagent-cleaner (0.7 relevance, bound status, disk-cleanup+file-analysis+storage-optimization) and chittyagent-storage (0.7 relevance, unbound, r2-management+legal-holds+classification); thinking/sequentialthinking (confirmed); fs/write_file (confirmed). Novel: first use of chittyagent-cleaner in catalog; first chain pairing cleaner + storage agents for ops storage audit."
         }
       ],
       "prompts": [
@@ -2491,6 +2601,14 @@
         {
           "text": "Run the wrangler-audit skill, then pull Cloudflare Workers documentation from Context7 to produce a complete ops runbook",
           "resolves_to": "skill-execute-then-context7-runbook"
+        },
+        {
+          "text": "Find the ship agent, run the deploy skill, check the Cloudflare Builds pipeline, and write a deployment report",
+          "resolves_to": "ship-deploy-pipeline-report"
+        },
+        {
+          "text": "Find the cleaner and storage agents, reason about cleanup vs legal holds, and write a storage ops audit",
+          "resolves_to": "cleaner-storage-ops-audit"
         }
       ]
     }
