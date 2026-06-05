@@ -267,3 +267,36 @@
   1. `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` — unblocks 39 notion combos
   2. Stripe/Neon/Cloudflare/GitHub/Linear tokens — unblocks remaining 22 combos
   3. Consider declaring E fully done since JSON deliverable is complete and all remaining work is human-auth-gated.
+
+### 2026-06-05T20:25Z (twentieth-pass)
+
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass, 0 fail, 2 skip.
+- Fetched all branches. Found 2 open PRs: #207 (nineteenth-pass, 145/84 verified) and #206 (run-log-18th-pass). Both CI green (3/3 checks passed).
+- **Merged PR#207** (squash) and **Merged PR#206** (squash). Pulled to latest main (`6fad590`).
+- Post-merge catalog state: 145 combos, 84 verified (57%).
+- Run log on disk confirmed through 15th-pass; PRs #206/#207 brought log to 18th-pass; this entry is 20th-pass.
+- Ch1tty gateway status: 0 connected initially (lazy). Confirmed via direct execute probes:
+  - `orchestrator/agent_list` → 28 real agents ✓
+  - `orchestrator/skill_list` → 54 real skills ✓
+  - `orchestrator/agent_search("dispute evidence legal")` → dispute agent (0.7, 7 tools, bound) ✓
+  - `orchestrator/skill_search("fact governance evidence litigation")` → fact-governance (0.8), dispute-evidence (0.4) ✓
+  - `orchestrator/skill_search("wrangler audit workers devops")` → wrangler-audit (0.8), chittyos-compliance (0.8) ✓
+  - `orchestrator/skill_search("cashflow planner finance mercury")` → cashflow-planner (0.8), mercury-finance (0.8) ✓
+  - `evidence/list_rags` → 3 RAGs (chittyevidence-ksn, re-evidence-search, chittyevidence-search) ✓
+  - `evidence/ai_search(re-evidence-search, "cash flow finance planning")` → real ROTH IRA data ($17/month, $204/12mo) ✓
+  - `playwright/browser_navigate`, `browser_snapshot`, `browser_take_screenshot` confirmed ✓
+  - `fs`, `thinking`, `context7` all confirmed ✓
+  - `notion` → 401 (39 combos blocked); `github/linear/stripe/neon/cloudflare` → no tokens (22 blocked)
+- Not connected this session: browser-rendering (auth-gated).
+- Added 7 new `verified:true` combos (twentieth-pass):
+  - **governance/fact-governance-evidence-synthesis**: skill_search → list_rags → ai_search → thinking → write — first to open with legal skill discovery then RAG+evidence
+  - **governance/dispute-agent-skill-evidence-reasoning**: agent_search → skill_search → ai_search → thinking → write — first 3-layer discovery (agent+skill+evidence) before reasoning
+  - **finance/agent-rag-evidence-finance-reasoning**: agent_search → list_rags → ai_search → skill_search → thinking — first finance chain to use agent discovery as entry into RAG→evidence→skill routing
+  - **ops/skill-execute-then-context7-runbook**: skill_search → skill_execute → context7 × 2 → write — first chain to use skill_execute THEN context7 (post-execution enrichment)
+  - **code/directory-evidence-skill-docs**: directory_tree → ai_search → skill_search → context7 × 2 — first code chain combining directory_tree + evidence + skill + library docs (4-category cross)
+  - **communication/skill-agent-evidence-comm-report**: skill_search → agent_list → ai_search → thinking → write — first comm combo starting with skill_search
+  - **design/evidence-rag-playwright-investigation**: list_rags → ai_search → playwright/navigate → snapshot → thinking — first design chain starting with evidence THEN navigating (inverts playwright-evidence-ux-analysis)
+- Catalog: 145 → 152 total, 84 → 91 verified (57% → 59%). 61 unverified remain (all auth-gated).
+- Build clean. Tests: 938 pass / 0 fail / 2 skip. Branch: `auto/E-catalog-twentieth-pass`. PR#208 open. CI in_progress.
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E (catalog JSON deliverable complete; 91/152 verified; further verification human-auth-gated)
+- **Next run**: Merge PR#208 if CI green + no blocking reviews. All remaining unverified combos need auth tokens. Human action: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` to unblock 39 Notion combos. Consider: new patterns to explore with orchestrator/agent_execute (appears in catalog but no verified combo uses it yet).
