@@ -292,7 +292,7 @@
       ]
     },
     "governance": {
-      "description": "ChittyOS ecosystem governance, identity, evidence, and persistent state — extended with ChittyAgent Tasks (tasks-mcp), ChittyLedger (ledger-mcp), Session Coordinator (session-mcp), and ChittyEvidence canonical document store (chittyevidence). github and orchestrator NOT connected. Notion API returning 401 (invalid token) in remote container — all Notion-write combos are verified:false. See individual combo verified flags.",
+      "description": "ChittyOS ecosystem governance, identity, evidence, and persistent state — extended with ChittyAgent Tasks (tasks-mcp), ChittyLedger (ledger-mcp), Session Coordinator (session-mcp), and ChittyEvidence canonical document store (chittyevidence). Orchestrator connected (toolCount: 13, confirmed 2026-06-05) — combos using orchestrator/agent_search and agent_list are verified:true. github NOT connected. Notion API returning 401 (invalid token) in remote container — all Notion-write combos are verified:false. See individual combo verified flags.",
       "combos": [
         {
           "name": "rag-evidence-to-notion-brief",
