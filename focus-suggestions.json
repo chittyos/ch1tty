@@ -2,7 +2,7 @@
   "_comment": "Alchemist-surfaced suggestions catalog \u2014 cross-backend tool combos and pre-written /cast prompts, grouped by all six focus profiles from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain was confirmed on a connected server at the time that specific combo was written/verified; connectivity changes since then are noted in per-combo notes. `verified:false` means the chain references at least one config-present-but-not-connected server. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only \u2014 no loader, no public tool beyond the existing 5. Updated 2026-05-30 to add code, communication, and ops focus profiles (PRs #71, #72, #80). Updated 2026-06-03 to add Linear MCP (linear) to code and governance profiles. Updated 2026-06-04: re-enumerated connected server set. Updated 2026-06-05: notion reconnected; fixed tool names; 13 combos newly verified (31/65 total). Updated 2026-06-05 fifth-pass: +11 combos (76 total); Notion combos verified:false (401). Updated 2026-06-05 seventh-pass: +4 combos (84 total, 30 verified). Updated 2026-06-05 eighth-pass: +2 ops cloudflare-builds combos (86 total, 30 verified). Updated 2026-06-05 ninth-pass: +8 combos covering cloudflare-builds chains, linear workflows, a11y audit, and codebase+evidence governance (94 total, 30 verified).",
   "generatedFrom": {
     "gateway": "ch1tty",
-    "version": "9th-pass",
+    "version": "10th-pass",
     "method": "live-gateway-enumeration + cast-probe-driven combo discovery",
     "connectedServers": [
       "orchestrator",
@@ -32,7 +32,7 @@
       "linear"
     ],
     "updatedAt": "2026-06-05",
-    "connectedServerNote": "2026-06-05 ninth-pass: +8 combos (94 total, 30 verified). New combos cover: (ops) cloudflare-builds multi-step triage chains (build-failure-triage-report, build-config-review); (code) cloudflare-builds+context7 build-failure-to-docs research (build-log-lib-docs-research), linear+codebase+reasoning (linear-issue-codebase-analysis); (design) playwright+thinking+fs a11y audit (a11y-audit-to-file); (governance) linear sprint health report (linear-sprint-governance-report), codebase+evidence+reasoning audit (codebase-evidence-governance-audit); (finance) browser-rendering financial page brief (financial-page-brief). All 8 new combos are verified:false \u2014 cloudflare-builds, linear, evidence, browser-rendering not connected in the container environment. Previously: 8th-pass added cloudflare-builds with 2 ops combos (86 total). 7th-pass: finance+communication first verified (30 verified, 84 total). Remaining unverified: auth-gated backends (stripe/neon/cloudflare/github/linear/cloudflare-builds) + Notion 401 (NOTION_TOKEN via op://ChittyOS-Integrations/notion/api_token).",
+    "connectedServerNote": "2026-06-05 tenth-pass: +2 combos +1 verification (96 total, 33 verified). Verified a11y-audit-to-file (design \u2014 was added unverified in 9th-pass); added library-docs-to-file (code \u2014 context7\u2192thinking\u2192fs/write, new research-to-file pattern); added web-snapshot-report (communication \u2014 playwright\u2192snapshot\u2192thinking\u2192fs/write, extends web-comm-snapshot-analysis with output). All 3 new/updated combos verified via cast probes on live connected servers (playwright, context7, thinking, fs). Previously: 9th-pass +8 combos (94 total, 30 verified) \u2014 all unverified (auth-gated backends). Remaining unverified (63): Notion 401 (NOTION_TOKEN via op://ChittyOS-Integrations/notion/api_token) + auth-gated backends (stripe/neon/cloudflare/github/linear/cloudflare-builds/evidence/browser-rendering/orchestrator).",
     "date": "2026-06-05"
   },
   "profiles": {
@@ -683,8 +683,8 @@
             "fs/write_file"
           ],
           "accomplishes": "Navigate to a target page with Playwright, capture its full accessibility snapshot (ARIA roles, labels, interactive elements), reason over WCAG 2.1 compliance gaps and severity levels with sequential-thinking, then write a structured a11y audit report to a local file.",
-          "verified": false,
-          "notes": "playwright available (npx, no auth) but requires a browser in the environment. thinking and fs accessible. Extends a11y-snapshot-to-notion-audit (same first two steps) with reasoning + file output instead of Notion."
+          "verified": true,
+          "notes": "All 4 tools confirmed on live connected servers. 2026-06-05 tenth-pass cast probes: playwright/browser_navigate (1.05), playwright/browser_snapshot (0.78 \u2014 resolves directly), thinking/sequentialthinking (1.18), fs/write_file (0.83 as alternative for write intent). Extends a11y-snapshot-to-notion-audit (same first two steps) with reasoning + file output instead of Notion. playwright available via npx (lazy spawn, no auth required)."
         }
       ],
       "prompts": [
@@ -958,6 +958,18 @@
           "accomplishes": "Fetch a Linear issue's full description and metadata, search the local codebase for relevant files matching the issue keywords, read the most relevant ones, reason over the implementation approach or root cause, then write a structured analysis \u2014 grounding issue-driven work in actual code context.",
           "verified": false,
           "notes": "linear not connected (auth-gated). fs and thinking available locally. Tightest linear+codebase combo: issue context pulls code context pulls reasoning."
+        },
+        {
+          "name": "library-docs-to-file",
+          "chain": [
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Resolve a library or framework name to its context7 library ID, query current documentation and code examples, reason over the relevant API surface and design patterns with sequential thinking, then write a structured technical summary to a local file \u2014 turning on-demand library research into a persistent, queryable reference.",
+          "verified": true,
+          "notes": "All 4 tools confirmed on live connected servers. 2026-06-05 tenth-pass cast probes: context7/resolve-library-id (1.10), context7/query-docs (0.90 as alternative), thinking/sequentialthinking (1.18), fs/write_file (0.83 as alternative). Extends search-to-library-docs (ends at query-docs) with reasoning + file output. context7 available via npx (lazy spawn, no auth required). No auth-gated backends required."
         }
       ],
       "prompts": [
@@ -1148,6 +1160,18 @@
           "accomplishes": "Navigate to a web-based messaging tool, capture a structured accessibility snapshot (better than screenshot for element-level data), then reason about message threads, unread items, and required responses \u2014 enables structured extraction of communication state from browser-accessible tools.",
           "verified": true,
           "notes": "All 3 tools confirmed on live connected servers (playwright, thinking). 2026-06-05 seventh-pass. Cast scores: playwright/browser_snapshot (0.33 for accessibility-snapshot intent), playwright/browser_navigate (0.33 for navigate intent), thinking/sequentialthinking (0.33 for analysis intent). Prefer over web-comm-state-analysis when structured element data is needed."
+        },
+        {
+          "name": "web-snapshot-report",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_snapshot",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Navigate to a web-based communication or collaboration tool, capture a structured accessibility snapshot (ARIA roles, thread counts, message previews), reason over communication state and priority action items, then write a summary report to a local file \u2014 persisting the analysis for async review or as a daily digest artifact.",
+          "verified": true,
+          "notes": "All 4 tools confirmed on live connected servers. 2026-06-05 tenth-pass cast probes: playwright/browser_navigate (1.05), playwright/browser_snapshot (0.78), thinking/sequentialthinking (1.18), fs/write_file (0.83 as alternative). Extends web-comm-snapshot-analysis (ends at thinking) with file output step. playwright available via npx (lazy spawn, no auth required). No auth-gated backends required."
         }
       ],
       "prompts": [
