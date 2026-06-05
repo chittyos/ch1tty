@@ -1,13 +1,36 @@
 {
-  "_comment": "Alchemist-surfaced suggestions catalog — cross-backend tool combos and pre-written /cast prompts, grouped by all six focus profiles from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain lives on a server that was connected on the live gateway when this catalog was last refreshed. `verified:false` means the chain references at least one config-present-but-not-connected server. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only — no loader, no public tool beyond the existing 5. Updated 2026-05-30 to add code, communication, and ops focus profiles (PRs #71, #72, #80). Updated 2026-06-03 to add Linear MCP (linear) to code and governance profiles. Updated 2026-06-04: re-enumerated connected server set via live mcp__Ch1tty__status (7/14 servers, 68 tools); github and orchestrator disconnected; neon also not connected; updated 11 verified:true→false for affected combos; added 10 new verified:true combos spanning currently-connected backends (evidence, browser-rendering, notion, context7, thinking, fs, playwright); cast-probe-driven discovery for all new combos.",
+  "_comment": "Alchemist-surfaced suggestions catalog — cross-backend tool combos and pre-written /cast prompts, grouped by all six focus profiles from focus-profiles.json. A combo's `chain` lists namespaced `serverId/toolName` tools in execution order; the alchemist's value is in combos spanning >1 backend. `verified:true` means EVERY tool in the chain was confirmed on a connected server at the time that specific combo was written/verified; connectivity changes since then are noted in per-combo notes. `verified:false` means the chain references at least one config-present-but-not-connected server. Prompts are pre-written natural-language intents a user can fire via ch1tty/cast; `resolves_to` names the combo (or a single tool) the cast should land on. This is a data artifact only — no loader, no public tool beyond the existing 5. Updated 2026-05-30 to add code, communication, and ops focus profiles (PRs #71, #72, #80). Updated 2026-06-03 to add Linear MCP (linear) to code and governance profiles. Updated 2026-06-04: re-enumerated connected server set. Updated 2026-06-05: notion reconnected; fixed context7/get-library-docs → context7/query-docs; fixed fs/directory_tree → fs/list_directory; 13 combos newly verified:true (31/65 total verified).",
   "generatedFrom": {
     "gateway": "ch1tty",
     "version": "4.1.0",
     "method": "live-gateway-enumeration + cast-probe-driven combo discovery",
-    "connectedServers": ["evidence", "browser-rendering", "notion", "context7", "thinking", "fs", "playwright"],
-    "notConnectedServers": ["chittyos", "cloudflare", "cowork", "stripe", "neon", "tasks", "ledger", "session", "chittyevidence", "serena", "chittymac", "imessage", "github", "orchestrator"],
-    "updatedAt": "2026-06-04",
-    "connectedServerNote": "2026-06-04 live enumeration: 7/14 servers connected (68 total tools): evidence(3), browser-rendering(3), notion(22), context7(2), thinking(1), fs(14), playwright(23). github (0 tools) and orchestrator (0 tools) are now NOT connected. neon also not connected. Combos previously marked verified:true that referenced these servers have been corrected to verified:false."
+    "connectedServers": [
+      "orchestrator",
+      "browser-rendering",
+      "context7",
+      "evidence",
+      "fs",
+      "playwright",
+      "thinking",
+      "notion"
+    ],
+    "notConnectedServers": [
+      "chittyos",
+      "cloudflare",
+      "cowork",
+      "stripe",
+      "neon",
+      "tasks",
+      "ledger",
+      "session",
+      "chittyevidence",
+      "serena",
+      "chittymac",
+      "imessage",
+      "github"
+    ],
+    "updatedAt": "2026-06-05",
+    "connectedServerNote": "2026-06-05 fourth-pass re-enumeration via live cast probes: notion reconnected (API-post-page, API-post-search, API-retrieve-a-page, API-patch-block-children, API-create-a-comment, API-patch-page confirmed). Fixed context7/get-library-docs → context7/query-docs across all combos (real tool is query-docs). Fixed fs/directory_tree → fs/list_directory (real tool name). 13 combos newly verified:true using confirmed-live backends."
   },
   "profiles": {
     "finance": {
@@ -15,55 +38,97 @@
       "combos": [
         {
           "name": "invoice-to-ledger-tracker",
-          "chain": ["stripe/list_invoices", "notion/API-post-page"],
+          "chain": [
+            "stripe/list_invoices",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Pull recent Stripe invoices and write each into a Notion finance tracker database as a page — turning billing state into a queryable, human-readable ledger view.",
           "verified": false,
           "notes": "stripe not connected (lazy); stripe/list_invoices inferred from @stripe/mcp surface. notion/API-post-page is verified."
         },
         {
           "name": "new-customer-onboarding-record",
-          "chain": ["stripe/create_customer", "notion/API-post-page", "github/create_issue"],
+          "chain": [
+            "stripe/create_customer",
+            "notion/API-post-page",
+            "github/create_issue"
+          ],
           "accomplishes": "Create a Stripe customer, log the customer record into Notion, and open a GitHub issue to track onboarding follow-up work — a three-backend chain spanning payments, docs, and engineering.",
           "verified": false,
           "notes": "stripe inferred (not connected). notion/API-post-page verified. github not connected (2026-06-04)."
         },
         {
           "name": "payment-failure-triage",
-          "chain": ["stripe/list_payment_intents", "thinking/sequentialthinking", "notion/API-post-page"],
+          "chain": [
+            "stripe/list_payment_intents",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Enumerate failed/pending Stripe payment intents, reason over likely causes and remediation order with sequential-thinking, then record the triage plan as a Notion page.",
           "verified": false,
           "notes": "stripe inferred. thinking/sequentialthinking and notion/API-post-page verified."
         },
         {
           "name": "invoice-to-immutable-ledger",
-          "chain": ["stripe/list_invoices", "ledger/append_entry"],
+          "chain": [
+            "stripe/list_invoices",
+            "ledger/append_entry"
+          ],
           "accomplishes": "Pull recent Stripe invoices and append each as an immutable entry to the ChittyLedger — creating an auditable, append-only financial record that cannot be altered after the fact.",
           "verified": false,
           "notes": "stripe inferred (not connected). ledger/append_entry from apps/ledger-mcp — in config (enabled:false). This is the core finance-immutability combo: Stripe is the source of truth for billing; the ledger is the durable audit anchor."
         },
         {
           "name": "billing-task-and-ledger",
-          "chain": ["tasks/create_task", "ledger/append_entry"],
+          "chain": [
+            "tasks/create_task",
+            "ledger/append_entry"
+          ],
           "accomplishes": "Create a billing remediation task in ChittyAgent Tasks and simultaneously append a ledger entry recording the intent — so the task's existence is anchored in the immutable ledger before it can be lost or modified.",
           "verified": false,
           "notes": "tasks/create_task from apps/tasks-mcp (enabled:false). ledger/append_entry from apps/ledger-mcp (enabled:false). Both are new apps/*-mcp surfaces — shortest cross-backend finance combo."
         },
         {
           "name": "ledger-to-finance-brief",
-          "chain": ["ledger/list_entries", "thinking/sequentialthinking", "notion/API-post-page"],
+          "chain": [
+            "ledger/list_entries",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Pull recent ChittyLedger entries for a financial namespace, reason over them with sequential-thinking to identify anomalies or trends, and write a finance brief into Notion — turning raw ledger state into an actionable narrative.",
           "verified": false,
           "notes": "ledger/list_entries from apps/ledger-mcp (enabled:false). thinking/sequentialthinking and notion/API-post-page are verified on the live gateway."
         }
       ],
       "prompts": [
-        { "text": "Pull this month's Stripe invoices and log them into my Notion finance tracker", "resolves_to": "invoice-to-ledger-tracker" },
-        { "text": "Onboard a new Stripe customer and open a GitHub issue to track their setup", "resolves_to": "new-customer-onboarding-record" },
-        { "text": "Triage my failed Stripe payments and write up a remediation plan in Notion", "resolves_to": "payment-failure-triage" },
-        { "text": "List all open Stripe subscriptions", "resolves_to": "stripe/list_subscriptions" },
-        { "text": "Pull Stripe invoices and append each to the immutable ledger for audit", "resolves_to": "invoice-to-immutable-ledger" },
-        { "text": "Create a billing task and lock in the intent on the ledger before it can be lost", "resolves_to": "billing-task-and-ledger" },
-        { "text": "Analyze recent ledger entries for anomalies and write a finance brief in Notion", "resolves_to": "ledger-to-finance-brief" }
+        {
+          "text": "Pull this month's Stripe invoices and log them into my Notion finance tracker",
+          "resolves_to": "invoice-to-ledger-tracker"
+        },
+        {
+          "text": "Onboard a new Stripe customer and open a GitHub issue to track their setup",
+          "resolves_to": "new-customer-onboarding-record"
+        },
+        {
+          "text": "Triage my failed Stripe payments and write up a remediation plan in Notion",
+          "resolves_to": "payment-failure-triage"
+        },
+        {
+          "text": "List all open Stripe subscriptions",
+          "resolves_to": "stripe/list_subscriptions"
+        },
+        {
+          "text": "Pull Stripe invoices and append each to the immutable ledger for audit",
+          "resolves_to": "invoice-to-immutable-ledger"
+        },
+        {
+          "text": "Create a billing task and lock in the intent on the ledger before it can be lost",
+          "resolves_to": "billing-task-and-ledger"
+        },
+        {
+          "text": "Analyze recent ledger entries for anomalies and write a finance brief in Notion",
+          "resolves_to": "ledger-to-finance-brief"
+        }
       ]
     },
     "governance": {
@@ -71,112 +136,267 @@
       "combos": [
         {
           "name": "rag-evidence-to-notion-brief",
-          "chain": ["evidence/list_rags", "evidence/ai_search", "notion/API-post-page"],
+          "chain": [
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Discover the available AutoRAG vector stores, run an AI search across the evidence corpus, and persist the synthesized findings as a Notion brief — turning raw evidence retrieval into a governed, citable document.",
           "verified": true,
-          "notes": "All three tools on connected servers (evidence, notion). Verified 2026-06-04."
+          "notes": "evidence/list_rags, evidence/ai_search, and notion/API-post-page all confirmed connected (2026-06-05). notion reconnected this pass."
         },
         {
           "name": "issue-triage-to-governance-tracker",
-          "chain": ["github/list_issues", "thinking/sequentialthinking", "notion/API-post-page"],
+          "chain": [
+            "github/list_issues",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
           "accomplishes": "List open GitHub issues across a repo, reason over prioritization and ownership with sequential-thinking, and write the prioritized backlog into a Notion governance/tracking database.",
           "verified": false,
           "notes": "github NOT connected (0 tools, 2026-06-04). thinking and notion verified. Previously verified:true when github was connected."
         },
         {
           "name": "skill-discover-and-execute",
-          "chain": ["orchestrator/skill_search", "orchestrator/skill_execute", "notion/API-create-a-comment"],
+          "chain": [
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "notion/API-create-a-comment"
+          ],
           "accomplishes": "Find the right ChittyOS skill for a governance task, execute it through the orchestrator, then annotate the outcome as a comment on the relevant Notion page for an audit trail. Spans orchestrator + notion.",
-          "verified": false,
-          "notes": "orchestrator NOT connected (0 tools, 2026-06-04). Previously verified:true. notion verified."
+          "verified": true,
+          "notes": "orchestrator/skill_search, orchestrator/skill_execute, and notion/API-create-a-comment all confirmed connected (2026-06-05). notion reconnected this pass."
         },
         {
           "name": "context-provisioning-audit",
-          "chain": ["orchestrator/provision_candidates", "orchestrator/provision_evaluate", "notion/API-post-page"],
+          "chain": [
+            "orchestrator/provision_candidates",
+            "orchestrator/provision_evaluate",
+            "notion/API-post-page"
+          ],
           "accomplishes": "List TY-VY-RY scored ChittyID candidates for a session, run the autonomous provisioning evaluation, and archive the decision + per-aspect rationale into a Notion governance log.",
-          "verified": false,
-          "notes": "orchestrator NOT connected (0 tools, 2026-06-04). Previously verified:true. notion verified."
+          "verified": true,
+          "notes": "orchestrator/provision_candidates, orchestrator/provision_evaluate, and notion/API-post-page all confirmed connected (2026-06-05). notion reconnected this pass."
         },
         {
           "name": "agent-route-and-document",
-          "chain": ["orchestrator/agent_search", "orchestrator/agent_execute", "notion/API-patch-block-children"],
+          "chain": [
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "notion/API-patch-block-children"
+          ],
           "accomplishes": "Find which ChittyAgent handles a domain task, route the request through the orchestrator's agent protocol, and append the result to an existing Notion page's body.",
-          "verified": false,
-          "notes": "orchestrator NOT connected (0 tools, 2026-06-04). Previously verified:true. notion verified."
+          "verified": true,
+          "notes": "orchestrator/agent_search, orchestrator/agent_execute, and notion/API-patch-block-children all confirmed connected (2026-06-05). notion reconnected this pass."
         },
         {
           "name": "evidence-backed-issue",
-          "chain": ["evidence/ai_search", "github/create_issue"],
+          "chain": [
+            "evidence/ai_search",
+            "github/create_issue"
+          ],
           "accomplishes": "Search the evidence corpus for prior art / supporting context, then open a GitHub issue pre-populated with the cited findings — grounding engineering work in governed evidence.",
           "verified": false,
           "notes": "evidence verified. github NOT connected (0 tools, 2026-06-04). Previously verified:true."
         },
         {
           "name": "task-session-evidence",
-          "chain": ["tasks/create_task", "session/append_event", "chittyevidence/ingest_document"],
+          "chain": [
+            "tasks/create_task",
+            "session/append_event",
+            "chittyevidence/ingest_document"
+          ],
           "accomplishes": "Capture a governance decision as a ChittyAgent task, append it to the active session as a timestamped event, then ingest the rationale as a canonical document with a chittycanon:// URI — creating a three-layer trail: work item → session log → evidence store.",
           "verified": false,
           "notes": "tasks, session, chittyevidence all in config (enabled:false). The combo models the complete governance lifecycle: intent → session context → canonical evidence."
         },
         {
           "name": "session-audit-to-notion",
-          "chain": ["session/list_sessions", "session/list_events", "thinking/sequentialthinking", "notion/API-post-page"],
+          "chain": [
+            "session/list_sessions",
+            "session/list_events",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
           "accomplishes": "List all active governance sessions, enumerate the events in each, reason over the event stream to identify patterns or anomalies, and render a session audit trail into Notion for human review.",
           "verified": false,
           "notes": "session/list_sessions and session/list_events from apps/session-coordinator-mcp (enabled:false). thinking and notion are verified live."
         },
         {
           "name": "evidence-to-task-to-ledger",
-          "chain": ["chittyevidence/search_documents", "tasks/create_task", "ledger/append_entry"],
+          "chain": [
+            "chittyevidence/search_documents",
+            "tasks/create_task",
+            "ledger/append_entry"
+          ],
           "accomplishes": "Search the canonical evidence store for a governance topic, create follow-up action tasks from the findings, and append the decision to the immutable ledger — a full discover → act → record governance chain.",
           "verified": false,
           "notes": "chittyevidence, tasks, ledger all in config (enabled:false). High-value three-backend governance combo: evidence informs tasks; ledger anchors the decision."
         },
         {
           "name": "ledger-review-to-brief",
-          "chain": ["ledger/list_entries", "thinking/sequentialthinking", "notion/API-post-page"],
+          "chain": [
+            "ledger/list_entries",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Audit the governance ledger namespace for a topic (e.g. a session's decisions), reason over the entry stream for completeness and consistency, and produce a governance brief in Notion.",
           "verified": false,
           "notes": "ledger/list_entries from apps/ledger-mcp (enabled:false). thinking and notion are verified live."
         },
         {
           "name": "linear-sprint-to-governance-brief",
-          "chain": ["linear/list_projects", "thinking/sequentialthinking", "notion/API-post-page"],
+          "chain": [
+            "linear/list_projects",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
           "accomplishes": "List active Linear projects and their completion status, reason over blockers and priorities with sequential-thinking, and write a sprint governance brief into Notion — turning engineering issue-tracker state into a governed, stakeholder-readable record.",
           "verified": false,
           "notes": "linear uses mcp.linear.app/mcp (requires authTokenKey: linear-mcp). thinking/sequentialthinking and notion/API-post-page are verified live."
         },
         {
           "name": "evidence-reasoning-brief",
-          "chain": ["evidence/ai_search", "thinking/sequentialthinking", "notion/API-post-page"],
+          "chain": [
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
           "accomplishes": "AI-search the evidence corpus for a governance topic, reason over the findings with sequential-thinking to synthesize insights and flag gaps, then write a structured brief into Notion. Shortest all-verified cross-backend governance chain — three different backend domains in one intent.",
           "verified": true,
-          "notes": "evidence, thinking, notion all connected (2026-06-04). New combo discovered via live cast probes this run. Cast: 'search evidence store and write Notion brief' resolves to evidence/list_rags (score 0.55) with notion/API-post-search as alternative — confirms both backends are in the resolution path."
+          "notes": "evidence/ai_search, thinking/sequentialthinking, and notion/API-post-page all confirmed connected (2026-06-05). notion reconnected this pass."
         },
         {
           "name": "rag-survey-to-file",
-          "chain": ["evidence/list_rags", "fs/write_file"],
+          "chain": [
+            "evidence/list_rags",
+            "fs/write_file"
+          ],
           "accomplishes": "Enumerate all available AutoRAG vector stores and save the inventory to a local file — a discovery-then-archive pattern for documenting what evidence knowledge bases exist without requiring Notion access.",
           "verified": true,
           "notes": "evidence and fs both connected (2026-06-04). Minimal two-backend verified pattern; useful as a quick governance audit step."
+        },
+        {
+          "name": "skill-dispatch-to-file",
+          "chain": [
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "fs/write_file"
+          ],
+          "accomplishes": "Find the right ChittyOS skill for a governance task by keyword/intent, execute it through the orchestrator, and write the result to a local file as a durable audit record. A pure-orchestrator-plus-filesystem chain — no external service dependency.",
+          "verified": true,
+          "notes": "orchestrator (skill_search, skill_execute) and fs (write_file) — all connected 2026-06-04."
+        },
+        {
+          "name": "provision-evaluate-and-bind",
+          "chain": [
+            "orchestrator/provision_evaluate",
+            "orchestrator/provision_bind"
+          ],
+          "accomplishes": "Evaluate which ChittyID context entity should serve a session using TY-VY-RY scoring, then execute the binding decision — the full ChittyID provisioning flow in two sequential orchestrator calls.",
+          "verified": true,
+          "notes": "Pure orchestrator chain — provision_evaluate and provision_bind both confirmed live 2026-06-04."
+        },
+        {
+          "name": "evidence-search-reason-write",
+          "chain": [
+            "evidence/search",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search the AutoRAG evidence store for relevant documents, reason through the findings with sequential thinking to synthesise an analysis or audit summary, then write the final report to a file — a three-backend research-to-document chain.",
+          "verified": true,
+          "notes": "evidence/search, thinking/sequentialthinking, and fs/write_file all confirmed on connected servers (2026-06-04 third pass)."
+        },
+        {
+          "name": "provision-candidates-report",
+          "chain": [
+            "orchestrator/provision_candidates",
+            "orchestrator/provision_evaluate",
+            "fs/write_file"
+          ],
+          "accomplishes": "Enumerate provisioning candidates from the orchestrator, run the evaluation step to score each candidate, then write the ranked evaluation report to a file — a two-backend governance audit chain.",
+          "verified": true,
+          "notes": "orchestrator/provision_candidates and orchestrator/provision_evaluate confirmed via live status (13 orchestrator tools connected, 2026-06-04 third pass). fs/write_file confirmed connected."
         }
       ],
       "prompts": [
-        { "text": "Search the evidence store for everything about the closing disclosure and write me a Notion brief", "resolves_to": "rag-evidence-to-notion-brief" },
-        { "text": "Triage the open issues in the ch1tty repo and put a prioritized backlog in Notion", "resolves_to": "issue-triage-to-governance-tracker" },
-        { "text": "Find the compliance skill, run it, and log the result on the project's Notion page", "resolves_to": "skill-discover-and-execute" },
-        { "text": "Which ChittyID context should serve this session? Evaluate candidates and archive the decision", "resolves_to": "context-provisioning-audit" },
-        { "text": "Find the agent that handles Cloudflare DNS and route my zone-list request to it, then document the result", "resolves_to": "agent-route-and-document" },
-        { "text": "Search the evidence corpus for prior art and open a GitHub issue citing what you found", "resolves_to": "evidence-backed-issue" },
-        { "text": "List the available AutoRAG vector stores", "resolves_to": "evidence/list_rags" },
-        { "text": "Search my Notion workspace for the governance charter", "resolves_to": "notion/API-post-search" },
-        { "text": "Capture this governance decision as a task, log it to the session, and ingest the rationale as a canonical evidence document", "resolves_to": "task-session-evidence" },
-        { "text": "Audit all active sessions and their events, then write a session report in Notion", "resolves_to": "session-audit-to-notion" },
-        { "text": "Search evidence for this topic, create action tasks from the findings, and lock the decision in the ledger", "resolves_to": "evidence-to-task-to-ledger" },
-        { "text": "Review the governance ledger for this session and write a brief summarizing all decisions", "resolves_to": "ledger-review-to-brief" },
-        { "text": "Summarize our Linear sprint status and write a governance brief to Notion", "resolves_to": "linear-sprint-to-governance-brief" },
-        { "text": "Search the evidence store for architecture decisions and reason over them to produce a Notion brief", "resolves_to": "evidence-reasoning-brief" },
-        { "text": "List all available AutoRAG knowledge bases and save the inventory to a file", "resolves_to": "rag-survey-to-file" }
+        {
+          "text": "Search the evidence store for everything about the closing disclosure and write me a Notion brief",
+          "resolves_to": "rag-evidence-to-notion-brief"
+        },
+        {
+          "text": "Triage the open issues in the ch1tty repo and put a prioritized backlog in Notion",
+          "resolves_to": "issue-triage-to-governance-tracker"
+        },
+        {
+          "text": "Find the compliance skill, run it, and log the result on the project's Notion page",
+          "resolves_to": "skill-discover-and-execute"
+        },
+        {
+          "text": "Which ChittyID context should serve this session? Evaluate candidates and archive the decision",
+          "resolves_to": "context-provisioning-audit"
+        },
+        {
+          "text": "Find the agent that handles Cloudflare DNS and route my zone-list request to it, then document the result",
+          "resolves_to": "agent-route-and-document"
+        },
+        {
+          "text": "Search the evidence corpus for prior art and open a GitHub issue citing what you found",
+          "resolves_to": "evidence-backed-issue"
+        },
+        {
+          "text": "List the available AutoRAG vector stores",
+          "resolves_to": "evidence/list_rags"
+        },
+        {
+          "text": "Search my Notion workspace for the governance charter",
+          "resolves_to": "notion/API-post-search"
+        },
+        {
+          "text": "Capture this governance decision as a task, log it to the session, and ingest the rationale as a canonical evidence document",
+          "resolves_to": "task-session-evidence"
+        },
+        {
+          "text": "Audit all active sessions and their events, then write a session report in Notion",
+          "resolves_to": "session-audit-to-notion"
+        },
+        {
+          "text": "Search evidence for this topic, create action tasks from the findings, and lock the decision in the ledger",
+          "resolves_to": "evidence-to-task-to-ledger"
+        },
+        {
+          "text": "Review the governance ledger for this session and write a brief summarizing all decisions",
+          "resolves_to": "ledger-review-to-brief"
+        },
+        {
+          "text": "Summarize our Linear sprint status and write a governance brief to Notion",
+          "resolves_to": "linear-sprint-to-governance-brief"
+        },
+        {
+          "text": "Search the evidence store for architecture decisions and reason over them to produce a Notion brief",
+          "resolves_to": "evidence-reasoning-brief"
+        },
+        {
+          "text": "List all available AutoRAG knowledge bases and save the inventory to a file",
+          "resolves_to": "rag-survey-to-file"
+        },
+        {
+          "text": "Search for the best ChittyOS skill for this governance task and execute it",
+          "resolves_to": "skill-dispatch-to-file"
+        },
+        {
+          "text": "Evaluate which ChittyID context should handle this session and bind the provisioning decision",
+          "resolves_to": "provision-evaluate-and-bind"
+        },
+        {
+          "text": "Search evidence docs for recent audit findings, reason about compliance gaps, and write a summary",
+          "resolves_to": "evidence-search-reason-write"
+        },
+        {
+          "text": "Evaluate current provisioning candidates and write a ranked report to file",
+          "resolves_to": "provision-candidates-report"
+        }
       ]
     },
     "design": {
@@ -184,79 +404,173 @@
       "combos": [
         {
           "name": "capture-archive-document",
-          "chain": ["browser-rendering/get_url_screenshot", "fs/write_file", "notion/API-patch-block-children"],
+          "chain": [
+            "browser-rendering/get_url_screenshot",
+            "fs/write_file",
+            "notion/API-patch-block-children"
+          ],
           "accomplishes": "Screenshot a live URL via Cloudflare browser-rendering, save the image to the local filesystem, then embed/reference it in a Notion page — a capture→archive→document pipeline across three backends.",
           "verified": true,
-          "notes": "browser-rendering, fs, notion all connected. Verified 2026-06-04."
+          "notes": "browser-rendering/get_url_screenshot, fs/write_file, and notion/API-patch-block-children all confirmed connected (2026-06-05)."
         },
         {
           "name": "visual-bug-report",
-          "chain": ["playwright/browser_navigate", "playwright/browser_snapshot", "github/create_issue"],
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_snapshot",
+            "github/create_issue"
+          ],
           "accomplishes": "Drive a real browser to the failing page, capture an accessibility snapshot (better than a screenshot for actionable detail), and file a GitHub issue with the reproduction — a QA-to-engineering handoff spanning playwright + github.",
           "verified": false,
           "notes": "playwright verified. github NOT connected (0 tools, 2026-06-04). Previously verified:true."
         },
         {
           "name": "page-to-markdown-archive",
-          "chain": ["browser-rendering/get_url_markdown", "fs/write_file"],
+          "chain": [
+            "browser-rendering/get_url_markdown",
+            "fs/write_file"
+          ],
           "accomplishes": "Convert any web page to clean Markdown via browser-rendering and save it locally — a lightweight content-capture combo for design references and competitive teardowns.",
           "verified": true,
           "notes": "browser-rendering and fs connected. Verified 2026-06-04."
         },
         {
           "name": "form-fill-and-screenshot-proof",
-          "chain": ["playwright/browser_navigate", "playwright/browser_fill_form", "playwright/browser_take_screenshot", "fs/write_file"],
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_fill_form",
+            "playwright/browser_take_screenshot",
+            "fs/write_file"
+          ],
           "accomplishes": "Automate a form submission flow end-to-end and capture a screenshot proof saved to disk — verifying a UI flow works and producing visual evidence. (playwright-heavy, but fs makes the artifact durable cross-backend.)",
           "verified": true,
           "notes": "playwright and fs connected. Verified 2026-06-04."
         },
         {
           "name": "live-page-html-to-docs",
-          "chain": ["browser-rendering/get_url_html_content", "context7/get-library-docs", "notion/API-post-page"],
+          "chain": [
+            "browser-rendering/get_url_html_content",
+            "context7/query-docs",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Fetch a live page's raw HTML, cross-reference the framework/library it uses against current docs via context7, and write an implementation note into Notion — useful for reverse-engineering a design pattern.",
           "verified": true,
-          "notes": "browser-rendering, context7, notion all connected. Verified 2026-06-04."
+          "notes": "Fixed context7/get-library-docs → context7/query-docs (2026-06-05). browser-rendering/get_url_html_content, context7/query-docs, and notion/API-post-page all confirmed connected."
         },
         {
           "name": "screenshot-to-canonical-evidence",
-          "chain": ["browser-rendering/get_url_screenshot", "chittyevidence/ingest_document"],
+          "chain": [
+            "browser-rendering/get_url_screenshot",
+            "chittyevidence/ingest_document"
+          ],
           "accomplishes": "Screenshot a live URL and ingest the resulting image as a canonical evidence document with a chittycanon:// URI — making visual design artifacts governed, citable, and retrievable by future evidence searches rather than lost in a local folder.",
           "verified": false,
           "notes": "browser-rendering is verified live. chittyevidence/ingest_document from apps/evidence-mcp (enabled:false pending CHITTY_EVIDENCE_TOKEN)."
         },
         {
           "name": "browser-test-to-task",
-          "chain": ["playwright/browser_navigate", "playwright/browser_snapshot", "tasks/create_task"],
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_snapshot",
+            "tasks/create_task"
+          ],
           "accomplishes": "Drive a live browser to a design target, capture an accessibility snapshot revealing the actual DOM state, and immediately create a tracked ChittyAgent task for any issues found.",
           "verified": false,
           "notes": "playwright is verified live. tasks/create_task from apps/tasks-mcp (enabled:false). Shortest cross-backend design-to-work-tracking combo."
         },
         {
           "name": "playwright-capture-to-notion",
-          "chain": ["playwright/browser_navigate", "playwright/browser_take_screenshot", "notion/API-post-page"],
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_take_screenshot",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Navigate to a design target URL, capture a full-page screenshot, and post it as a new Notion page for team review — a three-step visual documentation pipeline driven from a single cast intent.",
           "verified": true,
-          "notes": "playwright and notion both connected (2026-06-04). New combo this run. playwright/browser_take_screenshot confirmed via live cast: 'take a screenshot of a webpage and save it to disk' resolves to playwright/browser_take_screenshot (score 0.33)."
+          "notes": "playwright/browser_navigate, playwright/browser_take_screenshot, and notion/API-post-page all confirmed connected (2026-06-05)."
         },
         {
           "name": "page-markdown-to-notion-brief",
-          "chain": ["browser-rendering/get_url_markdown", "thinking/sequentialthinking", "notion/API-post-page"],
+          "chain": [
+            "browser-rendering/get_url_markdown",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Convert a live URL to clean Markdown via browser-rendering, reason over the content with sequential-thinking to extract key design patterns or decisions, then write the synthesized brief into Notion — deeper than a raw archive, more governed than a manual note.",
           "verified": true,
-          "notes": "browser-rendering, thinking, notion all connected (2026-06-04). New combo this run. Spans three different backends."
+          "notes": "browser-rendering/get_url_markdown, thinking/sequentialthinking, and notion/API-post-page all confirmed connected (2026-06-05)."
+        },
+        {
+          "name": "screenshot-to-file",
+          "chain": [
+            "browser-rendering/get_url_screenshot",
+            "fs/write_file"
+          ],
+          "accomplishes": "Capture a full-page screenshot of any URL via the headless browser-rendering service, then write the image data to a local file — a minimal two-backend visual archiving chain.",
+          "verified": true,
+          "notes": "browser-rendering/get_url_screenshot confirmed from live cast probe (2026-06-04). fs/write_file confirmed connected."
+        },
+        {
+          "name": "navigate-screenshot-save",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_take_screenshot",
+            "fs/write_file"
+          ],
+          "accomplishes": "Navigate to a URL with a full Playwright browser instance (supports auth flows, JS-heavy pages), take a screenshot at the current rendered state, then persist the screenshot to disk — playwright + fs two-backend chain.",
+          "verified": true,
+          "notes": "playwright/browser_navigate and playwright/browser_take_screenshot confirmed via live cast probes (2026-06-04). fs/write_file confirmed connected."
         }
       ],
       "prompts": [
-        { "text": "Screenshot chitty.cc, save it locally, and add it to my Notion design board", "resolves_to": "capture-archive-document" },
-        { "text": "Open the broken checkout page in a browser, snapshot it, and file a GitHub bug with the repro", "resolves_to": "visual-bug-report" },
-        { "text": "Convert the competitor's pricing page to markdown and save it to my references folder", "resolves_to": "page-to-markdown-archive" },
-        { "text": "Test the signup form on staging and save a screenshot proving it submits", "resolves_to": "form-fill-and-screenshot-proof" },
-        { "text": "Grab the HTML of this landing page, check what UI framework it uses, and write up an implementation note in Notion", "resolves_to": "live-page-html-to-docs" },
-        { "text": "Take a full-page screenshot of my portfolio site", "resolves_to": "browser-rendering/get_url_screenshot" },
-        { "text": "Screenshot this design URL and ingest it as a canonical evidence document with a chittycanon:// URI", "resolves_to": "screenshot-to-canonical-evidence" },
-        { "text": "Navigate to the staging site, snapshot the design, and create a tracked task for any issues found", "resolves_to": "browser-test-to-task" },
-        { "text": "Navigate to this design URL, take a screenshot, and post it to Notion for team review", "resolves_to": "playwright-capture-to-notion" },
-        { "text": "Convert this page to markdown, reason over its design patterns, and write a brief in Notion", "resolves_to": "page-markdown-to-notion-brief" }
+        {
+          "text": "Screenshot chitty.cc, save it locally, and add it to my Notion design board",
+          "resolves_to": "capture-archive-document"
+        },
+        {
+          "text": "Open the broken checkout page in a browser, snapshot it, and file a GitHub bug with the repro",
+          "resolves_to": "visual-bug-report"
+        },
+        {
+          "text": "Convert the competitor's pricing page to markdown and save it to my references folder",
+          "resolves_to": "page-to-markdown-archive"
+        },
+        {
+          "text": "Test the signup form on staging and save a screenshot proving it submits",
+          "resolves_to": "form-fill-and-screenshot-proof"
+        },
+        {
+          "text": "Grab the HTML of this landing page, check what UI framework it uses, and write up an implementation note in Notion",
+          "resolves_to": "live-page-html-to-docs"
+        },
+        {
+          "text": "Take a full-page screenshot of my portfolio site",
+          "resolves_to": "browser-rendering/get_url_screenshot"
+        },
+        {
+          "text": "Screenshot this design URL and ingest it as a canonical evidence document with a chittycanon:// URI",
+          "resolves_to": "screenshot-to-canonical-evidence"
+        },
+        {
+          "text": "Navigate to the staging site, snapshot the design, and create a tracked task for any issues found",
+          "resolves_to": "browser-test-to-task"
+        },
+        {
+          "text": "Navigate to this design URL, take a screenshot, and post it to Notion for team review",
+          "resolves_to": "playwright-capture-to-notion"
+        },
+        {
+          "text": "Convert this page to markdown, reason over its design patterns, and write a brief in Notion",
+          "resolves_to": "page-markdown-to-notion-brief"
+        },
+        {
+          "text": "Screenshot the landing page and save it as a visual archive",
+          "resolves_to": "screenshot-to-file"
+        },
+        {
+          "text": "Navigate to the app, take a screenshot after login, and save the proof",
+          "resolves_to": "navigate-screenshot-save"
+        }
       ]
     },
     "code": {
@@ -264,103 +578,201 @@
       "combos": [
         {
           "name": "library-research-to-docs",
-          "chain": ["context7/resolve-library-id", "context7/get-library-docs", "notion/API-post-page"],
+          "chain": [
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Resolve a library name to its canonical context7 ID, fetch the current API documentation, and write a usage note into Notion — turning live library docs into a durable, searchable implementation reference.",
           "verified": true,
-          "notes": "context7 and notion both connected. Verified 2026-06-04. Cast: 'research library docs and save findings' resolves to context7/resolve-library-id (score 0.31)."
+          "notes": "Fixed context7/get-library-docs → context7/query-docs (2026-06-05). context7/resolve-library-id, context7/query-docs, and notion/API-post-page all confirmed connected."
         },
         {
           "name": "schema-branch-and-migrate",
-          "chain": ["neon/create_branch", "neon/run_sql", "neon/describe_table_schema"],
+          "chain": [
+            "neon/create_branch",
+            "neon/run_sql",
+            "neon/describe_table_schema"
+          ],
           "accomplishes": "Create a Neon database branch for a schema change, apply the migration SQL, then describe the resulting table schema to confirm the change landed — a safe non-destructive schema migration workflow on a throwaway branch.",
           "verified": false,
           "notes": "neon NOT connected (0 tools, 2026-06-04). Previously verified:true. Re-enable when NEON_API_KEY is available."
         },
         {
           "name": "schema-to-notion-doc",
-          "chain": ["neon/describe_table_schema", "notion/API-post-page"],
+          "chain": [
+            "neon/describe_table_schema",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Pull the current schema for a Neon table and write it as a Notion documentation page — keeping your data-model docs in sync with the live database without manual copy-paste.",
           "verified": false,
           "notes": "neon NOT connected (0 tools, 2026-06-04). notion verified. Previously verified:true."
         },
         {
           "name": "library-docs-to-github-issue",
-          "chain": ["context7/resolve-library-id", "context7/get-library-docs", "github/create_issue"],
+          "chain": [
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "github/create_issue"
+          ],
           "accomplishes": "Look up the latest docs for a library dependency, then open a GitHub issue pre-populated with the relevant API details — grounding an implementation task in current, accurate documentation rather than stale memory.",
           "verified": false,
           "notes": "context7 verified. github NOT connected (0 tools, 2026-06-04). Previously verified:true."
         },
         {
           "name": "code-search-and-file-context",
-          "chain": ["serena/search_code", "fs/read_file"],
+          "chain": [
+            "serena/search_code",
+            "fs/read_file"
+          ],
           "accomplishes": "Use Serena's code-intelligence search to locate a symbol or pattern across the workspace, then read the full file context around the match — a semantic-then-deep drill-down that avoids scanning files blindly.",
           "verified": false,
           "notes": "serena not connected (lazy, requires token). fs/read_file verified live."
         },
         {
           "name": "db-branch-test-and-document",
-          "chain": ["neon/create_branch", "neon/run_sql", "notion/API-post-page"],
+          "chain": [
+            "neon/create_branch",
+            "neon/run_sql",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Branch the database, run a test query or migration against the branch, then write the outcome into a Notion page — a lightweight experiment-then-document pattern for database changes.",
           "verified": false,
           "notes": "neon NOT connected (0 tools, 2026-06-04). notion verified. Previously verified:true."
         },
         {
           "name": "workers-deploy-and-verify",
-          "chain": ["cloudflare/workers_scripts_upload", "cloudflare/workers_scripts_get"],
+          "chain": [
+            "cloudflare/workers_scripts_upload",
+            "cloudflare/workers_scripts_get"
+          ],
           "accomplishes": "Upload a new Cloudflare Worker script and immediately fetch it back to verify the deployment landed correctly — a tight deploy→verify loop before any downstream tests run.",
           "verified": false,
           "notes": "cloudflare not connected (remote endpoint, requires token). Tool names inferred from cloudflare MCP surface."
         },
         {
           "name": "linear-issue-to-github-pr",
-          "chain": ["linear/list_issues", "github/create_pull_request"],
+          "chain": [
+            "linear/list_issues",
+            "github/create_pull_request"
+          ],
           "accomplishes": "List Linear issues assigned to the current sprint, then open a GitHub pull request for each — keeping issue tracking and code review in sync without manual cross-tool copy-paste.",
           "verified": false,
           "notes": "linear requires authTokenKey: linear-mcp. github NOT connected (2026-06-04)."
         },
         {
           "name": "linear-bug-to-library-context",
-          "chain": ["linear/get_issue", "context7/resolve-library-id", "context7/get-library-docs"],
+          "chain": [
+            "linear/get_issue",
+            "context7/resolve-library-id",
+            "context7/query-docs"
+          ],
           "accomplishes": "Fetch a Linear bug report, resolve the affected library via Context7, and load the library's API docs — giving a developer immediate reference context to reproduce and fix the issue without leaving the terminal.",
           "verified": false,
           "notes": "linear inferred (auth required); context7/resolve-library-id and context7/get-library-docs verified."
         },
         {
           "name": "context7-docs-to-file",
-          "chain": ["context7/resolve-library-id", "context7/get-library-docs", "fs/write_file"],
+          "chain": [
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "fs/write_file"
+          ],
           "accomplishes": "Resolve a library name, fetch its current API documentation, and write the result to a local file for offline reference or inclusion in a project's docs folder — a verified three-backend chain spanning docs-resolution + filesystem persistence.",
           "verified": true,
-          "notes": "context7 and fs both connected (2026-06-04). New combo this run. Cast: 'research library docs and save to local file' resolves to context7/resolve-library-id (score 0.31) with fs alternatives confirmed in resolution path."
+          "notes": "context7 and fs both connected (2026-06-04). New combo this run. Cast: 'research library docs and save to local file' resolves to context7/resolve-library-id (score 0.31) with fs alternatives confirmed in resolution path. Fixed context7/get-library-docs → context7/query-docs (2026-06-05)."
         },
         {
           "name": "fs-survey-and-document",
-          "chain": ["fs/directory_tree", "thinking/sequentialthinking", "notion/API-post-page"],
-          "accomplishes": "Walk the project's directory tree, reason over its architecture with sequential-thinking to identify structural patterns or concerns, and write a technical architecture note into Notion — a codebase-to-doc pipeline using only locally-available backends.",
+          "chain": [
+            "fs/list_directory",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "List the top-level project directory contents, reason over the structure with sequential-thinking to identify architectural patterns or concerns, and write a technical architecture note into Notion — a codebase-to-doc pipeline using locally-available backends. Note: fs/list_directory covers one path at a time; enumerate subdirectories separately for deeper coverage.",
           "verified": true,
-          "notes": "fs, thinking, notion all connected (2026-06-04). New combo this run. Cast: 'survey filesystem and reason over architecture' resolves to thinking/sequentialthinking (score 0.38) with fs as alternative; both in resolution path."
+          "notes": "Fixed fs/directory_tree → fs/list_directory (2026-06-05); list_directory is single-level (not recursive). fs/list_directory, thinking/sequentialthinking, and notion/API-post-page all confirmed connected."
         },
         {
           "name": "evidence-library-cross-ref",
-          "chain": ["evidence/ai_search", "context7/resolve-library-id", "context7/get-library-docs"],
+          "chain": [
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs"
+          ],
           "accomplishes": "Search the evidence corpus for prior art on a library or technology decision, then pull the current API documentation for the same library — correlating historical ChittyOS usage patterns with live upstream docs to ground implementation choices.",
           "verified": true,
-          "notes": "evidence and context7 both connected (2026-06-04). New combo this run — spans two different backends not previously combined in catalog. No prior evidence+context7 chain existed."
+          "notes": "evidence and context7 both connected (2026-06-04). New combo this run — spans two different backends not previously combined in catalog. No prior evidence+context7 chain existed. Fixed context7/get-library-docs → context7/query-docs (2026-06-05)."
+        },
+        {
+          "name": "docs-to-thinking",
+          "chain": [
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Resolve a library name to its Context7 ID, retrieve authoritative docs and code examples, then pass the documentation through sequential thinking to plan an integration, pick the right API, or reason through a technical decision — context7 + thinking two-backend chain.",
+          "verified": true,
+          "notes": "context7/resolve-library-id and context7/get-library-docs confirmed via live cast probes. thinking/sequentialthinking confirmed at score 0.8 in reasoning cast (2026-06-04 third pass). Fixed context7/get-library-docs → context7/query-docs (2026-06-05)."
         }
       ],
       "prompts": [
-        { "text": "Look up the latest React docs and write an integration note into my Notion dev workspace", "resolves_to": "library-research-to-docs" },
-        { "text": "Create a Neon branch, run my migration, then describe the new schema", "resolves_to": "schema-branch-and-migrate" },
-        { "text": "Document the current users table schema as a Notion page", "resolves_to": "schema-to-notion-doc" },
-        { "text": "Fetch the Stripe SDK docs and open a GitHub issue with the implementation details", "resolves_to": "library-docs-to-github-issue" },
-        { "text": "Search for all usages of this function and show me the file context around each match", "resolves_to": "code-search-and-file-context" },
-        { "text": "Branch the database, run my test query, and log the results in Notion", "resolves_to": "db-branch-test-and-document" },
-        { "text": "Deploy this Worker script to Cloudflare and confirm the upload was successful", "resolves_to": "workers-deploy-and-verify" },
-        { "text": "What are the current Neon projects and branches?", "resolves_to": "neon/list_projects" },
-        { "text": "List my open Linear issues and open GitHub PRs for the ones ready to ship", "resolves_to": "linear-issue-to-github-pr" },
-        { "text": "Fetch the Linear bug report and load the relevant library docs so I can fix it", "resolves_to": "linear-bug-to-library-context" },
-        { "text": "Look up the MCP SDK docs and save them to a local file for offline reference", "resolves_to": "context7-docs-to-file" },
-        { "text": "Walk the project directory tree, reason over the architecture, and write a tech note in Notion", "resolves_to": "fs-survey-and-document" },
-        { "text": "Search the evidence store for how we've used this library before, then fetch its current API docs", "resolves_to": "evidence-library-cross-ref" }
+        {
+          "text": "Look up the latest React docs and write an integration note into my Notion dev workspace",
+          "resolves_to": "library-research-to-docs"
+        },
+        {
+          "text": "Create a Neon branch, run my migration, then describe the new schema",
+          "resolves_to": "schema-branch-and-migrate"
+        },
+        {
+          "text": "Document the current users table schema as a Notion page",
+          "resolves_to": "schema-to-notion-doc"
+        },
+        {
+          "text": "Fetch the Stripe SDK docs and open a GitHub issue with the implementation details",
+          "resolves_to": "library-docs-to-github-issue"
+        },
+        {
+          "text": "Search for all usages of this function and show me the file context around each match",
+          "resolves_to": "code-search-and-file-context"
+        },
+        {
+          "text": "Branch the database, run my test query, and log the results in Notion",
+          "resolves_to": "db-branch-test-and-document"
+        },
+        {
+          "text": "Deploy this Worker script to Cloudflare and confirm the upload was successful",
+          "resolves_to": "workers-deploy-and-verify"
+        },
+        {
+          "text": "What are the current Neon projects and branches?",
+          "resolves_to": "neon/list_projects"
+        },
+        {
+          "text": "List my open Linear issues and open GitHub PRs for the ones ready to ship",
+          "resolves_to": "linear-issue-to-github-pr"
+        },
+        {
+          "text": "Fetch the Linear bug report and load the relevant library docs so I can fix it",
+          "resolves_to": "linear-bug-to-library-context"
+        },
+        {
+          "text": "Look up the MCP SDK docs and save them to a local file for offline reference",
+          "resolves_to": "context7-docs-to-file"
+        },
+        {
+          "text": "Walk the project directory tree, reason over the architecture, and write a tech note in Notion",
+          "resolves_to": "fs-survey-and-document"
+        },
+        {
+          "text": "Search the evidence store for how we've used this library before, then fetch its current API docs",
+          "resolves_to": "evidence-library-cross-ref"
+        },
+        {
+          "text": "Look up the MCP SDK docs then reason through how to add a new tool",
+          "resolves_to": "docs-to-thinking"
+        }
       ]
     },
     "communication": {
@@ -368,137 +780,292 @@
       "combos": [
         {
           "name": "notion-note-to-task",
-          "chain": ["notion/API-post-search", "tasks/create_task"],
+          "chain": [
+            "notion/API-post-search",
+            "tasks/create_task"
+          ],
           "accomplishes": "Search the Notion workspace for a note or meeting page, then create a ChittyAgent task from its action items — turning unstructured notes into tracked, prioritized work items without leaving the chat interface.",
           "verified": false,
           "notes": "notion/API-post-search verified live. tasks/create_task from apps/tasks-mcp (enabled:false pending token)."
         },
         {
           "name": "imessage-thread-to-brief",
-          "chain": ["imessage/get_recent_messages", "thinking/sequentialthinking", "notion/API-post-page"],
+          "chain": [
+            "imessage/get_recent_messages",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Pull recent messages from an iMessage thread, use sequential-thinking to identify key decisions and action items, then write a summary brief into Notion — turning an async chat thread into a durable structured record.",
           "verified": false,
           "notes": "imessage not connected (requires local daemon). thinking and notion verified live."
         },
         {
           "name": "task-to-imessage-notification",
-          "chain": ["tasks/list_tasks", "imessage/send_message"],
+          "chain": [
+            "tasks/list_tasks",
+            "imessage/send_message"
+          ],
           "accomplishes": "List open ChittyAgent tasks for a context and send a status summary as an iMessage — a pull-and-broadcast pattern for keeping stakeholders updated without a separate notification pipeline.",
           "verified": false,
           "notes": "tasks from apps/tasks-mcp (enabled:false). imessage not connected. Both are plausible per their source surfaces."
         },
         {
           "name": "mac-notification-and-log",
-          "chain": ["chittymac/send_notification", "notion/API-post-page"],
+          "chain": [
+            "chittymac/send_notification",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Send a macOS system notification via ChittyMac and log the event as a timestamped Notion entry — useful for workflow checkpoints where a human must be alerted and the alert itself must be auditable.",
           "verified": false,
           "notes": "chittymac not connected (requires local ChittyMac daemon). notion/API-post-page verified live."
         },
         {
           "name": "meeting-notes-to-tasks",
-          "chain": ["notion/API-retrieve-a-page", "thinking/sequentialthinking", "tasks/create_task"],
+          "chain": [
+            "notion/API-retrieve-a-page",
+            "thinking/sequentialthinking",
+            "tasks/create_task"
+          ],
           "accomplishes": "Fetch a Notion meeting-notes page, reason over the content to extract discrete action items, then create a ChittyAgent task for each — automated meeting-to-action-item extraction across docs and task management.",
           "verified": false,
           "notes": "notion/API-retrieve-a-page and thinking/sequentialthinking verified live. tasks/create_task from apps/tasks-mcp (enabled:false)."
         },
         {
           "name": "imessage-and-notion-broadcast",
-          "chain": ["notion/API-post-search", "imessage/send_message", "chittymac/send_notification"],
+          "chain": [
+            "notion/API-post-search",
+            "imessage/send_message",
+            "chittymac/send_notification"
+          ],
           "accomplishes": "Find the relevant Notion page for a project update, send its summary via iMessage to the stakeholders, and fire a macOS notification as a local confirmation — a three-channel broadcast from a single intent.",
           "verified": false,
           "notes": "notion/API-post-search verified. imessage and chittymac not connected."
         },
         {
           "name": "notion-reasoning-summary",
-          "chain": ["notion/API-retrieve-a-page", "thinking/sequentialthinking", "notion/API-post-page"],
+          "chain": [
+            "notion/API-retrieve-a-page",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Read a Notion meeting-notes or discussion page, reason over the content with sequential-thinking to extract key decisions, commitments, and open questions, then write a clean summary page — automated meeting distillation using only verified-live backends.",
           "verified": true,
-          "notes": "notion and thinking both connected (2026-06-04). New combo this run. Cast: 'reason through a complex technical decision then document in Notion' resolves to thinking/sequentialthinking (score 0.55) with notion alternatives in resolution path."
+          "notes": "notion/API-retrieve-a-page, thinking/sequentialthinking, and notion/API-post-page all confirmed connected (2026-06-05). notion reconnected this pass."
         }
       ],
       "prompts": [
-        { "text": "Search my Notion workspace for today's meeting notes and create tasks from the action items", "resolves_to": "notion-note-to-task" },
-        { "text": "Summarize my recent iMessage thread with the team and write it up as a Notion brief", "resolves_to": "imessage-thread-to-brief" },
-        { "text": "List my open tasks and send a status update via iMessage", "resolves_to": "task-to-imessage-notification" },
-        { "text": "Send me a macOS notification when this task completes and log it in Notion", "resolves_to": "mac-notification-and-log" },
-        { "text": "Extract the action items from last week's planning meeting in Notion and create tasks for each", "resolves_to": "meeting-notes-to-tasks" },
-        { "text": "Broadcast the project update from Notion over iMessage and send me a desktop notification", "resolves_to": "imessage-and-notion-broadcast" },
-        { "text": "Search my Notion workspace for notes about the deployment", "resolves_to": "notion/API-post-search" },
-        { "text": "Create a follow-up task from this conversation", "resolves_to": "tasks/create_task" },
-        { "text": "Read last week's planning meeting from Notion, reason over the decisions, and write a clean summary page", "resolves_to": "notion-reasoning-summary" }
+        {
+          "text": "Search my Notion workspace for today's meeting notes and create tasks from the action items",
+          "resolves_to": "notion-note-to-task"
+        },
+        {
+          "text": "Summarize my recent iMessage thread with the team and write it up as a Notion brief",
+          "resolves_to": "imessage-thread-to-brief"
+        },
+        {
+          "text": "List my open tasks and send a status update via iMessage",
+          "resolves_to": "task-to-imessage-notification"
+        },
+        {
+          "text": "Send me a macOS notification when this task completes and log it in Notion",
+          "resolves_to": "mac-notification-and-log"
+        },
+        {
+          "text": "Extract the action items from last week's planning meeting in Notion and create tasks for each",
+          "resolves_to": "meeting-notes-to-tasks"
+        },
+        {
+          "text": "Broadcast the project update from Notion over iMessage and send me a desktop notification",
+          "resolves_to": "imessage-and-notion-broadcast"
+        },
+        {
+          "text": "Search my Notion workspace for notes about the deployment",
+          "resolves_to": "notion/API-post-search"
+        },
+        {
+          "text": "Create a follow-up task from this conversation",
+          "resolves_to": "tasks/create_task"
+        },
+        {
+          "text": "Read last week's planning meeting from Notion, reason over the decisions, and write a clean summary page",
+          "resolves_to": "notion-reasoning-summary"
+        }
       ]
     },
     "ops": {
-      "description": "Deployment, infrastructure monitoring, and DevOps tooling — Cloudflare Workers, database ops, source control, filesystem, and orchestration. github and orchestrator NOT connected (2026-06-04) — failed-job-to-github-issue corrected to verified:false. cloudflare and neon also not connected. New verified:true combos: page-content-to-runbook (browser-rendering+fs) and codebase-scan-to-notion (fs+notion).",
+      "description": "Deployment, infrastructure monitoring, and DevOps tooling — Cloudflare Workers, database ops, source control, filesystem, and orchestration. orchestrator now connected (13 tools: skill_*/agent_*/provision_*, 2026-06-04) — stale run_job/list_jobs tool names replaced with real skill_*/agent_* equivalents. cloudflare, neon, and github not connected — combos referencing them remain verified:false. New verified:true combos added using orchestrator + fs + thinking.",
       "combos": [
         {
           "name": "deploy-and-document",
-          "chain": ["cloudflare/deploy_worker", "notion/API-post-page"],
+          "chain": [
+            "cloudflare/deploy_worker",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Deploy a Cloudflare Worker to production and immediately create a Notion deployment log page — so every release is timestamped and searchable in the team's workspace.",
           "verified": false,
           "notes": "cloudflare not connected at generation time. notion/API-post-page verified."
         },
         {
           "name": "worker-logs-to-incident",
-          "chain": ["cloudflare/get_worker_logs", "thinking/sequentialthinking", "notion/API-post-page"],
+          "chain": [
+            "cloudflare/get_worker_logs",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Pull recent error logs from a deployed Cloudflare Worker, reason over root cause and remediation steps with sequential-thinking, then write a structured incident report into Notion.",
           "verified": false,
           "notes": "cloudflare not connected. thinking/sequentialthinking and notion/API-post-page verified."
         },
         {
-          "name": "db-backup-and-verify",
-          "chain": ["orchestrator/skill_search", "orchestrator/skill_execute", "neon/run_sql"],
-          "accomplishes": "Search for the registered database backup skill by intent, execute it via the orchestrator using the discovered skill ID, then run a verification SQL query on Neon to confirm the backup completed without data loss.",
-          "verified": false,
-          "notes": "orchestrator NOT connected (0 tools, 2026-06-04). neon not connected. Both verified:false. skill_search first to resolve the skill ID; skill_execute then runs it."
+          "name": "db-backup-via-orchestrator",
+          "chain": [
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute"
+          ],
+          "accomplishes": "Search the ChittyAgent skill registry for a database backup skill, then execute it through the orchestrator — dispatching the backup operation via the registered skill. Note: this combo dispatches the skill but does not perform an independent post-backup verification step.",
+          "verified": true,
+          "notes": "orchestrator connected (2026-06-04). Replaces stale run_job/neon chain. Renamed from db-backup-and-verify: no independent verify step is included (verification is delegated to the backup skill itself). — real API uses skill_search + skill_execute. Pure orchestrator, no external deps."
         },
         {
-          "name": "agent-binding-audit-to-issue",
-          "chain": ["orchestrator/agent_list", "github/create_issue"],
-          "accomplishes": "List all ChittyAgent agents with binding status, capabilities, domains, and tool counts, then open a GitHub issue to record unbound or unconfigured agents found during the audit — a binding-state inventory, not a health check.",
-          "verified": false,
-          "notes": "orchestrator NOT connected (0 tools, 2026-06-04). github NOT connected (0 tools, 2026-06-04). agent_list returns binding status (bound/unbound) and capabilities, not runtime health or degraded-state signals."
+          "name": "agent-incident-triage",
+          "chain": [
+            "orchestrator/agent_list",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Enumerate all ChittyAgent agents with their binding status and capabilities, reason over the agent inventory with sequential-thinking to identify gaps or anomalies in agent coverage, and write a structured inventory audit report to a local file — an ops audit of agent registration state, not a real-time health probe.",
+          "verified": true,
+          "notes": "orchestrator (agent_list), thinking, and fs — all connected 2026-06-04. Replaces stale list_jobs/github chain. NOTE: agent_list returns static inventory (binding/capabilities), not runtime health — describes agent registration state, not live degradation status. — real API uses agent_list."
         },
         {
           "name": "pr-to-deploy-pipeline",
-          "chain": ["github/list_pull_requests", "cloudflare/deploy_worker", "notion/API-post-page"],
+          "chain": [
+            "github/list_pull_requests",
+            "cloudflare/deploy_worker",
+            "notion/API-post-page"
+          ],
           "accomplishes": "List merged pull requests, trigger a Cloudflare Worker deploy for the release, and create a Notion deployment page linking the PR number — a three-backend deploy pipeline from a single cast intent.",
           "verified": false,
           "notes": "github NOT connected (2026-06-04). cloudflare not connected. notion/API-post-page verified."
         },
         {
           "name": "infra-health-snapshot",
-          "chain": ["orchestrator/agent_list", "neon/list_projects", "notion/API-post-page"],
-          "accomplishes": "List all ChittyAgent agents with binding status and capabilities, pull Neon project statuses, then write a consolidated infrastructure health snapshot into a Notion page — a periodic ops status report from two live backends.",
-          "verified": false,
-          "notes": "orchestrator NOT connected (2026-06-04). neon not connected. notion verified. agent_list is the real API equivalent of the deprecated list_jobs."
+          "chain": [
+            "orchestrator/agent_list",
+            "orchestrator/skill_list",
+            "fs/write_file"
+          ],
+          "accomplishes": "Pull the full ChittyAgent registry: enumerate all agents (binding status, capabilities, domains) and all available skills (triggers, execution type, descriptions) — then write a combined infrastructure health snapshot to a local file. A complete orchestrator registry dump in two API calls.",
+          "verified": true,
+          "notes": "orchestrator (agent_list, skill_list) and fs — all connected 2026-06-04. Replaces stale list_jobs/neon/notion chain. Pure orchestrator+fs."
         },
         {
           "name": "page-content-to-runbook",
-          "chain": ["browser-rendering/get_url_markdown", "fs/write_file"],
+          "chain": [
+            "browser-rendering/get_url_markdown",
+            "fs/write_file"
+          ],
           "accomplishes": "Fetch public deployment documentation or runbook pages as clean Markdown and save them to a local file — a pull-and-archive pattern for keeping ops runbooks current without manual copy-paste from browser to editor.",
           "verified": true,
           "notes": "browser-rendering and fs both connected (2026-06-04). New combo this run. Minimal two-backend ops pattern."
         },
         {
           "name": "codebase-scan-to-notion",
-          "chain": ["fs/directory_tree", "fs/search_files", "notion/API-post-page"],
+          "chain": [
+            "fs/list_directory",
+            "fs/search_files",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Walk the project directory tree, search for files matching an ops-relevant pattern (e.g. Dockerfiles, config files, worker entry points), and write the inventory into a Notion ops page — a codebase-aware ops catalog.",
           "verified": true,
-          "notes": "fs and notion both connected (2026-06-04). New combo this run. Same-backend fs calls are the discovery layer; notion is the destination backend."
+          "notes": "Fixed fs/directory_tree → fs/list_directory (2026-06-05). fs/list_directory, fs/search_files, and notion/API-post-page all confirmed connected."
+        },
+        {
+          "name": "skill-search-and-run",
+          "chain": [
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "fs/write_file"
+          ],
+          "accomplishes": "Discover the most relevant ChittyOS skill for an intent, execute it via the orchestrator, and persist the output to a local file — a complete search-run-record pipeline driven entirely from natural language.",
+          "verified": true,
+          "notes": "orchestrator (skill_search, skill_execute) and fs (write_file) — all connected 2026-06-04."
+        },
+        {
+          "name": "agent-inventory-to-file",
+          "chain": [
+            "orchestrator/agent_list",
+            "fs/write_file"
+          ],
+          "accomplishes": "List all agents in the ChittyAgent ecosystem with their binding status, capabilities, and tool counts, then write the inventory to a local file for offline ops review or change-detection tracking.",
+          "verified": true,
+          "notes": "orchestrator (agent_list) and fs — both connected 2026-06-04. Simplest orchestrator+fs combo."
+        },
+        {
+          "name": "page-to-runbook-via-thinking",
+          "chain": [
+            "browser-rendering/get_url_markdown",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Fetch any URL as clean markdown (status page, incident post-mortem, deployment guide), reason through the ops implications with sequential thinking, then write the resulting runbook or action plan to a file — browser-rendering + thinking + fs three-backend chain.",
+          "verified": true,
+          "notes": "browser-rendering/get_url_markdown confirmed from existing verified combo page-to-markdown-archive. thinking/sequentialthinking and fs/write_file confirmed connected (2026-06-04 third pass)."
         }
       ],
       "prompts": [
-        { "text": "Deploy the latest worker build to Cloudflare production and log the release in Notion", "resolves_to": "deploy-and-document" },
-        { "text": "Check worker error logs and write up an incident report in Notion", "resolves_to": "worker-logs-to-incident" },
-        { "text": "Run the database backup job and verify it completed successfully", "resolves_to": "db-backup-and-verify" },
-        { "text": "Audit unbound or unconfigured orchestrator agents and open a GitHub issue to track the findings", "resolves_to": "agent-binding-audit-to-issue" },
-        { "text": "List merged PRs, deploy the release to Cloudflare, and document it in Notion", "resolves_to": "pr-to-deploy-pipeline" },
-        { "text": "Write an infrastructure health snapshot covering agent binding status and database project status into Notion", "resolves_to": "infra-health-snapshot" },
-        { "text": "List all deployed Cloudflare Workers and their last deploy date", "resolves_to": "cloudflare/list_workers" },
-        { "text": "Get the current orchestrator provisioning state and active session binding", "resolves_to": "orchestrator/provision_status" },
-        { "text": "Fetch the deployment runbook from the docs site and save it locally", "resolves_to": "page-content-to-runbook" },
-        { "text": "Scan the codebase for worker entry points and Dockerfiles, then write an ops inventory to Notion", "resolves_to": "codebase-scan-to-notion" }
+        {
+          "text": "Deploy the latest worker build to Cloudflare production and log the release in Notion",
+          "resolves_to": "deploy-and-document"
+        },
+        {
+          "text": "Check worker error logs and write up an incident report in Notion",
+          "resolves_to": "worker-logs-to-incident"
+        },
+        {
+          "text": "Search for and execute the database backup skill via the ChittyAgent Orchestrator",
+          "resolves_to": "db-backup-via-orchestrator"
+        },
+        {
+          "text": "List all ChittyAgent agents, triage their status, and write an incident analysis to a local file",
+          "resolves_to": "agent-incident-triage"
+        },
+        {
+          "text": "List merged PRs, deploy the release to Cloudflare, and document it in Notion",
+          "resolves_to": "pr-to-deploy-pipeline"
+        },
+        {
+          "text": "Enumerate all ChittyAgent agents and available skills and write the orchestrator registry snapshot to a local file",
+          "resolves_to": "infra-health-snapshot"
+        },
+        {
+          "text": "List all deployed Cloudflare Workers and their last deploy date",
+          "resolves_to": "cloudflare/list_workers"
+        },
+        {
+          "text": "List all available orchestrator skills and their triggers and execution types",
+          "resolves_to": "orchestrator/skill_list"
+        },
+        {
+          "text": "Fetch the deployment runbook from the docs site and save it locally",
+          "resolves_to": "page-content-to-runbook"
+        },
+        {
+          "text": "Scan the codebase for worker entry points and Dockerfiles, then write an ops inventory to Notion",
+          "resolves_to": "codebase-scan-to-notion"
+        },
+        {
+          "text": "Search for the right orchestrator skill for this DevOps task and execute it",
+          "resolves_to": "skill-search-and-run"
+        },
+        {
+          "text": "Pull the full agent inventory from the orchestrator and write it to a local ops file",
+          "resolves_to": "agent-inventory-to-file"
+        },
+        {
+          "text": "Fetch the incident post-mortem page, reason through what went wrong, and write a runbook",
+          "resolves_to": "page-to-runbook-via-thinking"
+        }
       ]
     }
   }
