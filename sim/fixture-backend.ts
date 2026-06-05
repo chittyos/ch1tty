@@ -159,7 +159,7 @@ export const FIXTURE_TOOLS: Record<string, FixtureTool[]> = {
   context7: [
     { name: 'resolve-library-id', description: 'Resolve a package name or description to a Context7-compatible library ID' },
     // near-miss for governance.evidence-search: a "search library docs" tool competes with chittyevidence/search_documents
-    { name: 'get-library-docs', description: 'Get documentation and code examples for a library from the Context7 context window' },
+    { name: 'query-docs', description: 'Get documentation and code examples for a library from the Context7 context window' },
   ],
 
   // ── communication / messaging ────────────────────────────────

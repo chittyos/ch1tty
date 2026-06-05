@@ -716,11 +716,11 @@
           "name": "code-search-and-file-context",
           "chain": [
             "serena/search_code",
-            "fs/read_file"
+            "fs/read_text_file"
           ],
           "accomplishes": "Use Serena's code-intelligence search to locate a symbol or pattern across the workspace, then read the full file context around the match \u2014 a semantic-then-deep drill-down that avoids scanning files blindly.",
           "verified": false,
-          "notes": "serena not connected (lazy, requires token). fs/read_file verified live."
+          "notes": "serena not connected (lazy, requires token). fs/read_text_file verified live."
         },
         {
           "name": "db-branch-test-and-document",
@@ -762,7 +762,7 @@
           ],
           "accomplishes": "Fetch a Linear bug report, resolve the affected library via Context7, and load the library's API docs \u2014 giving a developer immediate reference context to reproduce and fix the issue without leaving the terminal.",
           "verified": false,
-          "notes": "linear inferred (auth required); context7/resolve-library-id and context7/get-library-docs verified."
+          "notes": "linear inferred (auth required); context7/resolve-library-id and context7/query-docs verified."
         },
         {
           "name": "context7-docs-to-file",
@@ -806,7 +806,7 @@
           ],
           "accomplishes": "Resolve a library name to its Context7 ID, retrieve authoritative docs and code examples, then pass the documentation through sequential thinking to plan an integration, pick the right API, or reason through a technical decision \u2014 context7 + thinking two-backend chain.",
           "verified": true,
-          "notes": "context7/resolve-library-id and context7/get-library-docs confirmed via live cast probes. thinking/sequentialthinking confirmed at score 0.8 in reasoning cast (2026-06-04 third pass). Fixed context7/get-library-docs \u2192 context7/query-docs (2026-06-05)."
+          "notes": "context7/resolve-library-id and context7/query-docs confirmed via live cast probes. thinking/sequentialthinking confirmed at score 0.8 in reasoning cast (2026-06-04 third pass). Fixed context7/get-library-docs \u2192 context7/query-docs (2026-06-05)."
         },
         {
           "name": "codebase-architecture-report",

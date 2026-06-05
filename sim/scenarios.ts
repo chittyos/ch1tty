@@ -205,7 +205,7 @@ export const SCENARIOS: Scenario[] = [
     id: 'code.lookup-docs',
     focus: 'code',
     intent: 'get the library documentation and code examples for this package',
-    expect: 'context7/get-library-docs',
+    expect: 'context7/query-docs',
     note: 'near-miss: notion/query_database (query + documents); context7 is in-focus via code profile servers list',
   },
   {

@@ -45,5 +45,5 @@
   - communication: notion-knowledge-synthesis, web-capture-to-notion-note (2nd/3rd verified comm combos)
 - Also added 11 matching prompts. Catalog: 65→76 combos, 32→43 verified.
 - Created branch `auto/E-catalog-fifth-pass`, PR to follow.
-- Build clean post-changes. Tests not re-run (catalog is a pure data file, no TypeScript changes).
+- Build clean post-changes. Follow-up commit also updated TypeScript test files: `test/fixture-backend.ts`, `test/scenario.test.ts`, `test/suggestions.test.ts` (context7 tool name fix). Build clean post-changes.
 - **Next run**: Check if PR #192 (100% branch coverage) merged; if E workstream catalog reaches satisfactory coverage (43/76); consider closing workstream E and marking all done. Notion board summary remains the one open thread.
