@@ -15,7 +15,6 @@
       "notion"
     ],
     "notConnectedServers": [
-      "notion",
       "chittyos",
       "cloudflare",
       "cowork",
@@ -690,9 +689,9 @@
             "thinking/sequentialthinking",
             "notion/API-post-page"
           ],
-          "accomplishes": "Walk the project's directory tree, reason over its architecture with sequential-thinking to identify structural patterns or concerns, and write a technical architecture note into Notion — a codebase-to-doc pipeline using only locally-available backends.",
+          "accomplishes": "List the top-level project directory contents, reason over the structure with sequential-thinking to identify architectural patterns or concerns, and write a technical architecture note into Notion — a codebase-to-doc pipeline using locally-available backends. Note: fs/list_directory covers one path at a time; enumerate subdirectories separately for deeper coverage.",
           "verified": true,
-          "notes": "Fixed fs/directory_tree → fs/list_directory (2026-06-05). fs/list_directory, thinking/sequentialthinking, and notion/API-post-page all confirmed connected."
+          "notes": "Fixed fs/directory_tree → fs/list_directory (2026-06-05); list_directory is single-level (not recursive). fs/list_directory, thinking/sequentialthinking, and notion/API-post-page all confirmed connected."
         },
         {
           "name": "evidence-library-cross-ref",
