@@ -33,7 +33,8 @@
     ],
     "updatedAt": "2026-06-05",
     "connectedServerNote": "2026-06-05 fifteenth-pass: +6 verified combos (121 total, 60 verified). Confirmed live tools: orchestrator/agent_search, orchestrator/skill_search, orchestrator/skill_execute, orchestrator/agent_list, orchestrator/skill_list, orchestrator/provision_candidates; evidence/list_rags (3 RAGs), evidence/ai_search (with rag_id); context7/resolve-library-id; fs/list_allowed_directories, fs/write_file; thinking/sequentialthinking. browser-rendering returned 401 this session (auth-gated). notion still 401 (39 combos blocked). Remaining 55 unverified: Notion-blocked (39) + stripe/neon/cloudflare/github/linear/cloudflare-builds (~16).",
-    "date": "2026-06-05"
+    "date": "2026-06-05",
+    "verifiedSemantics": "verified:true means every tool in the chain was confirmed on a live connected server at the time that specific combo was written — it is a historical record, not a live reachability guarantee. connectedServers/notConnectedServers reflect this session only. Per-combo notes record which session performed the verification."
   },
   "profiles": {
     "finance": {
@@ -154,7 +155,7 @@
           ],
           "accomplishes": "Fetch a financial report page, dashboard, or investor doc as clean markdown via the browser-rendering service, reason over key data points, anomalies, and trends with sequential-thinking, then write a finance brief to a local file — useful for quickly digesting external financial data without manual extraction.",
           "verified": true,
-          "notes": "All 3 tools confirmed on live connected servers. 2026-06-05 eleventh-pass cast probes: browser-rendering/get_url_markdown (0.6 as alternative), thinking/sequentialthinking (1.18), fs/write_file (0.83). browser-rendering confirmed connected (toolCount: 3). Extends page-to-markdown-archive (ends at fs/write_file) with reasoning step. No auth-gated backends required."
+          "notes": "All 3 tools confirmed on live connected servers. 2026-06-05 eleventh-pass cast probes: browser-rendering/get_url_markdown (0.6 as alternative), thinking/sequentialthinking (1.18), fs/write_file (0.83). browser-rendering confirmed connected (toolCount: 3). Extends page-to-markdown-archive (ends at fs/write_file) with reasoning step. No auth-gated backends required NOTE: browser-rendering returned 401 in 15th-pass session (auth-gated); verified:true reflects historical confirmation in the session noted above, not current-session reachability."
         },
         {
           "name": "financial-page-screenshot-analysis",
@@ -165,7 +166,7 @@
           ],
           "accomplishes": "Capture a screenshot of a financial dashboard or reporting page, analyze the visible financial indicators and chart data with reasoning, write a financial snapshot — captures visual dashboard state vs existing financial-page-brief which fetches as markdown.",
           "verified": true,
-          "notes": "All 3 tools confirmed 2026-06-05: browser-rendering/get_url_screenshot (0.33), thinking/sequentialthinking (0.40), fs/write_file (confirmed). Novel: uses screenshot (visual) vs existing financial-page-brief which uses get_url_markdown."
+          "notes": "All 3 tools confirmed 2026-06-05: browser-rendering/get_url_screenshot (0.33), thinking/sequentialthinking (0.40), fs/write_file (confirmed). Novel: uses screenshot (visual) vs existing financial-page-brief which uses get_url_markdown NOTE: browser-rendering returned 401 in 15th-pass session (auth-gated); verified:true reflects historical confirmation in the session noted above, not current-session reachability."
         },
         {
           "name": "finance-agent-skill-pipeline",
@@ -682,7 +683,7 @@
           ],
           "accomplishes": "Convert any web page to clean Markdown via browser-rendering and save it locally — a lightweight content-capture combo for design references and competitive teardowns.",
           "verified": true,
-          "notes": "browser-rendering and fs connected. Verified 2026-06-04."
+          "notes": "browser-rendering and fs connected. Verified 2026-06-04 NOTE: browser-rendering returned 401 in 15th-pass session (auth-gated); verified:true reflects historical confirmation in the session noted above, not current-session reachability."
         },
         {
           "name": "form-fill-and-screenshot-proof",
@@ -758,7 +759,7 @@
           ],
           "accomplishes": "Capture a full-page screenshot of any URL via the headless browser-rendering service, then write the image data to a local file — a minimal two-backend visual archiving chain.",
           "verified": true,
-          "notes": "browser-rendering/get_url_screenshot confirmed from live cast probe (2026-06-04). fs/write_file confirmed connected."
+          "notes": "browser-rendering/get_url_screenshot confirmed from live cast probe (2026-06-04). fs/write_file confirmed connected NOTE: browser-rendering returned 401 in 15th-pass session (auth-gated); verified:true reflects historical confirmation in the session noted above, not current-session reachability."
         },
         {
           "name": "navigate-screenshot-save",
@@ -792,7 +793,7 @@
           ],
           "accomplishes": "Fetch full HTML content of a web page, reason through DOM structure, patterns, and potential issues, save a structured analysis report to file",
           "verified": true,
-          "notes": "All 3 tools confirmed on live connected servers (browser-rendering, thinking, fs). 2026-06-05 fifth-pass verification."
+          "notes": "All 3 tools confirmed on live connected servers (browser-rendering, thinking, fs). 2026-06-05 fifth-pass verification NOTE: browser-rendering returned 401 in 15th-pass session (auth-gated); verified:true reflects historical confirmation in the session noted above, not current-session reachability."
         },
         {
           "name": "a11y-audit-to-file",
@@ -815,7 +816,7 @@
           ],
           "accomplishes": "Get a page screenshot via browser-rendering's screenshot tool, analyze visual design elements and hierarchy with reasoning, write a design assessment report — complements existing page-html-analysis-to-file by using the visual/screenshot surface rather than HTML markup.",
           "verified": true,
-          "notes": "All 3 tools confirmed 2026-06-05: browser-rendering/get_url_screenshot (0.33), thinking/sequentialthinking (0.44), fs/write_file (0.30). Novel: first use of browser-rendering/get_url_screenshot in design profile."
+          "notes": "All 3 tools confirmed 2026-06-05: browser-rendering/get_url_screenshot (0.33), thinking/sequentialthinking (0.44), fs/write_file (0.30). Novel: first use of browser-rendering/get_url_screenshot in design profile NOTE: browser-rendering returned 401 in 15th-pass session (auth-gated); verified:true reflects historical confirmation in the session noted above, not current-session reachability."
         },
         {
           "name": "interactive-design-flow-analysis",
@@ -1148,7 +1149,7 @@
           ],
           "accomplishes": "Fetch the full HTML content of a web page via Cloudflare browser rendering, run an AI-powered semantic search against the evidence base to find related documents and prior research, reason over the combined web context and evidence with sequential thinking to surface insights or gaps, then write a structured cross-reference report to a local file.",
           "verified": true,
-          "notes": "All 4 tools confirmed on live connected servers. 2026-06-05 eleventh-pass cast probes: browser-rendering/get_url_html_content (0.6), evidence/ai_search (1.3), thinking/sequentialthinking (1.18), fs/write_file (0.83). Cross-domain: browser-rendering plus evidence plus thinking plus fs, 4 distinct backends. No auth-gated backends required."
+          "notes": "All 4 tools confirmed on live connected servers. 2026-06-05 eleventh-pass cast probes: browser-rendering/get_url_html_content (0.6), evidence/ai_search (1.3), thinking/sequentialthinking (1.18), fs/write_file (0.83). Cross-domain: browser-rendering plus evidence plus thinking plus fs, 4 distinct backends. No auth-gated backends required NOTE: browser-rendering returned 401 in 15th-pass session (auth-gated); verified:true reflects historical confirmation in the session noted above, not current-session reachability."
         },
         {
           "name": "repo-size-profile-report",
@@ -1439,7 +1440,7 @@
           ],
           "accomplishes": "Fetch a communication platform page's raw HTML, extract communication channel patterns and key feature structures with reasoning, write a structured platform analysis brief — uses HTML content for richer structural analysis vs markdown or screenshot.",
           "verified": true,
-          "notes": "All 3 tools confirmed 2026-06-05: browser-rendering/get_url_html_content (0.20 as alternative), thinking/sequentialthinking (confirmed), fs/write_file (confirmed). Novel: first browser-rendering/get_url_html_content in communication profile."
+          "notes": "All 3 tools confirmed 2026-06-05: browser-rendering/get_url_html_content (0.20 as alternative), thinking/sequentialthinking (confirmed), fs/write_file (confirmed). Novel: first browser-rendering/get_url_html_content in communication profile NOTE: browser-rendering returned 401 in 15th-pass session (auth-gated); verified:true reflects historical confirmation in the session noted above, not current-session reachability."
         },
         {
           "name": "comm-skill-execute-log",
@@ -1592,7 +1593,7 @@
           ],
           "accomplishes": "Fetch public deployment documentation or runbook pages as clean Markdown and save them to a local file — a pull-and-archive pattern for keeping ops runbooks current without manual copy-paste from browser to editor.",
           "verified": true,
-          "notes": "browser-rendering and fs both connected (2026-06-04). New combo this run. Minimal two-backend ops pattern."
+          "notes": "browser-rendering and fs both connected (2026-06-04). New combo this run. Minimal two-backend ops pattern NOTE: browser-rendering returned 401 in 15th-pass session (auth-gated); verified:true reflects historical confirmation in the session noted above, not current-session reachability."
         },
         {
           "name": "codebase-scan-to-notion",
@@ -1635,7 +1636,7 @@
           ],
           "accomplishes": "Fetch any URL as clean markdown (status page, incident post-mortem, deployment guide), reason through the ops implications with sequential thinking, then write the resulting runbook or action plan to a file — browser-rendering + thinking + fs three-backend chain.",
           "verified": true,
-          "notes": "browser-rendering/get_url_markdown confirmed from existing verified combo page-to-markdown-archive. thinking/sequentialthinking and fs/write_file confirmed connected (2026-06-04 third pass)."
+          "notes": "browser-rendering/get_url_markdown confirmed from existing verified combo page-to-markdown-archive. thinking/sequentialthinking and fs/write_file confirmed connected (2026-06-04 third pass) NOTE: browser-rendering returned 401 in 15th-pass session (auth-gated); verified:true reflects historical confirmation in the session noted above, not current-session reachability."
         },
         {
           "name": "provision-bind-and-document",
