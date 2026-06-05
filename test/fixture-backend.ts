@@ -642,15 +642,34 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
         inputSchema: {
           type: 'object',
           properties: {
-            worker_name: { type: 'string' },
-            limit: { type: 'number' },
+            workerId: { type: 'string' },
+            page: { type: 'number' },
+            perPage: { type: 'number' },
           },
-          required: ['worker_name'],
+          required: [],
         },
         response: text(JSON.stringify([
-          { id: 'build-abc', worker: 'ch1tty-gateway', status: 'success', triggered_at: '2026-06-05T06:00:00Z', duration_ms: 45000 },
-          { id: 'build-xyz', worker: 'ch1tty-gateway', status: 'failed', triggered_at: '2026-06-04T22:00:00Z', error: 'Build command exited with code 1' },
+          { buildUUID: 'uuid-abc', worker: 'ch1tty-gateway', status: 'success', triggered_at: '2026-06-05T06:00:00Z', duration_ms: 45000 },
+          { buildUUID: 'uuid-xyz', worker: 'ch1tty-gateway', status: 'failed', triggered_at: '2026-06-04T22:00:00Z', error: 'Build command exited with code 1' },
         ])),
+      },
+      {
+        name: 'workers_builds_get_build',
+        description: 'Get details of a specific Cloudflare Workers Builds build run including configuration, status, and deployment outcome',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            buildUUID: { type: 'string' },
+          },
+          required: ['buildUUID'],
+        },
+        response: text(JSON.stringify({
+          buildUUID: 'uuid-xyz',
+          worker: 'ch1tty-gateway',
+          status: 'failed',
+          triggered_at: '2026-06-04T22:00:00Z',
+          error: 'Build command exited with code 1',
+        })),
       },
       {
         name: 'workers_builds_get_build_logs',
@@ -658,28 +677,26 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
         inputSchema: {
           type: 'object',
           properties: {
-            build_id: { type: 'string' },
-            worker_name: { type: 'string' },
+            buildUUID: { type: 'string' },
           },
-          required: ['build_id'],
+          required: ['buildUUID'],
         },
         response: text(JSON.stringify({
-          build_id: 'build-xyz',
+          buildUUID: 'uuid-xyz',
           logs: 'Error: Build command exited with code 1\nnpm ERR! missing script: build',
         })),
       },
       {
         name: 'workers_builds_set_active_worker',
-        description: 'Set the active deployed version of a Cloudflare Worker project via Workers Builds to roll back or promote a build',
+        description: 'Set the active Worker ID for subsequent Workers Builds API calls in this session',
         inputSchema: {
           type: 'object',
           properties: {
-            worker_name: { type: 'string' },
-            build_id: { type: 'string' },
+            workerId: { type: 'string' },
           },
-          required: ['worker_name', 'build_id'],
+          required: ['workerId'],
         },
-        response: text(JSON.stringify({ worker: 'ch1tty-gateway', active_build: 'build-abc', status: 'active' })),
+        response: text(JSON.stringify({ workerId: 'ch1tty-gateway', status: 'active' })),
       },
     ],
   },
