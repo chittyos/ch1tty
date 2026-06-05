@@ -1,6 +1,6 @@
 {
-  "_comment": "ch1tty focus-profile suggestions catalog \u2014 152 combos, 91 verified (twentieth-pass 2026-06-05)",
-  "generatedFrom": "19th-pass",
+  "_comment": "ch1tty focus-profile suggestions catalog \u2014 159 combos, 98 verified (twenty-first-pass 2026-06-05)",
+  "generatedFrom": "20th-pass",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools \u2014 now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time \u2014 combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -205,6 +205,19 @@
           "accomplishes": "Find the finance agent, survey available evidence RAGs for financial corpus, AI-search for specific financial data, discover relevant financial skills (cashflow-planner, mercury-finance), and reason over the combined financial landscape. Agent-entry finance chain \u2014 uses agent discovery as the entry point into evidence-driven skill routing.",
           "verified": true,
           "notes": "20th-pass: agent_search confirmed finance agent (finance.agent.chitty.cc, Mercury banking); evidence/list_rags (3 RAGs confirmed); evidence/ai_search(re-evidence-search, 'cash flow finance planning') returned real ROTH IRA cash flow data ($17/month, 12-month $204 rolling); skill_search('cashflow planner finance mercury') confirmed cashflow-planner (0.8) and mercury-finance (0.8); thinking confirmed. Novel: first finance chain to begin with agent_search \u2192 RAG survey \u2192 evidence \u2192 skill lookup (5-tool chain); prior finance chains skip agent entry or omit RAG survey."
+        },
+        {
+          "name": "obligation-cashflow-evidence-plan",
+          "chain": [
+            "orchestrator/skill_search(obligation-tracker)",
+            "orchestrator/skill_search(cashflow-planner)",
+            "evidence/ai_search(re-evidence-search)",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Dual-skill discovery for financial planning: first surface the obligation-tracker skill to enumerate current financial/legal obligations, then the cashflow-planner skill for forecasting, cross-reference both against real RAG evidence data (ROTH IRA, account statements), then reason into a consolidated obligation-vs-cashflow plan and write it to a file.",
+          "verified": true,
+          "notes": "obligation-tracker (0.8 relevance) and cashflow-planner (0.8 relevance) both confirmed via live skill_search. evidence/ai_search(re-evidence-search, 'cash flow finance planning ROTH') returned real ROTH IRA cash flow data ($17/month). Novel: first finance chain to use two sequential skill_search calls targeting distinct but related financial planning skills before pivoting to evidence \u2014 prior finance chains use a single skill_search."
         }
       ],
       "prompts": [
@@ -670,6 +683,19 @@
           "accomplishes": "Search for the dispute agent, discover matching dispute-evidence or fact-governance skills, cross-reference the evidence base for supporting facts, reason over the dispute landscape, and write a strategy brief. Three-layer discovery (agent \u2192 skill \u2192 evidence) before reasoning \u2014 first governance chain to sequence all three discovery mechanisms.",
           "verified": true,
           "notes": "20th-pass: agent_search('dispute evidence legal') confirmed dispute agent (0.7 relevance, 7 tools, bound); skill_search('fact governance evidence litigation') confirmed fact-governance (0.8) and dispute-evidence (0.4); evidence/ai_search confirmed; thinking confirmed; fs/write_file confirmed. Novel: first governance chain to sequence agent_search + skill_search + evidence in series \u2014 differs from dispute-agent-evidence-brief (agent+evidence, no skill) and capability-landscape-report (agent+skill, no evidence)."
+        },
+        {
+          "name": "multi-rag-cross-synthesis",
+          "chain": [
+            "evidence/list_rags",
+            "evidence/ai_search(re-evidence-search)",
+            "evidence/ai_search(chittyevidence-search)",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Enumerate all RAGs, then query TWO distinct RAGs in sequence \u2014 financial data RAG (ROTH IRA cash flow, account statements) and property evidence RAG (purchase agreements, real estate) \u2014 then use sequential thinking to synthesize a cross-domain picture of the user's financial + property holdings, and write a governance/audit report.",
+          "verified": true,
+          "notes": "evidence/ai_search(re-evidence-search, 'cash flow finance planning ROTH') \u2192 ROTH IRA $17/month confirmed. evidence/ai_search(chittyevidence-search, 'property real estate evidence') \u2192 Purchase Agreement + RE: Property Transaction confirmed. Novel: FIRST chain to query two different RAGs in sequence within a single pipeline \u2014 all prior chains call ai_search at most once per combo."
         }
       ],
       "prompts": [
@@ -1041,6 +1067,19 @@
           "accomplishes": "Survey evidence RAGs to identify design-relevant documents, AI-search for specific design context, navigate to the relevant page, capture an accessibility snapshot, and reason about the design. Evidence-driven browser investigation \u2014 using existing knowledge to guide targeted page navigation, then reasoning over what was found.",
           "verified": true,
           "notes": "20th-pass: evidence/list_rags (3 RAGs confirmed); evidence/ai_search confirmed; playwright/browser_navigate (1.05 score confirmed prior runs); playwright/browser_snapshot (0.78 score confirmed); thinking confirmed. Novel: first design chain to begin with RAG survey + evidence THEN pivot to playwright \u2014 prior design chains start with playwright/browser-rendering and optionally add evidence later (playwright-evidence-ux-analysis: navigate\u2192screenshot\u2192evidence\u2192thinking is the REVERSE order). Inverts the pattern: knowledge-first navigation rather than navigate-then-discover."
+        },
+        {
+          "name": "alchemist-scaffold-proposal",
+          "chain": [
+            "orchestrator/agent_search(alchemist)",
+            "orchestrator/skill_search(build-mcp-server)",
+            "evidence/ai_search(chittyevidence-search)",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Alchemical surface composition workflow: discover the alchemist agent (pattern-observation, alchemical-routing capabilities), find the build-mcp-server and chittyos-compliance scaffolding skills, ground the proposal in existing evidence context, then reason through which recurring cross-backend patterns in the current catalog deserve a new focused MCP surface \u2014 write out a surface proposal.",
+          "verified": true,
+          "notes": "agent_search('alchemist pattern observation mcp composition') \u2192 chittyagent-alchemist (0.7 relevance, pattern-observation + alchemical-routing + mcp-composition capabilities, bound status) confirmed. skill_search('build mcp server scaffold plugin') \u2192 build-mcp-server (0.8), chittyos-compliance (0.8), plugin-dev (0.8) all confirmed. evidence/ai_search(chittyevidence-search, 'property real estate evidence') confirmed. Novel: first chain centered on the alchemist agent as orchestration entry; first to pair agent discovery with mcp scaffolding skill before evidence."
         }
       ],
       "prompts": [
@@ -1504,6 +1543,19 @@
           "accomplishes": "Map the codebase directory structure, cross-reference with the evidence base for architectural context, find the most relevant skill for the codebase pattern, then pull library documentation. Four-category cross: desktop (fs) + search (evidence) + reasoning (orchestrator) + documents (context7) \u2014 codebase analysis enriched by all three external knowledge sources.",
           "verified": true,
           "notes": "20th-pass: fs/directory_tree (confirmed in prior passes, tree-to-architecture-thinking); evidence/ai_search (confirmed this session); skill_search confirmed (multiple skills returned); context7/resolve-library-id (0.8 score confirmed); context7/query-docs confirmed. Novel: first code chain to combine directory_tree \u2192 evidence \u2192 skill_search \u2192 context7 docs \u2014 prior chains use directory_tree with thinking only (tree-to-architecture-thinking) or sizes+tree+thinking, never branching into evidence+skill+library docs. Four distinct backend categories crossed in single chain."
+        },
+        {
+          "name": "ch1tty-self-discovery-docs",
+          "chain": [
+            "orchestrator/agent_search(ch1tty-gateway)",
+            "orchestrator/skill_search(cast-mcp-route)",
+            "context7/resolve-library-id(@modelcontextprotocol/sdk)",
+            "context7/query-docs",
+            "fs/write_file"
+          ],
+          "accomplishes": "Meta-recursive self-discovery: ch1tty searches for itself in the agent registry (chittyagent-ch1tty, mcp-gateway capability), then finds its own cast skill in the skill registry, then fetches its own MCP SDK docs via context7 \u2014 producing a self-referential architecture document: 'what am I, what can I cast, and what does the SDK I'm built on say about my primitives?'",
+          "verified": true,
+          "notes": "agent_search('ch1tty gateway mcp aggregation') \u2192 chittyagent-ch1tty (0.7 relevance, mcp-gateway capability, unbound status) confirmed. skill_search('cast mcp route orchestration intent') \u2192 user:cast (0.8 relevance) confirmed. context7 resolve-library-id + query-docs confirmed in prior passes. Novel: first meta-recursive chain where ch1tty discovers ITSELF via its own orchestrator, then its own cast skill, then its underlying SDK \u2014 a self-knowledge chain."
         }
       ],
       "prompts": [
@@ -1812,6 +1864,19 @@
           "accomplishes": "Find communication connector skills (imessage, discord, telegram), list all available communication agents, cross-reference with the evidence base for messaging context, reason over the full communication landscape, and write a communication strategy report. Skill-first communication pattern \u2014 starts with skill discovery rather than agent or browser.",
           "verified": true,
           "notes": "20th-pass: skill_search confirmed connectors (discord, telegram, imessage) plus comm-adjacent skills; agent_list (28 real agents confirmed); evidence/ai_search confirmed; thinking confirmed; fs/write_file confirmed. Novel: first communication combo to start with skill_search \u2192 agent_list (reversed from infra-health-snapshot which does agent_list\u2192skill_list); first comm combo to use skill_search as entry point (prior comm combos start with evidence/ai_search or playwright/browser_navigate)."
+        },
+        {
+          "name": "ux-observer-domain-evidence-report",
+          "chain": [
+            "orchestrator/skill_search(ux-observer)",
+            "orchestrator/skill_search(domain-knowledge)",
+            "evidence/ai_search(chittyevidence-search)",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Cross-pollinate UX engagement observations with ecosystem domain knowledge: surface the ux-observer skill (engagement patterns, UX reports, ChittyCommand insights), then the domain-knowledge skill (architectural navigation, ecosystem context), ground both against evidence data, then synthesize a communication-focused report that connects user behavior patterns with system architecture knowledge.",
+          "verified": true,
+          "notes": "skill_search('ux observer engagement patterns insights chittycommand') \u2192 chittycommand-alpha:ux-observer (0.8 relevance) confirmed. skill_search('domain knowledge ecosystem navigation chittycommand') \u2192 chittycommand:domain-knowledge (0.7 relevance) confirmed. evidence/ai_search(chittyevidence-search) confirmed. Novel: first chain using ux-observer as entry skill (never used as chain entry before); first to sequence ux-observer + domain-knowledge in a two-skill pivot before evidence."
         }
       ],
       "prompts": [
@@ -2210,6 +2275,33 @@
           "accomplishes": "Search for and execute an ops skill (wrangler-audit, chittyos-compliance, chitty-deploy), then pull the relevant library documentation from Context7 to enrich the output, and write a complete runbook. A 'run then document' pattern \u2014 skill execution enriched with post-execution library docs.",
           "verified": true,
           "notes": "20th-pass: skill_search('wrangler audit workers devops') confirmed wrangler-audit (0.8) and chittyos-compliance (0.8); skill_execute confirmed in prior passes; context7/resolve-library-id (0.8 score); context7/query-docs confirmed; fs/write_file confirmed. Novel: first catalog chain to use skill_execute THEN context7 for post-execution documentation enrichment \u2014 prior skill+context7 chains do search-only (skill-deploy-context7-docs: skill_search\u2192context7 without execution; skill-context7-ops-research: skill_list\u2192context7\u2192write without execution)."
+        },
+        {
+          "name": "recommendation-evidence-agent-dispatch",
+          "chain": [
+            "orchestrator/skill_search(recommendation-engine)",
+            "evidence/list_rags",
+            "evidence/ai_search(re-evidence-search)",
+            "orchestrator/agent_list",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Evidence-grounded recommendation-to-agent-dispatch pipeline: surface the recommendation-engine skill to understand what actions are suggested, enumerate and query RAG evidence to ground the recommendations in real data, then inventory all 28 available agents to find the right dispatch target, then reason into an ops runbook and write it.",
+          "verified": true,
+          "notes": "skill_search('recommendation engine actions suggest') \u2192 chittycommand-alpha:recommendation-engine (0.8 relevance) confirmed. evidence/list_rags \u2192 3 RAGs confirmed. evidence/ai_search(re-evidence-search, 'cash flow') \u2192 ROTH IRA data confirmed. orchestrator/agent_list \u2192 28 agents confirmed. Novel: first 5-tool+ chain using recommendation-engine as entry skill; first to sequence skill_search \u2192 RAG inventory \u2192 ai_search \u2192 agent_list (reversed from prior chains that start with agent_list)."
+        },
+        {
+          "name": "directory-ship-agent-routing-guide",
+          "chain": [
+            "fs/directory_tree",
+            "orchestrator/agent_search(ship-workflow)",
+            "evidence/ai_search(chittyevidence-search)",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Project-structure-aware agent routing: scan the current project's directory tree to understand its shape, use that context to search for the best dev-workflow agent (ship agent: preflight checks, brainstorming, checkpointing, branch management, 0.7 relevance), ground in evidence context, then synthesize a routing guide \u2014 'given this project layout, here is which agent to invoke and how'.",
+          "verified": true,
+          "notes": "fs/directory_tree confirmed (fs connected). agent_search('project development ship workflow automation') \u2192 chittyagent-ship (0.7 relevance, dev-wrap-up + preflight-checks + brainstorming + checkpointing + branch-management capabilities) confirmed, also chittyagent-autobot (0.46). evidence/ai_search(chittyevidence-search) confirmed. Novel: first chain starting with fs/directory_tree that pivots to agent_search rather than evidence or skill_search; inverts prior directory-tree chains (directory-evidence-skill-docs went tree\u2192evidence\u2192skill)."
         }
       ],
       "prompts": [
