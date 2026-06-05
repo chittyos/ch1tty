@@ -192,7 +192,7 @@
       ]
     },
     "governance": {
-      "description": "ChittyOS ecosystem governance, identity, evidence, and persistent state — extended with ChittyAgent Tasks (tasks-mcp), ChittyLedger (ledger-mcp), Session Coordinator (session-mcp), and ChittyEvidence canonical document store (chittyevidence). Verified-strong (2026-06-04): evidence, notion, thinking, fs live. github and orchestrator NOT connected — corrected to verified:false. New verified:true combos: evidence-reasoning-brief (evidence+thinking+notion) and rag-survey-to-file (evidence+fs).",
+      "description": "ChittyOS ecosystem governance, identity, evidence, and persistent state — extended with ChittyAgent Tasks (tasks-mcp), ChittyLedger (ledger-mcp), Session Coordinator (session-mcp), and ChittyEvidence canonical document store (chittyevidence). github and orchestrator NOT connected. Notion API returning 401 (invalid token) in remote container — all Notion-write combos are verified:false. See individual combo verified flags.",
       "combos": [
         {
           "name": "rag-evidence-to-notion-brief",
@@ -492,7 +492,7 @@
       ]
     },
     "design": {
-      "description": "Browser rendering, automation, and desktop/visual work — extended with ChittyEvidence (chittyevidence) for canonical archival of visual artifacts, and ChittyAgent Tasks (tasks-mcp) for turning design findings into tracked work items. Verified-strong (2026-06-04): browser-rendering, playwright, fs, notion all live. github NOT connected — visual-bug-report corrected to verified:false. New combos: playwright-capture-to-notion and page-markdown-to-notion-brief (both verified:true).",
+      "description": "Browser rendering, automation, and desktop/visual work — extended with ChittyEvidence (chittyevidence) for canonical archival of visual artifacts, and ChittyAgent Tasks (tasks-mcp) for turning design findings into tracked work items. github NOT connected. Notion API returning 401 (invalid token) in remote container — Notion-write combos are verified:false. See individual combo verified flags.",
       "combos": [
         {
           "name": "capture-archive-document",
@@ -697,7 +697,7 @@
       ]
     },
     "code": {
-      "description": "Software development — source control, deployment, library documentation, database, and code quality tools. Verified-strong (2026-06-04): context7, fs, notion, evidence all live. github NOT connected — library-docs-to-github-issue corrected to verified:false. neon NOT connected — schema-branch-and-migrate, schema-to-notion-doc, db-branch-test-and-document corrected to verified:false. New verified:true combos: context7-docs-to-file, fs-survey-and-document, evidence-library-cross-ref.",
+      "description": "Software development — source control, deployment, library documentation, database, and code quality tools. github NOT connected — library-docs-to-github-issue is verified:false. neon NOT connected — schema/db combos are verified:false. Notion API returning 401 in remote container — Notion-write combos are verified:false. See individual combo verified flags.",
       "combos": [
         {
           "name": "library-research-to-docs",
@@ -952,7 +952,7 @@
       ]
     },
     "communication": {
-      "description": "Cross-channel messaging, notes, team communication, and follow-up task creation. Verified-strong (2026-06-04): notion and thinking connected. chittymac, imessage, and tasks are local MCP servers verified:false (not connected — require local daemon or token config). New verified:true combo: notion-reasoning-summary (notion + thinking).",
+      "description": "Cross-channel messaging, notes, team communication, and follow-up task creation. chittymac, imessage, and tasks are local MCP servers not connected (require local daemon or token config). Notion API returning 401 (invalid token) in remote container — all Notion combos are verified:false. playwright-based combos (web-comm-state-analysis, web-comm-snapshot-analysis) are verified. See individual combo verified flags.",
       "combos": [
         {
           "name": "notion-note-to-task",

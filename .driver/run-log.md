@@ -25,7 +25,7 @@
 ## Blockers
 
 1. **Notion API token** — `op://ChittyOS-Integrations/notion/api_token` not resolvable in remote container. Blocks: E Notion board summary. Human must run: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` then restart ch1tty.
-2. **GitHub/Stripe/Neon/Linear/Cloudflare backends** — auth tokens not available in remote container; 33 catalog combos remain `verified:false` until these connect.
+2. **GitHub/Stripe/Neon/Linear/Cloudflare backends** — auth tokens not available in remote container; 15 auth-gated catalog combos remain `verified:false` until these connect (plus 39 Notion-tool combos blocked by `NOTION_TOKEN`).
 
 ## Run log
 
