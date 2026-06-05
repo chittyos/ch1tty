@@ -517,7 +517,7 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
             libraryId: { type: 'string' },
             query: { type: 'string' },
           },
-          required: ['libraryId'],
+          required: ['libraryId', 'query'],
         },
         response: text(JSON.stringify({
           libraryId: '/modelcontextprotocol/typescript-sdk',
