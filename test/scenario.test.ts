@@ -693,13 +693,13 @@ test('scenario: code focus — multi-step: search library docs → execute → d
   assert.equal(searchResult.isError, undefined);
   const found = parseSearch(searchResult);
   assert.ok(
-    found.tools && found.tools.some((t) => t.tool === 'context7/get-library-docs'),
-    'should find context7/get-library-docs',
+    found.tools && found.tools.some((t) => t.tool === 'context7/query-docs'),
+    'should find context7/query-docs',
   );
 
   // Step 2: get library docs
   const docsResult = await aggregator.callTool('ch1tty/execute', {
-    tool: 'context7/get-library-docs',
+    tool: 'context7/query-docs',
     args: { libraryId: '/modelcontextprotocol/typescript-sdk', topic: 'server setup' },
   }, sessionId);
   assert.equal(docsResult.isError, undefined);
@@ -715,7 +715,7 @@ test('scenario: code focus — multi-step: search library docs → execute → d
 
   // Verify call log shows both backend invocations
   const toolNames = fixture.getCallLog().map((c) => `${c.serverId}/${c.tool}`);
-  assert.ok(toolNames.includes('context7/get-library-docs'), 'context7 should have been called');
+  assert.ok(toolNames.includes('context7/query-docs'), 'context7 should have been called');
   assert.ok(toolNames.includes('notion/create_page'), 'notion should have been called');
 });
 

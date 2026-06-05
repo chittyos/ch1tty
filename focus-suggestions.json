@@ -108,7 +108,7 @@
           ],
           "accomplishes": "Search RAG evidence for financial and billing context (Chitty pricing docs, payment patterns, ledger policy), reason about implications and action items, create a structured finance brief in Notion \u2014 a useful fallback until stripe/ledger/tasks backends connect",
           "verified": true,
-          "notes": "All 3 tools confirmed on live connected servers (evidence, thinking, notion). Verified 2026-06-05 fifth-pass. Works as a research-only finance workflow until Stripe/ledger are connected."
+          "notes": "All 3 tools confirmed on live connected servers (evidence, thinking, notion). Verified 2026-06-05 fifth-pass. Works as a research-only finance workflow until Stripe/ledger are connected. Caveat (2026-06-05 fifth-pass env): Notion API returning 401 (invalid token) \u2014 tool is registered in connected Notion MCP but write calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "financial-doc-analysis",
@@ -119,7 +119,7 @@
           ],
           "accomplishes": "Read financial documents or data exports from filesystem (CSV/JSON billing reports, ledger snapshots), reason about key metrics, anomalies, and action items, document structured summary in Notion",
           "verified": true,
-          "notes": "All 3 tools confirmed on live connected servers (fs, thinking, notion). Verified 2026-06-05 fifth-pass. Works with locally-synced financial data files."
+          "notes": "All 3 tools confirmed on live connected servers (fs, thinking, notion). Verified 2026-06-05 fifth-pass. Works with locally-synced financial data files. Caveat (2026-06-05 fifth-pass env): Notion API returning 401 (invalid token) \u2014 tool is registered in connected Notion MCP but write calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         }
       ],
       "prompts": [
@@ -359,7 +359,7 @@
           ],
           "accomplishes": "Navigate to a web resource, capture screenshot proof, search RAG evidence for related context, then create a Notion brief combining screenshot and evidence findings",
           "verified": true,
-          "notes": "All 4 tools confirmed on live connected servers (playwright, evidence, notion). 2026-06-05 fifth-pass verification."
+          "notes": "All 4 tools confirmed on live connected servers (playwright, evidence, notion). 2026-06-05 fifth-pass verification. Caveat (2026-06-05 fifth-pass env): Notion API returning 401 (invalid token) \u2014 tool is registered in connected Notion MCP but write calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "codebase-context-reasoning",
@@ -371,7 +371,7 @@
           ],
           "accomplishes": "Survey a project directory, read key source files, reason through architecture and governance implications, document structured findings in Notion",
           "verified": true,
-          "notes": "All 4 tools confirmed on live connected servers (fs, thinking, notion). Uses read_text_file (not deprecated read_file). 2026-06-05 fifth-pass verification."
+          "notes": "All 4 tools confirmed on live connected servers (fs, thinking, notion). Uses read_text_file (not deprecated read_file). 2026-06-05 fifth-pass verification. Caveat (2026-06-05 fifth-pass env): Notion API returning 401 (invalid token) \u2014 tool is registered in connected Notion MCP but write calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         }
       ],
       "prompts": [
@@ -593,7 +593,7 @@
           ],
           "accomplishes": "Navigate to a page, capture the accessibility tree snapshot (richer than screenshot for structural analysis), reason about UX/a11y issues and improvements, document the audit in Notion",
           "verified": true,
-          "notes": "All 4 tools confirmed. browser_snapshot is preferred over screenshot for accessibility analysis (returns structured DOM tree). 2026-06-05 fifth-pass verification."
+          "notes": "All 4 tools confirmed. browser_snapshot is preferred over screenshot for accessibility analysis (returns structured DOM tree). 2026-06-05 fifth-pass verification. Caveat (2026-06-05 fifth-pass env): Notion API returning 401 (invalid token) \u2014 tool is registered in connected Notion MCP but write calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "page-html-analysis-to-file",
@@ -987,7 +987,7 @@
           ],
           "accomplishes": "Search Notion for existing knowledge pages on a topic, retrieve their content, reason about common themes, gaps, and connections, synthesize a new summary page \u2014 useful for async team briefs and knowledge consolidation",
           "verified": true,
-          "notes": "All 4 tools confirmed: API-post-search confirmed connected; API-retrieve-a-page in verified notion-reasoning-summary; thinking and API-post-page confirmed. 2026-06-05 fifth-pass verification."
+          "notes": "All 4 tools confirmed: API-post-search confirmed connected; API-retrieve-a-page in verified notion-reasoning-summary; thinking and API-post-page confirmed. 2026-06-05 fifth-pass verification. Caveat (2026-06-05 fifth-pass env): Notion API returning 401 (invalid token) \u2014 tool is registered in connected Notion MCP but write calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         },
         {
           "name": "web-capture-to-notion-note",
@@ -998,7 +998,7 @@
           ],
           "accomplishes": "Navigate to a web resource, capture a screenshot for visual reference, create a Notion note with the screenshot \u2014 useful for visual handoffs, async team updates, and capturing state of external tools",
           "verified": true,
-          "notes": "All 3 tools confirmed on live connected servers (playwright, notion). 2026-06-05 fifth-pass verification."
+          "notes": "All 3 tools confirmed on live connected servers (playwright, notion). 2026-06-05 fifth-pass verification. Caveat (2026-06-05 fifth-pass env): Notion API returning 401 (invalid token) \u2014 tool is registered in connected Notion MCP but write calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         }
       ],
       "prompts": [
@@ -1178,7 +1178,7 @@
           ],
           "accomplishes": "Discover provision candidates for a session, evaluate and score them, bind the best fit, then document the provisioning decision and rationale in a Notion page",
           "verified": true,
-          "notes": "All 4 tools confirmed: provision_candidates/evaluate/bind from existing verified combos; notion/API-post-page confirmed. 2026-06-05 fifth-pass verification."
+          "notes": "All 4 tools confirmed: provision_candidates/evaluate/bind from existing verified combos; notion/API-post-page confirmed. 2026-06-05 fifth-pass verification. Caveat (2026-06-05 fifth-pass env): Notion API returning 401 (invalid token) \u2014 tool is registered in connected Notion MCP but write calls will fail until token is restored via op://ChittyOS-Integrations/notion/api_token."
         }
       ],
       "prompts": [
