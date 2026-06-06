@@ -1,6 +1,6 @@
 {
   "_comment": "ch1tty focus-profile suggestions catalog \u2014 214 combos, 150 verified (twenty-eighth-pass 2026-06-06)",
-  "generatedFrom": "28th-pass",
+  "generatedFrom": "orchestrator/agent_list (28 agents, 2026-06-06) \u2014 30th catalog pass",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools \u2014 now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time \u2014 combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -291,6 +291,28 @@
           "accomplishes": "Evaluate current ChittyID candidates for a financial session, fork the best-scored generalist into a finance-specialist context, then execute a billing/ledger skill against the newly forked specialist \u2014 bootstrapping a financial entity in one chain.",
           "verified": true,
           "notes": "Novel pattern: evaluate \u2192 fork \u2192 execute without a manual bind step. All orchestrator tools confirmed live (2026-06-06). Useful when no dedicated financial entity exists yet."
+        },
+        {
+          "name": "dispute-billing-ledger-chain",
+          "chain": [
+            "orchestrator/agent_execute(dispute)",
+            "evidence/ai_search",
+            "orchestrator/agent_execute(finance)"
+          ],
+          "accomplishes": "Intake a financial dispute via the dispute agent's multi-domain lifecycle workflow, run an AI evidence search to surface relevant contracts or prior-case precedents, then log the resolved outcome to the finance agent's Mercury banking ledger \u2014 closing the billing dispute loop with verifiable, citable evidence.",
+          "verified": true,
+          "notes": "First combo linking dispute intake directly to finance ledger closure. dispute and finance agents both bound; evidence/ai_search confirmed accessible in prior passes; orchestrator live 2026-06-06 (28 agents, 15 bound)."
+        },
+        {
+          "name": "token-ops-finance-api-rotation",
+          "chain": [
+            "orchestrator/provision_evaluate",
+            "orchestrator/agent_execute(token-ops)",
+            "orchestrator/agent_execute(finance)"
+          ],
+          "accomplishes": "Evaluate the current session's trust context for financial access, rotate stale ChittyAuth tokens for Mercury banking API connections via token-ops, then immediately query the finance agent to confirm live connectivity \u2014 the safest credential-rotation pattern with built-in liveness verification.",
+          "verified": true,
+          "notes": "Distinct from existing token-ops combos that focus on compliance sweeps or evidence. This pattern uses provision_evaluate to gate the rotation, ensuring only trusted sessions can initiate token rotation. All three orchestrator tools confirmed live."
         }
       ],
       "prompts": [
@@ -361,6 +383,14 @@
         {
           "text": "Find the finance agent, survey our evidence RAGs for financial data, discover relevant financial skills like cashflow-planner, and reason over the combined financial landscape",
           "resolves_to": "agent-rag-evidence-finance-reasoning"
+        },
+        {
+          "text": "We have a billing dispute on invoice #4521 \u2014 intake it, find relevant contracts in the evidence store, and log the outcome to the ledger",
+          "resolves_to": "dispute-billing-ledger-chain"
+        },
+        {
+          "text": "Rotate the Mercury API tokens and verify the finance connection is still live",
+          "resolves_to": "token-ops-finance-api-rotation"
         }
       ]
     },
@@ -933,6 +963,17 @@
           "accomplishes": "List all registered governance agents to find gaps, register a new policy-checker or compliance agent, immediately execute it to verify the registration is live \u2014 closes the full agent onboarding loop in one chain.",
           "verified": true,
           "notes": "First use of orchestrator/agent_register in governance profile. All three orchestrator tools confirmed live (2026-06-06). The immediate execute after register is the key novelty: confirms the agent is reachable, not just indexed."
+        },
+        {
+          "name": "canon-document-lifecycle-governance-audit",
+          "chain": [
+            "orchestrator/agent_execute(canon)",
+            "orchestrator/agent_execute(registry)",
+            "evidence/ai_search"
+          ],
+          "accomplishes": "Validate chittycanon:// URIs for CERTIFIED governance documents via the canon agent's JSON Canonicalization Scheme, cross-reference each document's status lifecycle against the registry catalog, then run an evidence search to surface any uncertified, stale, or orphaned governance artifacts \u2014 a full URI-to-evidence governance audit.",
+          "verified": true,
+          "notes": "Distinct from canon-uri-evidence-governance (single-URI evidence retrieval). This combo audits the lifecycle of the full governance document set: URI validation \u2192 registry cross-check \u2192 evidence gap surfacing. canon and registry both bound; orchestrator live."
         }
       ],
       "prompts": [
@@ -1075,6 +1116,10 @@
         {
           "text": "Check outstanding inter-agent tasks, cross-reference with evidence RAGs, and write a governance decision trail",
           "resolves_to": "tasks-agent-evidence-dispatch"
+        },
+        {
+          "text": "Audit all certified governance docs \u2014 validate their URIs, check registry status, and surface any that are stale or uncertified",
+          "resolves_to": "canon-document-lifecycle-governance-audit"
         }
       ]
     },
@@ -1383,6 +1428,17 @@
           "accomplishes": "Register a new design agent (e.g. a UI variant generator or brand-consistency checker), search for a complementary skill by design intent, execute the skill \u2014 bootstrapping a new design capability and immediately pairing it with the closest existing skill.",
           "verified": true,
           "notes": "First use of orchestrator/agent_register in design profile. All orchestrator tools confirmed live (2026-06-06). Novel pattern: register a capability before searching for skills \u2014 ensures the registry is updated before downstream resolution."
+        },
+        {
+          "name": "chatgpt-ui-mcp-design-spec",
+          "chain": [
+            "orchestrator/agent_execute(chatgpt)",
+            "orchestrator/agent_execute(ui)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Use the ChatGPT integration agent to generate UI design templates and Custom GPT Action specifications (including MCP server guidance for Claude Code and Claude.ai channels), route through the UI agent's React/WebSocket streaming implementation for technical architecture alignment, then persist the complete design spec in Notion as a canonical design document.",
+          "verified": false,
+          "notes": "chatgpt agent bound; ui agent unbound. When ui reconnects, this enables a cross-AI design spec pipeline. chatgpt provides design patterns from the ChatGPT ecosystem while ui provides implementation context for the ch1tty agent.chitty.cc frontend. First combo pairing both AI-interface agents for design spec generation."
         }
       ],
       "prompts": [
@@ -1469,6 +1525,10 @@
         {
           "text": "Use the ChatGPT agent for design template context then scaffold a production frontend with the frontend-design skill",
           "resolves_to": "chatgpt-frontend-design-skill"
+        },
+        {
+          "text": "Generate a UI design spec for the new chat interface, align with our React/WebSocket architecture, and save it to Notion",
+          "resolves_to": "chatgpt-ui-mcp-design-spec"
         }
       ]
     },
@@ -2057,6 +2117,28 @@
           "accomplishes": "Register a newly deployed code agent (e.g. after publishing a new chittyagent worker), search by capability to confirm it's discoverable, execute a test request, then open a GitHub issue to track the onboarding follow-up \u2014 the full agent onboarding lifecycle: register \u2192 find \u2192 use \u2192 document.",
           "verified": false,
           "notes": "First use of orchestrator/agent_register in code profile. github/create_issue is unverified in this env (not connected), but verified in prior passes. orchestrator tools confirmed live (2026-06-06). The GitHub issue step closes the 'register and forget' anti-pattern \u2014 agents get a tracking ticket."
+        },
+        {
+          "name": "provision-candidates-code-specialist-fork",
+          "chain": [
+            "orchestrator/provision_candidates",
+            "orchestrator/provision_fork",
+            "context7/resolve-library-id"
+          ],
+          "accomplishes": "List all TY-VY-RY-scored candidate ChittyID entities for a code session (without committing to a decision), select and fork the best generalist into a code-specialist context, then resolve library IDs via context7 to surface the documentation most relevant to that specialist's domain \u2014 bootstrapping a specialized coding entity with targeted doc discovery in one deliberate chain.",
+          "verified": true,
+          "notes": "First code combo using provision_candidates rather than provision_evaluate \u2014 the candidates step lets a human or agent review options before forking, making it more deliberate than evaluate\u2192fork. context7/resolve-library-id confirmed live in prior passes; orchestrator provision tools confirmed via connected backend."
+        },
+        {
+          "name": "ui-autobot-feature-canonical-deploy",
+          "chain": [
+            "orchestrator/agent_execute(ui)",
+            "orchestrator/agent_execute(autobot)",
+            "github/create_pull_request"
+          ],
+          "accomplishes": "Describe a new UI feature via the UI agent's WebSocket-streaming chat interface, route the intent through autobot's canonical workflow (Sovereignty \u2192 Discover \u2192 Plan \u2192 Generate \u2192 Implement \u2192 Review \u2192 Tidy \u2192 CI/CD \u2192 Ship \u2192 Memory), then create the final PR on GitHub \u2014 full intent-to-deployed-PR in one orchestrated chain.",
+          "verified": false,
+          "notes": "ui and autobot are currently unbound; github is a registered remote backend. github/create_pull_request is the concrete ship step; autobot stages all preflight and tidy work before routing to it. Re-verify when ui and autobot reconnect. First combo covering the full UI\u2192autobot\u2192github PR pipeline."
         }
       ],
       "prompts": [
@@ -2187,6 +2269,14 @@
         {
           "text": "Discover the notes agent, search evidence RAGs for related context, then fetch library documentation for code research",
           "resolves_to": "notes-agent-evidence-context7-research"
+        },
+        {
+          "text": "Show me all candidate ChittyID entities for this code session, fork the best one as a TypeScript specialist, and find relevant coding skills",
+          "resolves_to": "provision-candidates-code-specialist-fork"
+        },
+        {
+          "text": "Take this UI feature request, run it through the canonical autobot workflow, and ship the PR",
+          "resolves_to": "ui-autobot-feature-canonical-deploy"
         }
       ]
     },
@@ -2462,6 +2552,28 @@
           "accomplishes": "Check who the session is bound to before routing a communication task, find and execute the appropriate communication agent, then reason over the result to decide follow-up actions \u2014 ensures the right ChittyID entity handles the dispatch and the outcome is reasoned before surfacing.",
           "verified": true,
           "notes": "First use of provision_status in communication profile. orchestrator tools confirmed live; thinking/sequentialthinking confirmed. The provision_status guard prevents misrouted outbound communication when session identity is ambiguous (2026-06-06)."
+        },
+        {
+          "name": "notes-imessage-contact-brief",
+          "chain": [
+            "orchestrator/agent_execute(notes)",
+            "notion/API-post-page",
+            "orchestrator/agent_execute(imessage)"
+          ],
+          "accomplishes": "Run semantic RAG search over Apple Notes (Workers AI embeddings) to surface prior context, notes, and thread history for a specific contact, persist the synthesized brief as a Notion page for future reference, then compose a targeted iMessage with the relationship context pre-loaded \u2014 turning personal notes into a contact-briefing system with a durable Notion record before every conversation.",
+          "verified": false,
+          "notes": "notes agent (6 MCP tools) and imessage agent are both unbound; notion/API-post-page verified in prior passes. The Notion write step gives the contact brief a canonical citable home. Re-verify when notes and imessage agents reconnect. First combo linking notes RAG \u2192 Notion brief \u2192 iMessage context."
+        },
+        {
+          "name": "scrape-dispute-comm-response",
+          "chain": [
+            "orchestrator/agent_execute(scrape)",
+            "orchestrator/agent_execute(dispute)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Scrape a counterparty or merchant site to gather public-facing evidence and claims, route the findings through the dispute agent's intake and strategy workflow, then draft and archive a communication response in Notion \u2014 a browser-to-brief dispute response pipeline with a citable, governed output.",
+          "verified": true,
+          "notes": "scrape (bound) and dispute (bound) confirmed live via orchestrator; notion/API-post-page verified in prior passes. Distinct from scrape-agent-monitor-and-analyze (monitoring focus) and scrape-resolve-error-triage-pipeline (error triage). First combo using scrape for legal dispute evidence gathering."
         }
       ],
       "prompts": [
@@ -2536,6 +2648,14 @@
         {
           "text": "Configure both Discord and Telegram connectors and write a cross-platform messaging integration plan",
           "resolves_to": "discord-telegram-connector-pair"
+        },
+        {
+          "text": "Before I message Alex, search my notes for context on our relationship and recent conversations",
+          "resolves_to": "notes-imessage-contact-brief"
+        },
+        {
+          "text": "Scrape the merchant's refund policy page, run a dispute strategy, and draft our response letter in Notion",
+          "resolves_to": "scrape-dispute-comm-response"
         }
       ]
     },
@@ -3044,6 +3164,28 @@
           "accomplishes": "Register a new ops agent and a matching skill in sequence, then evaluate whether provisioning should now route to this new capability \u2014 the alchemical bootstrap pattern: spawn a capability, anchor it with a skill, then let the evaluator decide if it should be the primary entity for the session.",
           "verified": true,
           "notes": "First use of orchestrator/agent_register in ops profile. All orchestrator tools confirmed live (2026-06-06). This closes the alchemical loop: new surface spawns \u2192 registered in ecosystem \u2192 provisioning re-evaluates to route to it."
+        },
+        {
+          "name": "intel-connect-provision-health-check",
+          "chain": [
+            "orchestrator/agent_execute(intel)",
+            "orchestrator/agent_execute(connect)",
+            "orchestrator/provision_status"
+          ],
+          "accomplishes": "Use the intel agent to gather operational intelligence across active sessions and service bindings, correlate with ChittyConnect's entity-memory context to identify binding anomalies or stale session states, then pull a provision_status audit to confirm the session-to-entity topology is healthy \u2014 a three-layer operational health check for the live orchestration layer.",
+          "verified": true,
+          "notes": "intel and connect both bound; provision_status confirmed live. Distinct from chitty-health-compliance-snapshot (service health checks) \u2014 this combo targets session-binding topology anomalies specifically. First combo using intel + connect together for operational correlation."
+        },
+        {
+          "name": "storage-connect-document-entity-map",
+          "chain": [
+            "orchestrator/agent_execute(storage)",
+            "orchestrator/agent_execute(connect)",
+            "orchestrator/agent_register"
+          ],
+          "accomplishes": "Retrieve entity-document relationships from the storage agent (R2 buckets, content-addressed docs, legal holds, AI-classified assets), correlate with ChittyConnect's active entity context to surface gaps in entity-to-document ownership, then register any newly discovered document types as agent capabilities \u2014 building a live document-entity map with self-registering metadata.",
+          "verified": false,
+          "notes": "storage agent currently unbound. connect bound; agent_register live. When storage reconnects, this enables automated entity-document topology auditing. Distinct from storage-agent-legal-hold-audit (legal hold focus) \u2014 this targets the broader entity-document ownership map."
         }
       ],
       "prompts": [
@@ -3154,6 +3296,14 @@
         {
           "text": "Probe the Cloudflare agent for resource endpoints and invoke chitty-pipelines to audit stream/sink config",
           "resolves_to": "pipelines-cloudflare-agent-audit"
+        },
+        {
+          "text": "Check whether our session-to-entity bindings are healthy \u2014 cross intel, connect, and provision status",
+          "resolves_to": "intel-connect-provision-health-check"
+        },
+        {
+          "text": "Map which documents in storage belong to which entities, find gaps, and register new doc types as agent capabilities",
+          "resolves_to": "storage-connect-document-entity-map"
         }
       ]
     }
