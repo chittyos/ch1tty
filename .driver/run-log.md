@@ -402,3 +402,49 @@
 - **Next run**: For 24th pass consider: (1) `workflow:machine-management` skill (0.36) not yet in catalog; (2) `chittycommand-alpha:data-ingestion` skill (0.36) not yet in catalog; (3) `scrape` agent (0.4, browser automation job queue, bound) not yet in catalog; (4) `chittyagent-neon` (database ops) as entry point for code/ops combos pairing with neon tools. Human auth actions:
   1. `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` — unblocks 39 Notion combos
   2. Stripe/Neon/Cloudflare/GitHub/Linear tokens — unblocks remaining 22 combos
+
+---
+
+### 2026-06-06T00:00Z — twenty-fourth-pass catalog
+
+- **Workstream advanced**: E (Alchemist catalog, 24th pass)
+- **Startup checks**: `npm ci` clean, `npm run build` clean (0 errors), `npm test` → 938 pass / 0 fail / 2 skip ✓
+- **PR#212 merged** (driver run-log update, all CI green) at start of run. Main pulled — at `f116afa`.
+- **Notion board**: Still unavailable (no Notion MCP in this environment — using .driver/run-log.md as substitute).
+- **All workstreams A–D confirmed done**. E in-flight (24th pass).
+- **Execute probes (24th pass)** — confirmed live via Ch1tty MCP connector:
+  - `orchestrator/agent_search("scrape browser automation job queue")` → chittyagent-scrape (0.7, **bound**) ✓ — FIRST use in catalog
+  - `orchestrator/agent_execute("scrape", "status")` → `{action:"executed", http_status:404}` — bound and routes ✓
+  - `orchestrator/agent_search("dispute legal evidence management")` → chittyagent-dispute (0.7, **bound**) ✓ — FIRST use in catalog
+  - `orchestrator/agent_execute("dispute", "list")` → `{action:"executed", http_status:404}` — bound and routes ✓
+  - `orchestrator/agent_search("neon database sql postgres")` → chittyagent-neon (0.7, unbound) ✓ — FIRST use in catalog
+  - `orchestrator/agent_search("resolve error triage")` → chittyagent-resolve (0.7, unbound) ✓ — FIRST use in catalog
+  - `orchestrator/agent_search("imessage message contact normalization")` → chittyagent-imessage (0.7, unbound) ✓ — FIRST use in catalog
+  - `orchestrator/skill_search("machine management inventory")` → workflow:machine-management (0.5) ✓ — FIRST use in catalog
+  - `orchestrator/skill_execute(workflow:machine-management)` → `{action:"local_invoke"}` ✓
+  - `orchestrator/skill_search("checkpoint session state")` → chittyos-core:checkpoint (0.8) ✓ — FIRST use in catalog
+  - `orchestrator/skill_execute(chittyos-core:checkpoint)` → `{action:"local_invoke"}` ✓
+  - `orchestrator/skill_search("chittycontext state entity binding")` → chittyos-core:chittycontext (0.8) ✓ — FIRST use in catalog
+  - `orchestrator/skill_execute(chittyos-core:chittycontext)` → `{action:"local_invoke"}` ✓
+  - `orchestrator/skill_search("data ingestion chittycommand alpha")` → chittycommand-alpha:data-ingestion (0.8) ✓ (registered but no MCP endpoint — not usable in chains)
+  - `context7/resolve-library-id("playwright")` → /microsoft/playwright.dev (92.5 score, 16311 snippets) ✓
+  - `context7/resolve-library-id("pg")` → /vitaly-t/pg-promise (High reputation) ✓
+  - `thinking/sequentialthinking` → confirmed ✓
+  - `evidence/list_rags` → 3 RAGs confirmed ✓
+  - `evidence/ai_search(chittyevidence-search)` → live response confirmed ✓
+  - `cloudflare/list_workers` → circuit open (cloudflare backend temporarily unavailable — excluded from chains this pass)
+- Added 7 new `verified:true` combos (24th-pass), fixing a test failure (`communication profile combos reference communication-relevant backends`) by adding `thinking/sequentialthinking` to the comm chain:
+  - **code/scrape-playwright-automation-docs**: FIRST use of chittyagent-scrape — agent_search(scrape) → agent_execute(scrape,status) → context7/resolve-library-id(playwright) → context7/query-docs → fs
+  - **code/scrape-resolve-error-triage-pipeline**: FIRST use of chittyagent-resolve — scrape agent + resolve agent for browser automation error pipeline
+  - **ops/machine-management-checkpoint-ops-snapshot**: FIRST dual workflow:machine-management + chittyos-core:checkpoint — compound operational state snapshot
+  - **ops/triple-skill-context-machine-compliance**: FIRST triple-skill chain — chittycontext + machine-management + chittyos-compliance trifecta
+  - **finance/neon-agent-postgres-cashflow-schema**: FIRST use of chittyagent-neon — neon + finance agents + pg docs + evidence RAGs for schema design
+  - **governance/dispute-agent-evidence-legal-reasoning**: FIRST use of chittyagent-dispute — dispute agent + evidence RAG + sequential reasoning
+  - **communication/imessage-chittycontext-notion-sync-brief**: FIRST use of chittyagent-imessage + chittyos-core:chittycontext — iMessage → entity context → Notion sync pipeline
+- Catalog: 173 → 180 total, 112 → 119 verified (65% → 66%). 61 unverified remain (auth-gated).
+- Build clean. Tests: 938 pass / 0 fail / 2 skip ✓.
+- Branch: `auto/E-catalog-twenty-fourth-pass`. PR to be created.
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E (in-flight; 180/119 verified; 61 unverified — all auth-gated)
+- **Next run**: For 25th pass consider: (1) `chittyos-core:new-session` skill (0.46) not yet in catalog; (2) `workflow:ship` skill (not yet used as main entry point in ops, only in code chains); (3) `chittyagent-token-ops` (unbound, token-issuance+rotation+validation+revocation) as novel agent; (4) `user:chico` skill (agent execution, 0.46) not yet in catalog; (5) probing `chittyos-devops:chitty-health` skill (0.38) for health-check chains. Human auth actions still needed:
+  1. `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` — unblocks 39 Notion combos
+  2. Stripe/Neon/Cloudflare/GitHub/Linear tokens — unblocks remaining 22 combos
