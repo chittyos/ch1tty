@@ -322,4 +322,4 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 **Next run priority**:
 1. Merge PR #238 if CI green
 2. 45th catalog pass: `orchestrator/agent_execute(chatgpt)` in governance/design/ops profiles; deeper neon/linear combos when tokens available; further evidence+cloudflare-builds cross-chains
-3. Fix Notion auth to verify the ~165 Notion-auth-gated combos: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`
+3. Fix Notion auth to verify the ~177 Notion-auth-gated combos: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`

@@ -582,8 +582,8 @@
 - Catalog: 384 → 396 total, 219 verified (unchanged — Notion-auth-gated). All 22 Notion tools now cataloged (was 15/22). All 6 profiles now have cloudflare-builds coverage.
 - Build clean. Tests: 938 pass / 0 fail / 2 skip ✓.
 - Branch: `auto/E-catalog-forty-fourth-pass`. PR#238 open. CI in_progress at run end (CodeRabbit + Codex rate-limited — no findings, data-only change).
-- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E (in-flight; 396/219 verified; 165 unverified — all auth-gated)
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E (in-flight; 396/219 verified; 177 unverified — all auth-gated)
 - **Next run**: Merge PR#238 if CI green. All 22 Notion tools now cataloged; all 6 profiles have cloudflare-builds. Next novel targets: (1) `orchestrator/agent_execute(chatgpt)` in governance/design/ops profiles (already in code from prior — first non-code profile use); (2) deeper `neon` tool chains when Neon MCP connects; (3) `linear` tools when Linear token available. Human auth actions:
-  1. `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` — unblocks ~165 Notion-auth-gated combos
+  1. `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` — unblocks ~177 Notion-auth-gated combos
   2. `export GITHUB_MCP_AUTHORIZATION="Bearer $(op read op://ChittyOS-Integrations/github/personal_access_token)"` — unblocks github combos
   3. Linear/Cloudflare/Neon/Stripe tokens for remaining auth-gated combos
