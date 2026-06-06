@@ -86,3 +86,39 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 **Next run priority**:
 1. 38th catalog pass: `orchestrator` agent has 13 tools (status `unbound` in agent_list) — catalog combos using its specific tools (agent_search, skill_search, agent_execute, skill_execute, agent_list, skill_list + others); `resolve` agent combos when it binds (error-triage, severity-classification, auto-resolution); `storage` agent (document-storage, r2-management, legal-holds, AI classification — unbound)
 2. Fix Notion auth to restore cross-run board state (see blocker above)
+
+### 2026-06-06 — Session 01VnL49rexHj8hy5KSsHLDyN
+
+**Workstream advanced**: E (Alchemist brainstorm — catalog 38th pass)
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass / 0 fail / 2 skipped
+- No open PRs found; no existing 38th-pass branch. Clean start.
+- Queried live Ch1tty gateway: 15 servers, 8 connected, 81 tools, 276 active sessions
+- `orchestrator` connected with 13 tools; confirmed all 13 tool names from catalog scan:
+  `agent_execute`, `agent_list`, `agent_register`, `agent_search`, `chittycontext`,
+  `provision_bind`, `provision_candidates`, `provision_evaluate`, `provision_fork`,
+  `provision_status`, `skill_execute`, `skill_list`, `skill_register`, `skill_search`
+- Agent list: 28 total / 15 bound. Newly noted unbound agents with declared tools:
+  notes (6), ship (8), orchestrator (13), autobot (unbound), neon agent, token-ops, tasks, ui, ch1tty, imessage, resolve, storage, claude
+- Identified undercovered orchestrator tools: `chittycontext` (1 combo!), `provision_bind` (5), `provision_fork` (6)
+- Created branch `auto/E-catalog-thirty-eighth-pass`; added 12 combos + 12 prompts (2 per profile):
+  - finance: chittycontext→cashflow-planner→notion, provision_candidates→bind→finance
+  - governance: chittycontext→canon→evidence/ai_search, provision_evaluate→fork→resolve
+  - design: chittycontext→screenshot→ship, provision_bind→ui→screenshot
+  - code: chittycontext→autobot→github/PR, chittycontext→neon-agent→neon/run_sql
+  - communication: chittycontext→notes→notion, provision_bind→notes→notion/search
+  - ops: chittycontext→ship→resolve, provision_fork→storage→canon
+- Tests post-add: 938 pass / 0 fail / 2 skipped
+- Pushed branch, opened PR #231
+
+**Branch / PR**: `auto/E-catalog-thirty-eighth-pass` → PR #231 (https://github.com/chittyos/ch1tty/pull/231)
+
+**Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
+
+**Board state**: 324 combos / 219 verified (38th pass)
+
+**Next run priority**:
+1. Merge PR #231 (38th pass, 324/219, tests green, CI in progress at run end)
+2. 39th catalog pass: verify `chittycontext` combos when orchestrator binds; add `notes` agent combos when it binds (6 tools); add `autobot` combos for governance + ops profiles (pentad-aware workflows); add `token-ops` and `tasks` agent combos
+3. Fix Notion auth (see blocker above) to mark more combos verified
