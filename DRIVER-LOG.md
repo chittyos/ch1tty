@@ -161,6 +161,40 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 2. 39th catalog pass: verify `chittycontext` combos when orchestrator binds; add `notes` agent combos when it binds (6 tools); add `autobot` combos for governance + ops profiles (pentad-aware workflows); add `token-ops` and `tasks` agent combos
 3. Fix Notion auth (see blocker above) to mark more combos verified
 
+### 2026-06-06T18:20Z — Session 01Th6PgkszCJyHrtwrwdc3gJ (41st pass)
+
+**Workstream advanced**: E (Alchemist brainstorm — catalog 41st pass)
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass / 0 fail / 2 skipped
+- Fetched all branches. No open PRs at start. main at `e035548` (40th pass, 348/219). PR #233 already merged.
+- Read DRIVER-LOG.md — all workstreams A–E confirmed (E in-flight). Pulled main to latest.
+- Ch1tty status: 0 connected servers (lazy). 284 active sessions. Probed live gateway via cast.
+- Confirmed 10 new uncataloged tool types via cast probes (all resolve with score ≥0.5):
+  - `playwright/browser_console_messages` (score 0.5 as alternative), `playwright/browser_handle_dialog` (0.5 primary), `playwright/browser_tabs` (0.86 primary), `playwright/browser_type` (alternative)
+  - `fs/get_file_info` (0.86 primary), `notion/API-query-data-source` (0.63 primary), `notion/API-retrieve-a-database` (0.63 alternative), `notion/API-get-block-children` (1.1 primary), `notion/API-retrieve-a-block` (0.9 alternative)
+- Added 12 new combos + 12 prompts (2 per profile), all using at least one first-ever tool:
+  - finance: notion-database-finance-query, file-info-finance-doc-metadata
+  - governance: notion-block-children-policy-audit, notion-retrieve-block-evidence-cross-ref
+  - design: playwright-tabs-multi-site-design-compare, playwright-console-messages-ux-debug
+  - code: playwright-browser-type-form-automation-test, notion-database-query-context7-docs
+  - communication: playwright-handle-dialog-comm-form-capture, notion-block-retrieve-comm-patch
+  - ops: file-info-batch-ops-size-audit, notion-db-ops-task-query-deploy
+- Catalog: 348 → 360 total, 219 verified (unchanged — new combos Notion-auth-gated). All 6 profiles expanded.
+- Build clean. Tests: 938 pass / 0 fail / 2 skip ✓
+- Branch: `auto/E-catalog-forty-first-pass`. PR #234 open. CI in_progress (CodeQL). Subscribed for activity.
+
+**Branch / PR**: `auto/E-catalog-forty-first-pass` → PR #234 (https://github.com/chittyos/ch1tty/pull/234)
+
+**Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
+
+**Next run priority**:
+1. Merge PR #234 if CI green + no blocking CodeRabbit findings
+2. 42nd catalog pass: `notion/API-delete-a-block`, `notion/API-get-bot-info`, `playwright/browser_select_option`, `playwright/browser_close`, `playwright/browser_resize`, `fs/create_directory` — all uncataloged
+3. Fix Notion auth (see blocker above) to verify the 12 new combos (plus ~49 existing Notion-auth-gated ones)
+
+---
+
 ### 2026-06-06 — Session (auto-driver run)
 
 **Workstream advanced**: E (Alchemist brainstorm — catalog 40th pass)
