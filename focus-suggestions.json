@@ -1,5 +1,5 @@
 {
-  "_comment": "ch1tty focus-profile suggestions catalog \u2014 372 combos, 219 verified (forty-second pass \u2014 2 per profile: notion/API-search, notion/API-delete-a-block, notion/API-delete-a-page, notion/API-get-bot-info, playwright/browser_select_option, playwright/browser_resize, playwright/browser_drag, playwright/browser_close, playwright/browser_press_key, playwright/browser_file_upload, fs/create_directory all first use)",
+  "_comment": "ch1tty focus-profile suggestions catalog \u2014 384 combos, 219 verified (forty-third pass \u2014 2 per profile: notion/API-create-a-data-source, notion/API-list-data-source-templates, playwright/browser_wait_for, playwright/browser_drop, fs/list_allowed_directories all first use; orchestrator/provision_evaluate first use in design + communication profiles)",
   "generatedFrom": "38th-pass (orchestrator chittycontext/provision_bind/provision_fork coverage; ship/storage/resolve/autobot/neon agent combos across all 6 profiles)",
   "profiles": {
     "finance": {
@@ -599,6 +599,28 @@
           "accomplishes": "Retrieve a stale or outdated finance block (e.g. an old budget estimate), reason over whether it should be removed, delete it from the Notion page, then post a housekeeping summary of what was cleaned up \u2014 automated stale-block housekeeping for finance pages.",
           "verified": false,
           "notes": "FIRST use of notion/API-delete-a-block. notion/API-retrieve-a-block confirmed. notion/API-post-page confirmed. Notion auth 401 in remote env."
+        },
+        {
+          "name": "notion-create-data-source-finance-db",
+          "chain": [
+            "notion/API-retrieve-a-database",
+            "notion/API-create-a-data-source",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Create a new Notion data source from an existing finance database for structured data ingestion and reporting",
+          "verified": false
+        },
+        {
+          "name": "playwright-wait-for-finance-report-load",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_wait_for",
+            "playwright/browser_screenshot",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Navigate to a finance dashboard, wait for all data panels to load, screenshot the report, and log it to Notion",
+          "verified": false
         }
       ],
       "prompts": [
@@ -741,6 +763,14 @@
         {
           "text": "Find and delete stale budget blocks on the finance tracking page, then post a cleanup summary",
           "resolves_to": "notion-delete-stale-finance-block"
+        },
+        {
+          "text": "Create a Notion data source from our Q4 finance database and output a structured ingestion manifest.",
+          "resolves_to": "notion-create-data-source-finance-db"
+        },
+        {
+          "text": "Open the revenue dashboard, wait for all charts to load, screenshot the final state, and post it to our Notion finance page.",
+          "resolves_to": "playwright-wait-for-finance-report-load"
         }
       ]
     },
@@ -1639,6 +1669,28 @@
           "accomplishes": "Fetch the Notion bot's identity and integration permissions, list all workspace users, reason over access alignment for governance compliance, then post an access-audit page to the governance workspace \u2014 bot-identity-driven governance integration access audit.",
           "verified": false,
           "notes": "FIRST use of notion/API-get-bot-info. notion/API-get-users confirmed. thinking confirmed. Notion auth 401 in remote env."
+        },
+        {
+          "name": "notion-list-templates-governance-workflow",
+          "chain": [
+            "notion/API-list-data-source-templates",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "List available Notion data source templates, cross-reference with evidence policies, and draft a governance workflow page",
+          "verified": false
+        },
+        {
+          "name": "playwright-drop-file-governance-evidence-upload",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_drop",
+            "playwright/browser_snapshot",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Upload a governance evidence document via browser file-drop interaction, capture submission confirmation snapshot, log outcome to Notion",
+          "verified": false
         }
       ],
       "prompts": [
@@ -1845,6 +1897,14 @@
         {
           "text": "Audit the Notion integration bot's permissions and all workspace users for governance compliance",
           "resolves_to": "notion-bot-info-governance-audit"
+        },
+        {
+          "text": "List available Notion data source templates, cross-reference with our compliance policies, and draft a governance workflow page.",
+          "resolves_to": "notion-list-templates-governance-workflow"
+        },
+        {
+          "text": "Upload the Q3 audit evidence PDF via drag-and-drop on the portal, confirm the upload, and log the submission to Notion.",
+          "resolves_to": "playwright-drop-file-governance-evidence-upload"
         }
       ]
     },
@@ -2367,6 +2427,28 @@
           "accomplishes": "Navigate to a design page, resize the viewport to mobile and tablet breakpoints, take screenshots at each size to capture the layout, then write the responsive layout evidence to a design QA file \u2014 automated responsive design verification across breakpoints.",
           "verified": false,
           "notes": "FIRST use of playwright/browser_resize. browser_navigate, browser_screenshot, fs/write_file confirmed. Requires active browser."
+        },
+        {
+          "name": "provision-evaluate-design-ux-specialist",
+          "chain": [
+            "orchestrator/provision_candidates",
+            "orchestrator/provision_evaluate",
+            "playwright/browser_screenshot",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Evaluate candidate agents for a UX specialist role, screenshot current design workspace state, and post evaluation report to Notion",
+          "verified": false
+        },
+        {
+          "name": "fs-list-allowed-dirs-design-asset-scope",
+          "chain": [
+            "fs/list_allowed_directories",
+            "fs/directory_tree",
+            "thinking/sequentialthinking",
+            "playwright/browser_screenshot"
+          ],
+          "accomplishes": "Enumerate permitted filesystem directories, map the design asset directory tree, synthesize a scope summary, and screenshot the design workspace",
+          "verified": false
         }
       ],
       "prompts": [
@@ -2505,6 +2587,14 @@
         {
           "text": "Verify the design layout looks correct at mobile and tablet viewport sizes",
           "resolves_to": "playwright-resize-viewport-design-responsive"
+        },
+        {
+          "text": "Evaluate available agents for a UX specialist task, screenshot the current design workspace, and report findings to Notion.",
+          "resolves_to": "provision-evaluate-design-ux-specialist"
+        },
+        {
+          "text": "List all permitted design asset directories, map the full directory tree, and screenshot the current workspace layout.",
+          "resolves_to": "fs-list-allowed-dirs-design-asset-scope"
         }
       ]
     },
@@ -3432,6 +3522,28 @@
           "accomplishes": "Fork a provisioned workspace from the orchestrator, create the project directory scaffold (src/, test/, dist/), write initial config files, then resolve the primary library's documentation ID via Context7 to seed docs \u2014 full project scaffold bootstrap from orchestrator fork to initial docs.",
           "verified": false,
           "notes": "FIRST use of fs/create_directory. orchestrator/provision_fork, fs/write_file, context7/resolve-library-id confirmed. fs and context7 are code-relevant."
+        },
+        {
+          "name": "notion-create-data-source-code-lib-schema",
+          "chain": [
+            "orchestrator/skill_search",
+            "notion/API-create-a-data-source",
+            "context7/resolve-library-id",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search for schema-management skills, create a Notion data source for code library tracking, resolve library docs, and write the schema manifest locally",
+          "verified": false
+        },
+        {
+          "name": "playwright-wait-for-code-ci-build-result",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_wait_for",
+            "playwright/browser_snapshot",
+            "fs/write_file"
+          ],
+          "accomplishes": "Navigate to the CI dashboard, wait for the build result panel to render, capture an accessibility snapshot, and save the CI summary to disk",
+          "verified": false
         }
       ],
       "prompts": [
@@ -3634,6 +3746,14 @@
         {
           "text": "Fork a new project workspace, scaffold the directory structure, and fetch initial library docs",
           "resolves_to": "fs-create-directory-scaffold-code"
+        },
+        {
+          "text": "Search for schema skills, create a Notion data source for library version tracking, resolve the library docs, and write the schema manifest.",
+          "resolves_to": "notion-create-data-source-code-lib-schema"
+        },
+        {
+          "text": "Open the CI dashboard, wait for the build result to render, snapshot it, and save a CI summary report to disk.",
+          "resolves_to": "playwright-wait-for-code-ci-build-result"
         }
       ]
     },
@@ -4168,6 +4288,29 @@
           "accomplishes": "Navigate to a communication portal or accessibility-sensitive form, press keyboard keys (Tab, Enter, Escape) to drive keyboard-only navigation, snapshot the resulting UI state, then post a Notion page with the keyboard accessibility test results \u2014 keyboard-driven accessibility testing for communication interfaces.",
           "verified": false,
           "notes": "FIRST use of playwright/browser_press_key. browser_navigate, browser_snapshot confirmed. notion/API-post-page is comm-relevant. Notion auth 401 in remote env."
+        },
+        {
+          "name": "provision-evaluate-comm-channel-fit",
+          "chain": [
+            "orchestrator/provision_candidates",
+            "orchestrator/provision_evaluate",
+            "notion/API-post-page",
+            "fs/write_file"
+          ],
+          "accomplishes": "Evaluate candidate communication-channel agents, select the best fit for dispatching messages, document the decision in Notion and on disk",
+          "verified": false
+        },
+        {
+          "name": "playwright-drop-comm-file-attachment",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_fill",
+            "playwright/browser_drop",
+            "playwright/browser_snapshot",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Navigate to a communication portal, fill sender details, drop an attachment onto the upload target, snapshot the confirmed submission, and log the result to Notion",
+          "verified": false
         }
       ],
       "prompts": [
@@ -4306,6 +4449,14 @@
         {
           "text": "Run a keyboard-only accessibility test on the communication portal and post results to Notion",
           "resolves_to": "playwright-press-key-comm-keyboard-nav"
+        },
+        {
+          "text": "Evaluate communication-channel agents, pick the best one for our next dispatch, document the choice in Notion and locally.",
+          "resolves_to": "provision-evaluate-comm-channel-fit"
+        },
+        {
+          "text": "Navigate to the team portal, fill the sender fields, drop the report attachment onto the upload zone, and snapshot the submission confirmation.",
+          "resolves_to": "playwright-drop-comm-file-attachment"
         }
       ]
     },
@@ -5178,6 +5329,28 @@
           "accomplishes": "Create the ops deployment directory scaffold (logs/, config/, scripts/) and write initial config files, trigger the machine-management workflow to provision the environment, then verify the agent list to confirm the deployment is tracked \u2014 directory scaffold to automated ops deployment with agent-registry confirmation.",
           "verified": false,
           "notes": "FIRST use of fs/create_directory in ops profile. fs/write_file, orchestrator/skill_execute(workflow:machine-management), orchestrator/agent_list confirmed."
+        },
+        {
+          "name": "fs-list-allowed-dirs-ops-access-audit",
+          "chain": [
+            "fs/list_allowed_directories",
+            "fs/search_files",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Enumerate permitted filesystem paths, search for ops artefacts within them, synthesize an access audit report, and publish to Notion",
+          "verified": false
+        },
+        {
+          "name": "notion-list-templates-ops-deploy-workflow",
+          "chain": [
+            "notion/API-list-data-source-templates",
+            "orchestrator/skill_execute(workflow:machine-management)",
+            "fs/write_file",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "List available Notion workflow templates, execute the machine-management deploy skill, write an ops report to disk, and log the outcome to Notion",
+          "verified": false
         }
       ],
       "prompts": [
@@ -5364,6 +5537,14 @@
         {
           "text": "Scaffold the deployment directory, trigger the machine-management workflow, and verify agent registration",
           "resolves_to": "fs-create-directory-ops-deploy-scaffold"
+        },
+        {
+          "text": "Audit all permitted filesystem paths, search for stale ops artefacts, synthesize the findings, and publish the access audit to Notion.",
+          "resolves_to": "fs-list-allowed-dirs-ops-access-audit"
+        },
+        {
+          "text": "List Notion workflow templates, run the machine-management deploy skill, write the ops report to disk, and log the outcome to Notion.",
+          "resolves_to": "notion-list-templates-ops-deploy-workflow"
         }
       ]
     }
