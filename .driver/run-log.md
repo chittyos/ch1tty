@@ -484,7 +484,8 @@
 - Catalog: 180 → 187 total, 119 → 126 verified (66% → 67%). 61 unverified remain (all auth-gated).
 - Build clean. Tests: 938 pass / 0 fail / 2 skip ✓.
 - Branch: `auto/E-catalog-twenty-fifth-pass`. PR#214 open. CI in progress.
+- **PR#214 merged** ✓ (squash-merged to main). Catalog at 187/126 verified on main.
 - **Workstream status**: A ✓ B ✓ C ✓ D ✓ E (in-flight; 187/126 verified; 61 unverified — all auth-gated)
-- **Next run**: Merge PR#214 if CI green. Novel targets for 26th pass: (1) `chittyos-core:chitty-cleanup` (mac cleanup, 0.43 relevance, not yet in catalog as primary); (2) `chittyos-devops:wrangler-audit` (0.37, audit wrangler.toml files — not yet in catalog); (3) `chittycommand-alpha:ux-observer` (0.38, always-active engagement insights) not yet as chain entry; (4) deeper browser-rendering+playwright+context7 cross-chains (browser-rendering was 401 this pass). Human auth actions:
+- **Next run**: For 26th pass consider: (1) `chittyos-core:chitty-cleanup` (mac cleanup, 0.43 relevance, not yet in catalog as primary); (2) `chittyos-devops:wrangler-audit` (0.37, audit wrangler.toml files — not yet in catalog); (3) `chittycommand-alpha:ux-observer` (0.38, always-active engagement insights) not yet as chain entry; (4) deeper browser-rendering+playwright+context7 cross-chains (browser-rendering was 401 this pass). Human auth actions:
   1. `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` — unblocks 39 Notion combos
   2. Stripe/Neon/Cloudflare/GitHub/Linear tokens — unblocks remaining 22 combos
