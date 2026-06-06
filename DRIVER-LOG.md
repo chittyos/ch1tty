@@ -227,3 +227,38 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 1. Merge PR #233 (40th pass, 348/219, tests green, CI in progress at run end)
 2. 41st catalog pass: `playwright/browser_console_messages`, `browser_handle_dialog` (design); `fs/read_multiple_files`, `fs/get_file_info`, `fs/directory_tree` (code/ops); notion tools still undercovered (22 live, only 7 in combos)
 3. Fix Notion auth (see blocker above) to mark more combos verified
+
+### 2026-06-06T19:09Z — Session 01Kp1K48rhFLgH4PxbmDkJUz (42nd pass)
+
+**Workstream advanced**: E (Alchemist brainstorm — catalog 42nd pass)
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass / 0 fail / 2 skipped
+- Found 1 open PR: #234 (41st catalog pass, 360 combos / 219 verified). CI all 3/3 green.
+- Merged PR #234 (squash) → main now at 360 combos / 219 verified (41st pass, sha f6b7958)
+- Ch1tty status: 0 connected servers (lazy, all backends unreachable from env). 286 active sessions.
+- Identified 11 uncataloged tool types from PR #234 next-pass notes + JSON scan:
+  - `notion/API-search`, `notion/API-delete-a-block`, `notion/API-delete-a-page`, `notion/API-get-bot-info`
+  - `playwright/browser_select_option`, `playwright/browser_resize`, `playwright/browser_drag`, `playwright/browser_close`, `playwright/browser_press_key`, `playwright/browser_file_upload`
+  - `fs/create_directory`
+- Created branch `auto/E-catalog-forty-second-pass`; added 12 new combos + 12 prompts (2 per profile):
+  - finance: notion-search-finance-workspace, notion-delete-stale-finance-block
+  - governance: notion-delete-page-governance-archive, notion-bot-info-governance-audit
+  - design: playwright-select-option-design-form-test, playwright-resize-viewport-design-responsive
+  - code: playwright-drag-code-kanban-test, fs-create-directory-scaffold-code
+  - communication: playwright-file-upload-comm-form, playwright-press-key-comm-keyboard-nav
+  - ops: playwright-close-ops-session-cleanup, fs-create-directory-ops-deploy-scaffold
+- Tests: 938 pass / 0 fail / 2 skipped
+- Pushed branch, opened PR #236 (CI in progress)
+- Webhook events: 2 bot rate-limit notices (CodeRabbit, Codex) — no action needed
+
+**Branch / PR**: `auto/E-catalog-forty-second-pass` → PR #236 (https://github.com/chittyos/ch1tty/pull/236)
+
+**Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
+
+**Board state**: 372 combos / 219 verified (42nd pass open)
+
+**Next run priority**:
+1. Merge PR #236 (42nd pass, 372/219, tests green, CI in progress at run end)
+2. 43rd catalog pass: `notion/API-create-a-database`, `notion/API-update-a-database`, `notion/API-create-a-page`; `playwright/browser_wait_for`, `playwright/browser_pdf`; `orchestrator/provision_evaluate` in design + communication profiles
+3. Fix Notion auth (see blocker above) to mark more combos verified
