@@ -1,5 +1,5 @@
 {
-  "_comment": "ch1tty focus-profile suggestions catalog \u2014 324 combos, 219 verified (thirty-eighth pass)",
+  "_comment": "ch1tty focus-profile suggestions catalog \u2014 336 combos, 219 verified (thirty-ninth pass)",
   "generatedFrom": "38th-pass (orchestrator chittycontext/provision_bind/provision_fork coverage; ship/storage/resolve/autobot/neon agent combos across all 6 profiles)",
   "profiles": {
     "finance": {
@@ -505,6 +505,29 @@
           "accomplishes": "Evaluate provisioning candidates for the current intent, bind the matched financial context, then execute the Finance agent \u2014 the canonical TY-VY-RY provisioning + routing path for multi-entity Mercury banking workflows.",
           "verified": false,
           "notes": "provision_candidates + provision_bind chain follows the canonical TY-VY-RY flow documented in orchestrator capabilities. agent_execute(finance) routes to chittyagent-finance (bound)."
+        },
+        {
+          "name": "notes-agent-finance-invoice-query",
+          "chain": [
+            "orchestrator/agent_execute(notes)",
+            "orchestrator/skill_execute(chittyos-finance:mercury-finance)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Query Apple Notes for financial context (past invoices, account refs), run the mercury-finance skill to reconcile against live banking state, and persist a combined brief to Notion \u2014 bridging personal note-taking with live ledger data.",
+          "verified": false,
+          "notes": "notes agent unbound (6 tools). mercury-finance skill verified via orchestrator. notion auth currently 401."
+        },
+        {
+          "name": "provision-candidates-financial-specialist-fork",
+          "chain": [
+            "orchestrator/provision_candidates",
+            "orchestrator/provision_fork",
+            "orchestrator/skill_execute(chittyos-finance:mercury-finance)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Score provisioning candidates with TY-VY-RY aspects, fork a financial specialist context from the highest-scoring generalist, then immediately invoke the mercury-finance skill in the new context \u2014 bootstrapping a purpose-built financial agent on demand.",
+          "verified": false,
+          "notes": "provision_candidates and provision_fork confirmed via orchestrator (13 tools live). mercury-finance skill verified. notion auth 401."
         }
       ],
       "prompts": [
@@ -615,6 +638,14 @@
         {
           "text": "Find the right provisioning context and bind it before running the finance agent",
           "resolves_to": "provision-bind-finance-agent"
+        },
+        {
+          "text": "Check my Apple Notes for recent invoice references and reconcile them against my Mercury account",
+          "resolves_to": "notes-agent-finance-invoice-query"
+        },
+        {
+          "text": "Score available provisioning candidates and fork a financial specialist, then run a Mercury finance snapshot",
+          "resolves_to": "provision-candidates-financial-specialist-fork"
         }
       ]
     },
@@ -1419,6 +1450,29 @@
           "accomplishes": "Evaluate provisioning parameters for the governance context, fork a dedicated error-resolution subagent scope via TY-VY-RY, then execute the Resolve agent for automated error triage \u2014 creating a governed, isolated investigation thread.",
           "verified": false,
           "notes": "provision_evaluate + provision_fork is the canonical fork sub-scope flow. resolve is unbound (0 tools) but agent capability confirmed from agent_list."
+        },
+        {
+          "name": "autobot-sovereignty-cert-evidence-audit",
+          "chain": [
+            "orchestrator/agent_execute(autobot)",
+            "evidence/ai_search",
+            "orchestrator/skill_execute(chittyos-legal:fact-governance)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Execute an autobot sovereignty-certification workflow (canonicalizes the feature's authority chain), cross-reference the resulting artifact against the evidence corpus via AI search, then run fact-governance to surface compliance gaps and write a signed brief to Notion.",
+          "verified": false,
+          "notes": "autobot agent unbound in current run. evidence/ai_search confirmed live. fact-governance skill via orchestrator. notion auth 401."
+        },
+        {
+          "name": "skill-list-provision-fork-legal-resolve",
+          "chain": [
+            "orchestrator/skill_list",
+            "orchestrator/provision_fork",
+            "orchestrator/agent_execute(resolve)"
+          ],
+          "accomplishes": "Enumerate the full skill roster to locate legal and resolution capabilities, fork a specialist context scoped to legal operations, then route the session through the resolve agent for automated error-triage and severity classification \u2014 turning a generic session into a purpose-built legal-resolution pipeline.",
+          "verified": false,
+          "notes": "skill_list and provision_fork confirmed via orchestrator. resolve agent unbound but registered."
         }
       ],
       "prompts": [
@@ -1593,6 +1647,14 @@
         {
           "text": "Fork an error-resolution subagent from the current governance provisioning context",
           "resolves_to": "provision-fork-resolve-subagent"
+        },
+        {
+          "text": "Run an autobot sovereignty cert on this feature, audit against evidence, and write a governance brief to Notion",
+          "resolves_to": "autobot-sovereignty-cert-evidence-audit"
+        },
+        {
+          "text": "List all skills, fork a legal specialist context, and route this session to the resolve agent for triage",
+          "resolves_to": "skill-list-provision-fork-legal-resolve"
         }
       ]
     },
@@ -2024,6 +2086,28 @@
           "accomplishes": "Bind a UI-focused provisioning context via the orchestrator, invoke the UI agent to generate or update an interface, then capture a screenshot for design review \u2014 a focused, scoped UI generation + visual QA loop in one chain.",
           "verified": false,
           "notes": "provision_bind scopes the session to UI context. ui agent unbound but declared. browser-rendering/get_url_screenshot verified connected."
+        },
+        {
+          "name": "notes-design-reference-screenshot-notion",
+          "chain": [
+            "orchestrator/agent_execute(notes)",
+            "browser-rendering/get_url_screenshot",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Retrieve a design reference URL from Apple Notes via the notes agent, screenshot the live page through Cloudflare Browser Rendering, then embed the screenshot in a Notion design board \u2014 closing the loop between personal research notes and a shared visual reference.",
+          "verified": false,
+          "notes": "notes agent unbound (6 tools). browser-rendering/get_url_screenshot confirmed live. notion auth 401."
+        },
+        {
+          "name": "storage-design-asset-screenshot-ship",
+          "chain": [
+            "orchestrator/agent_execute(storage)",
+            "browser-rendering/get_url_screenshot",
+            "orchestrator/agent_execute(ship)"
+          ],
+          "accomplishes": "Retrieve a design asset or staging URL from the storage agent (R2/document-storage), screenshot the live preview via Cloudflare Browser Rendering, then hand off to the ship agent for branch management and preflight checks \u2014 a visual-QA-gated design delivery pipeline.",
+          "verified": false,
+          "notes": "storage agent unbound. browser-rendering confirmed live. ship agent unbound."
         }
       ],
       "prompts": [
@@ -2130,6 +2214,14 @@
         {
           "text": "Bind a UI context, generate the interface, then screenshot for review",
           "resolves_to": "provision-bind-ui-screenshot"
+        },
+        {
+          "text": "Pull the design reference URL from my Apple Notes, screenshot it, and add it to my Notion design board",
+          "resolves_to": "notes-design-reference-screenshot-notion"
+        },
+        {
+          "text": "Get the staging URL from storage, screenshot the live preview, then hand it off to ship for preflight",
+          "resolves_to": "storage-design-asset-screenshot-ship"
         }
       ]
     },
@@ -2962,6 +3054,29 @@
           "accomplishes": "Restore the code session context, engage the Neon database agent for schema reasoning and branch selection, then execute a targeted SQL query against the Neon PostgreSQL branch \u2014 context-scoped, agent-assisted data analysis with minimal manual setup.",
           "verified": false,
           "notes": "orchestrator/chittycontext restores session. neon agent unbound (0 tools declared) but maps to chittyagent-neon. neon/run_sql is a verified Neon MCP tool path."
+        },
+        {
+          "name": "provision-status-fork-typescript-skill-register",
+          "chain": [
+            "orchestrator/provision_status",
+            "orchestrator/provision_fork",
+            "orchestrator/skill_register",
+            "context7/resolve-library-id"
+          ],
+          "accomplishes": "Check current provisioning state, fork a TypeScript-specialist context from the active entity, register a new custom skill scoped to the forked context, then resolve the target library ID for inline documentation \u2014 bootstrapping a purpose-built TS dev agent with a custom skill surface in one pipeline.",
+          "verified": false,
+          "notes": "provision_status, provision_fork, skill_register, agent_register all confirmed via orchestrator (13 live tools). context7/resolve-library-id confirmed live."
+        },
+        {
+          "name": "agent-list-unbound-register-github-issue",
+          "chain": [
+            "orchestrator/agent_list",
+            "orchestrator/agent_register",
+            "github/create_issue"
+          ],
+          "accomplishes": "List all agents (filtering for unbound status), register or update metadata for an unbound agent to document its capabilities, then open a GitHub issue tracking the binding work \u2014 turning agent-inventory state into a trackable engineering backlog item.",
+          "verified": false,
+          "notes": "agent_list and agent_register confirmed via orchestrator. github/create_issue via GitHub MCP (github server not connected in current run; token env-based)."
         }
       ],
       "prompts": [
@@ -3132,6 +3247,14 @@
         {
           "text": "Restore my code session and run a Neon database query via the agent",
           "resolves_to": "chittycontext-neon-agent-sql"
+        },
+        {
+          "text": "Check my provisioning status, fork a TypeScript specialist, register a custom skill, and resolve the TypeScript library docs",
+          "resolves_to": "provision-status-fork-typescript-skill-register"
+        },
+        {
+          "text": "List all agents, find the unbound ones, register the most relevant, and open a GitHub issue to track the binding",
+          "resolves_to": "agent-list-unbound-register-github-issue"
         }
       ]
     },
@@ -3573,6 +3696,30 @@
           "accomplishes": "Bind a communication-focused provisioning context, invoke the Notes agent to retrieve semantically relevant Apple Notes, then cross-reference matching Notion workspace content \u2014 surfacing gaps between personal notes and team-facing workspace state.",
           "verified": false,
           "notes": "provision_bind scopes to comms context. notes agent unbound (6 tools). notion/API-post-search is a valid Notion MCP search endpoint (confirmed from existing combos)."
+        },
+        {
+          "name": "provision-notes-imessage-contact-notion-log",
+          "chain": [
+            "orchestrator/provision_status",
+            "orchestrator/agent_execute(notes)",
+            "orchestrator/agent_execute(imessage)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Check the current provisioning binding for comms context, query Apple Notes for relevant contact or thread context, look up the contact thread in iMessage, then log a consolidated brief to Notion \u2014 a full personal-knowledge-to-message-thread-to-workspace pipeline.",
+          "verified": false,
+          "notes": "provision_status confirmed via orchestrator. notes and imessage agents unbound. notion auth 401."
+        },
+        {
+          "name": "skill-list-discord-notes-notion-dispatch",
+          "chain": [
+            "orchestrator/skill_list",
+            "orchestrator/skill_execute(connectors:discord)",
+            "orchestrator/agent_execute(notes)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Enumerate all skills to locate the Discord connector, dispatch a structured notification to a Discord channel, sync the message to Apple Notes for personal record-keeping, then post a canonical summary to Notion \u2014 a multi-channel dispatch and archive pipeline.",
+          "verified": false,
+          "notes": "skill_list confirmed via orchestrator. discord connector via orchestrator/skill_execute. notes agent unbound. notion auth 401."
         }
       ],
       "prompts": [
@@ -3679,6 +3826,14 @@
         {
           "text": "Bind a comms context and compare Apple Notes against Notion workspace",
           "resolves_to": "provision-bind-notes-notion-search"
+        },
+        {
+          "text": "Check my provisioning context, find the iMessage thread for this contact via Notes, and log the summary to Notion",
+          "resolves_to": "provision-notes-imessage-contact-notion-log"
+        },
+        {
+          "text": "Find the Discord connector skill, send a channel update, sync to Apple Notes, and post the record to Notion",
+          "resolves_to": "skill-list-discord-notes-notion-dispatch"
         }
       ]
     },
@@ -4459,6 +4614,28 @@
           "accomplishes": "Fork a storage-focused provisioning subagent scope via TY-VY-RY, invoke the Storage agent for content-addressed document operations (R2 buckets, legal holds, AI classification), then canonicalize via Canon agent \u2014 a governed document storage pipeline with URI validation and lifecycle tracking.",
           "verified": false,
           "notes": "provision_fork forks a sub-scope from the current context. storage agent unbound (document-storage, r2-management, legal-holds, classification capabilities). canon agent is bound."
+        },
+        {
+          "name": "autobot-canonical-deploy-health-ops",
+          "chain": [
+            "orchestrator/agent_execute(autobot)",
+            "orchestrator/skill_execute(chittyos-devops:chitty-deploy)",
+            "orchestrator/skill_execute(chittyos-devops:chitty-health)"
+          ],
+          "accomplishes": "Execute an autobot canonical-feature workflow (sovereignty cert + branch finalisation), immediately deploy the resulting artifact via chitty-deploy, then run chitty-health to confirm the deployment came up clean \u2014 a fully automated ship-and-verify ops pipeline.",
+          "verified": false,
+          "notes": "autobot agent unbound. chitty-deploy and chitty-health skills confirmed via orchestrator. Pattern mirrors machine-management-wrangler-audit but autobot-led."
+        },
+        {
+          "name": "provision-candidates-ops-eval-storage-route",
+          "chain": [
+            "orchestrator/provision_candidates",
+            "orchestrator/provision_evaluate",
+            "orchestrator/agent_execute(storage)"
+          ],
+          "accomplishes": "List TY-VY-RY scored provisioning candidates for an ops session, run full evaluate to select the best context (development vs. operations support_type), then route the bound session through the storage agent for document-storage or R2 management operations \u2014 operations-context-aware storage dispatch.",
+          "verified": false,
+          "notes": "provision_candidates and provision_evaluate confirmed via orchestrator (13 live tools). storage agent unbound."
         }
       ],
       "prompts": [
@@ -4613,6 +4790,14 @@
         {
           "text": "Fork a storage subagent scope and canonicalize the ingested documents",
           "resolves_to": "provision-fork-storage-canon"
+        },
+        {
+          "text": "Run an autobot canonical workflow, deploy the output, then confirm the deployment is healthy",
+          "resolves_to": "autobot-canonical-deploy-health-ops"
+        },
+        {
+          "text": "Score provisioning candidates for this ops session, pick the best context, and route to storage for document management",
+          "resolves_to": "provision-candidates-ops-eval-storage-route"
         }
       ]
     }

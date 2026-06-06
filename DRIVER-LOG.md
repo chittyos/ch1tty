@@ -9,7 +9,7 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 - [x] **B** — GitHub MCP migration: `servers.json` `github` entry migrated to hosted remote `https://api.githubcopilot.com/mcp/` with `envHeaders: { "Authorization": "GITHUB_MCP_AUTHORIZATION" }`. Deprecated `@modelcontextprotocol/server-github` removed. ✅ DONE
 - [x] **C** — Focus-profile layer: `focus-profiles.json` (6 profiles: finance, governance, design, code, communication, ops), `src/focus.ts`, full aggregator integration (env `CH1TTY_FOCUS`, per-call `focus` param on `search`/`cast`, `status` reports active focus). Tests in `test/focus.test.ts` + coverage gap tests. ✅ DONE
 - [x] **D** — Scenario testing + simulation: `sim/` harness (`scenarios.ts`, `run.ts`, `fixture-backend.ts`), `test/scenario.test.ts`, `test/simulation.test.ts`, cloudflare-builds ops coverage fixtures + scenarios. ✅ DONE
-- [ ] **E** — Alchemist brainstorm: catalog in `focus-suggestions.json`. **IN PROGRESS** — 37th pass merged at PR #229 (312 combos / 219 verified). Currently at 312 combos / 219 verified on main (37th pass, merged this run).
+- [ ] **E** — Alchemist brainstorm: catalog in `focus-suggestions.json`. **IN PROGRESS** — 39th pass open at PR #232 (336 combos / 219 verified). Main at 324 combos (38th pass merged this run).
 
 ## Blocker
 
@@ -86,6 +86,44 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 **Next run priority**:
 1. 38th catalog pass: `orchestrator` agent has 13 tools (status `unbound` in agent_list) — catalog combos using its specific tools (agent_search, skill_search, agent_execute, skill_execute, agent_list, skill_list + others); `resolve` agent combos when it binds (error-triage, severity-classification, auto-resolution); `storage` agent (document-storage, r2-management, legal-holds, AI classification — unbound)
 2. Fix Notion auth to restore cross-run board state (see blocker above)
+
+### 2026-06-06 — Session 01C5BkrtXTpka9cyvhqeqeCE
+
+**Workstream advanced**: E (Alchemist brainstorm — catalog 38th + 39th pass)
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass / 0 fail / 2 skipped
+- Found 1 open PR: #231 (38th pass, 324 combos, based cleanly on current main)
+- Merged PR #231 (squash) → main now at **324 combos / 219 verified** (38th pass)
+- Queried live Ch1tty gateway: 15 servers, 8 connected, 81 tools, 277 active sessions
+  Connected: evidence (3), browser-rendering (3), notion (22), context7 (2), thinking (1), fs (14), playwright (23), orchestrator (13)
+- Orchestrator 13 live tools confirmed (no `chittycontext` in live list — it's a planned/upcoming tool)
+- Identified undercovered patterns for 39th pass:
+  - `notes` agent in finance (0) and design (0) profiles
+  - `autobot` agent in governance (0) and ops (0) profiles
+  - `provision_candidates → fork` chains — only 2 existing; added 2 new variants
+  - `agent_list → agent_register → github` tracking chain (new in code profile)
+  - `provision_status → fork → skill_register` TypeScript specialist bootstrap (new in code)
+- Created branch `auto/E-catalog-thirty-ninth-pass`; added 12 combos + 12 prompts (2 per profile):
+  - finance: notes→mercury-finance→notion, candidates→fork→mercury-finance→notion
+  - governance: autobot→evidence→fact-governance→notion, skill_list→fork→resolve
+  - design: notes→screenshot→notion, storage→screenshot→ship
+  - code: provision_status→fork→skill_register→context7, agent_list→agent_register→github/create_issue
+  - communication: provision_status→notes→imessage→notion, skill_list→discord→notes→notion
+  - ops: autobot→chitty-deploy→chitty-health, candidates→evaluate→storage
+- Tests: 938 pass / 0 fail / 2 skipped
+- Pushed branch, opened PR #232
+
+**Branch / PR**: `auto/E-catalog-thirty-ninth-pass` → PR #232 (https://github.com/chittyos/ch1tty/pull/232)
+
+**Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
+
+**Board state**: 336 combos / 219 verified (39th pass, PR open)
+
+**Next run priority**:
+1. Merge PR #232 (39th pass, 336/219, tests green)
+2. 40th catalog pass: add `notes` agent to ops profile (only one missing); add `autobot` to finance + communication; mark combos `verified: true` once Notion auth restored (run `chitty-mcp-token notion`)
+3. Fix Notion auth (see blocker above) to mark more combos verified
 
 ### 2026-06-06 — Session 01VnL49rexHj8hy5KSsHLDyN
 
