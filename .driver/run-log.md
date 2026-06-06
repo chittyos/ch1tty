@@ -585,3 +585,4 @@
   1. Notion token refresh: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`
   2. `export GITHUB_MCP_AUTHORIZATION="Bearer $(op read op://ChittyOS-Integrations/github/personal_access_token)"` — enables github-relevant code combos
   3. Linear/Cloudflare-builds/Neon/Stripe tokens for remaining unverified combos
+- **UPDATE 2026-06-06T06:40Z**: PR#219 closed without merging (no review findings; CodeRabbit hit rate limit). Branch `auto/E-catalog-thirtieth-pass` remains. Re-open or cherry-pick when ready.
