@@ -188,10 +188,11 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 
 **Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
 
+**PR merged**: PR #234 squash-merged to main. CI: CodeQL neutral ✓, Analyze(actions) success ✓, Analyze(javascript-typescript) success ✓. CodeRabbit rate-limited (no findings). Merged clean.
+
 **Next run priority**:
-1. Merge PR #234 if CI green + no blocking CodeRabbit findings
-2. 42nd catalog pass: `notion/API-delete-a-block`, `notion/API-get-bot-info`, `playwright/browser_select_option`, `playwright/browser_close`, `playwright/browser_resize`, `fs/create_directory` — all uncataloged
-3. Fix Notion auth (see blocker above) to verify the 12 new combos (plus ~49 existing Notion-auth-gated ones)
+1. 42nd catalog pass: `notion/API-delete-a-block`, `notion/API-get-bot-info`, `playwright/browser_select_option`, `playwright/browser_close`, `playwright/browser_resize`, `fs/create_directory` — all uncataloged
+2. Fix Notion auth (see blocker above) to verify the 12 new combos (plus ~49 existing Notion-auth-gated ones)
 
 ---
 
