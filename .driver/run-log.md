@@ -526,3 +526,30 @@
 - **Next run**: Merge PR#215 if CI green. Novel targets for 27th pass: `chittyos-core:chitty-cleanup`, `wrangler-audit`, `ux-observer`, `commit-push-pr`, `claude-official:hookify/plugin-dev/skill-creator/claude-md-improver/claude-api`, `migration:claude-opus-migration`. Human auth actions:
   1. `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` — unblocks 39 Notion combos
   2. Stripe/Neon/Cloudflare/GitHub/Linear tokens — unblocks remaining 22 combos
+
+---
+
+### 2026-06-06T04:00Z — twenty-eighth-pass catalog (PR#217)
+
+- **Workstream advanced**: E (Alchemist catalog, 28th pass)
+- **Startup checks**: `npm ci` clean, `npm run build` clean (0 errors), `npm test` → 938 pass / 0 fail / 2 skip ✓
+- **State inspection**: PR#216 (twenty-seventh-pass, 204/143) open; all 3 CI checks green → **squash-merged PR#216**. main pulled to `0425e09`.
+- **Notion board**: BLOCKER — Notion API returning 401 (invalid token). Using `.driver/run-log.md` as substitute. Human fix: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`
+- **All workstreams A–D confirmed done**. E in-flight.
+- **ch1tty status**: 1 server connected at start (orchestrator only — 13 tools live). All others lazy/remote, not connected (remote execution env).
+- **Execute probes (28th pass)** — confirmed via Ch1tty MCP connector:
+  - All 13 orchestrator tools confirmed present.
+  - `provision_status` and `agent_register` were the only two orchestrator tools not yet in the catalog — both introduced this pass.
+  - Notion returning 401. All other lazy servers not activated.
+- **10 new combos added (+7 newly verified, 143 → 150)** — 2 first-ever orchestrator tools introduced:
+  - `orchestrator/provision_status` — FIRST USE (4 combos: finance, governance, code, communication)
+  - `orchestrator/agent_register` — FIRST USE (4 combos: governance, design, code, ops)
+  - Novel patterns: evaluate→fork→execute (no bind); provision_status guard; ops identity-drift detection; alchemical bootstrap (agent_register→skill_register→provision_evaluate)
+- Catalog: 204 → 214 total, 143 → 150 verified. Profile: finance 25, governance 48, design 26, code 49, comm 23, ops 43.
+- Build clean. Tests: 938 pass / 0 fail / 2 skip ✓.
+- Branch: `auto/E-twentyeighth-pass-catalog`. PR#217 open. CI in progress (CodeQL).
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E (in-flight; 214/150 verified)
+- **Next run**: Merge PR#217 if CI green. All 13 orchestrator tools now in catalog. Next novel targets: cloudflare-builds, linear, github combos. Human auth needed:
+  1. `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`
+  2. `export GITHUB_MCP_AUTHORIZATION="Bearer $(op read op://ChittyOS-Integrations/github/personal_access_token)"`
+  3. Linear/Cloudflare-builds/Neon/Stripe tokens
