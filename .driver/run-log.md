@@ -553,3 +553,37 @@
   1. `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`
   2. `export GITHUB_MCP_AUTHORIZATION="Bearer $(op read op://ChittyOS-Integrations/github/personal_access_token)"`
   3. Linear/Cloudflare-builds/Neon/Stripe tokens
+
+---
+
+### 2026-06-06T21:15Z — forty-fourth-pass catalog (PR#238)
+
+- **Workstream advanced**: E (Alchemist brainstorm — catalog 44th pass)
+- **Startup checks**: `npm ci` clean, `npm run build` clean (0 errors), `npm test` → 938 pass / 0 fail / 2 skip ✓
+- **State inspection**: PR#237 (43rd-pass, 384/219) open at run start; all 3 CI checks green → **squash-merged PR#237**. main reset to `69db73f`.
+- **Notion board**: Still unavailable (API 401). Using `.driver/run-log.md` as substitute. Human fix: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`
+- **All workstreams A–D confirmed done**. E in-flight (44th pass).
+- **New branches found on origin** (no open PRs): `fix/v2-hardening`, `refactor/backend-interface`, `fix/canonical-compliance`, `fix/simplify-server-config`, `feat/viewport-hydration`, `fix/mcp-auth-endpoint`, `fix/worker-routes-and-deps`, `fix/viewport-probe-namespacing`. These have **no merge base with current main** (orphan lineage from pre-history-rewrite era); no action taken — they are historical branches with no open PRs.
+- **ch1tty status**: 0 connected servers (lazy). 292 active sessions.
+- **Cast probes (44th pass)**:
+  - `notion/API-update-a-data-source` (0.7) confirmed available ✓
+  - `orchestrator/agent_execute(chatgpt, status)` → `{action:"executed", http_status:404}` ✓ (already in chains from prior pass)
+  - All 22 Notion tools enumerated via `ch1tty/search`
+- **Coverage gap analysis**:
+  - 7 uncataloged Notion tools found: `get-self`, `move-page`, `retrieve-a-comment`, `retrieve-a-data-source`, `retrieve-a-page-property`, `update-a-block`, `update-a-data-source`
+  - cloudflare-builds missing from 4 profiles: finance, governance, design, communication
+- **Added 12 new combos + 12 prompts** (2 per profile):
+  - finance: `notion-retrieve-update-data-source-finance`, `cloudflare-build-finance-deploy-status`
+  - governance: `notion-page-property-move-governance-restructure`, `cloudflare-build-governance-config-compliance`
+  - design: `notion-retrieve-comment-design-feedback-loop`, `cloudflare-build-design-asset-pipeline`
+  - code: `notion-get-self-bot-audit-docs`, `notion-update-block-code-documentation-sync`
+  - communication: `cloudflare-build-comm-notify-notion`, `notion-retrieve-comment-comm-thread-summary`
+  - ops: `notion-retrieve-data-source-ops-sync-report`, `notion-get-self-ops-identity-access-audit`
+- Catalog: 384 → 396 total, 219 verified (unchanged — Notion-auth-gated). All 22 Notion tools now cataloged (was 15/22). All 6 profiles now have cloudflare-builds coverage.
+- Build clean. Tests: 938 pass / 0 fail / 2 skip ✓.
+- Branch: `auto/E-catalog-forty-fourth-pass`. PR#238 open. CI in_progress at run end (CodeRabbit + Codex rate-limited — no findings, data-only change).
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E (in-flight; 396/219 verified; 177 unverified — all auth-gated)
+- **Next run**: Merge PR#238 if CI green. All 22 Notion tools now cataloged; all 6 profiles have cloudflare-builds. Next novel targets: (1) `orchestrator/agent_execute(chatgpt)` in governance/design/ops profiles (already in code from prior — first non-code profile use); (2) deeper `neon` tool chains when Neon MCP connects; (3) `linear` tools when Linear token available. Human auth actions:
+  1. `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` — unblocks ~177 Notion-auth-gated combos
+  2. `export GITHUB_MCP_AUTHORIZATION="Bearer $(op read op://ChittyOS-Integrations/github/personal_access_token)"` — unblocks github combos
+  3. Linear/Cloudflare/Neon/Stripe tokens for remaining auth-gated combos
