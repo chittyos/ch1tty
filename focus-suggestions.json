@@ -1,5 +1,5 @@
 {
-  "_comment": "ch1tty focus-profile suggestions catalog \u2014 360 combos, 219 verified (forty-first pass \u2014 2 per profile: playwright/browser_tabs, browser_console_messages, browser_handle_dialog, browser_type, fs/get_file_info, notion/API-retrieve-a-database, API-query-data-source, API-get-block-children, API-retrieve-a-block all first use)",
+  "_comment": "ch1tty focus-profile suggestions catalog \u2014 372 combos, 219 verified (forty-second pass \u2014 2 per profile: notion/API-search, notion/API-delete-a-block, notion/API-delete-a-page, notion/API-get-bot-info, playwright/browser_select_option, playwright/browser_resize, playwright/browser_drag, playwright/browser_close, playwright/browser_press_key, playwright/browser_file_upload, fs/create_directory all first use)",
   "generatedFrom": "38th-pass (orchestrator chittycontext/provision_bind/provision_fork coverage; ship/storage/resolve/autobot/neon agent combos across all 6 profiles)",
   "profiles": {
     "finance": {
@@ -575,6 +575,30 @@
           "accomplishes": "Inspect metadata (size, age, permissions) of key finance documents, read them in batch, reason over their contents and metadata to flag stale or oversized files, then write a finance document health report \u2014 batch metadata-aware document audit.",
           "verified": false,
           "notes": "FIRST use of fs/get_file_info. fs/read_multiple_files and thinking confirmed live. Verified path available in fs allowed dirs."
+        },
+        {
+          "name": "notion-search-finance-workspace",
+          "chain": [
+            "notion/API-search",
+            "notion/API-retrieve-a-page",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Full-text search the Notion finance workspace for expense or cash-flow pages, retrieve the most relevant page in full, reason over its contents, then write a finance workspace discovery summary to disk \u2014 intent-driven finance Notion search-to-report pipeline.",
+          "verified": false,
+          "notes": "FIRST use of notion/API-search. notion/API-retrieve-a-page, thinking, fs/write_file confirmed. Notion auth 401 in remote env."
+        },
+        {
+          "name": "notion-delete-stale-finance-block",
+          "chain": [
+            "notion/API-retrieve-a-block",
+            "thinking/sequentialthinking",
+            "notion/API-delete-a-block",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Retrieve a stale or outdated finance block (e.g. an old budget estimate), reason over whether it should be removed, delete it from the Notion page, then post a housekeeping summary of what was cleaned up \u2014 automated stale-block housekeeping for finance pages.",
+          "verified": false,
+          "notes": "FIRST use of notion/API-delete-a-block. notion/API-retrieve-a-block confirmed. notion/API-post-page confirmed. Notion auth 401 in remote env."
         }
       ],
       "prompts": [
@@ -709,6 +733,14 @@
         {
           "text": "Inspect file metadata for all finance documents in the projects folder, read them in batch, and write a document health report",
           "resolves_to": "file-info-finance-doc-metadata"
+        },
+        {
+          "text": "Search the Notion finance workspace for all cash-flow pages and write a discovery summary",
+          "resolves_to": "notion-search-finance-workspace"
+        },
+        {
+          "text": "Find and delete stale budget blocks on the finance tracking page, then post a cleanup summary",
+          "resolves_to": "notion-delete-stale-finance-block"
         }
       ]
     },
@@ -1583,6 +1615,30 @@
           "accomplishes": "Retrieve a specific Notion block (e.g. a governance decision record), cross-reference its content against the evidence RAG for corroborating or conflicting evidence, reason over the alignment, then post a new Notion governance brief summarising the evidence chain \u2014 block-level governance evidence loop.",
           "verified": false,
           "notes": "FIRST use of notion/API-retrieve-a-block. evidence/ai_search confirmed. notion/API-post-page confirmed. Notion auth 401 in remote env."
+        },
+        {
+          "name": "notion-delete-page-governance-archive",
+          "chain": [
+            "evidence/ai_search",
+            "notion/API-search",
+            "notion/API-delete-a-page",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search evidence for resolved governance issues, full-text search Notion for the corresponding superseded policy draft pages, delete (archive) the outdated pages, then write a governance housekeeping log to disk \u2014 evidence-driven governance page archival and audit trail.",
+          "verified": false,
+          "notes": "FIRST use of notion/API-delete-a-page and notion/API-search in governance profile. evidence/ai_search confirmed. Notion auth 401 in remote env."
+        },
+        {
+          "name": "notion-bot-info-governance-audit",
+          "chain": [
+            "notion/API-get-bot-info",
+            "notion/API-get-users",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Fetch the Notion bot's identity and integration permissions, list all workspace users, reason over access alignment for governance compliance, then post an access-audit page to the governance workspace \u2014 bot-identity-driven governance integration access audit.",
+          "verified": false,
+          "notes": "FIRST use of notion/API-get-bot-info. notion/API-get-users confirmed. thinking confirmed. Notion auth 401 in remote env."
         }
       ],
       "prompts": [
@@ -1781,6 +1837,14 @@
         {
           "text": "Retrieve the governance decision block in Notion, find supporting evidence, reason over alignment, and post a brief to the governance workspace",
           "resolves_to": "notion-retrieve-block-evidence-cross-ref"
+        },
+        {
+          "text": "Archive all resolved and superseded policy draft pages from the governance Notion workspace",
+          "resolves_to": "notion-delete-page-governance-archive"
+        },
+        {
+          "text": "Audit the Notion integration bot's permissions and all workspace users for governance compliance",
+          "resolves_to": "notion-bot-info-governance-audit"
         }
       ]
     },
@@ -2279,6 +2343,30 @@
           "accomplishes": "Navigate to a page under design review, capture all browser console messages (errors, warnings, log output) emitted during page load and interaction, then write the full console log to a debug report file \u2014 automated UX debug capture for design QA.",
           "verified": false,
           "notes": "FIRST use of playwright/browser_console_messages. browser_navigate confirmed. fs/write_file confirmed. Console capture requires page load."
+        },
+        {
+          "name": "playwright-select-option-design-form-test",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_select_option",
+            "playwright/browser_snapshot",
+            "fs/write_file"
+          ],
+          "accomplishes": "Navigate to a design system form or component library page, select a dropdown option (e.g. color theme or component variant), take a DOM snapshot after selection to verify the resulting UI state, then write the snapshot to a design QA report \u2014 dropdown interaction testing for design system forms.",
+          "verified": false,
+          "notes": "FIRST use of playwright/browser_select_option. browser_navigate, browser_snapshot, fs/write_file confirmed. Requires interactive browser session."
+        },
+        {
+          "name": "playwright-resize-viewport-design-responsive",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_resize",
+            "playwright/browser_screenshot",
+            "fs/write_file"
+          ],
+          "accomplishes": "Navigate to a design page, resize the viewport to mobile and tablet breakpoints, take screenshots at each size to capture the layout, then write the responsive layout evidence to a design QA file \u2014 automated responsive design verification across breakpoints.",
+          "verified": false,
+          "notes": "FIRST use of playwright/browser_resize. browser_navigate, browser_screenshot, fs/write_file confirmed. Requires active browser."
         }
       ],
       "prompts": [
@@ -2409,6 +2497,14 @@
         {
           "text": "Navigate to the staging site, capture all browser console messages during load, and write the debug log to a file",
           "resolves_to": "playwright-console-messages-ux-debug"
+        },
+        {
+          "text": "Test that the design system dropdown menu correctly selects each color theme variant",
+          "resolves_to": "playwright-select-option-design-form-test"
+        },
+        {
+          "text": "Verify the design layout looks correct at mobile and tablet viewport sizes",
+          "resolves_to": "playwright-resize-viewport-design-responsive"
         }
       ]
     },
@@ -3312,6 +3408,30 @@
           "accomplishes": "Retrieve the Notion tech-stack or library database, query it for in-use packages and versions, resolve each library ID via Context7, fetch the relevant documentation snippets, then write a consolidated library-documentation map to disk \u2014 Notion-as-dependency-registry to live docs pipeline.",
           "verified": false,
           "notes": "FIRST use of notion/API-retrieve-a-database and notion/API-query-data-source in code profile. context7 confirmed live. Notion auth 401 in remote env."
+        },
+        {
+          "name": "playwright-drag-code-kanban-test",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_drag",
+            "playwright/browser_snapshot",
+            "fs/write_file"
+          ],
+          "accomplishes": "Navigate to a kanban board or drag-and-drop UI (e.g. a project management tool under test), drag a task card from one column to another, take a DOM snapshot to verify the state change, then write the test result to disk \u2014 automated drag-and-drop interaction test for kanban-style code review or planning UIs.",
+          "verified": false,
+          "notes": "FIRST use of playwright/browser_drag. browser_navigate, browser_snapshot, fs/write_file confirmed. fs is code-relevant."
+        },
+        {
+          "name": "fs-create-directory-scaffold-code",
+          "chain": [
+            "orchestrator/provision_fork",
+            "fs/create_directory",
+            "fs/write_file",
+            "context7/resolve-library-id"
+          ],
+          "accomplishes": "Fork a provisioned workspace from the orchestrator, create the project directory scaffold (src/, test/, dist/), write initial config files, then resolve the primary library's documentation ID via Context7 to seed docs \u2014 full project scaffold bootstrap from orchestrator fork to initial docs.",
+          "verified": false,
+          "notes": "FIRST use of fs/create_directory. orchestrator/provision_fork, fs/write_file, context7/resolve-library-id confirmed. fs and context7 are code-relevant."
         }
       ],
       "prompts": [
@@ -3506,6 +3626,14 @@
         {
           "text": "Query the Notion tech-stack database for in-use libraries, fetch their Context7 docs, and write a consolidated library map to disk",
           "resolves_to": "notion-database-query-context7-docs"
+        },
+        {
+          "text": "Test drag-and-drop card movement on the kanban board and capture the resulting state",
+          "resolves_to": "playwright-drag-code-kanban-test"
+        },
+        {
+          "text": "Fork a new project workspace, scaffold the directory structure, and fetch initial library docs",
+          "resolves_to": "fs-create-directory-scaffold-code"
         }
       ]
     },
@@ -4016,6 +4144,30 @@
           "accomplishes": "Retrieve a specific Notion communication block (e.g. a meeting notes or announcement block), expand its children for full context, reason over what updates or follow-ups are needed, then append new content blocks as children \u2014 targeted block-level Notion communication update.",
           "verified": false,
           "notes": "FIRST use of notion/API-retrieve-a-block and notion/API-get-block-children in communication profile. notion/API-patch-block-children confirmed. Notion auth 401 in remote env."
+        },
+        {
+          "name": "playwright-file-upload-comm-form",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_file_upload",
+            "playwright/browser_snapshot",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Navigate to a file-submission or feedback form, upload a document attachment via the browser, take a DOM snapshot to confirm the upload was accepted, then post a Notion page summarizing the submission result \u2014 automated file-upload form testing with submission logging.",
+          "verified": false,
+          "notes": "FIRST use of playwright/browser_file_upload. browser_navigate, browser_snapshot confirmed. notion/API-post-page is comm-relevant. Notion auth 401 in remote env."
+        },
+        {
+          "name": "playwright-press-key-comm-keyboard-nav",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_press_key",
+            "playwright/browser_snapshot",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Navigate to a communication portal or accessibility-sensitive form, press keyboard keys (Tab, Enter, Escape) to drive keyboard-only navigation, snapshot the resulting UI state, then post a Notion page with the keyboard accessibility test results \u2014 keyboard-driven accessibility testing for communication interfaces.",
+          "verified": false,
+          "notes": "FIRST use of playwright/browser_press_key. browser_navigate, browser_snapshot confirmed. notion/API-post-page is comm-relevant. Notion auth 401 in remote env."
         }
       ],
       "prompts": [
@@ -4146,6 +4298,14 @@
         {
           "text": "Retrieve the Notion meeting notes block, expand its children, reason over follow-ups needed, and append update blocks to it",
           "resolves_to": "notion-block-retrieve-comm-patch"
+        },
+        {
+          "text": "Test file attachment upload on the feedback form and log the submission result to Notion",
+          "resolves_to": "playwright-file-upload-comm-form"
+        },
+        {
+          "text": "Run a keyboard-only accessibility test on the communication portal and post results to Notion",
+          "resolves_to": "playwright-press-key-comm-keyboard-nav"
         }
       ]
     },
@@ -4994,6 +5154,30 @@
           "accomplishes": "Retrieve the Notion ops task database, query it for open or urgent tasks due this sprint, search orchestrator skills for matching deployment or maintenance skills, then write a prioritised ops action plan to disk \u2014 Notion task board to ops skill dispatch pipeline.",
           "verified": false,
           "notes": "FIRST use of notion/API-retrieve-a-database and notion/API-query-data-source in ops profile. skill_search confirmed live. Notion auth 401 in remote env."
+        },
+        {
+          "name": "playwright-close-ops-session-cleanup",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_screenshot",
+            "playwright/browser_close",
+            "fs/write_file"
+          ],
+          "accomplishes": "Navigate to an ops dashboard (e.g. a deployment status page or service health UI), take a screenshot to capture the current state, explicitly close the browser session to free resources, then write the screenshot evidence to an ops audit file \u2014 browser-session-aware ops health capture with explicit resource cleanup.",
+          "verified": false,
+          "notes": "FIRST use of playwright/browser_close. browser_navigate, browser_screenshot, fs/write_file confirmed. Explicit browser_close enables deterministic resource management in ops automation."
+        },
+        {
+          "name": "fs-create-directory-ops-deploy-scaffold",
+          "chain": [
+            "fs/create_directory",
+            "fs/write_file",
+            "orchestrator/skill_execute(workflow:machine-management)",
+            "orchestrator/agent_list"
+          ],
+          "accomplishes": "Create the ops deployment directory scaffold (logs/, config/, scripts/) and write initial config files, trigger the machine-management workflow to provision the environment, then verify the agent list to confirm the deployment is tracked \u2014 directory scaffold to automated ops deployment with agent-registry confirmation.",
+          "verified": false,
+          "notes": "FIRST use of fs/create_directory in ops profile. fs/write_file, orchestrator/skill_execute(workflow:machine-management), orchestrator/agent_list confirmed."
         }
       ],
       "prompts": [
@@ -5172,6 +5356,14 @@
         {
           "text": "Query the Notion ops task database for urgent items this sprint, find matching deployment skills, and write a prioritised ops action plan",
           "resolves_to": "notion-db-ops-task-query-deploy"
+        },
+        {
+          "text": "Capture the ops deployment dashboard screenshot and close the browser session cleanly",
+          "resolves_to": "playwright-close-ops-session-cleanup"
+        },
+        {
+          "text": "Scaffold the deployment directory, trigger the machine-management workflow, and verify agent registration",
+          "resolves_to": "fs-create-directory-ops-deploy-scaffold"
         }
       ]
     }
