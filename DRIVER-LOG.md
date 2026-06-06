@@ -298,3 +298,28 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 1. Merge PR #237 if CI green + no blocking review findings
 2. 44th catalog pass: `notion/API-update-a-database` (uncataloged), `playwright/browser_pdf` (uncataloged — score 0.5 to browser_drop this pass, try more specific intent), `fs/move_directory` (13/14 fs tools now cataloged; #14 likely move_directory), `orchestrator/agent_execute(chatgpt)` (bound agent, never cataloged), `cloudflare-builds` gaps in finance/governance/design/communication profiles
 3. Fix Notion auth (see blocker above) to verify the ~61 unverified combos
+
+### 2026-06-06T21:15Z — Session 01MGgXWqtHe7CBm1mxajGsZU (44th pass)
+
+**Workstream advanced**: E (Alchemist brainstorm — catalog 44th pass)
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass / 0 fail / 2 skipped
+- Merged PR #237 (43rd pass, 384/219, 3/3 CI green) → main at `69db73f`
+- Found new orphan branches on origin (no merge base with current main — historical pre-rewrite): fix/v2-hardening, refactor/backend-interface, fix/canonical-compliance, fix/simplify-server-config, feat/viewport-hydration, fix/mcp-auth-endpoint, fix/worker-routes-and-deps, fix/viewport-probe-namespacing. No open PRs for any of these — no action taken.
+- Enumerated all 22 Notion tools via `ch1tty/search`; found 7 never cataloged: `get-self`, `move-page`, `retrieve-a-comment`, `retrieve-a-data-source`, `retrieve-a-page-property`, `update-a-block`, `update-a-data-source`
+- Confirmed cloudflare-builds missing from finance, governance, design, communication (only in code + ops)
+- Added 12 new combos + 12 prompts (2 per profile) covering all 7 new Notion tools + 4 new cloudflare-builds profiles
+- 0 test failures. Tests: 938 pass / 0 fail / 2 skipped ✓
+- Pushed branch, opened PR #238; CodeRabbit + Codex rate-limited (data-only JSON file, no action needed)
+
+**Branch / PR**: `auto/E-catalog-forty-fourth-pass` → PR #238 (https://github.com/chittyos/ch1tty/pull/238)
+
+**Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
+
+**Board state**: 396 combos / 219 verified (44th pass open, PR #238). All 22 Notion tools now cataloged. All 6 profiles have cloudflare-builds coverage.
+
+**Next run priority**:
+1. Merge PR #238 if CI green
+2. 45th catalog pass: `orchestrator/agent_execute(chatgpt)` in governance/design/ops profiles; deeper neon/linear combos when tokens available; further evidence+cloudflare-builds cross-chains
+3. Fix Notion auth to verify the ~165 Notion-auth-gated combos: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`
