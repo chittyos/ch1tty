@@ -443,8 +443,48 @@
   - **communication/imessage-chittycontext-notion-sync-brief**: FIRST use of chittyagent-imessage + chittyos-core:chittycontext — iMessage → entity context → Notion sync pipeline
 - Catalog: 173 → 180 total, 112 → 119 verified (65% → 66%). 61 unverified remain (auth-gated).
 - Build clean. Tests: 938 pass / 0 fail / 2 skip ✓.
-- Branch: `auto/E-catalog-twenty-fourth-pass`. PR to be created.
+- Branch: `auto/E-catalog-twenty-fourth-pass`. Commit `6bc4f0f` merged to main directly.
 - **Workstream status**: A ✓ B ✓ C ✓ D ✓ E (in-flight; 180/119 verified; 61 unverified — all auth-gated)
-- **Next run**: For 25th pass consider: (1) `chittyos-core:new-session` skill (0.46) not yet in catalog; (2) `workflow:ship` skill (not yet used as main entry point in ops, only in code chains); (3) `chittyagent-token-ops` (unbound, token-issuance+rotation+validation+revocation) as novel agent; (4) `user:chico` skill (agent execution, 0.46) not yet in catalog; (5) probing `chittyos-devops:chitty-health` skill (0.38) for health-check chains. Human auth actions still needed:
+
+---
+
+### 2026-06-06T(current run) — twenty-fifth-pass catalog (PR#214)
+
+- **Workstream advanced**: E (Alchemist catalog, 25th pass)
+- **Startup checks**: `npm ci` clean, `npm run build` clean (0 errors), `npm test` → 938 pass / 0 fail / 2 skip ✓
+- **Fetched all branches**: No open PRs at start. Main at `6bc4f0f` (24th-pass already merged). Pulled to latest.
+- **Notion board**: Still unavailable (Notion API 401 — token invalid). Using .driver/run-log.md as substitute.
+- **All workstreams A–D confirmed done**. E in-flight (25th pass).
+- **Execute probes (25th pass)** — confirmed live via Ch1tty MCP connector:
+  - `orchestrator/skill_search("new session core initialize start")` → `chittyos-core:new-session` (0.8) ✓ — FIRST use in catalog
+  - `orchestrator/skill_execute(chittyos-core:new-session)` → `{action:"local_invoke"}` ✓
+  - `orchestrator/skill_search("ship workflow deliver release branch")` → `workflow:ship` (0.8) ✓ — FIRST as code-profile entry
+  - `orchestrator/skill_execute(workflow:ship)` → `{action:"local_invoke"}` ✓
+  - `orchestrator/skill_search("health check monitor status liveness")` → `chittyos-devops:chitty-health` (0.8) ✓ — FIRST use in catalog
+  - `orchestrator/skill_execute(chittyos-devops:chitty-health)` → `{action:"local_invoke"}` ✓
+  - `orchestrator/skill_search("chittyxl context compression token")` → `chittyos-core:chittyxl` (0.8) ✓ — FIRST use in catalog
+  - `orchestrator/skill_execute(chittyos-core:chittyxl)` → `{action:"local_invoke"}` ✓
+  - `orchestrator/skill_search("chico user personal concierge")` → `user:chico` (0.8, execution:agent) ✓ — FIRST use in catalog
+  - `orchestrator/skill_execute(user:chico)` → `{action:"agent_unavailable", binding:"AGENT_USER"}` — real routed response ✓
+  - `orchestrator/agent_search("token ops issuance rotation")` → `chittyagent-token-ops` (0.63, unbound) ✓ — FIRST use in catalog
+  - `orchestrator/agent_execute(token-ops, status)` → `{action:"redirect", domain:"token-ops.agent.chitty.cc"}` — real routed response ✓
+  - `orchestrator/skill_search("branch cleanup merged stale")` → `chittyos-devops:branch-cleanup` (0.57) ✓ — FIRST use in catalog
+  - `orchestrator/skill_execute(chittyos-devops:branch-cleanup)` → `{action:"local_invoke"}` ✓
+  - `orchestrator/skill_execute(commit-commands:clean-gone)` → `{action:"local_invoke"}` ✓ — FIRST use in catalog
+  - `evidence/list_rags` → 3 RAGs ✓. `thinking/sequentialthinking` ✓. `fs/write_file` ✓.
+  - Notion: still 401 (toolCount:22 shown connected but all calls return 401).
+- Added 7 new `verified:true` combos (25th-pass):
+  - **finance/token-ops-redirect-evidence-finance**: FIRST use of chittyagent-token-ops — agent_search(token-ops) + agent_execute + evidence RAGs + thinking + fs
+  - **governance/new-session-chittycontext-evidence-audit**: FIRST use of new-session — skill_execute(new-session) + chittycontext + list_rags + ai_search + thinking + fs
+  - **code/ship-then-branch-cleanup**: FIRST use of branch-cleanup + clean-gone — workflow:ship + branch-cleanup + clean-gone + fs (3-skill chain)
+  - **code/chittyxl-new-session-context7-docs**: FIRST use of chittyxl — chittyxl + new-session + context7 x2 + fs
+  - **communication/chico-concierge-new-session-comm-brief**: FIRST use of user:chico — chico + new-session + thinking + fs
+  - **ops/chitty-health-compliance-snapshot**: FIRST use of chitty-health — health + compliance + thinking + fs (health-first audit pattern)
+  - **ops/token-ops-health-compliance-ops-sweep**: broadest security chain — token-ops + chitty-health + compliance + registry + thinking + fs (7 tools)
+- Catalog: 180 → 187 total, 119 → 126 verified (66% → 67%). 61 unverified remain (all auth-gated).
+- Build clean. Tests: 938 pass / 0 fail / 2 skip ✓.
+- Branch: `auto/E-catalog-twenty-fifth-pass`. PR#214 open. CI in progress.
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E (in-flight; 187/126 verified; 61 unverified — all auth-gated)
+- **Next run**: Merge PR#214 if CI green. Novel targets for 26th pass: (1) `chittyos-core:chitty-cleanup` (mac cleanup, 0.43 relevance, not yet in catalog as primary); (2) `chittyos-devops:wrangler-audit` (0.37, audit wrangler.toml files — not yet in catalog); (3) `chittycommand-alpha:ux-observer` (0.38, always-active engagement insights) not yet as chain entry; (4) deeper browser-rendering+playwright+context7 cross-chains (browser-rendering was 401 this pass). Human auth actions:
   1. `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` — unblocks 39 Notion combos
   2. Stripe/Neon/Cloudflare/GitHub/Linear tokens — unblocks remaining 22 combos
