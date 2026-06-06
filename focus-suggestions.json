@@ -1,6 +1,6 @@
 {
   "_comment": "ch1tty focus-profile suggestions catalog \u2014 412 combos, 219 verified (forty-fifth pass \u2014 orchestrator/agent_execute + evidence cross-chains in finance/governance/design/communication)",
-  "generatedFrom": "38th-pass (orchestrator chittycontext/provision_bind/provision_fork coverage; ship/storage/resolve/autobot/neon agent combos across all 6 profiles)",
+  "generatedFrom": "auto-driver 46th-pass 2026-06-06T22:30Z",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools \u2014 now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time \u2014 combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -687,6 +687,28 @@
           ],
           "accomplishes": "Search for a billing compliance skill, execute it to run compliance checks, search evidence docs for regulatory policy context, write a combined billing compliance report.",
           "verified": false
+        },
+        {
+          "name": "finance-agent-list-register-new-specialist",
+          "chain": [
+            "orchestrator/agent_list",
+            "orchestrator/agent_register",
+            "orchestrator/agent_execute(finance)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "List current finance-domain agents, register a new specialist agent into the orchestrator, immediately route a finance query through it, post the agent's output as a Notion finance brief.",
+          "verified": false
+        },
+        {
+          "name": "finance-skill-register-reporting-framework",
+          "chain": [
+            "orchestrator/skill_search(financial-reporting)",
+            "orchestrator/skill_register",
+            "orchestrator/skill_execute",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search for a financial reporting skill, register it in the orchestrator skill registry, execute it to generate a structured report, write the output to a local file.",
+          "verified": false
         }
       ],
       "prompts": [
@@ -845,6 +867,14 @@
         {
           "text": "List the last 10 Cloudflare builds for our finance app, pull the error logs for any failures, and post a deploy health summary to Notion.",
           "resolves_to": "cloudflare-build-finance-deploy-status"
+        },
+        {
+          "text": "List our current finance agents, register a new specialist agent, route a Q4 revenue question through it, and post the response to Notion.",
+          "resolves_to": "finance-agent-list-register-new-specialist"
+        },
+        {
+          "text": "Find our financial reporting skill, register it in the orchestrator, run it to generate a quarterly report, and save the output to disk.",
+          "resolves_to": "finance-skill-register-reporting-framework"
         }
       ]
     },
@@ -1832,6 +1862,29 @@
           ],
           "accomplishes": "Query registry agent for certified services catalog, market agent for published artifacts, evidence docs for governance requirements, reason over the full ecosystem landscape and write a governance coverage report.",
           "verified": false
+        },
+        {
+          "name": "governance-triple-agent-audit-chain",
+          "chain": [
+            "orchestrator/agent_execute(alchemist)",
+            "orchestrator/agent_execute(chatgpt)",
+            "orchestrator/agent_execute(registry)",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Run a three-agent governance audit: Alchemist surfaces structural pattern gaps, ChatGPT interprets policy implications, registry agent validates certified service coverage, sequential reasoning consolidates all findings into a Notion governance audit report.",
+          "verified": false
+        },
+        {
+          "name": "governance-provision-bind-skill-register-compliance",
+          "chain": [
+            "orchestrator/provision_bind",
+            "orchestrator/skill_register",
+            "orchestrator/skill_execute",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Bind a provisioned workspace to governance scope, register a compliance skill scoped to that binding, execute it to run compliance checks, post a compliance attestation brief to Notion.",
+          "verified": false
         }
       ],
       "prompts": [
@@ -2054,6 +2107,14 @@
         {
           "text": "Pull our Cloudflare worker build config, check it against governance compliance evidence, and post a deviation report to Notion.",
           "resolves_to": "cloudflare-build-governance-config-compliance"
+        },
+        {
+          "text": "Run a full governance audit using three agents \u2014 Alchemist for pattern gaps, ChatGPT for policy interpretation, and registry for service validation \u2014 then post findings to Notion.",
+          "resolves_to": "governance-triple-agent-audit-chain"
+        },
+        {
+          "text": "Bind our governance workspace, register a compliance skill for it, run compliance checks, and post an attestation brief to Notion.",
+          "resolves_to": "governance-provision-bind-skill-register-compliance"
         }
       ]
     },
@@ -2663,6 +2724,28 @@
           ],
           "accomplishes": "Trigger a deploy skill for a design asset or UI worker, list Cloudflare builds to confirm the deployment ran, take a screenshot to visually verify the live design, post a design-deploy verification report to Notion.",
           "verified": false
+        },
+        {
+          "name": "design-agent-list-skill-register-ux-observer",
+          "chain": [
+            "orchestrator/agent_list",
+            "orchestrator/skill_register",
+            "orchestrator/skill_execute(chittycommand-alpha:ux-observer)",
+            "playwright/browser_screenshot"
+          ],
+          "accomplishes": "List available design agents to identify the active UX surface, register a UX observer skill, execute it against the target UI, capture a screenshot as a visual verification artifact.",
+          "verified": false
+        },
+        {
+          "name": "design-provision-status-ui-agent-screenshot",
+          "chain": [
+            "orchestrator/provision_status",
+            "orchestrator/agent_execute(ui)",
+            "playwright/browser_screenshot",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Check the provisioned design workspace status to confirm readiness, route UI generation to the UI agent, capture a screenshot of the rendered result, post an accessibility and visual review brief to Notion.",
+          "verified": false
         }
       ],
       "prompts": [
@@ -2817,6 +2900,14 @@
         {
           "text": "List Cloudflare builds for our design system site, navigate to the latest preview URL, screenshot it, and post the visual to Notion for team review.",
           "resolves_to": "cloudflare-build-design-asset-pipeline"
+        },
+        {
+          "text": "List design agents, register a UX observer skill, run it against the current UI, and capture a screenshot as a verification artifact.",
+          "resolves_to": "design-agent-list-skill-register-ux-observer"
+        },
+        {
+          "text": "Check the provisioned design workspace status, generate a UI component via the UI agent, screenshot the result, and post a visual review brief to Notion.",
+          "resolves_to": "design-provision-status-ui-agent-screenshot"
         }
       ]
     },
@@ -3788,6 +3879,30 @@
           ],
           "accomplishes": "Retrieve a Notion code documentation block, update it with latest API reference from context7, and write the synced content to a local docs file",
           "verified": false
+        },
+        {
+          "name": "code-provision-bind-evaluate-deploy-gate",
+          "chain": [
+            "orchestrator/provision_candidates",
+            "orchestrator/provision_bind",
+            "orchestrator/provision_evaluate",
+            "cloudflare-builds/workers_builds_list_builds",
+            "fs/write_file"
+          ],
+          "accomplishes": "Identify deployment candidates, bind the selected environment, evaluate readiness against provisioning criteria, cross-reference existing Cloudflare builds for conflicts, write a deploy gate report to disk.",
+          "verified": false
+        },
+        {
+          "name": "code-multi-agent-ship-build-playwright-verify",
+          "chain": [
+            "orchestrator/agent_execute(ship)",
+            "cloudflare-builds/workers_builds_get_build_logs",
+            "orchestrator/agent_execute(cloudflare)",
+            "playwright/browser_screenshot",
+            "fs/write_file"
+          ],
+          "accomplishes": "Trigger a code deploy via the ship agent, pull Cloudflare build logs for the resulting run, route a post-deploy inspection to the Cloudflare agent, capture a screenshot as end-to-end deploy verification, write the full verification report to disk.",
+          "verified": false
         }
       ],
       "prompts": [
@@ -4006,6 +4121,14 @@
         {
           "text": "Read the API reference Notion block, update it with the latest context7 documentation, and sync the updated docs to a local file.",
           "resolves_to": "notion-update-block-code-documentation-sync"
+        },
+        {
+          "text": "Find deployment candidates, bind the environment, evaluate readiness, cross-check Cloudflare builds, and write a deploy gate report.",
+          "resolves_to": "code-provision-bind-evaluate-deploy-gate"
+        },
+        {
+          "text": "Trigger a deploy via the ship agent, pull Cloudflare build logs, have the Cloudflare agent inspect the result, and screenshot the live endpoint as verification.",
+          "resolves_to": "code-multi-agent-ship-build-playwright-verify"
         }
       ]
     },
@@ -4628,6 +4751,28 @@
           ],
           "accomplishes": "Route a message drafting request to the ChatGPT agent for a polished communication draft, cross-reference evidence docs for tone and context, post the draft message and context to a Notion communication page for review.",
           "verified": false
+        },
+        {
+          "name": "comm-agent-register-skill-register-broadcast",
+          "chain": [
+            "orchestrator/agent_register",
+            "orchestrator/skill_register",
+            "orchestrator/skill_execute(broadcast)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Register a new communication agent, register a broadcast skill scoped to it, execute the broadcast skill to dispatch a message, post a delivery receipt and audit trail to Notion.",
+          "verified": false
+        },
+        {
+          "name": "comm-provision-fork-chatgpt-notes-draft",
+          "chain": [
+            "orchestrator/provision_fork",
+            "orchestrator/agent_execute(chatgpt)",
+            "orchestrator/agent_execute(notes)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Fork a new communication session context, route a message draft request to the ChatGPT agent for generation, refine and store via the notes agent, post the draft as a communication record to Notion.",
+          "verified": false
         }
       ],
       "prompts": [
@@ -4782,6 +4927,14 @@
         {
           "text": "Retrieve the comment thread on our launch announcement Notion page, search for related pages, and post a concise discussion summary.",
           "resolves_to": "notion-retrieve-comment-comm-thread-summary"
+        },
+        {
+          "text": "Register a new comms agent, register a broadcast skill for it, send a broadcast message, and post the delivery receipt to Notion.",
+          "resolves_to": "comm-agent-register-skill-register-broadcast"
+        },
+        {
+          "text": "Fork a new communication context, draft a message with ChatGPT, store and refine via notes agent, then post the final draft to Notion.",
+          "resolves_to": "comm-provision-fork-chatgpt-notes-draft"
         }
       ]
     },
@@ -5698,6 +5851,30 @@
           ],
           "accomplishes": "Retrieve the Notion bot identity, list all workspace users, cross-reference with orchestrator agents for access coverage, and reason over identity gaps",
           "verified": false
+        },
+        {
+          "name": "ops-cloudflare-evidence-build-audit",
+          "chain": [
+            "cloudflare-builds/workers_builds_list_builds",
+            "cloudflare-builds/workers_builds_get_build_logs",
+            "evidence/ai_search",
+            "orchestrator/agent_execute(cloudflare)",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "List all ops-tier Cloudflare builds, pull logs for recent runs, cross-reference evidence docs for compliance and SLA baselines, route anomalies to the Cloudflare agent for remediation context, reason over the combined audit trail.",
+          "verified": false
+        },
+        {
+          "name": "ops-triple-agent-alchemist-storage-registry",
+          "chain": [
+            "orchestrator/chittyagent-alchemist",
+            "orchestrator/chittyagent-storage",
+            "orchestrator/chittyagent-registry",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Three named ops agents in sequence: Alchemist identifies emergent cross-backend patterns, storage agent audits the current object store for stale resources, registry agent cross-checks active service registrations, sequential reasoning consolidates into an ops topology audit written to disk.",
+          "verified": false
         }
       ],
       "prompts": [
@@ -5900,6 +6077,14 @@
         {
           "text": "Get the Notion bot user identity, list all workspace users, compare with orchestrator agent roster, and reason over any access coverage gaps.",
           "resolves_to": "notion-get-self-ops-identity-access-audit"
+        },
+        {
+          "text": "List Cloudflare builds, pull logs for recent runs, check evidence for compliance baselines, route anomalies to the Cloudflare agent, and reason over the audit trail.",
+          "resolves_to": "ops-cloudflare-evidence-build-audit"
+        },
+        {
+          "text": "Run a three-agent ops audit with Alchemist, storage, and registry agents, then synthesize the topology findings into a written report.",
+          "resolves_to": "ops-triple-agent-alchemist-storage-registry"
         }
       ]
     }
