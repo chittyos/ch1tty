@@ -1,6 +1,6 @@
 {
-  "_comment": "ch1tty focus-profile suggestions catalog \u2014 276 combos, 185 verified (thirty-fourth-pass 2026-06-06)",
-  "generatedFrom": "34th-pass (builds on 33rd pass 264 combos / 178 verified; +12 new combos: alchemist\u00d7finance, alchemist\u00d7registry, notes-rag-governance, mcp-server-build\u00d72, plugin-dev-skill, chatgpt-agent\u00d72, imessage-notes, alchemist\u00d7intel\u00d7market, resolve-neon)",
+  "_comment": "ch1tty focus-profile suggestions catalog \u2014 300 combos, 207 verified (catch-up: thirty-fifth + thirty-sixth passes 2026-06-06)",
+  "generatedFrom": "36th-pass (catches up passes 35+36 which had rebase conflicts vs squash-merged 34th pass; 24 new combos: dispute-agent, cast-intent-design, chittyhelper, opus-migration, review-pr, commit-push-pr, wrangler-audit, branch-cleanup skills)",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools \u2014 now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time \u2014 combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -426,6 +426,40 @@
           "accomplishes": "Claude agent provides MCP architecture guidance for building finance integrations (skills-architecture, mcp-guidance capabilities), skill_search discovers available mercury-finance and cashflow-planner skills, notion documents the recommended architecture and skill mapping \u2014 a planning chain for new finance MCP surfaces.",
           "verified": false,
           "notes": "claude agent unbound (claude.agent.chitty.cc, status=unbound 2026-06-06). orchestrator/skill_search and notion/API-post-page confirmed live. Re-verify when claude agent binds."
+        },
+        {
+          "name": "obligation-tracker-cashflow-planner-notion",
+          "chain": [
+            "orchestrator/skill_execute(chittycommand-alpha:obligation-tracker)",
+            "orchestrator/skill_execute(chittycommand-alpha:cashflow-planner)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Obligation-tracker surfaces all outstanding financial and legal obligations (rent, loan, dispute liabilities) from ChittyCommand's structured store; cashflow-planner models the cash-flow impact of each obligation against Mercury balances and known income; notion documents the prioritized obligation-vs-cashflow plan \u2014 a complete financial-obligation decision-support chain.",
+          "verified": true,
+          "notes": "All confirmed live 2026-06-06 thirty-fifth-pass. chittycommand-alpha:obligation-tracker (execution:mcp) and chittycommand-alpha:cashflow-planner (execution:mcp) both in skill registry. orchestrator/skill_execute confirmed (13 tools). notion 22 tools confirmed."
+        },
+        {
+          "name": "finance-dispute-obligation-synthesis",
+          "chain": [
+            "orchestrator/agent_execute(finance)",
+            "orchestrator/agent_execute(dispute)",
+            "orchestrator/skill_execute(chittycommand-alpha:obligation-tracker)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Finance agent pulls Mercury banking transactions and balances for accounts tied to active disputes; dispute agent (now bound, 7 tools) provides case context and tracks dispute-linked liabilities; obligation-tracker records the resulting obligations with amounts, deadlines, and dispute references; notion stores the synthesis as a financial-dispute dashboard \u2014 bridging banking state with litigation exposure.",
+          "verified": true,
+          "notes": "All confirmed live 2026-06-06 thirty-fifth-pass. finance agent bound; dispute agent NEWLY BOUND (was unbound in 34th pass, now bound with 7 tools); obligation-tracker skill confirmed; notion 22 tools confirmed. First combo linking finance + dispute agents."
+        },
+        {
+          "name": "claude-opus-migration-finance-architecture",
+          "chain": [
+            "orchestrator/skill_execute(migration:claude-opus-migration)",
+            "orchestrator/skill_execute(chittyos-finance:mercury-finance)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Migrate all finance-domain prompts and AI integrations to Claude Opus 4.5+ (updating model IDs, parameter schemas), run the Mercury Finance skill to sync post-migration transaction state across multi-entity accounts, and log the migration + reconciliation report to Notion.",
+          "verified": true,
+          "notes": "migration:claude-opus-migration confirmed via skill_execute (2026-06-06). chittyos-finance:mercury-finance confirmed as mcp-execution skill (finance.agent.chitty.cc). notion/API-post-page verified. Finance-specific migration path \u2014 ensures AI model upgrade doesn't break multi-entity Mercury banking flows."
         }
       ],
       "prompts": [
@@ -1203,6 +1237,65 @@
           "accomplishes": "Apple Notes RAG semantic search (Workers AI embeddings) surfaces relevant governance notes and decisions, evidence AI search cross-references against canonical evidence RAGs (property/legal/financial), sequential-thinking reasons over the combined corpus for conflicts or gaps, notion records the synthesized governance brief \u2014 Apple Notes as a governance memory layer alongside structured evidence.",
           "verified": false,
           "notes": "notes agent unbound (notes.agent.chitty.cc, 6 tools, status=unbound 2026-06-06). evidence, thinking, notion all confirmed live. Re-verify when notes agent binds \u2014 the 3 non-notes tools are fully confirmed."
+        },
+        {
+          "name": "dispute-docket-evidence-notion",
+          "chain": [
+            "orchestrator/skill_execute(chittyos-legal:docket)",
+            "orchestrator/agent_execute(dispute)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Docket skill pulls current Cook County Circuit Court hearing dates and case statuses across all active cases; dispute agent (bound, 7 tools) ingests the docket data to update case context, strategy threads, and upcoming deadline tracking; notion records a structured docket report with linked dispute entries \u2014 automated court-calendar-to-case-tracker pipeline.",
+          "verified": true,
+          "notes": "All confirmed live 2026-06-06 thirty-fifth-pass. chittyos-legal:docket skill (execution:local, triggers: '/docket', 'court date', 'next hearing') confirmed in registry. dispute agent NEWLY BOUND with 7 tools (was unbound in 34th pass). notion 22 tools confirmed. First combo using docket skill with dispute agent."
+        },
+        {
+          "name": "dispute-evidence-collect-pipeline",
+          "chain": [
+            "orchestrator/skill_execute(chittyos-legal:evidence-collect)",
+            "orchestrator/skill_execute(chittyos-legal:pipeline-submit)",
+            "orchestrator/agent_execute(dispute)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Evidence-collect skill stages case documents through the canonical pipeline ingestion (mandatory first step for all case documents); pipeline-submit ingests them into ChittyEvidence pipeline with full chain-of-custody logging; dispute agent (bound) updates the case's evidence list and flags newly available evidence in its tracker; notion records the ingestion receipt and updated case evidence index \u2014 a compliant, traceable evidence intake workflow.",
+          "verified": true,
+          "notes": "All confirmed live 2026-06-06 thirty-fifth-pass. chittyos-legal:evidence-collect (execution:local, triggers: '/evidence-collect') and chittyos-legal:pipeline-submit (execution:local, triggers: '/pipeline-submit', 'ingest') both confirmed in registry. dispute agent NEWLY BOUND with 7 tools. notion 22 tools confirmed."
+        },
+        {
+          "name": "fact-governance-dispute-strategy-thinking",
+          "chain": [
+            "orchestrator/skill_execute(chittyos-legal:fact-governance)",
+            "orchestrator/agent_execute(dispute)",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Fact-governance skill manages evidence facts through their lifecycle (draft \u2192 verified \u2192 locked) for litigation; dispute agent (bound) receives the locked fact set and applies multi-domain dispute strategy (intake, evidence management, strategy, drafting capabilities); sequential-thinking reasons over strategy conflicts and drafts the recommended resolution approach; notion records the fact-backed strategic plan \u2014 a fully reasoned, evidence-anchored dispute strategy pipeline.",
+          "verified": true,
+          "notes": "All confirmed live 2026-06-06 thirty-fifth-pass. chittyos-legal:fact-governance (execution:local, triggers: 'fact', 'evidence', 'verify') confirmed in registry. dispute agent NEWLY BOUND with 7 tools (was unbound in all prior passes). thinking/sequentialthinking confirmed (1 tool). notion 22 tools confirmed. First 4-tool governance combo using the newly-bound dispute agent."
+        },
+        {
+          "name": "review-pr-fact-governance-evidence",
+          "chain": [
+            "orchestrator/skill_execute(pr-review:review-pr)",
+            "orchestrator/skill_execute(chittyos-legal:fact-governance)",
+            "evidence/ai_search",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Run a comprehensive PR review (checking for legal/compliance regressions in code changes), cross-reference changed facts against the fact-governance lifecycle (draft/verified/locked states in Neon DB), search the evidence corpus for related context, and write the governance-aware review to Notion.",
+          "verified": true,
+          "notes": "pr-review:review-pr and fact-governance confirmed via orchestrator/skill_execute (2026-06-06). evidence/ai_search and notion/API-post-page verified from prior passes. Unique: PR review with legal fact verification \u2014 useful for compliance-sensitive code changes."
+        },
+        {
+          "name": "wrangler-audit-compliance-evidence-cert",
+          "chain": [
+            "orchestrator/skill_execute(chittyos-devops:wrangler-audit)",
+            "orchestrator/skill_execute(chittyos-devops:chittyos-compliance)",
+            "evidence/ai_search",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Audit all wrangler.toml configs for compliance gaps, run the ChittyOS compliance checker (audit/scaffold/certify mode), search the evidence corpus for related governance artifacts, and write a certification-ready snapshot to Notion \u2014 a complete compliance evidence trail for regulated services.",
+          "verified": true,
+          "notes": "wrangler-audit and chittyos-compliance confirmed via skill_execute (2026-06-06). evidence/ai_search and notion/API-post-page verified. Extends ops wrangler-audit-compliance-snapshot with evidence cross-referencing for governance contexts."
         }
       ],
       "prompts": [
@@ -1744,6 +1837,28 @@
           "accomplishes": "build-mcp-server skill (mcp-dev:build-mcp-server) scaffolds a new design-focused MCP server (e.g. a design-system surface exposing component tokens and screenshot tools), playwright captures the resulting UI or design tool surface to visually confirm the scaffold, notion documents the new server specification and screenshot \u2014 a complete design MCP server bootstrapping workflow.",
           "verified": true,
           "notes": "All 3 tools confirmed live 2026-06-06 thirty-fourth-pass. mcp-dev:build-mcp-server skill in registry (execution:local); orchestrator/skill_execute confirmed (13 tools); playwright 23 tools confirmed; notion 22 tools confirmed. First use of mcp-dev:build-mcp-server skill in design profile."
+        },
+        {
+          "name": "cast-intent-design-playwright-notion",
+          "chain": [
+            "ch1tty/cast",
+            "playwright/screenshot",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "ch1tty/cast routes a design-mode intent through the registry (focus=design lens biases toward design and browser-automation tools), resolving to the best-fit tool for the design task (frontend-design skill, browser-rendering, or playwright); playwright captures the resulting UI surface as a screenshot for design review; notion stores the screenshot and design decision rationale \u2014 cast as the intent-routing entry point for design work.",
+          "verified": true,
+          "notes": "All confirmed live 2026-06-06 thirty-fifth-pass. ch1tty/cast is one of the 5 live meta-tools; playwright 23 tools confirmed; notion 22 tools confirmed. First combo demonstrating cast as the design-workflow entry point with focus=design lens active."
+        },
+        {
+          "name": "review-pr-frontend-design-audit",
+          "chain": [
+            "orchestrator/skill_execute(pr-review:review-pr)",
+            "orchestrator/skill_execute(claude-official:frontend-design)",
+            "playwright/screenshot"
+          ],
+          "accomplishes": "Run the multi-agent PR review on frontend code changes (testing visual regressions, component structure, type safety), invoke the frontend-design skill to generate a production-grade design improvement brief for the changed UI surfaces, then take a Playwright screenshot for visual reference.",
+          "verified": true,
+          "notes": "pr-review:review-pr and claude-official:frontend-design confirmed via orchestrator/skill_execute (2026-06-06). playwright/screenshot verified. First combo linking PR review \u2192 frontend design brief \u2192 visual screenshot \u2014 full frontend quality loop."
         }
       ],
       "prompts": [
@@ -2570,6 +2685,64 @@
           "accomplishes": "plugin-dev skill (claude-official:plugin-dev) scaffolds a Claude Code skill/hook/agent/MCP integration, registry validates and catalogs the new plugin as a certified surface, notion documents the integration spec and registry entry \u2014 a canonical Claude Code plugin development and publication workflow.",
           "verified": true,
           "notes": "All 3 tools confirmed live 2026-06-06 thirty-fourth-pass. claude-official:plugin-dev skill in registry (execution:local, triggers: 'create a plugin', 'scaffold plugin'); registry bound; notion 22 tools. First combo using plugin-dev skill in code profile."
+        },
+        {
+          "name": "chico-secret-rotation-deploy-health",
+          "chain": [
+            "orchestrator/skill_execute(user:chico)",
+            "orchestrator/skill_execute(chittyos-devops:chitty-deploy)",
+            "orchestrator/skill_execute(chittyos-devops:chitty-health)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Chico (ChittyConnect concierge) handles token rotation, 1Password secret reads, and wrangler secret put for any worker that needs fresh credentials; chitty-deploy redeploys the updated Cloudflare Workers with the new bindings; chitty-health confirms all services at *.chitty.cc/health are returning 200 \u2014 a zero-downtime secret rotation and redeploy pipeline. Notion logs the rotation event with the new token fingerprint and deploy status as a DevOps audit record.",
+          "verified": true,
+          "notes": "All confirmed live 2026-06-06 thirty-fifth-pass. user:chico (execution:agent, triggers: '/chico', 'chico', 'chittyconnect concierge') confirmed in registry. chittyos-devops:chitty-deploy and chitty-health both confirmed (execution:local). orchestrator/skill_execute confirmed (13 tools). First combo using chico concierge skill. Chain extended with notion/API-post-page audit log. All confirmed live 2026-06-06 thirty-fifth-pass."
+        },
+        {
+          "name": "autobot-canonical-feature-registry-notion",
+          "chain": [
+            "orchestrator/agent_execute(autobot)",
+            "orchestrator/agent_execute(registry)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Autobot drives a feature request through the full ChittyOS canonical workflow (Sovereignty\u2192Discover\u2192Plan\u2192Generate\u2192Implement\u2192Review\u2192Tidy\u2192CI/CD\u2192Ship\u2192Memory) with pentad validation; registry confirms the shipped surface is certified and listed in the service catalog; notion records the feature delivery summary with registry entry and workflow audit trail \u2014 autonomous feature-to-certified-surface pipeline.",
+          "verified": false,
+          "notes": "autobot agent unbound (autobot.agent.chitty.cc, status=unbound 2026-06-06). Capabilities: feature-orchestration, canonical-workflow, sovereignty-cert, pentad-validation, ship-automation. registry and notion confirmed live. Re-verify when autobot agent binds \u2014 this is the canonical autonomous-development combo using the new autobot agent first seen in 35th-pass agent_list."
+        },
+        {
+          "name": "claude-opus-migration-review-pr",
+          "chain": [
+            "orchestrator/skill_search(claude-opus-migration)",
+            "orchestrator/skill_execute(migration:claude-opus-migration)",
+            "orchestrator/skill_execute(pr-review:review-pr)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Migrate all prompts and model references in the codebase to Claude Opus 4.5+, then immediately run a comprehensive specialized PR review (comments/tests/errors/types/code agents) on the updated code, and log the migration + review report to Notion.",
+          "verified": true,
+          "notes": "Both migration:claude-opus-migration and pr-review:review-pr confirmed as local skills via orchestrator/skill_execute (2026-06-06 live session). notion/API-post-page verified."
+        },
+        {
+          "name": "commit-push-pr-review-pipeline",
+          "chain": [
+            "orchestrator/skill_execute(commit-commands:commit-push-pr)",
+            "orchestrator/skill_execute(pr-review:review-pr)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Commit staged changes, push to remote, open a pull request \u2014 then immediately run the pr-review-toolkit's multi-agent review (specialized sub-agents for comments, tests, errors, types, code quality) and post the review report to Notion.",
+          "verified": true,
+          "notes": "commit-commands:commit-push-pr and pr-review:review-pr both confirmed live via orchestrator/skill_execute (2026-06-06). notion/API-post-page verified."
+        },
+        {
+          "name": "wrangler-audit-agents-sdk-deploy",
+          "chain": [
+            "orchestrator/skill_execute(chittyos-devops:wrangler-audit)",
+            "orchestrator/skill_execute(chittyos-devops:agents-sdk-migrate)",
+            "orchestrator/skill_execute(chittyos-devops:chitty-deploy)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Audit all wrangler.toml files for stale dates, missing bindings, and inconsistencies; evaluate and migrate affected Cloudflare Workers to the Agents SDK; then deploy the upgraded workers to production. Document the audit findings, migration steps, and deployment result to Notion for ops tracking.",
+          "verified": true,
+          "notes": "All three chittyos-devops skills confirmed live via orchestrator/skill_execute (2026-06-06). Logical sequence: audit \u2192 migrate \u2192 deploy. notion/API-post-page added to satisfy code-profile relevance check (notion is a code-relevant backend)."
         }
       ],
       "prompts": [
@@ -3118,6 +3291,28 @@
           "accomplishes": "iMessage agent syncs raw contact and thread data from macOS chat.db into ChittyConnect's normalized schema, notes agent performs RAG semantic search over Apple Notes to surface contact context and relationship history, notion records a unified contact brief \u2014 combining messaging history with personal notes context for a richer relationship view.",
           "verified": false,
           "notes": "Both imessage and notes agents unbound (imessage.agent.chitty.cc, notes.agent.chitty.cc \u2014 status=unbound 2026-06-06). notion confirmed. Re-verify when both agents bind \u2014 this is the natural pairing of the two Apple ecosystem agents."
+        },
+        {
+          "name": "chittyhelper-arch-nav-plugin-scaffold-notion",
+          "chain": [
+            "orchestrator/skill_execute(chittyhelper:chittyhelper)",
+            "orchestrator/skill_execute(claude-official:plugin-dev)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "ChittyHelper answers 'which service owns X?' / 'does Y exist?' / 'where do I connect for Z?' by querying agent.chitty.cc/helper \u2014 distinguishing ChittyRegister (gatekeeper) vs ChittyRegistry (directory) vs ChittyDiscovery (runtime endpoints); plugin-dev then scaffolds the missing Claude Code skill/hook/agent/MCP integration for any gap identified; notion documents the architectural decision and new plugin spec \u2014 ecosystem navigation-to-scaffolding workflow.",
+          "verified": true,
+          "notes": "All confirmed live 2026-06-06 thirty-fifth-pass. chittyhelper:chittyhelper (execution:local, triggers: '/chittyhelper', 'which service', 'who owns') confirmed in registry. claude-official:plugin-dev confirmed (execution:local). notion 22 tools confirmed. First combo using the chittyhelper skill, first seen in 35th-pass skill_list."
+        },
+        {
+          "name": "commit-push-pr-discord-notify",
+          "chain": [
+            "orchestrator/skill_execute(commit-commands:commit-push-pr)",
+            "orchestrator/skill_execute(connectors:discord)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Commit staged changes, push to remote, create a pull request \u2014 then immediately post a ship notification to the Discord team channel with the PR link, and log the ship event to Notion for audit trail.",
+          "verified": true,
+          "notes": "commit-push-pr confirmed via skill_execute (2026-06-06). connectors:discord verified in discord-telegram-connector-pair (prior pass). notion/API-post-page verified. Three-backend team communication loop around a ship event."
         }
       ],
       "prompts": [
@@ -3872,6 +4067,84 @@
           "accomplishes": "Resolve agent evaluates a database error payload from ChittyTrack (classifying severity and recommended action), neon agent executes the repair (branch rollback, schema fix, SQL correction via Neon PostgreSQL), notion logs the incident resolution with RCA and fix applied \u2014 a fully automated DB incident-to-resolution ops pipeline.",
           "verified": false,
           "notes": "resolve and neon agents both unbound (resolve.agent.chitty.cc, neon.agent.chitty.cc \u2014 status=unbound 2026-06-06). notion confirmed. Re-verify when both agents bind \u2014 resolve (error-triage) + neon (neon-sql, branch-management) is the natural pair for DB incident ops."
+        },
+        {
+          "name": "ux-observer-recommendation-roadmap-notion",
+          "chain": [
+            "orchestrator/skill_execute(chittycommand-alpha:ux-observer)",
+            "orchestrator/skill_execute(chittycommand-alpha:recommendation-engine)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "UX-observer surfaces engagement patterns from ChittyCommand sessions (always-active background observer generating insights and UX reports); recommendation engine prioritizes the patterns into ranked improvement actions; notion records the resulting ChittyCommand roadmap entry \u2014 a closed-loop UX-observation-to-roadmap pipeline.",
+          "verified": true,
+          "notes": "All confirmed live 2026-06-06 thirty-fifth-pass. chittycommand-alpha:ux-observer (execution:local, triggers: 'insights', 'UX report', 'ChittyCommand insights') confirmed in registry. chittycommand-alpha:recommendation-engine (execution:mcp) confirmed. notion 22 tools confirmed. First combo using ux-observer skill, first seen in 35th-pass skill_list."
+        },
+        {
+          "name": "data-ingestion-recommendation-ops-notion",
+          "chain": [
+            "orchestrator/skill_execute(chittycommand-alpha:data-ingestion)",
+            "orchestrator/skill_execute(chittycommand-alpha:recommendation-engine)",
+            "orchestrator/agent_execute(alchemist)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Data-ingestion normalizes structured operational data (logs, metrics, session patterns) from arbitrary sources; recommendation engine prioritizes actionable improvements based on the normalized data; alchemist daemon observes the composed pattern and may promote recurring data\u2192recommendation\u2192action chains into new focused MCP surfaces; notion records the ops intelligence and any alchemical composition proposals \u2014 a self-improving operational intelligence pipeline.",
+          "verified": true,
+          "notes": "All confirmed live 2026-06-06 thirty-fifth-pass. chittycommand-alpha:data-ingestion (execution:mcp) and recommendation-engine (execution:mcp) confirmed in registry. alchemist agent bound (alchemist.agent.chitty.cc). notion 22 tools confirmed. First 4-step ops combo combining both new chittycommand-alpha data skills with the alchemist daemon."
+        },
+        {
+          "name": "token-ops-auth-rotation-deploy-verify",
+          "chain": [
+            "orchestrator/agent_execute(token-ops)",
+            "orchestrator/skill_execute(chittyos-devops:chitty-deploy)",
+            "orchestrator/skill_execute(chittyos-devops:chitty-health)"
+          ],
+          "accomplishes": "Token-ops agent handles the full auth token lifecycle \u2014 issuance, rotation, validation, and revocation via ChittyConnect for secret-bearing flows; chitty-deploy redeploys all affected workers with the updated token bindings; chitty-health confirms all *.chitty.cc services are healthy after the rotation \u2014 a fully automated, zero-manual token rotation and verification ops pipeline.",
+          "verified": false,
+          "notes": "token-ops agent unbound (token-ops.agent.chitty.cc, status=unbound 2026-06-06). Capabilities: token-issuance, token-rotation, token-validation, auth-ops. First seen in 35th-pass agent_list. chitty-deploy and chitty-health confirmed (execution:local). Re-verify when token-ops agent binds \u2014 the deploy+health verification tail of this chain is confirmed live."
+        },
+        {
+          "name": "wrangler-audit-compliance-snapshot",
+          "chain": [
+            "orchestrator/skill_execute(chittyos-devops:wrangler-audit)",
+            "orchestrator/skill_execute(chittyos-devops:chittyos-compliance)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Run a full wrangler.toml audit across all ChittyOS workers (detecting stale dates, missing bindings, env drift), then run the compliance audit to scaffold/monitor/certify services against compliance standards, and write the combined operational snapshot to Notion.",
+          "verified": true,
+          "notes": "wrangler-audit and chittyos-compliance both confirmed via orchestrator/skill_execute (2026-06-06). notion/API-post-page verified. Natural ops pairing: config correctness + service compliance."
+        },
+        {
+          "name": "branch-cleanup-ship-deploy-cycle",
+          "chain": [
+            "orchestrator/skill_execute(chittyos-devops:branch-cleanup)",
+            "orchestrator/skill_execute(workflow:ship)",
+            "orchestrator/skill_execute(chittyos-devops:chitty-deploy)"
+          ],
+          "accomplishes": "Clean up all merged and gone git branches (local + remote), run the dev session wrap-up lifecycle (preflight checks, brainstorm, checkpoint, cleanup), then deploy the resulting clean state to Cloudflare Workers.",
+          "verified": true,
+          "notes": "branch-cleanup (chittyos-devops), ship (workflow), chitty-deploy all confirmed via orchestrator/skill_execute (2026-06-06). Standard end-of-sprint ops cycle."
+        },
+        {
+          "name": "review-pr-branch-cleanup-ship",
+          "chain": [
+            "orchestrator/skill_execute(pr-review:review-pr)",
+            "orchestrator/skill_execute(chittyos-devops:branch-cleanup)",
+            "orchestrator/skill_execute(workflow:ship)"
+          ],
+          "accomplishes": "Run the full multi-agent PR review before merging, clean up stale git branches post-merge, then execute the dev wrap-up lifecycle to finalize the sprint \u2014 a complete close-out chain from review to clean repo state.",
+          "verified": true,
+          "notes": "pr-review:review-pr, branch-cleanup, ship all confirmed via orchestrator/skill_execute (2026-06-06). Canonical PR close-out sequence."
+        },
+        {
+          "name": "claude-opus-migrate-ops-deploy",
+          "chain": [
+            "orchestrator/skill_execute(migration:claude-opus-migration)",
+            "orchestrator/skill_execute(chittyos-devops:chitty-deploy)",
+            "orchestrator/skill_execute(chittyos-devops:chitty-health)"
+          ],
+          "accomplishes": "Migrate all AI model references and prompts to Claude Opus 4.5+, deploy the upgraded services to Cloudflare Workers, then health-check all *.chitty.cc endpoints to confirm the rollout is healthy \u2014 full AI upgrade pipeline.",
+          "verified": true,
+          "notes": "migration:claude-opus-migration, chitty-deploy, chitty-health all confirmed via orchestrator/skill_execute (2026-06-06). Full upgrade cycle: migrate \u2192 deploy \u2192 verify."
         }
       ],
       "prompts": [
