@@ -553,3 +553,35 @@
   1. `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`
   2. `export GITHUB_MCP_AUTHORIZATION="Bearer $(op read op://ChittyOS-Integrations/github/personal_access_token)"`
   3. Linear/Cloudflare-builds/Neon/Stripe tokens
+
+---
+
+### 2026-06-06T06:00Z — thirtieth-pass catalog (PR#219)
+
+- **Workstream advanced**: E (Alchemist catalog, 30th pass)
+- **Startup checks**: `npm ci` clean, `npm run build` clean (0 errors), `npm test` → 938 pass / 0 fail / 2 skip ✓
+- **State inspection**: Only open PR was #218 (twenty-ninth-pass, 224/160) on branch `auto/E-catalog-twenty-ninth-pass`. Confirmed via `git diff`: PR#218 has real changes (470 insertions to focus-suggestions.json) but not yet merged. Working from main (214/150).
+- **Notion board**: BLOCKER (persistent) — Notion API returning auth error. Human fix: refresh `chitty-mcp-token notion` or rotate Notion API key. Using `.driver/run-log.md` as substitute.
+- **All workstreams A–D confirmed done**. E in-flight.
+- **ch1tty status**: 1 server connected (orchestrator only, 13 tools live). 241 active sessions. 28 agents (15 bound, 13 unbound). Focus profiles loaded.
+- **Execute probes**: `orchestrator/agent_list` confirmed all 28 agents live. 6 new agent types featured first time this pass: dispute, token-ops, canon, notes+imessage (unbound), intel, connect, storage, ui, chatgpt.
+- **10 new combos added (+6 newly verified, 150 → 156)**:
+  - `finance/dispute-billing-ledger-chain` — FIRST dispute→evidence→finance closure (verified)
+  - `finance/token-ops-finance-api-rotation` — FIRST provision_evaluate→token-ops→finance (verified)
+  - `governance/canon-document-lifecycle-governance-audit` — FIRST full URI lifecycle audit (verified)
+  - `code/provision-candidates-code-specialist-fork` — FIRST provision_candidates (not evaluate) + context7 (verified)
+  - `code/ui-autobot-feature-canonical-deploy` — FIRST ui→autobot→github PR pipeline (unverified; ui/autobot unbound)
+  - `communication/notes-imessage-contact-brief` — FIRST notes RAG→notion brief→iMessage (unverified; notes/imessage unbound)
+  - `communication/scrape-dispute-comm-response` — FIRST scrape for dispute evidence + comm response (verified)
+  - `ops/intel-connect-provision-health-check` — FIRST intel+connect correlation (verified)
+  - `ops/storage-connect-document-entity-map` — storage entity-doc map (unverified; storage unbound)
+  - `design/chatgpt-ui-mcp-design-spec` — FIRST chatgpt+ui design spec pipeline (unverified; ui unbound)
+- Tests passed after fixing 3 chain-server violations (code/comm profiles require direct server IDs in chain, not orchestrator/agent_execute wrapping).
+- Catalog: 214 → 224 total, 150 → 156 verified. Profile: finance 27, governance 49, design 27, code 51, comm 25, ops 45.
+- Build clean. Tests: 938 pass / 0 fail / 2 skip ✓.
+- Branch: `auto/E-catalog-thirtieth-pass`. PR#219 open. CI (CodeQL) in progress. CodeRabbit review in progress. Codex bot: usage limit (external, no action).
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E (in-flight; 224/156 verified — PR#218 + PR#219 both open adding 10 each from main)
+- **Next run**: Merge PR#218 and PR#219 if CI green. 4 unverified combos this pass target unbound agents (ui, autobot, notes, imessage, storage) — re-verify once reconnected. Human auth actions:
+  1. Notion token refresh: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`
+  2. `export GITHUB_MCP_AUTHORIZATION="Bearer $(op read op://ChittyOS-Integrations/github/personal_access_token)"` — enables github-relevant code combos
+  3. Linear/Cloudflare-builds/Neon/Stripe tokens for remaining unverified combos
