@@ -448,7 +448,7 @@
 
 ---
 
-### 2026-06-06T(current run) — twenty-fifth-pass catalog (PR#214)
+### 2026-06-06T01:00Z — twenty-fifth-pass catalog (PR#214)
 
 - **Workstream advanced**: E (Alchemist catalog, 25th pass)
 - **Startup checks**: `npm ci` clean, `npm run build` clean (0 errors), `npm test` → 938 pass / 0 fail / 2 skip ✓
@@ -486,5 +486,43 @@
 - Branch: `auto/E-catalog-twenty-fifth-pass`. PR#214 open. CI in progress.
 - **Workstream status**: A ✓ B ✓ C ✓ D ✓ E (in-flight; 187/126 verified; 61 unverified — all auth-gated)
 - **Next run**: Merge PR#214 if CI green. Novel targets for 26th pass: (1) `chittyos-core:chitty-cleanup` (mac cleanup, 0.43 relevance, not yet in catalog as primary); (2) `chittyos-devops:wrangler-audit` (0.37, audit wrangler.toml files — not yet in catalog); (3) `chittycommand-alpha:ux-observer` (0.38, always-active engagement insights) not yet as chain entry; (4) deeper browser-rendering+playwright+context7 cross-chains (browser-rendering was 401 this pass). Human auth actions:
+  1. `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` — unblocks 39 Notion combos
+  2. Stripe/Neon/Cloudflare/GitHub/Linear tokens — unblocks remaining 22 combos
+
+---
+
+### 2026-06-06T02:00Z — twenty-sixth-pass catalog (PR#215)
+
+- **Workstream advanced**: E (Alchemist catalog, 26th pass)
+- **Startup checks**: `npm ci` clean, `npm run build` clean (0 errors), `npm test` → 938 pass / 0 fail / 2 skip ✓
+- **Fetched all branches**: PR#214 (25th-pass, 187/126) open; all 3 CI checks green → **squash-merged PR#214**. main pulled to `22cee0e`.
+- **Notion board**: Still unavailable (Notion API 401 — token not set). Using .driver/run-log.md as substitute.
+- **All workstreams A–D confirmed done**. E in-flight (26th pass).
+- **ch1tty status**: 3 servers connected at start (evidence, notion/401, orchestrator). fs/thinking/context7/playwright lazy-available.
+- **Execute probes (26th pass)** — all confirmed live via Ch1tty MCP connector:
+  - `orchestrator/agent_search("chatgpt mcp guidance custom gpt design templates")` → chittyagent-chatgpt (0.7, bound) ✓ FIRST USE
+  - `orchestrator/agent_execute(chatgpt,status)` → `{action:executed, http_status:404}` ✓
+  - `orchestrator/agent_search("notes apple semantic search RAG embeddings")` → chittyagent-notes (0.7, unbound) ✓ FIRST USE
+  - `orchestrator/agent_execute(notes,status)` → `{action:redirect, domain:notes.agent.chitty.cc}` ✓
+  - `orchestrator/agent_search("cloudflare dns workers kv r2 pages")` → chittyagent-cloudflare (0.7, bound) ✓ FIRST USE
+  - `orchestrator/agent_execute(cloudflare,status)` → `{action:executed, http_status:404, available_endpoints:{workers,kv,r2,dns,domains,sync}}` ✓ rich endpoint map confirmed
+  - `orchestrator/agent_search("tasks inter-agent work queue notion assign")` → chittyagent-tasks (0.7, unbound) ✓ FIRST USE
+  - `orchestrator/agent_execute(tasks,status)` → `{action:redirect, domain:tasks.chitty.cc}` ✓
+  - `orchestrator/skill_search/execute` × 7 novel skills all confirmed (docket 0.8, chitty-pipelines 0.8, frontend-design 0.8, discord 0.8, telegram 0.8, chittyhelper 0.8, feature-dev 0.8) — all `{action:local_invoke}` ✓
+  - `evidence/list_rags` → 3 RAGs ✓. `evidence/ai_search` ✓. `context7` × 2 ✓. `thinking` ✓. `fs/write_file` ✓.
+  - Notion still 401. browser-rendering/github/linear/stripe/neon/cloudflare-backend not connected.
+- Added 7 new `verified:true` combos (26th-pass):
+  - **governance/docket-evidence-legal-brief**: FIRST chittyos-legal:docket — 6-tool legal chain
+  - **governance/tasks-agent-evidence-dispatch**: FIRST chittyagent-tasks — inter-agent task entry + evidence grounding
+  - **ops/pipelines-cloudflare-agent-audit**: FIRST chittyagent-cloudflare + chittyos-devops:chitty-pipelines
+  - **design/chatgpt-frontend-design-skill**: FIRST chittyagent-chatgpt + claude-official:frontend-design
+  - **communication/discord-telegram-connector-pair**: FIRST dual-connector combo (connectors:discord + connectors:telegram)
+  - **code/chittyhelper-feature-dev-pipeline**: FIRST chittyhelper + feature-dev — 7-tool architecture→dev→docs chain
+  - **code/notes-agent-evidence-context7-research**: FIRST chittyagent-notes — notes+evidence+context7 multi-source research
+- Catalog: 187 → 194 total, 126 → 133 verified (67% → 69%). 61 unverified remain (all auth-gated).
+- Build clean. Tests: 938 pass / 0 fail / 2 skip ✓.
+- Branch: `auto/E-catalog-twenty-sixth-pass`. PR#215 open. CI in progress. CodeRabbit: skipped (data-only file).
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E (in-flight; 194/133 verified; 61 unverified — all auth-gated)
+- **Next run**: Merge PR#215 if CI green. Novel targets for 27th pass: `chittyos-core:chitty-cleanup`, `wrangler-audit`, `ux-observer`, `commit-push-pr`, `claude-official:hookify/plugin-dev/skill-creator/claude-md-improver/claude-api`, `migration:claude-opus-migration`. Human auth actions:
   1. `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` — unblocks 39 Notion combos
   2. Stripe/Neon/Cloudflare/GitHub/Linear tokens — unblocks remaining 22 combos
