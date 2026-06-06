@@ -9,7 +9,7 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 - [x] **B** — GitHub MCP migration: `servers.json` `github` entry migrated to hosted remote `https://api.githubcopilot.com/mcp/` with `envHeaders: { "Authorization": "GITHUB_MCP_AUTHORIZATION" }`. Deprecated `@modelcontextprotocol/server-github` removed. ✅ DONE
 - [x] **C** — Focus-profile layer: `focus-profiles.json` (6 profiles: finance, governance, design, code, communication, ops), `src/focus.ts`, full aggregator integration (env `CH1TTY_FOCUS`, per-call `focus` param on `search`/`cast`, `status` reports active focus). Tests in `test/focus.test.ts` + coverage gap tests. ✅ DONE
 - [x] **D** — Scenario testing + simulation: `sim/` harness (`scenarios.ts`, `run.ts`, `fixture-backend.ts`), `test/scenario.test.ts`, `test/simulation.test.ts`, cloudflare-builds ops coverage fixtures + scenarios. ✅ DONE
-- [ ] **E** — Alchemist brainstorm: catalog in `focus-suggestions.json`. **IN PROGRESS** — 39th pass open at PR #232 (336 combos / 219 verified). Main at 324 combos (38th pass merged this run).
+- [ ] **E** — Alchemist brainstorm: catalog in `focus-suggestions.json`. **IN PROGRESS** — 40th pass open at PR #233 (348 combos / 219 verified). Main at 336 combos (39th pass merged this run).
 
 ## Blocker
 
@@ -159,4 +159,37 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 **Next run priority**:
 1. Merge PR #231 (38th pass, 324/219, tests green, CI in progress at run end)
 2. 39th catalog pass: verify `chittycontext` combos when orchestrator binds; add `notes` agent combos when it binds (6 tools); add `autobot` combos for governance + ops profiles (pentad-aware workflows); add `token-ops` and `tasks` agent combos
+3. Fix Notion auth (see blocker above) to mark more combos verified
+
+### 2026-06-06 — Session (auto-driver run)
+
+**Workstream advanced**: E (Alchemist brainstorm — catalog 40th pass)
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass / 0 fail / 2 skipped
+- Found 1 open PR: #232 (39th catalog pass, 336 combos / 219 verified). CI all green (3/3 checks passed).
+- Confirmed workstream state: A ✅ B ✅ C ✅ D ✅ (scenario + simulation tests exist and pass). E in progress.
+- Merged PR #232 (squash) → main now at 336 combos / 219 verified (39th pass)
+- Queried live gateway: 15 servers, 8 connected, 81 tools, 279 active sessions
+- Connected servers: evidence (3), browser-rendering (3), notion (22), context7 (2), thinking (1), fs (14), playwright (23), orchestrator (13)
+- Identified tool coverage gaps: playwright/browser_evaluate, browser_network_requests, browser_run_code_unsafe never cataloged; fs/edit_file, move_file, read_media_file never cataloged; notion/API-patch-page never cataloged; autobot missing from finance + communication; notes missing from ops
+- Created branch `auto/E-catalog-fortieth-pass`; added 12 combos + 12 prompts (2 per profile):
+  - finance: autobot-finance-pentad-cashflow-notion, skill-search-ledger-notion-page-update
+  - governance: agent-search-dispute-resolve-evidence, fs-policy-edit-notion-governance-publish
+  - design: playwright-evaluate-design-notion-audit, playwright-network-requests-fs-har-save
+  - code: fs-read-context7-docs-edit-file, playwright-run-code-unsafe-fs-debug-dump
+  - communication: autobot-comm-skill-search-notion-dispatch, fs-read-media-notion-embed-comm
+  - ops: notes-agent-ops-storage-resolve-chain, fs-search-move-artifact-deploy-ops
+- Tests post-add: 938 pass / 0 fail / 2 skipped
+- Pushed branch, opened PR #233
+
+**Branch / PR**: `auto/E-catalog-fortieth-pass` → PR #233 (https://github.com/chittyos/ch1tty/pull/233)
+
+**Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
+
+**Board state**: 348 combos / 219 verified (40th pass open)
+
+**Next run priority**:
+1. Merge PR #233 (40th pass, 348/219, tests green, CI in progress at run end)
+2. 41st catalog pass: `playwright/browser_console_messages`, `browser_handle_dialog` (design); `fs/read_multiple_files`, `fs/get_file_info`, `fs/directory_tree` (code/ops); notion tools still undercovered (22 live, only 7 in combos)
 3. Fix Notion auth (see blocker above) to mark more combos verified
