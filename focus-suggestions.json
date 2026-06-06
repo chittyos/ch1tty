@@ -1,5 +1,5 @@
 {
-  "_comment": "ch1tty focus-profile suggestions catalog \u2014 348 combos, 219 verified (fortieth pass)",
+  "_comment": "ch1tty focus-profile suggestions catalog \u2014 360 combos, 219 verified (forty-first pass \u2014 2 per profile: playwright/browser_tabs, browser_console_messages, browser_handle_dialog, browser_type, fs/get_file_info, notion/API-retrieve-a-database, API-query-data-source, API-get-block-children, API-retrieve-a-block all first use)",
   "generatedFrom": "38th-pass (orchestrator chittycontext/provision_bind/provision_fork coverage; ship/storage/resolve/autobot/neon agent combos across all 6 profiles)",
   "profiles": {
     "finance": {
@@ -551,6 +551,30 @@
           "accomplishes": "Search skills for the ledger reconciliation workflow, execute it for the current billing period, retrieve the corresponding Notion billing-status page, then patch it with the new reconciliation outcome and timestamp \u2014 closes the loop between ChittyOS ledger state and the finance team\u2019s Notion dashboard.",
           "verified": false,
           "notes": "skill_search + skill_execute confirmed via orchestrator. notion API-retrieve-a-page and API-patch-page available; auth 401."
+        },
+        {
+          "name": "notion-database-finance-query",
+          "chain": [
+            "notion/API-retrieve-a-database",
+            "notion/API-query-data-source",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Retrieve the Notion finance database schema, query it for this period's records (filtered by date/status), reason over the results to identify trends or discrepancies, then write a structured finance summary to disk \u2014 turning a Notion database into a queryable finance analysis pipeline.",
+          "verified": false,
+          "notes": "FIRST use of notion/API-retrieve-a-database and notion/API-query-data-source. Notion auth 401 in remote env; tools confirmed in registry."
+        },
+        {
+          "name": "file-info-finance-doc-metadata",
+          "chain": [
+            "fs/get_file_info",
+            "fs/read_multiple_files",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Inspect metadata (size, age, permissions) of key finance documents, read them in batch, reason over their contents and metadata to flag stale or oversized files, then write a finance document health report \u2014 batch metadata-aware document audit.",
+          "verified": false,
+          "notes": "FIRST use of fs/get_file_info. fs/read_multiple_files and thinking confirmed live. Verified path available in fs allowed dirs."
         }
       ],
       "prompts": [
@@ -677,6 +701,14 @@
         {
           "text": "Find the ledger reconciliation skill, run it for this month, and patch the Notion billing-status page with today\u2019s result",
           "resolves_to": "skill-search-ledger-notion-page-update"
+        },
+        {
+          "text": "Retrieve the Notion finance database schema, query this month's records, and write a summary of outstanding items to a report file",
+          "resolves_to": "notion-database-finance-query"
+        },
+        {
+          "text": "Inspect file metadata for all finance documents in the projects folder, read them in batch, and write a document health report",
+          "resolves_to": "file-info-finance-doc-metadata"
         }
       ]
     },
@@ -1526,6 +1558,31 @@
           "accomplishes": "Search the local policy file tree for the target governance document, make a line-based compliance edit (e.g. update review date or policy scope), then publish the revised policy as a new Notion governance page \u2014 local policy authoring to canonical governance documentation in one chain.",
           "verified": false,
           "notes": "fs/search_files and fs/edit_file confirmed (fs server connected, 14 tools). notion API-post-page live; auth 401."
+        },
+        {
+          "name": "notion-block-children-policy-audit",
+          "chain": [
+            "notion/API-retrieve-a-page",
+            "notion/API-get-block-children",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Retrieve a governance policy Notion page, expand its full block-tree via block-children, cross-reference the policy clauses against the evidence RAG for supporting or conflicting facts, reason over the gap analysis, then write a policy audit report \u2014 deep Notion-to-evidence governance chain.",
+          "verified": false,
+          "notes": "FIRST use of notion/API-get-block-children. API-retrieve-a-page confirmed. evidence/ai_search confirmed. Notion auth 401 in remote env."
+        },
+        {
+          "name": "notion-retrieve-block-evidence-cross-ref",
+          "chain": [
+            "notion/API-retrieve-a-block",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Retrieve a specific Notion block (e.g. a governance decision record), cross-reference its content against the evidence RAG for corroborating or conflicting evidence, reason over the alignment, then post a new Notion governance brief summarising the evidence chain \u2014 block-level governance evidence loop.",
+          "verified": false,
+          "notes": "FIRST use of notion/API-retrieve-a-block. evidence/ai_search confirmed. notion/API-post-page confirmed. Notion auth 401 in remote env."
         }
       ],
       "prompts": [
@@ -1716,6 +1773,14 @@
         {
           "text": "Find the data-retention policy file, update the compliance review date, and publish the revised policy to the governance Notion page",
           "resolves_to": "fs-policy-edit-notion-governance-publish"
+        },
+        {
+          "text": "Retrieve the governance policy page, expand its block tree, cross-reference clauses against evidence, and write a policy audit report",
+          "resolves_to": "notion-block-children-policy-audit"
+        },
+        {
+          "text": "Retrieve the governance decision block in Notion, find supporting evidence, reason over alignment, and post a brief to the governance workspace",
+          "resolves_to": "notion-retrieve-block-evidence-cross-ref"
         }
       ]
     },
@@ -2191,6 +2256,29 @@
           "accomplishes": "Navigate to the target application page, capture the full list of network requests made during load (filtering to API endpoints only), then write the structured request log to a local HAR file for performance analysis and regression comparison \u2014 automated network profiling with local artifact output.",
           "verified": false,
           "notes": "playwright/browser_navigate + browser_network_requests confirmed (playwright 23 tools). fs/write_file confirmed (fs 14 tools)."
+        },
+        {
+          "name": "playwright-tabs-multi-site-design-compare",
+          "chain": [
+            "playwright/browser_tabs",
+            "playwright/browser_navigate",
+            "playwright/browser_snapshot",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Open multiple browser tabs to navigate to competitor or reference sites simultaneously, capture accessibility snapshots of each tab, then reason over the design patterns found across sites to produce a comparative design analysis \u2014 multi-tab design benchmarking.",
+          "verified": false,
+          "notes": "FIRST use of playwright/browser_tabs. browser_navigate and browser_snapshot confirmed live. thinking confirmed."
+        },
+        {
+          "name": "playwright-console-messages-ux-debug",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_console_messages",
+            "fs/write_file"
+          ],
+          "accomplishes": "Navigate to a page under design review, capture all browser console messages (errors, warnings, log output) emitted during page load and interaction, then write the full console log to a debug report file \u2014 automated UX debug capture for design QA.",
+          "verified": false,
+          "notes": "FIRST use of playwright/browser_console_messages. browser_navigate confirmed. fs/write_file confirmed. Console capture requires page load."
         }
       ],
       "prompts": [
@@ -2313,6 +2401,14 @@
         {
           "text": "Load the payment flow in the browser, capture all API network requests, and save the full request log to a local file for perf analysis",
           "resolves_to": "playwright-network-requests-fs-har-save"
+        },
+        {
+          "text": "Open tabs to three reference design sites, take accessibility snapshots from each, and compare their design patterns",
+          "resolves_to": "playwright-tabs-multi-site-design-compare"
+        },
+        {
+          "text": "Navigate to the staging site, capture all browser console messages during load, and write the debug log to a file",
+          "resolves_to": "playwright-console-messages-ux-debug"
         }
       ]
     },
@@ -3191,6 +3287,31 @@
           "accomplishes": "Navigate to the application under test, run an arbitrary Playwright code snippet to inject assertions or extract runtime state (e.g. evaluate form submission, check local storage, measure timing), then dump the diagnostic output to a local debug file \u2014 RCE-class browser automation wired to local artifact persistence for code debugging.",
           "verified": false,
           "notes": "playwright/browser_navigate + browser_run_code_unsafe confirmed (playwright 23 tools). fs/write_file confirmed (fs 14 tools \u2014 code-relevant server)."
+        },
+        {
+          "name": "playwright-browser-type-form-automation-test",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_type",
+            "playwright/browser_snapshot",
+            "fs/write_file"
+          ],
+          "accomplishes": "Navigate to a web form, type test values into fields programmatically, capture an accessibility snapshot of the form after fill, then write the snapshot and result to a test artifact file \u2014 basic form automation and test-capture pipeline.",
+          "verified": false,
+          "notes": "FIRST use of playwright/browser_type. browser_navigate and browser_snapshot confirmed live. fs/write_file confirmed."
+        },
+        {
+          "name": "notion-database-query-context7-docs",
+          "chain": [
+            "notion/API-retrieve-a-database",
+            "notion/API-query-data-source",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "fs/write_file"
+          ],
+          "accomplishes": "Retrieve the Notion tech-stack or library database, query it for in-use packages and versions, resolve each library ID via Context7, fetch the relevant documentation snippets, then write a consolidated library-documentation map to disk \u2014 Notion-as-dependency-registry to live docs pipeline.",
+          "verified": false,
+          "notes": "FIRST use of notion/API-retrieve-a-database and notion/API-query-data-source in code profile. context7 confirmed live. Notion auth 401 in remote env."
         }
       ],
       "prompts": [
@@ -3377,6 +3498,14 @@
         {
           "text": "Navigate to the app under test, run a Playwright snippet to inject form assertions, and write the diagnostic output to a debug file",
           "resolves_to": "playwright-run-code-unsafe-fs-debug-dump"
+        },
+        {
+          "text": "Navigate to the login form, type test credentials, take an accessibility snapshot, and write the result to a test-artifact file",
+          "resolves_to": "playwright-browser-type-form-automation-test"
+        },
+        {
+          "text": "Query the Notion tech-stack database for in-use libraries, fetch their Context7 docs, and write a consolidated library map to disk",
+          "resolves_to": "notion-database-query-context7-docs"
         }
       ]
     },
@@ -3863,6 +3992,30 @@
           "accomplishes": "Read a local image or audio file as base64 (e.g. updated brand logo, recorded voice note, screenshot asset), then embed it in a Notion communication page by appending the media as a block child \u2014 local asset pipeline to Notion comms documentation.",
           "verified": false,
           "notes": "fs/read_media_file confirmed (fs 14 tools). notion/API-patch-block-children live; auth 401 (notion is comm-relevant server)."
+        },
+        {
+          "name": "playwright-handle-dialog-comm-form-capture",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_handle_dialog",
+            "playwright/browser_snapshot",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Navigate to a communication form or survey page that triggers confirmation dialogs, programmatically handle (accept/dismiss) each dialog, capture the post-dialog state as an accessibility snapshot, then post the result as a Notion page for team review \u2014 automated dialog-driven form completion with Notion audit trail.",
+          "verified": false,
+          "notes": "FIRST use of playwright/browser_handle_dialog. browser_navigate and browser_snapshot confirmed. notion/API-post-page confirmed; Notion auth 401 in remote env."
+        },
+        {
+          "name": "notion-block-retrieve-comm-patch",
+          "chain": [
+            "notion/API-retrieve-a-block",
+            "notion/API-get-block-children",
+            "thinking/sequentialthinking",
+            "notion/API-patch-block-children"
+          ],
+          "accomplishes": "Retrieve a specific Notion communication block (e.g. a meeting notes or announcement block), expand its children for full context, reason over what updates or follow-ups are needed, then append new content blocks as children \u2014 targeted block-level Notion communication update.",
+          "verified": false,
+          "notes": "FIRST use of notion/API-retrieve-a-block and notion/API-get-block-children in communication profile. notion/API-patch-block-children confirmed. Notion auth 401 in remote env."
         }
       ],
       "prompts": [
@@ -3985,6 +4138,14 @@
         {
           "text": "Read the updated brand logo from the local assets folder and embed it in the team\u2019s Notion communication page",
           "resolves_to": "fs-read-media-notion-embed-comm"
+        },
+        {
+          "text": "Navigate to the survey form, handle any confirmation dialogs, take a snapshot of the completed state, and post the result to Notion for team review",
+          "resolves_to": "playwright-handle-dialog-comm-form-capture"
+        },
+        {
+          "text": "Retrieve the Notion meeting notes block, expand its children, reason over follow-ups needed, and append update blocks to it",
+          "resolves_to": "notion-block-retrieve-comm-patch"
         }
       ]
     },
@@ -4809,6 +4970,30 @@
           "accomplishes": "Search the local filesystem for the compiled worker artifact in the dist/ output directory, move it to the deploy staging path (promoting the build to deploy-ready status), then trigger the Cloudflare Workers deploy skill to push the artifact to production \u2014 local build artifact to cloud deploy pipeline without leaving the gateway.",
           "verified": false,
           "notes": "fs/search_files + fs/move_file confirmed (fs 14 tools). chitty-deploy skill confirmed via orchestrator/skill_list."
+        },
+        {
+          "name": "file-info-batch-ops-size-audit",
+          "chain": [
+            "fs/get_file_info",
+            "fs/list_directory_with_sizes",
+            "thinking/sequentialthinking",
+            "orchestrator/skill_execute(workflow:machine-management)"
+          ],
+          "accomplishes": "Inspect metadata for a target artifact or config file, get directory-level size breakdown for context, reason over which files are candidates for cleanup or archival, then invoke the machine-management skill to execute the cleanup cycle \u2014 metadata-informed automated ops cleanup.",
+          "verified": false,
+          "notes": "FIRST use of fs/get_file_info in ops profile. list_directory_with_sizes and thinking confirmed live. skill_execute(workflow:machine-management) confirmed."
+        },
+        {
+          "name": "notion-db-ops-task-query-deploy",
+          "chain": [
+            "notion/API-retrieve-a-database",
+            "notion/API-query-data-source",
+            "orchestrator/skill_search",
+            "fs/write_file"
+          ],
+          "accomplishes": "Retrieve the Notion ops task database, query it for open or urgent tasks due this sprint, search orchestrator skills for matching deployment or maintenance skills, then write a prioritised ops action plan to disk \u2014 Notion task board to ops skill dispatch pipeline.",
+          "verified": false,
+          "notes": "FIRST use of notion/API-retrieve-a-database and notion/API-query-data-source in ops profile. skill_search confirmed live. Notion auth 401 in remote env."
         }
       ],
       "prompts": [
@@ -4979,6 +5164,14 @@
         {
           "text": "Find the compiled worker artifact in the dist folder, move it to deploy staging, and trigger the Cloudflare deploy skill",
           "resolves_to": "fs-search-move-artifact-deploy-ops"
+        },
+        {
+          "text": "Inspect metadata for the build artifact, get the full directory size breakdown, reason over cleanup candidates, and run the machine-management cleanup skill",
+          "resolves_to": "file-info-batch-ops-size-audit"
+        },
+        {
+          "text": "Query the Notion ops task database for urgent items this sprint, find matching deployment skills, and write a prioritised ops action plan",
+          "resolves_to": "notion-db-ops-task-query-deploy"
         }
       ]
     }
