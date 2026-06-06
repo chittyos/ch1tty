@@ -398,6 +398,7 @@
 - Build clean. Tests: 938 pass / 0 fail / 2 skip ✓.
 - Branch: `auto/E-catalog-twenty-third-pass`. PR#211 open; CI in progress (CodeQL); subscribed for activity.
 - **Workstream status**: A ✓ B ✓ C ✓ D ✓ E (in-flight; 173/112 verified; 61 unverified — all auth-gated)
-- **Next run**: Merge PR#211 if CI green. For 24th pass consider: (1) `workflow:machine-management` skill (0.36) not yet in catalog; (2) `chittycommand-alpha:data-ingestion` skill (0.36) not yet in catalog; (3) `scrape` agent (0.4, browser automation job queue, bound) not yet in catalog; (4) `chittyagent-neon` (database ops) as entry point for code/ops combos pairing with neon tools. Human auth actions:
+- **PR#211 merged** (e5bce9b → squash-merged 2026-06-05T23:xx). CI all 3 checks green (CodeQL ✓, Analyze-actions ✓, Analyze-javascript-typescript ✓). CodeRabbit P2 + Codex P2 accuracy findings addressed in fix commit (5ee9478) before merge. main now at e5bce9b.
+- **Next run**: For 24th pass consider: (1) `workflow:machine-management` skill (0.36) not yet in catalog; (2) `chittycommand-alpha:data-ingestion` skill (0.36) not yet in catalog; (3) `scrape` agent (0.4, browser automation job queue, bound) not yet in catalog; (4) `chittyagent-neon` (database ops) as entry point for code/ops combos pairing with neon tools. Human auth actions:
   1. `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` — unblocks 39 Notion combos
   2. Stripe/Neon/Cloudflare/GitHub/Linear tokens — unblocks remaining 22 combos
