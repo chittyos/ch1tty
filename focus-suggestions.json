@@ -1,5 +1,5 @@
 {
-  "_comment": "ch1tty focus-profile suggestions catalog \u2014 336 combos, 219 verified (thirty-ninth pass)",
+  "_comment": "ch1tty focus-profile suggestions catalog \u2014 348 combos, 219 verified (fortieth pass)",
   "generatedFrom": "38th-pass (orchestrator chittycontext/provision_bind/provision_fork coverage; ship/storage/resolve/autobot/neon agent combos across all 6 profiles)",
   "profiles": {
     "finance": {
@@ -528,6 +528,29 @@
           "accomplishes": "Score provisioning candidates with TY-VY-RY aspects, fork a financial specialist context from the highest-scoring generalist, then immediately invoke the mercury-finance skill in the new context \u2014 bootstrapping a purpose-built financial agent on demand.",
           "verified": false,
           "notes": "provision_candidates and provision_fork confirmed via orchestrator (13 tools live). mercury-finance skill verified. notion auth 401."
+        },
+        {
+          "name": "autobot-finance-pentad-cashflow-notion",
+          "chain": [
+            "orchestrator/agent_execute(autobot)",
+            "orchestrator/skill_execute(chittyos-finance:mercury-finance)",
+            "notion/API-patch-page"
+          ],
+          "accomplishes": "Autobot runs a pentad-aware finance workflow: evaluates pending cashflow obligations across all registered entities, executes the Mercury finance skill to fetch live balances and transaction summaries, then patches the existing Notion finance tracker page with the updated status \u2014 automated weekly finance review in one chain.",
+          "verified": false,
+          "notes": "autobot confirmed via orchestrator. mercury-finance skill confirmed. notion/API-patch-page live but auth 401."
+        },
+        {
+          "name": "skill-search-ledger-notion-page-update",
+          "chain": [
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "notion/API-retrieve-a-page",
+            "notion/API-patch-page"
+          ],
+          "accomplishes": "Search skills for the ledger reconciliation workflow, execute it for the current billing period, retrieve the corresponding Notion billing-status page, then patch it with the new reconciliation outcome and timestamp \u2014 closes the loop between ChittyOS ledger state and the finance team\u2019s Notion dashboard.",
+          "verified": false,
+          "notes": "skill_search + skill_execute confirmed via orchestrator. notion API-retrieve-a-page and API-patch-page available; auth 401."
         }
       ],
       "prompts": [
@@ -646,6 +669,14 @@
         {
           "text": "Score available provisioning candidates and fork a financial specialist, then run a Mercury finance snapshot",
           "resolves_to": "provision-candidates-financial-specialist-fork"
+        },
+        {
+          "text": "Run autobot to do a pentad-aware cashflow review with Mercury and update our Notion finance tracker with the new status",
+          "resolves_to": "autobot-finance-pentad-cashflow-notion"
+        },
+        {
+          "text": "Find the ledger reconciliation skill, run it for this month, and patch the Notion billing-status page with today\u2019s result",
+          "resolves_to": "skill-search-ledger-notion-page-update"
         }
       ]
     },
@@ -1473,6 +1504,28 @@
           "accomplishes": "Enumerate the full skill roster to locate legal and resolution capabilities, fork a specialist context scoped to legal operations, then route the session through the resolve agent for automated error-triage and severity classification \u2014 turning a generic session into a purpose-built legal-resolution pipeline.",
           "verified": false,
           "notes": "skill_list and provision_fork confirmed via orchestrator. resolve agent unbound but registered."
+        },
+        {
+          "name": "agent-search-dispute-resolve-evidence",
+          "chain": [
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute(resolve)",
+            "evidence/ai_search"
+          ],
+          "accomplishes": "Search the agent registry for the best dispute-handling agent given the governance context, route the resolution request through the resolve agent (error-triage and severity-classification), then surface supporting evidence documents via AI search \u2014 a governed, evidence-backed dispute resolution pipeline.",
+          "verified": false,
+          "notes": "agent_search + agent_execute confirmed via orchestrator. resolve agent unbound. evidence/ai_search connected (3 tools)."
+        },
+        {
+          "name": "fs-policy-edit-notion-governance-publish",
+          "chain": [
+            "fs/search_files",
+            "fs/edit_file",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search the local policy file tree for the target governance document, make a line-based compliance edit (e.g. update review date or policy scope), then publish the revised policy as a new Notion governance page \u2014 local policy authoring to canonical governance documentation in one chain.",
+          "verified": false,
+          "notes": "fs/search_files and fs/edit_file confirmed (fs server connected, 14 tools). notion API-post-page live; auth 401."
         }
       ],
       "prompts": [
@@ -1655,6 +1708,14 @@
         {
           "text": "List all skills, fork a legal specialist context, and route this session to the resolve agent for triage",
           "resolves_to": "skill-list-provision-fork-legal-resolve"
+        },
+        {
+          "text": "Find the best dispute-handling agent for this governance case, run the resolution workflow, and surface the supporting evidence",
+          "resolves_to": "agent-search-dispute-resolve-evidence"
+        },
+        {
+          "text": "Find the data-retention policy file, update the compliance review date, and publish the revised policy to the governance Notion page",
+          "resolves_to": "fs-policy-edit-notion-governance-publish"
         }
       ]
     },
@@ -2108,6 +2169,28 @@
           "accomplishes": "Retrieve a design asset or staging URL from the storage agent (R2/document-storage), screenshot the live preview via Cloudflare Browser Rendering, then hand off to the ship agent for branch management and preflight checks \u2014 a visual-QA-gated design delivery pipeline.",
           "verified": false,
           "notes": "storage agent unbound. browser-rendering confirmed live. ship agent unbound."
+        },
+        {
+          "name": "playwright-evaluate-design-notion-audit",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_evaluate",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Navigate to the staging application, run a JavaScript evaluation to inspect component rendering state (e.g. verify hero section dimensions, check CSS custom properties, assert layout invariants), then post the visual audit results as a new Notion design-board page \u2014 browser-side quality gate feeding directly into design documentation.",
+          "verified": false,
+          "notes": "playwright/browser_navigate + browser_evaluate confirmed (playwright 23 tools). notion API-post-page live; auth 401."
+        },
+        {
+          "name": "playwright-network-requests-fs-har-save",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_network_requests",
+            "fs/write_file"
+          ],
+          "accomplishes": "Navigate to the target application page, capture the full list of network requests made during load (filtering to API endpoints only), then write the structured request log to a local HAR file for performance analysis and regression comparison \u2014 automated network profiling with local artifact output.",
+          "verified": false,
+          "notes": "playwright/browser_navigate + browser_network_requests confirmed (playwright 23 tools). fs/write_file confirmed (fs 14 tools)."
         }
       ],
       "prompts": [
@@ -2222,6 +2305,14 @@
         {
           "text": "Get the staging URL from storage, screenshot the live preview, then hand it off to ship for preflight",
           "resolves_to": "storage-design-asset-screenshot-ship"
+        },
+        {
+          "text": "Navigate to the staging app, run a JavaScript check to verify the hero section renders correctly, and post the visual audit to the Notion design board",
+          "resolves_to": "playwright-evaluate-design-notion-audit"
+        },
+        {
+          "text": "Load the payment flow in the browser, capture all API network requests, and save the full request log to a local file for perf analysis",
+          "resolves_to": "playwright-network-requests-fs-har-save"
         }
       ]
     },
@@ -3077,6 +3168,29 @@
           "accomplishes": "List all agents (filtering for unbound status), register or update metadata for an unbound agent to document its capabilities, then open a GitHub issue tracking the binding work \u2014 turning agent-inventory state into a trackable engineering backlog item.",
           "verified": false,
           "notes": "agent_list and agent_register confirmed via orchestrator. github/create_issue via GitHub MCP (github server not connected in current run; token env-based)."
+        },
+        {
+          "name": "fs-read-context7-docs-edit-file",
+          "chain": [
+            "fs/read_text_file",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "fs/edit_file"
+          ],
+          "accomplishes": "Read the target TypeScript source file, resolve the SDK library ID from the package name, query the library documentation to verify correct API call signatures and types, then apply line-based edits to fix any usage errors \u2014 doc-guided automated code correctness pass.",
+          "verified": false,
+          "notes": "fs/read_text_file + edit_file confirmed (fs 14 tools). context7/resolve-library-id + query-docs confirmed (context7 2 tools)."
+        },
+        {
+          "name": "playwright-run-code-unsafe-fs-debug-dump",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_run_code_unsafe",
+            "fs/write_file"
+          ],
+          "accomplishes": "Navigate to the application under test, run an arbitrary Playwright code snippet to inject assertions or extract runtime state (e.g. evaluate form submission, check local storage, measure timing), then dump the diagnostic output to a local debug file \u2014 RCE-class browser automation wired to local artifact persistence for code debugging.",
+          "verified": false,
+          "notes": "playwright/browser_navigate + browser_run_code_unsafe confirmed (playwright 23 tools). fs/write_file confirmed (fs 14 tools \u2014 code-relevant server)."
         }
       ],
       "prompts": [
@@ -3255,6 +3369,14 @@
         {
           "text": "List all agents, find the unbound ones, register the most relevant, and open a GitHub issue to track the binding",
           "resolves_to": "agent-list-unbound-register-github-issue"
+        },
+        {
+          "text": "Read the TypeScript service file, resolve the SDK library ID, look up the API docs for correct signatures, and edit the file to fix the type errors",
+          "resolves_to": "fs-read-context7-docs-edit-file"
+        },
+        {
+          "text": "Navigate to the app under test, run a Playwright snippet to inject form assertions, and write the diagnostic output to a debug file",
+          "resolves_to": "playwright-run-code-unsafe-fs-debug-dump"
         }
       ]
     },
@@ -3720,6 +3842,27 @@
           "accomplishes": "Enumerate all skills to locate the Discord connector, dispatch a structured notification to a Discord channel, sync the message to Apple Notes for personal record-keeping, then post a canonical summary to Notion \u2014 a multi-channel dispatch and archive pipeline.",
           "verified": false,
           "notes": "skill_list confirmed via orchestrator. discord connector via orchestrator/skill_execute. notes agent unbound. notion auth 401."
+        },
+        {
+          "name": "autobot-comm-skill-search-notion-dispatch",
+          "chain": [
+            "orchestrator/agent_execute(autobot)",
+            "orchestrator/skill_search",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Autobot orchestrates a team communication workflow: evaluates the current session context and pending comms obligations, skill_search finds the right notification channel skill (Discord, iMessage, or email depending on context), then posts a canonical dispatch summary to the Notion communication board \u2014 autobot-driven adaptive comms dispatch.",
+          "verified": false,
+          "notes": "autobot confirmed via orchestrator. skill_search confirmed (orchestrator 13 tools). notion API-post-page live; auth 401 (notion is comm-relevant)."
+        },
+        {
+          "name": "fs-read-media-notion-embed-comm",
+          "chain": [
+            "fs/read_media_file",
+            "notion/API-patch-block-children"
+          ],
+          "accomplishes": "Read a local image or audio file as base64 (e.g. updated brand logo, recorded voice note, screenshot asset), then embed it in a Notion communication page by appending the media as a block child \u2014 local asset pipeline to Notion comms documentation.",
+          "verified": false,
+          "notes": "fs/read_media_file confirmed (fs 14 tools). notion/API-patch-block-children live; auth 401 (notion is comm-relevant server)."
         }
       ],
       "prompts": [
@@ -3834,6 +3977,14 @@
         {
           "text": "Find the Discord connector skill, send a channel update, sync to Apple Notes, and post the record to Notion",
           "resolves_to": "skill-list-discord-notes-notion-dispatch"
+        },
+        {
+          "text": "Have autobot orchestrate the team status round-up, find the right notification skill for this context, and log the dispatch to our Notion comms board",
+          "resolves_to": "autobot-comm-skill-search-notion-dispatch"
+        },
+        {
+          "text": "Read the updated brand logo from the local assets folder and embed it in the team\u2019s Notion communication page",
+          "resolves_to": "fs-read-media-notion-embed-comm"
         }
       ]
     },
@@ -4636,6 +4787,28 @@
           "accomplishes": "List TY-VY-RY scored provisioning candidates for an ops session, run full evaluate to select the best context (development vs. operations support_type), then route the bound session through the storage agent for document-storage or R2 management operations \u2014 operations-context-aware storage dispatch.",
           "verified": false,
           "notes": "provision_candidates and provision_evaluate confirmed via orchestrator (13 live tools). storage agent unbound."
+        },
+        {
+          "name": "notes-agent-ops-storage-resolve-chain",
+          "chain": [
+            "orchestrator/agent_execute(notes)",
+            "orchestrator/agent_execute(storage)",
+            "orchestrator/agent_execute(resolve)"
+          ],
+          "accomplishes": "Notes agent captures the current session\u2019s key observations, decisions, and open questions into persistent memory; storage agent archives the session notes to long-term R2 storage with document classification; resolve agent processes the archived notes into a structured ops action list with priorities and owners \u2014 full ops knowledge loop: observe \u2192 archive \u2192 resolve.",
+          "verified": false,
+          "notes": "notes agent unbound (6 tools declared). storage agent unbound. resolve agent unbound. orchestrator/agent_execute confirmed (13 live tools)."
+        },
+        {
+          "name": "fs-search-move-artifact-deploy-ops",
+          "chain": [
+            "fs/search_files",
+            "fs/move_file",
+            "orchestrator/skill_execute(chittyos-devops:chitty-deploy)"
+          ],
+          "accomplishes": "Search the local filesystem for the compiled worker artifact in the dist/ output directory, move it to the deploy staging path (promoting the build to deploy-ready status), then trigger the Cloudflare Workers deploy skill to push the artifact to production \u2014 local build artifact to cloud deploy pipeline without leaving the gateway.",
+          "verified": false,
+          "notes": "fs/search_files + fs/move_file confirmed (fs 14 tools). chitty-deploy skill confirmed via orchestrator/skill_list."
         }
       ],
       "prompts": [
@@ -4798,6 +4971,14 @@
         {
           "text": "Score provisioning candidates for this ops session, pick the best context, and route to storage for document management",
           "resolves_to": "provision-candidates-ops-eval-storage-route"
+        },
+        {
+          "text": "Use the notes agent to capture this session\u2019s key observations, archive them to long-term storage, and resolve them into an ops action list",
+          "resolves_to": "notes-agent-ops-storage-resolve-chain"
+        },
+        {
+          "text": "Find the compiled worker artifact in the dist folder, move it to deploy staging, and trigger the Cloudflare deploy skill",
+          "resolves_to": "fs-search-move-artifact-deploy-ops"
         }
       ]
     }
