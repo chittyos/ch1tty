@@ -1,6 +1,6 @@
 {
-  "_comment": "ch1tty focus-profile suggestions catalog \u2014 312 combos, 219 verified (thirty-seventh-pass 2026-06-06)",
-  "generatedFrom": "37th-pass (5 new chittycommand-alpha dispute skills: strategy/intake/evidence/tracker/drafting; feature-dev:feature-dev plugin; workflow:machine-management; 12 new combos)",
+  "_comment": "ch1tty focus-profile suggestions catalog \u2014 324 combos, 219 verified (thirty-eighth pass)",
+  "generatedFrom": "38th-pass (orchestrator chittycontext/provision_bind/provision_fork coverage; ship/storage/resolve/autobot/neon agent combos across all 6 profiles)",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools \u2014 now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time \u2014 combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -483,6 +483,28 @@
           "accomplishes": "Pull Mercury banking transaction data, pipe it into structured dispute intake to classify financial discrepancies, and record the intake form in Notion \u2014 entry point for a payment dispute.",
           "verified": true,
           "notes": "mercury-finance confirmed via skill_execute (execution: mcp). dispute-intake confirmed as chittycommand-alpha MCP skill. notion/API-post-page verified."
+        },
+        {
+          "name": "chittycontext-cashflow-planner-notion",
+          "chain": [
+            "orchestrator/chittycontext",
+            "orchestrator/skill_execute(chittycommand-alpha:cashflow-planner)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Restore the active financial session context, run the cashflow-planner skill scoped to the bound entity, and persist the projection to a Notion finance page \u2014 ensuring forecasts are always anchored to the current session's entity scope.",
+          "verified": false,
+          "notes": "orchestrator/chittycontext verified (1 prior combo). cashflow-planner is chittycommand-alpha skill. notion unbound (401 token issue) but tool path confirmed."
+        },
+        {
+          "name": "provision-bind-finance-agent",
+          "chain": [
+            "orchestrator/provision_candidates",
+            "orchestrator/provision_bind",
+            "orchestrator/agent_execute(finance)"
+          ],
+          "accomplishes": "Evaluate provisioning candidates for the current intent, bind the matched financial context, then execute the Finance agent \u2014 the canonical TY-VY-RY provisioning + routing path for multi-entity Mercury banking workflows.",
+          "verified": false,
+          "notes": "provision_candidates + provision_bind chain follows the canonical TY-VY-RY flow documented in orchestrator capabilities. agent_execute(finance) routes to chittyagent-finance (bound)."
         }
       ],
       "prompts": [
@@ -585,6 +607,14 @@
         {
           "text": "Pull intel signals and Mercury balances through finance agent, synthesize a cash-flow analysis with sequential thinking, and save the report",
           "resolves_to": "intel-finance-cash-flow-analysis"
+        },
+        {
+          "text": "Restore my financial session and run cash flow planning for the bound entity",
+          "resolves_to": "chittycontext-cashflow-planner-notion"
+        },
+        {
+          "text": "Find the right provisioning context and bind it before running the finance agent",
+          "resolves_to": "provision-bind-finance-agent"
         }
       ]
     },
@@ -1367,6 +1397,28 @@
           "accomplishes": "Build a high-level dispute strategy, route execution to the bound dispute agent (7 tools) for lifecycle management, apply sequential thinking for structured reasoning, and persist the strategy plan.",
           "verified": true,
           "notes": "dispute-strategy confirmed. dispute agent confirmed bound with 7 tools (agent_list 2026-06-06). thinking/sequentialthinking verified. notion/API-post-page verified."
+        },
+        {
+          "name": "chittycontext-canon-evidence-audit",
+          "chain": [
+            "orchestrator/chittycontext",
+            "orchestrator/agent_execute(canon)",
+            "evidence/ai_search"
+          ],
+          "accomplishes": "Restore the active governance session context, run a canonical compliance check via the Canon agent (URI validation, document lifecycle), then search the evidence corpus for supporting or conflicting facts \u2014 a context-anchored governance audit chain.",
+          "verified": false,
+          "notes": "orchestrator/chittycontext + agent_execute(canon) are orchestrator tools. evidence/ai_search is connected and verified."
+        },
+        {
+          "name": "provision-fork-resolve-subagent",
+          "chain": [
+            "orchestrator/provision_evaluate",
+            "orchestrator/provision_fork",
+            "orchestrator/agent_execute(resolve)"
+          ],
+          "accomplishes": "Evaluate provisioning parameters for the governance context, fork a dedicated error-resolution subagent scope via TY-VY-RY, then execute the Resolve agent for automated error triage \u2014 creating a governed, isolated investigation thread.",
+          "verified": false,
+          "notes": "provision_evaluate + provision_fork is the canonical fork sub-scope flow. resolve is unbound (0 tools) but agent capability confirmed from agent_list."
         }
       ],
       "prompts": [
@@ -1533,6 +1585,14 @@
         {
           "text": "Process a Notion document change event, assign a review task to the appropriate agent via tasks, and validate the document lifecycle with canon",
           "resolves_to": "notion-tasks-canon-governance-review"
+        },
+        {
+          "text": "Restore my governance session and audit canonical compliance with evidence search",
+          "resolves_to": "chittycontext-canon-evidence-audit"
+        },
+        {
+          "text": "Fork an error-resolution subagent from the current governance provisioning context",
+          "resolves_to": "provision-fork-resolve-subagent"
         }
       ]
     },
@@ -1942,6 +2002,28 @@
           "accomplishes": "Collect and organize dispute evidence, take browser screenshots as visual proof, record them as verified facts through the fact-governance lifecycle, and persist to Notion.",
           "verified": true,
           "notes": "dispute-evidence confirmed as chittycommand-alpha MCP skill. playwright/screenshot confirmed via playwright server. fact-governance confirmed via chittyos-legal. notion/API-post-page verified."
+        },
+        {
+          "name": "chittycontext-screenshot-ship",
+          "chain": [
+            "orchestrator/chittycontext",
+            "browser-rendering/get_url_screenshot",
+            "orchestrator/agent_execute(ship)"
+          ],
+          "accomplishes": "Restore the design session context, capture a screenshot of the target URL to document the before-state, then run the Ship lifecycle \u2014 context-anchored design-to-delivery with visual evidence of the shipped state captured mid-flow.",
+          "verified": false,
+          "notes": "orchestrator/chittycontext restores session scope. browser-rendering/get_url_screenshot is connected and verified. ship agent unbound (8 tools declared) but agent capability confirmed."
+        },
+        {
+          "name": "provision-bind-ui-screenshot",
+          "chain": [
+            "orchestrator/provision_bind",
+            "orchestrator/agent_execute(ui)",
+            "browser-rendering/get_url_screenshot"
+          ],
+          "accomplishes": "Bind a UI-focused provisioning context via the orchestrator, invoke the UI agent to generate or update an interface, then capture a screenshot for design review \u2014 a focused, scoped UI generation + visual QA loop in one chain.",
+          "verified": false,
+          "notes": "provision_bind scopes the session to UI context. ui agent unbound but declared. browser-rendering/get_url_screenshot verified connected."
         }
       ],
       "prompts": [
@@ -2040,6 +2122,14 @@
         {
           "text": "Queue a browser scrape job, capture screenshots and render PDFs of target pages with playwright and browser-rendering, and save the design corpus to Notion",
           "resolves_to": "scrape-playwright-browser-design-corpus"
+        },
+        {
+          "text": "Restore my design session, screenshot the current state, then run the ship lifecycle",
+          "resolves_to": "chittycontext-screenshot-ship"
+        },
+        {
+          "text": "Bind a UI context, generate the interface, then screenshot for review",
+          "resolves_to": "provision-bind-ui-screenshot"
         }
       ]
     },
@@ -2850,6 +2940,28 @@
           "accomplishes": "Develop a feature, scaffold it as a Claude Code plugin, register it in the ChittyRegistry directory, and persist the registration details to Notion.",
           "verified": true,
           "notes": "feature-dev and plugin-dev confirmed via skill_execute. registry agent confirmed bound (agent_list 2026-06-06). notion/API-post-page verified."
+        },
+        {
+          "name": "chittycontext-autobot-pr",
+          "chain": [
+            "orchestrator/chittycontext",
+            "orchestrator/agent_execute(autobot)",
+            "github/create_pull_request"
+          ],
+          "accomplishes": "Restore the active code session context, engage Autobot to drive the canonical ChittyOS feature workflow (sovereignty \u2192 plan \u2192 implement \u2192 review \u2192 ship), and create the resulting pull request on GitHub \u2014 a context-anchored fully automated feature delivery.",
+          "verified": false,
+          "notes": "orchestrator/chittycontext restores entity scope. autobot is unbound but declared with sovereignty-cert + pentad-validation capabilities. github/create_pull_request is a known tool shape."
+        },
+        {
+          "name": "chittycontext-neon-agent-sql",
+          "chain": [
+            "orchestrator/chittycontext",
+            "orchestrator/agent_execute(neon)",
+            "neon/run_sql"
+          ],
+          "accomplishes": "Restore the code session context, engage the Neon database agent for schema reasoning and branch selection, then execute a targeted SQL query against the Neon PostgreSQL branch \u2014 context-scoped, agent-assisted data analysis with minimal manual setup.",
+          "verified": false,
+          "notes": "orchestrator/chittycontext restores session. neon agent unbound (0 tools declared) but maps to chittyagent-neon. neon/run_sql is a verified Neon MCP tool path."
         }
       ],
       "prompts": [
@@ -3012,6 +3124,14 @@
         {
           "text": "Run the agents-sdk-migrate skill to migrate a Worker to the Agents SDK, deploy via cloudflare, and verify deployment status",
           "resolves_to": "agents-sdk-migrate-cloudflare-deploy"
+        },
+        {
+          "text": "Restore my code session and have autobot drive the full feature-to-PR workflow",
+          "resolves_to": "chittycontext-autobot-pr"
+        },
+        {
+          "text": "Restore my code session and run a Neon database query via the agent",
+          "resolves_to": "chittycontext-neon-agent-sql"
         }
       ]
     },
@@ -3431,6 +3551,28 @@
           "accomplishes": "Draft a dispute letter, publish a summary to Discord for team visibility, and archive the full draft in Notion.",
           "verified": true,
           "notes": "dispute-drafting confirmed as chittycommand-alpha MCP skill. connectors:discord confirmed via skill_execute returning local_invoke. notion/API-post-page verified."
+        },
+        {
+          "name": "chittycontext-notes-notion-sync",
+          "chain": [
+            "orchestrator/chittycontext",
+            "orchestrator/agent_execute(notes)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Restore the active communication session context, query Apple Notes via the Notes agent (semantic RAG search), then persist the retrieved notes as structured Notion pages \u2014 a context-anchored cross-app knowledge sync that bridges personal notes with team workspace.",
+          "verified": false,
+          "notes": "orchestrator/chittycontext restores session. notes agent unbound (6 tools declared). notion/API-post-page path confirmed; notion auth 401 issue known."
+        },
+        {
+          "name": "provision-bind-notes-notion-search",
+          "chain": [
+            "orchestrator/provision_bind",
+            "orchestrator/agent_execute(notes)",
+            "notion/API-post-search"
+          ],
+          "accomplishes": "Bind a communication-focused provisioning context, invoke the Notes agent to retrieve semantically relevant Apple Notes, then cross-reference matching Notion workspace content \u2014 surfacing gaps between personal notes and team-facing workspace state.",
+          "verified": false,
+          "notes": "provision_bind scopes to comms context. notes agent unbound (6 tools). notion/API-post-search is a valid Notion MCP search endpoint (confirmed from existing combos)."
         }
       ],
       "prompts": [
@@ -3529,6 +3671,14 @@
         {
           "text": "Query the agent work queue via tasks, gather operational intel, and publish a team ops brief to Notion",
           "resolves_to": "tasks-intel-notion-team-ops-brief"
+        },
+        {
+          "text": "Restore my comms session and sync recent Apple Notes into Notion",
+          "resolves_to": "chittycontext-notes-notion-sync"
+        },
+        {
+          "text": "Bind a comms context and compare Apple Notes against Notion workspace",
+          "resolves_to": "provision-bind-notes-notion-search"
         }
       ]
     },
@@ -4287,6 +4437,28 @@
           "accomplishes": "Run machine management to surface storage sprawl, audit wrangler.toml files for stale bindings, run compliance scaffold/audit, and persist the full maintenance report to Notion.",
           "verified": true,
           "notes": "workflow:machine-management confirmed via skill_list. wrangler-audit and chittyos-compliance confirmed via chittyos-devops plugin. notion/API-post-page verified."
+        },
+        {
+          "name": "chittycontext-ship-resolve-errors",
+          "chain": [
+            "orchestrator/chittycontext",
+            "orchestrator/agent_execute(ship)",
+            "orchestrator/agent_execute(resolve)"
+          ],
+          "accomplishes": "Restore the ops session context, run the Ship wrap-up lifecycle (preflight checks, context checkpoint, branch cleanup), then pass any detected errors to the Resolve agent for automated triage \u2014 a context-anchored ops closure that self-heals before session end.",
+          "verified": false,
+          "notes": "orchestrator/chittycontext restores session. ship agent unbound (8 tools: preflight, brainstorm, checkpoint, etc). resolve agent unbound (error-triage, severity-classification, auto-resolution capabilities)."
+        },
+        {
+          "name": "provision-fork-storage-canon",
+          "chain": [
+            "orchestrator/provision_fork",
+            "orchestrator/agent_execute(storage)",
+            "orchestrator/agent_execute(canon)"
+          ],
+          "accomplishes": "Fork a storage-focused provisioning subagent scope via TY-VY-RY, invoke the Storage agent for content-addressed document operations (R2 buckets, legal holds, AI classification), then canonicalize via Canon agent \u2014 a governed document storage pipeline with URI validation and lifecycle tracking.",
+          "verified": false,
+          "notes": "provision_fork forks a sub-scope from the current context. storage agent unbound (document-storage, r2-management, legal-holds, classification capabilities). canon agent is bound."
         }
       ],
       "prompts": [
@@ -4433,6 +4605,14 @@
         {
           "text": "Checkpoint session context via orchestrator, run ship preflight checks, and provision a clean fork branch",
           "resolves_to": "chittycontext-ship-branch-preflight"
+        },
+        {
+          "text": "Restore my ops session, run ship lifecycle, then auto-resolve any errors",
+          "resolves_to": "chittycontext-ship-resolve-errors"
+        },
+        {
+          "text": "Fork a storage subagent scope and canonicalize the ingested documents",
+          "resolves_to": "provision-fork-storage-canon"
         }
       ]
     }
