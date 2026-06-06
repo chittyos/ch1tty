@@ -263,3 +263,38 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 1. Merge PR #236 (42nd pass, 372/219, tests green, CI in progress at run end)
 2. 43rd catalog pass: `notion/API-create-a-database`, `notion/API-update-a-database`, `notion/API-create-a-page`; `playwright/browser_wait_for`, `playwright/browser_pdf`; `orchestrator/provision_evaluate` in design + communication profiles
 3. Fix Notion auth (see blocker above) to mark more combos verified
+
+### 2026-06-06T20:10Z — Session (auto-driver run)
+
+**Workstream advanced**: E (Alchemist brainstorm — catalog 43rd pass)
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass / 0 fail / 2 skipped
+- Found 2 open PRs: #235 (driver log update, 3/3 CI green), #236 (42nd catalog pass, 3/3 CI green)
+- Merged PR #235 (squash) → main
+- Merged PR #236 (squash) → main now at **372 combos / 219 verified** (42nd pass)
+- Pulled main; confirmed workstream state: A ✅ B ✅ C ✅ D ✅ E in-progress
+- Live gateway: 15 servers, 8 connected (notion 22 tools, playwright 23, fs 14, orchestrator 13), 288 sessions
+- Identified 5 first-use tool targets for 43rd pass via cast probes:
+  - `notion/API-create-a-data-source` (score 0.59 as alternative in DB query)
+  - `notion/API-list-data-source-templates` (score 0.7 primary)
+  - `playwright/browser_wait_for` (score 0.43 as alternative)
+  - `playwright/browser_drop` (score 0.5 primary)
+  - `fs/list_allowed_directories` (appeared in cast alternatives)
+  - `orchestrator/provision_evaluate` first use in design + communication profiles
+- Analyzed coverage: provision_evaluate was in finance (2), governance (4), ops (5) but NOT design or communication
+- Created branch `auto/E-catalog-forty-third-pass`; added 12 combos + 12 prompts (2 per profile)
+- 1 test failure caught: `playwright-drop-comm-file-attachment` chain lacked comm-relevant server → fixed by appending `notion/API-post-page`
+- Tests after fix: 938 pass / 0 fail / 2 skipped ✓
+- Pushed branch, opened PR #237
+
+**Branch / PR**: `auto/E-catalog-forty-third-pass` → PR #237 (https://github.com/chittyos/ch1tty/pull/237)
+
+**Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
+
+**Board state**: 384 combos / 219 verified (43rd pass open, PR #237)
+
+**Next run priority**:
+1. Merge PR #237 if CI green + no blocking review findings
+2. 44th catalog pass: `notion/API-update-a-database` (uncataloged), `playwright/browser_pdf` (uncataloged — score 0.5 to browser_drop this pass, try more specific intent), `fs/move_directory` (13/14 fs tools now cataloged; #14 likely move_directory), `orchestrator/agent_execute(chatgpt)` (bound agent, never cataloged), `cloudflare-builds` gaps in finance/governance/design/communication profiles
+3. Fix Notion auth (see blocker above) to verify the ~61 unverified combos
