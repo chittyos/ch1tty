@@ -541,7 +541,7 @@
   - All 13 orchestrator tools confirmed present.
   - `provision_status` and `agent_register` were the only two orchestrator tools not yet in the catalog — both introduced this pass.
   - Notion returning 401. All other lazy servers not activated.
-- **10 new combos added** — 2 first-ever orchestrator tools introduced:
+- **10 new combos added (+7 newly verified, 143 → 150)** — 2 first-ever orchestrator tools introduced:
   - `orchestrator/provision_status` — FIRST USE (4 combos: finance, governance, code, communication)
   - `orchestrator/agent_register` — FIRST USE (4 combos: governance, design, code, ops)
   - Novel patterns: evaluate→fork→execute (no bind); provision_status guard; ops identity-drift detection; alchemical bootstrap (agent_register→skill_register→provision_evaluate)
