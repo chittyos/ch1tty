@@ -835,3 +835,20 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 1. Merge PR #251 (57th pass, 556/243, rebased onto main) then merge PR #252 (58th pass, 568/246)
 2. 59th catalog pass: extend `comm-ten-step-broadcast-visual-publish` to 11 steps (add `evidence/ingest_document` or `fs/read_file` re-entry); `linear/update_project` in finance+governance+code+communication (currently only design+ops); `neon/reset_from_parent` in finance+communication+design (currently only governance+ops+code)
 3. Fix Notion auth to verify the ~322 unverified combos: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`
+
+---
+
+### 2026-06-07T11:30Z — PR merge note
+
+**PR #252 merged** — 57th + 58th passes combined (PR #251 was closed by user; changes folded into #252).
+
+Main is now at `c8cc1c7`: **568 combos / 246 verified**, max chain = **10** in all 6 profiles.
+
+**Current board state**:
+- A ✅ B ✅ C ✅ D ✅ E in-progress
+- Catalog: 568 combos / 246 verified / max chain = 10
+- Blocker: Notion auth 401 — ~322 unverified combos pending auth fix
+
+**Next run priority**:
+1. 59th catalog pass: `linear/update_project` in finance + governance + code + communication (only design + ops so far); `neon/reset_from_parent` in finance + communication + design (only governance + ops + code so far); target first 11-step chain
+2. Fix Notion auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`
