@@ -426,7 +426,7 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 - All 23 playwright tools now cataloged across relevant profiles
 - Pushed branch, opened PR #241
 
-**Branch / PR**: `auto/E-catalog-forty-seventh-pass` → PR #241 (https://github.com/chittyos/ch1tty/pull/241)
+**Branch / PR**: `auto/E-catalog-forty-seventh-pass` → PR #241 (https://github.com/chittyos/ch1tty/pull/241) **MERGED** ✓
 
 **Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
 
