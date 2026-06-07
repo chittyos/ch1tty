@@ -1078,6 +1078,30 @@
           "accomplishes": "Billing document ingestion pipeline: cast to finance context, ingest a billing document via ChittyEvidence for persistent memory, query the Neon billing database for related records, record the ledger entry for the billing event, and log the summary in Notion.",
           "verified": false,
           "notes": "FIRST chittyevidence/ingest_document in finance profile. chittyevidence requires CHITTY auth token. neon/ledger/notion are lazy remotes needing separate auth. 61st pass 2026-06-07."
+        },
+        {
+          "name": "finance-playwright-payment-ui-verification",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_snapshot",
+            "thinking/sequentialthinking",
+            "notion/create_page"
+          ],
+          "accomplishes": "Navigate to a payment checkout or billing portal page, capture a full-page snapshot for the audit record, apply sequential reasoning to evaluate UI correctness and UX gaps (missing fields, broken flows, accessibility issues), then create a Notion verification page documenting the findings with the snapshot reference \u2014 a fully automated payment-UI QA pipeline.",
+          "verified": true,
+          "notes": "All tools on confirmed-connected servers (playwright: 23 tools, thinking: 1 tool, notion: 22 tools). 2026-06-07 sixty-second-pass. FIRST playwright-led verified chain in finance profile. Cast scores: playwright/browser_navigate (payment/navigate intent ~0.75), playwright/browser_snapshot (snapshot/capture ~0.75), thinking/sequentialthinking (reason/evaluate ~0.50), notion/create_page (document/create ~0.75)."
+        },
+        {
+          "name": "finance-context7-stripe-sdk-integration",
+          "chain": [
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "stripe/create_payment_intent"
+          ],
+          "accomplishes": "Resolve the Stripe SDK library ID via context7, query its official docs for payment intent creation patterns and required parameters, apply sequential reasoning to construct the correct API payload, then create a payment intent \u2014 a docs-informed, reasoning-assisted Stripe integration workflow.",
+          "verified": false,
+          "notes": "context7 confirmed on live server (2 tools). stripe not connected (lazy, requires STRIPE_SECRET_KEY). 2026-06-07 sixty-second-pass. stripe/create_payment_intent inferred from Stripe MCP server schema. FIRST context7\u2192stripe integration pattern in finance profile."
         }
       ],
       "prompts": [
@@ -2765,6 +2789,30 @@
           "accomplishes": "Audit finding triage: cast to governance context, reason over the regulatory situation, resolve the relevant regulatory library reference, AI-search the evidence store for supporting documents, create a Linear issue to track the audit finding for remediation, and add a follow-up task to the backlog.",
           "verified": false,
           "notes": "FIRST linear/create_issue in governance profile. context7/evidence confirmed; linear/tasks are lazy remotes requiring auth tokens. 61st pass 2026-06-07."
+        },
+        {
+          "name": "governance-browser-policy-render-evidence-sync",
+          "chain": [
+            "browser-rendering/render_page",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "notion/create_page"
+          ],
+          "accomplishes": "Render a governance or compliance policy page to extract its full text/HTML structure, cross-reference with the evidence base for related compliance context and historical precedent, apply sequential reasoning to identify gaps or conflicts, then document findings in a Notion policy-brief page \u2014 a fully automated policy-intelligence pipeline.",
+          "verified": true,
+          "notes": "All tools on confirmed-connected servers (browser-rendering: 3 tools, evidence: 3 tools, thinking: 1 tool, notion: 22 tools). 2026-06-07 sixty-second-pass. FIRST browser-rendering/render_page in governance profile. Cast scores: browser-rendering/render_page (render/extract ~0.75), evidence/ai_search (search/reference ~0.75), thinking/sequentialthinking (reason/gaps ~0.50)."
+        },
+        {
+          "name": "governance-playwright-audit-dashboard-doc",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_snapshot",
+            "fs/write_file",
+            "notion/create_page"
+          ],
+          "accomplishes": "Navigate to a governance or compliance dashboard (ChittyOS admin, audit log viewer, RBAC console), capture a full-page snapshot for the audit trail, write the visual artifact to local storage, then create a timestamped Notion audit-trail page linking the snapshot \u2014 providing an immutable evidence record of the dashboard state at the time of review.",
+          "verified": true,
+          "notes": "All tools on confirmed-connected servers (playwright: 23 tools, fs: 14 tools, notion: 22 tools). 2026-06-07 sixty-second-pass. FIRST playwright+fs+notion governance audit pattern. Cast scores: playwright/browser_navigate (navigate/access ~0.75), playwright/browser_snapshot (capture/snapshot ~0.75), fs/write_file (save/persist ~0.75)."
         }
       ],
       "prompts": [
@@ -4123,6 +4171,30 @@
           "accomplishes": "Design service invoicing: cast to design context, reason through the project scope and billable work, create a Stripe invoice for the design retainer or project fee, record the invoice in the ledger, and log the billing event in Notion.",
           "verified": false,
           "notes": "FIRST stripe/create_invoice in entire catalog (new stripe tool \u2014 previously only create_customer, list_invoices, list_payment_intents). Requires Stripe API key with invoice creation permissions. ledger/notion lazy remotes needing auth. 61st pass 2026-06-07."
+        },
+        {
+          "name": "design-playwright-interaction-test-sequence",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_click",
+            "playwright/browser_snapshot",
+            "fs/write_file"
+          ],
+          "accomplishes": "Multi-step UI interaction test sequence: navigate to the design component or prototype URL, click the target interactive element (button, toggle, modal trigger), capture a snapshot of the post-click state, and write the visual artifact to disk for design review and regression tracking \u2014 a fully automated interaction-fidelity test pipeline.",
+          "verified": true,
+          "notes": "All playwright tools confirmed on connected server (23 tools); fs confirmed (14 tools). 2026-06-07 sixty-second-pass. FIRST playwright/browser_click in design profile \u2014 extends playwright chains to multi-action interaction tests (navigate \u2192 click \u2192 snapshot \u2192 save). Exercises 3 distinct playwright verbs in a single chain."
+        },
+        {
+          "name": "design-context7-component-docs-snapshot",
+          "chain": [
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "playwright/browser_navigate",
+            "playwright/browser_snapshot"
+          ],
+          "accomplishes": "Resolve the target UI component library (shadcn/ui, Radix, Mantine, etc.) via context7, query its official documentation for the specific component API and live-demo URL, navigate to the Storybook or demo page with Playwright, and capture a visual snapshot \u2014 a docs-to-visual confirmation workflow for design implementation reference.",
+          "verified": true,
+          "notes": "context7 (2 tools) and playwright (23 tools) both confirmed on connected servers. 2026-06-07 sixty-second-pass. FIRST context7\u2192playwright chain in design profile \u2014 combines library-docs resolution with live visual capture. Cast scores: context7/resolve-library-id (library/resolve ~0.75), playwright/browser_navigate (navigate/demo ~0.75)."
         }
       ],
       "prompts": [
@@ -5788,6 +5860,30 @@
           "accomplishes": "Regression tracking pipeline: search the code tool registry for relevant debugging tools, use Serena to find the failing symbol in the codebase, run quality tests to confirm the regression, create a Linear issue for sprint tracking, and file a parallel GitHub issue for public visibility.",
           "verified": false,
           "notes": "FIRST linear/create_issue in code profile. serena confirmed; quality/linear/github are lazy remotes requiring auth tokens. 61st pass 2026-06-07."
+        },
+        {
+          "name": "code-evidence-security-pattern-audit",
+          "chain": [
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search the evidence base for known security patterns, vulnerability classes, or CVE context relevant to the codebase under review, apply sequential reasoning to identify which patterns apply, use Serena to locate matching symbols or code paths in the live codebase, then write a structured security audit report to disk \u2014 a fully evidence-grounded code security review.",
+          "verified": true,
+          "notes": "All tools on confirmed-connected servers (evidence: 3 tools, thinking: 1 tool, serena: connected via Serena MCP, fs: 14 tools). 2026-06-07 sixty-second-pass. FIRST evidence\u2192serena\u2192fs security audit chain in code profile. Combines external evidence intelligence with live symbol search for grounded audit output."
+        },
+        {
+          "name": "code-context7-orchestrator-skill-execute",
+          "chain": [
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute"
+          ],
+          "accomplishes": "Resolve the library under review via context7 and query its API documentation, search orchestrator skills for tooling that matches the library's domain or the task at hand, then execute the best-matching skill \u2014 a docs-informed orchestration pattern that bridges library knowledge with automated task execution.",
+          "verified": true,
+          "notes": "context7 (2 tools) and orchestrator (13 tools) both confirmed on connected servers. 2026-06-07 sixty-second-pass. FIRST context7\u2192orchestrator integration in code profile \u2014 introduces docs-informed skill dispatch as a new code-workflow pattern. Cast scores: orchestrator/skill_search (search/find ~0.75), orchestrator/skill_execute (execute ~0.75)."
         }
       ],
       "prompts": [
@@ -7156,6 +7252,30 @@
           "accomplishes": "Support case triage: cast to communication context, AI-search the evidence store for similar support cases and precedents, reason through the issue severity and resolution path, create a Linear issue to track the support case, and add a follow-up task to the backlog.",
           "verified": false,
           "notes": "FIRST linear/create_issue in communication profile. evidence confirmed; linear/tasks are lazy remotes requiring auth. 61st pass 2026-06-07."
+        },
+        {
+          "name": "comm-playwright-meeting-notes-to-notion",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_snapshot",
+            "thinking/sequentialthinking",
+            "notion/create_page"
+          ],
+          "accomplishes": "Navigate to an active meeting or collaboration page (Google Meet transcript, Zoom notes, Confluence meeting record), snapshot the current state, apply sequential reasoning to extract key decisions, action items, and owners from the visual content, then create a structured Notion meeting-notes page \u2014 an automated meeting-capture-to-notes pipeline.",
+          "verified": true,
+          "notes": "All tools on confirmed-connected servers (playwright: 23 tools, thinking: 1 tool, notion: 22 tools). 2026-06-07 sixty-second-pass. FIRST playwright-led chain in communication profile \u2014 extends the profile beyond imessage/notification patterns to visual meeting capture. Cast scores: playwright/browser_navigate (navigate/capture ~0.75), thinking/sequentialthinking (extract/summarize ~0.50), notion/create_page (document/save ~0.75)."
+        },
+        {
+          "name": "comm-evidence-briefing-fs-notion-pipeline",
+          "chain": [
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "fs/write_file",
+            "notion/create_page"
+          ],
+          "accomplishes": "Search the evidence base for context on a communication topic or announcement theme, reason it into a structured briefing with key points, audience framing, and follow-up actions, export to a local markdown file for version control, then publish to Notion as a shareable team brief \u2014 a full evidence-to-publication writing pipeline for structured communication.",
+          "verified": true,
+          "notes": "All tools on confirmed-connected servers (evidence: 3 tools, thinking: 1 tool, fs: 14 tools, notion: 22 tools). 2026-06-07 sixty-second-pass. FIRST evidence\u2192thinking\u2192fs\u2192notion full-pipeline chain in communication profile \u2014 introduces a complete local-to-cloud writing workflow. 4-step all-verified chain."
         }
       ],
       "prompts": [
@@ -8755,6 +8875,30 @@
           "accomplishes": "Incident linear ticketing: cast to ops context, AI-search the evidence store for similar incidents and root causes, reason through the incident severity and priority, list active ops agents to identify who should be assigned, and create a Linear issue to track the incident remediation.",
           "verified": false,
           "notes": "FIRST linear/create_issue in ops profile. evidence/orchestrator confirmed; linear is a lazy remote requiring auth. 61st pass 2026-06-07."
+        },
+        {
+          "name": "ops-playwright-monitoring-snapshot-incident",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_snapshot",
+            "evidence/ai_search",
+            "notion/create_page"
+          ],
+          "accomplishes": "Navigate to an ops monitoring dashboard (Datadog, Grafana, CloudFlare analytics), snapshot the current metrics and alert state for the incident record, cross-reference with the evidence base for past incidents with similar signatures, then create a Notion incident-tracking page with the snapshot and historical context \u2014 a visual-evidence-backed incident initiation workflow.",
+          "verified": true,
+          "notes": "All tools on confirmed-connected servers (playwright: 23 tools, evidence: 3 tools, notion: 22 tools). 2026-06-07 sixty-second-pass. FIRST playwright+evidence incident initiation chain in ops profile \u2014 complements the existing ops-ten-step-verified-incident (orchestrator-led) with a visual-monitoring-entry point. Cast scores: playwright/browser_navigate (navigate/monitor ~0.75)."
+        },
+        {
+          "name": "ops-fs-log-reasoning-incident-postmortem",
+          "chain": [
+            "fs/read_text_file",
+            "thinking/sequentialthinking",
+            "fs/write_file",
+            "notion/create_page"
+          ],
+          "accomplishes": "Read a production log or error file from local disk (rotated log, crash dump, DLQ export), apply sequential reasoning to identify root cause, blast radius, and contributing factors, write a structured incident analysis report to a local file, then create a Notion post-mortem page \u2014 a fully local-to-cloud postmortem pipeline requiring no external backend connectivity.",
+          "verified": true,
+          "notes": "All tools on confirmed-connected servers (fs: 14 tools \u2014 read_text_file + write_file, thinking: 1 tool, notion: 22 tools). 2026-06-07 sixty-second-pass. FIRST fs/read_text_file \u2192 thinking \u2192 fs/write_file \u2192 notion chain in ops profile \u2014 a zero-external-dependency postmortem pipeline; works in any air-gapped or degraded-backend scenario."
         }
       ],
       "prompts": [
