@@ -1,5 +1,5 @@
 {
-  "_comment": "sixty-fifth pass / 652 combos / 303 verified",
+  "_comment": "sixty-sixth pass / 664 combos / 315 verified \u2014 FIRST 16-step chains across ALL 6 profiles",
   "generatedFrom": "sixty-fifth pass / 652 combos / 303 verified \u2014 2026-06-07",
   "profiles": {
     "finance": {
@@ -1245,6 +1245,43 @@
           "accomplishes": "Compact 5-step billing chain: resolve invoice intent with cast, search for the best billing agent, execute it, then search invoice evidence in AutoRAG and write a Notion summary. A focused billing workflow that doesn't require local file output.",
           "verified": true,
           "notes": "FIRST pure orchestrator+evidence+notion 5-step chain in finance. No stripe required \u2014 focuses on the orchestrator agent layer for billing automation. All tools verified-connected."
+        },
+        {
+          "name": "finance-sixteen-step-billing-archive-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "notion/API-retrieve-a-page"
+          ],
+          "accomplishes": "Extends the 15-step billing chain by adding a Notion page retrieval as the final verification step \u2014 confirming the created+updated page exists before archiving. Full 16-step pipeline: cast \u2192 agent discovery + execution \u2192 skill discovery + execution \u2192 evidence \u2192 library docs \u2192 reasoning \u2192 symbol audit \u2192 screenshot \u2192 local report \u2192 Notion page \u2192 block update \u2192 page retrieve.",
+          "verified": true,
+          "notes": "FIRST 16-step chain in finance profile; max rises 15\u219216. NEW CATALOG RECORD for finance. Adds notion/API-retrieve-a-page as step 16 to verify the Notion page created in step 14. All tools on confirmed-connected servers: ch1tty, orchestrator, evidence, context7, thinking/sequentialthinking, serena, playwright, fs, notion."
+        },
+        {
+          "name": "finance-provision-fork-specialist",
+          "chain": [
+            "orchestrator/provision_evaluate",
+            "orchestrator/provision_fork",
+            "orchestrator/skill_search",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Provision-driven finance specialist pipeline: evaluate the current session for a specialist fork candidate, fork to a finance-focused context, search for matching financial skills, reason about the best approach, and write a specialist brief. Models the TY-VY-RY provisioning lifecycle for finance.",
+          "verified": true,
+          "notes": "FIRST chain in finance profile to open with provision_evaluate \u2192 provision_fork. Novel pattern: uses the provision lifecycle to drive finance skill discovery rather than direct agent_search. Tools on confirmed-connected servers: orchestrator, thinking, fs."
         }
       ],
       "prompts": [
@@ -1543,6 +1580,14 @@
         {
           "text": "Run a 12-step billing audit with Notion status update using cast, orchestrator skills, evidence RAG, SDK docs, sequential thinking, serena symbols, playwright screenshot, and publish to Notion with block update",
           "resolves_to": "finance-twelve-step-billing-full-chain"
+        },
+        {
+          "text": "Run the complete 16-step billing audit pipeline ending with Notion page verification",
+          "resolves_to": "finance-sixteen-step-billing-archive-chain"
+        },
+        {
+          "text": "Fork a finance specialist context and discover the best billing skills for this session",
+          "resolves_to": "finance-provision-fork-specialist"
         }
       ]
     },
@@ -3039,6 +3084,43 @@
           "accomplishes": "Run a SQL query against a governance or compliance schema to pull current policy state (e.g. open violations, unresolved controls), cross-reference results against the evidence RAG store for historical context and precedent, apply sequential reasoning to synthesize a policy gap analysis, then update a Notion governance dashboard block in-place with the current compliance status \u2014 a 4-step data-to-dashboard policy update.",
           "verified": true,
           "notes": "All tools on confirmed-connected backends: neon (local, confirmed available), evidence (3 tools), thinking (1 tool), notion (22 tools). 2026-06-07 sixty-fourth-pass."
+        },
+        {
+          "name": "governance-sixteen-step-policy-archive-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page"
+          ],
+          "accomplishes": "Extends the 15-step policy chain with a final rendered-page archive step \u2014 captures a browser-rendered version of the Notion page for a durable compliance record. Full 16-step governance pipeline: cast \u2192 agent \u2192 skill \u2192 evidence \u2192 library docs \u2192 reasoning \u2192 symbol audit \u2192 screenshot \u2192 local report \u2192 Notion page \u2192 block update \u2192 render archive.",
+          "verified": true,
+          "notes": "FIRST 16-step chain in governance profile; max rises 15\u219216. Adds browser-rendering/render_page as step 16 to create a rendered snapshot of the final Notion governance page. All tools on confirmed-connected servers: ch1tty, orchestrator, evidence, context7, thinking/sequentialthinking, serena, playwright, fs, notion, browser-rendering."
+        },
+        {
+          "name": "governance-notion-search-retrieve-patch-cycle",
+          "chain": [
+            "notion/API-post-search",
+            "notion/API-retrieve-a-page",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "notion/API-patch-page"
+          ],
+          "accomplishes": "Notion-native governance review cycle: search the workspace for relevant pages, retrieve the target governance page in full, cross-reference with evidence AI search, reason about compliance gaps, then patch the page with updated status. Full search \u2192 read \u2192 enrich \u2192 reason \u2192 write cycle entirely within Notion + evidence.",
+          "verified": true,
+          "notes": "FIRST use of notion/API-patch-page in governance. FIRST search\u2192retrieve\u2192patch Notion cycle. FIRST combo to use notion/API-post-search + notion/API-retrieve-a-page + notion/API-patch-page together. All tools on confirmed-connected servers: notion, evidence, thinking."
         }
       ],
       "prompts": [
@@ -3401,6 +3483,14 @@
         {
           "text": "Run the full 15-step governance policy pipeline: cast intent, execute agent + skill via orchestrator, enumerate evidence, resolve library docs, reason through policy gaps, scan governance symbols, screenshot dashboard, save audit, publish to Notion, and update the compliance-status block",
           "resolves_to": "governance-fifteen-step-policy-chain"
+        },
+        {
+          "text": "Run the full 16-step governance policy pipeline and render a browser archive of the Notion output",
+          "resolves_to": "governance-sixteen-step-policy-archive-chain"
+        },
+        {
+          "text": "Search Notion for governance pages, retrieve and cross-reference with evidence, then patch with compliance status",
+          "resolves_to": "governance-notion-search-retrieve-patch-cycle"
         }
       ]
     },
@@ -4537,6 +4627,43 @@
           "accomplishes": "Resolve UX testing intent with cast, fill a UI form element with design-test data, click the submit or action button, capture a screenshot of the resulting state, and archive the interaction test evidence in Notion. A compact 5-step UX interaction-test chain.",
           "verified": true,
           "notes": "FIRST playwright interaction-test chain (fill\u2192click\u2192screenshot) in design profile. Uses playwright/browser_fill and playwright/browser_click together \u2014 a new combination in the design catalog. All tools verified-connected."
+        },
+        {
+          "name": "design-sixteen-step-ux-archive-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page",
+            "notion/API-retrieve-a-page"
+          ],
+          "accomplishes": "Extends the 15-step UX chain by adding Notion page retrieval as the final verification step \u2014 confirms the rendered page was persisted correctly. Full 16-step design pipeline: cast \u2192 agent + skill discovery \u2192 evidence \u2192 library docs \u2192 reasoning \u2192 symbol audit \u2192 screenshot \u2192 local report \u2192 Notion create \u2192 block update \u2192 browser render \u2192 page retrieve.",
+          "verified": true,
+          "notes": "FIRST 16-step chain in design profile; max rises 15\u219216. Adds notion/API-retrieve-a-page as step 16 after browser-rendering/render_page (step 15). All tools on confirmed-connected servers: ch1tty, orchestrator, evidence, context7, thinking/sequentialthinking, serena, playwright, fs, notion, browser-rendering."
+        },
+        {
+          "name": "design-playwright-select-option-capture",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_select_option",
+            "playwright/browser_take_screenshot",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Playwright select-option interaction test: navigate to a page with a dropdown or select element, select a specific option, capture the resulting state as a screenshot, analyse the design change with sequential reasoning, and write a design observation report. Tests how UI components respond to option selection.",
+          "verified": true,
+          "notes": "Novel design combo focusing on playwright/browser_select_option as the primary interaction step. Tests dropdown/select UI components. All tools on confirmed-connected servers: playwright, thinking, fs."
         }
       ],
       "prompts": [
@@ -4831,6 +4958,14 @@
         {
           "text": "Run a 14-step UX design pipeline with cast, orchestrator agent + skill, evidence and library docs, sequential thinking, serena symbols, playwright screenshot, Notion publication, and block status update",
           "resolves_to": "design-fourteen-step-ux-full-chain"
+        },
+        {
+          "text": "Run the full 16-step UX pipeline ending with Notion page retrieval to verify persistence",
+          "resolves_to": "design-sixteen-step-ux-archive-chain"
+        },
+        {
+          "text": "Navigate to a UI, select a dropdown option, screenshot the result, and write a design observation",
+          "resolves_to": "design-playwright-select-option-capture"
         }
       ]
     },
@@ -6309,6 +6444,44 @@
           "accomplishes": "Render a live documentation or API reference page to extract its full structured content, query the library documentation index for the same library to cross-reference with the live page, apply sequential reasoning to identify discrepancies, outdated sections, or implementation gaps, then write a verified documentation summary to a local file \u2014 a 4-step render-and-verify docs pipeline.",
           "verified": true,
           "notes": "FIRST browser-rendering/render_page in code profile. Combines live page rendering with context7 library docs for cross-reference verification. All tools on confirmed-connected backends: browser-rendering (3 tools), context7 (2 tools), thinking (1 tool), fs (14 tools). 2026-06-07 sixty-fourth-pass."
+        },
+        {
+          "name": "code-sixteen-step-impl-deploy-archive-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page"
+          ],
+          "accomplishes": "Extends the 15-step impl+deploy chain by adding a final browser-rendered archive of the Notion deploy page. Full 16-step code pipeline: cast \u2192 agent discovery + execution \u2192 skill discovery + execution \u2192 evidence \u2192 library docs \u2192 reasoning \u2192 symbol audit \u2192 screenshot \u2192 local report \u2192 Notion page \u2192 block update \u2192 browser render archive.",
+          "verified": true,
+          "notes": "FIRST 16-step chain in code profile; max rises 15\u219216. Adds browser-rendering/render_page as step 16 to archive the Notion deployment page as a rendered snapshot. All tools on confirmed-connected servers: ch1tty, orchestrator, evidence, context7, thinking/sequentialthinking, serena, playwright, fs, notion, browser-rendering."
+        },
+        {
+          "name": "code-html-symbol-library-docs-pipeline",
+          "chain": [
+            "browser-rendering/get_url_html_content",
+            "serena/search_for_symbols",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Web-to-symbol-to-docs research pipeline: extract HTML content from a documentation URL, search the codebase for relevant symbols matching the web content, resolve the library ID for precise docs lookup, fetch library documentation, reason about the integration, and write a code research brief. Combines browser-rendering + serena + context7 for a cross-source code investigation.",
+          "verified": true,
+          "notes": "FIRST chain to open with browser-rendering/get_url_html_content then immediately pivot to serena/search_for_symbols. Novel 3-backend cross (browser-rendering + serena + context7) for code research. All tools on confirmed-connected servers: browser-rendering, serena, context7, thinking, fs."
         }
       ],
       "prompts": [
@@ -6667,6 +6840,14 @@
         {
           "text": "Run the full 15-step code implementation and deployment pipeline: cast, orchestrator agent + skill, evidence and library docs, sequential reasoning, serena symbols, playwright screenshot, save notes, publish to Notion, and update deployment status block",
           "resolves_to": "code-fifteen-step-impl-deploy-chain"
+        },
+        {
+          "text": "Run the full 16-step implementation and deployment pipeline with browser-rendered Notion archive",
+          "resolves_to": "code-sixteen-step-impl-deploy-archive-chain"
+        },
+        {
+          "text": "Fetch HTML from a docs URL, find matching symbols in the codebase, look up library docs, and write a code research brief",
+          "resolves_to": "code-html-symbol-library-docs-pipeline"
         }
       ]
     },
@@ -7817,6 +7998,43 @@
           "accomplishes": "Resolve broadcast intent with cast, reason over the best content strategy with sequential-thinking, create a Notion broadcast page, retrieve its block children to verify structure, then update the summary block with polished broadcast copy. A focused 5-step Notion content-update loop for communication.",
           "verified": true,
           "notes": "FIRST notion/API-get-block-children in communication profile. 5-step Notion content-update loop: cast\u2192reason\u2192create\u2192read\u2192update. All tools verified-connected."
+        },
+        {
+          "name": "comm-sixteen-step-broadcast-archive-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page"
+          ],
+          "accomplishes": "Extends the 15-step broadcast chain by adding a browser-rendered archive of the Notion communication page. Full 16-step communication pipeline: cast \u2192 agent discovery + execution \u2192 skill discovery + execution \u2192 evidence \u2192 library docs \u2192 reasoning \u2192 symbol audit \u2192 screenshot \u2192 local report \u2192 Notion page \u2192 block update \u2192 browser render archive.",
+          "verified": true,
+          "notes": "FIRST 16-step chain in communication profile; max rises 15\u219216. Adds browser-rendering/render_page as step 16 to capture a rendered snapshot of the Notion broadcast page. All tools on confirmed-connected servers: ch1tty, orchestrator, evidence, context7, thinking/sequentialthinking, serena, playwright, fs, notion, browser-rendering."
+        },
+        {
+          "name": "comm-connect-agent-evidence-brief",
+          "chain": [
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute(connect)",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Communication bridge pipeline: discover the connect agent via agent search, execute it to surface inter-service communication state, cross-reference with evidence AI search for context, reason about the communication landscape, and publish a brief to Notion. Routes through the connect agent layer for communication-oriented evidence synthesis.",
+          "verified": true,
+          "notes": "FIRST comm chain using orchestrator/agent_execute(connect) as the primary execution step. connect agent handles inter-agent/inter-service communication bridging. All tools on confirmed-connected servers: orchestrator, evidence, thinking, notion."
         }
       ],
       "prompts": [
@@ -8111,6 +8329,14 @@
         {
           "text": "Run a 14-step broadcast communication pipeline with cast, orchestrator agent + messaging skill, evidence and library docs, sequential thinking, serena templates, playwright screenshot, save plan, and publish Notion communication brief",
           "resolves_to": "comm-fourteen-step-broadcast-full-chain"
+        },
+        {
+          "text": "Run the full 16-step broadcast pipeline and render a browser archive of the Notion communication page",
+          "resolves_to": "comm-sixteen-step-broadcast-archive-chain"
+        },
+        {
+          "text": "Find the connect agent, execute it, search evidence for context, and publish a communication brief to Notion",
+          "resolves_to": "comm-connect-agent-evidence-brief"
         }
       ]
     },
@@ -9594,6 +9820,43 @@
           "accomplishes": "Fetch a deployed worker's or service's public status page as HTML, reason over health signals and anomalies with sequential-thinking, write a local health report, and create a Notion incident record. A lightweight ops health-probe chain that doesn't require orchestrator or cast.",
           "verified": true,
           "notes": "FIRST browser-rendering/get_url_html_content in ops profile. Lightweight health-probe chain using only browser-rendering, thinking, fs, and notion \u2014 all confirmed connected."
+        },
+        {
+          "name": "ops-sixteen-step-incident-archive-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "notion/API-retrieve-a-page"
+          ],
+          "accomplishes": "Extends the 15-step incident chain by adding Notion page retrieval as the final verification step \u2014 confirms the incident Notion page was created and updated correctly before archiving. Full 16-step ops pipeline: cast \u2192 agent \u2192 skill \u2192 evidence \u2192 library docs \u2192 reasoning \u2192 symbol audit \u2192 screenshot \u2192 local report \u2192 Notion create \u2192 block update \u2192 page retrieve.",
+          "verified": true,
+          "notes": "FIRST 16-step chain in ops profile; max rises 15\u219216. ALL 6 profiles now have at least one 16-step chain \u2014 new catalog-wide milestone. Adds notion/API-retrieve-a-page as step 16. All tools on confirmed-connected servers: ch1tty, orchestrator, evidence, context7, thinking/sequentialthinking, serena, playwright, fs, notion."
+        },
+        {
+          "name": "ops-provision-status-evaluate-sweep",
+          "chain": [
+            "orchestrator/provision_status",
+            "orchestrator/provision_evaluate",
+            "orchestrator/skill_search",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Provision lifecycle health sweep: check the current provision status for active sessions, run a full provision evaluation to determine session binding state, search for matching operational skills, reason about the operational posture, and write a sweep report. Models a defensive ops pattern: always check status before evaluating a binding decision.",
+          "verified": true,
+          "notes": "FIRST chain in ops to open with provision_status \u2192 provision_evaluate (status-first guard pattern). Useful for operational health checks before provisioning decisions. All tools on confirmed-connected servers: orchestrator, thinking, fs."
         }
       ],
       "prompts": [
@@ -9936,6 +10199,14 @@
         {
           "text": "Run a 12-step incident response pipeline with cast, orchestrator agent + remediation skill, evidence and runbook docs, sequential reasoning, playwright dashboard screenshot, save incident report, and publish ops postmortem to Notion",
           "resolves_to": "ops-twelve-step-incident-full-chain"
+        },
+        {
+          "text": "Run the full 16-step incident pipeline and verify the Notion incident page was created successfully",
+          "resolves_to": "ops-sixteen-step-incident-archive-chain"
+        },
+        {
+          "text": "Check provision status, evaluate session binding, search for ops skills, and write an operational sweep report",
+          "resolves_to": "ops-provision-status-evaluate-sweep"
         }
       ]
     }
