@@ -5236,7 +5236,7 @@
           "resolves_to": "comm-playwright-navigate-back-thread-root"
         },
         {
-          "text": "Look up the messaging SDK documentation (e.g. Twilio, SendGrid, or iMessage framework) and save the integration reference to a local file.",
+          "text": "Look up the messaging SDK documentation (e.g. Twilio, SendGrid, or iMessage framework) and post the integration reference to Notion.",
           "resolves_to": "comm-context7-messaging-sdk-docs"
         },
         {
@@ -6224,9 +6224,9 @@
             "quality/analyze",
             "cloudflare/deploy_worker"
           ],
-          "accomplishes": "Run a code quality analysis pass against the worker source before deploying — surfacing lint errors, complexity issues, or security warnings as a pre-deploy gate. Only proceed with Cloudflare Worker deployment if the quality check passes.",
+          "accomplishes": "Run a code quality analysis pass against the worker source, then deploy the Cloudflare Worker. Review quality findings before using this chain in production workflows.",
           "verified": false,
-          "notes": "First quality combo in ops profile. quality/analyze not confirmed connected on live gateway. cloudflare/deploy_worker verified."
+          "notes": "First quality combo in ops profile. quality/analyze not confirmed connected on live gateway. cloudflare/deploy_worker not confirmed connected on live gateway."
         }
       ],
       "prompts": [

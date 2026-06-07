@@ -458,7 +458,7 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   - **ops**: `ops-neon-slow-queries-incident-evidence` (first neon/list_slow_queries), `ops-quality-analyze-pre-deploy-gate` (first quality in ops)
 - 1 test failure caught: `comm-context7-messaging-sdk-docs` used `fs/write_file` as final step (no comm-relevant server) → fixed to `notion/API-post-page`
 - Tests after fix: 938 pass / 0 fail / 2 skipped ✓
-- Catalog: 436 → **448 combos / 220 verified** (+2 verified: both governance+communication context7 combos)
+- Catalog: 436 → **448 combos / 220 verified** (+1 verified: governance-context7-policy-sdk-docs)
 
 **Branch / PR**: `auto/E-catalog-forty-eighth-pass` → PR TBD
 
