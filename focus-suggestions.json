@@ -1,6 +1,6 @@
 {
-  "_comment": "ch1tty focus-profile suggestions catalog — 448 combos, 220 verified (forty-eighth pass — first neon in finance/governance, first context7 in governance/communication, first linear in finance/design/communication, first fs/move_directory, first neon/get_database_tables + neon/list_slow_queries)",
-  "generatedFrom": "auto-driver 48th-pass 2026-06-07T01:30Z",
+  "_comment": "ch1tty focus-profile suggestions catalog — 460 combos, 220 verified (forty-ninth pass — neon first use in design+communication+ops-linear+governance-browser-rendering; neon/get_connection_string + prepare/complete_database_migration + describe_project + explain_sql_statement + run_sql_transaction + list_organizations first use)",
+  "generatedFrom": "auto-driver 49th-pass 2026-06-07T05:00Z",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools — now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time — combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -753,6 +753,27 @@
           "accomplishes": "Pull billing-related Linear engineering issues (payment processing bugs, invoice failures, subscription edge cases), filter by label or project, and write a structured Notion page that summarizes open billing work for finance review.",
           "verified": false,
           "notes": "First linear combo in finance profile. linear not connected (lazy). notion/API-post-page connected but Notion API returns 401 until token is refreshed."
+        },
+        {
+          "name": "finance-neon-get-connection-billing-db",
+          "chain": [
+            "neon/get_connection_string",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Retrieve the Neon billing database connection string (production or branch) and document it in a Notion finance workspace credentials page — centralising DB access info for the finance team without exposing secrets in ad-hoc messages.",
+          "verified": false,
+          "notes": "First use of neon/get_connection_string in finance profile. neon not connected (lazy); neon/get_connection_string confirmed in live Neon MCP surface. notion/API-post-page connected but 401 until Notion token refreshed."
+        },
+        {
+          "name": "finance-neon-billing-db-migration-flow",
+          "chain": [
+            "neon/prepare_database_migration",
+            "neon/complete_database_migration",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Prepare a billing schema migration (preview DDL and risk assessment), then execute it on the Neon billing database, and post a migration completion summary to a Notion finance changelog — full auditable migration trail for finance schema changes.",
+          "verified": false,
+          "notes": "First use of neon/prepare_database_migration and neon/complete_database_migration. Neon migration tools confirmed in live Neon MCP surface. All steps unverified: neon not connected in current env."
         }
       ],
       "prompts": [
@@ -935,6 +956,14 @@
         {
           "text": "List all billing-related Linear issues and post a summary of open finance engineering work to a Notion finance tracker page.",
           "resolves_to": "finance-linear-billing-issues-notion-sync"
+        },
+        {
+          "text": "Get the Neon billing database connection string and save it to our Notion finance credentials page.",
+          "resolves_to": "finance-neon-get-connection-billing-db"
+        },
+        {
+          "text": "Prepare and execute a billing schema migration in Neon, then post the migration summary to our Notion finance changelog.",
+          "resolves_to": "finance-neon-billing-db-migration-flow"
         }
       ]
     },
@@ -1991,6 +2020,26 @@
           "accomplishes": "Resolve the library ID for a governance-relevant SDK (e.g. ChittyOS canon client, MCP SDK, or identity/auth library), query its full API documentation, and write the relevant sections to a local reference file for policy implementation work.",
           "verified": true,
           "notes": "First context7 combo in governance profile. context7/resolve-library-id and context7/query-docs both verified on live gateway. fs/write_file verified."
+        },
+        {
+          "name": "governance-browser-rendering-policy-snapshot",
+          "chain": [
+            "browser-rendering/get_url_markdown",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Fetch a public regulatory or policy webpage as clean markdown using Cloudflare Browser Rendering, then post the snapshot to a Notion governance evidence page — creating an immutable timestamped record of external policy language for compliance audits.",
+          "verified": false,
+          "notes": "First use of browser-rendering/get_url_markdown in governance profile. browser-rendering not connected (lazy). notion/API-post-page connected but 401 until Notion token refreshed."
+        },
+        {
+          "name": "governance-neon-describe-project-compliance",
+          "chain": [
+            "neon/describe_project",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Describe a Neon database project's settings (region, plan, compute, branch count) and post a compliance snapshot to Notion — verifying that the production database configuration meets governance standards (region lock, encryption, retention policy).",
+          "verified": false,
+          "notes": "First use of neon/describe_project. neon/describe_project confirmed in live Neon MCP surface. neon not connected in current env."
         }
       ],
       "prompts": [
@@ -2237,6 +2286,14 @@
         {
           "text": "Look up the canonical MCP SDK or ChittyOS canon library documentation and save the relevant policy implementation reference to a local file.",
           "resolves_to": "governance-context7-policy-sdk-docs"
+        },
+        {
+          "text": "Fetch the latest data-protection regulation page as markdown and store a compliance snapshot in Notion.",
+          "resolves_to": "governance-browser-rendering-policy-snapshot"
+        },
+        {
+          "text": "Describe the compliance Neon project configuration and post a governance audit snapshot to Notion.",
+          "resolves_to": "governance-neon-describe-project-compliance"
         }
       ]
     },
@@ -2913,6 +2970,26 @@
           "accomplishes": "Move a design asset directory (icons, components, mockups) to a new location in the project structure, then enumerate the updated directory tree to confirm the reorganization — the first use of the 14th fs tool (move_directory) in the catalog.",
           "verified": false,
           "notes": "First fs/move_directory combo in any profile. 14 fs tools are live on the gateway; move_directory is the inferred 14th (13 others are already cataloged). fs/directory_tree verified."
+        },
+        {
+          "name": "design-neon-run-sql-data-prototype",
+          "chain": [
+            "neon/run_sql",
+            "fs/write_file"
+          ],
+          "accomplishes": "Run a SQL query against the Neon product database to fetch real content samples (product names, copy, user data), then write the results to a local fixture file — giving designers real data to populate mockups instead of lorem ipsum.",
+          "verified": false,
+          "notes": "First neon combo in design profile. neon/run_sql confirmed in live Neon MCP surface. neon not connected in current env; fs/write_file is live."
+        },
+        {
+          "name": "design-neon-list-projects-schema-preview",
+          "chain": [
+            "neon/list_projects",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "List all Neon database projects and their summaries, then post a structured Notion page outlining available databases and their purposes — giving designers a reference map for what data schemas exist when building data-driven UI components.",
+          "verified": false,
+          "notes": "First use of neon/list_projects in design profile. neon/list_projects confirmed in live Neon MCP surface."
         }
       ],
       "prompts": [
@@ -3091,6 +3168,14 @@
         {
           "text": "Move the design assets directory to a new project location and show the updated directory tree to confirm the reorganization.",
           "resolves_to": "design-fs-move-directory-asset-reorganize"
+        },
+        {
+          "text": "Query the product database in Neon for real content samples and write them to a local design fixture file.",
+          "resolves_to": "design-neon-run-sql-data-prototype"
+        },
+        {
+          "text": "List all Neon database projects and post a schema map to Notion so designers know what data is available.",
+          "resolves_to": "design-neon-list-projects-schema-preview"
         }
       ]
     },
@@ -4132,6 +4217,26 @@
           "accomplishes": "Move a source module directory to a new location in the project, use Serena to search for all import references to the old path, and edit each file to update the import paths — a complete module-relocation refactor via three coordinated tools.",
           "verified": false,
           "notes": "First fs/move_directory combo in code profile (second in catalog, after design-fs-move-directory-asset-reorganize). fs/move_directory inferred as 14th fs tool. serena/search_code and fs/edit_file verified."
+        },
+        {
+          "name": "code-neon-explain-sql-optimizer-report",
+          "chain": [
+            "neon/explain_sql_statement",
+            "fs/write_file"
+          ],
+          "accomplishes": "Run EXPLAIN ANALYZE on a slow SQL query in Neon and write the full query plan to a local file — enabling developers to inspect execution plans, identify missing indexes, and optimize bottlenecks without leaving the IDE workflow.",
+          "verified": false,
+          "notes": "First use of neon/explain_sql_statement. Confirmed in live Neon MCP surface. neon not connected in current env; fs/write_file is live."
+        },
+        {
+          "name": "code-neon-run-sql-transaction-schema-migrate",
+          "chain": [
+            "neon/run_sql_transaction",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Execute a multi-statement schema migration as a single atomic SQL transaction on Neon (ensuring all-or-nothing semantics), then post the migration result and any affected table names to a Notion code changelog — combining safe DDL execution with auditable record-keeping.",
+          "verified": false,
+          "notes": "First use of neon/run_sql_transaction. Confirmed in live Neon MCP surface. neon not connected in current env."
         }
       ],
       "prompts": [
@@ -4374,6 +4479,14 @@
         {
           "text": "Move a source module directory to a new location, search for all import references to the old path, and update them in each file.",
           "resolves_to": "code-fs-move-directory-module-refactor"
+        },
+        {
+          "text": "Run EXPLAIN ANALYZE on the slow checkout query in Neon and write the query plan to a local optimizer report file.",
+          "resolves_to": "code-neon-explain-sql-optimizer-report"
+        },
+        {
+          "text": "Execute the schema migration as a Neon SQL transaction and post the result to the Notion code changelog.",
+          "resolves_to": "code-neon-run-sql-transaction-schema-migrate"
         }
       ]
     },
@@ -5064,6 +5177,26 @@
           "accomplishes": "Pull communication-related Linear issues (notification bugs, messaging failures, channel delivery errors), create follow-up tasks for each in the task system, and send an iMessage summary to the relevant team member — closing the loop from issue tracking to human notification.",
           "verified": false,
           "notes": "First linear combo in communication profile. linear not connected. tasks not connected. imessage not connected on live gateway."
+        },
+        {
+          "name": "comm-neon-user-activity-query-notion",
+          "chain": [
+            "neon/run_sql",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Query Neon for recent user activity (new signups, engagement metrics, last-active timestamps) and post a formatted digest to a Notion communication workspace page — bridging live database state with the team's async communication hub for daily standups or status syncs.",
+          "verified": false,
+          "notes": "First neon combo in communication profile. Chain includes notion/API-post-page (comm-relevant server). neon not connected in current env."
+        },
+        {
+          "name": "comm-github-issue-digest-notion",
+          "chain": [
+            "github/list_issues",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "List open GitHub issues (filtered by label or assignee) and post a structured digest to a Notion communication page — giving the team a single async-friendly view of active engineering discussions without requiring everyone to watch GitHub notifications directly.",
+          "verified": false,
+          "notes": "First github combo in communication profile. Chain includes notion/API-post-page (comm-relevant server). github connected via hosted remote endpoint."
         }
       ],
       "prompts": [
@@ -5242,6 +5375,14 @@
         {
           "text": "Pull communication-related Linear issues, create follow-up tasks for each, and send a notification summary via iMessage to the team.",
           "resolves_to": "comm-linear-issue-task-notify"
+        },
+        {
+          "text": "Query Neon for today's new signups and active users, then post a status digest to the Notion team comms page.",
+          "resolves_to": "comm-neon-user-activity-query-notion"
+        },
+        {
+          "text": "List open GitHub issues and post a communication digest for today's standup to Notion.",
+          "resolves_to": "comm-github-issue-digest-notion"
         }
       ]
     },
@@ -6227,6 +6368,27 @@
           "accomplishes": "Run a code quality analysis pass against the worker source, then deploy the Cloudflare Worker. Review quality findings before using this chain in production workflows.",
           "verified": false,
           "notes": "First quality combo in ops profile. quality/analyze not confirmed connected on live gateway. cloudflare/deploy_worker not confirmed connected on live gateway."
+        },
+        {
+          "name": "ops-linear-incident-triage-on-call",
+          "chain": [
+            "linear/list_issues",
+            "orchestrator/skill_execute",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Pull open Linear incident issues (P0/P1, labelled 'incident' or 'oncall'), execute the on-call triage skill via the orchestrator to route and prioritise them, then document the triage outcome in a Notion ops runbook page — automating the first-response workflow from issue discovery to documented action.",
+          "verified": false,
+          "notes": "First linear combo in ops profile. linear not connected (lazy). orchestrator/skill_execute confirmed live. notion/API-post-page connected but 401 until Notion token refreshed."
+        },
+        {
+          "name": "ops-neon-list-organizations-multi-tenant-audit",
+          "chain": [
+            "neon/list_organizations",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "List all Neon organizations in the account to audit multi-tenant database sprawl — verify each org has proper naming, billing plan, and access controls — then post the audit summary to a Notion ops dashboard for ongoing governance tracking.",
+          "verified": false,
+          "notes": "First use of neon/list_organizations. Confirmed in live Neon MCP surface. neon not connected in current env."
         }
       ],
       "prompts": [
@@ -6453,6 +6615,14 @@
         {
           "text": "Run a code quality analysis on the worker source and, if it passes, deploy the Cloudflare Worker.",
           "resolves_to": "ops-quality-analyze-pre-deploy-gate"
+        },
+        {
+          "text": "List open Linear incidents, run the on-call triage skill, and document the outcome in the Notion ops runbook.",
+          "resolves_to": "ops-linear-incident-triage-on-call"
+        },
+        {
+          "text": "List all Neon organizations and post a multi-tenant database audit summary to the Notion ops dashboard.",
+          "resolves_to": "ops-neon-list-organizations-multi-tenant-audit"
         }
       ]
     }
