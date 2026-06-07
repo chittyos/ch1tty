@@ -902,15 +902,15 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 - 4 new verified combos (all on confirmed-connected servers: ch1tty, orchestrator, evidence, context7, thinking, serena, playwright, fs)
 - 0 test failures. Tests: 938 pass / 0 fail / 2 skipped ✓
 - Catalog: 580 → **592 combos / 248 → 252 verified** (max chain: 12 → **13** — FIRST 13-step in catalog)
-- Pushed branch, opened PR #255
+- Pushed branch, opened PR #256
 
-**Branch / PR**: `auto/E-catalog-sixtieth-pass` → PR #255
+**Branch / PR**: `auto/E-catalog-sixtieth-pass` → PR #256 (https://github.com/chittyos/ch1tty/pull/256)
 
 **Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
 
 **Board state**: 592 combos / 252 verified. MILESTONES: FIRST 13-step chain (code ✅). FIRST 12-step in governance ✅. FIRST 11-step in design ✅ and communication ✅. `neon/run_sql_transaction` now in finance+ops. `cloudflare/AI-run-model` now in design+ops. `github/create_or_update_file` now in governance.
 
 **Next run priority**:
-1. Merge PR #255 if CI green
+1. Merge PR #256 if CI green
 2. 61st catalog pass: `linear/create_issue` in finance+governance+communication+design (currently only code+ops); `chittyevidence/search_documents` depth (single use); `stripe/create_invoice` if available (never cataloged); `neon/run_sql_transaction` in governance+design+communication (currently finance+ops only); 14-step chain attempt by adding `neon/run_sql` as step 12 in code (inserting before playwright)
 3. Fix Notion auth to verify the ~340 unverified combos: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`
