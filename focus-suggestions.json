@@ -1,5 +1,5 @@
 {
-  "_comment": "sixty-first pass / 604 combos / 257 verified",
+  "_comment": "sixty-third pass / 628 combos / 279 verified",
   "generatedFrom": "focus-suggestions: sixty-first pass \u2014 604 combos",
   "profiles": {
     "finance": {
@@ -1102,6 +1102,38 @@
           "accomplishes": "Resolve the Stripe SDK library ID via context7, query its official docs for payment intent creation patterns and required parameters, apply sequential reasoning to construct the correct API payload, then create a payment intent \u2014 a docs-informed, reasoning-assisted Stripe integration workflow.",
           "verified": false,
           "notes": "context7 confirmed on live server (2 tools). stripe not connected (lazy, requires STRIPE_SECRET_KEY). 2026-06-07 sixty-second-pass. stripe/create_payment_intent inferred from Stripe MCP server schema. FIRST context7\u2192stripe integration pattern in finance profile."
+        },
+        {
+          "name": "finance-eleven-step-billing-full-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "End-to-end billing research pipeline: cast intent \u2192 skill match \u2192 RAG evidence search \u2192 docs-informed reasoning \u2192 symbol-grounded analysis \u2192 browser snapshot \u2192 file capture \u2192 Notion report publication.",
+          "verified": true,
+          "notes": "FIRST 11-step chain in finance profile. Extends finance-ten-step-verified-cast-serena by adding notion/API-post-page publish step. All confirmed-connected backends: ch1tty, orchestrator, evidence, context7, thinking, serena, playwright, fs, notion. 2026-06-07 sixty-third-pass."
+        },
+        {
+          "name": "finance-neon-slow-query-billing-audit",
+          "chain": [
+            "neon/list_slow_queries",
+            "thinking/sequentialthinking",
+            "neon/run_sql",
+            "fs/write_file",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Billing DB performance audit: surface slow queries \u2192 reason over impact and optimization opportunities \u2192 run targeted SQL verification \u2192 save findings to local file \u2192 publish Notion performance report.",
+          "verified": true,
+          "notes": "FIRST neon/list_slow_queries in finance profile (was only ops). All confirmed-connected backends: neon (local), thinking, fs, notion. 2026-06-07 sixty-third-pass."
         }
       ],
       "prompts": [
@@ -1388,6 +1420,14 @@
         {
           "text": "Ingest a billing document via ChittyEvidence, query the Neon billing database, record the ledger entry, and log the summary in Notion",
           "resolves_to": "finance-chittyevidence-billing-doc-ingest"
+        },
+        {
+          "text": "Run the full billing research pipeline and publish a Notion billing report",
+          "resolves_to": "finance-eleven-step-billing-full-chain"
+        },
+        {
+          "text": "Audit the billing database for slow queries and surface optimization opportunities",
+          "resolves_to": "finance-neon-slow-query-billing-audit"
         }
       ]
     },
@@ -2813,6 +2853,42 @@
           "accomplishes": "Navigate to a governance or compliance dashboard (ChittyOS admin, audit log viewer, RBAC console), capture a full-page snapshot for the audit trail, write the visual artifact to local storage, then create a timestamped Notion audit-trail page linking the snapshot \u2014 providing an immutable evidence record of the dashboard state at the time of review.",
           "verified": true,
           "notes": "All tools on confirmed-connected servers (playwright: 23 tools, fs: 14 tools, notion: 22 tools). 2026-06-07 sixty-second-pass. FIRST playwright+fs+notion governance audit pattern. Cast scores: playwright/browser_navigate (navigate/access ~0.75), playwright/browser_snapshot (capture/snapshot ~0.75), fs/write_file (save/persist ~0.75)."
+        },
+        {
+          "name": "governance-fourteen-step-policy-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Full governance policy research-to-publish pipeline: intent cast → agent dispatch → skill execution → RAG evidence retrieval → library docs research → sequential reasoning → symbol audit → browser snapshot → file output → Notion publication.",
+          "verified": true,
+          "notes": "FIRST 14-step chain in entire catalog. Extends governance-thirteen-step-policy-full-chain by adding notion/API-post-page as final publish step. All confirmed-connected backends: ch1tty, orchestrator, evidence, context7, thinking, serena, playwright, fs, notion. 2026-06-07 sixty-third-pass. Catalog max chain length rises 13→14."
+        },
+        {
+          "name": "governance-neon-slow-query-compliance-audit",
+          "chain": [
+            "neon/describe_table_schema",
+            "neon/list_slow_queries",
+            "neon/run_sql_transaction",
+            "thinking/sequentialthinking",
+            "fs/write_file",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "DB compliance and performance audit: inspect schema for compliance-relevant tables → surface slow queries impacting governance operations → run corrective SQL transaction → reason over findings → save audit report locally → publish Notion compliance report.",
+          "verified": true,
+          "notes": "FIRST neon/list_slow_queries in governance profile. FIRST neon/run_sql_transaction in governance profile. All confirmed-connected backends: neon (local), thinking, fs, notion. 2026-06-07 sixty-third-pass."
         }
       ],
       "prompts": [
@@ -3163,6 +3239,14 @@
         {
           "text": "Surface an audit finding, reason over the regulatory context, search evidence for support, create a Linear issue for remediation, and add to the task backlog",
           "resolves_to": "governance-linear-create-audit-issue"
+        },
+        {
+          "text": "Run the full 14-step governance policy research pipeline and publish the report to Notion",
+          "resolves_to": "governance-fourteen-step-policy-chain"
+        },
+        {
+          "text": "Audit the governance database schema for compliance issues and slow queries",
+          "resolves_to": "governance-neon-slow-query-compliance-audit"
         }
       ]
     },
@@ -4195,6 +4279,40 @@
           "accomplishes": "Resolve the target UI component library (shadcn/ui, Radix, Mantine, etc.) via context7, query its official documentation for the specific component API and live-demo URL, navigate to the Storybook or demo page with Playwright, and capture a visual snapshot \u2014 a docs-to-visual confirmation workflow for design implementation reference.",
           "verified": true,
           "notes": "context7 (2 tools) and playwright (23 tools) both confirmed on connected servers. 2026-06-07 sixty-second-pass. FIRST context7\u2192playwright chain in design profile \u2014 combines library-docs resolution with live visual capture. Cast scores: context7/resolve-library-id (library/resolve ~0.75), playwright/browser_navigate (navigate/demo ~0.75)."
+        },
+        {
+          "name": "design-thirteen-step-ux-full-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Full UX design research-to-report pipeline: intent cast \u2192 agent search \u2192 skill execution \u2192 RAG evidence retrieval \u2192 library docs research \u2192 sequential reasoning \u2192 symbol exploration \u2192 browser snapshot \u2192 file capture \u2192 Notion design report publication.",
+          "verified": true,
+          "notes": "FIRST 13-step chain in design profile. Extends design-twelve-step-ux-deep-impl by adding notion/API-post-page as final publish step. All confirmed-connected backends: ch1tty, orchestrator, evidence, context7, thinking, serena, playwright, fs, notion. 2026-06-07 sixty-third-pass. Design max chain length rises 12\u219213."
+        },
+        {
+          "name": "design-neon-slow-query-schema-visual",
+          "chain": [
+            "neon/list_slow_queries",
+            "neon/describe_table_schema",
+            "thinking/sequentialthinking",
+            "playwright/browser_screenshot",
+            "fs/write_file"
+          ],
+          "accomplishes": "Design DB performance snapshot: surface slow queries affecting the design data layer \u2192 inspect table schema for structural issues \u2192 reason over optimization paths \u2192 capture a browser visual for reference \u2192 save findings to disk.",
+          "verified": true,
+          "notes": "FIRST neon/list_slow_queries in design profile. All confirmed-connected backends: neon (local), thinking, playwright, fs. 2026-06-07 sixty-third-pass."
         }
       ],
       "prompts": [
@@ -4477,6 +4595,14 @@
         {
           "text": "Invoice a design client: cast to design, reason through the project scope, create a Stripe invoice for the retainer, record in the ledger, and log in Notion",
           "resolves_to": "design-stripe-create-invoice-project-fee"
+        },
+        {
+          "text": "Run the full 13-step UX design research pipeline and publish a Notion design report",
+          "resolves_to": "design-thirteen-step-ux-full-chain"
+        },
+        {
+          "text": "Audit the design database for slow queries and capture a visual reference snapshot",
+          "resolves_to": "design-neon-slow-query-schema-visual"
         }
       ]
     },
@@ -5884,6 +6010,42 @@
           "accomplishes": "Resolve the library under review via context7 and query its API documentation, search orchestrator skills for tooling that matches the library's domain or the task at hand, then execute the best-matching skill \u2014 a docs-informed orchestration pattern that bridges library knowledge with automated task execution.",
           "verified": true,
           "notes": "context7 (2 tools) and orchestrator (13 tools) both confirmed on connected servers. 2026-06-07 sixty-second-pass. FIRST context7\u2192orchestrator integration in code profile \u2014 introduces docs-informed skill dispatch as a new code-workflow pattern. Cast scores: orchestrator/skill_search (search/find ~0.75), orchestrator/skill_execute (execute ~0.75)."
+        },
+        {
+          "name": "code-fourteen-step-impl-deploy-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Full code research-to-deploy pipeline: intent cast \u2192 agent dispatch \u2192 skill execution \u2192 RAG evidence \u2192 library docs \u2192 sequential reasoning \u2192 symbol grounding \u2192 browser snapshot \u2192 file output \u2192 Notion documentation.",
+          "verified": true,
+          "notes": "FIRST 14-step chain in code profile. Ties catalog max with governance-fourteen-step-policy-chain. Extends code-thirteen-step-research-impl-chain by adding notion/API-post-page as final publish step. All confirmed-connected backends: ch1tty, orchestrator, evidence, context7, thinking, serena, playwright, fs, notion. 2026-06-07 sixty-third-pass."
+        },
+        {
+          "name": "code-stripe-billing-sdk-integration",
+          "chain": [
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "stripe/list_invoices",
+            "neon/run_sql",
+            "fs/write_file"
+          ],
+          "accomplishes": "Stripe SDK billing integration: resolve Stripe library docs \u2192 query billing API patterns and parameters \u2192 reason over integration approach \u2192 list invoices for validation \u2192 run SQL to compare ledger state \u2192 save implementation notes to disk.",
+          "verified": false,
+          "notes": "FIRST stripe in code profile. context7 and neon confirmed connected; stripe lazy (requires STRIPE_SECRET_KEY). fs confirmed. 2026-06-07 sixty-third-pass. stripe/list_invoices inferred from Stripe MCP server schema."
         }
       ],
       "prompts": [
@@ -6230,6 +6392,14 @@
         {
           "text": "Find the failing symbol in the codebase with Serena, run quality tests to confirm the regression, create a Linear issue for tracking, and file a parallel GitHub issue",
           "resolves_to": "code-linear-create-issue-regression"
+        },
+        {
+          "text": "Run the full 14-step code research and implementation pipeline and publish to Notion",
+          "resolves_to": "code-fourteen-step-impl-deploy-chain"
+        },
+        {
+          "text": "Integrate Stripe billing SDK into the codebase and validate invoice sync with the database",
+          "resolves_to": "code-stripe-billing-sdk-integration"
         }
       ]
     },
@@ -7276,6 +7446,40 @@
           "accomplishes": "Search the evidence base for context on a communication topic or announcement theme, reason it into a structured briefing with key points, audience framing, and follow-up actions, export to a local markdown file for version control, then publish to Notion as a shareable team brief \u2014 a full evidence-to-publication writing pipeline for structured communication.",
           "verified": true,
           "notes": "All tools on confirmed-connected servers (evidence: 3 tools, thinking: 1 tool, fs: 14 tools, notion: 22 tools). 2026-06-07 sixty-second-pass. FIRST evidence\u2192thinking\u2192fs\u2192notion full-pipeline chain in communication profile \u2014 introduces a complete local-to-cloud writing workflow. 4-step all-verified chain."
+        },
+        {
+          "name": "comm-thirteen-step-broadcast-full-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file"
+          ],
+          "accomplishes": "Full communication broadcast research pipeline: intent cast \u2192 agent dispatch \u2192 skill execution \u2192 RAG evidence retrieval \u2192 library docs research \u2192 sequential reasoning \u2192 symbol grounding \u2192 browser capture \u2192 file save.",
+          "verified": true,
+          "notes": "FIRST 13-step chain in communication profile. Extends comm-twelve-step-broadcast-serena by adding fs/write_file as final capture step. All confirmed-connected backends: ch1tty, orchestrator, evidence, context7, thinking, serena, playwright, fs. 2026-06-07 sixty-third-pass. Communication max chain length rises 12\u219213."
+        },
+        {
+          "name": "comm-neon-slow-query-analytics-audit",
+          "chain": [
+            "neon/list_slow_queries",
+            "thinking/sequentialthinking",
+            "context7/query-docs",
+            "notion/API-post-page",
+            "notion/API-update-a-block"
+          ],
+          "accomplishes": "Communication analytics DB audit: surface slow queries impacting analytics pipelines \u2192 reason over performance impact and remediation paths \u2192 consult documentation for query optimization patterns \u2192 create Notion audit report \u2192 update report block with final assessment.",
+          "verified": true,
+          "notes": "FIRST neon/list_slow_queries in communication profile. FIRST notion/API-update-a-block in communication profile. All confirmed-connected backends: neon (local), thinking, context7, notion. 2026-06-07 sixty-third-pass."
         }
       ],
       "prompts": [
@@ -7558,6 +7762,14 @@
         {
           "text": "Triage a support case: cast to communication, AI-search evidence for similar cases, reason through the issue, create a Linear issue for tracking, and add to the task backlog",
           "resolves_to": "comm-linear-create-issue-support"
+        },
+        {
+          "text": "Run the full 13-step communication broadcast research pipeline and save to disk",
+          "resolves_to": "comm-thirteen-step-broadcast-full-chain"
+        },
+        {
+          "text": "Audit communication analytics database slow queries and update the Notion performance report",
+          "resolves_to": "comm-neon-slow-query-analytics-audit"
         }
       ]
     },
@@ -8899,6 +9111,38 @@
           "accomplishes": "Read a production log or error file from local disk (rotated log, crash dump, DLQ export), apply sequential reasoning to identify root cause, blast radius, and contributing factors, write a structured incident analysis report to a local file, then create a Notion post-mortem page \u2014 a fully local-to-cloud postmortem pipeline requiring no external backend connectivity.",
           "verified": true,
           "notes": "All tools on confirmed-connected servers (fs: 14 tools \u2014 read_text_file + write_file, thinking: 1 tool, notion: 22 tools). 2026-06-07 sixty-second-pass. FIRST fs/read_text_file \u2192 thinking \u2192 fs/write_file \u2192 notion chain in ops profile \u2014 a zero-external-dependency postmortem pipeline; works in any air-gapped or degraded-backend scenario."
+        },
+        {
+          "name": "ops-eleven-step-incident-full-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Full ops incident response pipeline: intent cast \u2192 agent dispatch \u2192 skill execution \u2192 RAG evidence retrieval \u2192 context docs \u2192 sequential reasoning \u2192 browser snapshot of monitoring state \u2192 file capture \u2192 Notion incident report publication.",
+          "verified": true,
+          "notes": "FIRST 11-step chain in ops profile. Extends ops-ten-step-verified-incident by adding notion/API-post-page as final publish step. All confirmed-connected backends: ch1tty, orchestrator, evidence, context7, thinking, playwright, fs, notion. 2026-06-07 sixty-third-pass. Ops max chain length rises 10\u219211."
+        },
+        {
+          "name": "ops-notion-incident-block-update",
+          "chain": [
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "neon/run_sql",
+            "notion/API-post-page",
+            "notion/API-update-a-block"
+          ],
+          "accomplishes": "Ops incident report lifecycle: search evidence for incident context and historical precedent \u2192 reason over findings and resolution paths \u2192 verify system state via SQL \u2192 create Notion incident report page \u2192 update report block with resolution status and postmortem link.",
+          "verified": true,
+          "notes": "FIRST notion/API-update-a-block in ops profile. All confirmed-connected backends: evidence, thinking, neon (local), notion. 2026-06-07 sixty-third-pass. Introduces incident-report-update pattern (create then update)."
         }
       ],
       "prompts": [
@@ -9229,6 +9473,14 @@
         {
           "text": "Triage an incident: cast to ops, AI-search evidence for precedents, reason through severity, list active ops agents, and create a Linear issue to track remediation",
           "resolves_to": "ops-linear-create-issue-incident"
+        },
+        {
+          "text": "Run the full 11-step ops incident response pipeline and publish the Notion incident report",
+          "resolves_to": "ops-eleven-step-incident-full-chain"
+        },
+        {
+          "text": "Search evidence for incident context, verify system state in the DB, and update the Notion incident report",
+          "resolves_to": "ops-notion-incident-block-update"
         }
       ]
     }
