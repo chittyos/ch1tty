@@ -1,6 +1,6 @@
 {
-  "_comment": "fifty-eighth pass / 568 combos / 246 verified",
-  "generatedFrom": "sixtieth-pass 2026-06-07 \u2014 592 combos, FIRST 13-step chain (code), 12-step first in governance, 11-step first in design+communication",
+  "_comment": "sixty-first pass / 604 combos / 257 verified",
+  "generatedFrom": "focus-suggestions: sixty-first pass \u2014 604 combos",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools \u2014 now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time \u2014 combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -1047,6 +1047,37 @@
           "accomplishes": "Find the appropriate billing skill via orchestrator, create a new Stripe customer record, summarize the onboarding context with sequential thinking, and write the customer profile as a Notion page \u2014 linking the billing system to the workspace record.",
           "verified": false,
           "notes": "stripe is lazy (inferred from @stripe/mcp surface); notion returning 401 in last run. orchestrator and thinking confirmed. 60th pass 2026-06-07."
+        },
+        {
+          "name": "finance-ten-step-verified-cast-serena",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file"
+          ],
+          "accomplishes": "10-step billing research pipeline: cast to finance context, search and execute a billing skill via orchestrator, list and AI-search the evidence RAG for financial precedents, query Context7 library docs, reason sequentially over findings, search for billing-relevant code symbols via Serena, screenshot the billing dashboard, and write a cashflow report \u2014 all on confirmed-connected servers.",
+          "verified": true,
+          "notes": "FIRST 10-step VERIFIED chain in finance. FIRST serena/search_for_symbols in finance profile. All on confirmed-connected servers: ch1tty, orchestrator, evidence, context7, thinking/sequentialthinking, serena, playwright, fs. 61st pass 2026-06-07."
+        },
+        {
+          "name": "finance-chittyevidence-billing-doc-ingest",
+          "chain": [
+            "ch1tty/cast",
+            "chittyevidence/ingest_document",
+            "neon/run_sql",
+            "ledger/append_entry",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Billing document ingestion pipeline: cast to finance context, ingest a billing document via ChittyEvidence for persistent memory, query the Neon billing database for related records, record the ledger entry for the billing event, and log the summary in Notion.",
+          "verified": false,
+          "notes": "FIRST chittyevidence/ingest_document in finance profile. chittyevidence requires CHITTY auth token. neon/ledger/notion are lazy remotes needing separate auth. 61st pass 2026-06-07."
         }
       ],
       "prompts": [
@@ -1325,6 +1356,14 @@
         {
           "text": "Find the right billing skill, create a new Stripe customer, summarize the onboarding, and add them to Notion",
           "resolves_to": "finance-stripe-customer-cast-workflow"
+        },
+        {
+          "text": "Cast into finance mode, run a billing skill via orchestrator, cross-reference evidence and Context7 docs, reason sequentially, search for billing code symbols, screenshot the billing dashboard, and write a cashflow report",
+          "resolves_to": "finance-ten-step-verified-cast-serena"
+        },
+        {
+          "text": "Ingest a billing document via ChittyEvidence, query the Neon billing database, record the ledger entry, and log the summary in Notion",
+          "resolves_to": "finance-chittyevidence-billing-doc-ingest"
         }
       ]
     },
@@ -2691,6 +2730,41 @@
           "accomplishes": "Search the evidence corpus for the relevant policy text, synthesize a compliance artifact with sequential thinking, and commit the resulting document directly to the governance repository on GitHub \u2014 creating an auditable policy commit from raw evidence.",
           "verified": false,
           "notes": "github is a lazy remote backend \u2014 connection not confirmed in test environment. evidence and thinking confirmed. First github/create_or_update_file use in governance. 60th pass 2026-06-07."
+        },
+        {
+          "name": "governance-thirteen-step-policy-full-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file"
+          ],
+          "accomplishes": "Full policy governance pipeline: cast to governance context, search and execute an orchestration agent, search and execute a governance skill, list all evidence RAGs, AI-search evidence for policy precedents, resolve the regulatory library reference via Context7, query library docs, reason sequentially over compliance gaps, search codebase for implementation symbols via Serena, screenshot the policy review dashboard, and write the final compliance report.",
+          "verified": true,
+          "notes": "FIRST 13-step chain in governance (extends governance-twelve-step-policy-visual-chain by adding orchestrator/agent_execute). All on confirmed-connected servers: ch1tty, orchestrator, evidence, context7, thinking/sequentialthinking, serena, playwright, fs. 61st pass 2026-06-07."
+        },
+        {
+          "name": "governance-linear-create-audit-issue",
+          "chain": [
+            "ch1tty/cast",
+            "thinking/sequentialthinking",
+            "context7/resolve-library-id",
+            "evidence/ai_search",
+            "linear/create_issue",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Audit finding triage: cast to governance context, reason over the regulatory situation, resolve the relevant regulatory library reference, AI-search the evidence store for supporting documents, create a Linear issue to track the audit finding for remediation, and add a follow-up task to the backlog.",
+          "verified": false,
+          "notes": "FIRST linear/create_issue in governance profile. context7/evidence confirmed; linear/tasks are lazy remotes requiring auth tokens. 61st pass 2026-06-07."
         }
       ],
       "prompts": [
@@ -3033,6 +3107,14 @@
         {
           "text": "Search the evidence store for the relevant policy, synthesize a compliance document, and commit it to the governance repo on GitHub",
           "resolves_to": "governance-github-policy-artifact-commit"
+        },
+        {
+          "text": "Full policy pipeline: cast to governance, search and execute an agent and skill, list and search policy evidence, resolve library references, reason sequentially, search codebase for implementation symbols, screenshot policy dashboard, write compliance report",
+          "resolves_to": "governance-thirteen-step-policy-full-chain"
+        },
+        {
+          "text": "Surface an audit finding, reason over the regulatory context, search evidence for support, create a Linear issue for remediation, and add to the task backlog",
+          "resolves_to": "governance-linear-create-audit-issue"
         }
       ]
     },
@@ -4008,6 +4090,39 @@
           "accomplishes": "Run a Cloudflare AI model to generate a UI component (e.g. from a description or wireframe prompt), write the generated component to disk, then navigate to it in a browser to visually verify the rendered output.",
           "verified": false,
           "notes": "cloudflare is a lazy remote backend \u2014 connection not confirmed in test environment. fs and playwright confirmed. First cloudflare/AI-run-model use in design. 60th pass 2026-06-07."
+        },
+        {
+          "name": "design-twelve-step-ux-deep-impl",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file"
+          ],
+          "accomplishes": "Deep UX design research and implementation pipeline: cast to design context, search and execute a design orchestration agent and skill, list and AI-search UX evidence, resolve the design library reference, query library documentation, reason sequentially through design decisions, search the codebase for relevant UI component symbols via Serena, screenshot the design result, and write the design implementation report.",
+          "verified": true,
+          "notes": "FIRST 12-step chain in design (extends design-eleven-step-ux-deep-scaffold by adding serena/search_for_symbols). FIRST serena/search_for_symbols in design profile. All on confirmed-connected servers: ch1tty, orchestrator, evidence, context7, thinking/sequentialthinking, serena, playwright, fs. 61st pass 2026-06-07."
+        },
+        {
+          "name": "design-stripe-create-invoice-project-fee",
+          "chain": [
+            "ch1tty/cast",
+            "thinking/sequentialthinking",
+            "stripe/create_invoice",
+            "ledger/append_entry",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Design service invoicing: cast to design context, reason through the project scope and billable work, create a Stripe invoice for the design retainer or project fee, record the invoice in the ledger, and log the billing event in Notion.",
+          "verified": false,
+          "notes": "FIRST stripe/create_invoice in entire catalog (new stripe tool \u2014 previously only create_customer, list_invoices, list_payment_intents). Requires Stripe API key with invoice creation permissions. ledger/notion lazy remotes needing auth. 61st pass 2026-06-07."
         }
       ],
       "prompts": [
@@ -4282,6 +4397,14 @@
         {
           "text": "Use Cloudflare AI to generate a UI component, write it to disk, and open it in the browser to check the rendered output",
           "resolves_to": "design-cloudflare-ai-component-gen"
+        },
+        {
+          "text": "Deep UX research: cast to design, run design agent and skill, list and search UX evidence, resolve library docs, reason through design decisions, search codebase for UI symbols, screenshot the design result, write implementation report",
+          "resolves_to": "design-twelve-step-ux-deep-impl"
+        },
+        {
+          "text": "Invoice a design client: cast to design, reason through the project scope, create a Stripe invoice for the retainer, record in the ledger, and log in Notion",
+          "resolves_to": "design-stripe-create-invoice-project-fee"
         }
       ]
     },
@@ -5639,6 +5762,32 @@
           "accomplishes": "List open pull requests on the project repo, pull relevant library documentation to understand the changed APIs, scan code symbols for the affected modules, synthesize a structured review brief with sequential thinking, and write the review report to disk.",
           "verified": false,
           "notes": "github is a lazy remote backend \u2014 connection not confirmed in test environment. context7, serena, thinking, fs all confirmed. 60th pass 2026-06-07."
+        },
+        {
+          "name": "code-chittyevidence-codebase-doc-ingest",
+          "chain": [
+            "ch1tty/cast",
+            "chittyevidence/ingest_document",
+            "serena/search_for_symbols",
+            "quality/analyze",
+            "github/create_issue"
+          ],
+          "accomplishes": "Codebase documentation ingestion: cast to code context, ingest the codebase documentation via ChittyEvidence for persistent memory, search for relevant code symbols via Serena to cross-reference the docs, run quality tests to verify documentation coverage, and file a GitHub issue for any documentation gaps or coverage failures.",
+          "verified": false,
+          "notes": "FIRST chittyevidence/ingest_document in code profile. serena confirmed; chittyevidence requires CHITTY token; quality/github are lazy remotes needing auth. 61st pass 2026-06-07."
+        },
+        {
+          "name": "code-linear-create-issue-regression",
+          "chain": [
+            "ch1tty/search",
+            "serena/search_for_symbols",
+            "quality/analyze",
+            "linear/create_issue",
+            "github/create_issue"
+          ],
+          "accomplishes": "Regression tracking pipeline: search the code tool registry for relevant debugging tools, use Serena to find the failing symbol in the codebase, run quality tests to confirm the regression, create a Linear issue for sprint tracking, and file a parallel GitHub issue for public visibility.",
+          "verified": false,
+          "notes": "FIRST linear/create_issue in code profile. serena confirmed; quality/linear/github are lazy remotes requiring auth tokens. 61st pass 2026-06-07."
         }
       ],
       "prompts": [
@@ -5977,6 +6126,14 @@
         {
           "text": "List open PRs, pull the relevant library docs, scan code symbols for the changed modules, and write me a review brief",
           "resolves_to": "code-github-pr-review-workflow"
+        },
+        {
+          "text": "Ingest codebase docs via ChittyEvidence, search for relevant symbols with Serena, run quality tests to verify coverage, and file a GitHub issue for documentation gaps",
+          "resolves_to": "code-chittyevidence-codebase-doc-ingest"
+        },
+        {
+          "text": "Find the failing symbol in the codebase with Serena, run quality tests to confirm the regression, create a Linear issue for tracking, and file a parallel GitHub issue",
+          "resolves_to": "code-linear-create-issue-regression"
         }
       ]
     },
@@ -6966,6 +7123,39 @@
           "accomplishes": "Retrieve recent iMessage threads from the connected Mac, synthesize patterns, sentiment, and key topics with sequential thinking, and write a structured conversation analysis report to disk.",
           "verified": false,
           "notes": "imessage is a local backend \u2014 connection not confirmed in test environment (chittymac dependency). thinking and fs confirmed. First imessage/get_recent_messages use in communication. 60th pass 2026-06-07."
+        },
+        {
+          "name": "comm-twelve-step-broadcast-serena",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot"
+          ],
+          "accomplishes": "Full broadcast research and planning pipeline: cast to communication context, search and execute a comms orchestration agent and skill, list and AI-search communication evidence, resolve the messaging library reference, query library documentation, reason sequentially through the broadcast strategy, search the codebase for relevant comms symbols via Serena, and screenshot the broadcast dashboard for visual verification.",
+          "verified": true,
+          "notes": "FIRST 12-step chain in communication (extends comm-eleven-step-research-scaffold by adding serena/search_for_symbols). FIRST serena/search_for_symbols in communication profile. All on confirmed-connected servers: ch1tty, orchestrator, evidence, context7, thinking/sequentialthinking, serena, playwright. 61st pass 2026-06-07."
+        },
+        {
+          "name": "comm-linear-create-issue-support",
+          "chain": [
+            "ch1tty/cast",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "linear/create_issue",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Support case triage: cast to communication context, AI-search the evidence store for similar support cases and precedents, reason through the issue severity and resolution path, create a Linear issue to track the support case, and add a follow-up task to the backlog.",
+          "verified": false,
+          "notes": "FIRST linear/create_issue in communication profile. evidence confirmed; linear/tasks are lazy remotes requiring auth. 61st pass 2026-06-07."
         }
       ],
       "prompts": [
@@ -7240,6 +7430,14 @@
         {
           "text": "Pull my recent iMessage threads, analyze the conversation patterns and sentiment, and write me a summary report",
           "resolves_to": "comm-imessage-thread-analysis"
+        },
+        {
+          "text": "Full broadcast research: cast to communication, run comms agents and skills, list and search evidence, resolve library docs, reason through message strategy, search for comms symbols with Serena, screenshot the broadcast dashboard",
+          "resolves_to": "comm-twelve-step-broadcast-serena"
+        },
+        {
+          "text": "Triage a support case: cast to communication, AI-search evidence for similar cases, reason through the issue, create a Linear issue for tracking, and add to the task backlog",
+          "resolves_to": "comm-linear-create-issue-support"
         }
       ]
     },
@@ -8526,6 +8724,37 @@
           "accomplishes": "Execute a diagnostic SQL transaction to collect database metrics atomically, then query for the current slow query log to identify performance bottlenecks, synthesize findings with sequential thinking, and write the performance audit report.",
           "verified": false,
           "notes": "neon is a lazy local backend \u2014 connection not confirmed in test environment. thinking and fs confirmed. First combined neon/run_sql_transaction + neon/list_slow_queries chain. 60th pass 2026-06-07."
+        },
+        {
+          "name": "ops-ten-step-verified-incident",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "playwright/browser_take_screenshot",
+            "fs/write_file"
+          ],
+          "accomplishes": "10-step incident ops pipeline: cast to ops context, search and execute an incident response agent, execute an ops skill, list and AI-search evidence for precedents, query Context7 for operational docs, reason sequentially through the incident timeline, screenshot the ops dashboard, and write the incident report \u2014 all on confirmed-connected servers.",
+          "verified": true,
+          "notes": "FIRST 10-step VERIFIED chain in ops (extends ops-nine-step-incident-context7-pipeline by adding ch1tty/cast prefix and orchestrator/agent_execute). The existing ops-ten-step-incident-context7-publish is unverified due to notion. All on confirmed-connected servers: ch1tty, orchestrator, evidence, context7, thinking/sequentialthinking, playwright, fs. 61st pass 2026-06-07."
+        },
+        {
+          "name": "ops-linear-create-issue-incident",
+          "chain": [
+            "ch1tty/cast",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "orchestrator/agent_list",
+            "linear/create_issue"
+          ],
+          "accomplishes": "Incident linear ticketing: cast to ops context, AI-search the evidence store for similar incidents and root causes, reason through the incident severity and priority, list active ops agents to identify who should be assigned, and create a Linear issue to track the incident remediation.",
+          "verified": false,
+          "notes": "FIRST linear/create_issue in ops profile. evidence/orchestrator confirmed; linear is a lazy remote requiring auth. 61st pass 2026-06-07."
         }
       ],
       "prompts": [
@@ -8848,6 +9077,14 @@
         {
           "text": "Run a diagnostic SQL transaction and check the slow query log in Neon, then write me a database performance audit",
           "resolves_to": "ops-neon-sql-transaction-perf-audit"
+        },
+        {
+          "text": "Full incident pipeline: cast to ops, search and execute an incident agent and skill, list and search evidence, query ops docs, reason through the incident, screenshot ops state, write the incident report",
+          "resolves_to": "ops-ten-step-verified-incident"
+        },
+        {
+          "text": "Triage an incident: cast to ops, AI-search evidence for precedents, reason through severity, list active ops agents, and create a Linear issue to track remediation",
+          "resolves_to": "ops-linear-create-issue-incident"
         }
       ]
     }
