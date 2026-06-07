@@ -1,6 +1,6 @@
 {
   "_comment": "fifty-eighth pass / 568 combos / 246 verified",
-  "generatedFrom": "focus-suggestions: fifty-eighth pass \u2014 568 combos",
+  "generatedFrom": "sixtieth-pass 2026-06-07 \u2014 592 combos, FIRST 13-step chain (code), 12-step first in governance, 11-step first in design+communication",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools \u2014 now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time \u2014 combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -1024,6 +1024,29 @@
           "accomplishes": "List open Linear issues for the billing project, pull recent Stripe invoices to gauge budget burn, reason through milestone completion against spend, update the Linear project status with budget progress, and write a budget milestone summary \u2014 closing the loop between issue tracking and payment data.",
           "verified": false,
           "notes": "FIRST linear/update_project in finance profile. Unverified: linear + stripe auth-gated. Verify when Linear and Stripe tokens are available."
+        },
+        {
+          "name": "finance-neon-sql-transaction-reconcile",
+          "chain": [
+            "neon/run_sql_transaction",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Execute a multi-statement SQL transaction against the Neon financial database (e.g. update account balances, reconcile entries atomically), synthesize the reconciliation summary with sequential thinking, and write the audit report to disk.",
+          "verified": false,
+          "notes": "neon is a lazy local backend \u2014 connection not confirmed in test environment. thinking and fs confirmed. First neon/run_sql_transaction use in finance. 60th pass 2026-06-07."
+        },
+        {
+          "name": "finance-stripe-customer-cast-workflow",
+          "chain": [
+            "orchestrator/skill_search",
+            "stripe/create_customer",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Find the appropriate billing skill via orchestrator, create a new Stripe customer record, summarize the onboarding context with sequential thinking, and write the customer profile as a Notion page \u2014 linking the billing system to the workspace record.",
+          "verified": false,
+          "notes": "stripe is lazy (inferred from @stripe/mcp surface); notion returning 401 in last run. orchestrator and thinking confirmed. 60th pass 2026-06-07."
         }
       ],
       "prompts": [
@@ -1294,6 +1317,14 @@
         {
           "text": "List Linear billing issues, pull Stripe invoices for budget burn, reason through milestones, update the Linear project, and write a budget milestone summary",
           "resolves_to": "finance-linear-update-project-budget-milestone"
+        },
+        {
+          "text": "Run an atomic SQL transaction to reconcile the account balances in Neon and write me the audit report",
+          "resolves_to": "finance-neon-sql-transaction-reconcile"
+        },
+        {
+          "text": "Find the right billing skill, create a new Stripe customer, summarize the onboarding, and add them to Notion",
+          "resolves_to": "finance-stripe-customer-cast-workflow"
         }
       ]
     },
@@ -2629,6 +2660,37 @@
           "accomplishes": "Search agents for the best policy executor, run an evidence search to surface recent compliance findings, reason through milestone completion against open policy items, update the Linear project with policy milestone progress, and write a compliance milestone summary \u2014 linking evidence-based governance work to project tracking.",
           "verified": false,
           "notes": "FIRST linear/update_project in governance profile. Unverified: linear auth-gated. Verify when Linear token is available."
+        },
+        {
+          "name": "governance-twelve-step-policy-visual-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file"
+          ],
+          "accomplishes": "Cast intent to dispatch governance research, locate and execute the best governance skill, survey the evidence corpus for policy material, pull authoritative documentation, reason with sequential thinking, search code/document symbols for implementation anchors, capture a visual screenshot as audit proof, and persist the compiled policy brief.",
+          "verified": true,
+          "notes": "FIRST 12-step chain in governance. All on confirmed-connected servers: ch1tty, orchestrator, evidence, context7, thinking, serena, playwright, fs. 60th pass 2026-06-07."
+        },
+        {
+          "name": "governance-github-policy-artifact-commit",
+          "chain": [
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "github/create_or_update_file"
+          ],
+          "accomplishes": "Search the evidence corpus for the relevant policy text, synthesize a compliance artifact with sequential thinking, and commit the resulting document directly to the governance repository on GitHub \u2014 creating an auditable policy commit from raw evidence.",
+          "verified": false,
+          "notes": "github is a lazy remote backend \u2014 connection not confirmed in test environment. evidence and thinking confirmed. First github/create_or_update_file use in governance. 60th pass 2026-06-07."
         }
       ],
       "prompts": [
@@ -2963,6 +3025,14 @@
         {
           "text": "Search agents for policy executor, search evidence for compliance findings, reason through milestones, update the Linear project, and write a compliance milestone summary",
           "resolves_to": "governance-linear-update-project-policy-milestone"
+        },
+        {
+          "text": "Run the full 12-step governance research pipeline: cast intent, find the governance skill, survey evidence, pull docs, reason, search code symbols, screenshot, and write the policy brief",
+          "resolves_to": "governance-twelve-step-policy-visual-chain"
+        },
+        {
+          "text": "Search the evidence store for the relevant policy, synthesize a compliance document, and commit it to the governance repo on GitHub",
+          "resolves_to": "governance-github-policy-artifact-commit"
         }
       ]
     },
@@ -3908,6 +3978,36 @@
           "accomplishes": "Resolve the UI library ID for the design sprint, pull documentation to confirm component API surface, reason through UX sprint milestone completion against documented design patterns, update the Linear project with sprint progress, and write a sprint completion summary \u2014 grounding design sprint updates in library documentation.",
           "verified": false,
           "notes": "FIRST linear/update_project (distinct combo) in design profile alongside design-linear-update-project-ux-milestone. Focuses on context7-driven library documentation as sprint evidence. Unverified: linear auth-gated."
+        },
+        {
+          "name": "design-eleven-step-ux-deep-scaffold",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "playwright/browser_take_screenshot",
+            "fs/write_file"
+          ],
+          "accomplishes": "Cast design intent, locate and execute the right UX skill, survey the evidence store for design precedents, pull component library documentation, synthesize a design brief with sequential thinking, capture a visual screenshot as reference, and write the design scaffold \u2014 11-step end-to-end UX research and scaffolding pipeline.",
+          "verified": true,
+          "notes": "FIRST 11-step chain in design. All on confirmed-connected servers: ch1tty, orchestrator, evidence, context7, thinking, playwright, fs. 60th pass 2026-06-07."
+        },
+        {
+          "name": "design-cloudflare-ai-component-gen",
+          "chain": [
+            "cloudflare/AI-run-model",
+            "fs/write_file",
+            "playwright/browser_navigate"
+          ],
+          "accomplishes": "Run a Cloudflare AI model to generate a UI component (e.g. from a description or wireframe prompt), write the generated component to disk, then navigate to it in a browser to visually verify the rendered output.",
+          "verified": false,
+          "notes": "cloudflare is a lazy remote backend \u2014 connection not confirmed in test environment. fs and playwright confirmed. First cloudflare/AI-run-model use in design. 60th pass 2026-06-07."
         }
       ],
       "prompts": [
@@ -4174,6 +4274,14 @@
         {
           "text": "Resolve UI library ID, pull docs, reason through sprint completion against design patterns, update the Linear project, and write a sprint completion summary",
           "resolves_to": "design-linear-update-project-ux-sprint"
+        },
+        {
+          "text": "Run the full 11-step UX research pipeline: cast intent, find the design skill, survey evidence, pull component docs, reason, screenshot, and write the design scaffold",
+          "resolves_to": "design-eleven-step-ux-deep-scaffold"
+        },
+        {
+          "text": "Use Cloudflare AI to generate a UI component, write it to disk, and open it in the browser to check the rendered output",
+          "resolves_to": "design-cloudflare-ai-component-gen"
         }
       ]
     },
@@ -5496,6 +5604,41 @@
           "accomplishes": "Resolve the target library ID for the current sprint's tech stack, pull documentation to assess implementation completeness, search the evidence store for code quality findings, reason through sprint status against docs and evidence, update the Linear project with sprint progress, and write a sprint status report \u2014 grounding Linear updates in library documentation and evidence.",
           "verified": false,
           "notes": "FIRST linear/update_project in code profile. Unverified: linear auth-gated. Verify when Linear token is available."
+        },
+        {
+          "name": "code-thirteen-step-research-impl-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file"
+          ],
+          "accomplishes": "Full research-to-implementation pipeline: dispatch via ch1tty/cast, locate and run the best agent+skill, survey the evidence corpus, pull library documentation, reason with sequential thinking, then anchor implementation by searching live code symbols before capturing a visual proof and persisting the output \u2014 13-step end-to-end code research and scaffolding chain.",
+          "verified": true,
+          "notes": "FIRST 13-step chain in entire catalog. All on confirmed-connected servers: ch1tty, orchestrator, evidence, context7, thinking, serena, playwright, fs. serena/search_for_symbols confirmed in prior passes (4 uses). 60th pass 2026-06-07."
+        },
+        {
+          "name": "code-github-pr-review-workflow",
+          "chain": [
+            "github/list_pull_requests",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "serena/search_for_symbols",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "List open pull requests on the project repo, pull relevant library documentation to understand the changed APIs, scan code symbols for the affected modules, synthesize a structured review brief with sequential thinking, and write the review report to disk.",
+          "verified": false,
+          "notes": "github is a lazy remote backend \u2014 connection not confirmed in test environment. context7, serena, thinking, fs all confirmed. 60th pass 2026-06-07."
         }
       ],
       "prompts": [
@@ -5826,6 +5969,14 @@
         {
           "text": "Resolve library ID, pull docs, search evidence for code quality findings, reason through sprint status, update the Linear project, and write a sprint status report",
           "resolves_to": "code-linear-update-project-sprint-status"
+        },
+        {
+          "text": "Run the full 13-step research-to-implementation pipeline: cast intent, find the right agent and skill, survey the evidence store, pull library docs, reason, search code symbols, screenshot, and write the output",
+          "resolves_to": "code-thirteen-step-research-impl-chain"
+        },
+        {
+          "text": "List open PRs, pull the relevant library docs, scan code symbols for the changed modules, and write me a review brief",
+          "resolves_to": "code-github-pr-review-workflow"
         }
       ]
     },
@@ -6785,6 +6936,36 @@
           "accomplishes": "Search agents for the best communication executor, run the selected agent to gather campaign engagement data, reason through campaign milestone completion against engagement metrics, update the Linear project with campaign milestone progress, and write a campaign milestone summary \u2014 connecting agent-gathered campaign data to project milestone tracking.",
           "verified": false,
           "notes": "FIRST linear/update_project in communication profile. Unverified: linear auth-gated. Verify when Linear token is available."
+        },
+        {
+          "name": "comm-eleven-step-research-scaffold",
+          "chain": [
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "playwright/browser_take_screenshot",
+            "fs/write_file"
+          ],
+          "accomplishes": "Locate and execute the best communication agent and skill, survey the evidence store for messaging context, pull communication API documentation, synthesize the broadcast strategy with sequential thinking, capture a visual proof of the messaging state, and persist the campaign brief \u2014 11-step end-to-end communication research chain.",
+          "verified": true,
+          "notes": "FIRST 11-step chain in communication. All on confirmed-connected servers: orchestrator, evidence, context7, thinking, playwright, fs. 60th pass 2026-06-07."
+        },
+        {
+          "name": "comm-imessage-thread-analysis",
+          "chain": [
+            "imessage/get_recent_messages",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Retrieve recent iMessage threads from the connected Mac, synthesize patterns, sentiment, and key topics with sequential thinking, and write a structured conversation analysis report to disk.",
+          "verified": false,
+          "notes": "imessage is a local backend \u2014 connection not confirmed in test environment (chittymac dependency). thinking and fs confirmed. First imessage/get_recent_messages use in communication. 60th pass 2026-06-07."
         }
       ],
       "prompts": [
@@ -7051,6 +7232,14 @@
         {
           "text": "Search agents for campaign executor, execute agent for engagement data, reason through campaign milestones, update the Linear project, and write a campaign milestone summary",
           "resolves_to": "comm-linear-update-project-campaign-milestone"
+        },
+        {
+          "text": "Run the full 11-step communication research pipeline: find the right agent and skill, survey evidence, pull API docs, reason, screenshot, and write the campaign brief",
+          "resolves_to": "comm-eleven-step-research-scaffold"
+        },
+        {
+          "text": "Pull my recent iMessage threads, analyze the conversation patterns and sentiment, and write me a summary report",
+          "resolves_to": "comm-imessage-thread-analysis"
         }
       ]
     },
@@ -8313,6 +8502,30 @@
           "accomplishes": "Search agents for the best incident context gatherer, execute the matched skill to aggregate live incident signals, reason through incident scope and required remediation work, create a new Linear project for the incident tracking workstream, and write the incident project brief \u2014 turning a live incident into a structured project before the retrospective.",
           "verified": false,
           "notes": "FIRST linear/create_project in ops profile. Unverified: linear auth-gated. Verify when Linear token is available."
+        },
+        {
+          "name": "ops-cloudflare-ai-incident-classify",
+          "chain": [
+            "cloudflare/get_worker_logs",
+            "cloudflare/AI-run-model",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Pull the latest Cloudflare Worker error logs, run them through a Cloudflare AI model to classify incident severity and root cause, synthesize the incident report with sequential thinking, and write the triage output to disk.",
+          "verified": false,
+          "notes": "cloudflare is a lazy remote backend \u2014 connection not confirmed in test environment. thinking and fs confirmed. First cloudflare/AI-run-model + cloudflare/get_worker_logs combo in ops. 60th pass 2026-06-07."
+        },
+        {
+          "name": "ops-neon-sql-transaction-perf-audit",
+          "chain": [
+            "neon/run_sql_transaction",
+            "neon/list_slow_queries",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Execute a diagnostic SQL transaction to collect database metrics atomically, then query for the current slow query log to identify performance bottlenecks, synthesize findings with sequential thinking, and write the performance audit report.",
+          "verified": false,
+          "notes": "neon is a lazy local backend \u2014 connection not confirmed in test environment. thinking and fs confirmed. First combined neon/run_sql_transaction + neon/list_slow_queries chain. 60th pass 2026-06-07."
         }
       ],
       "prompts": [
@@ -8627,6 +8840,14 @@
         {
           "text": "Search agents for incident context, execute the skill, reason through incident scope, create a new Linear project for the incident, and write the incident project brief",
           "resolves_to": "ops-linear-create-project-incident-tracker"
+        },
+        {
+          "text": "Pull Cloudflare Worker logs, classify the incidents with AI, synthesize the triage report, and write it to disk",
+          "resolves_to": "ops-cloudflare-ai-incident-classify"
+        },
+        {
+          "text": "Run a diagnostic SQL transaction and check the slow query log in Neon, then write me a database performance audit",
+          "resolves_to": "ops-neon-sql-transaction-perf-audit"
         }
       ]
     }
