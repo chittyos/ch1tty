@@ -956,3 +956,27 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 1. Investigate PR #256 CI failure (0 jobs, instant fail) — if still red, diagnose root cause. PR #257 is stacked on #256.
 2. 62nd catalog pass: `linear/create_issue` in finance (the last missing profile); 14-step chain attempt in code or governance (current max 13); `cloudflare/AI-run-model` in finance+governance+communication as verified combos (currently unverified due to cloudflare being lazy remote); `neon/run_sql_transaction` in governance+design+communication (currently only finance+ops)
 3. Fix Notion auth to verify the ~347 unverified combos: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`
+
+---
+
+## Run 62 — 2026-06-07 (CodeRabbit fix pass)
+
+**Context**: Continuing from run 61 which had a context overflow mid-fix. PR #257 open, CodeRabbit review had 4 actionable comments (3 tool name bugs + 1 DRIVER-LOG.md clarification). This run applied all fixes.
+
+**Actions taken**:
+- Fixed `focus-suggestions.json`: 6 tool name corrections across 3 bug types:
+  - `ledger/record_transaction` → `ledger/append_entry` (2 combos: finance-chittyevidence-billing-doc-ingest, design-stripe-create-invoice-project-fee)
+  - `tasks/create` → `tasks/create_task` (2 combos: governance-linear-create-audit-issue, comm-linear-create-issue-support)
+  - `quality/run_tests` → `quality/analyze` (2 combos: code-chittyevidence-codebase-doc-ingest, code-linear-create-issue-regression)
+- Fixed DRIVER-LOG.md line 932: clarified "linear/create_issue: present ONLY in design" was pass-START state, not final state
+- Committed as `fix(catalog): correct tool names per CodeRabbit review` (SHA 9738bb2)
+- Pushed to `origin/auto/E-catalog-sixty-first-pass` (non-force, fast-forward from ffc4ddc)
+- CodeRabbit attempted re-review but hit rate limit (49 min cooldown). Walkthrough shows it processed both files correctly.
+- CodeQL checks (Analyze javascript-typescript + Analyze actions) started at 14:34:59Z — in_progress
+
+**Board state**: PR #257 open, fix commit live at 9738bb2. Awaiting CodeQL green + CodeRabbit re-review (rate limit resets ~15:25Z). mergeable_state: blocked (pending CI).
+
+**Next run priority**:
+1. Check PR #257 CI — if CodeQL green, PR should be mergeable (no branch protection issues seen previously)
+2. If CodeRabbit re-reviews cleanly, merge #257
+3. 62nd catalog pass: `linear/create_issue` in finance (last missing profile); 14-step chain attempt in code or governance; `neon/run_sql_transaction` in design+communication
