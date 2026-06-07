@@ -1,6 +1,6 @@
 {
-  "_comment": "ch1tty focus-profile suggestions catalog — 436 combos, 219 verified (forty-seventh pass — playwright/browser_navigate_back + browser_network_request + browser_hover first use across all profiles)",
-  "generatedFrom": "auto-driver 47th-pass 2026-06-07T00:00Z",
+  "_comment": "ch1tty focus-profile suggestions catalog — 448 combos, 220 verified (forty-eighth pass — first neon in finance/governance, first context7 in governance/communication, first linear in finance/design/communication, first fs/move_directory, first neon/get_database_tables + neon/list_slow_queries)",
+  "generatedFrom": "auto-driver 48th-pass 2026-06-07T01:30Z",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools — now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time — combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -733,6 +733,26 @@
           "accomplishes": "Navigate to the Stripe payments dashboard, enumerate all network requests fired during page load with browser_network_requests, then inspect the full request/response body of the payment API call using browser_network_request (singular), and post the API audit to a Notion financial record — enabling deep payment-flow debugging without leaving ch1tty.",
           "verified": false,
           "notes": "playwright/browser_network_request (singular, index-based detail) first use in finance profile (47th pass). Distinct from browser_network_requests (list). playwright connected (23 tools)."
+        },
+        {
+          "name": "finance-neon-billing-db-ledger-sync",
+          "chain": [
+            "neon/run_sql",
+            "ledger/append_entry"
+          ],
+          "accomplishes": "Query the financial database for billing metrics (revenue totals, outstanding invoices, chargeback rates) via Neon SQL, then append an immutable timestamped summary entry to ChittyLedger — creating a durable, append-only audit trail tied to real DB state.",
+          "verified": false,
+          "notes": "First neon combo in finance profile. neon/run_sql inferred from Neon MCP surface (neon server not connected on live gateway at generation time). ledger/append_entry unverified (ledger server disabled)."
+        },
+        {
+          "name": "finance-linear-billing-issues-notion-sync",
+          "chain": [
+            "linear/list_issues",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Pull billing-related Linear engineering issues (payment processing bugs, invoice failures, subscription edge cases), filter by label or project, and write a structured Notion page that summarizes open billing work for finance review.",
+          "verified": false,
+          "notes": "First linear combo in finance profile. linear not connected (lazy). notion/API-post-page connected but Notion API returns 401 until token is refreshed."
         }
       ],
       "prompts": [
@@ -907,6 +927,14 @@
         {
           "text": "Navigate to the Stripe payments UI, enumerate all network requests fired on load, inspect the payment API response body in full detail, and post the API audit to a Notion financial record.",
           "resolves_to": "finance-playwright-network-request-payment-inspect"
+        },
+        {
+          "text": "Run a billing database query to pull revenue and invoice metrics, then record the summary as an immutable ledger entry for audit purposes.",
+          "resolves_to": "finance-neon-billing-db-ledger-sync"
+        },
+        {
+          "text": "List all billing-related Linear issues and post a summary of open finance engineering work to a Notion finance tracker page.",
+          "resolves_to": "finance-linear-billing-issues-notion-sync"
         }
       ]
     },
@@ -1941,6 +1969,28 @@
           "accomplishes": "Load a governance portal, capture all API requests fired during authentication and data fetch, inspect the full request headers and response body of the authorization API call with browser_network_request, and write the API audit log to a file for compliance review — surfacing auth token exposure or unexpected API calls.",
           "verified": false,
           "notes": "playwright/browser_network_request (singular) in governance context (47th pass). fs/write_file confirmed connected. Useful for compliance audit of auth API surface."
+        },
+        {
+          "name": "governance-neon-compliance-branch-audit",
+          "chain": [
+            "neon/create_branch",
+            "neon/run_sql",
+            "evidence/ai_search"
+          ],
+          "accomplishes": "Create an isolated Neon database branch for non-destructive compliance auditing, run policy-compliance SQL queries (user consent records, data retention checks, access log aggregates) against the branch, then cross-reference findings with the evidence store to surface any known violations or precedents.",
+          "verified": false,
+          "notes": "First neon combo in governance profile. neon/create_branch + neon/run_sql inferred (neon server not connected). evidence/ai_search verified."
+        },
+        {
+          "name": "governance-context7-policy-sdk-docs",
+          "chain": [
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "fs/write_file"
+          ],
+          "accomplishes": "Resolve the library ID for a governance-relevant SDK (e.g. ChittyOS canon client, MCP SDK, or identity/auth library), query its full API documentation, and write the relevant sections to a local reference file for policy implementation work.",
+          "verified": true,
+          "notes": "First context7 combo in governance profile. context7/resolve-library-id and context7/query-docs both verified on live gateway. fs/write_file verified."
         }
       ],
       "prompts": [
@@ -2179,6 +2229,14 @@
         {
           "text": "Load the governance portal, enumerate all API calls made during authentication, inspect the authorization API call headers and body in full detail, and write the API audit log to a file for compliance review.",
           "resolves_to": "governance-playwright-network-request-auth-api-audit"
+        },
+        {
+          "text": "Create a Neon database branch for compliance auditing, run consent and data-retention SQL checks, and cross-reference the findings with the evidence store.",
+          "resolves_to": "governance-neon-compliance-branch-audit"
+        },
+        {
+          "text": "Look up the canonical MCP SDK or ChittyOS canon library documentation and save the relevant policy implementation reference to a local file.",
+          "resolves_to": "governance-context7-policy-sdk-docs"
         }
       ]
     },
@@ -2834,6 +2892,27 @@
           "accomplishes": "Navigate through a prototype user flow to a key design decision point, screenshot the current state, go back to the entry state with browser_navigate_back, screenshot the before state, and save both screenshots to a file as a before/after design comparison artifact for review handoff.",
           "verified": false,
           "notes": "playwright/browser_navigate_back first use in design profile (47th pass). fs/write_file confirmed connected. Natural complement to navigate+screenshot existing design combos."
+        },
+        {
+          "name": "design-linear-ux-issue-screenshot-report",
+          "chain": [
+            "linear/list_issues",
+            "playwright/browser_navigate",
+            "playwright/browser_screenshot"
+          ],
+          "accomplishes": "Pull open UX/design Linear issues, navigate to the affected UI page in a browser, and capture a screenshot of the current visual state — producing a visual audit report that links engineering issues to their actual rendered appearance.",
+          "verified": false,
+          "notes": "First linear combo in design profile. linear not connected. playwright/browser_navigate and playwright/browser_screenshot verified."
+        },
+        {
+          "name": "design-fs-move-directory-asset-reorganize",
+          "chain": [
+            "fs/move_directory",
+            "fs/directory_tree"
+          ],
+          "accomplishes": "Move a design asset directory (icons, components, mockups) to a new location in the project structure, then enumerate the updated directory tree to confirm the reorganization — the first use of the 14th fs tool (move_directory) in the catalog.",
+          "verified": false,
+          "notes": "First fs/move_directory combo in any profile. 14 fs tools are live on the gateway; move_directory is the inferred 14th (13 others are already cataloged). fs/directory_tree verified."
         }
       ],
       "prompts": [
@@ -3004,6 +3083,14 @@
         {
           "text": "Navigate through the prototype user flow to a key design decision point, screenshot it, go back with browser_navigate_back, screenshot the entry state, and save both as before/after comparison files.",
           "resolves_to": "design-playwright-navigate-back-prototype-flow"
+        },
+        {
+          "text": "List open UX design issues from Linear, navigate to the affected page in the browser, and capture a screenshot to document the current visual state.",
+          "resolves_to": "design-linear-ux-issue-screenshot-report"
+        },
+        {
+          "text": "Move the design assets directory to a new project location and show the updated directory tree to confirm the reorganization.",
+          "resolves_to": "design-fs-move-directory-asset-reorganize"
         }
       ]
     },
@@ -4023,6 +4110,28 @@
           "accomplishes": "Navigate to a library's online documentation page, hover over a method or symbol to surface the inline type signature tooltip preview, screenshot the hovered state, then query Context7 for the full typed API docs — cross-referencing the hover preview against the canonical docs to catch type drift in published documentation.",
           "verified": false,
           "notes": "playwright/browser_hover first use in code profile (47th pass). context7/query-docs confirmed connected (context7 2 tools). Natural pairing: hover captures ephemeral tooltip; context7 supplies authoritative docs."
+        },
+        {
+          "name": "code-neon-get-tables-schema-codegen",
+          "chain": [
+            "neon/get_database_tables",
+            "neon/describe_table_schema",
+            "fs/write_file"
+          ],
+          "accomplishes": "Discover all tables in the database via Neon, retrieve the schema for each relevant table, and write generated TypeScript type definitions or Zod schemas to a file — automating DB-to-type codegen without a build step.",
+          "verified": false,
+          "notes": "First neon/get_database_tables combo in catalog. Tool inferred from Neon MCP surface (confirmed in NEON-MCP tool list). neon server not connected on live ch1tty gateway. fs/write_file verified."
+        },
+        {
+          "name": "code-fs-move-directory-module-refactor",
+          "chain": [
+            "fs/move_directory",
+            "serena/search_code",
+            "fs/edit_file"
+          ],
+          "accomplishes": "Move a source module directory to a new location in the project, use Serena to search for all import references to the old path, and edit each file to update the import paths — a complete module-relocation refactor via three coordinated tools.",
+          "verified": false,
+          "notes": "First fs/move_directory combo in code profile (second in catalog, after design-fs-move-directory-asset-reorganize). fs/move_directory inferred as 14th fs tool. serena/search_code and fs/edit_file verified."
         }
       ],
       "prompts": [
@@ -4257,6 +4366,14 @@
         {
           "text": "Navigate to the library docs, hover over a method to capture the inline type tooltip, screenshot it, then query Context7 for the full API docs to cross-reference and catch type drift.",
           "resolves_to": "code-playwright-hover-docs-type-preview"
+        },
+        {
+          "text": "Get all database tables, retrieve their schemas, and write generated TypeScript type definitions to a file for type-safe DB access.",
+          "resolves_to": "code-neon-get-tables-schema-codegen"
+        },
+        {
+          "text": "Move a source module directory to a new location, search for all import references to the old path, and update them in each file.",
+          "resolves_to": "code-fs-move-directory-module-refactor"
         }
       ]
     },
@@ -4925,6 +5042,28 @@
           "accomplishes": "Navigate through a message thread chain to the deepest reply, capture an accessibility snapshot of the thread leaf, go back to the thread root with browser_navigate_back, capture the root snapshot for context, and create a Notion page summarizing the full thread context — preserving both origin and resolution state for follow-up.",
           "verified": false,
           "notes": "playwright/browser_navigate_back first use in communication profile (47th pass). Notion auth 401 — write blocked. Natural communication flow: thread-leaf to thread-root for context capture."
+        },
+        {
+          "name": "comm-context7-messaging-sdk-docs",
+          "chain": [
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Resolve the library ID for a messaging SDK (e.g. Twilio, SendGrid, iMessage framework, or Slack API), query its full API documentation, and post the relevant integration reference as a Notion page in the communication workspace — enabling team-visible SDK research before implementing a new communication channel.",
+          "verified": false,
+          "notes": "First context7 combo in communication profile. context7/resolve-library-id and context7/query-docs both verified on live gateway. notion/API-post-page connected but Notion API returns 401 until token is refreshed."
+        },
+        {
+          "name": "comm-linear-issue-task-notify",
+          "chain": [
+            "linear/list_issues",
+            "tasks/create_task",
+            "imessage/send_message"
+          ],
+          "accomplishes": "Pull communication-related Linear issues (notification bugs, messaging failures, channel delivery errors), create follow-up tasks for each in the task system, and send an iMessage summary to the relevant team member — closing the loop from issue tracking to human notification.",
+          "verified": false,
+          "notes": "First linear combo in communication profile. linear not connected. tasks not connected. imessage not connected on live gateway."
         }
       ],
       "prompts": [
@@ -5095,6 +5234,14 @@
         {
           "text": "Navigate through a message thread to the deepest reply, snapshot it, go back to the thread root with browser_navigate_back, snapshot the root for context, and create a Notion summary page of the full thread.",
           "resolves_to": "comm-playwright-navigate-back-thread-root"
+        },
+        {
+          "text": "Look up the messaging SDK documentation (e.g. Twilio, SendGrid, or iMessage framework) and post the integration reference to Notion.",
+          "resolves_to": "comm-context7-messaging-sdk-docs"
+        },
+        {
+          "text": "Pull communication-related Linear issues, create follow-up tasks for each, and send a notification summary via iMessage to the team.",
+          "resolves_to": "comm-linear-issue-task-notify"
         }
       ]
     },
@@ -6059,6 +6206,27 @@
           "accomplishes": "Navigate through ops monitoring dashboards (Workers → Analytics → Logs view), capture accessibility snapshots at each stage, go back to the Workers overview with browser_navigate_back for incident baseline reference, and write all captured dashboard snapshots to a file as a structured ops survey artifact — useful for incident runbook generation and post-mortem evidence.",
           "verified": false,
           "notes": "playwright/browser_navigate_back first use in ops profile (47th pass). fs/write_file confirmed. Complements existing ops browser-automation combos by adding multi-dashboard back-navigation survey pattern."
+        },
+        {
+          "name": "ops-neon-slow-queries-incident-evidence",
+          "chain": [
+            "neon/list_slow_queries",
+            "evidence/ai_search",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Retrieve the slowest database queries from Neon's performance analytics, search the evidence store for prior performance incidents and remediation patterns matching the slow queries, and post an incident report with recommended mitigations to a Notion ops runbook page.",
+          "verified": false,
+          "notes": "First neon/list_slow_queries combo in catalog. Tool confirmed in Neon MCP surface. neon server not connected on live ch1tty gateway. evidence/ai_search verified. notion/API-post-page connected but Notion API 401."
+        },
+        {
+          "name": "ops-quality-analyze-pre-deploy-gate",
+          "chain": [
+            "quality/analyze",
+            "cloudflare/deploy_worker"
+          ],
+          "accomplishes": "Run a code quality analysis pass against the worker source, then deploy the Cloudflare Worker. Review quality findings before using this chain in production workflows.",
+          "verified": false,
+          "notes": "First quality combo in ops profile. quality/analyze not confirmed connected on live gateway. cloudflare/deploy_worker not confirmed connected on live gateway."
         }
       ],
       "prompts": [
@@ -6277,6 +6445,14 @@
         {
           "text": "Navigate through ops monitoring dashboards (Workers → Analytics → Logs), capture snapshots at each stage, go back to the Workers overview with browser_navigate_back for incident baseline, and write the full dashboard survey to a file.",
           "resolves_to": "ops-playwright-navigate-back-dashboard-survey"
+        },
+        {
+          "text": "List the slowest Neon database queries, cross-reference with evidence for prior incidents, and post a performance incident report to Notion.",
+          "resolves_to": "ops-neon-slow-queries-incident-evidence"
+        },
+        {
+          "text": "Run a code quality analysis on the worker source and, if it passes, deploy the Cloudflare Worker.",
+          "resolves_to": "ops-quality-analyze-pre-deploy-gate"
         }
       ]
     }
