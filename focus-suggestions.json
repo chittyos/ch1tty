@@ -1,6 +1,6 @@
 {
   "_comment": "sixty-seventh pass / 676 combos / 324 verified \u2014 FIRST 17-step chains across ALL 6 profiles",
-  "generatedFrom": "sixty-fifth pass / 652 combos / 303 verified \u2014 2026-06-07",
+  "generatedFrom": "sixty-sixth pass / 664 combos / 315 verified \u2014 2026-06-07",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools \u2014 now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time \u2014 combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
