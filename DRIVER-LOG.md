@@ -929,7 +929,7 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 - Notion board still 401 — DRIVER-LOG.md remains cross-run fallback
 - Coverage analysis (post 60th-pass, from live catalog inspection):
   - `cloudflare/AI-run-model`: present in design, code, ops → MISSING from finance, governance, communication (those added only as unverified combos this pass)
-  - `linear/create_issue`: present ONLY in design → MISSING from finance, governance, code, communication, ops
+  - `linear/create_issue`: present ONLY in design at pass-start → MISSING from finance, governance, code, communication, ops (this pass adds it to governance, code, communication as unverified combos)
   - `chittyevidence`: present in governance, design, communication, ops → MISSING from finance, code
   - `stripe/create_invoice`: NEVER in catalog (only create_customer, list_invoices, list_payment_intents)
   - Finance verified_max: 9 steps (10-step unverified due to notion); Ops verified_max: 9 steps (10-step unverified due to notion)

@@ -1072,7 +1072,7 @@
             "ch1tty/cast",
             "chittyevidence/ingest_document",
             "neon/run_sql",
-            "ledger/record_transaction",
+            "ledger/append_entry",
             "notion/API-post-page"
           ],
           "accomplishes": "Billing document ingestion pipeline: cast to finance context, ingest a billing document via ChittyEvidence for persistent memory, query the Neon billing database for related records, record the ledger entry for the billing event, and log the summary in Notion.",
@@ -2760,7 +2760,7 @@
             "context7/resolve-library-id",
             "evidence/ai_search",
             "linear/create_issue",
-            "tasks/create"
+            "tasks/create_task"
           ],
           "accomplishes": "Audit finding triage: cast to governance context, reason over the regulatory situation, resolve the relevant regulatory library reference, AI-search the evidence store for supporting documents, create a Linear issue to track the audit finding for remediation, and add a follow-up task to the backlog.",
           "verified": false,
@@ -4117,7 +4117,7 @@
             "ch1tty/cast",
             "thinking/sequentialthinking",
             "stripe/create_invoice",
-            "ledger/record_transaction",
+            "ledger/append_entry",
             "notion/API-post-page"
           ],
           "accomplishes": "Design service invoicing: cast to design context, reason through the project scope and billable work, create a Stripe invoice for the design retainer or project fee, record the invoice in the ledger, and log the billing event in Notion.",
@@ -5769,7 +5769,7 @@
             "ch1tty/cast",
             "chittyevidence/ingest_document",
             "serena/search_for_symbols",
-            "quality/run_tests",
+            "quality/analyze",
             "github/create_issue"
           ],
           "accomplishes": "Codebase documentation ingestion: cast to code context, ingest the codebase documentation via ChittyEvidence for persistent memory, search for relevant code symbols via Serena to cross-reference the docs, run quality tests to verify documentation coverage, and file a GitHub issue for any documentation gaps or coverage failures.",
@@ -5781,7 +5781,7 @@
           "chain": [
             "ch1tty/search",
             "serena/search_for_symbols",
-            "quality/run_tests",
+            "quality/analyze",
             "linear/create_issue",
             "github/create_issue"
           ],
@@ -7151,7 +7151,7 @@
             "evidence/ai_search",
             "thinking/sequentialthinking",
             "linear/create_issue",
-            "tasks/create"
+            "tasks/create_task"
           ],
           "accomplishes": "Support case triage: cast to communication context, AI-search the evidence store for similar support cases and precedents, reason through the issue severity and resolution path, create a Linear issue to track the support case, and add a follow-up task to the backlog.",
           "verified": false,
