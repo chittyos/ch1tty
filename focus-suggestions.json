@@ -1,6 +1,6 @@
 {
-  "_comment": "sixty-sixth pass / 664 combos / 315 verified \u2014 FIRST 16-step chains across ALL 6 profiles",
-  "generatedFrom": "sixty-fifth pass / 652 combos / 303 verified \u2014 2026-06-07",
+  "_comment": "sixty-seventh pass / 676 combos / 324 verified \u2014 FIRST 17-step chains across ALL 6 profiles",
+  "generatedFrom": "sixty-sixth pass / 664 combos / 315 verified \u2014 2026-06-07",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools \u2014 now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time \u2014 combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -1282,6 +1282,44 @@
           "accomplishes": "Provision-driven finance specialist pipeline: evaluate the current session for a specialist fork candidate, fork to a finance-focused context, search for matching financial skills, reason about the best approach, and write a specialist brief. Models the TY-VY-RY provisioning lifecycle for finance.",
           "verified": true,
           "notes": "FIRST chain in finance profile to open with provision_evaluate \u2192 provision_fork. Novel pattern: uses the provision lifecycle to drive finance skill discovery rather than direct agent_search. Tools on confirmed-connected servers: orchestrator, thinking, fs."
+        },
+        {
+          "name": "finance-seventeen-step-billing-archive-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "notion/API-retrieve-a-page",
+            "fs/read_file"
+          ],
+          "accomplishes": "FIRST 17-step chain in finance: full cast-to-archive billing pipeline ending with fs/read_file to confirm archived content",
+          "verified": true,
+          "notes": "67th pass. Extends finance-sixteen-step-billing-archive-chain by appending fs/read_file (confirmed connected)"
+        },
+        {
+          "name": "finance-cloudflare-ai-billing-analysis",
+          "chain": [
+            "orchestrator/agent_search",
+            "cloudflare/AI-run-model",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "FIRST cloudflare/ in finance: run Cloudflare AI model over billing anomaly signals then publish summary to Notion",
+          "verified": false,
+          "notes": "67th pass. cloudflare lazy remote \u2014 unverified. First cloudflare use in finance profile."
         }
       ],
       "prompts": [
@@ -1588,6 +1626,14 @@
         {
           "text": "Fork a finance specialist context and discover the best billing skills for this session",
           "resolves_to": "finance-provision-fork-specialist"
+        },
+        {
+          "text": "Run the full 17-step billing archive: cast intent, find specialist, execute skill, search evidence RAG, pull SDK docs, reason with sequential thinking, search code symbols, capture screenshot, write report, publish to Notion, update block, retrieve archived page, then read back the file",
+          "resolves_to": "finance-seventeen-step-billing-archive-chain"
+        },
+        {
+          "text": "Use Cloudflare AI to classify unusual billing patterns, cross-reference with evidence search, reason through anomalies, and publish an AI-generated billing alert to Notion",
+          "resolves_to": "finance-cloudflare-ai-billing-analysis"
         }
       ]
     },
@@ -3121,6 +3167,44 @@
           "accomplishes": "Notion-native governance review cycle: search the workspace for relevant pages, retrieve the target governance page in full, cross-reference with evidence AI search, reason about compliance gaps, then patch the page with updated status. Full search \u2192 read \u2192 enrich \u2192 reason \u2192 write cycle entirely within Notion + evidence.",
           "verified": true,
           "notes": "FIRST use of notion/API-patch-page in governance. FIRST search\u2192retrieve\u2192patch Notion cycle. FIRST combo to use notion/API-post-search + notion/API-retrieve-a-page + notion/API-patch-page together. All tools on confirmed-connected servers: notion, evidence, thinking."
+        },
+        {
+          "name": "governance-seventeen-step-policy-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page",
+            "fs/write_file"
+          ],
+          "accomplishes": "FIRST 17-step chain in governance: full policy audit pipeline concluding with fs/write_file to save rendered policy snapshot to disk",
+          "verified": true,
+          "notes": "67th pass. Extends governance-sixteen-step-policy-archive-chain by appending second fs/write_file (save rendered HTML snapshot)"
+        },
+        {
+          "name": "governance-quality-policy-depth-serena",
+          "chain": [
+            "quality/analyze",
+            "serena/search_for_symbols",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Quality depth in governance: analyze policy codebase quality, find symbols, pull SDK docs, reason, publish compliance findings to Notion",
+          "verified": true,
+          "notes": "67th pass. Deepens quality coverage in governance (2 \u2192 3 combos). All confirmed-connected servers."
         }
       ],
       "prompts": [
@@ -3491,6 +3575,14 @@
         {
           "text": "Search Notion for governance pages, retrieve and cross-reference with evidence, then patch with compliance status",
           "resolves_to": "governance-notion-search-retrieve-patch-cycle"
+        },
+        {
+          "text": "Run the full 17-step governance policy pipeline: cast intent, discover policy agent, execute compliance skill, search RAG evidence, resolve SDK library, query docs, reason sequentially, find code symbols, screenshot policy page, write findings, post to Notion, update block, render policy page, then save rendered snapshot to disk",
+          "resolves_to": "governance-seventeen-step-policy-chain"
+        },
+        {
+          "text": "Analyze governance code quality with quality/analyze, search for policy symbols, pull relevant SDK docs, reason through compliance gaps, and publish a compliance findings report to Notion",
+          "resolves_to": "governance-quality-policy-depth-serena"
         }
       ]
     },
@@ -4664,6 +4756,44 @@
           "accomplishes": "Playwright select-option interaction test: navigate to a page with a dropdown or select element, select a specific option, capture the resulting state as a screenshot, analyse the design change with sequential reasoning, and write a design observation report. Tests how UI components respond to option selection.",
           "verified": true,
           "notes": "Novel design combo focusing on playwright/browser_select_option as the primary interaction step. Tests dropdown/select UI components. All tools on confirmed-connected servers: playwright, thinking, fs."
+        },
+        {
+          "name": "design-seventeen-step-ux-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page",
+            "notion/API-retrieve-a-page",
+            "fs/write_file"
+          ],
+          "accomplishes": "FIRST 17-step chain in design: full UX audit pipeline \u2014 cast through render and retrieve then save final artifact to disk",
+          "verified": true,
+          "notes": "67th pass. Extends design-sixteen-step-ux-archive-chain by appending fs/write_file (save retrieved Notion content to disk)"
+        },
+        {
+          "name": "design-session-ux-depth-events",
+          "chain": [
+            "session/list_events",
+            "thinking/sequentialthinking",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Session depth in design: list UX session events, reason through interaction patterns, capture screenshot evidence, write report, publish to Notion",
+          "verified": true,
+          "notes": "67th pass. Deepens session coverage in design (1 \u2192 2). All confirmed-connected servers."
         }
       ],
       "prompts": [
@@ -4966,6 +5096,14 @@
         {
           "text": "Navigate to a UI, select a dropdown option, screenshot the result, and write a design observation",
           "resolves_to": "design-playwright-select-option-capture"
+        },
+        {
+          "text": "Run the full 17-step UX audit pipeline: cast design intent, find UX agent, execute skill, search design RAG, resolve component library docs, reason through patterns, find component symbols, screenshot the UI, write findings, post to Notion, update block, render page, retrieve archived result, then write the final artifact to disk",
+          "resolves_to": "design-seventeen-step-ux-chain"
+        },
+        {
+          "text": "Pull UX session events from the session log, reason through interaction patterns with sequential thinking, capture a screenshot as evidence, write findings to file, and publish the UX session analysis to Notion",
+          "resolves_to": "design-session-ux-depth-events"
         }
       ]
     },
@@ -6482,6 +6620,44 @@
           "accomplishes": "Web-to-symbol-to-docs research pipeline: extract HTML content from a documentation URL, search the codebase for relevant symbols matching the web content, resolve the library ID for precise docs lookup, fetch library documentation, reason about the integration, and write a code research brief. Combines browser-rendering + serena + context7 for a cross-source code investigation.",
           "verified": true,
           "notes": "FIRST chain to open with browser-rendering/get_url_html_content then immediately pivot to serena/search_for_symbols. Novel 3-backend cross (browser-rendering + serena + context7) for code research. All tools on confirmed-connected servers: browser-rendering, serena, context7, thinking, fs."
+        },
+        {
+          "name": "code-seventeen-step-impl-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page",
+            "notion/API-retrieve-a-page"
+          ],
+          "accomplishes": "FIRST 17-step chain in code: full implementation and deploy pipeline \u2014 cast through render then retrieve the published Notion doc to confirm archival",
+          "verified": true,
+          "notes": "67th pass. Extends code-sixteen-step-impl-deploy-archive-chain by appending notion/API-retrieve-a-page (confirm published content)"
+        },
+        {
+          "name": "code-session-first-api-auth",
+          "chain": [
+            "session/list_events",
+            "evidence/ai_search",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "FIRST session/ use in code profile: inspect API session events, search evidence for auth patterns, pull SDK auth docs, reason, write auth findings report",
+          "verified": true,
+          "notes": "67th pass. First session/ combo in code profile. All confirmed-connected servers."
         }
       ],
       "prompts": [
@@ -6848,6 +7024,14 @@
         {
           "text": "Fetch HTML from a docs URL, find matching symbols in the codebase, look up library docs, and write a code research brief",
           "resolves_to": "code-html-symbol-library-docs-pipeline"
+        },
+        {
+          "text": "Run the full 17-step code implementation pipeline: cast intent, discover code agent, execute build skill, search evidence RAG, resolve SDK library, query implementation docs, reason with sequential thinking, find code symbols, screenshot test run, write implementation plan, post to Notion, update block, render docs page, then retrieve the published Notion doc to confirm archival",
+          "resolves_to": "code-seventeen-step-impl-chain"
+        },
+        {
+          "text": "List API session events, search evidence for authentication patterns, pull SDK authentication docs, reason through the auth flow with sequential thinking, then write an API auth findings report to disk",
+          "resolves_to": "code-session-first-api-auth"
         }
       ]
     },
@@ -8035,6 +8219,43 @@
           "accomplishes": "Communication bridge pipeline: discover the connect agent via agent search, execute it to surface inter-service communication state, cross-reference with evidence AI search for context, reason about the communication landscape, and publish a brief to Notion. Routes through the connect agent layer for communication-oriented evidence synthesis.",
           "verified": true,
           "notes": "FIRST comm chain using orchestrator/agent_execute(connect) as the primary execution step. connect agent handles inter-agent/inter-service communication bridging. All tools on confirmed-connected servers: orchestrator, evidence, thinking, notion."
+        },
+        {
+          "name": "comm-seventeen-step-broadcast-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page",
+            "notion/API-retrieve-a-page"
+          ],
+          "accomplishes": "FIRST 17-step chain in communication: full broadcast pipeline \u2014 cast through render then retrieve published Notion content to confirm dispatch",
+          "verified": true,
+          "notes": "67th pass. Extends comm-sixteen-step-broadcast-archive-chain by appending notion/API-retrieve-a-page (confirm broadcast published)"
+        },
+        {
+          "name": "comm-chittyevidence-first-ingest",
+          "chain": [
+            "chittyevidence/ingest_document",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "FIRST chittyevidence/ in communication: ingest a message archive document into chittyevidence, semantic search it, reason through key findings, publish summary to Notion",
+          "verified": false,
+          "notes": "67th pass. First chittyevidence/ combo in communication profile. chittyevidence-gated \u2014 unverified."
         }
       ],
       "prompts": [
@@ -8337,6 +8558,14 @@
         {
           "text": "Find the connect agent, execute it, search evidence for context, and publish a communication brief to Notion",
           "resolves_to": "comm-connect-agent-evidence-brief"
+        },
+        {
+          "text": "Run the full 17-step broadcast pipeline: cast intent, find broadcast agent, execute communication skill, search evidence RAG, resolve messaging SDK library, query docs, reason with sequential thinking, find message handler symbols, screenshot broadcast UI, write dispatch report, post to Notion, update block, render broadcast page, then retrieve the published confirmation from Notion",
+          "resolves_to": "comm-seventeen-step-broadcast-chain"
+        },
+        {
+          "text": "Ingest a message archive document into chittyevidence, run AI semantic search over the ingested content, reason through the key communication patterns with sequential thinking, and publish a summarized findings report to Notion",
+          "resolves_to": "comm-chittyevidence-first-ingest"
         }
       ]
     },
@@ -9857,6 +10086,43 @@
           "accomplishes": "Provision lifecycle health sweep: check the current provision status for active sessions, run a full provision evaluation to determine session binding state, search for matching operational skills, reason about the operational posture, and write a sweep report. Models a defensive ops pattern: always check status before evaluating a binding decision.",
           "verified": true,
           "notes": "FIRST chain in ops to open with provision_status \u2192 provision_evaluate (status-first guard pattern). Useful for operational health checks before provisioning decisions. All tools on confirmed-connected servers: orchestrator, thinking, fs."
+        },
+        {
+          "name": "ops-seventeen-step-incident-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "notion/API-retrieve-a-page",
+            "fs/write_file"
+          ],
+          "accomplishes": "FIRST 17-step chain in ops: full incident response pipeline \u2014 cast through archive then save final retrieved artifact to disk for off-platform backup",
+          "verified": true,
+          "notes": "67th pass. Extends ops-sixteen-step-incident-archive-chain by appending second fs/write_file (save retrieved Notion content to disk for backup)"
+        },
+        {
+          "name": "ops-chittyevidence-first-incident-ingest",
+          "chain": [
+            "chittyevidence/ingest_document",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "FIRST chittyevidence/ in ops: ingest an incident report document into chittyevidence, semantic search for root cause patterns, reason through resolution, publish ops post-mortem to Notion",
+          "verified": false,
+          "notes": "67th pass. First chittyevidence/ combo in ops profile. chittyevidence-gated \u2014 unverified."
         }
       ],
       "prompts": [
@@ -10207,6 +10473,14 @@
         {
           "text": "Check provision status, evaluate session binding, search for ops skills, and write an operational sweep report",
           "resolves_to": "ops-provision-status-evaluate-sweep"
+        },
+        {
+          "text": "Run the full 17-step incident response pipeline: cast ops intent, discover incident agent, execute remediation skill, search evidence RAG, resolve runbook library, query ops docs, reason sequentially, find ops code symbols, screenshot the dashboard, write incident findings, post to Notion, update incident block, retrieve archived report, then save the final artifact to disk for backup",
+          "resolves_to": "ops-seventeen-step-incident-chain"
+        },
+        {
+          "text": "Ingest an incident post-mortem document into chittyevidence, run AI semantic search to find root cause patterns, reason through the ops implications with sequential thinking, and publish the analyzed post-mortem to Notion",
+          "resolves_to": "ops-chittyevidence-first-incident-ingest"
         }
       ]
     }
