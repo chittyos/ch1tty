@@ -1174,7 +1174,7 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 - Catalog: 688 → **700 combos / 325 → 330 verified** / 697 → **709 prompts** / **0 prompt gaps**
 - Max chain lengths: finance=18✅, governance=18✅, design=18✅, code=18✅, comm=18✅, ops=18✅ (ALL 6 PROFILES AT 18-STEP!)
 
-**Branch / PR**: `auto/E-catalog-seventieth-pass` → (PR pending push)
+**Branch / PR**: `auto/E-catalog-seventieth-pass` → (PR #266: https://github.com/chittyos/ch1tty/pull/266)
 
 **Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
 
