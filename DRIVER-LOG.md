@@ -9,7 +9,7 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 - [x] **B** — GitHub MCP migration: `servers.json` `github` entry migrated to hosted remote `https://api.githubcopilot.com/mcp/` with `envHeaders: { "Authorization": "GITHUB_MCP_AUTHORIZATION" }`. Deprecated `@modelcontextprotocol/server-github` removed. ✅ DONE
 - [x] **C** — Focus-profile layer: `focus-profiles.json` (6 profiles: finance, governance, design, code, communication, ops), `src/focus.ts`, full aggregator integration (env `CH1TTY_FOCUS`, per-call `focus` param on `search`/`cast`, `status` reports active focus). Tests in `test/focus.test.ts` + coverage gap tests. ✅ DONE
 - [x] **D** — Scenario testing + simulation: `sim/` harness (`scenarios.ts`, `run.ts`, `fixture-backend.ts`), `test/scenario.test.ts`, `test/simulation.test.ts`, cloudflare-builds ops coverage fixtures + scenarios. ✅ DONE
-- [ ] **E** — Alchemist brainstorm: catalog in `focus-suggestions.json`. **IN PROGRESS** — 40th pass open at PR #233 (348 combos / 219 verified). Main at 336 combos (39th pass merged this run).
+- [ ] **E** — Alchemist brainstorm: catalog in `focus-suggestions.json`. **IN PROGRESS** — 49th pass open at PR #243 (460 combos / 220 verified). All 6 profiles now have neon, linear, browser-rendering, and github coverage.
 
 ## Blocker
 
@@ -470,3 +470,44 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 1. Merge PR (48th pass) if CI green
 2. 49th catalog pass: `neon/run_sql_transaction` (confirmed in Neon MCP surface, never cataloged); `neon/explain_sql_statement` in code/ops; `neon/prepare_database_migration + complete_database_migration` in governance/ops (DB migration workflow); `cloudflare-builds/workers_builds_trigger` if it exists; `evidence/ingest_document` cross-chains in finance/design/communication
 3. Fix Notion auth to verify the ~228 unverified combos: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`
+
+---
+
+### 2026-06-07T05:00Z — Session auto-driver run (49th pass)
+
+**Workstream advanced**: E (Alchemist brainstorm — catalog 49th pass)
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass / 0 fail / 2 skipped
+- Found 1 open PR: #242 (48th pass, 448/220, 3/3 CI green) — merged squash → main now at `e58a3e6`
+- Workstream states: A ✅ B ✅ C ✅ D ✅ E in-progress (confirmed via DRIVER-LOG + repo scan)
+- Notion board still 401 — DRIVER-LOG.md remains cross-run fallback
+- Surveyed catalog gaps via per-profile server coverage analysis:
+  - `neon` missing from `design` and `communication` profiles entirely
+  - `linear` missing from `ops` profile
+  - `browser-rendering` missing from `governance` profile
+  - 7 new neon tools confirmed in live NEON-MCP surface but never cataloged:
+    `get_connection_string`, `prepare_database_migration`, `complete_database_migration`,
+    `describe_project`, `explain_sql_statement`, `run_sql_transaction`, `list_organizations`, `list_projects`
+- Added 12 combos + 12 prompts (2 per profile) targeting first-use gaps:
+  - **finance**: `finance-neon-get-connection-billing-db` (first neon/get_connection_string), `finance-neon-billing-db-migration-flow` (first prepare+complete_database_migration)
+  - **governance**: `governance-browser-rendering-policy-snapshot` (first browser-rendering in governance), `governance-neon-describe-project-compliance` (first neon/describe_project)
+  - **design**: `design-neon-run-sql-data-prototype` (first neon in design), `design-neon-list-projects-schema-preview` (first neon/list_projects in design)
+  - **code**: `code-neon-explain-sql-optimizer-report` (first neon/explain_sql_statement), `code-neon-run-sql-transaction-schema-migrate` (first neon/run_sql_transaction)
+  - **communication**: `comm-neon-user-activity-query-notion` (first neon in communication), `comm-github-issue-digest-notion` (first github in communication)
+  - **ops**: `ops-linear-incident-triage-on-call` (first linear in ops), `ops-neon-list-organizations-multi-tenant-audit` (first neon/list_organizations)
+- 0 test failures. Tests: 938 pass / 0 fail / 2 skipped ✓
+- Catalog: 448 → **460 combos / 220 verified** (all new combos Neon-auth-gated, verified count unchanged)
+- Pushed branch, opened PR #243; subscribed to PR activity; CodeRabbit + Codex rate-limited (no action)
+- CI on PR #243: 2/3 checks in_progress at run end (CodeQL not yet triggered)
+
+**Branch / PR**: `auto/E-catalog-forty-ninth-pass` → PR #243 (https://github.com/chittyos/ch1tty/pull/243)
+
+**Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
+
+**Board state**: 460 combos / 220 verified (49th pass open, PR #243). All 6 profiles now have neon coverage. linear now in all 6 profiles. browser-rendering now in all 6 profiles. github now in all 6 profiles.
+
+**Next run priority**:
+1. Merge PR #243 if CI green
+2. 50th catalog pass: `neon/compare_database_schema`, `neon/describe_branch`, `neon/list_branch_computes`, `neon/provision_neon_data_api`, `neon/reset_from_parent`, `neon/prepare_query_tuning + complete_query_tuning` — confirmed in NEON-MCP surface, never cataloged
+3. Fix Notion auth to verify the ~240 unverified combos: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`
