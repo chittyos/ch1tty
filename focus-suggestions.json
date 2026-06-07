@@ -1,5 +1,5 @@
 {
-  "_comment": "ch1tty focus-profile suggestions catalog — 508 combos, 220 verified (fifty-third pass — tasks/list_tasks first use in finance+governance+design; first tasks in code+ops; first serena in ops; 4-step quality+serena chains in finance+governance+design+communication)",
+  "_comment": "ch1tty focus-profile suggestions catalog — 520 combos, 226 verified (fifty-fourth pass — thinking/sequentialthinking as chain opener in all 6 profiles (FIRST EVER); ch1tty/cast in finance+communication; cloudflare/AI-run-model in design+code+ops; browser-rendering/render-pdf in governance)",
   "generatedFrom": "auto-driver 51st-pass 2026-06-07T08:00Z",
   "profiles": {
     "finance": {
@@ -859,6 +859,31 @@
           "accomplishes": "Run static quality analysis on the financial processing codebase, use Serena to search for payment-handling symbols, execute a validation query on Neon, and publish the full audit report to Notion — a 4-step pipeline for pre-release financial compliance.",
           "verified": false,
           "notes": "First 4-step quality+serena chain in finance profile."
+        },
+        {
+          "name": "finance-thinking-first-rag-cashflow",
+          "chain": [
+            "thinking/sequentialthinking",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "fs/write_file"
+          ],
+          "accomplishes": "Open with sequential reasoning to frame the financial query, enumerate available evidence RAGs, search for matching cash flow data, and write the structured analysis to file — a reasoning-first pattern that improves RAG targeting accuracy.",
+          "verified": true,
+          "notes": "FIRST use of thinking/sequentialthinking as chain opener in finance profile. Reasoning-first pattern: think before searching."
+        },
+        {
+          "name": "finance-cast-stripe-neon-reasoning",
+          "chain": [
+            "ch1tty/cast",
+            "stripe/list_payment_intents",
+            "neon/run_sql",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Use ch1tty/cast to route the intent to the Stripe payment surface, list recent payment intents, cross-validate against the Neon ledger with a SQL query, reason through the findings, and save the analysis to file — a meta-routing-first financial reconciliation pipeline.",
+          "verified": false,
+          "notes": "FIRST use of ch1tty/cast in finance profile. Stripe+Neon cross-validation with thinking as post-action synthesis step."
         }
       ],
       "prompts": [
@@ -1081,6 +1106,14 @@
         {
           "text": "Run a full 4-step quality audit on the payment codebase: analyze, find symbols, validate SQL, publish to Notion",
           "resolves_to": "finance-quality-serena-four-step-audit"
+        },
+        {
+          "text": "Think first about what financial data to search, then find it in the evidence RAG and write the analysis",
+          "resolves_to": "finance-thinking-first-rag-cashflow"
+        },
+        {
+          "text": "Route my payment intent through ch1tty, list Stripe payment intents, validate against Neon, and reason through the results",
+          "resolves_to": "finance-cast-stripe-neon-reasoning"
         }
       ]
     },
@@ -2242,6 +2275,30 @@
           "accomplishes": "Analyze policy enforcement code for quality issues, locate compliance-critical symbols with Serena, ingest the findings as a structured document into Evidence for policy cross-referencing, and post the verified policy status to Notion — a 4-step governance compliance gate.",
           "verified": false,
           "notes": "First 4-step quality+serena+evidence chain in governance profile."
+        },
+        {
+          "name": "governance-thinking-first-agent-evidence",
+          "chain": [
+            "thinking/sequentialthinking",
+            "orchestrator/agent_list",
+            "evidence/ai_search",
+            "fs/write_file"
+          ],
+          "accomplishes": "Reason through the governance posture and audit scope before enumerating all registered agents, cross-reference the agent topology against the evidence store for policy alignment, and write the compliance brief — a reason-then-discover pattern for governance oversight.",
+          "verified": true,
+          "notes": "FIRST use of thinking/sequentialthinking as chain opener in governance profile. Reason-then-discover governance oversight pattern."
+        },
+        {
+          "name": "governance-render-pdf-evidence-policy",
+          "chain": [
+            "browser-rendering/render-pdf",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Render a regulatory policy document as PDF via Cloudflare browser rendering, search the evidence store for supporting precedents and prior rulings, reason through the combined material to identify compliance gaps, and publish the governance brief to Notion — a document-first compliance chain.",
+          "verified": false,
+          "notes": "FIRST use of browser-rendering/render-pdf in governance profile. Render-then-evidence governance compliance chain."
         }
       ],
       "prompts": [
@@ -2528,6 +2585,14 @@
         {
           "text": "Run a 4-step policy compliance gate: quality check, symbol search, evidence ingest, Notion publish",
           "resolves_to": "governance-quality-four-step-policy-verify"
+        },
+        {
+          "text": "Reason about governance scope, enumerate all agents, cross-reference with evidence, and write the compliance brief",
+          "resolves_to": "governance-thinking-first-agent-evidence"
+        },
+        {
+          "text": "Render a policy PDF, find supporting evidence, reason through compliance gaps, and publish to Notion",
+          "resolves_to": "governance-render-pdf-evidence-policy"
         }
       ]
     },
@@ -3310,6 +3375,31 @@
           "accomplishes": "Quality-gate a UI component library: static analysis on component code, Serena symbol search to surface all usage sites, a live browser screenshot to visually confirm rendering, and publish the full audit to the Notion design system page — 4-step component release gate.",
           "verified": false,
           "notes": "First 4-step quality+serena+playwright chain in design profile."
+        },
+        {
+          "name": "design-thinking-first-playwright-ux",
+          "chain": [
+            "thinking/sequentialthinking",
+            "playwright/browser_navigate",
+            "playwright/browser_take_screenshot",
+            "fs/write_file"
+          ],
+          "accomplishes": "Reason through the UX evaluation criteria and visual inspection goals before navigating to the target page, capture a screenshot of the current state, and save the annotated design analysis — a reasoning-first visual inspection pattern that sets evaluation goals before observing.",
+          "verified": true,
+          "notes": "FIRST use of thinking/sequentialthinking as chain opener in design profile. Reason-then-observe visual UX inspection pattern."
+        },
+        {
+          "name": "design-cloudflare-ai-spec-ux-audit",
+          "chain": [
+            "cloudflare/AI-run-model",
+            "playwright/browser_navigate",
+            "playwright/browser_snapshot",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Run a Cloudflare AI model to generate UX design criteria and acceptance conditions, navigate to the live UI, capture an accessibility snapshot of the current implementation, reason through gaps between AI spec and observed reality, and publish the design gap report to Notion — an AI-driven spec-vs-reality design audit.",
+          "verified": false,
+          "notes": "FIRST use of cloudflare/AI-run-model in design profile. 5-tool AI-spec-to-UX-reality audit chain."
         }
       ],
       "prompts": [
@@ -3528,6 +3618,14 @@
         {
           "text": "Run a 4-step component quality gate: analyze, find symbol usages, screenshot live, publish to Notion",
           "resolves_to": "design-quality-serena-four-step-component-gate"
+        },
+        {
+          "text": "Think through UX evaluation criteria, then navigate and screenshot the page, and save the design analysis",
+          "resolves_to": "design-thinking-first-playwright-ux"
+        },
+        {
+          "text": "Generate UX spec with Cloudflare AI, navigate the live UI, snapshot it, reason through gaps, and publish to Notion",
+          "resolves_to": "design-cloudflare-ai-spec-ux-audit"
         }
       ]
     },
@@ -4675,6 +4773,31 @@
           "accomplishes": "List the active sprint tasks, pull relevant library documentation from Context7 for each tech stack entry, and write a consolidated sprint-context briefing to a local file — preparing developers for the sprint with curated docs.",
           "verified": false,
           "notes": "First tasks/list_tasks in code profile. context7/query-docs and fs/write_file are verified."
+        },
+        {
+          "name": "code-thinking-first-tree-docs",
+          "chain": [
+            "thinking/sequentialthinking",
+            "fs/directory_tree",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "fs/write_file"
+          ],
+          "accomplishes": "Reason through the architecture goals and design constraints before exploring the directory tree for structural context, resolve the relevant library ID from its name, fetch up-to-date documentation, and write a context-informed implementation plan — a reason-first architecture-to-docs code workflow.",
+          "verified": true,
+          "notes": "FIRST use of thinking/sequentialthinking as chain opener in code profile. 5-tool reasoning-first architecture-to-docs chain."
+        },
+        {
+          "name": "code-cloudflare-ai-serena-scaffold",
+          "chain": [
+            "cloudflare/AI-run-model",
+            "serena/search_code",
+            "context7/query-docs",
+            "fs/write_file"
+          ],
+          "accomplishes": "Run a Cloudflare AI model to generate a code scaffold specification for the new feature, use Serena to search the existing codebase for relevant patterns and conventions to align with, fetch current library documentation to inform the scaffold, and write the final output — an AI-model-first code generation pipeline.",
+          "verified": false,
+          "notes": "FIRST use of cloudflare/AI-run-model in code profile. AI model generation paired with Serena codebase pattern discovery."
         }
       ],
       "prompts": [
@@ -4957,6 +5080,14 @@
         {
           "text": "List sprint tasks and pull the relevant docs for each one, write a briefing file",
           "resolves_to": "code-tasks-list-sprint-context-docs"
+        },
+        {
+          "text": "Think through architecture goals, explore the directory tree, resolve the library, fetch docs, and write an implementation plan",
+          "resolves_to": "code-thinking-first-tree-docs"
+        },
+        {
+          "text": "Generate a code scaffold with Cloudflare AI, search codebase patterns with Serena, fetch docs, and write the output",
+          "resolves_to": "code-cloudflare-ai-serena-scaffold"
         }
       ]
     },
@@ -5751,6 +5882,30 @@
           "accomplishes": "Retrieve the team's open tasks, write a structured status summary to the Notion team board, then delegate to the ChatGPT agent to compose a personalized broadcast message for each team member — automating async status communication.",
           "verified": false,
           "notes": "tasks/list_tasks depth in communication profile with agent_execute(chatgpt) follow-up."
+        },
+        {
+          "name": "comm-thinking-first-url-evidence",
+          "chain": [
+            "thinking/sequentialthinking",
+            "browser-rendering/get_url_markdown",
+            "evidence/ai_search",
+            "fs/write_file"
+          ],
+          "accomplishes": "Reason through the communication objectives and target audience before scraping the source URL as structured markdown, cross-reference the content against the evidence store for factual grounding, and write the polished communication brief — a thinking-first content pipeline that aligns messaging with evidence.",
+          "verified": true,
+          "notes": "FIRST use of thinking/sequentialthinking as chain opener in communication profile. Reason-then-scrape-then-verify communication content pipeline."
+        },
+        {
+          "name": "comm-cast-broadcast-notion-log",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/skill_execute(broadcast)",
+            "notion/API-post-page",
+            "fs/write_file"
+          ],
+          "accomplishes": "Use ch1tty/cast to dynamically route the broadcast intent to the optimal channel skill, execute the broadcast to the resolved channel, publish a delivery confirmation and record to Notion, and log the dispatch locally — a meta-routing-first communication dispatch chain.",
+          "verified": false,
+          "notes": "FIRST use of ch1tty/cast in communication profile. Meta-routing-to-broadcast pattern with delivery audit trail."
         }
       ],
       "prompts": [
@@ -5969,6 +6124,14 @@
         {
           "text": "List open team tasks, post a status update to Notion, and use ChatGPT to broadcast it to the team",
           "resolves_to": "comm-tasks-list-team-status-broadcast"
+        },
+        {
+          "text": "Think through communication goals, scrape the URL as markdown, verify with evidence, and write the brief",
+          "resolves_to": "comm-thinking-first-url-evidence"
+        },
+        {
+          "text": "Route my broadcast intent through ch1tty cast, execute the broadcast, log to Notion, and save locally",
+          "resolves_to": "comm-cast-broadcast-notion-log"
         }
       ]
     },
@@ -7061,6 +7224,31 @@
           "accomplishes": "Search the deployment codebase for infrastructure configuration symbols with Serena, run static quality analysis to catch misconfigs or security issues, then trigger the Cloudflare Worker deployment only when both gates pass — a 3-step code-quality deploy gate.",
           "verified": false,
           "notes": "First serena/search_code in ops profile. quality/analyze now used as deploy gate."
+        },
+        {
+          "name": "ops-thinking-first-skill-execute",
+          "chain": [
+            "thinking/sequentialthinking",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/ai_search",
+            "fs/write_file"
+          ],
+          "accomplishes": "Reason through the operational context and incident scope before searching for the most appropriate skill, execute the selected skill action, cross-reference the outcomes against the evidence store for validation, and write the ops resolution summary — a reason-plan-act-verify operational pattern.",
+          "verified": true,
+          "notes": "FIRST use of thinking/sequentialthinking as chain opener in ops profile. 5-tool reason-plan-act-verify ops cycle."
+        },
+        {
+          "name": "ops-cloudflare-ai-agent-risk",
+          "chain": [
+            "cloudflare/AI-run-model",
+            "orchestrator/agent_list",
+            "evidence/ai_search",
+            "fs/write_file"
+          ],
+          "accomplishes": "Run a Cloudflare AI model to analyze operational risk signals from current infrastructure metrics, enumerate the registered agent topology for full system awareness, cross-reference findings against the evidence store for historical patterns, and write the ops risk summary — an AI-driven operational risk pipeline.",
+          "verified": false,
+          "notes": "FIRST use of cloudflare/AI-run-model in ops profile. AI model risk analysis paired with agent topology awareness."
         }
       ],
       "prompts": [
@@ -7327,6 +7515,14 @@
         {
           "text": "Search the deploy config code, run quality analysis, then deploy to Cloudflare if it passes",
           "resolves_to": "ops-serena-code-quality-deploy-gate"
+        },
+        {
+          "text": "Reason through the ops context, find the right skill, execute it, verify with evidence, and write the summary",
+          "resolves_to": "ops-thinking-first-skill-execute"
+        },
+        {
+          "text": "Run Cloudflare AI for risk signals, enumerate agents, cross-reference with evidence, and write the ops risk summary",
+          "resolves_to": "ops-cloudflare-ai-agent-risk"
         }
       ]
     }
