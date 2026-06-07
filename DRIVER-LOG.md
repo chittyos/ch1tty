@@ -396,3 +396,43 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 1. Merge PR #239 (45th pass) if CI green; merge 46th pass PR when ready
 2. 47th catalog pass targets: `orchestrator/agent_deregister` (never cataloged); `orchestrator/skill_deregister`; `cloudflare-builds/workers_builds_cancel` (likely exists); deeper `evidence` + `orchestrator/chittyagent-*` named agent combos in finance/design
 3. Fix Notion auth to verify the ~205 unverified combos: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`
+
+---
+
+### 2026-06-07T00:00Z — Session 01W8FBLevnR5FQ5nikv88o4c (47th pass)
+
+**Workstream advanced**: E (Alchemist brainstorm — catalog 47th pass)
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass / 0 fail / 2 skipped
+- No open PRs; main at `624be04` (46th pass, 424/219). Reset local main to match origin/main (50-commit squash divergence).
+- Workstream states: A ✅ B ✅ C ✅ D ✅ E in-progress (all per DRIVER-LOG + repo scan)
+- Notion board still 401 — DRIVER-LOG.md remains cross-run fallback
+- Live gateway: 15 servers, 8 connected (notion 22, playwright 23, fs 14, orchestrator 13, evidence 3, browser-rendering 3, context7 2, thinking 1), 297 sessions
+- `orchestrator/agent_deregister` and `orchestrator/skill_deregister` confirmed absent from live registry (only 13 tools exist — no deregister methods). Previous DRIVER-LOG suggestion was incorrect.
+- Discovered 3 uncataloged playwright tools from live 23-tool set:
+  - `playwright/browser_navigate_back` (navigate history back)
+  - `playwright/browser_network_request` (singular, index-based full detail)
+  - `playwright/browser_hover` (hover over element)
+- Created branch `auto/E-catalog-forty-seventh-pass`; added 12 combos + 12 prompts (2 per profile):
+  - **finance**: hover-pricing-tooltip, network-request-payment-inspect
+  - **governance**: navigate-back-policy-compare, network-request-auth-api-audit
+  - **design**: hover-ux-tooltip-audit, navigate-back-prototype-flow
+  - **code**: network-request-api-debug, hover-docs-type-preview
+  - **communication**: hover-notification-preview, navigate-back-thread-root
+  - **ops**: network-request-deploy-api-inspect, navigate-back-dashboard-survey
+- 1 test failure caught: prompts missing `resolves_to` field → fixed all 12 before commit
+- Tests after fix: 938 pass / 0 fail / 2 skipped ✓
+- All 23 playwright tools now cataloged across relevant profiles
+- Pushed branch, opened PR #241
+
+**Branch / PR**: `auto/E-catalog-forty-seventh-pass` → PR #241 (https://github.com/chittyos/ch1tty/pull/241)
+
+**Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
+
+**Board state**: 436 combos / 219 verified (47th pass open, PR #241). All 23 playwright tools now cataloged.
+
+**Next run priority**:
+1. Merge PR #241 if CI green
+2. 48th catalog pass: `cloudflare-builds` tools when connected (workers_builds_cancel, workers_builds_get); deeper `evidence/ai_search` + named-agent combos in remaining gaps; `context7/resolve-library-id` in communication/ops profiles (only 2 context7 tools, both used in code/governance)
+3. Fix Notion auth to verify the ~217 unverified combos: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`
