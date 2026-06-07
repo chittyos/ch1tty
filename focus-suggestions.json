@@ -1,6 +1,6 @@
 {
-  "_comment": "fifty-sixth pass / 544 combos / 234 verified",
-  "generatedFrom": "auto-driver 55th-pass 2026-06-07T08:00Z",
+  "_comment": "fifty-eighth pass / 568 combos / 246 verified",
+  "generatedFrom": "focus-suggestions: fifty-eighth pass — 568 combos",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools — now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time — combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -935,6 +935,68 @@
           "accomplishes": "Create an isolated Neon branch for billing schema development to avoid touching the production database, run a validation SQL query against the branch to confirm schema integrity and data state, reason through the results to identify any migration blockers, and write the schema validation report — a safe branch-per-feature billing schema workflow.",
           "verified": false,
           "notes": "FIRST neon/create_branch in finance profile. Neon is auth-gated — verify when neon token is available."
+        },
+        {
+          "name": "finance-nine-step-billing-cast-visual",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "playwright/browser_take_screenshot",
+            "fs/write_file"
+          ],
+          "accomplishes": "Cast a billing intent to discover the right orchestration skill, execute it against the full tool registry, survey available RAGs for financial data context, search the evidence store for billing patterns, cross-reference library documentation for API integration details, reason through the combined evidence, take a visual screenshot of the billing dashboard to capture current state, and write the billing analysis report — a 9-step billing orchestration with visual evidence capture.",
+          "verified": true,
+          "notes": "FIRST 9-step chain in finance profile. All servers confirmed connected: ch1tty, orchestrator, evidence, context7, thinking, playwright, fs."
+        },
+        {
+          "name": "finance-linear-create-project-budget-milestone",
+          "chain": [
+            "linear/create_project",
+            "linear/list_issues",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Create a new Linear project to track a budget milestone initiative, list existing issues to link financial work items to the new project, reason through the issue prioritization relative to the budget timeline, and write the project setup summary — a finance-scoped Linear project scaffold for budget milestone tracking.",
+          "verified": false,
+          "notes": "FIRST linear/create_project in finance profile. Linear is auth-gated — verify when linear token is available."
+        },
+        {
+          "name": "finance-chatgpt-evidence-context7-cashflow-brief",
+          "chain": [
+            "orchestrator/agent_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Execute the ChatGPT agent to apply LLM reasoning over the task, survey available evidence RAGs for financial data context, search the evidence store for cashflow patterns, resolve the relevant financial SDK library ID, query its documentation for API integration details, reason through the combined evidence and library guidance, and write the cashflow analysis brief — completing the first chatgpt+evidence+context7 triple in the finance profile.",
+          "verified": true,
+          "notes": "FIRST chatgpt+evidence+context7 triple in finance profile. All servers confirmed connected (2026-06-07): orchestrator/agent_execute(chatgpt), evidence, context7, thinking, fs."
+        },
+        {
+          "name": "finance-ten-step-billing-cast-publish",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Cast a billing intent to auto-discover and invoke the right orchestration skill, execute the matched skill against the full tool registry, survey evidence RAGs for billing data context, search the evidence store for payment patterns, cross-reference library documentation for billing API details, reason through the combined data, take a visual screenshot of the billing dashboard, write the full billing report to disk, then publish the report to the Notion workspace — a 10-step billing pipeline that ends with a Notion publish.",
+          "verified": false,
+          "notes": "FIRST 10-step chain in finance profile. Unverified: notion auth-gated (401). All other steps confirmed connected. Verify when Notion integration token is refreshed."
         }
       ],
       "prompts": [
@@ -1181,6 +1243,22 @@
         {
           "text": "Create a neon branch for billing schema work, validate with SQL, and write the schema report",
           "resolves_to": "finance-neon-create-branch-billing-schema"
+        },
+        {
+          "text": "Use cast to discover billing skills, run them, pull financial RAGs, search evidence, cross-reference docs, reason, screenshot the dashboard, and write a billing report",
+          "resolves_to": "finance-nine-step-billing-cast-visual"
+        },
+        {
+          "text": "Create a Linear project for a budget milestone, list linked issues, reason through priorities, and write the project brief",
+          "resolves_to": "finance-linear-create-project-budget-milestone"
+        },
+        {
+          "text": "Execute ChatGPT agent over cashflow data, survey evidence RAGs, query context7 docs, reason, and write the cashflow brief",
+          "resolves_to": "finance-chatgpt-evidence-context7-cashflow-brief"
+        },
+        {
+          "text": "Cast a billing intent, discover and run the skill, pull financial RAGs, search evidence, cross-reference docs, reason, screenshot, write, then publish to Notion",
+          "resolves_to": "finance-ten-step-billing-cast-publish"
         }
       ]
     },
@@ -2420,6 +2498,70 @@
           "accomplishes": "List active governance sessions to identify ongoing audit workflows, create an isolated Neon branch for compliance SQL testing to avoid production risk, run the compliance audit query against the branch to extract policy-relevant data patterns, search the evidence store for corroborating regulatory material, and write the compliance snapshot — a session-scoped database compliance audit workflow.",
           "verified": false,
           "notes": "FIRST session/ + neon/create_branch combo in governance. session is disabled, neon is auth-gated — verify when both reconnect."
+        },
+        {
+          "name": "governance-nine-step-policy-visual",
+          "chain": [
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "playwright/browser_take_screenshot",
+            "orchestrator/agent_list",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search orchestrator skills for governance-relevant policy tools, execute the matching skill to pull policy artifacts, survey available RAGs for regulatory document context, search the evidence store for compliance material, cross-reference library documentation for standards alignment, reason through the combined policy evidence, take a visual screenshot of the governance dashboard to timestamp the current state, list active governance agents to assign follow-on tasks, and write the full policy brief — a 9-step governance policy pipeline with visual documentation.",
+          "verified": true,
+          "notes": "FIRST 9-step chain in governance profile. All servers confirmed connected: orchestrator, evidence, context7, thinking, playwright, fs."
+        },
+        {
+          "name": "governance-neon-reset-parent-compliance-rollback",
+          "chain": [
+            "neon/create_branch",
+            "neon/run_sql",
+            "evidence/ai_search",
+            "neon/reset_from_parent",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Create an isolated Neon branch for a compliance audit migration test, run the compliance validation SQL against the branch to detect any policy-breaking schema drift, search the evidence store for regulatory rollback requirements, reset the branch back to the parent state if the migration fails compliance checks, reason through the rollback decision and its implications, and write the compliance audit report — a safe branch-scoped compliance migration with rollback capability.",
+          "verified": false,
+          "notes": "FIRST neon/reset_from_parent in governance profile. Neon is auth-gated — verify when neon token is available."
+        },
+        {
+          "name": "governance-chatgpt-evidence-context7-policy-brief",
+          "chain": [
+            "orchestrator/agent_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Execute the ChatGPT agent to reason over governance policy questions, survey available evidence RAGs for regulatory document context, search the evidence store for compliance material, resolve the relevant governance SDK library ID, query its documentation for standards alignment, reason through the combined policy evidence, and write the policy brief — completing the first chatgpt+evidence+context7 triple in the governance profile.",
+          "verified": true,
+          "notes": "FIRST chatgpt+evidence+context7 triple in governance profile. All servers confirmed connected (2026-06-07): orchestrator/agent_execute(chatgpt), evidence, context7, thinking, fs."
+        },
+        {
+          "name": "governance-ten-step-policy-visual-publish",
+          "chain": [
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "playwright/browser_take_screenshot",
+            "orchestrator/agent_list",
+            "fs/write_file",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search orchestrator skills for governance policy tools, execute the matching skill, survey evidence RAGs for regulatory context, search the evidence store for compliance material, cross-reference library documentation, reason through the combined evidence, take a visual screenshot of the governance dashboard, list active agents for follow-on task assignment, write the policy brief to disk, then publish it to the Notion workspace — a 10-step governance pipeline with Notion publish.",
+          "verified": false,
+          "notes": "FIRST 10-step chain in governance profile. Unverified: notion auth-gated (401). All other steps confirmed connected. Verify when Notion integration token is refreshed."
         }
       ],
       "prompts": [
@@ -2730,6 +2872,22 @@
         {
           "text": "List governance sessions, branch neon for compliance testing, run audit SQL, search evidence, and write the compliance snapshot",
           "resolves_to": "governance-session-neon-branch-audit"
+        },
+        {
+          "text": "Search governance skills, execute them, pull regulatory RAGs, search evidence, cross-reference docs, reason, screenshot the dashboard, list agents, and write the policy brief",
+          "resolves_to": "governance-nine-step-policy-visual"
+        },
+        {
+          "text": "Create a Neon branch for compliance migration, run audit SQL, check evidence for rollback requirements, reset to parent if non-compliant, reason through it, and write the report",
+          "resolves_to": "governance-neon-reset-parent-compliance-rollback"
+        },
+        {
+          "text": "Execute ChatGPT agent over policy questions, survey evidence RAGs, query context7 docs, reason, and write the policy brief",
+          "resolves_to": "governance-chatgpt-evidence-context7-policy-brief"
+        },
+        {
+          "text": "Search governance skills, execute them, pull regulatory RAGs, search evidence, cross-reference docs, reason, screenshot, list agents, write, then publish to Notion",
+          "resolves_to": "governance-ten-step-policy-visual-publish"
         }
       ]
     },
@@ -3587,6 +3745,67 @@
           "accomplishes": "Append a UX feedback event to the session coordinator to anchor the design iteration, capture a browser screenshot of the current UI state to record the visual baseline, search the evidence store for prior UX research findings and design patterns that apply, and write the UX iteration report — a session-anchored UX feedback capture pipeline.",
           "verified": false,
           "notes": "FIRST session/ in design profile. session is disabled in servers.json — verify when it reconnects."
+        },
+        {
+          "name": "design-nine-step-ux-visual-pipeline",
+          "chain": [
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "thinking/sequentialthinking",
+            "playwright/browser_take_screenshot",
+            "fs/write_file"
+          ],
+          "accomplishes": "Resolve the target UI library identifier to confirm documentation availability, query the library docs for component APIs and design constraints, survey available RAGs for design system context, search the evidence store for UX research and prior design decisions, search orchestrator skills for a frontend design tool, execute the design skill to generate the component scaffold, reason through the design choices against the library constraints and evidence, take a visual screenshot of the rendered component for review, and write the design brief — a 9-step UX pipeline grounded in library docs and evidence.",
+          "verified": true,
+          "notes": "FIRST 9-step chain in design profile. All servers confirmed connected: context7, evidence, orchestrator, thinking, playwright, fs."
+        },
+        {
+          "name": "design-chatgpt-evidence-context7-brief",
+          "chain": [
+            "orchestrator/agent_execute(chatgpt)",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Route the design brief intent through the ChatGPT agent for creative ideation and multi-model perspective, search the evidence store for relevant design precedents and user research, resolve the target library identifier for accurate component documentation, query the library docs for API constraints and accessibility guidelines, reason through the ChatGPT output against the evidence and documentation, and write the final design brief — the FIRST agent_execute(chatgpt)+evidence+context7 triple in design.",
+          "verified": true,
+          "notes": "FIRST chatgpt+evidence+context7 triple in design. All components confirmed connected: orchestrator/agent_execute(chatgpt) verified in comm, evidence verified, context7 verified, thinking+fs verified."
+        },
+        {
+          "name": "design-ten-step-ux-visual-publish",
+          "chain": [
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "thinking/sequentialthinking",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Resolve the target UI library ID and query its design documentation, survey evidence RAGs for UX patterns, search the evidence store for design research, discover and execute a design skill via orchestrator, reason through the combined design guidance, take a visual screenshot of the interface under review, write the UX audit report to disk, then publish the complete report to Notion — a 10-step design pipeline with Notion publish.",
+          "verified": false,
+          "notes": "FIRST 10-step chain in design profile. Unverified: notion auth-gated (401). All other steps confirmed connected. Verify when Notion integration token is refreshed."
+        },
+        {
+          "name": "design-linear-update-project-ux-milestone",
+          "chain": [
+            "linear/list_projects",
+            "linear/update_project",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "List existing Linear projects to identify the active UX design initiative, update the project with new milestone details and progress state, reason through the milestone timeline and remaining design tasks, and write the updated project brief — the first use of linear/update_project in the catalog, applied to design milestone tracking.",
+          "verified": false,
+          "notes": "FIRST linear/update_project in catalog. Linear is auth-gated — verify when linear token is available."
         }
       ],
       "prompts": [
@@ -3829,6 +4048,22 @@
         {
           "text": "Log a UX session event, capture a design screenshot, search evidence for UX patterns, and save the iteration report",
           "resolves_to": "design-session-ux-event-tracking"
+        },
+        {
+          "text": "Resolve the UI library, query its docs, survey RAGs, search evidence for UX research, find and run a design skill, reason, screenshot the component, and write the design brief",
+          "resolves_to": "design-nine-step-ux-visual-pipeline"
+        },
+        {
+          "text": "Ask ChatGPT for design ideation, search evidence for design precedents, resolve and query the library docs, reason through it, and write the design brief",
+          "resolves_to": "design-chatgpt-evidence-context7-brief"
+        },
+        {
+          "text": "Resolve UI library ID, query design docs, pull UX evidence RAGs, search patterns, run design skill, reason, screenshot, write, then publish the UX audit to Notion",
+          "resolves_to": "design-ten-step-ux-visual-publish"
+        },
+        {
+          "text": "List Linear projects for the UX initiative, update the project milestone, reason through timeline, and write the project brief",
+          "resolves_to": "design-linear-update-project-ux-milestone"
         }
       ]
     },
@@ -5054,6 +5289,69 @@
           "accomplishes": "Use ch1tty/cast to route the scaffolding intent to the best orchestrator surface, search for the relevant development skill, execute the workflow skill to set up project structure, resolve the target library ID in Context7, query the full documentation for API patterns and examples, search the evidence store for prior implementation patterns and architectural decisions, reason through the combined skill output and documentation to synthesize the scaffold, and write the generated project scaffold — a cast-first 8-step code generation pipeline.",
           "verified": true,
           "notes": "VERIFIED: SECOND 8-STEP CHAIN in catalog. All servers confirmed connected in prior runs: ch1tty (internal), orchestrator (13 tools), context7 (2 tools), evidence (3 tools), thinking (1 tool), fs (14 tools). 6 distinct servers. Code-relevant via orchestrator, context7, evidence, thinking, fs."
+        },
+        {
+          "name": "code-nine-step-cast-visual-scaffold",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "playwright/browser_take_screenshot",
+            "fs/write_file"
+          ],
+          "accomplishes": "Cast a code scaffolding intent to discover the right skill, execute the matching scaffold skill, resolve the target library identifier for precise documentation lookup, query the library docs for API usage patterns and code examples, search the evidence store for related implementation precedents, reason through the scaffold design decisions against the documentation and evidence, take a visual screenshot of the running app or component to validate the scaffold renders correctly, and write the final implementation report — a 9-step code scaffold with visual validation.",
+          "verified": true,
+          "notes": "FIRST 9-step chain in code profile; extends code-eight-step-cast-scaffold with playwright visual verification as step 8. All servers confirmed connected: ch1tty, orchestrator, context7, evidence, thinking, playwright, fs."
+        },
+        {
+          "name": "code-chatgpt-evidence-context7-research",
+          "chain": [
+            "orchestrator/agent_execute(chatgpt)",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Execute the ChatGPT agent for initial code research and alternative implementation perspective, survey available RAGs for relevant codebase and API context, search the evidence store for prior art and implementation patterns, resolve the target library identifier for documentation alignment, query the library docs for API contracts and type signatures, reason through the ChatGPT output against the evidence and documentation to form a verified implementation plan, and write the research report — the FIRST agent_execute(chatgpt)+evidence+context7 triple in code.",
+          "verified": true,
+          "notes": "FIRST chatgpt+evidence+context7 triple in code. All components confirmed: orchestrator/agent_execute(chatgpt) verified, evidence/list_rags+ai_search verified, context7 verified, thinking+fs verified."
+        },
+        {
+          "name": "code-ten-step-cast-visual-publish",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Cast a code scaffolding intent to discover and invoke the right skill, execute it against the registry, resolve the target library ID, query its API documentation, search the evidence store for implementation patterns, reason through the combined guidance, take a visual screenshot of the scaffold output, write the code report to disk, then publish it to Notion — a 10-step code pipeline with Notion publish.",
+          "verified": false,
+          "notes": "FIRST 10-step chain in code profile. Unverified: notion auth-gated (401). All other steps confirmed connected. Verify when Notion integration token is refreshed."
+        },
+        {
+          "name": "code-neon-reset-from-parent-schema-rollback",
+          "chain": [
+            "neon/create_branch",
+            "neon/run_sql",
+            "neon/reset_from_parent",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Create an isolated Neon branch for a schema migration test, run the migration SQL against the branch to validate correctness, reset the branch back to the parent state if the migration reveals regressions, reason through the rollback decision and its impact on the codebase, and write the schema migration audit report — the first neon/reset_from_parent in the code profile.",
+          "verified": false,
+          "notes": "FIRST neon/reset_from_parent in code profile. Neon is auth-gated — verify when neon token is available."
         }
       ],
       "prompts": [
@@ -5360,6 +5658,22 @@
         {
           "text": "8-step code scaffold: cast intent → search skills → execute workflow → resolve library → query docs → search evidence → synthesize → write output",
           "resolves_to": "code-eight-step-cast-scaffold"
+        },
+        {
+          "text": "Cast the scaffolding intent, execute the scaffold skill, resolve and query the library docs, search evidence for precedents, reason, screenshot the running app, and write the implementation report",
+          "resolves_to": "code-nine-step-cast-visual-scaffold"
+        },
+        {
+          "text": "Ask ChatGPT for code research, pull RAGs, search evidence, resolve and query the library docs, reason through an implementation plan, and write the research report",
+          "resolves_to": "code-chatgpt-evidence-context7-research"
+        },
+        {
+          "text": "Cast a scaffold intent, discover and run the skill, query context7 docs, search evidence, reason, screenshot, write, then publish the code report to Notion",
+          "resolves_to": "code-ten-step-cast-visual-publish"
+        },
+        {
+          "text": "Create a Neon branch for schema migration, run the migration SQL, reset to parent if it regresses, reason through the rollback, and write the audit report",
+          "resolves_to": "code-neon-reset-from-parent-schema-rollback"
         }
       ]
     },
@@ -6230,6 +6544,68 @@
           "accomplishes": "List all active sessions to identify which communication workflows are in flight, enumerate the events for the target session to understand the message history and context, reason through the session event timeline to compose a coherent broadcast update, execute the broadcast skill to distribute the message across configured channels, and post the broadcast summary to the team Notion page — a session-event-driven team broadcast pipeline.",
           "verified": false,
           "notes": "FIRST session/list_events in communication profile. session is disabled — verify when it reconnects. Comm-relevant via thinking, notion."
+        },
+        {
+          "name": "comm-linear-create-project-campaign",
+          "chain": [
+            "linear/create_project",
+            "thinking/sequentialthinking",
+            "evidence/ai_search",
+            "fs/write_file"
+          ],
+          "accomplishes": "Create a new Linear project to organize a communication campaign initiative, reason through the campaign scope, milestones, and stakeholder assignment strategy, search the evidence store for prior campaign retrospectives and audience research to inform the project setup, and write the campaign project brief — a communication-scoped Linear project scaffold for campaign planning.",
+          "verified": false,
+          "notes": "FIRST linear/create_project in communication profile. Linear is auth-gated — verify when linear token is available."
+        },
+        {
+          "name": "comm-nine-step-broadcast-visual-pipeline",
+          "chain": [
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "playwright/browser_take_screenshot",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search orchestrator agents for a broadcast or notification agent, execute the agent to draft the initial broadcast message, survey available RAGs for audience context and prior messaging, search the evidence store for communication precedents and approved messaging patterns, resolve the notification API library identifier, query the library docs for channel-specific formatting requirements, reason through the message strategy against evidence and API constraints, take a visual screenshot of the message preview to verify formatting, and write the broadcast report — a 9-step communication broadcast pipeline with visual preview.",
+          "verified": true,
+          "notes": "FIRST 9-step chain in communication profile. All servers confirmed connected: orchestrator, evidence, context7, thinking, playwright, fs."
+        },
+        {
+          "name": "comm-chatgpt-evidence-context7-broadcast-brief",
+          "chain": [
+            "orchestrator/agent_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Execute the ChatGPT agent to draft communication content, survey available evidence RAGs for messaging context, search the evidence store for audience and engagement patterns, resolve the relevant communication SDK library ID, query its documentation for broadcast API details, reason through the combined evidence to refine the message, and write the broadcast brief — completing the first chatgpt+evidence+context7 triple in the communication profile.",
+          "verified": true,
+          "notes": "FIRST chatgpt+evidence+context7 triple in communication profile. All servers confirmed connected (2026-06-07): orchestrator/agent_execute(chatgpt), evidence, context7, thinking, fs."
+        },
+        {
+          "name": "comm-ten-step-broadcast-visual-publish",
+          "chain": [
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search orchestrator agents for communication specialists, execute the best agent for the broadcast task, survey evidence RAGs for audience context, search the evidence store for engagement patterns, resolve the messaging SDK library ID, query its documentation, reason through the combined data to finalize the broadcast plan, take a visual screenshot of the communication interface, write the broadcast report to disk, then publish it to Notion — a 10-step communication pipeline with Notion publish.",
+          "verified": false,
+          "notes": "FIRST 10-step chain in communication profile. Unverified: notion auth-gated (401). All other steps confirmed connected. Verify when Notion integration token is refreshed."
         }
       ],
       "prompts": [
@@ -6472,6 +6848,22 @@
         {
           "text": "List active sessions, enumerate events, synthesize broadcast message, execute broadcast skill, and post update to notion",
           "resolves_to": "comm-session-list-events-broadcast"
+        },
+        {
+          "text": "Create a Linear project for the communication campaign, reason through scope and milestones, search evidence for prior campaigns, and write the project brief",
+          "resolves_to": "comm-linear-create-project-campaign"
+        },
+        {
+          "text": "Search for a broadcast agent, execute it, pull audience RAGs, search evidence, resolve and query the notification API docs, reason, screenshot the message preview, and write the broadcast report",
+          "resolves_to": "comm-nine-step-broadcast-visual-pipeline"
+        },
+        {
+          "text": "Execute ChatGPT agent to draft broadcast content, survey evidence RAGs, query context7 docs, reason, and write the broadcast brief",
+          "resolves_to": "comm-chatgpt-evidence-context7-broadcast-brief"
+        },
+        {
+          "text": "Search comm agents, execute the best one, pull audience RAGs, search evidence, query docs, reason, screenshot, write, then publish the broadcast report to Notion",
+          "resolves_to": "comm-ten-step-broadcast-visual-publish"
         }
       ]
     },
@@ -7645,6 +8037,69 @@
           "accomplishes": "Search for the appropriate deploy or ops agent by capability, execute the matched agent to initiate the deployment audit workflow, run the ops verification skill to check deployment health and configuration, discover available evidence RAG stores for prior deployment patterns, search the evidence corpus for runbooks and post-mortems relevant to this deployment, reason through the agent output and evidence to synthesize an audit verdict, capture a screenshot of the deployment dashboard to document the live state, and write the deployment audit report — a full orchestrator-to-evidence 8-step deploy audit pipeline.",
           "verified": true,
           "notes": "VERIFIED: THIRD 8-STEP CHAIN in catalog. All servers confirmed connected in prior runs: orchestrator (13 tools, agent_search+execute confirmed), evidence (3 tools, list_rags+ai_search confirmed), thinking (connected), playwright (23 tools, screenshot confirmed), fs (14 tools). 5 distinct servers."
+        },
+        {
+          "name": "ops-nine-step-incident-context7-pipeline",
+          "chain": [
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "playwright/browser_take_screenshot",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search orchestrator agents for an incident responder, execute the agent to triage the incident, execute the on-call skill to page the responsible team, survey available RAGs for runbook and system context, search the evidence store for prior incident post-mortems, cross-reference library documentation for system API behavior, reason through the incident severity and response plan, take a visual screenshot of the monitoring dashboard to timestamp the incident state, and write the incident report — a 9-step ops incident pipeline adding context7 depth to the 8-step deploy audit.",
+          "verified": true,
+          "notes": "FIRST 9-step chain in ops profile with context7; extends ops-eight-step-deploy-audit by adding context7/query-docs for runbook/API documentation cross-reference. All servers confirmed connected."
+        },
+        {
+          "name": "ops-chatgpt-evidence-context7-incident-brief",
+          "chain": [
+            "orchestrator/agent_execute(chatgpt)",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Execute the ChatGPT agent to generate an initial incident analysis and alternative failure hypothesis, survey available RAGs for runbook and system topology context, search the evidence store for prior incidents and resolution patterns, resolve the affected system's library identifier for API documentation, query the library docs for known failure modes and configuration constraints, reason through the ChatGPT hypothesis against the evidence and documentation to form a verified RCA, and write the incident brief — the FIRST agent_execute(chatgpt)+evidence+context7 triple in ops.",
+          "verified": true,
+          "notes": "FIRST chatgpt+evidence+context7 triple in ops. All components confirmed: orchestrator/agent_execute(chatgpt) verified, evidence verified, context7 verified, thinking+fs verified."
+        },
+        {
+          "name": "ops-ten-step-incident-context7-publish",
+          "chain": [
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search orchestrator agents for incident-response specialists, execute the incident agent, run the resolution skill against the registry, survey evidence RAGs for ops runbook context, search the evidence store for prior incident patterns, cross-reference library documentation for tooling details, reason through the combined evidence, take a visual screenshot of the ops dashboard, write the incident post-mortem to disk, then publish it to Notion — a 10-step incident response pipeline with Notion publish.",
+          "verified": false,
+          "notes": "FIRST 10-step chain in ops profile. Unverified: notion auth-gated (401). All other steps confirmed connected. Verify when Notion integration token is refreshed."
+        },
+        {
+          "name": "ops-linear-update-project-incident-milestone",
+          "chain": [
+            "linear/list_projects",
+            "linear/update_project",
+            "thinking/sequentialthinking",
+            "evidence/ai_search",
+            "fs/write_file"
+          ],
+          "accomplishes": "List existing Linear projects to locate the active incident response initiative, update the project state to reflect resolved or escalated milestone status, reason through the updated scope and remaining remediation steps, search the evidence store for incident pattern context to inform next-sprint priorities, and write the milestone update report — the first linear/update_project in the ops profile.",
+          "verified": false,
+          "notes": "FIRST linear/update_project in ops profile. Linear is auth-gated — verify when linear token is available."
         }
       ],
       "prompts": [
@@ -7935,6 +8390,22 @@
         {
           "text": "8-step deploy audit: search agents → execute deploy agent → run ops skill → discover evidence → synthesize findings → capture dashboard screenshot → write report",
           "resolves_to": "ops-eight-step-deploy-audit"
+        },
+        {
+          "text": "Search for an incident agent, execute it, run on-call skill, pull runbook RAGs, search evidence, cross-reference API docs, reason, screenshot the monitoring dashboard, and write the incident report",
+          "resolves_to": "ops-nine-step-incident-context7-pipeline"
+        },
+        {
+          "text": "Ask ChatGPT for incident analysis, pull runbook RAGs, search evidence for prior incidents, resolve and query the affected system docs, reason through the RCA, and write the incident brief",
+          "resolves_to": "ops-chatgpt-evidence-context7-incident-brief"
+        },
+        {
+          "text": "Search ops agents, execute the incident agent, run resolution skill, pull runbook RAGs, search evidence, cross-reference docs, reason, screenshot, write, then publish the post-mortem to Notion",
+          "resolves_to": "ops-ten-step-incident-context7-publish"
+        },
+        {
+          "text": "List Linear projects for the incident initiative, update the project milestone, reason through scope, search evidence for next-sprint context, and write the update report",
+          "resolves_to": "ops-linear-update-project-incident-milestone"
         }
       ]
     }
