@@ -1133,7 +1133,7 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 - Catalog: 676 → **688 combos / 324 → 325 verified**
 - 0 test failures. Tests: 938 pass / 0 fail / 2 skipped ✓
 
-**Branch / PR**: `auto/E-catalog-sixty-eighth-pass` → PR TBD
+**Branch / PR**: `auto/E-catalog-sixty-eighth-pass` → PR #264 (https://github.com/chittyos/ch1tty/pull/264)
 
 **Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
 
