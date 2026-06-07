@@ -783,7 +783,7 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 - 0 test failures. Tests: 938 pass / 0 fail / 2 skipped ✓
 - Pushed branch, opened PR #250
 
-**Branch / PR**: `auto/E-catalog-fifty-sixth-pass` → PR #250
+**Branch / PR**: `auto/E-catalog-fifty-sixth-pass` → PR #250 (https://github.com/chittyos/ch1tty/pull/250)
 
 **Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
 
