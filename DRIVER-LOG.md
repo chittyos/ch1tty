@@ -1310,3 +1310,47 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 1. Merge PR #268 + PR #269 if CI green
 2. 74th catalog pass: `tasks/create_task` still missing from governance + design + code + communication; `stripe/finalize_invoice` first use; `fs/list_directory_with_sizes` needs more coverage; 22-step chain attempt; `linear` combos that are currently unverified once token is available
 3. Fix Notion auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` to unblock cross-run board writes
+
+---
+
+### 2026-06-08T03:30Z — Session auto-driver run (74th pass)
+
+**Workstream advanced**: E (Alchemist brainstorm — catalog 74th pass)
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass / 0 fail / 2 skipped
+- Found 2 open PRs: #268 (72nd pass, 724 combos) and #269 (73rd pass, 736 combos) — both CI all-green
+- **Merged PR #268** (squash) → main at 72nd pass (724 combos)
+- PR #269 needed rebase: 73rd pass branch included 72nd pass commits; rebased onto new main (stripped 72nd pass commits, kept only 73rd pass commits), force-pushed, CI re-ran → **3/3 green** → **merged PR #269** (squash) → main now at 73rd pass (736 combos, 21-step chains in all 6 profiles)
+- Live gateway: v4.1.0, 15 servers, 8 connected, 59 tools, 352 active sessions
+  - Connected: evidence (3), browser-rendering (3), context7 (2), thinking (1), fs (14), playwright (23), orchestrator (13)
+  - Disconnected: chittyos, cloudflare, cowork, github, linear, notion, stripe, neon
+- Coverage gap analysis (post 73rd-pass merge):
+  - All 6 profiles at 21-step verified chains (catalog record going into this pass)
+  - All playwright/evidence tools already in catalog — focus shifted to novel CROSS-BACKEND pairings and 22-step extensions
+  - Orchestrator provision tools (evaluate/candidates/fork/bind) rarely appear together in ops
+  - browser-rendering/render-pdf → evidence/ingest_document pairing unused in governance
+  - fs/search_files → fs/read_multiple_files → evidence chain unused in code
+  - context7 → playwright/browser_fill_form chain unused in design
+- Created branch `auto/E-catalog-seventy-fourth-pass`; added 12 combos + 12 prompts (2 per profile):
+  - **finance**: `finance-twenty-two-step-billing-apex-chain` ✅ (FIRST 22-step chain in entire catalog! Step 22 = playwright/browser_console_messages), `finance-provision-evaluate-billing-agent` ✅ (FIRST provision_evaluate → provision_bind → agent_execute → evidence/ai_search in finance)
+  - **governance**: `governance-twenty-two-step-policy-apex-chain` (FIRST 22-step in governance, unverified — notion at step 21 disconnected), `governance-render-pdf-evidence-archive` ✅ (FIRST browser-rendering/render-pdf → evidence/ingest_document in governance)
+  - **design**: `design-twenty-two-step-ux-apex-chain` ✅ (FIRST 22-step in design! Step 22 = playwright/browser_snapshot), `design-context7-playwright-form-test` ✅ (FIRST context7 → playwright/browser_fill_form → browser_snapshot in design)
+  - **code**: `code-twenty-two-step-impl-apex-chain` (FIRST 22-step in code, unverified — notion at step 21 disconnected), `code-fs-search-evidence-synthesis` ✅ (FIRST fs/search_files → fs/read_multiple_files → evidence/ingest_document in code)
+  - **communication**: `comm-twenty-two-step-broadcast-apex-chain` (FIRST 22-step in communication, unverified — notion at step 21 disconnected), `comm-browser-markdown-screenshot-synthesis` ✅ (FIRST browser-rendering dual-fetch + playwright validation in communication)
+  - **ops**: `ops-twenty-two-step-incident-apex-chain` ✅ (FIRST 22-step in ops! Step 22 = playwright/browser_network_requests), `ops-provision-fork-incident-specialist` ✅ (FIRST combo with ALL 4 provision steps: evaluate → candidates → fork → bind in ops)
+- 3 verified 22-step apex chains (finance ✅, design ✅, ops ✅). 3 unverified 22-step chains (governance, code, comm — blocked on notion at step 21). 6 verified utility combos.
+- Catalog: 736 → **748 combos / 357 → 366 verified** / 745 → **757 prompts** / **0 prompt gaps** / **0 orphans**
+- Max chain lengths: ALL 6 profiles at 22-step (new record!)
+- 0 test failures. Tests: 938 pass / 0 fail / 2 skipped ✓
+
+**Branch / PR**: `auto/E-catalog-seventy-fourth-pass` → (PR pending push)
+
+**Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
+
+**Board state**: 748 combos / 366 verified / 757 prompts. MILESTONES: FIRST 22-step chains in ALL 6 profiles simultaneously. FIRST browser_console_messages as step 22 in finance. FIRST browser_snapshot as step 22 in design. FIRST browser_network_requests as step 22 in ops. FIRST all-4-provision-steps chain in ops. FIRST browser-rendering/render-pdf → evidence/ingest_document in governance. FIRST fs/search_files → evidence ingestion chain in code. FIRST context7 → playwright/browser_fill_form in design.
+
+**Next run priority**:
+1. Merge 74th pass PR when CI green
+2. 75th catalog pass: extend to 23-step chains (target finance/design/ops which have verified 22-step bases); `orchestrator/provision_status` not yet in a standalone utility combo; `browser-rendering/render-pdf` not yet used in finance/code/communication; `playwright/browser_fill_form` not yet in governance/ops/code/communication
+3. Fix Notion auth to verify the ~380 unverified combos: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`
