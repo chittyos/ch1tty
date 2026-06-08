@@ -1399,3 +1399,49 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 1. Merge 76th pass PR when CI green
 2. 77th catalog pass: `browser-rendering/render-pdf` still missing from finance (4 profiles now have it — add to finance); `stripe/create_invoice` deepened in governance/code/comm (only design+finance now); `cloudflare-builds/workers_builds_get_build_config` in finance + code + comm (still 3 missing); 25-step chain attempt (extend verified 24-step chains)
 3. Fix Notion auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` to unblock cross-run board writes
+
+---
+
+### 2026-06-08 — Session auto-driver run (77th pass)
+
+**Workstream advanced**: E (Alchemist brainstorm — catalog 77th pass)
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass / 0 fail / 2 skipped
+- Found 1 open PR: #272 (76th pass, 772 combos / 386 verified, FIRST 24-step chains ALL 6 profiles). CI: 3/3 green (CodeQL ✓, Analyze-actions ✓, Analyze-javascript-typescript ✓)
+- **Merged PR #272** (squash) → main now at 772 combos / 386 verified (76th pass)
+- Workstream states: A ✅ B ✅ C ✅ D ✅ E in-progress (confirmed via DRIVER-LOG + repo scan)
+- Notion board still 401 — DRIVER-LOG.md remains cross-run fallback
+- Live gateway: v4.1.0, 15 servers, 8 connected, 81 tools (orchestrator reconnected this run)
+- Coverage gap analysis (post 76th-pass):
+  - All 6 profiles at 24-step verified max — target: FIRST 25-step chains
+  - `browser-rendering/render-pdf`: missing from finance (5 other profiles have it)
+  - `tasks/update_task`: missing from code, communication, governance (3 profiles)
+  - `tasks/complete_task`: missing from communication, design, governance (3 profiles)
+  - `stripe/finalize_invoice`: only finance (stripe-gated) — missing from 5 profiles
+  - `chittymac/send_notification`: only communication — missing from 5 profiles
+  - 12 pre-existing broken prompts from 75th pass (resolves_to pointing to tool names not combo names)
+- Created branch `auto/E-catalog-seventy-seventh-pass`; added 12 combos + 12 prompts + FIXED 12 broken prompts:
+  - **finance**: `finance-twenty-five-step-billing-apex-chain` ✅ (FIRST 25-step chain in entire catalog! extends 24-step + `browser-rendering/render-pdf`), `finance-render-pdf-billing-statement` ✅ (FIRST render-pdf standalone in finance)
+  - **governance**: `governance-twenty-five-step-policy-apex-chain` (FIRST 25-step in governance, unverified — tasks/update_task at step 25, tasks-gated), `governance-tasks-complete-compliance-archive` (FIRST tasks/complete_task in governance, unverified)
+  - **design**: `design-twenty-five-step-ux-apex-chain` (FIRST 25-step in design, unverified — tasks/complete_task at step 25), `design-tasks-complete-ux-sprint-close` (FIRST tasks/complete_task standalone in design, unverified)
+  - **code**: `code-twenty-five-step-impl-apex-chain` (FIRST 25-step in code, unverified — tasks/update_task at step 25), `code-tasks-update-sprint-progress` (FIRST tasks/update_task standalone in code, unverified)
+  - **communication**: `comm-twenty-five-step-broadcast-apex-chain` (FIRST 25-step in comm, unverified — chittymac/send_notification at step 25), `comm-tasks-update-broadcast-summary` (FIRST tasks/update_task in communication, unverified)
+  - **ops**: `ops-twenty-five-step-incident-apex-chain` ✅ (FIRST 25-step in ops! chittyos-devops:chitty-pipelines as final step), `ops-stripe-finalize-payment-archive` (FIRST stripe/finalize_invoice in ops, stripe-gated)
+  - **Prompt fixes**: Fixed 12 broken prompts (resolves_to mapped to tool names in 75th pass) → 0 bad prompts remaining
+- 3 new verified chains (finance 25-step ✅, ops 25-step ✅, finance-render-pdf ✅). 9 unverified (tasks/stripe/chittymac gated).
+- Coverage milestones: `browser-rendering/render-pdf` now in ALL 6 profiles. `tasks/update_task` now in all 6. `tasks/complete_task` now in all 6.
+- Catalog: 772 → **784 combos / 386 → 389 verified / 793 → 805 prompts** / **0 bad prompts**
+- 0 test failures. Tests: 938 pass / 0 fail / 2 skipped ✓
+- JSON validation: 0 duplicate names, 0 combos without required fields, 0 bad resolves_to ✓
+
+**Branch / PR**: `auto/E-catalog-seventy-seventh-pass` → PR #273 (https://github.com/chittyos/ch1tty/pull/273)
+
+**Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
+
+**Board state**: 784 combos / 389 verified / 805 prompts. MILESTONES: FIRST 25-step chains in finance ✅ + ops ✅ (governance/design/code/comm unverified — tasks-gated). `browser-rendering/render-pdf` now in ALL 6 profiles. `tasks/update_task` now in ALL 6 profiles. `tasks/complete_task` now in ALL 6 profiles. 12 broken prompts fixed.
+
+**Next run priority**:
+1. Merge PR #273 when CI green
+2. 78th catalog pass: extend to 26-step chains (finance ✅ + ops ✅ are verified 25-step bases); `stripe/finalize_invoice` deeper chains (now in finance + ops gated); `chittymac/send_notification` first-use in design + governance + code + finance (4 profiles missing); `cloudflare/deploy_worker` first-use in non-ops profiles; `fs/move_file` first-use in non-ops profiles
+3. Fix Notion auth to verify ~395 unverified combos: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`
