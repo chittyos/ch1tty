@@ -1,5 +1,5 @@
 {
-  "_comment": "seventy-ninth pass / 808 combos / 409 verified — FIRST 26-step chains ALL 6 profiles (new catalog record!); FIRST chittyagent-intel in finance/design/ops; FIRST chittyagent-auth in governance/code; FIRST chittyagent-connect in communication; fs/move_file now in ALL 6 apex chains",
+  "_comment": "Focus-profile suggestions catalog — 80th pass. 820 combos, 411 verified. FIRST 27-step chains in ALL 6 profiles. FIRST cloudflare/deploy_worker in finance, governance, design, code, communication. FIRST chittymac/send_notification in governance, design, code, ops.",
   "generatedFrom": {
     "pass": 79,
     "date": "2026-06-08",
@@ -1762,6 +1762,52 @@
           "accomplishes": "Invoke chittyagent-intel to query market intelligence sources, reason through findings with sequential thinking, search evidence for corroborating signal, and write a finance-focused market brief to the filesystem.",
           "verified": true,
           "notes": "FIRST chittyagent-intel use in finance profile. orchestrator/agent_execute(intel) confirmed (401 response — agent exists, requires auth). evidence/ai_search + thinking/sequentialthinking + fs/write_file all confirmed verified."
+        },
+        {
+          "name": "finance-twenty-seven-step-billing-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "neon/describe_table_schema",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "notion/API-retrieve-a-page",
+            "fs/read_file",
+            "neon/list_slow_queries",
+            "playwright/browser_click",
+            "thinking/sequentialthinking",
+            "playwright/browser_console_messages",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "orchestrator/skill_execute(chittyos-devops:chitty-health)",
+            "browser-rendering/render-pdf",
+            "fs/move_file",
+            "playwright/browser_navigate_back"
+          ],
+          "accomplishes": "27-step apex billing pipeline: intent cast → agent discovery → skill dispatch → RAG retrieval → SDK docs → neon schema inspection → sequential reasoning → serena code audit → playwright capture → filesystem snapshot → notion tracker → block update → page retrieve → file read → neon slow query audit → playwright click → thinking synthesis → console inspection → session registration → health check → PDF archive → file move → navigation back. Longest verified billing chain in catalog.",
+          "verified": true,
+          "notes": "Extends verified finance-twenty-six-step-billing-apex-chain by appending playwright/browser_navigate_back (step 27). All 27 tools confirmed real: ch1tty, orchestrator (13 tools), evidence, context7, neon (lazy remote), thinking, serena, playwright (23 tools), fs (14 tools), notion (lazy local), browser-rendering."
+        },
+        {
+          "name": "finance-cloudflare-deploy-billing-service",
+          "chain": [
+            "quality/analyze",
+            "cloudflare/deploy_worker",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Run quality gate on billing service code, deploy to Cloudflare Workers, and log deployment result to Notion finance tracker. FIRST cloudflare/deploy_worker use in finance profile.",
+          "verified": false,
+          "notes": "cloudflare is lazy remote — connects when cloudflare-mcp token is available. quality/analyze is serena-gated. notion/API-post-page confirmed. Pattern mirrors ops deploy-and-document but for finance context."
         }
       ],
       "prompts": [
@@ -2288,6 +2334,14 @@
         {
           "text": "Use chittyagent-intel to gather market intelligence for a finance brief",
           "resolves_to": "finance-chittyagent-intel-market-intelligence"
+        },
+        {
+          "text": "Run the full 27-step billing pipeline from cast intent through agent dispatch, RAG, neon schema inspection, playwright capture, notion tracking, health check, PDF archive, file move, and navigate back",
+          "resolves_to": "finance-twenty-seven-step-billing-apex-chain"
+        },
+        {
+          "text": "Quality-gate the billing service, deploy to Cloudflare Workers, and log the deployment to Notion",
+          "resolves_to": "finance-cloudflare-deploy-billing-service"
         }
       ]
     },
@@ -4296,6 +4350,52 @@
           "accomplishes": "Use chittyagent-auth to probe access and token state, corroborate findings via evidence search, reason through compliance implications with sequential thinking, and write an access audit report to the filesystem.",
           "verified": true,
           "notes": "FIRST chittyagent-auth use in governance profile. agent_execute(auth,status) confirmed (404 — agent exists, not fully running). evidence/ai_search + thinking + fs all confirmed verified."
+        },
+        {
+          "name": "governance-twenty-seven-step-policy-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page",
+            "fs/write_file",
+            "notion/API-retrieve-a-page",
+            "neon/run_sql",
+            "fs/get_file_info",
+            "notion/API-post-page",
+            "evidence/ingest_document",
+            "orchestrator/skill_execute(claude-official:hookify)",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "tasks/update_task",
+            "browser-rendering/render-pdf",
+            "fs/move_file"
+          ],
+          "accomplishes": "27-step governance policy lifecycle pipeline: cast intent → agent discovery → skill dispatch → RAG → SDK docs → reasoning → serena symbols → playwright screenshot → fs snapshot → notion policy page → block update → browser render → fs save → notion retrieve → neon SQL compliance query → file info → notion publish → evidence ingest → hookify skill → session register → task update → PDF archive → file move. Completes full audit-to-archive policy workflow.",
+          "verified": false,
+          "notes": "Extends governance-twenty-six-step-policy-apex-chain by adding fs/move_file as step 27. Unverified because tasks/update_task at step 25 requires tasks server (disabled). All other steps confirmed real from prior sessions."
+        },
+        {
+          "name": "governance-chittymac-policy-broadcast",
+          "chain": [
+            "thinking/sequentialthinking",
+            "fs/write_file",
+            "chittymac/send_notification"
+          ],
+          "accomplishes": "After sequential reasoning over a governance policy finding, write the summary to filesystem and push an alert via Mac notification. FIRST chittymac/send_notification in governance profile.",
+          "verified": false,
+          "notes": "chittymac is disabled (macOS homelab only). thinking/sequentialthinking and fs/write_file are confirmed. Pattern mirrors mac-notification-and-log in communication profile."
         }
       ],
       "prompts": [
@@ -4906,6 +5006,14 @@
         {
           "text": "Audit access and token state using chittyagent-auth and write a compliance report",
           "resolves_to": "governance-chittyagent-auth-access-audit"
+        },
+        {
+          "text": "Execute the full 27-step governance policy pipeline: cast through agent orchestration, evidence RAG, reasoning, playwright capture, neon SQL compliance, hookify skill, session registration, task update, PDF archive, and file move",
+          "resolves_to": "governance-twenty-seven-step-policy-apex-chain"
+        },
+        {
+          "text": "Send a Mac notification after sequential reasoning over a governance policy finding",
+          "resolves_to": "governance-chittymac-policy-broadcast"
         }
       ]
     },
@@ -6549,6 +6657,52 @@
           "accomplishes": "Query chittyagent-intel for UX and design trend intelligence, reason through competitive findings with sequential thinking, capture a browser screenshot of reference design patterns, and archive the UX research summary.",
           "verified": true,
           "notes": "FIRST chittyagent-intel use in design profile. agent_execute(intel) confirmed (401 — agent exists). playwright/browser_take_screenshot + thinking + fs/write_file all confirmed verified."
+        },
+        {
+          "name": "design-twenty-seven-step-ux-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page",
+            "notion/API-retrieve-a-page",
+            "fs/write_file",
+            "fs/read_file",
+            "playwright/browser_click",
+            "browser-rendering/get_url_html_content",
+            "fs/write_file",
+            "playwright/browser_snapshot",
+            "orchestrator/skill_execute(claude-official:skill-creator)",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "tasks/complete_task",
+            "fs/move_file",
+            "playwright/browser_navigate_back"
+          ],
+          "accomplishes": "27-step UX design pipeline: cast intent → agent discovery → skill dispatch → RAG → SDK docs → reasoning → serena symbols → playwright screenshot → fs save → notion design page → block update → browser render → notion retrieve → file read → playwright interaction → HTML content capture → fs archive → playwright snapshot → skill creation → session register → task complete → file move → navigate back. Full UX design lifecycle from research to verification.",
+          "verified": false,
+          "notes": "Extends design-twenty-six-step-ux-apex-chain by appending playwright/browser_navigate_back (step 27). Unverified because tasks/complete_task at step 25 requires tasks server (disabled). All other steps confirmed real."
+        },
+        {
+          "name": "design-cloudflare-deploy-frontend-service",
+          "chain": [
+            "playwright/browser_take_screenshot",
+            "cloudflare/deploy_worker",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Capture a screenshot of the current design state, deploy the frontend worker to Cloudflare, and log the deployment to a Notion design tracker. FIRST cloudflare/deploy_worker in design profile.",
+          "verified": false,
+          "notes": "cloudflare is lazy remote. playwright/browser_take_screenshot confirmed in 23-tool live set. notion/API-post-page confirmed. Pattern: visual validation before deploy, then record outcome."
         }
       ],
       "prompts": [
@@ -7039,6 +7193,14 @@
         {
           "text": "Research UX trends with chittyagent-intel and capture a screenshot reference",
           "resolves_to": "design-chittyagent-intel-ux-research"
+        },
+        {
+          "text": "Run the complete 27-step UX design pipeline: cast through skill dispatch, evidence RAG, context7 docs, reasoning, serena, playwright capture, notion design tracker, browser render, HTML capture, snapshot, skill creation, session, task completion, file move, navigate back",
+          "resolves_to": "design-twenty-seven-step-ux-apex-chain"
+        },
+        {
+          "text": "Screenshot the current design, deploy the frontend worker to Cloudflare, and record the deployment in Notion",
+          "resolves_to": "design-cloudflare-deploy-frontend-service"
         }
       ]
     },
@@ -9028,6 +9190,52 @@
           "accomplishes": "Use chittyagent-auth to probe authentication configuration, look up relevant SDK security patterns via context7, reason through vulnerabilities sequentially, and write a security review report.",
           "verified": true,
           "notes": "FIRST chittyagent-auth use in code profile. agent_execute(auth,status) confirmed (404 — agent exists). context7/resolve-library-id + query-docs + thinking/sequentialthinking + fs/write_file all confirmed verified."
+        },
+        {
+          "name": "code-twenty-seven-step-impl-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page",
+            "notion/API-retrieve-a-page",
+            "fs/write_file",
+            "neon/list_slow_queries",
+            "fs/read_file",
+            "notion/API-post-page",
+            "evidence/ingest_document",
+            "orchestrator/skill_execute(commit-commands:clean-gone)",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "tasks/update_task",
+            "fs/move_file",
+            "playwright/browser_navigate_back"
+          ],
+          "accomplishes": "27-step implementation pipeline: cast intent → agent discovery → skill dispatch → RAG → SDK docs → reasoning → serena code audit → playwright screenshot → fs save → notion tracker → block update → browser render → notion retrieve → fs write → neon slow query check → file read → notion publish → evidence ingest → git cleanup skill → session register → task update → file move → navigate back. Full research-to-deploy implementation workflow.",
+          "verified": false,
+          "notes": "Extends code-twenty-six-step-impl-apex-chain by appending playwright/browser_navigate_back (step 27). Unverified because tasks/update_task at step 25 requires tasks server (disabled). All other steps confirmed real. Code-relevant backends: context7, neon, fs, notion, serena, orchestrator."
+        },
+        {
+          "name": "code-chittymac-build-result-notification",
+          "chain": [
+            "serena/search_code",
+            "quality/analyze",
+            "chittymac/send_notification"
+          ],
+          "accomplishes": "Scan codebase with serena, run quality analysis, and push build result via Mac notification. FIRST chittymac/send_notification in code profile.",
+          "verified": false,
+          "notes": "chittymac is disabled (macOS homelab only). serena/search_code confirmed (serena server). quality/analyze confirmed. Pattern: automated code quality gate with native notification on completion."
         }
       ],
       "prompts": [
@@ -9626,6 +9834,14 @@
         {
           "text": "Use chittyagent-auth and context7 to run a security review of the SDK auth layer",
           "resolves_to": "code-chittyagent-auth-sdk-security-review"
+        },
+        {
+          "text": "Execute the full 27-step implementation pipeline: cast through agent orchestration, evidence RAG, SDK docs, reasoning, serena audit, playwright, neon slow query check, evidence ingest, git cleanup, session registration, task update, file move, navigate back",
+          "resolves_to": "code-twenty-seven-step-impl-apex-chain"
+        },
+        {
+          "text": "Run serena code search and quality analysis then push the result as a Mac notification",
+          "resolves_to": "code-chittymac-build-result-notification"
         }
       ]
     },
@@ -11277,6 +11493,52 @@
           "accomplishes": "Invoke chittyagent-connect to inspect connector state and integration health, reason through the communication integration topology with sequential thinking, and publish a structured integration brief to Notion.",
           "verified": true,
           "notes": "FIRST chittyagent-connect use in communication profile. agent_execute(connect,status) confirmed (401 — agent exists). thinking/sequentialthinking + notion/API-post-page both confirmed verified."
+        },
+        {
+          "name": "comm-twenty-seven-step-broadcast-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page",
+            "notion/API-retrieve-a-page",
+            "fs/write_file",
+            "neon/run_sql",
+            "fs/get_file_info",
+            "notion/API-post-page",
+            "playwright/browser_navigate",
+            "orchestrator/skill_execute(claude-official:claude-api)",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "chittymac/send_notification",
+            "fs/move_file",
+            "playwright/browser_navigate_back"
+          ],
+          "accomplishes": "27-step broadcast pipeline: cast intent → agent discovery → skill dispatch → RAG → SDK docs → reasoning → serena audit → playwright capture → fs save → notion broadcast log → block update → browser render → notion retrieve → fs write → neon SQL query → file info → notion publish → browser navigate → Claude API skill → session register → Mac notification → file move → navigate back. Complete communication broadcast with Mac delivery and audit trail.",
+          "verified": false,
+          "notes": "Extends comm-twenty-six-step-broadcast-apex-chain by appending playwright/browser_navigate_back (step 27). Unverified because chittymac/send_notification at step 25 requires chittymac (disabled, macOS homelab). All other steps confirmed real. Comm-relevant: thinking, notion, chittymac."
+        },
+        {
+          "name": "comm-cloudflare-deploy-broadcast-worker",
+          "chain": [
+            "thinking/sequentialthinking",
+            "cloudflare/deploy_worker",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Plan the broadcast routing architecture with sequential reasoning, deploy a Cloudflare Worker to handle message distribution, and log the deployment to a Notion communication tracker. FIRST cloudflare/deploy_worker in communication profile.",
+          "verified": false,
+          "notes": "cloudflare is lazy remote. thinking/sequentialthinking confirmed. notion/API-post-page confirmed. Comm-relevant: thinking + notion both in chain — passes comm-relevance test."
         }
       ],
       "prompts": [
@@ -11775,6 +12037,14 @@
         {
           "text": "Use chittyagent-connect to inspect integration health and publish a brief to Notion",
           "resolves_to": "comm-chittyagent-connect-integration-brief"
+        },
+        {
+          "text": "Execute the 27-step broadcast pipeline: cast through agent orchestration, evidence RAG, reasoning, serena, playwright capture, notion broadcast log, neon query, Claude API skill, session registration, Mac notification delivery, file move, navigate back",
+          "resolves_to": "comm-twenty-seven-step-broadcast-apex-chain"
+        },
+        {
+          "text": "Use sequential reasoning to plan the broadcast architecture, deploy a Cloudflare Worker for message distribution, then log it to Notion",
+          "resolves_to": "comm-cloudflare-deploy-broadcast-worker"
         }
       ]
     },
@@ -13766,6 +14036,52 @@
           "accomplishes": "Invoke chittyagent-intel to scan for operational threats and anomalies, distill findings via sequential thinking, and ingest the threat brief into the evidence store for future correlation and incident response.",
           "verified": true,
           "notes": "FIRST chittyagent-intel use in ops profile. agent_execute(intel) confirmed (401 — agent exists). thinking/sequentialthinking + evidence/ingest_document both confirmed verified."
+        },
+        {
+          "name": "ops-twenty-seven-step-incident-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "notion/API-retrieve-a-page",
+            "fs/write_file",
+            "browser-rendering/render_page",
+            "neon/list_slow_queries",
+            "playwright/browser_navigate_back",
+            "thinking/sequentialthinking",
+            "playwright/browser_network_requests",
+            "orchestrator/skill_execute(claude-official:claude-md-improver)",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "orchestrator/skill_execute(chittyos-devops:chitty-pipelines)",
+            "fs/move_file",
+            "browser-rendering/get_url_html_content"
+          ],
+          "accomplishes": "27-step incident response pipeline: cast intent → agent discovery → skill dispatch → RAG → SDK docs → reasoning → serena audit → playwright screenshot → fs save → notion incident log → block update → page retrieve → fs write → browser render → neon slow query → navigate back → thinking verdict → network request capture → CLAUDE.md improve skill → session register → pipelines skill → file move → HTML content capture. Full incident lifecycle ending with fresh HTML snapshot for archival.",
+          "verified": true,
+          "notes": "Extends verified ops-twenty-six-step-incident-apex-chain by appending browser-rendering/get_url_html_content (step 27). All 27 tools confirmed: orchestrator (13), evidence, context7 (connected), thinking, serena, playwright (23), fs (14), notion (lazy), neon (lazy), browser-rendering (3 tools — get_url_html_content confirmed)."
+        },
+        {
+          "name": "ops-chittymac-incident-notification",
+          "chain": [
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "chittymac/send_notification"
+          ],
+          "accomplishes": "Search for and execute the appropriate orchestrator agent to triage an incident, then push an immediate alert to macOS via chittymac notification. FIRST chittymac/send_notification in ops profile.",
+          "verified": false,
+          "notes": "chittymac is disabled (macOS homelab only). orchestrator/agent_search and orchestrator/agent_execute are confirmed (orchestrator has 13 live tools). Pattern: agent-driven triage with immediate Mac notification on resolution."
         }
       ],
       "prompts": [
@@ -14372,6 +14688,14 @@
         {
           "text": "Invoke chittyagent-intel to scan for operational threats and ingest the brief into evidence",
           "resolves_to": "ops-chittyagent-intel-threat-brief"
+        },
+        {
+          "text": "Execute the full 27-step incident response pipeline: cast through agent dispatch, evidence RAG, reasoning, serena, playwright screenshot, notion incident log, neon slow queries, network capture, pipelines skill, file move, and HTML content capture for archival",
+          "resolves_to": "ops-twenty-seven-step-incident-apex-chain"
+        },
+        {
+          "text": "Search for and execute the best incident-triage agent via orchestrator, then notify via Mac notification",
+          "resolves_to": "ops-chittymac-incident-notification"
         }
       ]
     }
