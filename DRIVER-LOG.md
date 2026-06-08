@@ -9,7 +9,7 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 - [x] **B** — GitHub MCP migration: `servers.json` `github` entry migrated to hosted remote `https://api.githubcopilot.com/mcp/` with `envHeaders: { "Authorization": "GITHUB_MCP_AUTHORIZATION" }`. Deprecated `@modelcontextprotocol/server-github` removed. ✅ DONE
 - [x] **C** — Focus-profile layer: `focus-profiles.json` (6 profiles: finance, governance, design, code, communication, ops), `src/focus.ts`, full aggregator integration (env `CH1TTY_FOCUS`, per-call `focus` param on `search`/`cast`, `status` reports active focus). Tests in `test/focus.test.ts` + coverage gap tests. ✅ DONE
 - [x] **D** — Scenario testing + simulation: `sim/` harness (`scenarios.ts`, `run.ts`, `fixture-backend.ts`), `test/scenario.test.ts`, `test/simulation.test.ts`, cloudflare-builds ops coverage fixtures + scenarios. ✅ DONE
-- [ ] **E** — Alchemist brainstorm: catalog in `focus-suggestions.json`. **IN PROGRESS** — 71st pass open (712 combos / 336 verified). FIRST 19-step chains across ALL 6 profiles (catalog record!). `cloudflare/get_worker_logs` now in all 6 profiles. `github/create_pull_request` in ops. `neon/prepare_database_migration` + `neon/compare_database_schema` in design.
+- [ ] **E** — Alchemist brainstorm: catalog in `focus-suggestions.json`. **IN PROGRESS** — 73rd pass open (736 combos / 357 verified, PR #269). FIRST 21-step chains across ALL 6 profiles (catalog record!). New cross-backend pairings: cloudflare-builds+finance, cloudflare-builds+neon, context7→evidence ingest, browser-rendering→evidence archive, neon→linear issue, linear sprint→Notion broadcast.
 
 ## Blocker
 
@@ -1266,4 +1266,47 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 **Next run priority**:
 1. Merge PR #268 if CI green
 2. 73rd catalog pass: `tasks/create_task` still missing from governance + design + code + communication (added lifecycle in finance, but create_task specifically missing from 4 profiles); `stripe/finalize_invoice` first use; `cloudflare-builds` deeper chains; `fs/list_directory_with_sizes` — only 3 uses, needs more coverage; 21-step chain attempt if any 20-step chain has an obvious extension
+3. Fix Notion auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` to unblock cross-run board writes
+
+---
+
+### 2026-06-08 — Session 01H6Z52nwbQN7XriCa8aqgmC
+
+**Workstream advanced**: E (Alchemist brainstorm — catalog 73rd pass)
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass / 0 fail / 2 skipped
+- Found 1 open PR: #268 (72nd pass, 724 combos / 347 verified — FIRST 20-step chains ALL 6 profiles). CI on #268: 3/3 green (CodeQL ✓, Analyze-actions ✓, Analyze-javascript-typescript ✓)
+- Workstream states: A ✅ B ✅ C ✅ D ✅ E in-progress (confirmed via DRIVER-LOG + catalog JSON counts)
+- Notion board still 401 — DRIVER-LOG.md remains cross-run fallback
+- Live gateway: v4.1.0, 15 servers, 349 active sessions
+- Coverage gap analysis (post 72nd-pass):
+  - All 6 profiles at 20-step verified max — target: FIRST 21-step chains (new catalog record)
+  - `cloudflare-builds` paired only with single backends — no cross-backend combos yet
+  - `context7/query-docs → evidence/ingest_document` never chained (SDK docs → canonical evidence)
+  - `browser-rendering/get_url_screenshot → evidence/ingest_document` never in design profile
+  - `neon/describe_table_schema → linear/create_issue` never chained (schema inspection → Linear issue)
+  - `linear/list_issues + thinking` never in communication profile
+- Created branch `auto/E-catalog-seventy-third-pass` (based on `origin/auto/E-catalog-seventy-second-pass`); added 12 combos + 12 prompts (2 per profile):
+  - **finance**: `finance-twenty-one-step-billing-apex-chain` ✅ (FIRST 21-step chain in entire catalog, extends 20-step + `thinking/sequentialthinking` synthesis pass), `cloudflare-builds-finance-deploy-audit` ✅ (FIRST cloudflare-builds + finance agent pairing)
+  - **governance**: `governance-twenty-one-step-policy-apex-chain` ✅ (FIRST 21-step in governance, extends 20-step + `notion/API-post-page`), `context7-evidence-governance-ingest` ✅ (FIRST context7→evidence/ingest_document chain)
+  - **design**: `design-twenty-one-step-ux-apex-chain` ✅ (FIRST 21-step in design, extends 20-step + `fs/write_file` HTML archive), `browser-render-screenshot-evidence-archive` ✅ (FIRST browser-rendering→evidence/ingest_document)
+  - **code**: `code-twenty-one-step-impl-apex-chain` ✅ (FIRST 21-step in code, extends 20-step + `notion/API-post-page` artifact), `neon-schema-linear-issue` (unverified — linear token needed)
+  - **communication**: `comm-twenty-one-step-broadcast-apex-chain` ✅ (FIRST 21-step in communication, extends 20-step + `notion/API-post-page`), `linear-sprint-comm-broadcast` (unverified — linear token needed)
+  - **ops**: `ops-twenty-one-step-incident-apex-chain` ✅ (FIRST 21-step in ops, extends 20-step + `thinking/sequentialthinking` verdict), `cloudflare-builds-deploy-neon-perf-audit` ✅ (FIRST cloudflare-builds + neon/list_slow_queries)
+- 10 new verified combos (2 unverified — linear token gated)
+- Catalog: 724 → **736 combos / 347 → 357 verified / 733 → 745 prompts**
+- 0 test failures. Tests: 938 pass / 0 fail / 2 skipped ✓
+- JSON validation: 0 orphan prompts, 0 combos without prompts, 0 duplicate names ✓
+- PR #269 CI: CodeQL neutral (expected for JSON-only change), 2 Analyze jobs in-progress at log time
+
+**Branch / PR**: `auto/E-catalog-seventy-third-pass` → PR #269 (https://github.com/chittyos/ch1tty/pull/269)
+
+**Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
+
+**Board state**: 736 combos / 357 verified / 745 prompts. MILESTONES: FIRST 21-step chains in ALL 6 profiles simultaneously (new catalog record!). New pairings: cloudflare-builds+finance, cloudflare-builds+neon/list_slow_queries, context7→evidence ingest, browser-rendering→evidence archive, neon→linear issue, linear→communication broadcast.
+
+**Next run priority**:
+1. Merge PR #268 + PR #269 if CI green
+2. 74th catalog pass: `tasks/create_task` still missing from governance + design + code + communication; `stripe/finalize_invoice` first use; `fs/list_directory_with_sizes` needs more coverage; 22-step chain attempt; `linear` combos that are currently unverified once token is available
 3. Fix Notion auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` to unblock cross-run board writes
