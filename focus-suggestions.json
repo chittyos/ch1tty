@@ -1,5 +1,5 @@
 {
-  "_comment": "87th pass — 904 combos / 436 verified / 925 prompts. FIRST USE of 8 novel skills: chittyos-core:chittyxl, chittyos-legal:dispute-skill, workflow:market, user:cast (governance+code), mcp-dev:build-mcp-server, connectors:imessage (design+communication), commit-commands:commit (code+ops), chittyos-devops:chitty-register (governance+design+ops).",
+  "_comment": "88th pass — 916 combos / 443 verified / 937 prompts. FIRST USE: github/search_issues in 5 profiles (finance, governance, code, communication, ops). FIRST chittyos-core:chittyxl in governance, code, ops. FIRST workflow:market in finance, design, communication. FIRST user:cast in design. FIRST mcp-dev:build-mcp-server depth in design.",
   "generatedFrom": "E-catalog-87th-pass",
   "profiles": {
     "finance": {
@@ -2053,6 +2053,32 @@
           "accomplishes": "Invoke the dispute skill to open or review a financial dispute lifecycle (insurance, property, financial — multi-domain), cross-reference with obligation-tracker to surface pending financial obligations tied to the dispute, search evidence RAGs for supporting documentation, reason across dispute status and obligation data to produce a resolution pathway, and write the financial-legal analysis to disk.",
           "verified": true,
           "notes": "FIRST USE of chittyos-legal:dispute skill (the /dispute orchestration skill, not the agent). All 5 tools confirmed: orchestrator/skill_execute(chittyos-legal:dispute) -> {action:local_invoke}; orchestrator/skill_execute(chittycommand-alpha:obligation-tracker) -> {action:local_invoke}; evidence/ai_search -> live; thinking confirmed; fs confirmed."
+        },
+        {
+          "name": "finance-workflow-market-billing-install",
+          "chain": [
+            "orchestrator/skill_execute(workflow:market)",
+            "orchestrator/skill_execute(chittycommand-alpha:cashflow-planner)",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Install a billing-domain market skill via workflow:market, activate cashflow planning, cross-reference evidence RAGs for billing projections, and synthesize the results into a financial analysis report.",
+          "verified": true,
+          "notes": "orchestrator connected in prior sessions; workflow:market + cashflow-planner confirmed skill_execute targets; evidence and thinking verified live. FIRST workflow:market in finance."
+        },
+        {
+          "name": "finance-github-search-issues-billing-triage",
+          "chain": [
+            "github/search_issues",
+            "thinking/sequentialthinking",
+            "neon/run_sql",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search GitHub issues tagged with billing labels, apply sequential reasoning to triage by severity, query Neon for affected customer billing records, and post a billing triage report to Notion.",
+          "verified": false,
+          "notes": "github lazy remote (GITHUB_MCP_AUTHORIZATION needed); neon auth-gated; notion 401. FIRST github/search_issues in finance."
         }
       ],
       "prompts": [
@@ -2643,6 +2669,14 @@
         {
           "text": "Open a dispute lifecycle for a financial insurance claim, cross-reference obligations, search evidence for documentation, and produce a financial-legal resolution analysis",
           "resolves_to": "dispute-legal-obligation-finance-analysis"
+        },
+        {
+          "text": "Install a billing workflow plugin from the market, activate cashflow planning, search evidence for billing projections, and write a financial analysis report",
+          "resolves_to": "finance-workflow-market-billing-install"
+        },
+        {
+          "text": "Search GitHub for billing-related issues, triage them by severity, query Neon for affected customer records, and post a billing triage report to Notion",
+          "resolves_to": "finance-github-search-issues-billing-triage"
         }
       ]
     },
@@ -4950,6 +4984,31 @@
           "accomplishes": "Invoke user:cast to route an intent through the canonical ch1tty orchestration layer (the MCP hierarchy entry point), chain into agent_search to discover the most relevant ChittyOS agent for a governance task, enumerate evidence RAGs, search for policy and compliance documentation, reason across cast-resolved intent + agent capability + evidence to produce a governance synthesis, and write the report.",
           "verified": true,
           "notes": "FIRST USE of user:cast skill. All 6 tools confirmed: orchestrator/skill_execute(user:cast) -> {action:local_invoke, skill:cast}; orchestrator/agent_search -> 28 agents live; evidence/list_rags confirmed; evidence/ai_search confirmed; thinking confirmed; fs confirmed."
+        },
+        {
+          "name": "governance-chittyxl-policy-session-context",
+          "chain": [
+            "orchestrator/skill_execute(chittyos-core:chittyxl)",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Bootstrap a persistent governance session via chittyxl, enumerate evidence RAGs for applicable policy documents, cross-reference them with an intent-specific search, reason over compliance posture, and write a structured policy context file.",
+          "verified": true,
+          "notes": "orchestrator confirmed connected; chittyos-core:chittyxl skill confirmed via 87th pass; evidence and thinking verified live. FIRST chittyxl in governance."
+        },
+        {
+          "name": "governance-github-search-issues-compliance-audit",
+          "chain": [
+            "github/search_issues",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search GitHub for open compliance-related issues, cross-reference findings with the evidence store, reason over regulatory posture and risk, and post a compliance audit summary to Notion.",
+          "verified": false,
+          "notes": "github lazy remote; notion 401. FIRST github/search_issues in governance."
         }
       ],
       "prompts": [
@@ -5624,6 +5683,14 @@
         {
           "text": "Route a governance intent through ch1tty/cast, discover the relevant agent, search policy evidence, and synthesize a governance compliance report",
           "resolves_to": "user-cast-agent-evidence-govern-synthesis"
+        },
+        {
+          "text": "Bootstrap a persistent governance session via chittyxl, search evidence for policy documents, reason over compliance posture, and write a policy context file",
+          "resolves_to": "governance-chittyxl-policy-session-context"
+        },
+        {
+          "text": "Search GitHub for open compliance issues, cross-reference with the evidence store, and post a compliance audit summary to Notion",
+          "resolves_to": "governance-github-search-issues-compliance-audit"
         }
       ]
     },
@@ -7565,6 +7632,33 @@
           "accomplishes": "Invoke the iMessage connector skill to inspect or configure iMessage integration state, navigate to a web-based design or message delivery endpoint using Playwright, capture a screenshot of the current interface state, reason about visual design quality and iMessage delivery channel alignment, and write the visual capture analysis to disk.",
           "verified": true,
           "notes": "FIRST USE of connectors:imessage as chain entry in design profile. All 5 tools: orchestrator/skill_execute(connectors:imessage) -> {action:local_invoke}; playwright/browser_navigate confirmed; playwright/browser_take_screenshot confirmed; thinking/sequentialthinking confirmed; fs/write_file confirmed."
+        },
+        {
+          "name": "design-user-cast-ux-scaffold",
+          "chain": [
+            "orchestrator/skill_execute(user:cast)",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "playwright/browser_take_screenshot",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Route a UX design intent through the user:cast skill for personalized framing, pull library docs for the relevant component library, capture a screenshot of the current UI state, reason over design patterns, and write a UX scaffold.",
+          "verified": true,
+          "notes": "orchestrator confirmed connected; user:cast confirmed skill in 87th pass; context7, playwright, thinking, fs all verified live. FIRST user:cast in design."
+        },
+        {
+          "name": "design-workflow-market-ux-plugin-install",
+          "chain": [
+            "orchestrator/skill_execute(workflow:market)",
+            "orchestrator/skill_execute(mcp-dev:build-mcp-server)",
+            "playwright/browser_navigate",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Browse the workflow market to identify a UX design plugin, spin up a new MCP server scaffold via mcp-dev:build-mcp-server, navigate to the plugin docs page for visual context, reason over integration requirements, and write an installation plan.",
+          "verified": true,
+          "notes": "orchestrator confirmed connected; workflow:market + mcp-dev:build-mcp-server confirmed; playwright, thinking, fs verified. FIRST workflow:market in design."
         }
       ],
       "prompts": [
@@ -8119,6 +8213,14 @@
         {
           "text": "Configure the iMessage connector, navigate to a delivery endpoint with Playwright, capture a screenshot, and analyze the visual design",
           "resolves_to": "imessage-connector-playwright-visual-capture"
+        },
+        {
+          "text": "Route a UX design intent through user:cast, pull component library docs via context7, screenshot the current UI state, and write a UX scaffold",
+          "resolves_to": "design-user-cast-ux-scaffold"
+        },
+        {
+          "text": "Browse the workflow market for a UX plugin, scaffold a new MCP server for it, navigate to its docs page, and write an installation plan",
+          "resolves_to": "design-workflow-market-ux-plugin-install"
         }
       ]
     },
@@ -10405,6 +10507,33 @@
           "accomplishes": "Invoke user:cast to route the feature development intent through ch1tty canonical orchestration, chain into the feature-dev skill for guided feature development with codebase architecture focus, resolve the relevant library via context7, query its documentation for implementation guidance, search evidence for prior art or domain-relevant patterns, and write the complete feature development scaffold to disk.",
           "verified": true,
           "notes": "FIRST USE of user:cast in code profile. All 6 tools: orchestrator/skill_execute(user:cast) -> {action:local_invoke}; orchestrator/skill_execute(feature-dev:feature-dev) -> {action:local_invoke}; context7/resolve-library-id confirmed; context7/query-docs confirmed; evidence/ai_search -> live; fs/write_file confirmed."
+        },
+        {
+          "name": "code-github-search-issues-bug-triage",
+          "chain": [
+            "github/search_issues",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search GitHub issues for open bugs in the target library, pull relevant library docs via context7, reason over root causes and potential fixes with sequential thinking, and write a triage report.",
+          "verified": false,
+          "notes": "github lazy remote; context7, thinking, fs verified. FIRST github/search_issues in code."
+        },
+        {
+          "name": "code-chittyxl-sprint-architecture-session",
+          "chain": [
+            "orchestrator/skill_execute(chittyos-core:chittyxl)",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Persist the current sprint architecture context via chittyxl for session continuity, look up library docs for the active dependency set, cross-reference the evidence store for architectural precedents, reason over the design, and write an architecture decision record.",
+          "verified": true,
+          "notes": "orchestrator + chittyxl confirmed; context7, evidence, thinking, fs verified live. FIRST chittyxl in code."
         }
       ],
       "prompts": [
@@ -11067,6 +11196,14 @@
         {
           "text": "Route a feature development intent through ch1tty/cast, activate feature-dev skill, pull library docs via context7, search evidence for prior art, and write a feature scaffold",
           "resolves_to": "user-cast-feature-dev-context7-evidence-scaffold"
+        },
+        {
+          "text": "Search GitHub for open bugs in my library, pull docs via context7, reason over root causes, and write a bug triage report",
+          "resolves_to": "code-github-search-issues-bug-triage"
+        },
+        {
+          "text": "Persist sprint architecture context via chittyxl, pull library docs, search evidence for architectural precedents, and write an architecture decision record",
+          "resolves_to": "code-chittyxl-sprint-architecture-session"
         }
       ]
     },
@@ -13008,6 +13145,30 @@
           "accomplishes": "Invoke the dispute skill to fetch current dispute status and next actions from the multi-domain dispute lifecycle, invoke the Discord connector to prepare a broadcast of the dispute update to the relevant channel, reason about the appropriate message framing for a public dispute status update, and write the formatted broadcast plan to disk.",
           "verified": true,
           "notes": "FIRST USE of chittyos-legal:dispute skill in communication profile. All 4 tools: orchestrator/skill_execute(chittyos-legal:dispute) -> {action:local_invoke}; orchestrator/skill_execute(connectors:discord) -> {action:local_invoke}; thinking/sequentialthinking confirmed; fs/write_file confirmed."
+        },
+        {
+          "name": "comm-workflow-market-broadcast-plugin",
+          "chain": [
+            "orchestrator/skill_execute(workflow:market)",
+            "orchestrator/skill_execute(connectors:discord)",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Install a communication plugin from the workflow market, broadcast the announcement via Discord, reason over message structure for maximum clarity, and log the broadcast to Notion.",
+          "verified": true,
+          "notes": "orchestrator confirmed connected; workflow:market + connectors:discord confirmed skills; thinking verified; notion 22 tools connected. FIRST workflow:market in communication."
+        },
+        {
+          "name": "comm-github-search-issues-team-update",
+          "chain": [
+            "github/search_issues",
+            "thinking/sequentialthinking",
+            "notion/API-post-page",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Search GitHub for issues assigned to the team, reason over priorities and blockers, post a team status update to Notion, and create tasks for items requiring immediate action.",
+          "verified": false,
+          "notes": "github lazy; tasks lazy; notion 401. FIRST github/search_issues in communication."
         }
       ],
       "prompts": [
@@ -13570,6 +13731,14 @@
         {
           "text": "Fetch dispute status via the dispute skill and broadcast an update to Discord via the connector skill",
           "resolves_to": "dispute-skill-discord-comm-broadcast"
+        },
+        {
+          "text": "Install a communication plugin from the workflow market, broadcast via Discord, reason over message structure, and log the broadcast to Notion",
+          "resolves_to": "comm-workflow-market-broadcast-plugin"
+        },
+        {
+          "text": "Search GitHub issues assigned to the team, reason over priorities, post a team status to Notion, and create tasks for action items",
+          "resolves_to": "comm-github-search-issues-team-update"
         }
       ]
     },
@@ -15861,6 +16030,32 @@
           "accomplishes": "Invoke the commit skill to checkpoint the current codebase state with a proper commit, run the health check skill across all ChittyOS services to capture pre-deploy liveness, invoke compliance to audit against standards, discover relevant ops agents via agent_search to coordinate follow-up actions, reason across commit + health + compliance + agent results to produce an ops readiness report, and write it to disk.",
           "verified": true,
           "notes": "FIRST USE of commit-commands:commit in ops profile. Commit-anchored ops readiness trifecta: commit -> health -> compliance -> agent discovery. All 6 tools: orchestrator/skill_execute(commit-commands:commit) -> {action:local_invoke}; skill_execute(chitty-health) -> {action:local_invoke}; skill_execute(chittyos-compliance) -> {action:local_invoke}; orchestrator/agent_search -> 28 agents live; thinking confirmed; fs confirmed."
+        },
+        {
+          "name": "ops-chittyxl-incident-session-context",
+          "chain": [
+            "orchestrator/skill_execute(chittyos-core:chittyxl)",
+            "orchestrator/skill_execute(chittyos-devops:chitty-health)",
+            "evidence/list_rags",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Preserve incident response session context via chittyxl for cross-agent continuity, run a system health check, enumerate evidence RAGs for relevant runbooks and prior incidents, reason over the response strategy, and write an incident brief.",
+          "verified": true,
+          "notes": "orchestrator + chittyxl + chittyos-devops:chitty-health all confirmed; evidence, thinking, fs verified live. FIRST chittyxl in ops."
+        },
+        {
+          "name": "ops-github-search-issues-infra-audit",
+          "chain": [
+            "github/search_issues",
+            "neon/run_sql",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search GitHub for open infrastructure issues and CVEs, query Neon for affected service records, cross-reference with the evidence store for prior audit findings, reason over risk posture, and post an infrastructure audit report to Notion.",
+          "verified": false,
+          "notes": "github lazy; neon auth-gated; notion 401. FIRST github/search_issues in ops."
         }
       ],
       "prompts": [
@@ -16531,6 +16726,14 @@
         {
           "text": "Commit the current state, health-check all ChittyOS services, run compliance, discover relevant agents, and write an ops readiness report",
           "resolves_to": "commit-skill-health-compliance-ops-trifecta"
+        },
+        {
+          "text": "Preserve incident session context via chittyxl, run a health check, search evidence for runbooks, and write an incident brief",
+          "resolves_to": "ops-chittyxl-incident-session-context"
+        },
+        {
+          "text": "Search GitHub for open infra issues and CVEs, query Neon for affected services, cross-reference evidence, and post an infrastructure audit report to Notion",
+          "resolves_to": "ops-github-search-issues-infra-audit"
         }
       ]
     }
