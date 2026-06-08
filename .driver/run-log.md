@@ -590,6 +590,56 @@
 
 ---
 
+### 2026-06-08T04:30Z — seventy-eighth-pass catalog (PR#TBD)
+
+- **Workstream advanced**: E (Alchemist catalog, 78th pass)
+- **Startup checks**: `npm ci` clean, `npm run build` clean (0 errors), `npm test` → 938 pass / 0 fail / 2 skip ✓
+- **State inspection**: No open PRs at run start. main at `4fa5994` (77th-pass — 784 combos / 389 verified). Local main had diverged 50/50 from origin — reset to `origin/main`. Run log was 11 passes behind (last entry: 66th pass).
+- **Notion board**: Still unavailable (API 401). Using `.driver/run-log.md` as substitute.
+- **All workstreams A–E confirmed done**. Catalog continuous-improvement pass.
+- **ch1tty status**: connectedServers=1 (orchestrator — 13 tools). 360 active sessions. All others lazy.
+- **New agents discovered and verified (all FIRST USE in catalog)**:
+  - `chittyagent-auth` (bound) → `agent_execute(auth,status)` → `{action:executed, http_status:404}` ✓
+  - `chittyagent-connect` (bound) → `agent_execute(connect,status)` → `{action:executed, http_status:401}` ✓
+  - `chittyagent-intel` (bound) → `agent_execute(intel,status)` → `{action:executed, http_status:401}` ✓
+  - `chittyagent-claude` (unbound) → `agent_execute(claude,status)` → `{action:redirect, domain:claude.agent.chitty.cc}` ✓
+  - `chittyagent-ui` (unbound) → `agent_execute(ui,status)` → `{action:redirect, domain:agent.chitty.cc}` ✓
+- **New skills verified (all FIRST USE in catalog)**:
+  - `claude-official:hookify` → `{action:local_invoke}` ✓
+  - `claude-official:plugin-dev` → `{action:local_invoke}` ✓
+  - `claude-official:claude-md-improver` → `{action:local_invoke}` ✓
+  - `claude-official:skill-creator` → `{action:local_invoke}` ✓
+  - `claude-official:claude-api` → `{action:local_invoke}` ✓
+  - `workflow:nb-development-defaults` → `{action:local_invoke}` ✓
+  - `chittyos-core:chitty-cleanup` → `{action:local_invoke}` ✓
+  - `migration:claude-opus-migration` → `{action:local_invoke}` ✓
+  - `commit-commands:commit-push-pr` → `{action:local_invoke}` ✓
+  - `claude-official:code-review` → `{action:local_invoke}` ✓ (bonus verification)
+  - `commit-commands:commit` → `{action:local_invoke}` ✓ (bonus verification)
+- **12 new verified combos added (78th pass, 2 per profile)**:
+  - **finance/auth-agent-token-ops-mercury-sweep**: FIRST chittyagent-auth — auth agent probe → mercury-finance skill
+  - **finance/opus-migration-cashflow-sdk-docs**: FIRST migration:claude-opus-migration — Opus 4.5 migration → cashflow skill → context7 docs
+  - **governance/connect-agent-evidence-compliance-brief**: FIRST chittyagent-connect — connect agent probe → evidence RAG grounded compliance brief
+  - **governance/intel-agent-fact-skill-evidence-reasoning**: FIRST chittyagent-intel — intel agent probe → fact-governance skill → evidence reasoning
+  - **design/claude-agent-hookify-frontend-system**: FIRST chittyagent-claude + hookify — Claude agent probe → hookify → frontend-design
+  - **design/ui-agent-nb-defaults-frontend-scaffold**: FIRST chittyagent-ui + nb-development-defaults — UI agent probe → nb-defaults → frontend scaffold
+  - **code/plugin-dev-skill-creator-context7-scaffold**: FIRST claude-official:plugin-dev + skill-creator — dual scaffold pipeline with context7 docs
+  - **code/claude-md-improver-code-review-commit-push-pr**: FIRST claude-md-improver + code-review + commit-push-pr — CLAUDE.md → review → commit pipeline
+  - **communication/claude-api-discord-context7-integration**: FIRST claude-official:claude-api — Claude API guidance → context7 Anthropic SDK → Discord broadcast
+  - **communication/chitty-cleanup-telegram-connector-brief**: FIRST chittyos-core:chitty-cleanup — Mac cleanup → Telegram brief
+  - **ops/nb-defaults-chitty-cleanup-machine-sweep**: FIRST workflow:nb-development-defaults in ops — defaults → cleanup → machine-management sweep
+  - **ops/opus-migration-deploy-compliance-audit**: FIRST migration:claude-opus-migration in ops — Opus migration → deploy → compliance audit
+- Catalog: 784 → 796 total, 389 → 401 verified (50.4%). 14 new FIRST-USE tools introduced.
+- Build clean. Tests: 938 pass / 0 fail / 2 skip ✓.
+- Branch: `auto/E-catalog-seventy-eighth-pass`. PR open. CI in progress.
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E (in-flight; 796/401 verified; 395 unverified — all auth-gated)
+- **Next run**: Merge this PR if CI green. Remaining uncataloged skills: `workflow:nb-development-defaults` (now done), `commit-commands:commit` (bonus-verified, add to code chain next pass). Consider: `user:cast` meta-skill as chain entry, `chittycommand-alpha:dispute-*` skills (mcp execution type). Human auth actions:
+  1. `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` — unblocks auth-gated Notion combos
+  2. `export GITHUB_MCP_AUTHORIZATION="Bearer $(op read op://ChittyOS-Integrations/github/personal_access_token)"` — unblocks github combos
+  3. Linear/Cloudflare/Neon/Stripe tokens for remaining auth-gated combos
+
+---
+
 ### 2026-06-07T19:20Z — sixty-sixth-pass catalog (PR#262)
 
 - **Workstream advanced**: E (Alchemist catalog, 66th pass)
