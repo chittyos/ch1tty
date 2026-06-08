@@ -1,5 +1,5 @@
 {
-  "_comment": "Focus-profile suggestions catalog \u2014 83rd pass. 856 combos, 418 verified. FIRST verified 30-step chains in finance + ops (catalog record!). linear/update_issue FIRST in design + code. 29-step chains across all 6 profiles.",
+  "_comment": "86th pass \u2014 892 combos / 424 verified / 913 prompts. FIRST github/search_repositories in design + communication. FIRST stripe/create_payment_intent in design, code, communication, ops.",
   "generatedFrom": "E-catalog-84th-pass",
   "profiles": {
     "finance": {
@@ -1999,6 +1999,33 @@
           "accomplishes": "Create a Stripe payment intent for a billing transaction, run a Neon SQL query to verify the corresponding ledger record is in sync, reason about any discrepancies, and post an audit note to Notion.",
           "verified": false,
           "notes": "2nd stripe/create_payment_intent in finance. Stripe gated (not connected). neon, thinking, and notion confirmed live."
+        },
+        {
+          "name": "finance-github-search-sdk-payment-gateway",
+          "chain": [
+            "github/search_repositories",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "stripe/create_payment_intent",
+            "neon/run_sql",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search GitHub for payment SDK libraries, resolve their docs via Context7, create a test Stripe payment intent to validate the integration, verify the charge record in Neon, and log the full integration research note to Notion.",
+          "verified": false,
+          "notes": "github lazy (GITHUB_MCP_AUTHORIZATION); stripe lazy; context7 connected; neon lazy; notion connected (auth-gated)."
+        },
+        {
+          "name": "finance-cloudflare-builds-stripe-billing-gate",
+          "chain": [
+            "cloudflare-builds/list_builds",
+            "thinking/sequentialthinking",
+            "stripe/create_payment_intent",
+            "ledger/append_entry",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Check the latest Cloudflare Workers Builds for the billing service, reason about deploy safety and billing readiness, create a test Stripe payment intent to verify the endpoint, append a billing event to the ledger, and post a deployment+billing gate report to Notion.",
+          "verified": false,
+          "notes": "cloudflare-builds lazy; thinking connected; stripe lazy; ledger local build required; notion auth-gated."
         }
       ],
       "prompts": [
@@ -2573,6 +2600,14 @@
         {
           "text": "Create a Stripe payment intent for the pending invoice and run a Neon audit query to verify the ledger entry is consistent",
           "resolves_to": "finance-stripe-payment-intent-neon-audit"
+        },
+        {
+          "text": "Search GitHub for a Stripe payment SDK, check its docs via Context7, test a payment intent, verify in Neon, and log the integration research to Notion",
+          "resolves_to": "finance-github-search-sdk-payment-gateway"
+        },
+        {
+          "text": "Check the billing service deployment in Cloudflare Builds, create a test Stripe payment intent, log the event to the ledger, and post a billing gate report to Notion",
+          "resolves_to": "finance-cloudflare-builds-stripe-billing-gate"
         }
       ]
     },
@@ -4826,6 +4861,32 @@
           "accomplishes": "Search GitHub for compliance and audit tooling repositories, reason about alignment with governance policy, cross-reference the evidence corpus for prior art, and document findings to Notion.",
           "verified": false,
           "notes": "FIRST github/search_repositories in governance profile. github gated; evidence, thinking, and notion confirmed live."
+        },
+        {
+          "name": "governance-stripe-payment-compliance-depth",
+          "chain": [
+            "evidence/ai_search",
+            "stripe/list_invoices",
+            "stripe/create_payment_intent",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search the evidence store for billing compliance requirements, list recent Stripe invoices to audit payment history, create a test payment intent to verify billing compliance posture, reason about any policy gaps, and document the compliance assessment in Notion.",
+          "verified": false,
+          "notes": "evidence connected; stripe lazy; thinking connected; notion auth-gated. 2nd stripe/create_payment_intent in governance."
+        },
+        {
+          "name": "governance-github-search-security-dependency-audit",
+          "chain": [
+            "github/search_repositories",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "neon/run_sql",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search GitHub for repositories matching a known security vulnerability pattern, cross-reference with the evidence store for relevant policy or CVE data, reason about organizational risk exposure, query Neon for affected records, and post a dependency security audit report to Notion.",
+          "verified": false,
+          "notes": "github lazy; evidence connected; thinking connected; neon lazy; notion auth-gated. 2nd github/search_repositories in governance."
         }
       ],
       "prompts": [
@@ -5484,6 +5545,14 @@
         {
           "text": "Search GitHub for compliance and audit tooling repos, cross-reference with evidence, and document findings in Notion",
           "resolves_to": "governance-github-search-compliance-libs"
+        },
+        {
+          "text": "Audit Stripe invoices against compliance evidence, create a test payment intent to verify billing posture, and document the compliance assessment in Notion",
+          "resolves_to": "governance-stripe-payment-compliance-depth"
+        },
+        {
+          "text": "Search GitHub for security vulnerabilities, cross-reference with policy evidence, query affected records in Neon, and post a dependency audit report to Notion",
+          "resolves_to": "governance-github-search-security-dependency-audit"
         }
       ]
     },
@@ -7372,6 +7441,32 @@
           "accomplishes": "Navigate to the feature page under design review, capture a browser accessibility snapshot of the current UX state, update the Linear sprint issue with visual progress notes, and post the design review summary to Notion.",
           "verified": false,
           "notes": "2nd linear/update_issue in design profile. playwright and notion confirmed live; linear gated."
+        },
+        {
+          "name": "design-github-search-component-library",
+          "chain": [
+            "github/search_repositories",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "playwright/browser_take_screenshot",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search GitHub for UI component libraries matching the design brief, resolve and fetch their documentation via Context7, screenshot a live component demo with Playwright to validate the visual output, and archive the full component research to the Notion design board.",
+          "verified": false,
+          "notes": "github lazy; context7 connected; playwright connected; notion auth-gated. FIRST github/search_repositories in design."
+        },
+        {
+          "name": "design-stripe-checkout-flow-test",
+          "chain": [
+            "thinking/sequentialthinking",
+            "stripe/create_payment_intent",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Reason through the payment UX flow and error states, create a test Stripe payment intent to exercise the checkout backend, screenshot the resulting payment UI with Playwright, save the screenshot artifact locally, and log the design review findings to Notion.",
+          "verified": false,
+          "notes": "thinking connected; stripe lazy; playwright connected; fs connected; notion auth-gated. FIRST stripe/create_payment_intent in design."
         }
       ],
       "prompts": [
@@ -7910,6 +8005,14 @@
         {
           "text": "Navigate to the feature page, capture a snapshot, update the Linear sprint issue with visual progress notes, and post the review summary to Notion",
           "resolves_to": "design-linear-update-sprint-ux-review"
+        },
+        {
+          "text": "Search GitHub for UI component libraries, fetch their docs, screenshot a live demo with Playwright, and save the research to my Notion design board",
+          "resolves_to": "design-github-search-component-library"
+        },
+        {
+          "text": "Test the Stripe checkout flow \u2014 create a test payment intent, screenshot the UI with Playwright, save the artifact, and log the design review to Notion",
+          "resolves_to": "design-stripe-checkout-flow-test"
         }
       ]
     },
@@ -10144,6 +10247,31 @@
           "accomplishes": "Search GitHub for the latest version of a key dependency, resolve its library ID and fetch official documentation via Context7, and document the dependency audit to Notion for engineering reference.",
           "verified": false,
           "notes": "FIRST github/search_repositories in code profile. github gated; context7 and notion confirmed live."
+        },
+        {
+          "name": "code-stripe-sdk-integration-scaffold",
+          "chain": [
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "stripe/create_payment_intent",
+            "neon/run_sql",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Resolve the Stripe SDK library ID via Context7, fetch the payment integration docs, scaffold a test payment intent to validate the integration pattern, query Neon to verify the test charge record, and log the integration spec and test results to Notion.",
+          "verified": false,
+          "notes": "context7 connected; stripe lazy; neon lazy; notion auth-gated. FIRST stripe/create_payment_intent in code."
+        },
+        {
+          "name": "code-github-search-security-pattern-audit",
+          "chain": [
+            "github/search_repositories",
+            "serena/search_code",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search GitHub for repositories containing a known insecure pattern or vulnerable dependency, use Serena to scan the local codebase for the same pattern, reason about scope and remediation priority, and log the security audit findings to Notion.",
+          "verified": false,
+          "notes": "github lazy; serena disabled (uvx needed); thinking connected; notion auth-gated. 2nd github/search_repositories in code."
         }
       ],
       "prompts": [
@@ -10790,6 +10918,14 @@
         {
           "text": "Search GitHub for the latest version of a key dependency, fetch its docs via Context7, and document the dependency audit in Notion",
           "resolves_to": "code-github-search-repo-dependency-audit"
+        },
+        {
+          "text": "Look up the Stripe SDK docs via Context7, scaffold a payment intent integration, verify the test charge in Neon, and log the spec to Notion",
+          "resolves_to": "code-stripe-sdk-integration-scaffold"
+        },
+        {
+          "text": "Search GitHub for repos with a security pattern, scan local code with Serena, and log the audit findings to Notion",
+          "resolves_to": "code-github-search-security-pattern-audit"
         }
       ]
     },
@@ -12683,6 +12819,30 @@
           "accomplishes": "Search Notion for an existing meeting-notes or discussion page, reason about the action items surfaced in the discussion, create a Linear issue for the highest-priority follow-up, and log the derived task in the task tracker.",
           "verified": false,
           "notes": "2nd linear/create_issue in communication profile. notion/API-post-search confirmed live; linear and tasks gated."
+        },
+        {
+          "name": "comm-github-search-repo-team-update",
+          "chain": [
+            "github/search_repositories",
+            "thinking/sequentialthinking",
+            "notion/API-post-page",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Search GitHub for project repositories with recent releases or notable activity, reason about what changes matter to the team, draft a structured team update in Notion, and create a follow-up task to ensure the update is broadcast through the team channel.",
+          "verified": false,
+          "notes": "github lazy; thinking connected; notion auth-gated; tasks local build required. FIRST github/search_repositories in communication."
+        },
+        {
+          "name": "comm-stripe-payment-confirmation-notify",
+          "chain": [
+            "stripe/create_payment_intent",
+            "thinking/sequentialthinking",
+            "notion/API-post-page",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Create a Stripe payment intent for a client transaction, reason about the appropriate confirmation message and follow-up steps, draft the payment confirmation in Notion, and create a follow-up task to verify receipt and close the billing loop.",
+          "verified": false,
+          "notes": "stripe lazy; thinking connected; notion auth-gated; tasks local build required. FIRST stripe/create_payment_intent in communication."
         }
       ],
       "prompts": [
@@ -13229,6 +13389,14 @@
         {
           "text": "Search Notion for meeting notes, reason about action items, create a Linear issue for the top priority, and log the derived task",
           "resolves_to": "comm-linear-create-followup-task-chain"
+        },
+        {
+          "text": "Search GitHub for project repos with recent activity, draft a team update in Notion, and create a follow-up task",
+          "resolves_to": "comm-github-search-repo-team-update"
+        },
+        {
+          "text": "Create a Stripe payment intent for a client, draft the payment confirmation in Notion, and create a follow-up task to verify receipt",
+          "resolves_to": "comm-stripe-payment-confirmation-notify"
         }
       ]
     },
@@ -15465,6 +15633,33 @@
           "accomplishes": "Query Neon to identify a production anomaly (slow query, unexpected row count, schema drift), search evidence for prior incidents matching this pattern, reason about severity and remediation path, create a Linear issue for the on-call team, and log the full incident record to Notion.",
           "verified": false,
           "notes": "2nd linear/create_issue in ops profile. neon, evidence, and thinking confirmed live; linear gated."
+        },
+        {
+          "name": "ops-stripe-billing-health-check",
+          "chain": [
+            "cloudflare-builds/list_builds",
+            "stripe/create_payment_intent",
+            "neon/run_sql",
+            "evidence/ai_search",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "List the latest Cloudflare Workers Builds to confirm the billing service is deployed, create a test Stripe payment intent to verify the endpoint is live and responding, query Neon to cross-check the billing record was created, search the evidence store for SLA compliance data, and log the health check report to Notion.",
+          "verified": false,
+          "notes": "cloudflare-builds lazy; stripe lazy; neon lazy; evidence connected; notion auth-gated. FIRST stripe/create_payment_intent in ops."
+        },
+        {
+          "name": "ops-github-search-infra-repo-runbook",
+          "chain": [
+            "github/search_repositories",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "neon/run_sql",
+            "cloudflare-builds/list_builds",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search GitHub for infrastructure repositories with recent activity or new releases, resolve and fetch their deployment runbook documentation via Context7, query Neon for current deployment state and health metrics, check the latest Cloudflare Builds for the relevant service, and post a consolidated runbook summary to Notion.",
+          "verified": false,
+          "notes": "github lazy; context7 connected; neon lazy; cloudflare-builds lazy; notion auth-gated. 2nd github/search_repositories in ops."
         }
       ],
       "prompts": [
@@ -16119,6 +16314,14 @@
         {
           "text": "Query Neon for a production anomaly, search evidence for prior incidents, reason about severity, create a Linear issue, and log to Notion",
           "resolves_to": "ops-linear-create-incident-issue"
+        },
+        {
+          "text": "Check the billing service in Cloudflare Builds, test a Stripe payment intent, verify in Neon, check SLA evidence, and log the health check to Notion",
+          "resolves_to": "ops-stripe-billing-health-check"
+        },
+        {
+          "text": "Search GitHub for infra repos, fetch runbook docs via Context7, verify state in Neon, check Cloudflare builds, and post a runbook summary to Notion",
+          "resolves_to": "ops-github-search-infra-repo-runbook"
         }
       ]
     }
