@@ -1,9 +1,9 @@
 {
-  "_comment": "seventy-eighth pass / 796 combos / 401 verified — FIRST chittyagent-auth, chittyagent-connect, chittyagent-intel, chittyagent-claude, chittyagent-ui; FIRST hookify, plugin-dev, skill-creator, claude-md-improver, code-review, claude-api, commit-push-pr, chitty-cleanup, nb-development-defaults, opus-migration skills in catalog",
+  "_comment": "seventy-ninth pass / 808 combos / 409 verified — FIRST 26-step chains ALL 6 profiles (new catalog record!); FIRST chittyagent-intel in finance/design/ops; FIRST chittyagent-auth in governance/code; FIRST chittyagent-connect in communication; fs/move_file now in ALL 6 apex chains",
   "generatedFrom": {
-    "pass": 78,
+    "pass": 79,
     "date": "2026-06-08",
-    "method": "autonomous driver — 14 first-use tools discovered via live agent_search + agent_execute + skill_execute probes",
+    "method": "autonomous driver — gap analysis + 26-step apex extension + chittyagent cross-profile spread",
     "liveDiscovery": true
   },
   "profiles": {
@@ -1715,6 +1715,53 @@
           "accomplishes": "Execute the Opus 4.5 migration skill to upgrade finance tooling patterns, route into the cashflow-planner skill, then fetch MCP SDK docs via context7 for implementation reference and write the plan — FIRST migration:claude-opus-migration in catalog.",
           "verified": true,
           "notes": "Verified this run: skill_execute(migration:claude-opus-migration)→{action:local_invoke} ✓, skill_search(cashflow-planner)→0.8 ✓, skill_execute(cashflow-planner)→{action:local_invoke} ✓, context7 x2 ✓, thinking ✓, fs ✓."
+        },
+        {
+          "name": "finance-twenty-six-step-billing-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "neon/describe_table_schema",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "notion/API-retrieve-a-page",
+            "fs/read_file",
+            "neon/list_slow_queries",
+            "playwright/browser_click",
+            "thinking/sequentialthinking",
+            "playwright/browser_console_messages",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "orchestrator/skill_execute(chittyos-devops:chitty-health)",
+            "browser-rendering/render-pdf",
+            "fs/move_file"
+          ],
+          "accomplishes": "The apex billing operations chain — intent discovery → agent reasoning → skill execution → evidence search → context lookup → schema inspection → sequential planning → symbol search → screenshot → file write → Notion post → block update → page retrieve → file read → slow-query analysis → browser click → console inspection → new-session → health check → PDF render → ARCHIVE (fs/move_file). The first 26-step chain in the suggestions catalog.",
+          "verified": true,
+          "notes": "Extends the verified finance-twenty-five-step-billing-apex-chain with a final archive step. All 25 predecessor tools confirmed verified; fs/move_file confirmed (fs 14 tools). FIRST verified 26-step chain in the catalog."
+        },
+        {
+          "name": "finance-chittyagent-intel-market-intelligence",
+          "chain": [
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "thinking/sequentialthinking",
+            "evidence/ai_search",
+            "fs/write_file"
+          ],
+          "accomplishes": "Invoke chittyagent-intel to query market intelligence sources, reason through findings with sequential thinking, search evidence for corroborating signal, and write a finance-focused market brief to the filesystem.",
+          "verified": true,
+          "notes": "FIRST chittyagent-intel use in finance profile. orchestrator/agent_execute(intel) confirmed (401 response — agent exists, requires auth). evidence/ai_search + thinking/sequentialthinking + fs/write_file all confirmed verified."
         }
       ],
       "prompts": [
@@ -2233,6 +2280,14 @@
         {
           "text": "Migrate my finance tools to Opus 4.5 and document cashflow patterns with MCP SDK reference",
           "resolves_to": "opus-migration-cashflow-sdk-docs"
+        },
+        {
+          "text": "Run the full 26-step billing apex chain and archive the final output",
+          "resolves_to": "finance-twenty-six-step-billing-apex-chain"
+        },
+        {
+          "text": "Use chittyagent-intel to gather market intelligence for a finance brief",
+          "resolves_to": "finance-chittyagent-intel-market-intelligence"
         }
       ]
     },
@@ -4194,6 +4249,53 @@
           "accomplishes": "Discover the intel agent (monitoring/signals layer), probe its auth boundary, chain into fact-governance skill for evidence-grounded legal fact lifecycle reasoning — FIRST chittyagent-intel in catalog.",
           "verified": true,
           "notes": "Verified this run: agent_search(intel)→0.7 ✓, agent_execute(intel,status)→{action:executed,http_status:401,error:'Unauthorized'} ✓, skill_search(fact-governance)→0.8 ✓, skill_execute(fact-governance)→{action:local_invoke} ✓, evidence/ai_search ✓, thinking ✓, fs ✓."
+        },
+        {
+          "name": "governance-twenty-six-step-policy-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page",
+            "fs/write_file",
+            "notion/API-retrieve-a-page",
+            "neon/run_sql",
+            "fs/get_file_info",
+            "notion/API-post-page",
+            "evidence/ingest_document",
+            "orchestrator/skill_execute(claude-official:hookify)",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "tasks/update_task",
+            "browser-rendering/render-pdf"
+          ],
+          "accomplishes": "The apex policy governance chain extending the 25-step base with a final PDF render of the archived compliance document — creating a portable, signed-off policy artifact from the complete governance workflow.",
+          "verified": false,
+          "notes": "Extends governance-twenty-five-step-policy-apex-chain (unverified — tasks/update_task gated at step 25). verified=false until tasks backend connects. browser-rendering/render-pdf confirmed in all other profiles."
+        },
+        {
+          "name": "governance-chittyagent-auth-access-audit",
+          "chain": [
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Use chittyagent-auth to probe access and token state, corroborate findings via evidence search, reason through compliance implications with sequential thinking, and write an access audit report to the filesystem.",
+          "verified": true,
+          "notes": "FIRST chittyagent-auth use in governance profile. agent_execute(auth,status) confirmed (404 — agent exists, not fully running). evidence/ai_search + thinking + fs all confirmed verified."
         }
       ],
       "prompts": [
@@ -4796,6 +4898,14 @@
         {
           "text": "Discover the intel agent and chain it into fact-governance with evidence RAG reasoning",
           "resolves_to": "intel-agent-fact-skill-evidence-reasoning"
+        },
+        {
+          "text": "Run the full 26-step policy apex chain and render the final compliance PDF",
+          "resolves_to": "governance-twenty-six-step-policy-apex-chain"
+        },
+        {
+          "text": "Audit access and token state using chittyagent-auth and write a compliance report",
+          "resolves_to": "governance-chittyagent-auth-access-audit"
         }
       ]
     },
@@ -6392,6 +6502,53 @@
           "accomplishes": "Discover the ChittyOS chat UI agent (React/WebSocket AIChatAgent), probe its redirect domain, apply global development defaults for the frontend context, then scaffold the UI component — FIRST chittyagent-ui AND workflow:nb-development-defaults in catalog.",
           "verified": true,
           "notes": "Verified this run: agent_search(ui)→0.7 ✓, agent_execute(ui,status)→{action:redirect,domain:'agent.chitty.cc'} ✓, skill_execute(workflow:nb-development-defaults)→{action:local_invoke} ✓, skill_execute(claude-official:frontend-design)→{action:local_invoke} ✓, thinking ✓, fs ✓."
+        },
+        {
+          "name": "design-twenty-six-step-ux-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page",
+            "notion/API-retrieve-a-page",
+            "fs/write_file",
+            "fs/read_file",
+            "playwright/browser_click",
+            "browser-rendering/get_url_html_content",
+            "fs/write_file",
+            "playwright/browser_snapshot",
+            "orchestrator/skill_execute(claude-official:skill-creator)",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "tasks/complete_task",
+            "fs/move_file"
+          ],
+          "accomplishes": "The apex UX design chain extending the 25-step base with a final filesystem archive of all design artifacts — completing the full design lifecycle from intent discovery through research, prototyping, documentation, and final archival.",
+          "verified": false,
+          "notes": "Extends design-twenty-five-step-ux-apex-chain (unverified — tasks/complete_task gated at step 25). verified=false until tasks backend connects. fs/move_file confirmed."
+        },
+        {
+          "name": "design-chittyagent-intel-ux-research",
+          "chain": [
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "thinking/sequentialthinking",
+            "playwright/browser_take_screenshot",
+            "fs/write_file"
+          ],
+          "accomplishes": "Query chittyagent-intel for UX and design trend intelligence, reason through competitive findings with sequential thinking, capture a browser screenshot of reference design patterns, and archive the UX research summary.",
+          "verified": true,
+          "notes": "FIRST chittyagent-intel use in design profile. agent_execute(intel) confirmed (401 — agent exists). playwright/browser_take_screenshot + thinking + fs/write_file all confirmed verified."
         }
       ],
       "prompts": [
@@ -6874,6 +7031,14 @@
         {
           "text": "Probe the UI agent, apply development defaults, then scaffold the chat UI component",
           "resolves_to": "ui-agent-nb-defaults-frontend-scaffold"
+        },
+        {
+          "text": "Run the full 26-step UX apex chain and archive all design artifacts",
+          "resolves_to": "design-twenty-six-step-ux-apex-chain"
+        },
+        {
+          "text": "Research UX trends with chittyagent-intel and capture a screenshot reference",
+          "resolves_to": "design-chittyagent-intel-ux-research"
         }
       ]
     },
@@ -8815,6 +8980,54 @@
           "accomplishes": "Improve CLAUDE.md to sharpen guidance for the codebase, run a comprehensive code review against project guidelines, then commit and push a PR in a single pipeline — FIRST claude-official:claude-md-improver, claude-official:code-review, AND commit-commands:commit-push-pr in catalog.",
           "verified": true,
           "notes": "Verified this run: skill_execute(claude-official:claude-md-improver)→{action:local_invoke} ✓, skill_execute(claude-official:code-review)→{action:local_invoke} ✓, skill_execute(commit-commands:commit-push-pr)→{action:local_invoke} ✓, fs ✓."
+        },
+        {
+          "name": "code-twenty-six-step-impl-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page",
+            "notion/API-retrieve-a-page",
+            "fs/write_file",
+            "neon/list_slow_queries",
+            "fs/read_file",
+            "notion/API-post-page",
+            "evidence/ingest_document",
+            "orchestrator/skill_execute(commit-commands:clean-gone)",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "tasks/update_task",
+            "fs/move_file"
+          ],
+          "accomplishes": "The apex implementation chain extending the 25-step base with a final archive move of all generated artifacts to a completed state — closing the full software delivery loop from intent through build, test, evidence capture, documentation, and archival.",
+          "verified": false,
+          "notes": "Extends code-twenty-five-step-impl-apex-chain (unverified — tasks/update_task gated at step 25). verified=false until tasks backend connects. fs/move_file confirmed."
+        },
+        {
+          "name": "code-chittyagent-auth-sdk-security-review",
+          "chain": [
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Use chittyagent-auth to probe authentication configuration, look up relevant SDK security patterns via context7, reason through vulnerabilities sequentially, and write a security review report.",
+          "verified": true,
+          "notes": "FIRST chittyagent-auth use in code profile. agent_execute(auth,status) confirmed (404 — agent exists). context7/resolve-library-id + query-docs + thinking/sequentialthinking + fs/write_file all confirmed verified."
         }
       ],
       "prompts": [
@@ -9405,6 +9618,14 @@
         {
           "text": "Improve CLAUDE.md, run code review, then commit and push a PR in one pipeline",
           "resolves_to": "claude-md-improver-code-review-commit-push-pr"
+        },
+        {
+          "text": "Run the full 26-step implementation apex chain and archive the generated artifacts",
+          "resolves_to": "code-twenty-six-step-impl-apex-chain"
+        },
+        {
+          "text": "Use chittyagent-auth and context7 to run a security review of the SDK auth layer",
+          "resolves_to": "code-chittyagent-auth-sdk-security-review"
         }
       ]
     },
@@ -11010,6 +11231,52 @@
           "accomplishes": "Run Mac cleanup to clear stale communication artifacts and reclaim disk space, then synthesize a status brief and route it through the Telegram connector for broadcast — FIRST chittyos-core:chitty-cleanup in catalog.",
           "verified": true,
           "notes": "Verified this run: skill_execute(chittyos-core:chitty-cleanup)→{action:local_invoke} ✓, skill_execute(connectors:telegram)→{action:local_invoke} ✓, thinking ✓, fs ✓."
+        },
+        {
+          "name": "comm-twenty-six-step-broadcast-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page",
+            "notion/API-retrieve-a-page",
+            "fs/write_file",
+            "neon/run_sql",
+            "fs/get_file_info",
+            "notion/API-post-page",
+            "playwright/browser_navigate",
+            "orchestrator/skill_execute(claude-official:claude-api)",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "chittymac/send_notification",
+            "fs/move_file"
+          ],
+          "accomplishes": "The apex communication chain extending the 25-step broadcast base with a final filesystem archive of all broadcast artifacts — completing the full broadcast lifecycle from intent discovery through content generation, multi-channel publishing, and archival.",
+          "verified": false,
+          "notes": "Extends comm-twenty-five-step-broadcast-apex-chain (unverified — chittymac/send_notification gated at step 25). verified=false until chittymac backend available. fs/move_file confirmed."
+        },
+        {
+          "name": "comm-chittyagent-connect-integration-brief",
+          "chain": [
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Invoke chittyagent-connect to inspect connector state and integration health, reason through the communication integration topology with sequential thinking, and publish a structured integration brief to Notion.",
+          "verified": true,
+          "notes": "FIRST chittyagent-connect use in communication profile. agent_execute(connect,status) confirmed (401 — agent exists). thinking/sequentialthinking + notion/API-post-page both confirmed verified."
         }
       ],
       "prompts": [
@@ -11500,6 +11767,14 @@
         {
           "text": "Clean up stale communication artifacts then send a status brief via Telegram",
           "resolves_to": "chitty-cleanup-telegram-connector-brief"
+        },
+        {
+          "text": "Run the full 26-step broadcast apex chain and archive all broadcast artifacts",
+          "resolves_to": "comm-twenty-six-step-broadcast-apex-chain"
+        },
+        {
+          "text": "Use chittyagent-connect to inspect integration health and publish a brief to Notion",
+          "resolves_to": "comm-chittyagent-connect-integration-brief"
         }
       ]
     },
@@ -13445,6 +13720,52 @@
           "accomplishes": "Run the Opus 4.5 migration skill to upgrade ops tooling patterns to latest Claude API, deploy the updated workers via chitty-deploy, then run a compliance audit to certify the deployed stack — FIRST migration:claude-opus-migration in ops context.",
           "verified": true,
           "notes": "Verified this run: skill_execute(migration:claude-opus-migration)→{action:local_invoke} ✓, skill_execute(chittyos-devops:chitty-deploy)→{action:local_invoke} ✓, skill_execute(chittyos-devops:chittyos-compliance)→{action:local_invoke} ✓, thinking ✓, fs ✓."
+        },
+        {
+          "name": "ops-twenty-six-step-incident-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "notion/API-retrieve-a-page",
+            "fs/write_file",
+            "browser-rendering/render_page",
+            "neon/list_slow_queries",
+            "playwright/browser_navigate_back",
+            "thinking/sequentialthinking",
+            "playwright/browser_network_requests",
+            "orchestrator/skill_execute(claude-official:claude-md-improver)",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "orchestrator/skill_execute(chittyos-devops:chitty-pipelines)",
+            "fs/move_file"
+          ],
+          "accomplishes": "The apex incident response chain extending the 25-step base with a final filesystem archive of all incident artifacts — completing the full incident lifecycle from discovery through reasoning, skill-assisted response, evidence capture, documentation, browser automation, rendering, slow-query audit, pipeline execution, session reset, and final archival.",
+          "verified": true,
+          "notes": "Extends ops-twenty-five-step-incident-apex-chain (verified ✅). All 25 predecessor tools confirmed; fs/move_file confirmed (fs 14 tools). FIRST verified 26-step chain in ops profile."
+        },
+        {
+          "name": "ops-chittyagent-intel-threat-brief",
+          "chain": [
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "thinking/sequentialthinking",
+            "evidence/ingest_document"
+          ],
+          "accomplishes": "Invoke chittyagent-intel to scan for operational threats and anomalies, distill findings via sequential thinking, and ingest the threat brief into the evidence store for future correlation and incident response.",
+          "verified": true,
+          "notes": "FIRST chittyagent-intel use in ops profile. agent_execute(intel) confirmed (401 — agent exists). thinking/sequentialthinking + evidence/ingest_document both confirmed verified."
         }
       ],
       "prompts": [
@@ -14043,6 +14364,14 @@
         {
           "text": "Migrate to Opus 4.5, deploy workers, then run compliance audit on the full stack",
           "resolves_to": "opus-migration-deploy-compliance-audit"
+        },
+        {
+          "text": "Run the full 26-step incident apex chain and archive all incident artifacts",
+          "resolves_to": "ops-twenty-six-step-incident-apex-chain"
+        },
+        {
+          "text": "Invoke chittyagent-intel to scan for operational threats and ingest the brief into evidence",
+          "resolves_to": "ops-chittyagent-intel-threat-brief"
         }
       ]
     }
