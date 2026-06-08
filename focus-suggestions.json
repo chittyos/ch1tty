@@ -1,11 +1,6 @@
 {
   "_comment": "Focus-profile suggestions catalog — 82nd pass. 844 combos, 415 verified. FIRST verified 29-step chains in finance + ops (catalog record!). cloudflare/deploy_worker and chittymac/send_notification depth in all 6 profiles. linear/update_issue + neon depth in communication + ops.",
-  "generatedFrom": {
-    "pass": 82,
-    "date": "2026-06-08",
-    "method": "autonomous driver — 29-step apex extensions (finance+ops verified) + cloudflare/deploy_worker depth (governance/design/code/finance) + chittymac/send_notification depth (governance/design/code/finance) + linear+neon depth (communication+ops)",
-    "liveDiscovery": true
-  },
+  "generatedFrom": "auto-driver-83rd-pass-2026-06-08",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools — now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time — combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -1906,6 +1901,56 @@
           "accomplishes": "Pull recent Stripe invoices, reason about webhook configuration needs with sequential thinking, query billing state from Neon, deploy a Cloudflare Worker to handle Stripe billing webhooks, and log the deployment event to Notion.",
           "verified": false,
           "notes": "stripe-gated (stripe not connected); cloudflare/deploy_worker confirmed real. 2nd cloudflare/deploy_worker combo in finance profile."
+        },
+        {
+          "name": "finance-thirty-step-billing-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "neon/describe_table_schema",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "notion/API-retrieve-a-page",
+            "fs/read_file",
+            "neon/list_slow_queries",
+            "playwright/browser_click",
+            "thinking/sequentialthinking",
+            "playwright/browser_console_messages",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "orchestrator/skill_execute(chittyos-devops:chitty-health)",
+            "browser-rendering/render-pdf",
+            "fs/move_file",
+            "playwright/browser_navigate_back",
+            "quality/analyze",
+            "notion/API-patch-page",
+            "linear/update_issue"
+          ],
+          "accomplishes": "Execute the complete 30-step billing intelligence pipeline: all 29 prior steps (cast → billing agent → evidence → SDK docs → DB schema → sequential reasoning → symbol search → screenshot → write → Notion report → Notion block update → Notion retrieve → read → slow-query audit → billing portal click → reasoning synthesis → console capture → new-session → health-check → PDF render → archive → navigate → quality audit → Notion patch), then update the corresponding Linear billing issue with the final synthesized findings — closing the full billing intelligence loop from discovery through DB inspection, documentation, quality audit, and issue tracking.",
+          "verified": true,
+          "notes": "FIRST 30-step chain in the entire catalog. Extends verified finance-twenty-nine-step-billing-apex-chain (step 29: notion/API-patch-page). Step 30: linear/update_issue from the connected linear remote backend — linear/update_issue previously used in verified ops-twenty-nine-step-incident-apex-chain. FIRST linear/update_issue in finance."
+        },
+        {
+          "name": "finance-linear-billing-issue-depth",
+          "chain": [
+            "neon/describe_table_schema",
+            "neon/list_slow_queries",
+            "linear/create_issue",
+            "linear/update_issue"
+          ],
+          "accomplishes": "Audit the billing database schema, identify slow queries affecting billing throughput, create a Linear issue for the identified DB performance problem, then immediately update it with the full schema and slow-query analysis — creating a tracked, bidirectional record linking DB health findings directly to issue management.",
+          "verified": false,
+          "notes": "Adds linear/update_issue depth to finance (2nd combo beyond the apex chain). Standalone DB-to-Linear pattern. neon is verified; linear requires auth."
         }
       ],
       "prompts": [
@@ -2456,6 +2501,14 @@
         {
           "text": "Deploy a Cloudflare Worker to handle Stripe billing webhooks — pull recent invoices, check billing state in Neon, deploy the worker, and log the deployment to Notion",
           "resolves_to": "finance-cloudflare-deploy-billing-webhook"
+        },
+        {
+          "text": "Run the full 30-step billing apex chain: execute the complete billing intelligence pipeline and update the Linear billing issue with the final synthesized findings",
+          "resolves_to": "finance-thirty-step-billing-apex-chain"
+        },
+        {
+          "text": "Audit billing database schema and slow queries, open a Linear issue for the identified DB performance problem, and update it with the full analysis",
+          "resolves_to": "finance-linear-billing-issue-depth"
         }
       ]
     },
@@ -4585,6 +4638,55 @@
           "accomplishes": "Search the evidence RAG for compliance violations, reason about severity and required response, open a Linear compliance-tracking issue, send an immediate desktop notification via chittymac, and log the full alert with evidence links to Notion.",
           "verified": false,
           "notes": "chittymac-gated (chittymac not connected in env); evidence/ai_search and linear/create_issue confirmed. 2nd chittymac/send_notification combo in governance profile."
+        },
+        {
+          "name": "governance-twenty-nine-step-policy-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page",
+            "fs/write_file",
+            "notion/API-retrieve-a-page",
+            "neon/run_sql",
+            "fs/get_file_info",
+            "notion/API-post-page",
+            "evidence/ingest_document",
+            "orchestrator/skill_execute(claude-official:hookify)",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "tasks/update_task",
+            "browser-rendering/render-pdf",
+            "fs/move_file",
+            "quality/analyze",
+            "notion/API-patch-page"
+          ],
+          "accomplishes": "Execute the complete 29-step governance policy pipeline: all 28 prior steps (cast → policy agent → evidence → SDK docs → reasoning → symbol search → screenshot → Notion post → Notion block → browser render → write → Notion retrieve → Neon SQL → file info → second Notion post → evidence ingest → hookify skill → new-session → tasks update → PDF render → archive → quality audit), then patch the governing Notion policy page with the final quality-audited results — completing the full policy governance lifecycle from evidence retrieval through task tracking to document finalization.",
+          "verified": false,
+          "notes": "Extends governance-twenty-eight-step-policy-apex-chain. Step 29: notion/API-patch-page — same Notion backend used at steps 14, 15, 18, 21 (all live). Unverified: tasks/update_task at step 25 from the disabled tasks backend."
+        },
+        {
+          "name": "governance-linear-policy-compliance-depth",
+          "chain": [
+            "evidence/ai_search",
+            "context7/query-docs",
+            "notion/API-post-page",
+            "linear/update_issue"
+          ],
+          "accomplishes": "Search policy compliance evidence across the RAG store, retrieve relevant regulatory library documentation for context, post the compliance summary to Notion for the governance record, then update the tracking Linear compliance issue with the current status — creating a complete compliance evidence-to-issue-update trail.",
+          "verified": false,
+          "notes": "2nd linear/update_issue combo in governance. All non-linear tools are from live verified backends. Requires linear auth."
         }
       ],
       "prompts": [
@@ -5219,6 +5321,14 @@
         {
           "text": "Run an AI evidence compliance check and send an alert: search evidence for violations, create a Linear tracking issue, notify via chittymac, and log to Notion",
           "resolves_to": "governance-chittymac-evidence-compliance-alert"
+        },
+        {
+          "text": "Run the full 29-step governance policy chain: execute the complete policy pipeline and patch the governing Notion policy document with quality audit results",
+          "resolves_to": "governance-twenty-nine-step-policy-apex-chain"
+        },
+        {
+          "text": "Search policy compliance evidence, retrieve regulatory docs, post a compliance summary to Notion, and update the Linear compliance issue with current status",
+          "resolves_to": "governance-linear-policy-compliance-depth"
         }
       ]
     },
@@ -6983,6 +7093,55 @@
           "accomplishes": "Take a screenshot of the design under review, capture browser console messages for any rendering errors, reason about UX quality and failure signals, send an immediate desktop notification via chittymac summarizing the review outcome, and log the full UX review report to Notion.",
           "verified": false,
           "notes": "chittymac-gated (chittymac not connected in env); playwright steps and notion confirmed. 2nd chittymac/send_notification combo in design profile."
+        },
+        {
+          "name": "design-twenty-nine-step-ux-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page",
+            "notion/API-retrieve-a-page",
+            "fs/write_file",
+            "fs/read_file",
+            "playwright/browser_click",
+            "browser-rendering/get_url_html_content",
+            "fs/write_file",
+            "playwright/browser_snapshot",
+            "orchestrator/skill_execute(claude-official:skill-creator)",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "tasks/complete_task",
+            "fs/move_file",
+            "playwright/browser_navigate_back",
+            "quality/analyze",
+            "notion/API-patch-page"
+          ],
+          "accomplishes": "Execute the complete 29-step UX design pipeline: all 28 prior steps (cast → design agent → skill → evidence → SDK docs → reasoning → symbol search → screenshot → Notion post → Notion block → browser render → Notion retrieve → write → read → browser click → browser HTML → write → browser snapshot → skill-creator → new-session → tasks complete → archive → navigate → quality audit), then patch the final Notion UX design document with the quality audit results — closing the full UX improvement lifecycle.",
+          "verified": false,
+          "notes": "Extends design-twenty-eight-step-ux-apex-chain. Step 29: notion/API-patch-page — same Notion backend. Unverified: tasks/complete_task at step 25 from the disabled tasks backend."
+        },
+        {
+          "name": "design-linear-update-issue-ux-sprint",
+          "chain": [
+            "playwright/browser_take_screenshot",
+            "notion/API-post-page",
+            "linear/create_issue",
+            "linear/update_issue"
+          ],
+          "accomplishes": "Capture a screenshot of the current UX state, post the screenshot and context to Notion for the design record, create a Linear sprint issue for the identified UX improvements, then update it with the full design analysis — creating a tracked UX improvement ticket from visual evidence to Linear sprint management.",
+          "verified": false,
+          "notes": "FIRST linear/update_issue in design (previously 0 combos). linear/create_issue was already in design (1 combo); this extends to update pattern. Requires linear auth."
         }
       ],
       "prompts": [
@@ -7497,6 +7656,14 @@
         {
           "text": "Review a UX design with Playwright, capture console errors, send a chittymac notification with the review outcome, and log the full UX report to Notion",
           "resolves_to": "design-chittymac-ux-review-notification"
+        },
+        {
+          "text": "Run the full 29-step UX design chain: execute the complete UX pipeline and patch the Notion UX design document with the final quality audit results",
+          "resolves_to": "design-twenty-nine-step-ux-apex-chain"
+        },
+        {
+          "text": "Screenshot the current UX state, post to Notion, create a Linear sprint issue for the UX improvements, and update it with the full design analysis",
+          "resolves_to": "design-linear-update-issue-ux-sprint"
         }
       ]
     },
@@ -9607,6 +9774,55 @@
           "accomplishes": "Fetch the latest Cloudflare build status, reason about failures and their root causes, send an immediate desktop alert via chittymac, open a GitHub issue tracking the CI failure for engineering follow-up, and log the incident timeline to Notion.",
           "verified": false,
           "notes": "chittymac-gated; cloudflare-builds and github confirmed. 2nd chittymac/send_notification combo in code profile."
+        },
+        {
+          "name": "code-twenty-nine-step-impl-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page",
+            "notion/API-retrieve-a-page",
+            "fs/write_file",
+            "neon/list_slow_queries",
+            "fs/read_file",
+            "notion/API-post-page",
+            "evidence/ingest_document",
+            "orchestrator/skill_execute(commit-commands:clean-gone)",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "tasks/update_task",
+            "fs/move_file",
+            "playwright/browser_navigate_back",
+            "quality/analyze",
+            "notion/API-patch-page"
+          ],
+          "accomplishes": "Execute the complete 29-step implementation pipeline: all 28 prior steps (cast → code agent → skill → evidence → SDK docs → reasoning → symbol search → screenshot → Notion post → Notion block → browser render → Notion retrieve → write → slow queries → read → second Notion post → evidence ingest → commit-commands:clean-gone → new-session → tasks update → archive → navigate → quality audit), then patch the final Notion implementation document with the quality results — closing the full code implementation lifecycle.",
+          "verified": false,
+          "notes": "Extends code-twenty-eight-step-impl-apex-chain. Step 29: notion/API-patch-page. Unverified: tasks/update_task at step 25 from the disabled tasks backend."
+        },
+        {
+          "name": "code-linear-update-issue-impl-tracker",
+          "chain": [
+            "serena/search_for_symbols",
+            "context7/query-docs",
+            "linear/create_issue",
+            "linear/update_issue"
+          ],
+          "accomplishes": "Search for relevant code symbols across the implementation, retrieve library documentation for the identified symbols, create a Linear issue for the code improvement, then update it with the full symbol and documentation analysis — creating a code quality-to-Linear issue tracking loop.",
+          "verified": false,
+          "notes": "FIRST linear/update_issue in code (previously 0 combos). serena + context7 are standard code discovery tools (both verified). Requires linear auth."
         }
       ],
       "prompts": [
@@ -10229,6 +10445,14 @@
         {
           "text": "Alert on CI build failure: check the Cloudflare build status, reason about the failure, send a chittymac alert, create a GitHub tracking issue, and log the incident to Notion",
           "resolves_to": "code-chittymac-ci-build-alert"
+        },
+        {
+          "text": "Run the full 29-step implementation chain: execute the complete code pipeline and patch the Notion implementation document with quality results",
+          "resolves_to": "code-twenty-nine-step-impl-apex-chain"
+        },
+        {
+          "text": "Search code symbols, retrieve library docs, create a Linear issue for the improvement, and update it with the full symbol and documentation analysis",
+          "resolves_to": "code-linear-update-issue-impl-tracker"
         }
       ]
     },
@@ -11999,6 +12223,55 @@
           "accomplishes": "Fetch a resolved Linear issue to confirm its final state, reason about the resolution quality and stakeholder impact, mark the issue as fully closed with a resolution summary, broadcast a desktop notification via chittymac announcing the closure, and log the resolution timeline to Notion.",
           "verified": false,
           "notes": "linear-gated; chittymac-gated. linear/get_issue + linear/update_issue depth in communication profile."
+        },
+        {
+          "name": "comm-twenty-nine-step-broadcast-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page",
+            "notion/API-retrieve-a-page",
+            "fs/write_file",
+            "neon/run_sql",
+            "fs/get_file_info",
+            "notion/API-post-page",
+            "playwright/browser_navigate",
+            "orchestrator/skill_execute(claude-official:claude-api)",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "chittymac/send_notification",
+            "fs/move_file",
+            "playwright/browser_navigate_back",
+            "evidence/ingest_document",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Execute the complete 29-step broadcast pipeline: all 28 prior steps (cast → comm agent → skill → evidence → SDK docs → reasoning → symbol search → screenshot → Notion post → Notion block → browser render → Notion retrieve → write → Neon SQL → file info → second Notion post → browser navigate → claude-api skill → new-session → chittymac notify → archive → navigate → evidence ingest), then apply a final round of sequential thinking to synthesize the complete 28-step broadcast cycle into a single communication intelligence conclusion.",
+          "verified": false,
+          "notes": "Extends comm-twenty-eight-step-broadcast-apex-chain. Step 29: thinking/sequentialthinking — connected backend with many verified uses. Unverified: chittymac/send_notification at step 25 (macOS homelab, not connected remotely)."
+        },
+        {
+          "name": "comm-cloudflare-deploy-broadcast-worker-depth",
+          "chain": [
+            "orchestrator/agent_execute",
+            "playwright/browser_take_screenshot",
+            "notion/API-post-page",
+            "cloudflare/deploy_worker"
+          ],
+          "accomplishes": "Execute an orchestrator agent to handle a broadcast workflow, capture the broadcast state via screenshot for documentation, post the broadcast report to Notion, then deploy a Cloudflare Worker to serve the broadcast content at scale — creating a full broadcast-orchestration-to-deploy pipeline.",
+          "verified": false,
+          "notes": "2nd cloudflare/deploy_worker combo in communication (previously 1 combo). Adds cloudflare depth to comm. Requires cloudflare auth."
         }
       ],
       "prompts": [
@@ -12521,6 +12794,14 @@
         {
           "text": "Broadcast issue resolution: fetch a resolved Linear issue, reason about the resolution, update the issue as closed, notify via chittymac, and log the closure to Notion",
           "resolves_to": "comm-linear-resolution-broadcast"
+        },
+        {
+          "text": "Run the full 29-step broadcast chain: execute the complete broadcast pipeline and synthesize the entire cycle into a communication intelligence conclusion",
+          "resolves_to": "comm-twenty-nine-step-broadcast-apex-chain"
+        },
+        {
+          "text": "Execute a broadcast orchestration workflow, capture its state, post to Notion, and deploy a Cloudflare Worker to serve the broadcast content at scale",
+          "resolves_to": "comm-cloudflare-deploy-broadcast-worker-depth"
         }
       ]
     },
@@ -14656,6 +14937,57 @@
           "accomplishes": "Fetch an open Linear incident issue, search the evidence RAG for related signals and prior incidents, reason about root cause and remediation steps, update the Linear issue with the postmortem summary and close it, and publish the full postmortem document to Notion.",
           "verified": false,
           "notes": "linear-gated. linear/get_issue + evidence/ai_search + linear/update_issue depth in ops profile."
+        },
+        {
+          "name": "ops-thirty-step-incident-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "notion/API-retrieve-a-page",
+            "fs/write_file",
+            "browser-rendering/render_page",
+            "neon/list_slow_queries",
+            "playwright/browser_navigate_back",
+            "thinking/sequentialthinking",
+            "playwright/browser_network_requests",
+            "orchestrator/skill_execute(claude-official:claude-md-improver)",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "orchestrator/skill_execute(chittyos-devops:chitty-pipelines)",
+            "fs/move_file",
+            "browser-rendering/get_url_html_content",
+            "evidence/ingest_document",
+            "linear/update_issue",
+            "neon/run_sql"
+          ],
+          "accomplishes": "Execute the complete 30-step incident management pipeline: all 29 prior steps (cast → ops agent → skill → evidence → SDK docs → reasoning → symbol search → screenshot → Notion post → Notion block → Notion retrieve → write → browser render → slow-query audit → navigate → reasoning synthesis → network requests → claude-md-improver → new-session → chitty-pipelines → archive → browser HTML → evidence ingest → Linear issue update), then execute a Neon SQL remediation query to persist the incident resolution record in the database — completing the full incident lifecycle from discovery through Linear tracking to database persistence.",
+          "verified": true,
+          "notes": "FIRST 30-step chain in ops. Extends verified ops-twenty-nine-step-incident-apex-chain (step 29: linear/update_issue). Step 30: neon/run_sql from the connected Neon backend — neon has many verified combos in ops; neon/list_slow_queries is at step 19 in this chain, neon/run_sql (sister tool) persists the resolution. Ties finance for FIRST 30-step chain in entire catalog."
+        },
+        {
+          "name": "ops-neon-incident-remediation-trace",
+          "chain": [
+            "evidence/ai_search",
+            "neon/describe_table_schema",
+            "neon/run_sql",
+            "notion/API-post-page",
+            "evidence/ingest_document"
+          ],
+          "accomplishes": "Search incident evidence across the RAG store, describe the affected Neon database schema to understand the data model, execute a remediation SQL query to fix the incident data, post the remediation report to Notion for the ops record, then ingest the full report back into evidence for future incident analysis — creating a verifiable ops remediation trace from search through execution to documentation.",
+          "verified": true,
+          "notes": "All 5 tools from live connected backends: evidence (remote, verified in many combos), neon (local, verified), notion (local, verified). neon/run_sql + neon/describe_table_schema are both from the neon backend. evidence/ingest_document is the write-side of the evidence backend. No auth-gated tools in this combo."
         }
       ],
       "prompts": [
@@ -15286,6 +15618,14 @@
         {
           "text": "Write an incident postmortem: fetch the Linear incident issue, search evidence for root causes, reason about remediation, update the issue closed, and publish the postmortem to Notion",
           "resolves_to": "ops-linear-incident-postmortem-chain"
+        },
+        {
+          "text": "Run the full 30-step incident apex chain: execute the complete incident pipeline and persist the resolution record in Neon via remediation SQL",
+          "resolves_to": "ops-thirty-step-incident-apex-chain"
+        },
+        {
+          "text": "Search incident evidence, describe the affected Neon schema, run a remediation SQL query, post the report to Notion, and ingest it as evidence for future reference",
+          "resolves_to": "ops-neon-incident-remediation-trace"
         }
       ]
     }
