@@ -1656,3 +1656,44 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 1. Merge PR (83rd pass) when CI green
 2. 84th catalog pass: (a) 30-step chains for governance/design/code/comm (extend 29-step + logical step 30 — all unverified due to tasks/chittymac gating); (b) `chittymac/send_notification` depth in ops (still only 2 combos — add 3rd); (c) `cloudflare/deploy_worker` depth in governance/code (still only 2 each — add depth); (d) `tasks/create_task` depth in design/code (still only 1 each)
 3. Fix Notion auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` to unblock cross-run board writes
+
+---
+
+### 2026-06-08 — Session auto-driver run (84th pass)
+
+**Workstream advanced**: E (Alchemist brainstorm — catalog 84th pass)
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean (0 errors), `npm test` → 938 pass / 0 fail / 2 skipped
+- Found 1 open PR at start: #279 (83rd pass, 856 combos / 418 verified / 877 prompts — FIRST verified 30-step chains finance+ops). CI: **3/3 green** (CodeQL ✓, Analyze-actions ✓, Analyze-javascript-typescript ✓)
+- **Merged PR #279** (squash) → main now at 1b7ef08 (856 combos / 418 verified, 30-step max in finance+ops)
+- Workstream states: A ✅ B ✅ C ✅ D ✅ E in-progress (confirmed via DRIVER-LOG + repo scan)
+- Notion board still 401 — DRIVER-LOG.md remains cross-run fallback
+- Coverage gap analysis (post 83rd-pass):
+  - finance: chittymac LOW (1 combo) — needs depth
+  - design/communication: github LOW (1 each)
+  - ops: chittymac LOW (2 combos)
+  - governance/design/code/communication: maxChain=29 — ALL 4 profiles missing 30-step chains
+- Created branch `auto/E-catalog-eighty-fourth-pass`; added 12 combos + 12 prompts (2 per profile):
+  - **finance**: `finance-chittymac-billing-escalation` ❌ (2nd chittymac in finance — depth from 1→2), `finance-evidence-neon-ledger-trace` ✅ (5-step verified: evidence+neon+thinking+notion+quality)
+  - **governance**: `governance-thirty-step-policy-apex-chain` ❌ (FIRST 30-step in governance! extends 29-step + `linear/update_issue`), `governance-evidence-neon-policy-trace` ✅ (5-step verified: evidence+neon/describe_table_schema+neon/run_sql+thinking+notion)
+  - **design**: `design-thirty-step-ux-apex-chain` ❌ (FIRST 30-step in design! extends 29-step + `neon/run_sql`), `design-context7-neon-ux-trace` ✅ (5-step verified: evidence+context7×2+thinking+notion)
+  - **code**: `code-thirty-step-impl-apex-chain` ❌ (FIRST 30-step in code! extends 29-step + `linear/update_issue`), `code-neon-evidence-impl-trace` ✅ (5-step verified: neon/list_slow_queries+evidence+thinking+quality+notion)
+  - **communication**: `comm-thirty-step-broadcast-apex-chain` ❌ (FIRST 30-step in comm! extends 29-step + `notion/API-patch-page`), `comm-evidence-neon-broadcast-trace` ✅ (5-step verified: evidence+neon+browser-rendering+notion+quality)
+  - **ops**: `ops-chittymac-neon-ops-alert` ❌ (3rd chittymac in ops — depth from 2→3), `ops-context7-neon-runbook-trace` ✅ (5-step verified: evidence+context7×2+neon+notion)
+- 6 new verified combos (all 5-step traces using only live backends: evidence, neon, thinking, notion, quality, browser-rendering, context7)
+- 4 new 30-step chains defined for governance/design/code/communication — ALL 6 profiles now have a 30-step chain
+- JSON validation: 0 duplicate names, 0 missing required fields, 0 non-namespaced tools, 0 bad resolves_to ✓
+- 0 test failures. Tests: 938 pass / 0 fail / 2 skipped ✓
+- Catalog: 856 → **868 combos / 418 → 424 verified / 877 → 889 prompts**
+
+**Branch / PR**: `auto/E-catalog-eighty-fourth-pass` → PR #280 (to be opened)
+
+**Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
+
+**Board state**: 868 combos / 424 verified / 889 prompts. MILESTONES: ALL 6 profiles now have a defined 30-step chain (governance/design/code/comm added ❌; finance/ops already ✅). 6 new verified 5-step cross-backend traces covering evidence+neon+notion patterns. chittymac depth: finance 1→2, ops 2→3.
+
+**Next run priority**:
+1. Merge PR #280 if CI green
+2. 85th catalog pass: `linear/update_issue` depth in governance (only 1 in governance); `github/create_issue` depth in design + communication (only 1 each); `tasks/create_task` depth in finance/ops (still only 3 each); deeper `cloudflare/deploy_worker` in communication (currently 4)
+3. Fix Notion auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` to unblock cross-run board writes

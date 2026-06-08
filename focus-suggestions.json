@@ -1,6 +1,6 @@
 {
   "_comment": "Focus-profile suggestions catalog — 83rd pass. 856 combos, 418 verified. FIRST verified 30-step chains in finance + ops (catalog record!). linear/update_issue FIRST in design + code. 29-step chains across all 6 profiles.",
-  "generatedFrom": "auto-driver-83rd-pass-2026-06-08",
+  "generatedFrom": "E-catalog-84th-pass",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools — now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time — combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -1951,6 +1951,30 @@
           "accomplishes": "Audit the billing database schema, identify slow queries affecting billing throughput, create a Linear issue for the identified DB performance problem, then immediately update it with the full schema and slow-query analysis — creating a tracked, bidirectional record linking DB health findings directly to issue management.",
           "verified": false,
           "notes": "Adds linear/update_issue depth to finance (2nd combo beyond the apex chain). Standalone DB-to-Linear pattern. neon is verified; linear requires auth."
+        },
+        {
+          "name": "finance-chittymac-billing-escalation",
+          "chain": [
+            "neon/run_sql",
+            "thinking/sequentialthinking",
+            "chittymac/send_notification"
+          ],
+          "accomplishes": "Query Neon for overdue billing records, reason over severity and routing with sequential thinking, then send a macOS push notification to escalate the most critical billing issues to the on-call finance team — a direct database-to-alert escalation path.",
+          "verified": false,
+          "notes": "chittymac/send_notification requires macOS homelab; neon/run_sql and thinking/sequentialthinking are both live. Second chittymac/send_notification combo in finance (depth from 1→2)."
+        },
+        {
+          "name": "finance-evidence-neon-ledger-trace",
+          "chain": [
+            "evidence/ai_search",
+            "neon/run_sql",
+            "thinking/sequentialthinking",
+            "notion/API-post-page",
+            "quality/analyze"
+          ],
+          "accomplishes": "Search financial evidence for historical billing or compliance records, correlate with live Neon ledger data via SQL, reason over discrepancies with sequential thinking, post the reconciliation report to Notion, then quality-analyze the output — a fully live cross-backend financial audit trace.",
+          "verified": true,
+          "notes": "All 5 tools from live connected backends: evidence (remote, verified), neon (local, verified), thinking (local, verified), notion (local, verified), quality (local, verified). No auth-gated or homelab tools."
         }
       ],
       "prompts": [
@@ -2509,6 +2533,14 @@
         {
           "text": "Audit billing database schema and slow queries, open a Linear issue for the identified DB performance problem, and update it with the full analysis",
           "resolves_to": "finance-linear-billing-issue-depth"
+        },
+        {
+          "text": "Query Neon for overdue billing records and send a chittymac escalation alert to the finance on-call",
+          "resolves_to": "finance-chittymac-billing-escalation"
+        },
+        {
+          "text": "Search financial evidence, correlate with Neon ledger data, reason over discrepancies, and post a reconciliation report to Notion",
+          "resolves_to": "finance-evidence-neon-ledger-trace"
         }
       ]
     },
@@ -4687,6 +4719,57 @@
           "accomplishes": "Search policy compliance evidence across the RAG store, retrieve relevant regulatory library documentation for context, post the compliance summary to Notion for the governance record, then update the tracking Linear compliance issue with the current status — creating a complete compliance evidence-to-issue-update trail.",
           "verified": false,
           "notes": "2nd linear/update_issue combo in governance. All non-linear tools are from live verified backends. Requires linear auth."
+        },
+        {
+          "name": "governance-thirty-step-policy-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page",
+            "fs/write_file",
+            "notion/API-retrieve-a-page",
+            "neon/run_sql",
+            "fs/get_file_info",
+            "notion/API-post-page",
+            "evidence/ingest_document",
+            "orchestrator/skill_execute(claude-official:hookify)",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "tasks/update_task",
+            "browser-rendering/render-pdf",
+            "fs/move_file",
+            "quality/analyze",
+            "notion/API-patch-page",
+            "linear/update_issue"
+          ],
+          "accomplishes": "Extends governance-twenty-nine-step-policy-apex-chain by one step: after patching the Notion policy page (step 29), update the corresponding Linear governance issue with the final compliance result — closing the full policy audit loop across all 10 registered backends.",
+          "verified": false,
+          "notes": "Extends governance-twenty-nine-step-policy-apex-chain (❌ at step 25 due to tasks/update_task from disabled tasks backend). Step 30: linear/update_issue — FIRST linear/update_issue in governance apex chain. linear requires linear-mcp auth token. All prior steps inherit unverified status from tasks at step 25."
+        },
+        {
+          "name": "governance-evidence-neon-policy-trace",
+          "chain": [
+            "evidence/ai_search",
+            "neon/describe_table_schema",
+            "neon/run_sql",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search governance evidence for compliance patterns, describe the target Neon schema to understand data structure, run a compliance SQL query against the live database, reason over findings with sequential thinking, then post the policy trace to Notion — a fully verified governance audit pipeline using 3 different Neon operations.",
+          "verified": true,
+          "notes": "All 5 tools from live connected backends: evidence (remote, verified), neon/describe_table_schema + neon/run_sql (local, verified), thinking (local, verified), notion (local, verified). No auth-gated tools. Uses two Neon operations in sequence for richer schema-aware querying."
         }
       ],
       "prompts": [
@@ -5329,6 +5412,14 @@
         {
           "text": "Search policy compliance evidence, retrieve regulatory docs, post a compliance summary to Notion, and update the Linear compliance issue with current status",
           "resolves_to": "governance-linear-policy-compliance-depth"
+        },
+        {
+          "text": "Run the full 30-step governance policy apex chain: complete the policy audit pipeline and update the Linear governance issue with the final compliance result",
+          "resolves_to": "governance-thirty-step-policy-apex-chain"
+        },
+        {
+          "text": "Search governance evidence, describe Neon schema, run a compliance SQL query, reason over findings, and post the policy trace to Notion",
+          "resolves_to": "governance-evidence-neon-policy-trace"
         }
       ]
     },
@@ -7142,6 +7233,57 @@
           "accomplishes": "Capture a screenshot of the current UX state, post the screenshot and context to Notion for the design record, create a Linear sprint issue for the identified UX improvements, then update it with the full design analysis — creating a tracked UX improvement ticket from visual evidence to Linear sprint management.",
           "verified": false,
           "notes": "FIRST linear/update_issue in design (previously 0 combos). linear/create_issue was already in design (1 combo); this extends to update pattern. Requires linear auth."
+        },
+        {
+          "name": "design-thirty-step-ux-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page",
+            "notion/API-retrieve-a-page",
+            "fs/write_file",
+            "fs/read_file",
+            "playwright/browser_click",
+            "browser-rendering/get_url_html_content",
+            "fs/write_file",
+            "playwright/browser_snapshot",
+            "orchestrator/skill_execute(claude-official:skill-creator)",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "tasks/complete_task",
+            "fs/move_file",
+            "playwright/browser_navigate_back",
+            "quality/analyze",
+            "notion/API-patch-page",
+            "neon/run_sql"
+          ],
+          "accomplishes": "Extends design-twenty-nine-step-ux-apex-chain by one step: after patching the Notion UX page (step 29), persist the final design metrics and session results to Neon via SQL — creating a durable, queryable record of the full UX audit across all registered backends.",
+          "verified": false,
+          "notes": "Extends design-twenty-nine-step-ux-apex-chain (❌ at step 25 due to tasks/complete_task from disabled tasks backend). Step 30: neon/run_sql — FIRST neon operation in design apex chain. Neon is a live backend. Overall chain remains unverified due to tasks at step 25."
+        },
+        {
+          "name": "design-context7-neon-ux-trace",
+          "chain": [
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search design evidence for UX patterns, resolve the target component library via context7, query its full documentation, reason over design decisions and trade-offs with sequential thinking, then post the synthesized UX reference to Notion — a fully verified documentation-to-design-record trace.",
+          "verified": true,
+          "notes": "All 5 tools from live connected backends: evidence (remote, verified), context7/resolve-library-id + context7/query-docs (local, verified), thinking (local, verified), notion (local, verified). No auth-gated tools. Adds context7 depth to design profile (now 3+ context7 combos in design)."
         }
       ],
       "prompts": [
@@ -7664,6 +7806,14 @@
         {
           "text": "Screenshot the current UX state, post to Notion, create a Linear sprint issue for the UX improvements, and update it with the full design analysis",
           "resolves_to": "design-linear-update-issue-ux-sprint"
+        },
+        {
+          "text": "Run the full 30-step design UX apex chain: complete the UX audit pipeline and persist the final design metrics to Neon",
+          "resolves_to": "design-thirty-step-ux-apex-chain"
+        },
+        {
+          "text": "Search design evidence, resolve a component library via context7, query its docs, reason over trade-offs, and post the UX reference to Notion",
+          "resolves_to": "design-context7-neon-ux-trace"
         }
       ]
     },
@@ -9823,6 +9973,57 @@
           "accomplishes": "Search for relevant code symbols across the implementation, retrieve library documentation for the identified symbols, create a Linear issue for the code improvement, then update it with the full symbol and documentation analysis — creating a code quality-to-Linear issue tracking loop.",
           "verified": false,
           "notes": "FIRST linear/update_issue in code (previously 0 combos). serena + context7 are standard code discovery tools (both verified). Requires linear auth."
+        },
+        {
+          "name": "code-thirty-step-impl-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page",
+            "notion/API-retrieve-a-page",
+            "fs/write_file",
+            "neon/list_slow_queries",
+            "fs/read_file",
+            "notion/API-post-page",
+            "evidence/ingest_document",
+            "orchestrator/skill_execute(commit-commands:clean-gone)",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "tasks/update_task",
+            "fs/move_file",
+            "playwright/browser_navigate_back",
+            "quality/analyze",
+            "notion/API-patch-page",
+            "linear/update_issue"
+          ],
+          "accomplishes": "Extends code-twenty-nine-step-impl-apex-chain by one step: after patching the Notion implementation page (step 29), update the corresponding Linear engineering ticket with the final implementation result — completing the full development lifecycle trace across all 10 registered backends.",
+          "verified": false,
+          "notes": "Extends code-twenty-nine-step-impl-apex-chain (❌ at step 25 due to tasks/update_task from disabled tasks backend). Step 30: linear/update_issue — FIRST linear/update_issue in code apex chain. linear requires linear-mcp auth token. Overall chain remains unverified due to tasks at step 25."
+        },
+        {
+          "name": "code-neon-evidence-impl-trace",
+          "chain": [
+            "neon/list_slow_queries",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "quality/analyze",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "List Neon slow queries to identify performance bottlenecks, search evidence for prior optimization patterns, reason over fix strategies with sequential thinking, quality-analyze the proposed solution, then post the implementation plan to Notion — a fully verified performance-investigation-to-documentation pipeline.",
+          "verified": true,
+          "notes": "All 5 tools from live connected backends: neon/list_slow_queries (local, verified), evidence (remote, verified), thinking (local, verified), quality (local, verified), notion (local, verified). No auth-gated tools. Uses neon/list_slow_queries (distinct from neon/run_sql) for code profile depth."
         }
       ],
       "prompts": [
@@ -10453,6 +10654,14 @@
         {
           "text": "Search code symbols, retrieve library docs, create a Linear issue for the improvement, and update it with the full symbol and documentation analysis",
           "resolves_to": "code-linear-update-issue-impl-tracker"
+        },
+        {
+          "text": "Run the full 30-step code implementation apex chain: complete the implementation pipeline and update the Linear engineering ticket with the final result",
+          "resolves_to": "code-thirty-step-impl-apex-chain"
+        },
+        {
+          "text": "List Neon slow queries, search evidence for optimization patterns, reason over fixes, quality-analyze the solution, and post the implementation plan to Notion",
+          "resolves_to": "code-neon-evidence-impl-trace"
         }
       ]
     },
@@ -12272,6 +12481,57 @@
           "accomplishes": "Execute an orchestrator agent to handle a broadcast workflow, capture the broadcast state via screenshot for documentation, post the broadcast report to Notion, then deploy a Cloudflare Worker to serve the broadcast content at scale — creating a full broadcast-orchestration-to-deploy pipeline.",
           "verified": false,
           "notes": "2nd cloudflare/deploy_worker combo in communication (previously 1 combo). Adds cloudflare depth to comm. Requires cloudflare auth."
+        },
+        {
+          "name": "comm-thirty-step-broadcast-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page",
+            "notion/API-retrieve-a-page",
+            "fs/write_file",
+            "neon/run_sql",
+            "fs/get_file_info",
+            "notion/API-post-page",
+            "playwright/browser_navigate",
+            "orchestrator/skill_execute(claude-official:claude-api)",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "chittymac/send_notification",
+            "fs/move_file",
+            "playwright/browser_navigate_back",
+            "evidence/ingest_document",
+            "thinking/sequentialthinking",
+            "notion/API-patch-page"
+          ],
+          "accomplishes": "Extends comm-twenty-nine-step-broadcast-apex-chain by one step: after final sequential thinking (step 29), patch the Notion broadcast page with the completed communication record — creating a definitive close to the full 30-step cross-backend broadcast orchestration.",
+          "verified": false,
+          "notes": "Extends comm-twenty-nine-step-broadcast-apex-chain (❌ at step 25 due to chittymac/send_notification from macOS homelab). Step 30: notion/API-patch-page — same Notion backend used at steps 14, 15, 18, 21 (all live). Overall chain remains unverified due to chittymac at step 25."
+        },
+        {
+          "name": "comm-evidence-neon-broadcast-trace",
+          "chain": [
+            "evidence/ai_search",
+            "neon/run_sql",
+            "browser-rendering/render_page",
+            "notion/API-post-page",
+            "quality/analyze"
+          ],
+          "accomplishes": "Search communication evidence for prior broadcast patterns, query Neon for audience/metrics data, render a full HTML preview of the broadcast output via browser-rendering, post the finalized broadcast plan to Notion, then quality-analyze the communication — a fully verified multi-backend broadcast audit trace.",
+          "verified": true,
+          "notes": "All 5 tools from live connected backends: evidence (remote, verified), neon/run_sql (local, verified), browser-rendering/render_page (remote, verified in many combos), notion (local, verified), quality (local, verified). No auth-gated tools. Adds browser-rendering depth to communication profile."
         }
       ],
       "prompts": [
@@ -12802,6 +13062,14 @@
         {
           "text": "Execute a broadcast orchestration workflow, capture its state, post to Notion, and deploy a Cloudflare Worker to serve the broadcast content at scale",
           "resolves_to": "comm-cloudflare-deploy-broadcast-worker-depth"
+        },
+        {
+          "text": "Run the full 30-step communication broadcast apex chain: complete the broadcast orchestration and patch the Notion broadcast page with the final record",
+          "resolves_to": "comm-thirty-step-broadcast-apex-chain"
+        },
+        {
+          "text": "Search broadcast evidence, query Neon metrics, render a broadcast preview via browser-rendering, post to Notion, and quality-analyze the communication",
+          "resolves_to": "comm-evidence-neon-broadcast-trace"
         }
       ]
     },
@@ -14988,6 +15256,30 @@
           "accomplishes": "Search incident evidence across the RAG store, describe the affected Neon database schema to understand the data model, execute a remediation SQL query to fix the incident data, post the remediation report to Notion for the ops record, then ingest the full report back into evidence for future incident analysis — creating a verifiable ops remediation trace from search through execution to documentation.",
           "verified": true,
           "notes": "All 5 tools from live connected backends: evidence (remote, verified in many combos), neon (local, verified), notion (local, verified). neon/run_sql + neon/describe_table_schema are both from the neon backend. evidence/ingest_document is the write-side of the evidence backend. No auth-gated tools in this combo."
+        },
+        {
+          "name": "ops-chittymac-neon-ops-alert",
+          "chain": [
+            "neon/run_sql",
+            "quality/analyze",
+            "chittymac/send_notification"
+          ],
+          "accomplishes": "Run a Neon SQL query to surface active incident or threshold-breach data, quality-analyze the severity and routing, then send a macOS push notification to the ops on-call — a minimal, direct database-to-alert ops escalation path.",
+          "verified": false,
+          "notes": "chittymac/send_notification requires macOS homelab; neon/run_sql and quality/analyze are both live. Third chittymac/send_notification combo in ops (depth from 2→3)."
+        },
+        {
+          "name": "ops-context7-neon-runbook-trace",
+          "chain": [
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "neon/run_sql",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search ops evidence for incident runbook patterns, resolve the relevant infrastructure library via context7, query its documentation for remediation procedures, execute the remediation SQL against Neon, then post the completed runbook execution record to Notion — a fully verified context-aware incident resolution trace.",
+          "verified": true,
+          "notes": "All 5 tools from live connected backends: evidence (remote, verified), context7/resolve-library-id + context7/query-docs (local, verified), neon/run_sql (local, verified), notion (local, verified). No auth-gated tools. Adds context7 depth to ops profile (second context7 combo in ops)."
         }
       ],
       "prompts": [
@@ -15626,6 +15918,14 @@
         {
           "text": "Search incident evidence, describe the affected Neon schema, run a remediation SQL query, post the report to Notion, and ingest it as evidence for future reference",
           "resolves_to": "ops-neon-incident-remediation-trace"
+        },
+        {
+          "text": "Run a Neon SQL query for active incidents, quality-analyze severity, and send a chittymac ops escalation alert",
+          "resolves_to": "ops-chittymac-neon-ops-alert"
+        },
+        {
+          "text": "Search ops evidence, resolve an infrastructure library via context7, query its runbook docs, execute remediation SQL in Neon, and post the runbook trace to Notion",
+          "resolves_to": "ops-context7-neon-runbook-trace"
         }
       ]
     }
