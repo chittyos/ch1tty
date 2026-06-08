@@ -1697,3 +1697,47 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 1. Merge PR #280 if CI green
 2. 85th catalog pass: `linear/update_issue` depth in governance (only 1 in governance); `github/create_issue` depth in design + communication (only 1 each); `tasks/create_task` depth in finance/ops (still only 3 each); deeper `cloudflare/deploy_worker` in communication (currently 4)
 3. Fix Notion auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` to unblock cross-run board writes
+
+---
+
+### 2026-06-08 — Session auto-driver run (85th pass)
+
+**Workstream advanced**: E (Alchemist brainstorm — catalog 85th pass)
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass / 0 fail / 2 skipped
+- Found 0 open PRs; PR #280 (84th pass) already merged. main HEAD: `0863c46` (868 combos / 424 verified / 889 prompts — ALL 6 profiles at 30-step max)
+- Workstream states: A ✅ B ✅ C ✅ D ✅ E in-progress (confirmed via DRIVER-LOG + repo scan)
+- Notion board still 401 — DRIVER-LOG.md remains cross-run fallback
+- Coverage gap analysis (post 84th-pass):
+  - `github/search_repositories`: 0 occurrences in ALL 6 profiles — MISSING entirely
+  - `stripe/create_payment_intent` in governance: 0 (MISSING)
+  - `stripe/create_payment_intent` in finance: only 1 (needs depth)
+  - `tasks/create_task` in design: only 1 (needs depth)
+  - `linear/update_issue` in design: only 1 (needs depth)
+  - `tasks/create_task` in code: only 1 (needs depth)
+  - `github/create_issue` in communication: 0 (MISSING)
+  - `linear/create_issue` in communication: only 1 (needs depth)
+  - `linear/create_issue` in ops: only 1 (needs depth)
+- Created branch `auto/E-catalog-eighty-fifth-pass`; added 12 combos + 12 prompts (2 per profile):
+  - **finance**: `finance-github-search-billing-lib` ❌ (FIRST github/search_repositories in finance; github→context7→context7→notion), `finance-stripe-payment-intent-neon-audit` ❌ (2nd stripe/create_payment_intent in finance; stripe→neon→thinking→notion)
+  - **governance**: `governance-stripe-payment-intent-policy-check` ❌ (FIRST stripe/create_payment_intent in governance; evidence→stripe→thinking→notion), `governance-github-search-compliance-libs` ❌ (FIRST github/search_repositories in governance; github→thinking→evidence→notion)
+  - **design**: `design-tasks-ux-feedback-track` ❌ (2nd tasks/create_task in design; playwright→thinking→tasks→notion), `design-linear-update-sprint-ux-review` ❌ (2nd linear/update_issue in design; playwright×2→linear→notion)
+  - **code**: `code-tasks-pr-review-track` ❌ (2nd tasks/create_task in code; github→thinking→tasks→notion), `code-github-search-repo-dependency-audit` ❌ (FIRST github/search_repositories in code; github→context7×2→notion)
+  - **communication**: `comm-github-issue-broadcast-notion` ❌ (FIRST github/create_issue in communication; thinking→github→notion), `comm-linear-create-followup-task-chain` ❌ (2nd linear/create_issue in communication; notion→thinking→linear→tasks)
+  - **ops**: `ops-github-search-repo-runbook-update` ❌ (FIRST github/search_repositories in ops; github→context7×2→neon→notion), `ops-linear-create-incident-issue` ❌ (2nd linear/create_issue in ops; neon→evidence→thinking→linear→notion)
+- Key milestone: FIRST github/search_repositories combos in finance, governance, code, and ops (4 of 6 profiles now covered)
+- 0 test failures. Tests: 938 pass / 0 fail / 2 skipped ✓
+- JSON validation: 0 duplicate names, 0 missing required fields, 0 non-namespaced tools, 0 bad resolves_to ✓
+- Catalog: 868 → **880 combos / 424 verified (unchanged) / 889 → 901 prompts**
+
+**Branch / PR**: `auto/E-catalog-eighty-fifth-pass` → PR pending
+
+**Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
+
+**Board state**: 880 combos / 424 verified / 901 prompts. MILESTONE: FIRST `github/search_repositories` combos across 4 profiles (finance, governance, code, ops). FIRST `stripe/create_payment_intent` in governance. FIRST `github/create_issue` in communication. All depth targets advanced (tasks/design 1→2, tasks/code 1→2, linear_update/design 1→2, linear_create/comm 1→2, linear_create/ops 1→2).
+
+**Next run priority**:
+1. Merge this PR when CI green
+2. 86th catalog pass: `github/search_repositories` in design + communication (still 0 each); `github/create_issue` in design (still 1); `stripe/create_payment_intent` in design/code/communication/ops (all 0); `cloudflare/deploy_worker` depth in communication (still 2)
+3. Fix Notion auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` to unblock cross-run board writes
