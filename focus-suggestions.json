@@ -1,16 +1,10 @@
 {
-  "_comment": "seventy-fifth pass / 760 combos / 378 verified \u2014 FIRST 23-step chains across ALL 6 profiles (NEW catalog record!), live-verified via orchestrator/skill_list + agent_list (2026-06-08, 54 skills / 28 agents), FIRST chittyos-core:new-session in finance+ops, FIRST commit-commands:clean-gone in code, FIRST claude-official:hookify in governance, FIRST claude-official:skill-creator in design, FIRST claude-official:claude-api in communication, 0 prompt gaps",
+  "_comment": "seventy-seventh pass / 784 combos / 389 verified \u2014 FIRST 25-step apex chains across ALL 6 profiles (new catalog record!); FIRST browser-rendering/render-pdf in finance; FIRST tasks/update_task in code + communication + governance; FIRST tasks/complete_task in design + governance; FIRST stripe/finalize_invoice in ops; chittymac/send_notification in comm apex",
   "generatedFrom": {
-    "pass": 76,
+    "pass": 77,
     "date": "2026-06-08",
-    "method": "gap analysis + 24-step apex extension + render-pdf/stripe/cloudflare-builds coverage",
-    "liveDiscovery": {
-      "skillsFound": 54,
-      "agentsFound": 28,
-      "newCombos": 12,
-      "missingPromptsFixed": 12,
-      "verificationSource": "orchestrator/skill_list + orchestrator/agent_list via live Ch1tty gateway (2026-06-08, 75th pass)"
-    }
+    "method": "autonomous driver \u2014 gap analysis + 25-step apex extension + coverage gap-filling",
+    "liveDiscovery": true
   },
   "profiles": {
     "finance": {
@@ -1647,6 +1641,51 @@
           "accomplishes": "Query the billing database to identify the current billing period, list outstanding Stripe invoices, create a new invoice for the period, finalize and lock it to prevent further changes, then ingest the invoice record into evidence for audit trail and compliance.",
           "verified": false,
           "notes": "stripe not connected (lazy); stripe/list_invoices, stripe/create_invoice, stripe/finalize_invoice inferred from @stripe/mcp surface. FIRST stripe/finalize_invoice in entire catalog. FIRST stripe/create_invoice in finance profile. neon/run_sql and evidence/ingest_document verified."
+        },
+        {
+          "name": "finance-twenty-five-step-billing-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "neon/describe_table_schema",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "notion/API-retrieve-a-page",
+            "fs/read_file",
+            "neon/list_slow_queries",
+            "playwright/browser_click",
+            "thinking/sequentialthinking",
+            "playwright/browser_console_messages",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "orchestrator/skill_execute(chittyos-devops:chitty-health)",
+            "browser-rendering/render-pdf"
+          ],
+          "accomplishes": "Full 25-step billing intelligence pipeline: cast \u2192 orchestrator \u2192 evidence \u2192 context7 \u2192 neon schema inspection \u2192 thinking synthesis \u2192 playwright automation \u2192 fs write \u2192 notion artifact \u2192 neon slow query audit \u2192 playwright console trace \u2192 session lifecycle checkpoint \u2192 chitty health \u2192 **render-pdf billing report** \u2014 FIRST 25-step chain in catalog, FIRST browser-rendering/render-pdf in finance.",
+          "verified": true,
+          "notes": "Extends the verified 24-step finance apex with browser-rendering/render-pdf as the final archival step. render-pdf generates a printable billing report from the session output. Verified: browser-rendering connected."
+        },
+        {
+          "name": "finance-render-pdf-billing-statement",
+          "chain": [
+            "neon/run_sql",
+            "notion/API-retrieve-a-page",
+            "browser-rendering/render-pdf",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Query billing data from Neon, fetch the Notion billing tracker page, render the combined view as a PDF statement, and post the PDF link back to Notion \u2014 FIRST browser-rendering/render-pdf standalone in finance.",
+          "verified": true,
+          "notes": "Verified: neon connected (lazy but works), browser-rendering connected, notion connected."
         }
       ],
       "prompts": [
@@ -2128,11 +2167,11 @@
         },
         {
           "text": "Reset to a new session then pull Mercury balances for all entities before starting reconciliation",
-          "resolves_to": "orchestrator/skill_execute(chittyos-core:new-session)"
+          "resolves_to": "new-session-before-mercury-reconciliation"
         },
         {
           "text": "Run the full 23-step billing apex lifecycle: cast intent to agent routing, skill execution, evidence search, library docs, schema analysis, reasoning, storage, Notion, then session reset",
-          "resolves_to": "ch1tty/cast"
+          "resolves_to": "finance-twenty-three-step-billing-apex-chain"
         },
         {
           "text": "Run the full 23-step billing apex lifecycle: cast billing intent through agent routing and skill execution, search evidence and SDK docs, analyze schema, reason about cashflow, track in Notion, audit slow queries, confirm the portal action, then reset to a fresh session.",
@@ -2149,6 +2188,14 @@
         {
           "text": "Query the billing DB, list and create a Stripe invoice for the current period, finalize it to lock, then ingest the invoice record as compliance evidence.",
           "resolves_to": "finance-stripe-finalize-invoice-cycle"
+        },
+        {
+          "text": "Run the full 25-step billing intelligence suite and render a PDF billing report at the end",
+          "resolves_to": "finance-twenty-five-step-billing-apex-chain"
+        },
+        {
+          "text": "Render a PDF billing statement from our Neon data and archive it in Notion",
+          "resolves_to": "finance-render-pdf-billing-statement"
         }
       ]
     },
@@ -4035,6 +4082,52 @@
           "accomplishes": "List all Cloudflare Workers builds in the governance context, retrieve the build configuration for the current deployment, ingest the configuration as compliance evidence, then run a full chittyos-compliance audit against the deployment state to surface any policy violations.",
           "verified": false,
           "notes": "cloudflare-builds not connected (lazy remote). workers_builds_list_builds and workers_builds_get_build_config inferred from cloudflare-builds surface. FIRST cloudflare-builds/workers_builds_list_builds in governance profile. evidence/ingest_document and chittyos-devops:chittyos-compliance skill verified."
+        },
+        {
+          "name": "governance-twenty-five-step-policy-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page",
+            "fs/write_file",
+            "notion/API-retrieve-a-page",
+            "neon/run_sql",
+            "fs/get_file_info",
+            "notion/API-post-page",
+            "evidence/ingest_document",
+            "orchestrator/skill_execute(claude-official:hookify)",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "tasks/update_task"
+          ],
+          "accomplishes": "Full 25-step governance policy pipeline: cast \u2192 orchestrator \u2192 evidence \u2192 context7 \u2192 thinking \u2192 serena \u2192 playwright snapshot \u2192 fs \u2192 notion policy post \u2192 notion update \u2192 browser-rendering \u2192 fs info \u2192 notion retrieve \u2192 neon run_sql \u2192 fs get_file_info \u2192 notion post \u2192 evidence ingest \u2192 hookify \u2192 new-session \u2192 **tasks/update_task** \u2014 FIRST 25-step in governance; FIRST tasks/update_task in governance.",
+          "verified": false,
+          "notes": "Extends the verified 24-step governance apex. tasks/update_task updates the compliance review task upon session completion. Unverified: tasks backend is lazy/auth-gated."
+        },
+        {
+          "name": "governance-tasks-complete-compliance-archive",
+          "chain": [
+            "tasks/list_tasks",
+            "thinking/sequentialthinking",
+            "tasks/complete_task",
+            "evidence/ingest_document",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "List open compliance review tasks, apply sequential thinking to validate completion criteria, mark the task complete, ingest the completion record into the evidence RAG, and post a summary to the Notion governance board \u2014 FIRST tasks/complete_task in governance.",
+          "verified": false,
+          "notes": "tasks is lazy/auth-gated. Unverified. evidence + notion connected."
         }
       ],
       "prompts": [
@@ -4600,11 +4693,11 @@
         },
         {
           "text": "Audit compliance rules with chittyos-compliance then hookify the violations into Claude Code hooks for automatic enforcement",
-          "resolves_to": "orchestrator/skill_execute(claude-official:hookify)"
+          "resolves_to": "hookify-compliance-rules-from-audit"
         },
         {
           "text": "Run the 23-step governance policy apex: cast to agent, skill orchestration, evidence, docs, reasoning, analysis, Notion archival, then hookify the extracted rules",
-          "resolves_to": "ch1tty/cast"
+          "resolves_to": "governance-twenty-three-step-policy-apex-chain"
         },
         {
           "text": "Run the 23-step governance policy apex: cast to agent and skill routing, search evidence and docs, reason, document in Notion, render and archive, then hookify discovered compliance rules into enforcement triggers.",
@@ -4621,6 +4714,14 @@
         {
           "text": "List all Cloudflare Workers builds in the governance context, retrieve the deployment config, ingest it as compliance evidence, then run a full chittyos-compliance audit.",
           "resolves_to": "governance-cloudflare-builds-list-compliance"
+        },
+        {
+          "text": "Run the full 25-step governance policy suite and update the compliance task upon completion",
+          "resolves_to": "governance-twenty-five-step-policy-apex-chain"
+        },
+        {
+          "text": "Review open compliance tasks, mark the completed ones done, and archive evidence in Notion",
+          "resolves_to": "governance-tasks-complete-compliance-archive"
         }
       ]
     },
@@ -6143,6 +6244,52 @@
           "accomplishes": "List Cloudflare Workers builds for the current design deployment, retrieve the exact build configuration, navigate to the deployed URL in a browser, then capture a snapshot to visually verify the live UI matches the expected design output.",
           "verified": false,
           "notes": "cloudflare-builds not connected (lazy remote). FIRST cloudflare-builds/workers_builds_get_build_config in design profile. playwright/browser_navigate and playwright/browser_snapshot verified."
+        },
+        {
+          "name": "design-twenty-five-step-ux-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page",
+            "notion/API-retrieve-a-page",
+            "fs/write_file",
+            "fs/read_file",
+            "playwright/browser_click",
+            "browser-rendering/get_url_html_content",
+            "fs/write_file",
+            "playwright/browser_snapshot",
+            "orchestrator/skill_execute(claude-official:skill-creator)",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "tasks/complete_task"
+          ],
+          "accomplishes": "Full 25-step UX research pipeline: cast \u2192 orchestrator \u2192 evidence \u2192 context7 \u2192 thinking \u2192 serena \u2192 playwright \u2192 fs \u2192 notion \u2192 browser-rendering \u2192 notion retrieve \u2192 fs write/read \u2192 playwright click/html/snapshot \u2192 skill-creator \u2192 new-session \u2192 **tasks/complete_task** \u2014 FIRST 25-step in design; FIRST tasks/complete_task in design.",
+          "verified": false,
+          "notes": "Extends the verified 24-step design apex. tasks/complete_task marks the UX sprint task done after the full session. Unverified: tasks backend is lazy/auth-gated."
+        },
+        {
+          "name": "design-tasks-complete-ux-sprint-close",
+          "chain": [
+            "tasks/list_tasks",
+            "playwright/browser_take_screenshot",
+            "tasks/complete_task",
+            "fs/write_file",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "List open UX sprint tasks, take a screenshot of the design artifact, complete the sprint task, write the final design file, and archive in Notion \u2014 FIRST tasks/complete_task in design.",
+          "verified": false,
+          "notes": "tasks is lazy/auth-gated. Unverified. playwright + fs + notion connected."
         }
       ],
       "prompts": [
@@ -6588,11 +6735,11 @@
         },
         {
           "text": "Build a frontend component with claude-official:frontend-design then scaffold it into a reusable skill via skill-creator and register it",
-          "resolves_to": "orchestrator/skill_execute(claude-official:skill-creator)"
+          "resolves_to": "skill-creator-from-frontend-pattern"
         },
         {
           "text": "Full 23-step UX design apex: cast intent through orchestrator, skill execution, evidence, library docs, reasoning, screenshot capture, write, Notion, then scaffold skill from pattern",
-          "resolves_to": "ch1tty/cast"
+          "resolves_to": "design-twenty-three-step-ux-apex-chain"
         },
         {
           "text": "Run the full 23-step UX design apex: cast intent through agent and skill routing, search evidence, resolve SDK docs, reason, screenshot, document in Notion, render, and scaffold a reusable skill from the discovered UX pattern.",
@@ -6609,6 +6756,14 @@
         {
           "text": "List Cloudflare Workers builds for the design deployment, retrieve the build config, navigate to the deployed URL, and snapshot the live UI for visual verification.",
           "resolves_to": "design-cloudflare-build-config-snapshot"
+        },
+        {
+          "text": "Run the complete 25-step UX research pipeline and close the design sprint task at the end",
+          "resolves_to": "design-twenty-five-step-ux-apex-chain"
+        },
+        {
+          "text": "Close out the UX sprint tasks and archive the final design artifacts in Notion",
+          "resolves_to": "design-tasks-complete-ux-sprint-close"
         }
       ]
     },
@@ -8480,6 +8635,51 @@
           "accomplishes": "Resolve the @modelcontextprotocol/sdk library ID via Context7, fetch its current documentation, render the docs page as a PDF for offline archival reference, then ingest the PDF artifact into evidence for retrieval during code reviews and architecture sessions.",
           "verified": true,
           "notes": "All steps verified: context7 connected (resolve-library-id + query-docs confirmed), browser-rendering/render-pdf verified, evidence/ingest_document verified. FIRST browser-rendering/render-pdf in code profile."
+        },
+        {
+          "name": "code-twenty-five-step-impl-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page",
+            "notion/API-retrieve-a-page",
+            "fs/write_file",
+            "neon/list_slow_queries",
+            "fs/read_file",
+            "notion/API-post-page",
+            "evidence/ingest_document",
+            "orchestrator/skill_execute(commit-commands:clean-gone)",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "tasks/update_task"
+          ],
+          "accomplishes": "Full 25-step implementation pipeline: cast \u2192 orchestrator \u2192 evidence \u2192 context7 \u2192 thinking \u2192 serena \u2192 playwright \u2192 fs \u2192 notion \u2192 browser-rendering \u2192 notion retrieve \u2192 fs write \u2192 neon slow queries \u2192 fs read \u2192 notion post \u2192 evidence ingest \u2192 commit-commands clean-gone \u2192 new-session \u2192 **tasks/update_task** \u2014 FIRST 25-step in code; FIRST tasks/update_task in code.",
+          "verified": false,
+          "notes": "Extends the verified 24-step code apex. tasks/update_task updates the sprint task with implementation status after session. Unverified: tasks backend is lazy/auth-gated."
+        },
+        {
+          "name": "code-tasks-update-sprint-progress",
+          "chain": [
+            "tasks/list_tasks",
+            "neon/run_sql",
+            "tasks/update_task",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "List active sprint tasks, query Neon for implementation metrics, update the task with progress data, and post a status update to the Notion engineering board \u2014 FIRST tasks/update_task in code.",
+          "verified": false,
+          "notes": "tasks is lazy/auth-gated. Unverified. neon + notion connected."
         }
       ],
       "prompts": [
@@ -9033,11 +9233,11 @@
         },
         {
           "text": "Clean gone branches then start guided feature development and auto-submit a reviewed PR when done",
-          "resolves_to": "orchestrator/skill_execute(commit-commands:clean-gone)"
+          "resolves_to": "clean-gone-pre-feature-dev-to-pr"
         },
         {
           "text": "Full 23-step code implementation apex: cast to agent, skill execution, evidence, docs, reasoning, analysis, write, review, ingest, then clean gone branches",
-          "resolves_to": "ch1tty/cast"
+          "resolves_to": "code-twenty-three-step-impl-apex-chain"
         },
         {
           "text": "Clean up gone branches, pull current library docs via Context7, run guided feature development end-to-end, review the PR, then commit, push, and open the pull request.",
@@ -9054,6 +9254,14 @@
         {
           "text": "Resolve the MCP SDK library ID via Context7, fetch current docs, render as a PDF for offline reference, then ingest into evidence for code reviews.",
           "resolves_to": "code-browser-render-pdf-sdk-docs"
+        },
+        {
+          "text": "Run the full 25-step implementation pipeline and update the sprint task with the session outcome",
+          "resolves_to": "code-twenty-five-step-impl-apex-chain"
+        },
+        {
+          "text": "Update the sprint task progress from Neon metrics and post the summary to Notion",
+          "resolves_to": "code-tasks-update-sprint-progress"
         }
       ]
     },
@@ -10588,6 +10796,51 @@
           "accomplishes": "Navigate to a published press release or announcement page, render it as a polished PDF for distribution, post the PDF artifact to a Notion broadcast database, then distribute the announcement via the Discord connector to the relevant team channels.",
           "verified": false,
           "notes": "playwright/browser_navigate, browser-rendering/render-pdf, and notion/API-post-page all verified. connectors:discord not connected (lazy). FIRST browser-rendering/render-pdf in communication profile."
+        },
+        {
+          "name": "comm-twenty-five-step-broadcast-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "browser-rendering/render_page",
+            "notion/API-retrieve-a-page",
+            "fs/write_file",
+            "neon/run_sql",
+            "fs/get_file_info",
+            "notion/API-post-page",
+            "playwright/browser_navigate",
+            "orchestrator/skill_execute(claude-official:claude-api)",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "chittymac/send_notification"
+          ],
+          "accomplishes": "Full 25-step broadcast pipeline: cast \u2192 orchestrator \u2192 evidence \u2192 context7 \u2192 thinking \u2192 serena \u2192 playwright \u2192 fs \u2192 notion \u2192 browser-rendering \u2192 notion retrieve \u2192 fs write \u2192 neon run_sql \u2192 fs get_file_info \u2192 notion post \u2192 playwright navigate \u2192 claude-api \u2192 new-session \u2192 **chittymac/send_notification** \u2014 FIRST 25-step in communication; deepens chittymac in apex chain.",
+          "verified": false,
+          "notes": "Extends the verified 24-step communication apex. chittymac/send_notification fires a macOS notification as the final broadcast confirmation. Unverified: chittymac is a local Mac integration tool."
+        },
+        {
+          "name": "comm-tasks-update-broadcast-summary",
+          "chain": [
+            "tasks/list_tasks",
+            "notion/API-retrieve-a-page",
+            "tasks/update_task",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "List active communication campaign tasks, retrieve the relevant Notion broadcast page, update the task with delivery metrics, and post a campaign summary \u2014 FIRST tasks/update_task in communication.",
+          "verified": false,
+          "notes": "tasks is lazy/auth-gated. Unverified. notion connected."
         }
       ],
       "prompts": [
@@ -11041,11 +11294,11 @@
         },
         {
           "text": "Get Claude API integration guidance via claude-official:claude-api, resolve current SDK docs, and post a structured summary to Notion for the team",
-          "resolves_to": "orchestrator/skill_execute(claude-official:claude-api)"
+          "resolves_to": "claude-api-integration-guide-to-notion"
         },
         {
           "text": "23-step broadcast apex: intent through agent routing, skill orchestration, evidence, docs, reasoning, screenshots, storage, Notion, navigation, then Claude API integration guidance",
-          "resolves_to": "ch1tty/cast"
+          "resolves_to": "comm-twenty-three-step-broadcast-apex-chain"
         },
         {
           "text": "Get structured Claude API / Anthropic SDK integration guidance via claude-official:claude-api, resolve the current SDK docs via Context7, and post the synthesis to Notion as a reference page.",
@@ -11062,6 +11315,14 @@
         {
           "text": "Navigate to a press release page, render it as a PDF, post to Notion, then broadcast via Discord connector.",
           "resolves_to": "comm-browser-render-pdf-press-release"
+        },
+        {
+          "text": "Run the full 25-step broadcast pipeline and send a macOS notification when the session is done",
+          "resolves_to": "comm-twenty-five-step-broadcast-apex-chain"
+        },
+        {
+          "text": "Update the campaign broadcast task with delivery metrics and post the summary to Notion",
+          "resolves_to": "comm-tasks-update-broadcast-summary"
         }
       ]
     },
@@ -12936,6 +13197,51 @@
           "accomplishes": "Execute the resolve agent to triage the current incident, pull slow-query data from Neon for database performance context, reason through root cause with sequential thinking, render the incident dashboard or runbook as a PDF, then ingest the complete incident report into evidence for audit and post-mortem archival.",
           "verified": true,
           "notes": "All steps verified: orchestrator/agent_execute(resolve) verified, neon/list_slow_queries verified, thinking/sequentialthinking verified, browser-rendering/render-pdf verified, evidence/ingest_document verified. FIRST browser-rendering/render-pdf in ops profile."
+        },
+        {
+          "name": "ops-twenty-five-step-incident-apex-chain",
+          "chain": [
+            "ch1tty/cast",
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute",
+            "orchestrator/skill_search",
+            "orchestrator/skill_execute",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "serena/search_for_symbols",
+            "playwright/browser_take_screenshot",
+            "fs/write_file",
+            "notion/API-post-page",
+            "notion/API-update-a-block",
+            "notion/API-retrieve-a-page",
+            "fs/write_file",
+            "browser-rendering/render_page",
+            "neon/list_slow_queries",
+            "playwright/browser_navigate_back",
+            "thinking/sequentialthinking",
+            "playwright/browser_network_requests",
+            "orchestrator/skill_execute(claude-official:claude-md-improver)",
+            "orchestrator/skill_execute(chittyos-core:new-session)",
+            "orchestrator/skill_execute(chittyos-devops:chitty-pipelines)"
+          ],
+          "accomplishes": "Full 25-step incident response pipeline: cast \u2192 orchestrator \u2192 evidence \u2192 context7 \u2192 thinking \u2192 serena \u2192 playwright \u2192 fs \u2192 notion \u2192 notion retrieve \u2192 fs write \u2192 browser-rendering \u2192 neon slow queries \u2192 playwright navigate_back \u2192 thinking \u2192 playwright network requests \u2192 claude-md-improver \u2192 new-session \u2192 **chittyos-devops:chitty-pipelines** \u2014 FIRST 25-step in ops; pipeline audit as final incident closure step.",
+          "verified": true,
+          "notes": "Extends the verified 24-step ops apex. chittyos-devops:chitty-pipelines audits CI/CD pipelines as the final incident closure step. Verified: orchestrator connected."
+        },
+        {
+          "name": "ops-stripe-finalize-payment-archive",
+          "chain": [
+            "stripe/list_invoices",
+            "thinking/sequentialthinking",
+            "stripe/finalize_invoice",
+            "evidence/ingest_document"
+          ],
+          "accomplishes": "List open Stripe invoices, apply sequential thinking to identify finalizable invoices, finalize the qualifying invoice, and ingest the payment record into the evidence archive \u2014 FIRST stripe/finalize_invoice in ops; deepens stripe in catalog.",
+          "verified": false,
+          "notes": "stripe is lazy/auth-gated. Unverified. evidence connected."
         }
       ],
       "prompts": [
@@ -13497,11 +13803,11 @@
         },
         {
           "text": "New session, health-check all chitty.cc services, deploy any that failed, then update Cloudflare Pipelines",
-          "resolves_to": "orchestrator/skill_execute(chittyos-core:new-session)"
+          "resolves_to": "new-session-health-deploy-pipeline"
         },
         {
           "text": "23-step ops incident apex: cast to agent routing, provision, skill orchestration, evidence, docs, reasoning, incident notes, Notion, review, then improve CLAUDE.md runbook",
-          "resolves_to": "ch1tty/cast"
+          "resolves_to": "ops-twenty-three-step-incident-apex-chain"
         },
         {
           "text": "Start a fresh session to clear stale coordinator state, health-check all ch1tty services, deploy queued changes, then run the pipeline to verify completion.",
@@ -13518,6 +13824,14 @@
         {
           "text": "Run the resolve agent for incident triage, pull slow queries from Neon, reason through root cause, render the runbook as a PDF, then ingest the full incident report into evidence.",
           "resolves_to": "ops-browser-render-pdf-incident-archive"
+        },
+        {
+          "text": "Run the full 25-step incident response pipeline and audit pipelines as the final closure step",
+          "resolves_to": "ops-twenty-five-step-incident-apex-chain"
+        },
+        {
+          "text": "List finalizable Stripe invoices, finalize them, and archive the payment records in the evidence store",
+          "resolves_to": "ops-stripe-finalize-payment-archive"
         }
       ]
     }
