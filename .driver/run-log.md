@@ -590,7 +590,7 @@
 
 ---
 
-### 2026-06-08T04:30Z — seventy-eighth-pass catalog (PR#TBD)
+### 2026-06-08T04:30Z — seventy-eighth-pass catalog (PR#274)
 
 - **Workstream advanced**: E (Alchemist catalog, 78th pass)
 - **Startup checks**: `npm ci` clean, `npm run build` clean (0 errors), `npm test` → 938 pass / 0 fail / 2 skip ✓
@@ -604,7 +604,7 @@
   - `chittyagent-intel` (bound) → `agent_execute(intel,status)` → `{action:executed, http_status:401}` ✓
   - `chittyagent-claude` (unbound) → `agent_execute(claude,status)` → `{action:redirect, domain:claude.agent.chitty.cc}` ✓
   - `chittyagent-ui` (unbound) → `agent_execute(ui,status)` → `{action:redirect, domain:agent.chitty.cc}` ✓
-- **New skills verified (all FIRST USE in catalog)**:
+- **New skills verified (all FIRST USE in catalog — 10 skills)**:
   - `claude-official:hookify` → `{action:local_invoke}` ✓
   - `claude-official:plugin-dev` → `{action:local_invoke}` ✓
   - `claude-official:claude-md-improver` → `{action:local_invoke}` ✓
@@ -614,8 +614,9 @@
   - `chittyos-core:chitty-cleanup` → `{action:local_invoke}` ✓
   - `migration:claude-opus-migration` → `{action:local_invoke}` ✓
   - `commit-commands:commit-push-pr` → `{action:local_invoke}` ✓
-  - `claude-official:code-review` → `{action:local_invoke}` ✓ (bonus verification)
-  - `commit-commands:commit` → `{action:local_invoke}` ✓ (bonus verification)
+  - `claude-official:code-review` → `{action:local_invoke}` ✓ (FIRST USE — named in combo `code/claude-md-improver-code-review-commit-push-pr`)
+- **Also bonus-verified (live confirmation, not added as named chain entry this pass)**:
+  - `commit-commands:commit` → `{action:local_invoke}` ✓
 - **12 new verified combos added (78th pass, 2 per profile)**:
   - **finance/auth-agent-token-ops-mercury-sweep**: FIRST chittyagent-auth — auth agent probe → mercury-finance skill
   - **finance/opus-migration-cashflow-sdk-docs**: FIRST migration:claude-opus-migration — Opus 4.5 migration → cashflow skill → context7 docs
@@ -629,7 +630,7 @@
   - **communication/chitty-cleanup-telegram-connector-brief**: FIRST chittyos-core:chitty-cleanup — Mac cleanup → Telegram brief
   - **ops/nb-defaults-chitty-cleanup-machine-sweep**: FIRST workflow:nb-development-defaults in ops — defaults → cleanup → machine-management sweep
   - **ops/opus-migration-deploy-compliance-audit**: FIRST migration:claude-opus-migration in ops — Opus migration → deploy → compliance audit
-- Catalog: 784 → 796 total, 389 → 401 verified (50.4%). 14 new FIRST-USE tools introduced.
+- Catalog: 784 → 796 total, 389 → 401 verified (50.4%). 15 new FIRST-USE tools introduced (5 agents + 10 skills).
 - Build clean. Tests: 938 pass / 0 fail / 2 skip ✓.
 - Branch: `auto/E-catalog-seventy-eighth-pass`. PR open. CI in progress.
 - **Workstream status**: A ✓ B ✓ C ✓ D ✓ E (in-flight; 796/401 verified; 395 unverified — all auth-gated)
