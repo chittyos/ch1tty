@@ -9,7 +9,7 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 - [x] **B** — GitHub MCP migration: `servers.json` `github` entry migrated to hosted remote `https://api.githubcopilot.com/mcp/` with `envHeaders: { "Authorization": "GITHUB_MCP_AUTHORIZATION" }`. Deprecated `@modelcontextprotocol/server-github` removed. ✅ DONE
 - [x] **C** — Focus-profile layer: `focus-profiles.json` (6 profiles: finance, governance, design, code, communication, ops), `src/focus.ts`, full aggregator integration (env `CH1TTY_FOCUS`, per-call `focus` param on `search`/`cast`, `status` reports active focus). Tests in `test/focus.test.ts` + coverage gap tests. ✅ DONE
 - [x] **D** — Scenario testing + simulation: `sim/` harness (`scenarios.ts`, `run.ts`, `fixture-backend.ts`), `test/scenario.test.ts`, `test/simulation.test.ts`, cloudflare-builds ops coverage fixtures + scenarios. ✅ DONE
-- [ ] **E** — Alchemist brainstorm: catalog in `focus-suggestions.json`. **IN PROGRESS** — 54th pass open at PR #248 (520 combos / 226 verified). `thinking/sequentialthinking` now leads chains in all 6 profiles (first ever as opener); `ch1tty/cast` in finance+communication; `cloudflare/AI-run-model` in design+code+ops.
+- [ ] **E** — Alchemist brainstorm: catalog in `focus-suggestions.json`. **IN PROGRESS** — 71st pass open (712 combos / 336 verified). FIRST 19-step chains across ALL 6 profiles (catalog record!). `cloudflare/get_worker_logs` now in all 6 profiles. `github/create_pull_request` in ops. `neon/prepare_database_migration` + `neon/compare_database_schema` in design.
 
 ## Blocker
 
@@ -1184,3 +1184,42 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 1. Merge PR for 70th pass when CI green
 2. 71st catalog pass: extend to 19-step chains (all 6 profiles now at 18-step max → target FIRST 19-step); `cloudflare/get_worker_logs` in governance + code + communication (still missing 3 profiles); `tasks/create_task` in finance + governance + design + code + communication (first-use in ops added this pass — 5 profiles still missing); deepen `session/create_session` chains now that all 6 profiles have it
 3. Fix Notion auth to verify the ~370 unverified combos: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`
+
+---
+
+### 2026-06-08 — Session auto-driver run (71st pass)
+
+**Workstream advanced**: E (Alchemist brainstorm — catalog 71st pass)
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass / 0 fail / 2 skipped
+- Found 1 open PR: #266 (70th pass, 700 combos, ALL CI green — CodeQL ✓, Analyze-actions ✓, Analyze-javascript-typescript ✓)
+- **Merged PR #266** (squash) → main now at 700 combos / 330 verified (70th pass)
+- Live gateway: v4.1.0, 15 servers, 8 connected, 81 tools, 345 active sessions
+- Notion auth still 401 — DRIVER-LOG.md fallback in use
+- Coverage gap analysis (post 70th-pass):
+  - `cloudflare/get_worker_logs`: ops (3), design (1), finance (1) — MISSING from governance, code, communication (3 profiles)
+  - `neon/prepare_database_migration` + `neon/compare_database_schema`: never used in design (rare tools)
+  - `github/create_pull_request`: code-only — missing from ops
+  - Max chains: ALL 6 profiles at 18-step verified — target: FIRST 19-step chains
+- Created branch `auto/E-catalog-seventy-first-pass`; added 12 new combos + 12 prompts (2 per profile):
+  - **finance**: `finance-nineteen-step-billing-grand-chain` ✅ (FIRST 19-step chain in entire catalog — extends 18-step with `neon/list_slow_queries`), `finance-cloudflare-worker-logs-billing-trace` (deepens cloudflare in finance)
+  - **governance**: `governance-nineteen-step-policy-grand-chain` ✅ (FIRST 19-step in governance — extends 18-step with `neon/run_sql`), `governance-cloudflare-worker-logs-audit-trail` (FIRST `cloudflare/get_worker_logs` in governance)
+  - **design**: `design-nineteen-step-ux-grand-chain` ✅ (FIRST 19-step in design — extends 18-step with `playwright/browser_click`), `design-neon-prepare-migration-schema-diff` (FIRST `neon/prepare_database_migration` + `neon/compare_database_schema` in design)
+  - **code**: `code-nineteen-step-impl-grand-chain` ✅ (FIRST 19-step in code — extends 18-step with `neon/list_slow_queries`), `code-cloudflare-worker-logs-debug-trace` (FIRST `cloudflare/get_worker_logs` in code)
+  - **communication**: `comm-nineteen-step-broadcast-grand-chain` ✅ (FIRST 19-step in communication — extends 18-step with `neon/run_sql`), `comm-cloudflare-worker-logs-channel-analytics` (FIRST `cloudflare/get_worker_logs` in communication)
+  - **ops**: `ops-nineteen-step-incident-grand-chain` ✅ (FIRST 19-step in ops — extends 18-step with `neon/list_slow_queries`), `ops-github-create-pr-deploy-gate` (FIRST `github/create_pull_request` in ops)
+- 6 new verified 19-step chains (catalog record!). 6 gap-filling combos (5 unverified: cloudflare/github gated on lazy remote).
+- Catalog: 700 → **712 combos / 330 → 336 verified**
+- 0 test failures. Tests: 938 pass / 0 fail / 2 skipped ✓
+
+**Branch / PR**: `auto/E-catalog-seventy-first-pass` → (PR to be opened)
+
+**Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
+
+**Board state**: 712 combos / 336 verified / 721 prompts. MILESTONES: FIRST 19-step chains in ALL 6 profiles simultaneously (catalog record!). `cloudflare/get_worker_logs` now in ALL 6 profiles (governance, code, communication added). `github/create_pull_request` FIRST in ops. `neon/prepare_database_migration` + `neon/compare_database_schema` FIRST in design.
+
+**Next run priority**:
+1. Merge 71st pass PR when CI green
+2. 72nd catalog pass: `tasks/create_task` in finance + governance + design + code + communication (only ops has it — 5 profiles missing); `stripe/finalize_invoice` first use (rare); `cloudflare-builds` deeper chains in non-ops profiles; 20-step chain attempt (extend a 19-step with 1 more unique step)
+3. Fix Notion auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` to unblock cross-run Notion board writes
