@@ -1,6 +1,6 @@
 {
-  "_comment": "88th pass — 916 combos / 443 verified / 937 prompts. FIRST USE: github/search_issues in 5 profiles (finance, governance, code, communication, ops). FIRST chittyos-core:chittyxl in governance, code, ops. FIRST workflow:market in finance, design, communication. FIRST user:cast in design. FIRST mcp-dev:build-mcp-server depth in design.",
-  "generatedFrom": "E-catalog-87th-pass",
+  "_comment": "89th pass — 928 combos / 443 verified / 949 prompts. FIRST imessage combos in 5 non-communication profiles (finance, governance, design, code, ops).",
+  "generatedFrom": "E-catalog-89th-pass",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools — now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time — combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -2079,6 +2079,27 @@
           "accomplishes": "Search GitHub issues tagged with billing labels, apply sequential reasoning to triage by severity, query Neon for affected customer billing records, and post a billing triage report to Notion.",
           "verified": false,
           "notes": "github lazy remote (GITHUB_MCP_AUTHORIZATION needed); neon auth-gated; notion 401. FIRST github/search_issues in finance."
+        },
+        {
+          "name": "finance-imessage-payment-failure-alert",
+          "chain": [
+            "stripe/list_payment_intents",
+            "imessage/send_message"
+          ],
+          "accomplishes": "Enumerate failed or pending Stripe payment intents and send a compact failure-alert summary directly via iMessage — instant mobile billing notifications without opening a dashboard.",
+          "verified": false,
+          "notes": "FIRST imessage combo in finance. stripe not connected (lazy); stripe/list_payment_intents inferred from @stripe/mcp surface. imessage disabled (macOS homelab only)."
+        },
+        {
+          "name": "finance-imessage-ledger-daily-summary",
+          "chain": [
+            "ledger/list_entries",
+            "thinking/sequentialthinking",
+            "imessage/send_message"
+          ],
+          "accomplishes": "Pull recent ChittyLedger append-only entries, reason over patterns and anomalies with sequential-thinking, then deliver a concise daily financial summary via iMessage — audit-trail-to-mobile in one chain.",
+          "verified": false,
+          "notes": "ledger disabled (enabled:false in servers.json). imessage disabled. thinking/sequentialthinking verified on live gateway."
         }
       ],
       "prompts": [
@@ -2677,6 +2698,14 @@
         {
           "text": "Search GitHub for billing-related issues, triage them by severity, query Neon for affected customer records, and post a billing triage report to Notion",
           "resolves_to": "finance-github-search-issues-billing-triage"
+        },
+        {
+          "text": "Check Stripe for failed payment intents and send me an iMessage alert with the failure summary",
+          "resolves_to": "finance-imessage-payment-failure-alert"
+        },
+        {
+          "text": "Pull today's ChittyLedger entries, analyze for anomalies, and send me an iMessage daily financial summary",
+          "resolves_to": "finance-imessage-ledger-daily-summary"
         }
       ]
     },
@@ -5009,6 +5038,27 @@
           "accomplishes": "Search GitHub for open compliance-related issues, cross-reference findings with the evidence store, reason over regulatory posture and risk, and post a compliance audit summary to Notion.",
           "verified": false,
           "notes": "github lazy remote; notion 401. FIRST github/search_issues in governance."
+        },
+        {
+          "name": "governance-imessage-policy-approval-request",
+          "chain": [
+            "linear/list_issues",
+            "notion/API-post-page",
+            "imessage/send_message"
+          ],
+          "accomplishes": "Enumerate open governance/policy issues from Linear, draft a structured approval-request page in Notion, then notify the decision-maker via iMessage — closing the loop from issue discovery to mobile-delivered approval prompt.",
+          "verified": false,
+          "notes": "FIRST imessage combo in governance. linear/list_issues and notion/API-post-page verified. imessage disabled (macOS homelab)."
+        },
+        {
+          "name": "governance-imessage-session-status-pulse",
+          "chain": [
+            "session/get_session",
+            "imessage/send_message"
+          ],
+          "accomplishes": "Read the active ChittyOS session coordinator state and forward a heartbeat summary via iMessage — keeps mobile stakeholders in the loop on long-running orchestration without polling or a dashboard.",
+          "verified": false,
+          "notes": "session disabled (enabled:false). imessage disabled. Minimal 2-step chain; useful as a mobile ops pulse when both backends are available."
         }
       ],
       "prompts": [
@@ -5691,6 +5741,14 @@
         {
           "text": "Search GitHub for open compliance issues, cross-reference with the evidence store, and post a compliance audit summary to Notion",
           "resolves_to": "governance-github-search-issues-compliance-audit"
+        },
+        {
+          "text": "Find open governance policy issues in Linear, draft a Notion approval-request page, and notify the decision-maker via iMessage",
+          "resolves_to": "governance-imessage-policy-approval-request"
+        },
+        {
+          "text": "Read the active session coordinator state and send a heartbeat status summary via iMessage",
+          "resolves_to": "governance-imessage-session-status-pulse"
         }
       ]
     },
@@ -7659,6 +7717,27 @@
           "accomplishes": "Browse the workflow market to identify a UX design plugin, spin up a new MCP server scaffold via mcp-dev:build-mcp-server, navigate to the plugin docs page for visual context, reason over integration requirements, and write an installation plan.",
           "verified": true,
           "notes": "orchestrator confirmed connected; workflow:market + mcp-dev:build-mcp-server confirmed; playwright, thinking, fs verified. FIRST workflow:market in design."
+        },
+        {
+          "name": "design-imessage-visual-preview-share",
+          "chain": [
+            "playwright/screenshot",
+            "imessage/send_message"
+          ],
+          "accomplishes": "Capture a browser screenshot of a design URL via Playwright and send the visual result via iMessage — instant mobile design review without opening a browser or sharing a link.",
+          "verified": false,
+          "notes": "FIRST imessage combo in design. playwright/screenshot verified. imessage disabled (macOS homelab)."
+        },
+        {
+          "name": "design-imessage-feedback-thread-to-notion",
+          "chain": [
+            "imessage/get_recent_messages",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Pull recent iMessage threads for design feedback, reason over recurring themes and action items with sequential-thinking, then persist structured findings as a Notion design-review page — informal mobile input formalized into trackable documentation.",
+          "verified": false,
+          "notes": "imessage disabled. thinking/sequentialthinking and notion/API-post-page verified. Mirror of the comm-profile imessage-thread-to-brief pattern, applied to design feedback capture."
         }
       ],
       "prompts": [
@@ -8221,6 +8300,14 @@
         {
           "text": "Browse the workflow market for a UX plugin, scaffold a new MCP server for it, navigate to its docs page, and write an installation plan",
           "resolves_to": "design-workflow-market-ux-plugin-install"
+        },
+        {
+          "text": "Take a Playwright screenshot of this design URL and send the visual preview via iMessage",
+          "resolves_to": "design-imessage-visual-preview-share"
+        },
+        {
+          "text": "Pull recent iMessage design feedback threads, reason over action items, and save findings as a Notion design-review page",
+          "resolves_to": "design-imessage-feedback-thread-to-notion"
         }
       ]
     },
@@ -10534,6 +10621,27 @@
           "accomplishes": "Persist the current sprint architecture context via chittyxl for session continuity, look up library docs for the active dependency set, cross-reference the evidence store for architectural precedents, reason over the design, and write an architecture decision record.",
           "verified": true,
           "notes": "orchestrator + chittyxl confirmed; context7, evidence, thinking, fs verified live. FIRST chittyxl in code."
+        },
+        {
+          "name": "code-imessage-deploy-status-alert",
+          "chain": [
+            "cloudflare-builds/list_builds",
+            "imessage/send_message"
+          ],
+          "accomplishes": "Check recent Cloudflare Worker build and deploy status and fire a pass/fail alert via iMessage — lightweight mobile deploy notification without a CI dashboard or webhook setup.",
+          "verified": false,
+          "notes": "FIRST imessage combo in code. cloudflare-builds/list_builds verified. imessage disabled (macOS homelab)."
+        },
+        {
+          "name": "code-imessage-pr-review-digest",
+          "chain": [
+            "github/search_pull_requests",
+            "thinking/sequentialthinking",
+            "imessage/send_message"
+          ],
+          "accomplishes": "Discover open PRs needing review via GitHub search, reason over priority and reviewer assignments with sequential-thinking, then send a targeted review-request digest via iMessage — bridging GitHub PR state to mobile action.",
+          "verified": false,
+          "notes": "github not connected (lazy). thinking/sequentialthinking verified. imessage disabled. github/search_pull_requests inferred from official GitHub hosted MCP."
         }
       ],
       "prompts": [
@@ -11204,6 +11312,14 @@
         {
           "text": "Persist sprint architecture context via chittyxl, pull library docs, search evidence for architectural precedents, and write an architecture decision record",
           "resolves_to": "code-chittyxl-sprint-architecture-session"
+        },
+        {
+          "text": "Check Cloudflare Worker build status and send me an iMessage deploy pass/fail alert",
+          "resolves_to": "code-imessage-deploy-status-alert"
+        },
+        {
+          "text": "Find open PRs needing review, prioritize them, and send a review-request digest via iMessage",
+          "resolves_to": "code-imessage-pr-review-digest"
         }
       ]
     },
@@ -13169,6 +13285,29 @@
           "accomplishes": "Search GitHub for issues assigned to the team, reason over priorities and blockers, post a team status update to Notion, and create tasks for items requiring immediate action.",
           "verified": false,
           "notes": "github lazy; tasks lazy; notion 401. FIRST github/search_issues in communication."
+        },
+        {
+          "name": "comm-chittyevidence-neon-audience-memo",
+          "chain": [
+            "chittyevidence/search",
+            "neon/run_sql",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search ChittyEvidence for source documents on a topic, join against Neon subscriber or contact records to identify the target audience, then create a structured broadcast memo in Notion — evidence-backed audience-targeted communication.",
+          "verified": false,
+          "notes": "chittyevidence lazy (enabled:true but requires auth). neon lazy. notion/API-post-page verified. Three-backend cross-domain comm chain; canonical source of truth → audience data → memo output."
+        },
+        {
+          "name": "comm-cloudflare-builds-release-announce",
+          "chain": [
+            "cloudflare-builds/list_builds",
+            "thinking/sequentialthinking",
+            "notion/API-post-page",
+            "imessage/send_message"
+          ],
+          "accomplishes": "Pull recent Cloudflare Worker deployments, reason over changes and user-facing impact, synthesize structured release notes in Notion, and broadcast the announcement via iMessage — automated deploy-to-stakeholder announcement pipeline.",
+          "verified": false,
+          "notes": "cloudflare-builds verified. thinking/sequentialthinking and notion/API-post-page verified. imessage disabled. Four-step chain: builds → reasoning → docs → notify."
         }
       ],
       "prompts": [
@@ -13739,6 +13878,14 @@
         {
           "text": "Search GitHub issues assigned to the team, reason over priorities, post a team status to Notion, and create tasks for action items",
           "resolves_to": "comm-github-search-issues-team-update"
+        },
+        {
+          "text": "Search ChittyEvidence for documents on a topic, find the target audience in Neon, and create a Notion broadcast memo",
+          "resolves_to": "comm-chittyevidence-neon-audience-memo"
+        },
+        {
+          "text": "Pull recent Cloudflare deployments, write release notes in Notion, and announce them via iMessage",
+          "resolves_to": "comm-cloudflare-builds-release-announce"
         }
       ]
     },
@@ -16056,6 +16203,28 @@
           "accomplishes": "Search GitHub for open infrastructure issues and CVEs, query Neon for affected service records, cross-reference with the evidence store for prior audit findings, reason over risk posture, and post an infrastructure audit report to Notion.",
           "verified": false,
           "notes": "github lazy; neon auth-gated; notion 401. FIRST github/search_issues in ops."
+        },
+        {
+          "name": "ops-imessage-incident-escalation",
+          "chain": [
+            "orchestrator/skill_search(incident-responder)",
+            "neon/run_sql",
+            "imessage/send_message"
+          ],
+          "accomplishes": "Invoke the orchestrator's incident-responder skill to surface the current system incident state, query Neon for correlated error data, then escalate via iMessage — on-call mobile escalation without a pager service or webhook.",
+          "verified": false,
+          "notes": "FIRST imessage combo in ops. orchestrator connected (non-lazy). neon lazy. imessage disabled. orchestrator/skill_search(incident-responder) inferred from orchestrator surface."
+        },
+        {
+          "name": "ops-imessage-health-digest",
+          "chain": [
+            "neon/run_sql",
+            "thinking/sequentialthinking",
+            "imessage/send_message"
+          ],
+          "accomplishes": "Query Neon for key operational metrics — error rates, queue depth, recent deployment counts — reason over anomalies with sequential-thinking, and deliver a structured ops health digest via iMessage — daily mobile ops briefing without a dashboard.",
+          "verified": false,
+          "notes": "neon lazy. thinking/sequentialthinking verified. imessage disabled. Clean 3-step ops pulse chain; neon/run_sql verified in prior ops combos."
         }
       ],
       "prompts": [
@@ -16734,6 +16903,14 @@
         {
           "text": "Search GitHub for open infra issues and CVEs, query Neon for affected services, cross-reference evidence, and post an infrastructure audit report to Notion",
           "resolves_to": "ops-github-search-issues-infra-audit"
+        },
+        {
+          "text": "Run the incident-responder skill, query Neon for correlated errors, and escalate the incident summary via iMessage",
+          "resolves_to": "ops-imessage-incident-escalation"
+        },
+        {
+          "text": "Query Neon for ops metrics, reason over anomalies, and send a structured health digest via iMessage",
+          "resolves_to": "ops-imessage-health-digest"
         }
       ]
     }
