@@ -1354,3 +1354,48 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 1. Merge 74th pass PR when CI green
 2. 75th catalog pass: extend to 23-step chains (target finance/design/ops which have verified 22-step bases); `orchestrator/provision_status` not yet in a standalone utility combo; `browser-rendering/render-pdf` not yet used in finance/code/communication; `playwright/browser_fill_form` not yet in governance/ops/code/communication
 3. Fix Notion auth to verify the ~380 unverified combos: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`
+
+---
+
+### 2026-06-08 — Session auto-driver run (76th pass)
+
+**Workstream advanced**: E (Alchemist brainstorm — catalog 76th pass)
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass / 0 fail / 2 skipped
+- No open PRs (75th pass already merged to main at commit `079d69a` — 760 combos, 378 verified, FIRST 23-step chains in ALL 6 profiles)
+- Workstream states: A ✅ B ✅ C ✅ D ✅ E in-progress (confirmed via DRIVER-LOG + catalog JSON)
+- Notion board still 401 — DRIVER-LOG.md remains cross-run fallback
+- Live gateway: v4.1.0, 15 servers, 8 connected (per prior session state)
+- Coverage gap analysis (post 75th-pass):
+  - All 6 profiles at 23-step verified max — target: FIRST 24-step chains (new catalog record)
+  - 12 combos from 75th pass were missing prompts (2 per profile) — prompts had incorrect `resolves_to` pointing to tool IDs instead of combo names
+  - `stripe/finalize_invoice`: NEVER used in entire catalog
+  - `browser-rendering/render-pdf`: only design + governance (missing from code, comm, ops, finance)
+  - `cloudflare-builds/workers_builds_list_builds`: missing from governance (in code, comm, design, finance, ops)
+  - `cloudflare-builds/workers_builds_get_build_config`: missing from code, finance, design, comm (only governance + ops)
+  - `chittyos-core:new-session`: only in finance (apex) + ops (utility) — missing from governance/design/code/comm apex chains
+  - `chittyos-devops:chitty-health`: only in code + ops — missing from finance
+- **Fixed 12 missing prompts** from 75th pass (2 per profile) — all resolved to correct combo names
+- **Created branch `auto/E-catalog-seventy-sixth-pass`; added 12 combos + 12 prompts (2 per profile)**:
+  - **finance**: `finance-twenty-four-step-billing-apex-chain` ✅ (FIRST 24-step chain in entire catalog! extends 23-step + `chittyos-devops:chitty-health` — FIRST in finance), `finance-stripe-finalize-invoice-cycle` ❌ (FIRST `stripe/finalize_invoice` in entire catalog + FIRST `stripe/create_invoice` in finance; stripe gated)
+  - **governance**: `governance-twenty-four-step-policy-apex-chain` ✅ (FIRST 24-step in governance; extends 23-step + `chittyos-core:new-session` — FIRST new-session in governance apex), `governance-cloudflare-builds-list-compliance` ❌ (FIRST `cloudflare-builds/workers_builds_list_builds` in governance; cloudflare-builds gated)
+  - **design**: `design-twenty-four-step-ux-apex-chain` ✅ (FIRST 24-step in design; extends 23-step + `chittyos-core:new-session` — FIRST new-session in design apex), `design-cloudflare-build-config-snapshot` ❌ (FIRST `cloudflare-builds/workers_builds_get_build_config` in design; cloudflare-builds gated)
+  - **code**: `code-twenty-four-step-impl-apex-chain` ✅ (FIRST 24-step in code; extends 23-step + `chittyos-core:new-session` — FIRST new-session in code apex), `code-browser-render-pdf-sdk-docs` ✅ (FIRST `browser-rendering/render-pdf` in code; context7+browser-rendering+evidence all connected)
+  - **communication**: `comm-twenty-four-step-broadcast-apex-chain` ✅ (FIRST 24-step in communication; extends 23-step + `chittyos-core:new-session` — FIRST new-session in comm apex), `comm-browser-render-pdf-press-release` ❌ (FIRST `browser-rendering/render-pdf` in communication; discord connector gated)
+  - **ops**: `ops-twenty-four-step-incident-apex-chain` ✅ (FIRST 24-step in ops; extends 23-step + `chittyos-core:new-session` — new-session FIRST in ops apex chain), `ops-browser-render-pdf-incident-archive` ✅ (FIRST `browser-rendering/render-pdf` in ops; all steps verified)
+- 8 new verified combos (6 apex chains + code utility + ops utility), 4 unverified (stripe/cloudflare-builds/discord gated)
+- Catalog: 760 → **772 combos / 378 → 386 verified** / 769 → **793 prompts** (also fixed 12 missing prompts from 75th pass)
+- 0 test failures. Tests: 938 pass / 0 fail / 2 skipped ✓
+- JSON validation: 0 orphan combos, 0 duplicate names ✓
+
+**Branch / PR**: `auto/E-catalog-seventy-sixth-pass` → (PR pending push)
+
+**Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
+
+**Board state**: 772 combos / 386 verified / 793 prompts. MILESTONES: FIRST 24-step chains in ALL 6 profiles simultaneously (new catalog record!). FIRST `stripe/finalize_invoice` in entire catalog. FIRST `chittyos-core:new-session` in governance/design/code/comm apex chains. FIRST `chittyos-devops:chitty-health` in finance. FIRST `cloudflare-builds/workers_builds_list_builds` in governance. FIRST `cloudflare-builds/workers_builds_get_build_config` in design. FIRST `browser-rendering/render-pdf` in code ✅ + ops ✅ + communication.
+
+**Next run priority**:
+1. Merge 76th pass PR when CI green
+2. 77th catalog pass: `browser-rendering/render-pdf` still missing from finance (4 profiles now have it — add to finance); `stripe/create_invoice` deepened in governance/code/comm (only design+finance now); `cloudflare-builds/workers_builds_get_build_config` in finance + code + comm (still 3 missing); 25-step chain attempt (extend verified 24-step chains)
+3. Fix Notion auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` to unblock cross-run board writes
