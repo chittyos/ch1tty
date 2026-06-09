@@ -1,6 +1,6 @@
 {
-  "_comment": "98th pass — 1036 combos / 480 verified / 1057 prompts. COMPLETES to ALL 6 profiles: stripe/create_customer (design), cloudflare-builds/list_builds (governance+design), evidence/ai_search(chittyevidence-search) (finance+code), playwright/browser_network_requests (communication), fs/create_directory (communication), stripe/create_invoice (code+ops). 6 tools completed to ALL 6 this pass.",
-  "generatedFrom": "E-catalog-ninety-seventh-pass",
+  "_comment": "100th pass — 1072 combos / 1093 prompts. COMPLETES to ALL 6 profiles: all 14 previously partial-coverage tools now at 6/6 (fs/read_text_file, github/create_or_update_file, neon/run_sql_transaction, orchestrator/agent_execute(canon), cloudflare/list_workers, neon/describe_project, orchestrator/skill_execute(chittyos-core:chittyxl), playwright/browser_network_request, orchestrator/skill_execute(pr-review:review-pr), notion/create_page, fs/get_file_info, notion/API-retrieve-a-block, github/push_files, notion/API-get-users). First run with ZERO remaining 4/6 gaps.",
+  "generatedFrom": "E-catalog-hundredth-pass",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools — now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time — combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -2317,6 +2317,40 @@
           "accomplishes": "Fetch the live HTML from a financial rates source (e.g. SOFR, prime rate), extract the current rate values, run SQL to update the billing model in Neon with the new rates, and post the rate snapshot to the finance Notion workspace.",
           "verified": false,
           "notes": "FIRST browser-rendering/get_url_html_content in finance (4/6 → 5/6, governance still missing)."
+        },
+        {
+          "name": "finance-notion-api-create-page-billing-report",
+          "chain": [
+            "thinking/sequentialthinking",
+            "evidence/search",
+            "notion/API-create-a-page",
+            "neon/run_sql"
+          ],
+          "accomplishes": "Apply sequential reasoning to structure a billing summary, search ChittyEvidence for financial signal data, create a new dedicated Notion page for the report, then cross-reference against the billing database in Neon.",
+          "verified": false,
+          "notes": "FIRST notion/API-create-a-page in ENTIRE catalog (0/6 → 1/6)."
+        },
+        {
+          "name": "finance-notion-api-get-users-billing-team-access",
+          "chain": [
+            "thinking/sequentialthinking",
+            "notion/API-get-users",
+            "neon/run_sql",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Reason about billing team membership, list Notion workspace users to verify access permissions, run SQL against the billing database to confirm per-user entitlements, and post the access audit summary to the finance Notion workspace.",
+          "verified": false,
+          "notes": "FIRST notion/API-get-users in finance (was missing from finance+design)."
+        },
+        {
+          "name": "pr-review-billing-compliance",
+          "chain": [
+            "orchestrator/skill_execute(pr-review:review-pr)",
+            "stripe/list_invoices"
+          ],
+          "accomplishes": "Run the automated PR review skill to check a code change against billing compliance rules, then pull the current Stripe invoice list to verify no billing impact — code-to-billing audit chain.",
+          "verified": false,
+          "notes": "orchestrator skill unverified (remote). stripe lazy (inferred from @stripe/mcp surface)."
         }
       ],
       "prompts": [
@@ -2995,6 +3029,18 @@
         {
           "text": "Fetch the current prime rate from a rates page and update the billing model in Neon",
           "resolves_to": "finance-browser-rendering-rates-page-snapshot"
+        },
+        {
+          "text": "Create a new Notion billing report page from evidence signals and Neon database data",
+          "resolves_to": "finance-notion-api-create-page-billing-report"
+        },
+        {
+          "text": "Audit billing team Notion access and verify entitlements against the billing database",
+          "resolves_to": "finance-notion-api-get-users-billing-team-access"
+        },
+        {
+          "text": "Review this billing-related PR for compliance and pull the Stripe invoice list to check for impact",
+          "resolves_to": "pr-review-billing-compliance"
         }
       ]
     },
@@ -5568,6 +5614,40 @@
           "accomplishes": "Navigate to the internal policy publication portal, take a screenshot of the current policy status and publication timeline, search ChittyEvidence for related compliance signals and regulatory changes, and post the policy audit snapshot to the governance workspace.",
           "verified": false,
           "notes": "FIRST playwright/browser_screenshot in governance (4/6 → 5/6, communication still missing)."
+        },
+        {
+          "name": "governance-playwright-hover-policy-portal-tooltip",
+          "chain": [
+            "playwright/browser_click",
+            "playwright/browser_hover",
+            "evidence/ai_search",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Navigate to the policy portal, hover over policy navigation elements to expose tooltip text, AI-search ChittyEvidence for cross-referenced policy definitions, and post the captured tooltip content as a compliance audit record in Notion.",
+          "verified": false,
+          "notes": "FIRST playwright/browser_hover in governance — completes to ALL 6 profiles ✅."
+        },
+        {
+          "name": "governance-browser-rendering-policy-portal-html-audit",
+          "chain": [
+            "thinking/sequentialthinking",
+            "browser-rendering/get_url_html_content",
+            "evidence/ai_search",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Reason about the governance portal to inspect, fetch full HTML of the policy portal page, AI-search for relevant policy evidence, and post the HTML audit report to the governance Notion workspace.",
+          "verified": false,
+          "notes": "FIRST browser-rendering/get_url_html_content in governance — completes to ALL 6 profiles ✅."
+        },
+        {
+          "name": "worker-deployment-governance",
+          "chain": [
+            "cloudflare/list_workers",
+            "chittyevidence/log_evidence"
+          ],
+          "accomplishes": "List all active Cloudflare Worker deployments and log the deployment state as immutable governance evidence — creating an auditable record of what was deployed at a point in time.",
+          "verified": false,
+          "notes": "cloudflare remote, not connected in this session. chittyevidence local node backend, lazy."
         }
       ],
       "prompts": [
@@ -6330,6 +6410,18 @@
         {
           "text": "Screenshot the policy portal status and cross-reference with ChittyEvidence compliance signals",
           "resolves_to": "governance-playwright-screenshot-policy-portal-audit"
+        },
+        {
+          "text": "Hover over policy portal navigation tooltips and audit them against ChittyEvidence policy definitions",
+          "resolves_to": "governance-playwright-hover-policy-portal-tooltip"
+        },
+        {
+          "text": "Fetch policy portal HTML and audit it against evidence-backed governance standards",
+          "resolves_to": "governance-browser-rendering-policy-portal-html-audit"
+        },
+        {
+          "text": "List all deployed Cloudflare workers and log the deployment state as governance evidence",
+          "resolves_to": "worker-deployment-governance"
         }
       ]
     },
@@ -8537,6 +8629,130 @@
           "accomplishes": "List the most recent Cloudflare Workers builds for frontend services, retrieve the build logs to verify asset compilation succeeded, screenshot the deployed UI to visually confirm the deployment, and post the frontend build review to the design workspace.",
           "verified": false,
           "notes": "FIRST cloudflare-builds/list_builds in design — COMPLETES to ALL 6 profiles! FIRST workers_builds_get_build_logs in design."
+        },
+        {
+          "name": "design-github-create-pr-component-review-request",
+          "chain": [
+            "playwright/browser_screenshot",
+            "thinking/sequentialthinking",
+            "github/create_pull_request",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Screenshot the current component design state, reason about what changed, create a pull request on GitHub requesting UX review, and post the PR summary and design rationale to the design Notion workspace.",
+          "verified": false,
+          "notes": "FIRST github/create_pull_request in design (4/6 → 5/6; communication already added this pass → ALL 6)."
+        },
+        {
+          "name": "design-github-push-files-design-system-docs-update",
+          "chain": [
+            "fs/read_file",
+            "thinking/sequentialthinking",
+            "github/push_files",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Read local design system token files, reason about breaking changes and versioning, push the updated documentation files directly to the GitHub repo, and post a design system release note to Notion.",
+          "verified": false,
+          "notes": "FIRST github/push_files in design (4/6 → 5/6; communication already added this pass → ALL 6)."
+        },
+        {
+          "name": "spec-file-to-visual-proof",
+          "chain": [
+            "fs/read_text_file",
+            "playwright/browser_screenshot"
+          ],
+          "accomplishes": "Read a local design specification or acceptance criteria file and take a browser screenshot of the live implementation — creating a before/after visual proof for design review without leaving the terminal.",
+          "verified": false,
+          "notes": "fs/read_text_file verified. playwright browser_screenshot: lazy backend."
+        },
+        {
+          "name": "design-asset-commit-and-preview",
+          "chain": [
+            "github/create_or_update_file",
+            "browser-rendering/render_page"
+          ],
+          "accomplishes": "Commit a design config file or SVG asset to GitHub and render a browser preview of the updated page — closing the design → commit → visual-verify loop in a single chain.",
+          "verified": false,
+          "notes": "github not connected. browser-rendering remote (browser.mcp.cloudflare.com) — not connected in this session."
+        },
+        {
+          "name": "network-intercept-design-data",
+          "chain": [
+            "playwright/browser_network_request",
+            "browser-rendering/render_page"
+          ],
+          "accomplishes": "Intercept a network request carrying dynamic design data (e.g. a design-token API or a CMS content endpoint) and immediately render the page it feeds — useful for design QA of data-driven components.",
+          "verified": false,
+          "notes": "playwright lazy. browser-rendering remote, not connected."
+        },
+        {
+          "name": "notion-brief-to-screenshot",
+          "chain": [
+            "notion/create_page",
+            "browser-rendering/get_url_screenshot"
+          ],
+          "accomplishes": "Create a Notion design brief page for a new feature or screen, then capture a screenshot of the reference URL linked in the brief — co-locating the brief and visual reference in one automated step.",
+          "verified": false,
+          "notes": "notion/create_page via local notion-mcp-wrapper. browser-rendering remote, not connected."
+        },
+        {
+          "name": "chittyxl-design-orchestration",
+          "chain": [
+            "orchestrator/skill_execute(chittyos-core:chittyxl)",
+            "playwright/browser_screenshot"
+          ],
+          "accomplishes": "Run the ChittyXL orchestration skill to coordinate a multi-service design task (e.g. generating assets across services), then screenshot the result in the browser for visual sign-off.",
+          "verified": false,
+          "notes": "orchestrator skill unverified. playwright lazy."
+        },
+        {
+          "name": "canon-agent-visual-audit",
+          "chain": [
+            "orchestrator/agent_execute(canon)",
+            "playwright/browser_screenshot"
+          ],
+          "accomplishes": "Execute the canon agent to resolve a high-level design intent across backends, then take a browser screenshot to visually audit that the rendered output matches the intent — agent output meets the eye test.",
+          "verified": false,
+          "notes": "orchestrator remote. playwright lazy."
+        },
+        {
+          "name": "design-sql-token-preview",
+          "chain": [
+            "neon/run_sql_transaction",
+            "browser-rendering/render_page"
+          ],
+          "accomplishes": "Write updated design tokens or theme values to the database via a SQL transaction, then render the page to see the visual update live — closing the design-token → DB → preview loop.",
+          "verified": false,
+          "notes": "neon lazy. browser-rendering remote, not connected."
+        },
+        {
+          "name": "file-info-design-asset-audit",
+          "chain": [
+            "fs/get_file_info",
+            "browser-rendering/render_page"
+          ],
+          "accomplishes": "Inspect file metadata (size, modified date, MIME type) for a design asset, then render the associated page to verify the asset is serving correctly — a quick design-asset health check.",
+          "verified": false,
+          "notes": "fs/get_file_info verified. browser-rendering remote, not connected in this session."
+        },
+        {
+          "name": "notion-block-to-design-render",
+          "chain": [
+            "notion/API-retrieve-a-block",
+            "browser-rendering/render_page"
+          ],
+          "accomplishes": "Retrieve a design specification block from Notion (wireframe notes, color tokens, layout rules) and render the target page in the browser to compare implementation against the spec block.",
+          "verified": false,
+          "notes": "notion/API-retrieve-a-block verified via notion-mcp. browser-rendering remote, not connected."
+        },
+        {
+          "name": "notion-team-roster-design-context",
+          "chain": [
+            "notion/API-get-users",
+            "notion/create_page"
+          ],
+          "accomplishes": "Retrieve the list of Notion workspace users (designers, reviewers) and create a design-review page pre-populated with the right collaborators — automating the setup of design feedback sessions.",
+          "verified": false,
+          "notes": "notion/API-get-users and notion/create_page both via local notion-mcp."
         }
       ],
       "prompts": [
@@ -9179,6 +9395,54 @@
         {
           "text": "Review the latest frontend Cloudflare Workers builds and screenshot the deployed UI for visual verification",
           "resolves_to": "design-cloudflare-builds-list-frontend-deploy-visual-verify"
+        },
+        {
+          "text": "Screenshot a design component and open a GitHub PR requesting UX review",
+          "resolves_to": "design-github-create-pr-component-review-request"
+        },
+        {
+          "text": "Push updated design system documentation to GitHub and post a release note to Notion",
+          "resolves_to": "design-github-push-files-design-system-docs-update"
+        },
+        {
+          "text": "Read the design spec file and take a screenshot of the live implementation to compare",
+          "resolves_to": "spec-file-to-visual-proof"
+        },
+        {
+          "text": "Commit this SVG asset to GitHub and render a browser preview of the updated page",
+          "resolves_to": "design-asset-commit-and-preview"
+        },
+        {
+          "text": "Intercept the design-token API response and render the page it feeds",
+          "resolves_to": "network-intercept-design-data"
+        },
+        {
+          "text": "Create a Notion brief for this feature and attach a screenshot of the reference URL",
+          "resolves_to": "notion-brief-to-screenshot"
+        },
+        {
+          "text": "Run the ChittyXL design workflow and screenshot the result for visual sign-off",
+          "resolves_to": "chittyxl-design-orchestration"
+        },
+        {
+          "text": "Execute the canon agent on this design intent and screenshot the rendered output",
+          "resolves_to": "canon-agent-visual-audit"
+        },
+        {
+          "text": "Update the design tokens in the database and render the page to see the change",
+          "resolves_to": "design-sql-token-preview"
+        },
+        {
+          "text": "Check the size and modified date of this design asset and render the page to verify it's serving",
+          "resolves_to": "file-info-design-asset-audit"
+        },
+        {
+          "text": "Get the design spec block from Notion and render the page to compare against it",
+          "resolves_to": "notion-block-to-design-render"
+        },
+        {
+          "text": "Get the Notion workspace user list and set up a design-review page with the right collaborators",
+          "resolves_to": "notion-team-roster-design-context"
         }
       ]
     },
@@ -11738,6 +12002,40 @@
           "accomplishes": "List merged pull requests in the billing SDK repository to scope the release coverage, create a Stripe test invoice to validate the SDK invoice generation logic end-to-end, run SQL to verify the billing event was persisted correctly in the Neon database, and post the test report to Notion.",
           "verified": false,
           "notes": "FIRST stripe/create_invoice in code (4/6 → 5/6 — COMPLETES to ALL 6 with ops combo)."
+        },
+        {
+          "name": "code-fs-get-file-info-module-dependency-metadata",
+          "chain": [
+            "fs/get_file_info",
+            "context7/resolve-library-id",
+            "context7/get-library-docs",
+            "notion/API-create-a-page"
+          ],
+          "accomplishes": "Get filesystem metadata for a module file (size, modification time, type), resolve the library ID for its primary dependency, fetch the library documentation, and create a new Notion spec page with the module metadata and dependency docs for the team.",
+          "verified": false,
+          "notes": "FIRST fs/get_file_info in code (4/6 → 5/6). Also adds notion/API-create-a-page to code."
+        },
+        {
+          "name": "code-notion-api-create-page-release-spec-publish",
+          "chain": [
+            "serena/search_code",
+            "context7/get-library-docs",
+            "notion/API-create-a-page",
+            "github/push_files"
+          ],
+          "accomplishes": "Search the codebase for the implementation pattern to document, fetch the relevant library docs via Context7, create a new Notion spec page with the documented pattern, then push supporting reference files to the GitHub repository.",
+          "verified": false,
+          "notes": "notion/API-create-a-page in code (2nd combo using it across catalog)."
+        },
+        {
+          "name": "notion-code-doc-page",
+          "chain": [
+            "notion/create_page",
+            "github/create_issue"
+          ],
+          "accomplishes": "Create a Notion documentation page for a new module or API design, then open a linked GitHub issue to track implementation — keeping design docs and engineering tickets in sync from the start.",
+          "verified": false,
+          "notes": "notion/create_page via local notion-mcp. github not connected in this session."
         }
       ],
       "prompts": [
@@ -12488,6 +12786,18 @@
         {
           "text": "Test the billing SDK by creating a Stripe invoice and verifying the event in Neon",
           "resolves_to": "code-stripe-create-invoice-billing-sdk-test"
+        },
+        {
+          "text": "Get module file metadata, resolve library docs, and create a Notion spec page for the team",
+          "resolves_to": "code-fs-get-file-info-module-dependency-metadata"
+        },
+        {
+          "text": "Search code for a pattern, fetch library docs, publish a Notion spec page, and push reference files to GitHub",
+          "resolves_to": "code-notion-api-create-page-release-spec-publish"
+        },
+        {
+          "text": "Create a Notion doc page for this new module and open a GitHub issue to track implementation",
+          "resolves_to": "notion-code-doc-page"
         }
       ]
     },
@@ -14694,6 +15004,130 @@
           "accomplishes": "Plan a message archival strategy using sequential thinking to determine structure and retention rules, create a new archive directory on the filesystem, write the exported message threads to the archive, and post the archival completion notice to the team Notion workspace.",
           "verified": false,
           "notes": "FIRST fs/create_directory in communication — COMPLETES to ALL 6 profiles!"
+        },
+        {
+          "name": "comm-playwright-screenshot-broadcast-ui-validation",
+          "chain": [
+            "playwright/browser_screenshot",
+            "thinking/sequentialthinking",
+            "notion/API-post-page",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Screenshot the broadcast message UI to verify formatting, reason about any layout issues found, post the validation screenshot and findings to the communication Notion workspace, and create a follow-up task for any design fixes needed.",
+          "verified": false,
+          "notes": "FIRST playwright/browser_screenshot in communication — completes to ALL 6 profiles ✅."
+        },
+        {
+          "name": "comm-github-create-pr-release-team-broadcast",
+          "chain": [
+            "thinking/sequentialthinking",
+            "github/create_pull_request",
+            "notion/API-post-page",
+            "chittymac/send_notification"
+          ],
+          "accomplishes": "Reason about the release scope and changelog, create a pull request on GitHub for the release branch, post the release notes to Notion, and send a team broadcast notification via ChittaMac with the PR link.",
+          "verified": false,
+          "notes": "FIRST github/create_pull_request in communication — completes to ALL 6 profiles ✅."
+        },
+        {
+          "name": "read-file-and-share-imessage",
+          "chain": [
+            "fs/read_text_file",
+            "imessage/send_imessage"
+          ],
+          "accomplishes": "Read a local text file (meeting notes, release announcement, team update) and send its contents via iMessage to a contact or group — turning a local document into a direct async message.",
+          "verified": false,
+          "notes": "fs/read_text_file verified. imessage/send_imessage: chittymac backend, connected on macOS hosts."
+        },
+        {
+          "name": "commit-doc-and-post-update",
+          "chain": [
+            "github/create_or_update_file",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Commit a new or updated documentation file to GitHub and immediately post an announcement in a Notion team channel page — keeping the team informed of documentation changes without manual cross-posting.",
+          "verified": false,
+          "notes": "github not connected in this session. notion/API-post-page verified via local notion-mcp."
+        },
+        {
+          "name": "neon-db-status-to-team",
+          "chain": [
+            "neon/describe_project",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Describe the current Neon database project (branches, compute, connection info) and publish a structured status update to a Notion team-comms page — useful for sprint reviews or incident communications.",
+          "verified": false,
+          "notes": "neon describe_project inferred (lazy). notion/API-post-page verified."
+        },
+        {
+          "name": "canon-agent-result-to-task",
+          "chain": [
+            "orchestrator/agent_execute(canon)",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Run the canon orchestrator agent over a cross-domain intent and create a ChittyAgent task for human follow-up on the result — closing the loop between autonomous execution and team accountability.",
+          "verified": false,
+          "notes": "orchestrator remote (chitty.cc). tasks backend lazy. Both unverified in this session."
+        },
+        {
+          "name": "browser-request-log-to-notion",
+          "chain": [
+            "playwright/browser_network_request",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Intercept and capture a browser network request (API call, webhook payload) and post the captured data to a Notion page for team review — useful for debugging integration issues collaboratively.",
+          "verified": false,
+          "notes": "playwright backend lazy. notion/API-post-page verified."
+        },
+        {
+          "name": "chittyxl-orchestrate-and-notify",
+          "chain": [
+            "orchestrator/skill_execute(chittyos-core:chittyxl)",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Execute the ChittyXL orchestration skill for a cross-system workflow and log the result as a ChittyAgent task — bridging high-level automated orchestration with team-visible task tracking.",
+          "verified": false,
+          "notes": "orchestrator skill unverified (remote, chitty.cc). tasks backend lazy."
+        },
+        {
+          "name": "pr-review-skill-to-notion",
+          "chain": [
+            "orchestrator/skill_execute(pr-review:review-pr)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Run the automated PR review skill over a pull request and post the review findings to a Notion comms page for team discussion — automating review communication across code and docs channels.",
+          "verified": false,
+          "notes": "orchestrator skill unverified (remote). notion/API-post-page verified."
+        },
+        {
+          "name": "worker-roster-to-team-page",
+          "chain": [
+            "cloudflare/list_workers",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "List all deployed Cloudflare Workers and post the current deployment roster to a Notion team page — giving non-technical stakeholders a live view of what's deployed without accessing Cloudflare directly.",
+          "verified": false,
+          "notes": "cloudflare remote (mcp.cloudflare.com) — not connected in this session. notion/API-post-page verified."
+        },
+        {
+          "name": "sql-migration-announce",
+          "chain": [
+            "neon/run_sql_transaction",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Execute a SQL migration transaction on the Neon database and announce the schema change in a Notion team page — ensuring the team is notified of database changes as they happen.",
+          "verified": false,
+          "notes": "neon lazy. notion/API-post-page verified."
+        },
+        {
+          "name": "push-files-and-notify",
+          "chain": [
+            "github/push_files",
+            "imessage/send_imessage"
+          ],
+          "accomplishes": "Push a batch of files to a GitHub repository and send an iMessage to the team notifying them of the push — closing the code-push → team-notification loop without manual steps.",
+          "verified": false,
+          "notes": "github not connected. imessage/send_imessage via chittymac, macOS only."
         }
       ],
       "prompts": [
@@ -15344,6 +15778,54 @@
         {
           "text": "Archive team message threads to the filesystem and broadcast the completion to Notion",
           "resolves_to": "comm-fs-create-directory-message-archive-broadcast"
+        },
+        {
+          "text": "Screenshot broadcast UI to validate formatting, post findings to Notion, and create a follow-up task",
+          "resolves_to": "comm-playwright-screenshot-broadcast-ui-validation"
+        },
+        {
+          "text": "Create a release PR on GitHub, post release notes to Notion, and notify the team via ChittaMac",
+          "resolves_to": "comm-github-create-pr-release-team-broadcast"
+        },
+        {
+          "text": "Read my release-notes.txt and send it to the team via iMessage",
+          "resolves_to": "read-file-and-share-imessage"
+        },
+        {
+          "text": "Commit this updated README to GitHub and announce it in the team Notion page",
+          "resolves_to": "commit-doc-and-post-update"
+        },
+        {
+          "text": "Post the current Neon database status to our team Notion comms page",
+          "resolves_to": "neon-db-status-to-team"
+        },
+        {
+          "text": "Run the canon agent on this intent and create a task for whoever needs to follow up",
+          "resolves_to": "canon-agent-result-to-task"
+        },
+        {
+          "text": "Capture the API response from that browser request and post it to Notion for the team to review",
+          "resolves_to": "browser-request-log-to-notion"
+        },
+        {
+          "text": "Execute the ChittyXL workflow and log the result as a task for the team",
+          "resolves_to": "chittyxl-orchestrate-and-notify"
+        },
+        {
+          "text": "Review this PR automatically and post findings to our Notion team channel",
+          "resolves_to": "pr-review-skill-to-notion"
+        },
+        {
+          "text": "Post a list of all our deployed workers to the team Notion page",
+          "resolves_to": "worker-roster-to-team-page"
+        },
+        {
+          "text": "Run the database migration and announce the schema change in Notion",
+          "resolves_to": "sql-migration-announce"
+        },
+        {
+          "text": "Push these files to GitHub and send the team an iMessage about it",
+          "resolves_to": "push-files-and-notify"
         }
       ]
     },
@@ -17907,6 +18389,41 @@
           "accomplishes": "Navigate to the deployment operations dashboard, hover over service health indicators to reveal detailed status tooltips, take a screenshot of the highlighted deployment state for the incident record, and execute the ops triage skill to dispatch the appropriate alert to on-call.",
           "verified": false,
           "notes": "FIRST playwright/browser_hover in ops (4/6 → 5/6, governance still missing)."
+        },
+        {
+          "name": "ops-notion-api-create-page-incident-postmortem",
+          "chain": [
+            "evidence/search",
+            "neon/run_sql",
+            "thinking/sequentialthinking",
+            "notion/API-create-a-page"
+          ],
+          "accomplishes": "Search ChittyEvidence for prior incident patterns matching the current outage, run SQL against the ops database to gather metrics, reason about root cause and contributing factors, and create a new dedicated incident postmortem page in Notion.",
+          "verified": false,
+          "notes": "notion/API-create-a-page in ops (3rd combo in catalog using it)."
+        },
+        {
+          "name": "ops-notion-api-retrieve-block-runbook-section-pull",
+          "chain": [
+            "thinking/sequentialthinking",
+            "notion/API-retrieve-a-block",
+            "evidence/ai_search",
+            "cloudflare-builds/list_builds"
+          ],
+          "accomplishes": "Identify the relevant runbook section block ID, retrieve that specific Notion block to get the runbook step content, AI-search for related evidence and known fixes, then list recent Cloudflare builds to confirm the deployed artifact state.",
+          "verified": false,
+          "notes": "FIRST notion/API-retrieve-a-block in ops (was MISSING from design + ops — this completes ops coverage)."
+        },
+        {
+          "name": "neon-project-ops-snapshot",
+          "chain": [
+            "neon/describe_project",
+            "neon/list_slow_queries",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Describe the Neon project configuration, pull current slow queries, and apply sequential reasoning to identify operational bottlenecks — a three-step ops diagnostic for database health triage.",
+          "verified": false,
+          "notes": "neon lazy. thinking/sequentialthinking local node."
         }
       ],
       "prompts": [
@@ -18665,6 +19182,18 @@
         {
           "text": "Inspect the deployment dashboard by hovering over service indicators and capture the state for incident triage",
           "resolves_to": "ops-playwright-hover-deploy-dashboard-inspect"
+        },
+        {
+          "text": "Search for prior incident patterns and create a new Notion postmortem page from ops database metrics",
+          "resolves_to": "ops-notion-api-create-page-incident-postmortem"
+        },
+        {
+          "text": "Retrieve a runbook block from Notion, search for related fixes, and verify Cloudflare deploy state",
+          "resolves_to": "ops-notion-api-retrieve-block-runbook-section-pull"
+        },
+        {
+          "text": "Describe the Neon project, pull slow queries, and reason through the operational bottlenecks",
+          "resolves_to": "neon-project-ops-snapshot"
         }
       ]
     }
