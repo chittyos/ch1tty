@@ -2082,3 +2082,51 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 1. Merge PR #291 when CI green + no blocking CodeRabbit findings
 2. 96th catalog pass: `chittyevidence/search` to governance, design, ops, communication (5 profiles missing it — only finance+code added this pass); `stripe/create_customer` in design/code/communication (still 0 in those); `session/list_sessions` in design (only profile still missing it)
 3. Fix Notion auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` to unblock cross-run board writes
+
+---
+
+### 2026-06-09 — Session 01P8L9hoH6yRxi6EU28XkoQk (96th pass)
+
+**Workstream advanced**: E (Alchemist brainstorm — catalog 96th pass)
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass / 0 fail / 2 skipped
+- No open PRs at start — PR #291 (95th pass) was already merged (3/3 CI green, merged at 12:23Z)
+- `origin/main` HEAD: `dbf6f8c` (95th pass — 1000 combos / 477 verified / 1021 prompts)
+- Reset local main to origin/main. Workstream states: A ✅ B ✅ C ✅ D ✅ E in-progress
+- Notion board still 401 — DRIVER-LOG.md remains cross-run fallback
+- Coverage gap analysis (post 95th pass) via node scan of focus-suggestions.json:
+  - `chittyevidence/search`: 3/6 (finance, code, communication) — MISSING from governance, design, ops
+  - `session/list_sessions`: 5/6 — MISSING from design only
+  - `neon/create_branch`: 5/6 — MISSING from ops only
+  - `cloudflare-builds/workers_builds_trigger`: 0/6 — never cataloged in entire history
+  - `neon/delete_branch`: 0/6 — never cataloged in entire history
+  - `github/push_files`: 0/6 — never cataloged in entire history
+  - `stripe/create_customer`: 2/6 (finance, governance) — MISSING from design, code, communication, ops
+  - `stripe/create_invoice`: 3/6 — MISSING from code, communication, ops
+- Created branch `auto/E-catalog-ninety-sixth-pass`; added 12 combos + 12 prompts (2 per profile):
+  - **finance**: `finance-github-push-files-billing-report` (FIRST github/push_files in finance), `finance-cloudflare-builds-trigger-billing-worker-deploy` (FIRST workers_builds_trigger in ENTIRE catalog!)
+  - **governance**: `governance-chittyevidence-search-policy-pattern-audit` ✅ (FIRST chittyevidence/search in governance), `governance-github-push-files-policy-compliance-docs` (github/push_files in governance)
+  - **design**: `design-chittyevidence-search-ux-pattern-research` ✅ (FIRST chittyevidence/search in design), `design-session-list-sessions-ux-prototype-context` (FIRST session/list_sessions in design — ALL 6!)
+  - **code**: `code-stripe-create-customer-billing-sdk-test` (FIRST stripe/create_customer in code), `code-neon-delete-branch-feature-cleanup` (FIRST neon/delete_branch in ENTIRE catalog!)
+  - **communication**: `comm-stripe-create-customer-team-billing-onboard` (FIRST stripe/create_customer in communication), `comm-stripe-create-invoice-billing-status-broadcast` (FIRST stripe/create_invoice in communication)
+  - **ops**: `ops-chittyevidence-search-incident-pattern-discovery` ✅ (FIRST chittyevidence/search in ops — ALL 6!), `ops-neon-create-branch-incident-db-isolation` (completes neon/create_branch to ALL 6!)
+- 3 new verified combos (governance/design/ops chittyevidence — all confirmed-connected servers). 0 test failures.
+- JSON validation: 1012 unique names, 0 duplicates, 0 missing required fields, code constraint ✅, comm constraint ✅
+- Tests: 938 pass / 0 fail / 2 skipped ✓
+- Catalog: 1000 → **1012 combos / 477 → 480 verified / 1021 → 1033 prompts**
+- Pushed branch, opened PR #292; CI queued
+
+**Branch / PR**: `auto/E-catalog-ninety-sixth-pass` → PR #292 (https://github.com/chittyos/ch1tty/pull/292)
+
+**Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
+
+**Board state**: 1012 combos / 480 verified / 1033 prompts. MILESTONES: `chittyevidence/search` now ALL 6 profiles ✅. `session/list_sessions` now ALL 6 profiles ✅. `neon/create_branch` now ALL 6 profiles ✅. FIRST `cloudflare-builds/workers_builds_trigger` ever. FIRST `neon/delete_branch` ever. FIRST `github/push_files` in catalog.
+
+**Blockers**:
+- Notion auth 401: run `chitty-mcp-token notion` or rotate integration token in workspace settings
+
+**Next run priority**:
+1. Merge PR #292 when CI green (CodeQL typically green for JSON-only change)
+2. 97th catalog pass: `github/push_files` to design/code/communication/ops (4 profiles still 0); `cloudflare-builds/workers_builds_trigger` to governance/design/code/communication/ops (5 profiles still 0); `stripe/create_customer` to design/ops (2 profiles still 0); `neon/delete_branch` to other profiles (5 still missing)
+3. Fix Notion auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`
