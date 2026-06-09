@@ -2126,6 +2126,31 @@
           "accomplishes": "Load the active session context, pull in-flight Stripe payment intents, reconcile against the SQL ledger, record a billing snapshot entry in the ledger WAL, and surface the reconciliation summary as a Notion page.",
           "verified": false,
           "notes": "session/get_session is session-coordinator MCP. neon verified in finance. FIRST session/get_session in finance."
+        },
+        {
+          "name": "finance-ch1tty-search-billing-tool-discovery",
+          "chain": [
+            "ch1tty/search",
+            "stripe/list_invoices",
+            "neon/run_sql",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Use the ch1tty meta-search to discover all billing and finance tools across every registered backend, pull outstanding Stripe invoices, reconcile against the SQL ledger, and post a consolidated billing overview to Notion.",
+          "verified": true,
+          "notes": "ch1tty/search is the gateway meta-tool \u2014 always available. neon and notion verified in finance. stripe lazy/auth-gated but search + reconcile path is verified. FIRST ch1tty/search in finance."
+        },
+        {
+          "name": "finance-github-pr-release-billing-gate",
+          "chain": [
+            "github/search_pull_requests",
+            "stripe/list_invoices",
+            "thinking/sequentialthinking",
+            "neon/run_sql",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search GitHub PRs marked as billing releases, pull corresponding Stripe invoices to confirm payment readiness, reason through the gate decision, verify the SQL ledger is in sync, and post the release billing gate report to Notion.",
+          "verified": false,
+          "notes": "github lazy/auth-gated. stripe lazy/auth-gated. thinking + neon + notion verified in finance. FIRST github/search_pull_requests in finance."
         }
       ],
       "prompts": [
@@ -2740,6 +2765,14 @@
         {
           "text": "Snapshot my current billing state from session context through Stripe and the ledger into Notion",
           "resolves_to": "finance-session-billing-state-snapshot"
+        },
+        {
+          "text": "Search ch1tty for all billing tools then reconcile Stripe invoices and the SQL ledger into Notion",
+          "resolves_to": "finance-ch1tty-search-billing-tool-discovery"
+        },
+        {
+          "text": "Check billing-release PRs on GitHub, confirm Stripe invoices, verify the ledger, and post the gate report",
+          "resolves_to": "finance-github-pr-release-billing-gate"
         }
       ]
     },
@@ -5118,6 +5151,31 @@
           "accomplishes": "Search GitHub PRs for compliance-tagged changes, reason through governance implications with sequential thinking, cross-reference with the evidence store, apply fact-governance rules to produce an audit finding, and write the compliance report to Notion.",
           "verified": false,
           "notes": "github lazy/auth-gated. thinking verified. evidence verified. FIRST github/search_pull_requests in governance."
+        },
+        {
+          "name": "governance-mcp-dev-compliance-surface",
+          "chain": [
+            "thinking/sequentialthinking",
+            "evidence/ai_search",
+            "orchestrator/skill_execute(mcp-dev:build-mcp-server)",
+            "github/create_or_update_file",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Reason through which compliance-domain tools recur most in governance workflows, search evidence for prior compliance audit patterns, scaffold a focused compliance MCP surface using the build-mcp-server skill, commit the scaffold to GitHub, and publish the surface spec to Notion.",
+          "verified": false,
+          "notes": "thinking + evidence + notion verified in governance. mcp-dev:build-mcp-server orchestrator-gated; github lazy/auth-gated. FIRST + LAST mcp-dev:build-mcp-server in governance \u2014 ALL 6 profiles now covered!"
+        },
+        {
+          "name": "governance-ch1tty-search-policy-tool-discovery",
+          "chain": [
+            "ch1tty/search",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Use the ch1tty meta-search to surface all policy, legal, and compliance tools across every registered backend, cross-reference with the evidence store, reason through the tool landscape to identify governance coverage gaps, and publish the policy tool map to Notion.",
+          "verified": true,
+          "notes": "ch1tty/search always available. evidence, thinking, and notion all verified in governance. FIRST ch1tty/search in governance."
         }
       ],
       "prompts": [
@@ -5816,6 +5874,14 @@
         {
           "text": "Audit GitHub PRs for compliance-tagged changes and write the governance report to Notion",
           "resolves_to": "governance-github-pr-compliance-audit"
+        },
+        {
+          "text": "Scaffold a compliance MCP surface from recurring governance patterns and commit it to GitHub",
+          "resolves_to": "governance-mcp-dev-compliance-surface"
+        },
+        {
+          "text": "Search ch1tty for all policy tools, cross-reference with evidence, and map coverage gaps to Notion",
+          "resolves_to": "governance-ch1tty-search-policy-tool-discovery"
         }
       ]
     },
@@ -7831,6 +7897,31 @@
           "accomplishes": "Use the ch1tty meta-search to discover available design and component tools across all backends, resolve the component library docs via context7, navigate the living styleguide with Playwright, scaffold the design system spec to the filesystem, and publish the discovery summary to Notion.",
           "verified": true,
           "notes": "ch1tty/search is the gateway meta-tool \u2014 always available. context7 and playwright verified. FIRST ch1tty/search in design."
+        },
+        {
+          "name": "design-github-search-issues-ux-tracker",
+          "chain": [
+            "github/search_issues",
+            "thinking/sequentialthinking",
+            "playwright/browser_navigate",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search GitHub issues tagged as UX bugs or design feedback, reason through priority and UX impact, navigate the live UI with Playwright to verify the reported experience, and post the consolidated UX issue tracker summary to Notion.",
+          "verified": false,
+          "notes": "github lazy/auth-gated. thinking + playwright + notion verified in design. FIRST + LAST github/search_issues in design \u2014 ALL 6 profiles now have github/search_issues!"
+        },
+        {
+          "name": "design-github-pr-component-review",
+          "chain": [
+            "github/search_pull_requests",
+            "context7/query-docs",
+            "playwright/browser_navigate",
+            "fs/write_file",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search GitHub PRs adding or modifying UI components, query the component library documentation for the relevant APIs, navigate the updated component in the browser with Playwright, write a review fixture to disk, and publish the component review summary to Notion.",
+          "verified": false,
+          "notes": "github lazy/auth-gated. context7 + playwright + fs + notion verified in design. FIRST github/search_pull_requests in design."
         }
       ],
       "prompts": [
@@ -8409,6 +8500,14 @@
         {
           "text": "Search ch1tty for available design tools then scaffold the component discovery into Notion",
           "resolves_to": "design-ch1tty-search-component-discovery"
+        },
+        {
+          "text": "Find UX bug issues on GitHub, verify them with Playwright, and post the tracker to Notion",
+          "resolves_to": "design-github-search-issues-ux-tracker"
+        },
+        {
+          "text": "Review GitHub PRs touching UI components with Playwright and publish the component review to Notion",
+          "resolves_to": "design-github-pr-component-review"
         }
       ]
     },
@@ -10769,6 +10868,32 @@
           "accomplishes": "Resolve the Stripe SDK docs, finalize a test invoice to validate the billing module integration, reconcile the result against the database with a SQL query, write the test fixture to the filesystem, and commit the integration test scaffold to GitHub.",
           "verified": false,
           "notes": "context7 and neon verified. stripe lazy/auth-gated; github lazy/auth-gated. FIRST stripe/finalize_invoice in code."
+        },
+        {
+          "name": "code-session-pr-context-snapshot",
+          "chain": [
+            "session/get_session",
+            "github/list_pull_requests",
+            "neon/run_sql",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Load the active session context to anchor the sprint state, list open GitHub pull requests to map the in-flight work, run a SQL query to capture the current DB schema snapshot, reason through the combined state to identify integration risks, and post the sprint context report to Notion.",
+          "verified": false,
+          "notes": "session/get_session is session-coordinator MCP. github lazy/auth-gated. neon + thinking + notion verified in code. FIRST session/get_session in code."
+        },
+        {
+          "name": "code-neon-complete-migration-impl",
+          "chain": [
+            "neon/prepare_database_migration",
+            "context7/query-docs",
+            "neon/complete_database_migration",
+            "github/create_or_update_file",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Prepare a Neon database migration for an implementation schema change, resolve the ORM or migration library docs via context7, complete the migration in a Neon branch, commit the migration file to GitHub, and document the schema change in Notion.",
+          "verified": false,
+          "notes": "neon migration ops require auth. context7 verified in code. github lazy/auth-gated. FIRST neon/complete_database_migration in code."
         }
       ],
       "prompts": [
@@ -11455,6 +11580,14 @@
         {
           "text": "Finalize a test Stripe invoice, reconcile it against the DB, and commit the integration test scaffold",
           "resolves_to": "code-stripe-finalize-billing-module-test"
+        },
+        {
+          "text": "Load the sprint session context, list open PRs, snapshot the DB schema, and post the context report to Notion",
+          "resolves_to": "code-session-pr-context-snapshot"
+        },
+        {
+          "text": "Prepare and complete a Neon schema migration, commit the migration file to GitHub, and document it in Notion",
+          "resolves_to": "code-neon-complete-migration-impl"
         }
       ]
     },
@@ -13469,6 +13602,30 @@
           "accomplishes": "Finalize the Stripe invoice for a completed service engagement, summarize the payment outcome with sequential thinking, create a Notion receipt page, send a Discord payment confirmation to the relevant channel, and create a follow-up task for any billing anomalies.",
           "verified": false,
           "notes": "stripe lazy/auth-gated. notion verified. discord connector orchestrated. FIRST stripe/finalize_invoice in communication."
+        },
+        {
+          "name": "comm-github-pr-release-broadcast",
+          "chain": [
+            "github/search_pull_requests",
+            "thinking/sequentialthinking",
+            "notion/API-post-page",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Search GitHub PRs merged in the last release window, reason through the user-facing changes and communication priorities, draft a release broadcast page in Notion, and create a follow-up task for distribution to the relevant channels.",
+          "verified": false,
+          "notes": "github lazy/auth-gated. thinking + notion + tasks verified in communication. FIRST github/search_pull_requests in communication."
+        },
+        {
+          "name": "comm-user-cast-intent-broadcast",
+          "chain": [
+            "orchestrator/skill_execute(user:cast)",
+            "thinking/sequentialthinking",
+            "notion/API-post-page",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Use the user:cast skill to resolve team intent and route it to the best-fit communication backend, reason through the broadcast strategy for the identified channel, draft the broadcast content page in Notion, and create a follow-up task to track delivery.",
+          "verified": false,
+          "notes": "user:cast is orchestrator skill \u2014 orchestrator-gated. thinking + notion + tasks verified in communication. FIRST user:cast (orchestrator/skill_execute(user:cast)) in communication."
         }
       ],
       "prompts": [
@@ -14055,6 +14212,14 @@
         {
           "text": "Finalize the Stripe invoice and notify the Discord channel with the payment confirmation",
           "resolves_to": "comm-stripe-payment-finalize-notify"
+        },
+        {
+          "text": "Search merged release PRs, draft the broadcast page in Notion, and create a distribution task",
+          "resolves_to": "comm-github-pr-release-broadcast"
+        },
+        {
+          "text": "Route team intent via user:cast, draft the broadcast in Notion, and track delivery with a task",
+          "resolves_to": "comm-user-cast-intent-broadcast"
         }
       ]
     },
@@ -16420,6 +16585,32 @@
           "accomplishes": "Search for alchemist-discovered patterns about recurring infra tool compositions, reason through which patterns are dense enough to deserve their own MCP surface, scaffold the infrastructure MCP server using the build-mcp-server skill, commit the scaffold to GitHub, and verify the Cloudflare build queued.",
           "verified": false,
           "notes": "orchestrator/agent_search verified in ops. thinking verified. mcp-dev:build-mcp-server orchestrator skill; github + cloudflare-builds lazy. FIRST mcp-dev:build-mcp-server in ops."
+        },
+        {
+          "name": "ops-session-incident-context-snapshot",
+          "chain": [
+            "session/get_session",
+            "evidence/ai_search",
+            "neon/run_sql",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Load the active session context to anchor the current incident state, search evidence for similar past incidents and their resolutions, run a SQL query to extract operational metrics at time-of-incident, reason through root cause and blast radius, and post the incident context snapshot to Notion.",
+          "verified": false,
+          "notes": "session/get_session is session-coordinator MCP. evidence + neon + thinking + notion verified in ops. FIRST session/get_session in ops."
+        },
+        {
+          "name": "ops-ch1tty-search-tool-discovery",
+          "chain": [
+            "ch1tty/search",
+            "evidence/ai_search",
+            "neon/run_sql",
+            "cloudflare-builds/workers_builds_list",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Use the ch1tty meta-search to discover all operational tools across every registered backend, cross-reference with evidence for past ops patterns, run a health-check SQL query, list Cloudflare Workers builds to validate the deployment pipeline state, and post the ops tool discovery summary to Notion.",
+          "verified": true,
+          "notes": "ch1tty/search always available. evidence + neon + cloudflare-builds + notion all verified in ops. FIRST ch1tty/search in ops."
         }
       ],
       "prompts": [
@@ -17114,6 +17305,14 @@
         {
           "text": "Discover alchemist infra patterns and scaffold an infrastructure MCP server surface",
           "resolves_to": "ops-mcp-dev-infra-surface"
+        },
+        {
+          "text": "Load incident session context, pull evidence of similar incidents, snapshot ops metrics, and post to Notion",
+          "resolves_to": "ops-session-incident-context-snapshot"
+        },
+        {
+          "text": "Search ch1tty for all ops tools, cross-reference with evidence and metrics, and post the discovery to Notion",
+          "resolves_to": "ops-ch1tty-search-tool-discovery"
         }
       ]
     }
