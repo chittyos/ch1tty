@@ -2307,6 +2307,7 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   - Plus: `fs/get_file_info` (design), `notion/API-retrieve-a-block` (design), `github/push_files` (communication), `notion/API-get-users` (design)
 - Created branch `auto/E-catalog-hundredth-pass` from `origin/auto/E-catalog-ninety-ninth-pass`
 - Added 24 combos + 24 prompts (100th pass):
+  - **NOTE**: Deviates from the standard 2-per-profile pattern (12 total) — communication and design had the most 4/6→6/6 gaps, so an asymmetric distribution (24 total) was necessary to achieve the zero-partial-coverage milestone in a single pass.
   - **communication** (9 new): read-file-and-share-imessage, commit-doc-and-post-update, neon-db-status-to-team, canon-agent-result-to-task, browser-request-log-to-notion, chittyxl-orchestrate-and-notify, pr-review-skill-to-notion, worker-roster-to-team-page, sql-migration-announce
   - **design** (7 new): spec-file-to-visual-proof, design-asset-commit-and-preview, network-intercept-design-data, notion-brief-to-screenshot, chittyxl-design-orchestration, canon-agent-visual-audit, design-sql-token-preview
   - **finance** (1 new): pr-review-billing-compliance
@@ -2317,7 +2318,7 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 - JSON validation: 1072 unique names, 0 duplicates, 0 bad resolves_to, 0 empty chains ✓
 - Tests: 938 pass / 0 fail / 2 skipped ✓
 - **MILESTONE: ZERO partial-coverage tools remaining** — all 114 cataloged tools appear in ALL 6 focus profiles
-- Catalog: 1048 → **1072 combos / 1069 → 1093 prompts**
+- Catalog: 1048 → **1072 combos / 480 verified (unchanged — all new combos auth-gated) / 1069 → 1093 prompts**
 - Closed PR #296 (superseded); opened PR #297 retargeted to `main`
 - PR #297 CI check_runs: 0 (triggering after retarget)
 - Processed bot webhooks: Codex usage-limit notice (no action), CodeRabbit skip on non-default base (resolved by retargeting to main)
@@ -2326,7 +2327,7 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 
 **Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
 
-**Board state**: 1072 combos / 1093 prompts. MILESTONE: **ZERO partial-coverage tools**. All 114 cataloged tools appear in ALL 6 focus profiles. First time in project history with complete coverage.
+**Board state**: 1072 combos / 480 verified / 1093 prompts. MILESTONE: **ZERO partial-coverage tools**. All 114 cataloged tools appear in ALL 6 focus profiles. First time in project history with complete coverage.
 
 **Blockers**:
 - Notion auth 401: run `chitty-mcp-token notion` or rotate integration token in workspace settings
