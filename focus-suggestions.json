@@ -1,5 +1,5 @@
 {
-  "_comment": "100th pass — 1072 combos / 1093 prompts. COMPLETES to ALL 6 profiles: all 14 previously partial-coverage tools now at 6/6 (fs/read_text_file, github/create_or_update_file, neon/run_sql_transaction, orchestrator/agent_execute(canon), cloudflare/list_workers, neon/describe_project, orchestrator/skill_execute(chittyos-core:chittyxl), playwright/browser_network_request, orchestrator/skill_execute(pr-review:review-pr), notion/create_page, fs/get_file_info, notion/API-retrieve-a-block, github/push_files, notion/API-get-users). First run with ZERO remaining 4/6 gaps.",
+  "_comment": "101st pass — 1084 combos / 1105 prompts. Expands single-use tools to new profiles: chittyevidence/log_evidence (finance+ops = 3/6), orchestrator/agent_execute(claude) (governance+code = 3/6), notion/API-delete-a-block (communication+ops = 3/6), notion/API-update-a-data-source (design = 2/6). Adds 5 new verified combos boosting communication verified rate.",
   "generatedFrom": "E-catalog-hundredth-pass",
   "profiles": {
     "finance": {
@@ -2351,6 +2351,30 @@
           "accomplishes": "Run the automated PR review skill to check a code change against billing compliance rules, then pull the current Stripe invoice list to verify no billing impact — code-to-billing audit chain.",
           "verified": false,
           "notes": "orchestrator skill unverified (remote). stripe lazy (inferred from @stripe/mcp surface)."
+        },
+        {
+          "name": "finance-chittyevidence-log-billing-pattern",
+          "chain": [
+            "evidence/search",
+            "chittyevidence/log_evidence",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search for recurring billing anomaly patterns in evidence, log the consolidated finding into the chittyevidence store for audit trail, and write the log summary to a local file for review.",
+          "verified": false,
+          "notes": "chittyevidence/log_evidence not yet confirmed in this env (lazy remote); first use in finance profile."
+        },
+        {
+          "name": "finance-evidence-cast-verified-audit",
+          "chain": [
+            "ch1tty/cast",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "fs/write_file",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Cast an intent-driven billing audit: AI-search evidence for financial risk signals, reason through implications via sequential thinking, write the audit summary to a local file, and post the result to a Notion finance page.",
+          "verified": true,
+          "notes": "All servers confirmed connected: ch1tty, evidence, thinking, fs, notion (API-post-page)."
         }
       ],
       "prompts": [
@@ -3041,6 +3065,14 @@
         {
           "text": "Review this billing-related PR for compliance and pull the Stripe invoice list to check for impact",
           "resolves_to": "pr-review-billing-compliance"
+        },
+        {
+          "text": "Log today's billing anomalies into the evidence store with context for audit",
+          "resolves_to": "finance-chittyevidence-log-billing-pattern"
+        },
+        {
+          "text": "Cast an evidence-driven billing audit and write the summary to Notion",
+          "resolves_to": "finance-evidence-cast-verified-audit"
         }
       ]
     },
@@ -5648,6 +5680,31 @@
           "accomplishes": "List all active Cloudflare Worker deployments and log the deployment state as immutable governance evidence — creating an auditable record of what was deployed at a point in time.",
           "verified": false,
           "notes": "cloudflare remote, not connected in this session. chittyevidence local node backend, lazy."
+        },
+        {
+          "name": "governance-claude-agent-policy-synthesis",
+          "chain": [
+            "orchestrator/agent_list",
+            "orchestrator/agent_execute(claude)",
+            "evidence/ai_search",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "List available agents, invoke the Claude agent to synthesize latest compliance evidence into a structured policy recommendation, and post the recommendation to the governance Notion page.",
+          "verified": false,
+          "notes": "First orchestrator/agent_execute(claude) in governance (was only in finance). Claude agent may be unbound; auth-gated."
+        },
+        {
+          "name": "governance-evidence-thinking-serena-policy-chain",
+          "chain": [
+            "evidence/search",
+            "thinking/sequentialthinking",
+            "serena/search_code",
+            "context7/get-library-docs",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search compliance evidence, reason through policy implications via sequential thinking, scan relevant code sections for compliance patterns using Serena, look up governance framework docs via Context7, and write the findings report to disk.",
+          "verified": true,
+          "notes": "All confirmed-connected servers: evidence, thinking, serena, context7, fs."
         }
       ],
       "prompts": [
@@ -6422,6 +6479,14 @@
         {
           "text": "List all deployed Cloudflare workers and log the deployment state as governance evidence",
           "resolves_to": "worker-deployment-governance"
+        },
+        {
+          "text": "Use the Claude agent to synthesize compliance evidence into a policy recommendation",
+          "resolves_to": "governance-claude-agent-policy-synthesis"
+        },
+        {
+          "text": "Reason through policy evidence, scan codebase patterns, look up framework docs, and write findings",
+          "resolves_to": "governance-evidence-thinking-serena-policy-chain"
         }
       ]
     },
@@ -8753,6 +8818,30 @@
           "accomplishes": "Retrieve the list of Notion workspace users (designers, reviewers) and create a design-review page pre-populated with the right collaborators — automating the setup of design feedback sessions.",
           "verified": false,
           "notes": "notion/API-get-users and notion/create_page both via local notion-mcp."
+        },
+        {
+          "name": "design-notion-update-data-source-design-system",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_take_screenshot",
+            "notion/API-retrieve-a-database",
+            "notion/API-update-a-data-source"
+          ],
+          "accomplishes": "Navigate to the design system portal and screenshot current state, retrieve the Notion database tracking design tokens, then update the Notion data source with the latest design system snapshot metadata.",
+          "verified": false,
+          "notes": "First notion/API-update-a-data-source in design (was only in finance). Notion data-source API is auth-gated."
+        },
+        {
+          "name": "design-serena-playwright-ux-verify-chain",
+          "chain": [
+            "serena/search_code",
+            "playwright/browser_take_screenshot",
+            "browser-rendering/render_page",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search component implementation code with Serena, take a screenshot of the rendered component in Playwright, render the full page snapshot via browser-rendering for a pixel-accurate reference, and write the combined verification report to disk.",
+          "verified": true,
+          "notes": "All confirmed-connected servers: serena, playwright, browser-rendering, fs."
         }
       ],
       "prompts": [
@@ -9443,6 +9532,14 @@
         {
           "text": "Get the Notion workspace user list and set up a design-review page with the right collaborators",
           "resolves_to": "notion-team-roster-design-context"
+        },
+        {
+          "text": "Screenshot the design portal and update the Notion design system data source with the current state",
+          "resolves_to": "design-notion-update-data-source-design-system"
+        },
+        {
+          "text": "Search component code, screenshot the rendered UI, render a full-page snapshot, and save the verification report",
+          "resolves_to": "design-serena-playwright-ux-verify-chain"
         }
       ]
     },
@@ -12036,6 +12133,31 @@
           "accomplishes": "Create a Notion documentation page for a new module or API design, then open a linked GitHub issue to track implementation — keeping design docs and engineering tickets in sync from the start.",
           "verified": false,
           "notes": "notion/create_page via local notion-mcp. github not connected in this session."
+        },
+        {
+          "name": "code-orchestrator-claude-agent-refactor",
+          "chain": [
+            "orchestrator/agent_list",
+            "orchestrator/agent_execute(claude)",
+            "serena/search_code",
+            "github/create_or_update_file"
+          ],
+          "accomplishes": "List active agents, invoke the Claude agent to identify refactor targets in the codebase, use Serena to locate the relevant symbols and patterns, then commit the refactor changes to GitHub.",
+          "verified": false,
+          "notes": "First orchestrator/agent_execute(claude) in code (3/6 total). Claude agent may be unbound; github lazy remote."
+        },
+        {
+          "name": "code-evidence-serena-context7-analysis-chain",
+          "chain": [
+            "evidence/search",
+            "serena/search_code",
+            "context7/get-library-docs",
+            "fs/write_file",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search evidence store for known vulnerability or pattern signals, scan codebase for corresponding matches with Serena, look up the affected library docs via Context7, write a detailed analysis report to disk, and post the summary to Notion.",
+          "verified": true,
+          "notes": "All confirmed-connected servers: evidence, serena, context7, fs, notion (API-post-page)."
         }
       ],
       "prompts": [
@@ -12798,6 +12920,14 @@
         {
           "text": "Create a Notion doc page for this new module and open a GitHub issue to track implementation",
           "resolves_to": "notion-code-doc-page"
+        },
+        {
+          "text": "Use the Claude agent to identify refactor targets and commit changes to GitHub",
+          "resolves_to": "code-orchestrator-claude-agent-refactor"
+        },
+        {
+          "text": "Search evidence for known patterns, scan codebase matches, look up library docs, and write analysis to Notion",
+          "resolves_to": "code-evidence-serena-context7-analysis-chain"
         }
       ]
     },
@@ -15128,6 +15258,31 @@
           "accomplishes": "Push a batch of files to a GitHub repository and send an iMessage to the team notifying them of the push — closing the code-push → team-notification loop without manual steps.",
           "verified": false,
           "notes": "github not connected. imessage/send_imessage via chittymac, macOS only."
+        },
+        {
+          "name": "comm-evidence-thinking-cast-digest-pipeline",
+          "chain": [
+            "ch1tty/cast",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "fs/write_file",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Cast a broadcast digest request through Ch1tty, AI-search evidence for relevant signals, reason through the digest content via sequential thinking, write the draft to a local file, and post the finished digest to the communication Notion space.",
+          "verified": true,
+          "notes": "All confirmed-connected servers: ch1tty, evidence, thinking, fs, notion (API-post-page). Boosts communication verified rate (currently 35%)."
+        },
+        {
+          "name": "comm-notion-delete-stale-thread-cleanup",
+          "chain": [
+            "notion/API-search",
+            "notion/API-retrieve-a-page",
+            "notion/API-delete-a-block",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search Notion for stale communication threads, retrieve each page for verification, delete the outdated content blocks to keep the workspace clean, and write the cleanup log to a local file.",
+          "verified": false,
+          "notes": "First notion/API-delete-a-block in communication (was only in finance). notion/API-delete-a-block not yet confirmed in this env."
         }
       ],
       "prompts": [
@@ -15826,6 +15981,14 @@
         {
           "text": "Push these files to GitHub and send the team an iMessage about it",
           "resolves_to": "push-files-and-notify"
+        },
+        {
+          "text": "Cast a broadcast digest using evidence-driven reasoning and post it to Notion",
+          "resolves_to": "comm-evidence-thinking-cast-digest-pipeline"
+        },
+        {
+          "text": "Find stale communication threads in Notion and delete them to keep the workspace clean",
+          "resolves_to": "comm-notion-delete-stale-thread-cleanup"
         }
       ]
     },
@@ -18424,6 +18587,30 @@
           "accomplishes": "Describe the Neon project configuration, pull current slow queries, and apply sequential reasoning to identify operational bottlenecks — a three-step ops diagnostic for database health triage.",
           "verified": false,
           "notes": "neon lazy. thinking/sequentialthinking local node."
+        },
+        {
+          "name": "ops-chittyevidence-log-incident-evidence",
+          "chain": [
+            "evidence/search",
+            "chittyevidence/log_evidence",
+            "fs/write_file",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search for incident-related signals in the evidence store, log the distilled incident evidence into the chittyevidence audit trail, write the incident summary to a local file, and post a notification to the ops Notion space.",
+          "verified": false,
+          "notes": "First chittyevidence/log_evidence in ops (3/6 total across ops/governance/finance). chittyevidence lazy remote; auth-gated."
+        },
+        {
+          "name": "ops-notion-delete-stale-deploy-status",
+          "chain": [
+            "evidence/ai_search",
+            "notion/API-retrieve-a-page",
+            "notion/API-delete-a-block",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "AI-search evidence to confirm a deploy status block is superseded, retrieve the Notion page containing the stale deploy record, delete the outdated deploy block, and post an updated clean status to the ops page.",
+          "verified": false,
+          "notes": "First notion/API-delete-a-block in ops (3/6 total). notion/API-delete-a-block auth-gated; not yet confirmed in this env."
         }
       ],
       "prompts": [
@@ -19194,6 +19381,14 @@
         {
           "text": "Describe the Neon project, pull slow queries, and reason through the operational bottlenecks",
           "resolves_to": "neon-project-ops-snapshot"
+        },
+        {
+          "text": "Log incident signals into the evidence store and post a summary to the ops Notion space",
+          "resolves_to": "ops-chittyevidence-log-incident-evidence"
+        },
+        {
+          "text": "Find stale deploy status blocks in Notion and archive them after evidence confirms they are superseded",
+          "resolves_to": "ops-notion-delete-stale-deploy-status"
         }
       ]
     }
