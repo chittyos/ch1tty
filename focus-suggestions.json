@@ -1,5 +1,5 @@
 {
-  "_comment": "95th pass — 1000 combos / 477 verified / 1021 prompts. FIRST playwright/browser_fill_form + browser_wait_for in governance+communication+ops (ALL 6 profiles). FIRST evidence/search in ops (ALL 6 profiles). FIRST fs/read_multiple_files in design+communication (ALL 6 profiles). FIRST fs/create_directory in finance+governance+design (ALL 6 profiles). FIRST chittyevidence/search in finance+code. All 12 new combos verified.",
+  "_comment": "96th pass — 1012 combos / 480 verified / 1033 prompts. FIRST chittyevidence/search in governance+design+ops (ALL 6 profiles). FIRST session/list_sessions in design (ALL 6 profiles). FIRST neon/create_branch in ops (ALL 6 profiles). FIRST github/push_files in finance+governance. FIRST cloudflare-builds/workers_builds_trigger in ENTIRE catalog. FIRST neon/delete_branch in ENTIRE catalog. FIRST stripe/create_customer in code+communication. FIRST stripe/create_invoice in communication.",
   "generatedFrom": "E-catalog-ninety-fifth-pass",
   "profiles": {
     "finance": {
@@ -2250,6 +2250,28 @@
           "accomplishes": "Search the ChittyEvidence RAG for financial contract patterns, cross-reference with AI-powered evidence search for billing compliance anomalies, reason about discrepancies, and write a contracts summary.",
           "verified": true,
           "notes": "FIRST chittyevidence/search in finance. chittyevidence/search + evidence/ai_search + thinking + fs — all confirmed connected."
+        },
+        {
+          "name": "finance-github-push-files-billing-report",
+          "chain": [
+            "stripe/list_invoices",
+            "thinking/sequentialthinking",
+            "github/push_files"
+          ],
+          "accomplishes": "Pull recent Stripe invoices, reason about billing trends and outstanding amounts, and push a structured monthly billing report to the finance GitHub repository for audit trail and CI-triggered downstream notifications.",
+          "verified": false,
+          "notes": "FIRST github/push_files in finance. stripe not connected (auth-gated). github/push_files lazy (GitHub token required)."
+        },
+        {
+          "name": "finance-cloudflare-builds-trigger-billing-worker-deploy",
+          "chain": [
+            "neon/run_sql",
+            "thinking/sequentialthinking",
+            "cloudflare-builds/workers_builds_trigger"
+          ],
+          "accomplishes": "Query the billing database for pending schema migrations or configuration changes, reason about deployment readiness, and trigger a Cloudflare Builds worker deploy to push the billing service update.",
+          "verified": false,
+          "notes": "FIRST cloudflare-builds/workers_builds_trigger in ENTIRE catalog. cloudflare-builds not connected (auth-gated). neon gated."
         }
       ],
       "prompts": [
@@ -2904,6 +2926,14 @@
         {
           "text": "Search ChittyEvidence for financial contract patterns and cross-reference with AI evidence to write a contracts summary",
           "resolves_to": "finance-chittyevidence-search-financial-contracts"
+        },
+        {
+          "text": "Push a monthly billing summary report to the finance GitHub repo",
+          "resolves_to": "finance-github-push-files-billing-report"
+        },
+        {
+          "text": "Trigger a Cloudflare Builds deploy for the billing worker after a schema change",
+          "resolves_to": "finance-cloudflare-builds-trigger-billing-worker-deploy"
         }
       ]
     },
@@ -5408,6 +5438,30 @@
           "accomplishes": "Create a new policy-archive directory for the current compliance cycle, write the policy index file, verify completeness against the Evidence RAG, and publish the archive manifest to Notion.",
           "verified": true,
           "notes": "FIRST fs/create_directory in governance. fs + evidence + notion — all confirmed connected."
+        },
+        {
+          "name": "governance-chittyevidence-search-policy-pattern-audit",
+          "chain": [
+            "chittyevidence/search",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search the ChittyEvidence RAG for existing policy compliance patterns and precedents, cross-reference with AI-powered evidence search for regulatory gaps, reason about risk exposure and remediation priority, and write a governance audit report to Notion.",
+          "verified": true,
+          "notes": "FIRST chittyevidence/search in governance. chittyevidence/search + evidence/ai_search + thinking + notion — all confirmed connected in live gateway."
+        },
+        {
+          "name": "governance-github-push-files-policy-compliance-docs",
+          "chain": [
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "github/push_files",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search the evidence RAG for up-to-date compliance requirements and regulatory changes, reason about policy gaps and required updates, push revised compliance documentation to the governance repository on GitHub, and link the commit in a Notion policy tracker.",
+          "verified": false,
+          "notes": "FIRST github/push_files in governance. github/push_files lazy (GitHub token required). evidence/ai_search + thinking + notion connected."
         }
       ],
       "prompts": [
@@ -6146,6 +6200,14 @@
         {
           "text": "Create a policy-archive directory, write the index file, verify against Evidence, and publish the manifest to Notion",
           "resolves_to": "governance-fs-create-directory-policy-archive"
+        },
+        {
+          "text": "Search policy evidence and generate a compliance audit report",
+          "resolves_to": "governance-chittyevidence-search-policy-pattern-audit"
+        },
+        {
+          "text": "Update governance documentation in GitHub from evidence findings",
+          "resolves_to": "governance-github-push-files-policy-compliance-docs"
         }
       ]
     },
@@ -8284,6 +8346,29 @@
           "accomplishes": "Create the scaffold directory structure for a new UI component, navigate to the Storybook preview to capture the initial render, screenshot the component baseline, and post the scaffold report to Notion.",
           "verified": true,
           "notes": "FIRST fs/create_directory in design. fs + playwright + notion — all confirmed connected."
+        },
+        {
+          "name": "design-chittyevidence-search-ux-pattern-research",
+          "chain": [
+            "chittyevidence/search",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search the ChittyEvidence RAG for established UX patterns and prior design research artifacts, cross-reference with library documentation for component implementation context, reason about the optimal design approach, and write a design decision record to Notion.",
+          "verified": true,
+          "notes": "FIRST chittyevidence/search in design. chittyevidence/search + context7 + thinking + notion — all confirmed connected."
+        },
+        {
+          "name": "design-session-list-sessions-ux-prototype-context",
+          "chain": [
+            "session/list_sessions",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "List active prototype sessions to understand concurrent design work in progress, reason about context conflicts or collaboration opportunities across parallel design tracks, and write a design session summary to Notion.",
+          "verified": false,
+          "notes": "FIRST session/list_sessions in design — completes ALL 6 profiles. session gated (ChittyOS session service)."
         }
       ],
       "prompts": [
@@ -8902,6 +8987,14 @@
         {
           "text": "Scaffold a new UI component directory, navigate to Storybook, screenshot the baseline render, and post to Notion",
           "resolves_to": "design-fs-create-directory-component-scaffold"
+        },
+        {
+          "text": "Research UX patterns from evidence RAG and document design decisions in Notion",
+          "resolves_to": "design-chittyevidence-search-ux-pattern-research"
+        },
+        {
+          "text": "Review active prototype sessions and summarize design context",
+          "resolves_to": "design-session-list-sessions-ux-prototype-context"
         }
       ]
     },
@@ -11391,6 +11484,30 @@
           "accomplishes": "Navigate to the integration test form, fill it with test parameters, wait for async validation to complete, cross-reference the validation output with Evidence for known failure patterns, and write the integration test report.",
           "verified": true,
           "notes": "Deepens playwright/browser_fill_form + browser_wait_for in code with evidence/ai_search cross-reference. playwright + evidence + fs — all confirmed connected."
+        },
+        {
+          "name": "code-stripe-create-customer-billing-sdk-test",
+          "chain": [
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "stripe/create_customer",
+            "neon/run_sql"
+          ],
+          "accomplishes": "Resolve the Stripe SDK library to get accurate billing API documentation, create a test customer in Stripe to verify billing integration behavior, and record the customer ID plus billing state in the Neon database for integration test tracking.",
+          "verified": false,
+          "notes": "FIRST stripe/create_customer in code. context7 confirmed connected. stripe + neon gated (auth-required)."
+        },
+        {
+          "name": "code-neon-delete-branch-feature-cleanup",
+          "chain": [
+            "neon/describe_branch",
+            "neon/delete_branch",
+            "github/search_issues",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Describe a feature Neon database branch to confirm it is idle after merge, delete the branch to reclaim DB resources, cross-check the associated GitHub issue for closure confirmation, and log the cleanup event to Notion.",
+          "verified": false,
+          "notes": "FIRST neon/delete_branch in ENTIRE catalog. neon gated (auth-required). github + notion confirmed connected."
         }
       ],
       "prompts": [
@@ -12117,6 +12234,14 @@
         {
           "text": "Fill the integration test form, wait for async validation, cross-check failures against Evidence, and write the test report",
           "resolves_to": "code-playwright-fill-wait-form-evidence-integration-test"
+        },
+        {
+          "text": "Create a test Stripe customer and record billing state in Neon for integration tests",
+          "resolves_to": "code-stripe-create-customer-billing-sdk-test"
+        },
+        {
+          "text": "Delete the feature Neon branch after merge and log the cleanup",
+          "resolves_to": "code-neon-delete-branch-feature-cleanup"
         }
       ]
     },
@@ -14254,6 +14379,29 @@
           "accomplishes": "Navigate to a broadcast-submission portal, fill the form with campaign message parameters, wait for platform validation, screenshot the confirmation state, and log the campaign submission to Notion.",
           "verified": true,
           "notes": "FIRST playwright/browser_fill_form + browser_wait_for in communication. playwright + notion — all confirmed connected."
+        },
+        {
+          "name": "comm-stripe-create-customer-team-billing-onboard",
+          "chain": [
+            "stripe/create_customer",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Create a new Stripe customer record for an onboarded team or client, reason about the appropriate billing tier and invoice configuration, and post the onboarding billing summary to a Notion team billing tracker.",
+          "verified": false,
+          "notes": "FIRST stripe/create_customer in communication. stripe gated. thinking + notion confirmed connected. comm constraint: thinking ✓ notion ✓."
+        },
+        {
+          "name": "comm-stripe-create-invoice-billing-status-broadcast",
+          "chain": [
+            "stripe/list_payment_intents",
+            "stripe/create_invoice",
+            "thinking/sequentialthinking",
+            "tasks/create_task"
+          ],
+          "accomplishes": "List recent payment intents to assess outstanding billing status, create a new Stripe invoice for unpaid amounts, reason about follow-up priority and escalation path, and create a billing follow-up task for the team.",
+          "verified": false,
+          "notes": "FIRST stripe/create_invoice in communication. stripe + tasks gated. thinking confirmed connected. comm constraint: thinking ✓ tasks ✓."
         }
       ],
       "prompts": [
@@ -14880,6 +15028,14 @@
         {
           "text": "Fill the broadcast submission form, wait for validation, screenshot the confirmation, and log to Notion",
           "resolves_to": "comm-playwright-fill-form-wait-broadcast-submission"
+        },
+        {
+          "text": "Onboard a new team to Stripe billing and create their customer record",
+          "resolves_to": "comm-stripe-create-customer-team-billing-onboard"
+        },
+        {
+          "text": "Create and send a Stripe invoice for outstanding amounts with follow-up task",
+          "resolves_to": "comm-stripe-create-invoice-billing-status-broadcast"
         }
       ]
     },
@@ -17373,6 +17529,30 @@
           "accomplishes": "Navigate to the monitoring dashboard, fill the query filter form with incident parameters, wait for dashboard metrics to load, screenshot the current health state, and ingest the visual evidence into the Evidence RAG for post-incident correlation.",
           "verified": true,
           "notes": "FIRST playwright/browser_fill_form + browser_wait_for in ops. playwright + evidence — all confirmed connected."
+        },
+        {
+          "name": "ops-chittyevidence-search-incident-pattern-discovery",
+          "chain": [
+            "chittyevidence/search",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search the ChittyEvidence RAG for historical incident patterns matching the current failure signature, cross-reference with AI-powered evidence for known root-cause indicators, reason about remediation priority and escalation, and write an incident pattern report to Notion.",
+          "verified": true,
+          "notes": "FIRST chittyevidence/search in ops — completes ALL 6 profiles for chittyevidence/search. chittyevidence/search + evidence/ai_search + thinking + notion — all confirmed connected."
+        },
+        {
+          "name": "ops-neon-create-branch-incident-db-isolation",
+          "chain": [
+            "neon/create_branch",
+            "neon/run_sql",
+            "evidence/ingest_document",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Create a Neon database branch to isolate the incident data state for forensic analysis without affecting production, run diagnostic SQL queries against the isolated branch to surface anomalies, ingest query results into the Evidence RAG as incident artifacts, and write the DB forensics summary to Notion.",
+          "verified": false,
+          "notes": "Completes neon/create_branch to ALL 6 profiles. neon gated (auth-required). evidence/ingest_document + notion confirmed connected."
         }
       ],
       "prompts": [
@@ -18107,6 +18287,14 @@
         {
           "text": "Fill the monitoring dashboard filter form, wait for metrics to load, screenshot the health state, and ingest into Evidence",
           "resolves_to": "ops-playwright-fill-form-wait-monitoring-probe"
+        },
+        {
+          "text": "Search incident patterns in evidence RAG and create an incident pattern report",
+          "resolves_to": "ops-chittyevidence-search-incident-pattern-discovery"
+        },
+        {
+          "text": "Create a Neon database branch for incident DB forensics and isolation",
+          "resolves_to": "ops-neon-create-branch-incident-db-isolation"
         }
       ]
     }
