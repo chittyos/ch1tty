@@ -9,7 +9,7 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 - [x] **B** — GitHub MCP migration: `servers.json` `github` entry migrated to hosted remote `https://api.githubcopilot.com/mcp/` with `envHeaders: { "Authorization": "GITHUB_MCP_AUTHORIZATION" }`. Deprecated `@modelcontextprotocol/server-github` removed. ✅ DONE
 - [x] **C** — Focus-profile layer: `focus-profiles.json` (6 profiles: finance, governance, design, code, communication, ops), `src/focus.ts`, full aggregator integration (env `CH1TTY_FOCUS`, per-call `focus` param on `search`/`cast`, `status` reports active focus). Tests in `test/focus.test.ts` + coverage gap tests. ✅ DONE
 - [x] **D** — Scenario testing + simulation: `sim/` harness (`scenarios.ts`, `run.ts`, `fixture-backend.ts`), `test/scenario.test.ts`, `test/simulation.test.ts`, cloudflare-builds ops coverage fixtures + scenarios. ✅ DONE
-- [ ] **E** — Alchemist brainstorm: catalog in `focus-suggestions.json`. **IN PROGRESS** — 73rd pass open (736 combos / 357 verified, PR #269). FIRST 21-step chains across ALL 6 profiles (catalog record!). New cross-backend pairings: cloudflare-builds+finance, cloudflare-builds+neon, context7→evidence ingest, browser-rendering→evidence archive, neon→linear issue, linear sprint→Notion broadcast.
+- [ ] **E** — Alchemist brainstorm: catalog in `focus-suggestions.json`. **IN PROGRESS** — 90th pass open (940 combos / 444 verified / 961 prompts, PR #286). FIRST mcp-dev:build-mcp-server in 4 new profiles (finance/code/comm/ops); FIRST stripe/finalize_invoice in 4 profiles (now ALL 6 covered); FIRST github/search_pull_requests in governance+ops; FIRST ch1tty/search in design.
 
 ## Blocker
 
@@ -1820,4 +1820,47 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 **Next run priority**:
 1. Merge this PR when CI green
 2. 87th catalog pass: `github/create_issue` depth in design (still only 1); `stripe/finalize_invoice` FIRST use (never cataloged in any profile); `cloudflare/deploy_worker` depth in finance (2 combos — add 3rd); `linear/list_issues` depth in code (only 1); `tasks/update_task` depth in ops (only 2 combos)
+3. Fix Notion auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` to unblock cross-run board writes
+
+---
+
+### 2026-06-08T20:10Z — Session 01A9tyzdSDBCmxxubDiup31i (90th pass)
+
+**Workstream advanced**: E (Alchemist brainstorm — catalog 90th pass)
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass / 0 fail / 2 skipped
+- No open PRs at start. `origin/main` HEAD: `69b28242` (89th pass — 928 combos / 443 verified / 949 prompts)
+- NOTE: local `main` and `origin/main` have NO common ancestor (diverged git histories); branch was created from detached HEAD at `origin/main` directly to avoid using stale local main (55 combos).
+- Workstream states: A ✅ B ✅ C ✅ D ✅ E in-progress (confirmed via DRIVER-LOG + repo scan)
+- Notion board still 401 — DRIVER-LOG.md remains cross-run fallback
+- Coverage gap analysis (post 89th pass):
+  - `orchestrator/skill_execute(mcp-dev:build-mcp-server)` — ONLY in design (1/6 profiles)
+  - `stripe/finalize_invoice` — ONLY in finance + ops (2/6 profiles)
+  - `github/search_pull_requests` — ONLY in code (1/6 profiles)
+  - `session/get_session` — ONLY in governance (1/6 profiles)
+  - `ch1tty/search` (meta-tool itself) — ONLY in code (1/6 profiles)
+- Created branch `auto/E-catalog-ninetieth-pass`; added 12 combos + 12 prompts (2 per profile):
+  - **finance**: `finance-mcp-dev-payments-surface` ❌ (FIRST mcp-dev:build-mcp-server in finance), `finance-session-billing-state-snapshot` ❌ (FIRST session/get_session in finance)
+  - **governance**: `governance-stripe-finalize-policy-enforcement` ❌ (FIRST stripe/finalize_invoice in governance), `governance-github-pr-compliance-audit` ❌ (FIRST github/search_pull_requests in governance)
+  - **design**: `design-stripe-finalize-checkout-ux-verify` ❌ (FIRST stripe/finalize_invoice in design), `design-ch1tty-search-component-discovery` ✅ (FIRST ch1tty/search in design — verified because ch1tty/search is always available)
+  - **code**: `code-mcp-dev-payments-sdk-surface` ❌ (FIRST mcp-dev:build-mcp-server in code), `code-stripe-finalize-billing-module-test` ❌ (FIRST stripe/finalize_invoice in code)
+  - **communication**: `comm-mcp-dev-integration-surface` ❌ (FIRST mcp-dev:build-mcp-server in communication), `comm-stripe-payment-finalize-notify` ❌ (FIRST stripe/finalize_invoice in communication)
+  - **ops**: `ops-github-pr-deploy-gate` ❌ (FIRST github/search_pull_requests in ops), `ops-mcp-dev-infra-surface` ❌ (FIRST mcp-dev:build-mcp-server in ops)
+- 1 new verified, 11 unverified (stripe/github/orchestrator lazy or auth-gated)
+- JSON validation: 0 duplicate names, 0 missing required fields, 0 non-namespaced tools, 0 bad resolves_to ✓
+- 0 test failures. Tests: 938 pass / 0 fail / 2 skipped ✓
+- Catalog: 928 → **940 combos / 443 → 444 verified / 949 → 961 prompts**
+- Codex bot posted rate-limit notice on PR — no action needed
+- CI queued (2 CodeQL checks) at run end
+
+**Branch / PR**: `auto/E-catalog-ninetieth-pass` → PR #286 (https://github.com/chittyos/ch1tty/pull/286)
+
+**Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
+
+**Board state**: 940 combos / 444 verified / 961 prompts. MILESTONES: `mcp-dev:build-mcp-server` now in 5/6 profiles (finance, code, communication, ops added). `stripe/finalize_invoice` now in ALL 6 profiles (governance, design, code, communication added). `github/search_pull_requests` in 3 profiles (governance, ops added). `session/get_session` in 2 profiles (finance added). `ch1tty/search` in 2 profiles (design added).
+
+**Next run priority**:
+1. Merge PR #286 if CI green (CodeQL typically green for JSON-only change)
+2. 91st catalog pass: `mcp-dev:build-mcp-server` in communication (still unverified depth); `github/search_pull_requests` in design + finance + communication (still 0 each — 3 profiles); `session/get_session` in design, code, communication, ops (still 0 each — 4 profiles); `ch1tty/search` in finance, governance, communication, ops (still 0 each — 4 profiles); `stripe/list_payment_intents` depth in governance (only 0 — add first use)
 3. Fix Notion auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` to unblock cross-run board writes
