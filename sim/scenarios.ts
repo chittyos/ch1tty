@@ -115,6 +115,20 @@ export const SCENARIOS: Scenario[] = [
     expect: 'ledger/append_entry',
     note: 'near-misses: tasks/record_billing_event (billing but task not ledger), stripe/record_charge (payment but not ledger)',
   },
+  {
+    id: 'finance.list-subscriptions',
+    focus: 'finance',
+    intent: 'list active subscriptions for a customer',
+    expect: 'stripe/list_subscriptions',
+    note: 'near-misses: tasks/list_tasks (list keyword); stripe uniquely has subscriptions',
+  },
+  {
+    id: 'finance.list-ledger-namespaces',
+    focus: 'finance',
+    intent: 'list all ledger namespaces',
+    expect: 'ledger/list_namespaces',
+    note: 'near-miss: ledger/list_entries (same server, list+ledger but not namespaces)',
+  },
 
   // ── GOVERNANCE journey ───────────────────────────────────────
   {
@@ -177,6 +191,20 @@ export const SCENARIOS: Scenario[] = [
     note: 'near-miss: playwright/screenshot',
   },
   {
+    id: 'design.click-action',
+    focus: 'design',
+    intent: 'click an element on the page by css selector',
+    expect: 'playwright/click',
+    note: 'near-misses: playwright/screenshot (page keyword), browser-rendering/render_page (page keyword); click+selector uniquely scores playwright/click',
+  },
+  {
+    id: 'design.navigate',
+    focus: 'design',
+    intent: 'navigate the browser to a url',
+    expect: 'playwright/navigate',
+    note: 'near-miss: browser-rendering/render_page (url keyword); navigate+browser uniquely matches playwright/navigate',
+  },
+  {
     // REORDER probe: cross-focus near-miss. Without focus, pdf/render_pdf (documents,
     // out of the design lens) is a strong literal match. With the design focus, the
     // +0.5 boost must lift the in-focus browser-rendering tool above it.
@@ -216,6 +244,20 @@ export const SCENARIOS: Scenario[] = [
     expect: 'linear/list_issues',
     note: 'linear is in-focus via code profile servers list; near-miss: github/create_issue (issue keyword)',
   },
+  {
+    id: 'code.run-sql',
+    focus: 'code',
+    intent: 'run a sql query against the database',
+    expect: 'neon/run_sql',
+    note: 'near-miss: neon/list_projects (same server, database keyword); run+sql uniquely matches neon/run_sql',
+  },
+  {
+    id: 'code.read-file',
+    focus: 'code',
+    intent: 'read the contents of a configuration file',
+    expect: 'fs/read_file',
+    note: 'near-miss: fs/write_file (file keyword); read+contents uniquely scores fs/read_file; fs is in-focus via code profile servers list',
+  },
 
   // ── communication focus ──────────────────────────────────────────────────────
   {
@@ -245,6 +287,20 @@ export const SCENARIOS: Scenario[] = [
     intent: 'create a follow-up task to track the deployment issue from the team message',
     expect: 'tasks/create_task',
     note: 'near-miss: imessage/send_message (message keyword), notion/create_page (create keyword); tasks in communication profile via servers list',
+  },
+  {
+    id: 'comm.create-note',
+    focus: 'communication',
+    intent: 'create a new note in Apple Notes',
+    expect: 'chittymac/create_note',
+    note: 'near-misses: chittymac/search_notes and chittymac/list_notes (apple+notes keywords); create+new distinguishes create_note',
+  },
+  {
+    id: 'comm.list-conversations',
+    focus: 'communication',
+    intent: 'list recent imessage conversations',
+    expect: 'imessage/list_conversations',
+    note: 'near-miss: imessage/search_messages (same server, imessage keyword); list+conversations uniquely matches list_conversations; imessage serverId exact match gives nameBonus',
   },
 
   // ── ops journey ──────────────────────────────────────────────
