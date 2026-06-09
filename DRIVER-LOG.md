@@ -1867,6 +1867,51 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 
 ---
 
+### 2026-06-09 — Session 017CMGjfZX43YqNoYuxHzoXo (92nd pass)
+
+**Workstream advanced**: E (Alchemist brainstorm — catalog 92nd pass)
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass / 0 fail / 2 skipped
+- Found 1 open PR: #287 (91st pass, 952 combos / 447 verified, CI: 3/3 green — CodeQL ✓, Analyze-actions ✓, Analyze-javascript-typescript ✓)
+- **Merged PR #287** (squash) → main now at `fdfd232` (952 combos / 447 verified / 973 prompts)
+- Workstream states: A ✅ B ✅ C ✅ D ✅ E in-progress (confirmed via DRIVER-LOG + repo scan)
+- Notion board still 401 — DRIVER-LOG.md remains cross-run fallback
+- Live gateway: v4.1.0, 15 servers, connected servers include orchestrator (13 tools), evidence (3), browser-rendering (3), context7 (2), thinking (1), fs (14), playwright (23)
+- Coverage gap analysis (post 91st pass):
+  - `workflow:machine-management`: ops-only (7 combos) — MISSING from ALL 5 other profiles
+  - `user:cast`: 4/6 — MISSING from finance + ops
+  - `session/get_session`: 4/6 — MISSING from design + communication
+  - `cloudflare-builds/workers_builds_cancel`: ZERO everywhere — never cataloged in entire history
+  - `stripe/list_payment_intents`: finance-only — MISSING from 5 profiles
+  - `neon/complete_database_migration`: 2/6 (finance + code) — MISSING from 4 profiles
+- Created branch `auto/E-catalog-ninety-second-pass`; added 12 combos + 12 prompts (2 per profile):
+  - **finance**: `finance-user-cast-billing-analysis` ✅ (FIRST user:cast in finance), `finance-workflow-machine-billing-pipeline` ✅ (FIRST workflow:machine-management in finance)
+  - **governance**: `governance-workflow-machine-policy-compliance` ✅ (FIRST workflow:machine-management in governance), `governance-neon-complete-migration-schema-audit` ❌ (neon+notion gated)
+  - **design**: `design-workflow-machine-ux-provisioning` ✅ (FIRST workflow:machine-management in design), `design-session-get-ux-prototype-context` ❌ (session gated)
+  - **code**: `code-workflow-machine-ci-pipeline` ✅ (FIRST workflow:machine-management in code), `code-stripe-list-payment-intents-billing-module` ❌ (stripe+notion gated)
+  - **communication**: `comm-workflow-machine-broadcast-coordination` ❌ (tasks gated), `comm-session-get-channel-broadcast-context` ❌ (session+notion+tasks gated)
+  - **ops**: `ops-user-cast-incident-triage` ✅ (FIRST user:cast in ops), `ops-cloudflare-builds-cancel-emergency-rollback` ❌ (FIRST workers_builds_cancel in ENTIRE catalog; cloudflare-builds gated)
+- 6 new verified combos. 0 test failures. Tests: 938 pass / 0 fail / 2 skipped ✓
+- JSON validation: 0 duplicate names, 0 missing required fields, 0 non-namespaced tools, 0 bad resolves_to ✓
+- Catalog: 952 → **964 combos / 447 → 453 verified / 973 → 985 prompts**
+- Pushed branch, opened PR #288; CI queued (2 CodeQL checks) at run end
+
+**Branch / PR**: `auto/E-catalog-ninety-second-pass` → PR #288 (https://github.com/chittyos/ch1tty/pull/288)
+
+**Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
+
+**Board state**: 964 combos / 453 verified / 985 prompts. MILESTONES: `workflow:machine-management` now in ALL 6 profiles (finance/governance/design/code/comm added). `user:cast` now in ALL 6 profiles (finance+ops added). `session/get_session` now in ALL 6 profiles (design+comm added). FIRST `cloudflare-builds/workers_builds_cancel` in entire catalog. FIRST `stripe/list_payment_intents` in code. FIRST `neon/complete_database_migration` in governance.
+
+**Next run priority**:
+1. Merge PR #288 if CI green (CodeQL typically green for JSON-only change)
+2. 93rd catalog pass: `stripe/list_payment_intents` in governance/design/communication/ops (4 profiles still 0); `neon/complete_database_migration` in design/communication/ops (3 profiles still 0); `session/append_event` in code (check if 5/6 or still missing); `cloudflare-builds/workers_builds_trigger` (never cataloged — check if it exists); deeper `workflow:machine-management` chains now that all 6 profiles have it (add 2nd combo per profile for depth)
+3. Fix Notion auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` to unblock cross-run board writes
+
+---
+
+<!-- out-of-order archival: this 90th-pass entry was written by a session that ran after the 91st-pass entry was already merged to main, so it landed at the end of the file rather than in strict chronological position. Content is authentic. -->
+
 ### 2026-06-08T20:10Z — Session 01A9tyzdSDBCmxxubDiup31i (90th pass)
 
 **Workstream advanced**: E (Alchemist brainstorm — catalog 90th pass)
