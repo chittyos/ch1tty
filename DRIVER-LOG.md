@@ -1824,6 +1824,49 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 
 ---
 
+### 2026-06-09 — Session auto-driver run (91st pass)
+
+**Workstream advanced**: E (Alchemist brainstorm — catalog 91st pass)
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass / 0 fail / 2 skipped
+- Found 1 open PR at start: #286 (90th pass, 940 combos / 444 verified / 961 prompts). CI: **2/3 checks green, 1 queued at start** → checked and all green (CodeQL + 2 Analyze). Merged PR #286 (squash) → main now at c2292ad
+- Workstream states: A ✅ B ✅ C ✅ D ✅ E in-progress (confirmed via DRIVER-LOG + repo scan)
+- Notion board still 401 — DRIVER-LOG.md remains cross-run fallback
+- Coverage gap analysis (post 90th-pass): 940 combos / 444 verified / 961 prompts
+  - `github/search_issues` in design: **0** — LAST remaining profile (was FIRST in 5 others via 88th pass)
+  - `mcp-dev:build-mcp-server` in governance: **0** — LAST remaining profile (5/6 done via 90th pass)
+  - `ch1tty/search` in finance, governance, communication, ops: **0** each — only design+code had it
+  - `github/search_pull_requests` in finance, design, communication: **0** each — only governance+code+ops
+  - `session/get_session` in code, ops: **0** — only finance+governance had it
+  - `user:cast` in communication: **0** — only governance+design+code had it
+  - `neon/complete_database_migration` in code: **0** — only finance had it
+- Created branch `auto/E-catalog-ninety-first-pass`; added 12 combos + 12 prompts (2 per profile):
+  - **finance**: `finance-ch1tty-search-billing-tool-discovery` ✅ (FIRST ch1tty/search in finance; verified), `finance-github-pr-release-billing-gate` ❌ (FIRST github/search_pull_requests in finance)
+  - **governance**: `governance-mcp-dev-compliance-surface` ❌ (FIRST+LAST mcp-dev — ALL 6 PROFILES!), `governance-ch1tty-search-policy-tool-discovery` ✅ (FIRST ch1tty/search; verified)
+  - **design**: `design-github-search-issues-ux-tracker` ❌ (FIRST+LAST github/search_issues — ALL 6 PROFILES!), `design-github-pr-component-review` ❌ (FIRST github/search_pull_requests)
+  - **code**: `code-session-pr-context-snapshot` ❌ (FIRST session/get_session in code), `code-neon-complete-migration-impl` ❌ (FIRST neon/complete_database_migration in code)
+  - **communication**: `comm-github-pr-release-broadcast` ❌ (FIRST github/search_pull_requests in comm), `comm-user-cast-intent-broadcast` ❌ (FIRST user:cast in comm)
+  - **ops**: `ops-session-incident-context-snapshot` ❌ (FIRST session/get_session in ops), `ops-ch1tty-search-tool-discovery` ✅ (FIRST ch1tty/search in ops; verified)
+- 3 new verified combos (finance-ch1tty, governance-ch1tty, ops-ch1tty — all use always-available ch1tty/search + verified backends)
+- JSON validation: 0 duplicate names (952 unique), 0 missing required fields, 0 non-namespaced tools, 0 bad resolves_to, code constraint ✓, comm constraint ✓
+- 0 test failures. Tests: 938 pass / 0 fail / 2 skipped ✓
+- Catalog: 940 → **952 combos / 444 → 447 verified / 961 → 973 prompts**
+- Pushed branch, opened PR #287; CI queued (2 CodeQL Analyze checks); Codex rate-limit comment (no action, pre-existing pattern)
+
+**Branch / PR**: `auto/E-catalog-ninety-first-pass` → PR #287 (https://github.com/chittyos/ch1tty/pull/287)
+
+**Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
+
+**Board state**: 952 combos / 447 verified / 973 prompts. MILESTONES: `github/search_issues` now ALL 6 profiles ✅. `mcp-dev:build-mcp-server` now ALL 6 profiles ✅. `ch1tty/search` meta-tool now ALL 6 profiles ✅. `github/search_pull_requests` now ALL 6 profiles ✅. 4 major tool types at 6/6 coverage in single pass.
+
+**Next run priority**:
+1. Merge PR #287 when CI green (JSON-only change, CodeQL typically green)
+2. 92nd catalog pass: `session/get_session` in design + communication (still 0 — 2 profiles remaining); `user:cast` in finance + ops (still 0 — 2 profiles remaining); `neon/complete_database_migration` in governance, design, communication, ops (4 profiles still 0); `session/append_event` in code (5/6 — only code missing); `stripe/list_payment_intents` in governance/design/code/communication/ops (only finance has it — 5 missing)
+3. Fix Notion auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` to unblock cross-run board writes
+
+---
+
 ### 2026-06-08T20:10Z — Session 01A9tyzdSDBCmxxubDiup31i (90th pass)
 
 **Workstream advanced**: E (Alchemist brainstorm — catalog 90th pass)
