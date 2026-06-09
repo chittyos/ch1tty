@@ -2130,3 +2130,53 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 1. Merge PR #292 when CI green (CodeQL typically green for JSON-only change)
 2. 97th catalog pass: `github/push_files` to design/code/communication/ops (4 profiles still 0); `cloudflare-builds/workers_builds_trigger` to governance/design/code/communication/ops (5 profiles still 0); `stripe/create_customer` to design/ops (2 profiles still 0); `neon/delete_branch` to other profiles (5 still missing)
 3. Fix Notion auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`
+
+---
+
+### 2026-06-09 — Session (auto-driver run, 97th pass)
+
+**Workstream advanced**: E (Alchemist brainstorm — catalog 97th pass)
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass / 0 fail / 2 skipped
+- Found 1 open PR: #292 (96th pass, 1012 combos / 480 verified, **3/3 CI green**). Squash-merged → main now at `cbba3f4` (1012 combos / 480 verified / 1033 prompts)
+- Workstream states: A ✅ B ✅ C ✅ D ✅ E in-progress (confirmed via DRIVER-LOG + repo scan)
+- Notion board still 401 — DRIVER-LOG.md remains cross-run fallback
+- Coverage gap analysis (post 96th pass) via Python scan of focus-suggestions.json:
+  - `serena/search_code`: 5/6 — MISSING governance
+  - `ch1tty/search`: 5/6 — MISSING communication
+  - `tasks/complete_task`: 5/6 — MISSING communication
+  - `orchestrator/agent_execute(notes)`: 5/6 — MISSING code
+  - `orchestrator/skill_execute(workflow:market)`: 5/6 — MISSING code
+  - `stripe/list_payment_intents`: 5/6 — MISSING design
+  - `orchestrator/agent_execute(autobot)`: 5/6 — MISSING design
+  - `notion/API-patch-page`: 5/6 — MISSING ops
+  - `stripe/create_customer`: 4/6 — MISSING design+ops
+  - `github/create_pull_request`: 2/6 — MISSING finance+governance+design+communication
+- Created branch `auto/E-catalog-ninety-seventh-pass`; added 12 combos + 12 prompts (2 per profile):
+  - **finance**: `finance-github-create-pr-billing-release` (FIRST github/create_pull_request in finance), `finance-github-list-prs-quarterly-sprint-review` (FIRST github/list_pull_requests in finance)
+  - **governance**: `governance-serena-policy-codebase-audit` ✅ (FIRST serena/search_code in governance — ALL 6!), `governance-github-create-pr-policy-remediation` (FIRST github/create_pull_request in governance)
+  - **design**: `design-stripe-list-payment-intents-checkout-ux-audit` (FIRST stripe/list_payment_intents in design — ALL 6!), `design-orchestrator-autobot-ux-flow-check` (FIRST agent_execute(autobot) in design — ALL 6!)
+  - **code**: `code-orchestrator-notes-agent-sdk-doc-push` (FIRST agent_execute(notes) in code — ALL 6!), `code-orchestrator-workflow-market-plugin-release` (FIRST skill_execute(workflow:market) in code — ALL 6!)
+  - **communication**: `comm-ch1tty-search-broadcast-discovery` (FIRST ch1tty/search in communication — ALL 6!), `comm-tasks-complete-follow-up-broadcast` (FIRST tasks/complete_task in communication — ALL 6!)
+  - **ops**: `ops-notion-patch-page-deploy-status` (FIRST notion/API-patch-page in ops — ALL 6!), `ops-stripe-create-customer-saas-tenant-onboard` (FIRST stripe/create_customer in ops)
+- 8 tools completed to ALL 6 profiles this pass (largest ALL-6 sweep to date)
+- 0 test failures. Tests: 938 pass / 0 fail / 2 skipped ✓
+- JSON: 1024 unique names, 0 duplicates, 0 missing required fields, code ✅, comm ✅
+- Catalog: 1012 → **1024 combos / 480 verified (unchanged) / 1033 → 1045 prompts**
+- Pushed branch, opened PR #293; Codex rate-limited (no action — pre-existing pattern)
+- Updated DRIVER-LOG.md with this run entry
+
+**Branch / PR**: `auto/E-catalog-ninety-seventh-pass` → PR #293 (https://github.com/chittyos/ch1tty/pull/293)
+
+**Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
+
+**Board state**: 1024 combos / 480 verified / 1045 prompts. MILESTONES: `serena/search_code` ALL 6 ✅. `ch1tty/search` ALL 6 ✅. `tasks/complete_task` ALL 6 ✅. `orchestrator/agent_execute(notes)` ALL 6 ✅. `orchestrator/skill_execute(workflow:market)` ALL 6 ✅. `stripe/list_payment_intents` ALL 6 ✅. `orchestrator/agent_execute(autobot)` ALL 6 ✅. `notion/API-patch-page` ALL 6 ✅.
+
+**Blockers**:
+- Notion auth 401: run `chitty-mcp-token notion` or rotate integration token in workspace settings
+
+**Next run priority**:
+1. Merge PR #293 when CI green (CodeQL typically green for JSON-only change)
+2. 98th catalog pass: `stripe/create_customer` to design (last missing profile — 5/6 → ALL 6); `github/create_pull_request` to design/communication/ops (still 4/6 after this pass); `github/list_pull_requests` to governance/design/communication (still 3/6); `github/push_files` to code/communication/ops (still 3/6); `cloudflare-builds/workers_builds_trigger` depth (only finance+ops so far — 2/6)
+3. Fix Notion auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` to unblock cross-run board writes
