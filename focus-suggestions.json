@@ -1,5 +1,5 @@
 {
-  "_comment": "92nd pass — 964 combos / 453 verified / 985 prompts. FIRST workflow:machine-management in finance/governance/design/code/communication. FIRST user:cast in finance+ops. FIRST session/get_session in design+communication. FIRST cloudflare-builds/workers_builds_cancel in ENTIRE catalog. FIRST stripe/list_payment_intents in code. FIRST neon/complete_database_migration in governance.",
+  "_comment": "93rd pass — 976 combos / 453 verified / 997 prompts. FIRST session/list_events in finance. FIRST session/list_sessions in finance+code. FIRST session/append_event in code. FIRST stripe/list_payment_intents in governance+design+communication+ops (now ALL 6). FIRST stripe/create_customer+create_invoice in governance. FIRST stripe/list_invoices in design (now ALL 6). FIRST neon/complete_database_migration in design+communication+ops (now ALL 6).",
   "generatedFrom": "E-catalog-ninety-second-pass",
   "profiles": {
     "finance": {
@@ -2177,6 +2177,29 @@
           "accomplishes": "Trigger the workflow:machine-management skill to coordinate billing pipeline state, check service health via chitty-health, query evidence for anomalies, synthesize findings with sequential thinking, and write a pipeline status report to disk.",
           "verified": true,
           "notes": "orchestrator fully connected. evidence and thinking always connected. FIRST workflow:machine-management in finance."
+        },
+        {
+          "name": "finance-session-list-events-billing-log",
+          "chain": [
+            "session/list_events",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "List all recent billing workflow session events, reason through temporal patterns and anomalies with sequential thinking, and post a timestamped billing activity log to Notion.",
+          "verified": false,
+          "notes": "session is auth-gated. thinking and notion always connected. FIRST session/list_events in finance."
+        },
+        {
+          "name": "finance-session-list-sessions-finance-audit",
+          "chain": [
+            "session/list_sessions",
+            "session/get_session",
+            "evidence/ai_search",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "List all active finance sessions, retrieve details for each to examine billing context, search evidence for anomalous payment patterns, and post a session audit report to Notion.",
+          "verified": false,
+          "notes": "session is auth-gated. evidence and notion always connected. FIRST session/list_sessions in finance."
         }
       ],
       "prompts": [
@@ -2807,6 +2830,14 @@
         {
           "text": "Run the machine-management workflow to check the billing pipeline health and write a status report",
           "resolves_to": "finance-workflow-machine-billing-pipeline"
+        },
+        {
+          "text": "List recent finance session events and summarize billing workflow activity in Notion",
+          "resolves_to": "finance-session-list-events-billing-log"
+        },
+        {
+          "text": "Audit all active finance sessions for anomalous billing patterns and post a report to Notion",
+          "resolves_to": "finance-session-list-sessions-finance-audit"
         }
       ]
     },
@@ -5237,6 +5268,30 @@
           "accomplishes": "Prepare a governance database migration, compare pre/post schemas to surface compliance-relevant changes, complete the migration, reason through the schema diff for policy impact, and publish the audit result to Notion.",
           "verified": false,
           "notes": "neon auth-gated + notion 401 in env. FIRST neon/complete_database_migration in governance."
+        },
+        {
+          "name": "governance-stripe-list-payment-intents-compliance-report",
+          "chain": [
+            "stripe/list_payment_intents",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Retrieve recent payment intents from Stripe, cross-reference with compliance evidence for regulatory exposure, reason through audit implications with sequential thinking, and post a compliance report to Notion.",
+          "verified": false,
+          "notes": "stripe is lazy/auth-gated. evidence and thinking always connected. FIRST stripe/list_payment_intents in governance."
+        },
+        {
+          "name": "governance-stripe-create-invoice-vendor-billing",
+          "chain": [
+            "stripe/create_customer",
+            "stripe/create_invoice",
+            "stripe/finalize_invoice",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Create a Stripe customer record for a new vendor, generate and finalize an invoice for the engagement, then record the billing event in a Notion governance tracker for audit trail.",
+          "verified": false,
+          "notes": "stripe is lazy/auth-gated. FIRST stripe/create_customer in governance. FIRST stripe/create_invoice in governance."
         }
       ],
       "prompts": [
@@ -5951,6 +6006,14 @@
         {
           "text": "Prepare a governance DB migration, compare schemas, complete it, and publish the audit to Notion",
           "resolves_to": "governance-neon-complete-migration-schema-audit"
+        },
+        {
+          "text": "Pull recent Stripe payment intents and generate a compliance report in Notion",
+          "resolves_to": "governance-stripe-list-payment-intents-compliance-report"
+        },
+        {
+          "text": "Create a Stripe customer and invoice for a new vendor and log it in the governance tracker",
+          "resolves_to": "governance-stripe-create-invoice-vendor-billing"
         }
       ]
     },
@@ -8017,6 +8080,30 @@
           "accomplishes": "Retrieve the current UX prototype session context, capture a screenshot of the prototype state, reason about the session state relative to the UX goals, and write the session analysis to disk.",
           "verified": false,
           "notes": "session backend auth-gated in env. playwright+thinking+fs verified. FIRST session/get_session in design."
+        },
+        {
+          "name": "design-neon-complete-migration-design-system-db",
+          "chain": [
+            "neon/prepare_database_migration",
+            "neon/complete_database_migration",
+            "playwright/browser_screenshot",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Prepare and complete a database migration for a design-system component registry, capture a browser screenshot of the updated design-system preview after migration, and post a confirmation entry to Notion.",
+          "verified": false,
+          "notes": "neon is auth-gated. playwright and notion always connected. FIRST neon/complete_database_migration in design."
+        },
+        {
+          "name": "design-stripe-list-invoices-checkout-billing-ui",
+          "chain": [
+            "stripe/list_invoices",
+            "thinking/sequentialthinking",
+            "playwright/browser_screenshot",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Retrieve Stripe invoices to validate checkout billing flows, analyze UI billing edge cases and state transitions with sequential thinking, capture screenshots of billing pages, and post a UX billing audit to Notion.",
+          "verified": false,
+          "notes": "stripe is lazy/auth-gated. thinking, playwright, notion always connected. FIRST stripe/list_invoices in design."
         }
       ],
       "prompts": [
@@ -8611,6 +8698,14 @@
         {
           "text": "Get the current UX prototype session, screenshot it, and write a session analysis report",
           "resolves_to": "design-session-get-ux-prototype-context"
+        },
+        {
+          "text": "Complete the design-system DB migration and capture a screenshot of the updated preview",
+          "resolves_to": "design-neon-complete-migration-design-system-db"
+        },
+        {
+          "text": "Audit the Stripe checkout billing UI with screenshots and post a UX billing report",
+          "resolves_to": "design-stripe-list-invoices-checkout-billing-ui"
         }
       ]
     },
@@ -11024,6 +11119,30 @@
           "accomplishes": "Resolve and query Stripe SDK docs from context7 to understand the payment-intents surface, list live payment intents for billing module validation, reason through the module health, and publish the billing audit to Notion.",
           "verified": false,
           "notes": "stripe+notion auth-gated. context7+thinking verified. FIRST stripe/list_payment_intents in code."
+        },
+        {
+          "name": "code-session-append-event-dev-activity-log",
+          "chain": [
+            "session/create_session",
+            "session/append_event",
+            "orchestrator/agent_execute(chatgpt)",
+            "fs/write_file"
+          ],
+          "accomplishes": "Create a coding session, append granular development activity events to track work units and decisions, dispatch a ChatGPT agent for a natural-language code review summary, and write the full session log to disk.",
+          "verified": false,
+          "notes": "session is auth-gated. orchestrator is connected (chatgpt bound). FIRST session/append_event in code."
+        },
+        {
+          "name": "code-session-list-sessions-pr-context-snapshot",
+          "chain": [
+            "session/list_sessions",
+            "session/get_session",
+            "github/search_pull_requests",
+            "fs/write_file"
+          ],
+          "accomplishes": "List all active coding sessions, retrieve per-session details to capture PR context, search GitHub pull requests tied to those sessions, and snapshot the full development state to disk for review.",
+          "verified": false,
+          "notes": "session is auth-gated. github bound. fs always connected. FIRST session/list_sessions in code."
         }
       ],
       "prompts": [
@@ -11726,6 +11845,14 @@
         {
           "text": "Look up Stripe SDK payment-intents docs, list live payment intents, and audit the billing module in Notion",
           "resolves_to": "code-stripe-list-payment-intents-billing-module"
+        },
+        {
+          "text": "Start a coding session, log development events, and write a ChatGPT-reviewed activity summary to disk",
+          "resolves_to": "code-session-append-event-dev-activity-log"
+        },
+        {
+          "text": "List active sessions and snapshot PR context for the current sprint to disk",
+          "resolves_to": "code-session-list-sessions-pr-context-snapshot"
         }
       ]
     },
@@ -13789,6 +13916,30 @@
           "accomplishes": "Retrieve the current communication channel session context, reason through the active broadcast state, publish a session snapshot to Notion, and create a follow-up broadcast task.",
           "verified": false,
           "notes": "session+notion+tasks all auth-gated in env. thinking always connected. FIRST session/get_session in communication."
+        },
+        {
+          "name": "comm-neon-complete-migration-db-schema-broadcast",
+          "chain": [
+            "neon/prepare_database_migration",
+            "neon/complete_database_migration",
+            "orchestrator/agent_execute(notes)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Prepare and complete a database schema migration for a messaging service backend, notify the team via the notes agent with a plain-language migration summary, and log the migration event to a Notion channel update page.",
+          "verified": false,
+          "notes": "neon is auth-gated. orchestrator connected (notes agent). notion always connected. FIRST neon/complete_database_migration in communication."
+        },
+        {
+          "name": "comm-stripe-list-payment-intents-billing-status-update",
+          "chain": [
+            "stripe/list_payment_intents",
+            "orchestrator/agent_execute(chatgpt)",
+            "notion/API-post-page",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Fetch recent payment intents from Stripe, summarize billing status and outstanding items via ChatGPT agent, post a payment status update to Notion, and create a follow-up task for any intents requiring action.",
+          "verified": false,
+          "notes": "stripe is lazy/auth-gated. chatgpt agent bound. notion always connected. tasks always connected. FIRST stripe/list_payment_intents in communication."
         }
       ],
       "prompts": [
@@ -14391,6 +14542,14 @@
         {
           "text": "Get the channel session context, reason through broadcast state, publish to Notion, and create a follow-up task",
           "resolves_to": "comm-session-get-channel-broadcast-context"
+        },
+        {
+          "text": "Complete the messaging-service DB migration and broadcast the schema change to the team via notes",
+          "resolves_to": "comm-neon-complete-migration-db-schema-broadcast"
+        },
+        {
+          "text": "Summarize recent Stripe payment intents and post a billing status update to Notion with a follow-up task",
+          "resolves_to": "comm-stripe-list-payment-intents-billing-status-update"
         }
       ]
     },
@@ -16807,6 +16966,32 @@
           "accomplishes": "List active Workers builds to identify the offending deployment, cancel the problematic build to stop the rollout, reason through the rollback decision, and publish the emergency rollback log to Notion.",
           "verified": false,
           "notes": "cloudflare-builds+notion auth-gated. FIRST workers_builds_cancel in ENTIRE catalog. Complements workers_builds_list_builds already cataloged in ops."
+        },
+        {
+          "name": "ops-neon-complete-migration-db-rollout",
+          "chain": [
+            "neon/prepare_database_migration",
+            "neon/complete_database_migration",
+            "cloudflare-builds/workers_builds_list_builds",
+            "evidence/ai_search",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Prepare and complete a production database migration as part of an ops rollout, verify build history against migration timing to catch regressions, search evidence for migration anomalies or known failure patterns, and post the full ops migration report to Notion.",
+          "verified": false,
+          "notes": "neon and cloudflare-builds are lazy/auth-gated. evidence and notion always connected. FIRST neon/complete_database_migration in ops."
+        },
+        {
+          "name": "ops-stripe-list-payment-intents-billing-health",
+          "chain": [
+            "stripe/list_payment_intents",
+            "neon/run_sql",
+            "cloudflare-builds/workers_builds_list_builds",
+            "evidence/ai_search",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Retrieve Stripe payment intents to assess billing health across the ops stack, query Neon for transaction-side data to cross-reference, check build history for deploy-correlated billing anomalies, analyze patterns via evidence search, and post an ops billing health report to Notion.",
+          "verified": false,
+          "notes": "stripe and cloudflare-builds are lazy/auth-gated. neon is auth-gated. evidence and notion always connected. FIRST stripe/list_payment_intents in ops."
         }
       ],
       "prompts": [
@@ -17517,6 +17702,14 @@
         {
           "text": "List active Cloudflare builds, cancel the problematic one, and log the emergency rollback to Notion",
           "resolves_to": "ops-cloudflare-builds-cancel-emergency-rollback"
+        },
+        {
+          "text": "Complete the production DB migration as part of the ops rollout and post the migration report to Notion",
+          "resolves_to": "ops-neon-complete-migration-db-rollout"
+        },
+        {
+          "text": "Check Stripe payment intents and Neon billing health across the ops stack and post a report",
+          "resolves_to": "ops-stripe-list-payment-intents-billing-health"
         }
       ]
     }
