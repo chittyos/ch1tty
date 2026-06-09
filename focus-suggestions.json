@@ -1,6 +1,6 @@
 {
-  "_comment": "93rd pass — 976 combos / 453 verified / 997 prompts. FIRST session/list_events in finance. FIRST session/list_sessions in finance+code. FIRST session/append_event in code. FIRST stripe/list_payment_intents in governance+design+communication+ops (now ALL 6). FIRST stripe/create_customer+create_invoice in governance. FIRST stripe/list_invoices in design (now ALL 6). FIRST neon/complete_database_migration in design+communication+ops (now ALL 6).",
-  "generatedFrom": "E-catalog-ninety-second-pass",
+  "_comment": "94th pass — 988 combos / 465 verified / 1009 prompts. FIRST playwright/browser_click in governance+code+communication+ops (ALL 6 profiles). FIRST fs/read_multiple_files in governance+ops (now ALL 6 profiles). FIRST evidence/search in design+code+communication (now ALL 6 profiles). FIRST playwright/browser_wait_for in design (ALL 6 profiles). All 12 new combos verified.",
+  "generatedFrom": "E-catalog-ninety-third-pass",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools — now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time — combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -2200,6 +2200,32 @@
           "accomplishes": "List all active finance sessions, retrieve details for each to examine billing context, search evidence for anomalous payment patterns, and post a session audit report to Notion.",
           "verified": false,
           "notes": "session is auth-gated. evidence and notion always connected. FIRST session/list_sessions in finance."
+        },
+        {
+          "name": "finance-playwright-wait-for-payment-confirmation",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_fill_form",
+            "playwright/browser_wait_for",
+            "playwright/browser_take_screenshot",
+            "evidence/ai_search"
+          ],
+          "accomplishes": "Navigate to the payment confirmation page, fill in payment details, wait for the confirmation animation to complete, screenshot the final state, then search Evidence for payment anomaly patterns relevant to this transaction.",
+          "verified": true,
+          "notes": "playwright (all tools) + evidence confirmed connected in live gateway. Deepens playwright/browser_wait_for coverage in finance (2nd combo)."
+        },
+        {
+          "name": "finance-fs-read-multiple-contract-review",
+          "chain": [
+            "fs/search_files",
+            "fs/read_multiple_files",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search the billing directory for contract files, read all matching files in a single batch call, cross-reference with Evidence for billing pattern anomalies, reason about discrepancies, then post a consolidated contract-review summary to Notion.",
+          "verified": true,
+          "notes": "fs (search_files + read_multiple_files), evidence, thinking, notion — all confirmed connected. 3rd fs/read_multiple_files combo in finance."
         }
       ],
       "prompts": [
@@ -2838,6 +2864,14 @@
         {
           "text": "Audit all active finance sessions for anomalous billing patterns and post a report to Notion",
           "resolves_to": "finance-session-list-sessions-finance-audit"
+        },
+        {
+          "text": "Navigate to the payment page, wait for the confirmation animation, and check Evidence for anomaly patterns",
+          "resolves_to": "finance-playwright-wait-for-payment-confirmation"
+        },
+        {
+          "text": "Find all contract files in the billing directory, read them in bulk, and write a contract-review summary to Notion",
+          "resolves_to": "finance-fs-read-multiple-contract-review"
         }
       ]
     },
@@ -5292,6 +5326,31 @@
           "accomplishes": "Create a Stripe customer record for a new vendor, generate and finalize an invoice for the engagement, then record the billing event in a Notion governance tracker for audit trail.",
           "verified": false,
           "notes": "stripe is lazy/auth-gated. FIRST stripe/create_customer in governance. FIRST stripe/create_invoice in governance."
+        },
+        {
+          "name": "governance-playwright-click-policy-form-validation",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_click",
+            "playwright/browser_take_screenshot",
+            "evidence/ai_search",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Navigate to the policy submission portal, click the submit button to trigger the form action, screenshot the resulting state, search Evidence for policy precedents matching the submission, then write a Notion verification log.",
+          "verified": true,
+          "notes": "FIRST playwright/browser_click in governance. All tools confirmed connected in live gateway (playwright 23 tools, evidence 3, notion)."
+        },
+        {
+          "name": "governance-fs-read-multiple-policy-documents",
+          "chain": [
+            "fs/search_files",
+            "fs/read_multiple_files",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search the policy document directory for all files matching a compliance category, read all matches in a single batch call, reason about gaps and inconsistencies across the policy corpus, then post a consolidated policy review to Notion.",
+          "verified": true,
+          "notes": "FIRST fs/read_multiple_files in governance. fs + thinking + notion all confirmed connected."
         }
       ],
       "prompts": [
@@ -6014,6 +6073,14 @@
         {
           "text": "Create a Stripe customer and invoice for a new vendor and log it in the governance tracker",
           "resolves_to": "governance-stripe-create-invoice-vendor-billing"
+        },
+        {
+          "text": "Click the submit button on the policy portal, screenshot the result, and log a verification note to Notion",
+          "resolves_to": "governance-playwright-click-policy-form-validation"
+        },
+        {
+          "text": "Read all policy documents matching this compliance category in one go, then post a consolidated policy review to Notion",
+          "resolves_to": "governance-fs-read-multiple-policy-documents"
         }
       ]
     },
@@ -8104,6 +8171,30 @@
           "accomplishes": "Retrieve Stripe invoices to validate checkout billing flows, analyze UI billing edge cases and state transitions with sequential thinking, capture screenshots of billing pages, and post a UX billing audit to Notion.",
           "verified": false,
           "notes": "stripe is lazy/auth-gated. thinking, playwright, notion always connected. FIRST stripe/list_invoices in design."
+        },
+        {
+          "name": "design-evidence-search-ux-pattern-discovery",
+          "chain": [
+            "evidence/search",
+            "thinking/sequentialthinking",
+            "browser-rendering/get_url_screenshot",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search Evidence for UX design patterns relevant to the current component, reason about findings with sequential thinking, take a visual snapshot of a reference URL for comparison, then publish a design research brief to Notion.",
+          "verified": true,
+          "notes": "FIRST evidence/search in design. evidence (search tool confirmed), thinking, browser-rendering, notion all connected."
+        },
+        {
+          "name": "design-playwright-wait-for-animation-test",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_click",
+            "playwright/browser_wait_for",
+            "playwright/browser_take_screenshot"
+          ],
+          "accomplishes": "Navigate to the component preview page, click the trigger button to start the animation, wait for the CSS transition to complete, then screenshot the final state — a minimal verified 4-step visual regression workflow for animated UI elements.",
+          "verified": true,
+          "notes": "FIRST playwright/browser_wait_for in design. All 4 playwright tools confirmed connected in live gateway."
         }
       ],
       "prompts": [
@@ -8706,6 +8797,14 @@
         {
           "text": "Audit the Stripe checkout billing UI with screenshots and post a UX billing report",
           "resolves_to": "design-stripe-list-invoices-checkout-billing-ui"
+        },
+        {
+          "text": "Search evidence for UX patterns for this component, reason about them, screenshot a reference URL, and publish a design brief to Notion",
+          "resolves_to": "design-evidence-search-ux-pattern-discovery"
+        },
+        {
+          "text": "Navigate to the component preview, click the animation trigger, wait for the transition to finish, then screenshot the final state",
+          "resolves_to": "design-playwright-wait-for-animation-test"
         }
       ]
     },
@@ -11143,6 +11242,32 @@
           "accomplishes": "List all active coding sessions, retrieve per-session details to capture PR context, search GitHub pull requests tied to those sessions, and snapshot the full development state to disk for review.",
           "verified": false,
           "notes": "session is auth-gated. github bound. fs always connected. FIRST session/list_sessions in code."
+        },
+        {
+          "name": "code-evidence-search-implementation-patterns",
+          "chain": [
+            "evidence/search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search Evidence for implementation patterns relevant to the feature, resolve the related library ID and fetch its official docs via Context7, reason about the best approach combining Evidence findings with library docs, then write the implementation scaffold to a file.",
+          "verified": true,
+          "notes": "FIRST evidence/search in code. evidence + context7 (x2) + thinking + fs all confirmed connected in live gateway."
+        },
+        {
+          "name": "code-playwright-click-form-automation-test",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_fill_form",
+            "playwright/browser_click",
+            "playwright/browser_take_screenshot",
+            "fs/write_file"
+          ],
+          "accomplishes": "Navigate to the feature form UI, fill in test data, click submit to trigger the handler, screenshot the response, then write the captured test evidence to a file — a verified 5-step browser automation test pattern.",
+          "verified": true,
+          "notes": "FIRST playwright/browser_click in code. All playwright tools + fs confirmed connected in live gateway. Completes browser_click coverage in code profile."
         }
       ],
       "prompts": [
@@ -11853,6 +11978,14 @@
         {
           "text": "List active sessions and snapshot PR context for the current sprint to disk",
           "resolves_to": "code-session-list-sessions-pr-context-snapshot"
+        },
+        {
+          "text": "Search evidence for implementation patterns, fetch the library docs, reason about the best approach, and write a code scaffold",
+          "resolves_to": "code-evidence-search-implementation-patterns"
+        },
+        {
+          "text": "Fill in the feature form with test data, click submit, screenshot the response, and write the test evidence to a file",
+          "resolves_to": "code-playwright-click-form-automation-test"
         }
       ]
     },
@@ -13940,6 +14073,31 @@
           "accomplishes": "Fetch recent payment intents from Stripe, summarize billing status and outstanding items via ChatGPT agent, post a payment status update to Notion, and create a follow-up task for any intents requiring action.",
           "verified": false,
           "notes": "stripe is lazy/auth-gated. chatgpt agent bound. notion always connected. tasks always connected. FIRST stripe/list_payment_intents in communication."
+        },
+        {
+          "name": "comm-playwright-click-broadcast-ux-validation",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_click",
+            "playwright/browser_take_screenshot",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Navigate to the broadcast platform UI, click the publish button to fire the broadcast, screenshot the posted confirmation state, reason about delivery confirmation quality, then log the validated broadcast evidence to Notion.",
+          "verified": true,
+          "notes": "FIRST playwright/browser_click in communication. playwright + thinking + notion all confirmed connected. Comm-relevant via notion/API-post-page final step."
+        },
+        {
+          "name": "comm-evidence-search-message-pattern-discovery",
+          "chain": [
+            "evidence/search",
+            "thinking/sequentialthinking",
+            "orchestrator/agent_list",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search Evidence for message patterns in the communication corpus, reason with sequential thinking about which patterns best serve the current campaign, list available communication agents for routing, then publish a patterns brief to Notion.",
+          "verified": true,
+          "notes": "FIRST evidence/search in communication. evidence + thinking + orchestrator + notion all confirmed connected. Comm-relevant via notion/API-post-page + agent_list."
         }
       ],
       "prompts": [
@@ -14550,6 +14708,14 @@
         {
           "text": "Summarize recent Stripe payment intents and post a billing status update to Notion with a follow-up task",
           "resolves_to": "comm-stripe-list-payment-intents-billing-status-update"
+        },
+        {
+          "text": "Click publish on the broadcast UI, screenshot the confirmation, reason about delivery quality, and log the result to Notion",
+          "resolves_to": "comm-playwright-click-broadcast-ux-validation"
+        },
+        {
+          "text": "Search evidence for message patterns in the communication corpus and publish a patterns brief to Notion",
+          "resolves_to": "comm-evidence-search-message-pattern-discovery"
         }
       ]
     },
@@ -16992,6 +17158,31 @@
           "accomplishes": "Retrieve Stripe payment intents to assess billing health across the ops stack, query Neon for transaction-side data to cross-reference, check build history for deploy-correlated billing anomalies, analyze patterns via evidence search, and post an ops billing health report to Notion.",
           "verified": false,
           "notes": "stripe and cloudflare-builds are lazy/auth-gated. neon is auth-gated. evidence and notion always connected. FIRST stripe/list_payment_intents in ops."
+        },
+        {
+          "name": "ops-fs-read-multiple-runbook-consolidation",
+          "chain": [
+            "fs/search_files",
+            "fs/read_multiple_files",
+            "thinking/sequentialthinking",
+            "evidence/ingest_document",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search for runbook files matching the incident type, read all matched runbooks in a single batch call, reason about which procedures apply to the current incident state, ingest the consolidated runbook set into Evidence for future retrieval, then post the selected procedure to Notion.",
+          "verified": true,
+          "notes": "FIRST fs/read_multiple_files in ops. fs (search_files + read_multiple_files) + thinking + evidence/ingest_document + notion all confirmed connected."
+        },
+        {
+          "name": "ops-playwright-click-monitoring-dashboard-probe",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_click",
+            "playwright/browser_take_screenshot",
+            "evidence/ingest_document"
+          ],
+          "accomplishes": "Navigate to the monitoring dashboard, click the health-check trigger button to refresh metrics, screenshot the updated dashboard state, then ingest the snapshot into Evidence for the incident timeline — a verified 4-step ops monitoring probe.",
+          "verified": true,
+          "notes": "FIRST playwright/browser_click in ops. playwright (3 tools) + evidence/ingest_document all confirmed connected. Minimal verified ops-browser probe."
         }
       ],
       "prompts": [
@@ -17710,6 +17901,14 @@
         {
           "text": "Check Stripe payment intents and Neon billing health across the ops stack and post a report",
           "resolves_to": "ops-stripe-list-payment-intents-billing-health"
+        },
+        {
+          "text": "Find and read all runbooks for this incident type in bulk, ingest the consolidated runbook into Evidence, and post the procedure to Notion",
+          "resolves_to": "ops-fs-read-multiple-runbook-consolidation"
+        },
+        {
+          "text": "Navigate to the monitoring dashboard, click the health check, screenshot the metrics, and ingest the snapshot into Evidence",
+          "resolves_to": "ops-playwright-click-monitoring-dashboard-probe"
         }
       ]
     }
