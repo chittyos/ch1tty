@@ -1,6 +1,6 @@
 {
-  "_comment": "94th pass — 988 combos / 465 verified / 1009 prompts. FIRST playwright/browser_click in governance+code+communication+ops (ALL 6 profiles). FIRST fs/read_multiple_files in governance+ops (now ALL 6 profiles). FIRST evidence/search in design+code+communication (now ALL 6 profiles). FIRST playwright/browser_wait_for in design (ALL 6 profiles). All 12 new combos verified.",
-  "generatedFrom": "E-catalog-ninety-third-pass",
+  "_comment": "95th pass — 1000 combos / 477 verified / 1021 prompts. FIRST playwright/browser_fill_form + browser_wait_for in governance+communication+ops (ALL 6 profiles). FIRST evidence/search in ops (ALL 6 profiles). FIRST fs/read_multiple_files in design+communication (ALL 6 profiles). FIRST fs/create_directory in finance+governance+design (ALL 6 profiles). FIRST chittyevidence/search in finance+code. All 12 new combos verified.",
+  "generatedFrom": "E-catalog-ninety-fifth-pass",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools — now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time — combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -2226,6 +2226,30 @@
           "accomplishes": "Search the billing directory for contract files, read all matching files in a single batch call, cross-reference with Evidence for billing pattern anomalies, reason about discrepancies, then post a consolidated contract-review summary to Notion.",
           "verified": true,
           "notes": "fs (search_files + read_multiple_files), evidence, thinking, notion — all confirmed connected. 3rd fs/read_multiple_files combo in finance."
+        },
+        {
+          "name": "finance-fs-create-directory-billing-scaffold",
+          "chain": [
+            "fs/create_directory",
+            "fs/write_file",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Create a new billing-period directory structure, write a scaffold summary file, reason about the billing cycle setup, and post the initialization report to Notion.",
+          "verified": true,
+          "notes": "FIRST fs/create_directory in finance. fs + thinking + notion — all confirmed connected."
+        },
+        {
+          "name": "finance-chittyevidence-search-financial-contracts",
+          "chain": [
+            "chittyevidence/search",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search the ChittyEvidence RAG for financial contract patterns, cross-reference with AI-powered evidence search for billing compliance anomalies, reason about discrepancies, and write a contracts summary.",
+          "verified": true,
+          "notes": "FIRST chittyevidence/search in finance. chittyevidence/search + evidence/ai_search + thinking + fs — all confirmed connected."
         }
       ],
       "prompts": [
@@ -2872,6 +2896,14 @@
         {
           "text": "Find all contract files in the billing directory, read them in bulk, and write a contract-review summary to Notion",
           "resolves_to": "finance-fs-read-multiple-contract-review"
+        },
+        {
+          "text": "Create a new billing-period directory with scaffold files and post the initialization report to Notion",
+          "resolves_to": "finance-fs-create-directory-billing-scaffold"
+        },
+        {
+          "text": "Search ChittyEvidence for financial contract patterns and cross-reference with AI evidence to write a contracts summary",
+          "resolves_to": "finance-chittyevidence-search-financial-contracts"
         }
       ]
     },
@@ -5351,6 +5383,31 @@
           "accomplishes": "Search the policy document directory for all files matching a compliance category, read all matches in a single batch call, reason about gaps and inconsistencies across the policy corpus, then post a consolidated policy review to Notion.",
           "verified": true,
           "notes": "FIRST fs/read_multiple_files in governance. fs + thinking + notion all confirmed connected."
+        },
+        {
+          "name": "governance-playwright-fill-form-wait-policy-audit",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_fill_form",
+            "playwright/browser_wait_for",
+            "playwright/browser_take_screenshot",
+            "evidence/ai_search"
+          ],
+          "accomplishes": "Navigate to a policy submission portal, fill in the compliance form with governance parameters, wait for the form to process, screenshot the confirmation state, and cross-check against the Evidence RAG for policy consistency.",
+          "verified": true,
+          "notes": "FIRST playwright/browser_fill_form + browser_wait_for in governance. playwright + evidence — all confirmed connected."
+        },
+        {
+          "name": "governance-fs-create-directory-policy-archive",
+          "chain": [
+            "fs/create_directory",
+            "fs/write_file",
+            "evidence/ai_search",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Create a new policy-archive directory for the current compliance cycle, write the policy index file, verify completeness against the Evidence RAG, and publish the archive manifest to Notion.",
+          "verified": true,
+          "notes": "FIRST fs/create_directory in governance. fs + evidence + notion — all confirmed connected."
         }
       ],
       "prompts": [
@@ -6081,6 +6138,14 @@
         {
           "text": "Read all policy documents matching this compliance category in one go, then post a consolidated policy review to Notion",
           "resolves_to": "governance-fs-read-multiple-policy-documents"
+        },
+        {
+          "text": "Fill out the policy submission form, wait for it to process, screenshot the confirmation, and verify against Evidence",
+          "resolves_to": "governance-playwright-fill-form-wait-policy-audit"
+        },
+        {
+          "text": "Create a policy-archive directory, write the index file, verify against Evidence, and publish the manifest to Notion",
+          "resolves_to": "governance-fs-create-directory-policy-archive"
         }
       ]
     },
@@ -8195,6 +8260,30 @@
           "accomplishes": "Navigate to the component preview page, click the trigger button to start the animation, wait for the CSS transition to complete, then screenshot the final state — a minimal verified 4-step visual regression workflow for animated UI elements.",
           "verified": true,
           "notes": "FIRST playwright/browser_wait_for in design. All 4 playwright tools confirmed connected in live gateway."
+        },
+        {
+          "name": "design-fs-read-multiple-design-assets-review",
+          "chain": [
+            "fs/search_files",
+            "fs/read_multiple_files",
+            "thinking/sequentialthinking",
+            "browser-rendering/get_url_screenshot"
+          ],
+          "accomplishes": "Search the design assets directory for component files, read all matching files in a single batch call, reason about design consistency and pattern alignment, then capture a screenshot of the live component preview for visual validation.",
+          "verified": true,
+          "notes": "FIRST fs/read_multiple_files in design. fs + thinking + browser-rendering — all confirmed connected."
+        },
+        {
+          "name": "design-fs-create-directory-component-scaffold",
+          "chain": [
+            "fs/create_directory",
+            "playwright/browser_navigate",
+            "playwright/browser_take_screenshot",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Create the scaffold directory structure for a new UI component, navigate to the Storybook preview to capture the initial render, screenshot the component baseline, and post the scaffold report to Notion.",
+          "verified": true,
+          "notes": "FIRST fs/create_directory in design. fs + playwright + notion — all confirmed connected."
         }
       ],
       "prompts": [
@@ -8805,6 +8894,14 @@
         {
           "text": "Navigate to the component preview, click the animation trigger, wait for the transition to finish, then screenshot the final state",
           "resolves_to": "design-playwright-wait-for-animation-test"
+        },
+        {
+          "text": "Search design asset files, read them in bulk, reason about consistency, then screenshot the component preview",
+          "resolves_to": "design-fs-read-multiple-design-assets-review"
+        },
+        {
+          "text": "Scaffold a new UI component directory, navigate to Storybook, screenshot the baseline render, and post to Notion",
+          "resolves_to": "design-fs-create-directory-component-scaffold"
         }
       ]
     },
@@ -11268,6 +11365,32 @@
           "accomplishes": "Navigate to the feature form UI, fill in test data, click submit to trigger the handler, screenshot the response, then write the captured test evidence to a file — a verified 5-step browser automation test pattern.",
           "verified": true,
           "notes": "FIRST playwright/browser_click in code. All playwright tools + fs confirmed connected in live gateway. Completes browser_click coverage in code profile."
+        },
+        {
+          "name": "code-chittyevidence-search-sdk-implementation-patterns",
+          "chain": [
+            "chittyevidence/search",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search ChittyEvidence for SDK implementation patterns related to the current task, resolve the matching library in Context7, query its documentation, reason about the best implementation approach, and write the implementation brief.",
+          "verified": true,
+          "notes": "FIRST chittyevidence/search in code. chittyevidence/search + context7 + thinking + fs — all confirmed connected."
+        },
+        {
+          "name": "code-playwright-fill-wait-form-evidence-integration-test",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_fill_form",
+            "playwright/browser_wait_for",
+            "evidence/ai_search",
+            "fs/write_file"
+          ],
+          "accomplishes": "Navigate to the integration test form, fill it with test parameters, wait for async validation to complete, cross-reference the validation output with Evidence for known failure patterns, and write the integration test report.",
+          "verified": true,
+          "notes": "Deepens playwright/browser_fill_form + browser_wait_for in code with evidence/ai_search cross-reference. playwright + evidence + fs — all confirmed connected."
         }
       ],
       "prompts": [
@@ -11986,6 +12109,14 @@
         {
           "text": "Fill in the feature form with test data, click submit, screenshot the response, and write the test evidence to a file",
           "resolves_to": "code-playwright-click-form-automation-test"
+        },
+        {
+          "text": "Search ChittyEvidence for SDK patterns, look up library docs in Context7, reason about implementation, and write the brief",
+          "resolves_to": "code-chittyevidence-search-sdk-implementation-patterns"
+        },
+        {
+          "text": "Fill the integration test form, wait for async validation, cross-check failures against Evidence, and write the test report",
+          "resolves_to": "code-playwright-fill-wait-form-evidence-integration-test"
         }
       ]
     },
@@ -14098,6 +14229,31 @@
           "accomplishes": "Search Evidence for message patterns in the communication corpus, reason with sequential thinking about which patterns best serve the current campaign, list available communication agents for routing, then publish a patterns brief to Notion.",
           "verified": true,
           "notes": "FIRST evidence/search in communication. evidence + thinking + orchestrator + notion all confirmed connected. Comm-relevant via notion/API-post-page + agent_list."
+        },
+        {
+          "name": "comm-fs-read-multiple-message-templates-review",
+          "chain": [
+            "fs/search_files",
+            "fs/read_multiple_files",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search the message templates directory for all active communication templates, read them in a single batch call, reason about brand consistency and coverage gaps, and post the template-review report to Notion.",
+          "verified": true,
+          "notes": "FIRST fs/read_multiple_files in communication. fs + thinking + notion — all confirmed connected."
+        },
+        {
+          "name": "comm-playwright-fill-form-wait-broadcast-submission",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_fill_form",
+            "playwright/browser_wait_for",
+            "playwright/browser_take_screenshot",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Navigate to a broadcast-submission portal, fill the form with campaign message parameters, wait for platform validation, screenshot the confirmation state, and log the campaign submission to Notion.",
+          "verified": true,
+          "notes": "FIRST playwright/browser_fill_form + browser_wait_for in communication. playwright + notion — all confirmed connected."
         }
       ],
       "prompts": [
@@ -14716,6 +14872,14 @@
         {
           "text": "Search evidence for message patterns in the communication corpus and publish a patterns brief to Notion",
           "resolves_to": "comm-evidence-search-message-pattern-discovery"
+        },
+        {
+          "text": "Search message template files, read them in bulk, reason about brand consistency, and post the review report to Notion",
+          "resolves_to": "comm-fs-read-multiple-message-templates-review"
+        },
+        {
+          "text": "Fill the broadcast submission form, wait for validation, screenshot the confirmation, and log to Notion",
+          "resolves_to": "comm-playwright-fill-form-wait-broadcast-submission"
         }
       ]
     },
@@ -17183,6 +17347,32 @@
           "accomplishes": "Navigate to the monitoring dashboard, click the health-check trigger button to refresh metrics, screenshot the updated dashboard state, then ingest the snapshot into Evidence for the incident timeline — a verified 4-step ops monitoring probe.",
           "verified": true,
           "notes": "FIRST playwright/browser_click in ops. playwright (3 tools) + evidence/ingest_document all confirmed connected. Minimal verified ops-browser probe."
+        },
+        {
+          "name": "ops-evidence-search-incident-pattern-discovery",
+          "chain": [
+            "evidence/search",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "orchestrator/agent_list",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search the Evidence RAG for known incident patterns matching the current alert signature, perform AI-powered deep search for correlated failure modes, reason about root cause, list available agents for response routing, and write the incident analysis report.",
+          "verified": true,
+          "notes": "FIRST evidence/search in ops — completes ALL 6 profiles for evidence/search. evidence + thinking + orchestrator + fs — all confirmed connected."
+        },
+        {
+          "name": "ops-playwright-fill-form-wait-monitoring-probe",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_fill_form",
+            "playwright/browser_wait_for",
+            "playwright/browser_take_screenshot",
+            "evidence/ingest_document"
+          ],
+          "accomplishes": "Navigate to the monitoring dashboard, fill the query filter form with incident parameters, wait for dashboard metrics to load, screenshot the current health state, and ingest the visual evidence into the Evidence RAG for post-incident correlation.",
+          "verified": true,
+          "notes": "FIRST playwright/browser_fill_form + browser_wait_for in ops. playwright + evidence — all confirmed connected."
         }
       ],
       "prompts": [
@@ -17909,6 +18099,14 @@
         {
           "text": "Navigate to the monitoring dashboard, click the health check, screenshot the metrics, and ingest the snapshot into Evidence",
           "resolves_to": "ops-playwright-click-monitoring-dashboard-probe"
+        },
+        {
+          "text": "Search Evidence for incident patterns, AI-deep-search correlated failures, reason about root cause, list agents, and write the analysis",
+          "resolves_to": "ops-evidence-search-incident-pattern-discovery"
+        },
+        {
+          "text": "Fill the monitoring dashboard filter form, wait for metrics to load, screenshot the health state, and ingest into Evidence",
+          "resolves_to": "ops-playwright-fill-form-wait-monitoring-probe"
         }
       ]
     }
