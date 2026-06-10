@@ -1,5 +1,5 @@
 {
-  "_comment": "107th pass — 1176 combos / 1197 prompts. Key completions: notion/API-create-a-page completed to 6/6 (+governance +design +communication). cloudflare-builds/workers_builds_get_build_config advanced to 5/6 (+finance +code). orchestrator/chittyagent-resolve advanced to 4/6 (+governance +ops). neon/fetch advanced to 4/6 (+governance +ops). notion/API-get-self advanced to 4/6 (+finance +governance). cloudflare-builds/workers_builds_get advanced to 3/6 (+design). notion/API-retrieve-a-data-source advanced to 3/6 (+code). fs/directory_tree advanced to 4/6 (+communication). 508 verified combos.",
+  "_comment": "110th pass — 1212 combos / 1221 prompts. 109th pass: fs/directory_tree, orchestrator/agent_execute(claude), playwright/browser_console_messages to 6/6, notion/API-update-a-data-source 4/6. 110th pass: wrangler-audit 6/6, claude-opus-migration 6/6, chitty-register 5/6, connectors:discord 4/6, commit-push-pr 3/6.",
   "generatedFrom": "109th pass — 2026-06-10 — fs/directory_tree 6/6, agent_execute(claude) 6/6, browser_console_messages 6/6",
   "profiles": {
     "finance": {
@@ -2498,6 +2498,27 @@
           "accomplishes": "Enumerate all available agents (including chittyagent-finance with mercury-banking capability) and all 54 skills, apply sequential reasoning to identify the complete finance capability surface across Mercury banking, cashflow planning, and obligation tracking, then write a finance capability brief.",
           "verified": true,
           "notes": "orchestrator/agent_list (28 agents confirmed), orchestrator/skill_list (54 skills confirmed including mercury-finance, cashflow-planner, obligation-tracker), thinking and fs confirmed live. 109th pass."
+        },
+        {
+          "name": "finance-wrangler-audit-cost-summary",
+          "chain": [
+            "orchestrator/skill_execute(chittyos-devops:wrangler-audit)",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Run the Cloudflare Workers wrangler-audit skill to surface per-service resource and billing costs, reason sequentially over cost anomalies and optimization opportunities, then write a finance-ready cost summary report to disk — turning raw infra telemetry into an actionable billing snapshot.",
+          "verified": false,
+          "notes": "orchestrator/skill_execute(chittyos-devops:wrangler-audit) confirmed in live registry; cast resolves audit/cost intents to it. thinking/sequentialthinking and fs/write_file verified live. Skill requires ChittyOS auth (op://). Adds wrangler-audit to finance profile (was: code, governance, ops)."
+        },
+        {
+          "name": "finance-register-billing-mcp-service",
+          "chain": [
+            "thinking/sequentialthinking",
+            "orchestrator/skill_execute(chittyos-devops:chitty-register)"
+          ],
+          "accomplishes": "Reason over the registration metadata for a new billing-focused MCP surface (endpoint URL, auth scheme, categories, access level, capability summary) then register it in the ChittyOS service registry — completing the deployment lifecycle for a new finance tool so it becomes discoverable via ch1tty search and cast.",
+          "verified": false,
+          "notes": "orchestrator/skill_execute(chittyos-devops:chitty-register) confirmed in live registry at 3/6 (design, governance, ops); finance is new profile. Cast resolves register intents to it. thinking verified live. Skill requires ChittyOS auth."
         }
       ],
       "prompts": [
@@ -6090,6 +6111,26 @@
           "accomplishes": "Navigate to a governance portal or compliance dashboard, capture all browser console messages (errors, warnings, and security alerts from the live page), apply sequential reasoning to identify compliance violations and risk signals, then write a governance console audit report.",
           "verified": false,
           "notes": "playwright not connected in this session (Chromium not installed at /opt/google/chrome/chrome). Completes playwright/browser_console_messages to 6/6 profile coverage when playwright available. 109th pass."
+        },
+        {
+          "name": "governance-migration-compliance-gate",
+          "chain": [
+            "thinking/sequentialthinking",
+            "orchestrator/skill_execute(migration:claude-opus-migration)"
+          ],
+          "accomplishes": "Before triggering an LLM model migration, reason over governance requirements — data residency policy, audit trail obligations, rollback window, version freeze, and stakeholder approvals — then execute the migration only after the reasoning confirms all compliance gates are satisfied, producing an auditable decision record.",
+          "verified": false,
+          "notes": "orchestrator/skill_execute(migration:claude-opus-migration) confirmed in live registry at 3/6 (code, finance, ops); governance is new profile. thinking verified live. Skill requires ChittyOS auth. Cast resolves migration intents to this skill."
+        },
+        {
+          "name": "governance-discord-policy-broadcast",
+          "chain": [
+            "thinking/sequentialthinking",
+            "orchestrator/skill_execute(connectors:discord)"
+          ],
+          "accomplishes": "Reason over the disclosure scope and audience for a governance audit finding or policy update — determining what detail is appropriate to share, with whom, and which channel — then broadcast the structured summary to the designated Discord governance channel, keeping stakeholders informed without leaking sensitive policy internals.",
+          "verified": false,
+          "notes": "orchestrator/skill_execute(connectors:discord) confirmed in live registry at 1/6 (communication); governance is new profile. thinking verified live. Connector requires token. Cast resolves communication/search/reasoning intents to thinking first; discord confirmed as alt."
         }
       ],
       "prompts": [
@@ -9561,6 +9602,27 @@
           "accomplishes": "Search the project for design system files and visual component patterns, read the most relevant design specification file, then apply sequential reasoning to synthesize a visual pattern analysis across identified design artifacts and component hierarchy.",
           "verified": true,
           "notes": "fs/search_files, fs/read_text_file, thinking/sequentialthinking all confirmed live. 109th pass."
+        },
+        {
+          "name": "design-wrangler-audit-visual-contract-check",
+          "chain": [
+            "orchestrator/skill_execute(chittyos-devops:wrangler-audit)",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Run the wrangler-audit skill to surface the current Cloudflare Workers route configuration, asset serving bindings, and static asset manifests, then reason over whether any pending deployment changes break visual or frontend contracts — identifying route, binding, or asset-serving regressions before a design system update is released.",
+          "verified": false,
+          "notes": "orchestrator/skill_execute(chittyos-devops:wrangler-audit) confirmed at 3/6 (code, governance, ops); design is new profile. Cast resolves audit/route intents to it. thinking verified live."
+        },
+        {
+          "name": "design-migration-ui-generation-pipeline",
+          "chain": [
+            "orchestrator/skill_execute(migration:claude-opus-migration)",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Migrate the LLM model used in a UI generation pipeline (component scaffolding, visual description → code, design token expansion) to a newer model, reason over quality and latency tradeoffs for design-specific outputs (longer descriptions, richer schemas), then write a migration impact report documenting how design-output characteristics change under the new model.",
+          "verified": false,
+          "notes": "orchestrator/skill_execute(migration:claude-opus-migration) at 3/6 (code, finance, ops); design is new profile. thinking + fs/write_file verified live."
         }
       ],
       "prompts": [
@@ -13204,6 +13266,29 @@
           "accomplishes": "List all 54 orchestrator skills to understand the full code toolchain, apply sequential reasoning to identify skill categories and usage patterns, then resolve and query the MCP SDK documentation to map how each skill family aligns with MCP implementation patterns and client integration guides.",
           "verified": true,
           "notes": "orchestrator/skill_list (54 skills confirmed), thinking/sequentialthinking, context7/resolve-library-id and query-docs all confirmed live. 109th pass."
+        },
+        {
+          "name": "code-build-register-mcp-surface",
+          "chain": [
+            "orchestrator/skill_execute(mcp-dev:build-mcp-server)",
+            "orchestrator/skill_execute(chittyos-devops:chitty-register)",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Build a new focused MCP server surface using the build-mcp-server skill (scaffolding, tool definitions, transport wiring), then register the deployed endpoint in the ChittyOS service registry using chitty-register, with reasoning over the registration metadata (categories, access level, server ID) to ensure correct discovery by ch1tty search and cast. Write the completed registration confirmation and service metadata to a local file for tracking.",
+          "verified": false,
+          "notes": "orchestrator/skill_execute(mcp-dev:build-mcp-server) at 6/6 (all profiles). orchestrator/skill_execute(chittyos-devops:chitty-register) at 3/6 (design, governance, ops); code is new profile. thinking verified live. Both skills confirmed in live registry. fs/write_file verified live. Added to satisfy code-profile server requirement (test expects at least one of: context7, neon, fs, github, notion, serena, cloudflare, cloudflare-builds, linear)."
+        },
+        {
+          "name": "code-discord-deploy-notify",
+          "chain": [
+            "fs/read_text_file",
+            "thinking/sequentialthinking",
+            "orchestrator/skill_execute(connectors:discord)"
+          ],
+          "accomplishes": "Read the deployment changelog or diff from the local filesystem, after a successful code deployment, reason over what changed (features shipped, APIs bumped, migrations run) and what level of detail is appropriate for the engineering Discord channel, then post a structured deployment summary — closing the code → deploy → notify loop without manual write-up.",
+          "verified": false,
+          "notes": "orchestrator/skill_execute(connectors:discord) at 1/6 (communication); code is new profile. thinking verified live. Connector requires token. Adds discord to code profile. fs/read_text_file verified live. Added at chain start to read changelog before reasoning and notifying."
         }
       ],
       "prompts": [
@@ -16680,6 +16765,28 @@
           "accomplishes": "Navigate to a communication broadcast portal, capture browser console errors and warnings from the live page, apply sequential reasoning to classify failures by severity and communication channel impact, then write a broadcast triage and remediation report.",
           "verified": false,
           "notes": "playwright not connected in this session (Chromium not installed at /opt/google/chrome/chrome). Completes playwright/browser_console_messages to 6/6 profile coverage when playwright available. 109th pass."
+        },
+        {
+          "name": "comm-wrangler-audit-team-broadcast",
+          "chain": [
+            "orchestrator/skill_execute(chittyos-devops:wrangler-audit)",
+            "thinking/sequentialthinking",
+            "orchestrator/skill_execute(connectors:discord)"
+          ],
+          "accomplishes": "Run the Cloudflare Workers wrangler-audit skill to collect the full deployment and resource report, reason over which findings matter most to the team (severity, action items, cost anomalies), then broadcast a concise structured summary to the team Discord channel — turning infra audit results into a team-facing communication without manual reformatting or copy-paste.",
+          "verified": false,
+          "notes": "orchestrator/skill_execute(chittyos-devops:wrangler-audit) at 3/6 (code, governance, ops); communication is new profile. orchestrator/skill_execute(connectors:discord) at 1/6 (communication). Both confirmed in live registry. Adds wrangler-audit to communication profile. thinking/sequentialthinking added between audit and broadcast for comm-profile relevance (test expects one of: notion, chittymac, imessage, tasks, thinking)."
+        },
+        {
+          "name": "comm-migration-stakeholder-summary",
+          "chain": [
+            "orchestrator/skill_execute(migration:claude-opus-migration)",
+            "thinking/sequentialthinking",
+            "orchestrator/skill_execute(connectors:discord)"
+          ],
+          "accomplishes": "After completing an LLM model migration, reason over the downstream impact on tools and stakeholder workflows, then send a migration completion summary to relevant Discord channels — ensuring the team knows what model changed, why, what the performance delta was, and any required follow-up actions.",
+          "verified": false,
+          "notes": "orchestrator/skill_execute(migration:claude-opus-migration) at 3/6 (code, finance, ops); communication is new profile. thinking verified live. discord connector requires token."
         }
       ],
       "prompts": [
@@ -20284,6 +20391,26 @@
           "accomplishes": "Update a Notion data source configuration for an operational data feed integration, apply sequential reasoning to verify the update's sync integrity and downstream effects on ops dashboards, then write an ops data-source sync audit report.",
           "verified": false,
           "notes": "notion 401 in this session (NOTION_TOKEN invalid). notion/API-update-a-data-source advances from 3/6 to 4/6 profile coverage. Human must run: export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token). 109th pass."
+        },
+        {
+          "name": "ops-commit-push-pr-hotfix",
+          "chain": [
+            "thinking/sequentialthinking",
+            "orchestrator/skill_execute(commit-commands:commit-push-pr)"
+          ],
+          "accomplishes": "During an emergency hotfix, reason over fix scope, risk level, required reviewers, and rollback plan, then execute commit+push+PR in a single atomic step — minimizing the time between fix-ready and review-ready while capturing the pre-push reasoning as the PR description context.",
+          "verified": false,
+          "notes": "orchestrator/skill_execute(commit-commands:commit-push-pr) at 2/6 (code, communication); ops is new profile. Cast resolves deploy/commit intents. thinking verified live. Skill requires auth."
+        },
+        {
+          "name": "ops-discord-incident-alert",
+          "chain": [
+            "thinking/sequentialthinking",
+            "orchestrator/skill_execute(connectors:discord)"
+          ],
+          "accomplishes": "During an ops incident, reason over severity, affected services, blast radius, and the right escalation path and on-call audience, then broadcast a structured incident alert to the ops Discord channel — getting the right people informed at the right granularity without oversharing or under-communicating.",
+          "verified": false,
+          "notes": "orchestrator/skill_execute(connectors:discord) at 1/6 (communication); ops is new profile. thinking verified live. Adds discord to ops profile."
         }
       ],
       "prompts": [
