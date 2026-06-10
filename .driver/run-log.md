@@ -722,3 +722,37 @@
   1. `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` — unblocks ~177 Notion-auth-gated combos
   2. `export GITHUB_MCP_AUTHORIZATION="Bearer $(op read op://ChittyOS-Integrations/github/personal_access_token)"` — unblocks github combos
   3. Linear/Cloudflare/Neon/Stripe tokens for remaining auth-gated combos
+
+---
+
+### 2026-06-10T10:15Z — 105th-pass catalog (PR#302)
+
+- **Workstream advanced**: E (Alchemist catalog, 105th pass)
+- **Startup checks**: `npm ci` clean, `npm run build` clean (0 errors), `npm test` → 938 pass / 0 fail / 2 skip ✓
+- **State inspection**: Merged PR#301 (104th-pass, 1140 combos / 1161 prompts) at run start. main pulled to `c3dc441`.
+- **Notion board**: Still unavailable (API 401). Using `.driver/run-log.md` as substitute.
+- **All workstreams A–D confirmed done**. E continuous-improvement passes.
+- **ch1tty status**: 8 connected servers (cloudflare-builds, evidence, browser-rendering/401, context7, thinking, fs, playwright, orchestrator).
+- **Execute probes (105th pass)**:
+  - `orchestrator/agent_execute(auth)` → `{action:executed, http_status:404}` ✓
+  - `orchestrator/agent_execute(intel)` → `{action:executed, http_status:401}` ✓
+  - `orchestrator/agent_execute(dispute)` → `{action:executed, http_status:404}` ✓
+  - `orchestrator/agent_execute(storage)` → `{action:redirect, domain:storage.agent.chitty.cc}` ✓
+  - `orchestrator/agent_search(alchemist)` → chittyagent-alchemist (0.7, bound) ✓
+  - `orchestrator/skill_execute(chittyos-devops:chitty-health)` → `{action:local_invoke}` ✓
+  - `orchestrator/skill_execute(chittyos-devops:chittyos-compliance)` → `{action:local_invoke}` ✓
+  - `evidence/list_rags` → 3 RAGs ✓
+  - `evidence/ai_search(re-evidence-search)` → routes (no match on test query) ✓
+  - `browser-rendering/get_url_screenshot` → 401 (auth-gated this session) ✗
+- **12 new combos + 12 prompts (2 per profile, 11 verified / 1 unverified)**:
+  - finance: `finance-doc-evidence-guided-edit` (fs/edit_file 5/6→6/6 ✓), `finance-directory-evidence-scan` (fs/list_directory +finance ✓)
+  - governance: `governance-intel-evidence-signal-audit` (intel +governance ✓), `governance-health-compliance-canonical-sweep` (chitty-health +governance ✓)
+  - design: `design-alchemist-pattern-discovery` (alchemist 5/6→6/6 ✓), `design-re-evidence-ux-pattern-research` (re-evidence +design ✓)
+  - code: `code-auth-agent-sdk-integration-brief` (auth +code ✓), `code-dispute-codebase-evidence-triage` (dispute +code ✓)
+  - communication: `comm-re-evidence-signal-brief` (re-evidence +comm ✓), `comm-storage-document-distribution-prep` (storage +comm ✓)
+  - ops: `ops-worker-builds-screenshot-ops-brief` (screenshot 5/6→6/6, unverified — 401), `ops-dispute-compliance-evidence-audit` (dispute +ops ✓)
+- Catalog: 1140 → 1152 combos, 485 → 496 verified (43%). 6/6 tool count: 127 → 130.
+- Build clean. Tests: 938 pass / 0 fail / 2 skip ✓.
+- Branch: `auto/E-catalog-105th-pass`. PR#302 open. CI in_progress. Codex rate-limited (usage limits — no findings). CodeRabbit reviewing.
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E (in-flight; 1152/496 verified; 656 unverified — all auth-gated)
+- **Next run**: Merge PR#302 if CI green + no blocking reviews. Next targets: tools at 2/6 (`neon/fetch`, `notion/API-get-self`, `notion/API-retrieve-a-data-source`, `playwright/browser_console_messages`, `orchestrator/agent_execute(resolve)`, `cloudflare-builds/workers_builds_get_build_config`) — each needs 4 new profiles.
