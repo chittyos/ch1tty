@@ -1,5 +1,5 @@
 {
-  "_comment": "110th pass — 1212 combos / 1221 prompts. 109th pass: fs/directory_tree, orchestrator/agent_execute(claude), playwright/browser_console_messages to 6/6, notion/API-update-a-data-source 4/6. 110th pass: wrangler-audit 6/6, claude-opus-migration 6/6, chitty-register 5/6, connectors:discord 4/6, commit-push-pr 3/6.",
+  "_comment": "110th pass — 1224 combos / 1221 prompts. 109th pass: fs/directory_tree, orchestrator/agent_execute(claude), playwright/browser_console_messages to 6/6, notion/API-update-a-data-source 4/6. 110th pass: wrangler-audit 6/6, claude-opus-migration 6/6, chitty-register 5/6, connectors:discord 4/6, commit-push-pr 3/6.",
   "generatedFrom": "109th pass — 2026-06-10 — fs/directory_tree 6/6, agent_execute(claude) 6/6, browser_console_messages 6/6",
   "profiles": {
     "finance": {
@@ -2519,6 +2519,27 @@
           "accomplishes": "Reason over the registration metadata for a new billing-focused MCP surface (endpoint URL, auth scheme, categories, access level, capability summary) then register it in the ChittyOS service registry — completing the deployment lifecycle for a new finance tool so it becomes discoverable via ch1tty search and cast.",
           "verified": false,
           "notes": "orchestrator/skill_execute(chittyos-devops:chitty-register) confirmed in live registry at 3/6 (design, governance, ops); finance is new profile. Cast resolves register intents to it. thinking verified live. Skill requires ChittyOS auth."
+        },
+        {
+          "name": "discord-finance-broadcast",
+          "chain": [
+            "ch1tty/search",
+            "orchestrator/skill_execute(connectors:discord)"
+          ],
+          "accomplishes": "Search for relevant financial tools then broadcast findings or alerts to a Discord channel for stakeholder awareness",
+          "verified": false,
+          "notes": "connectors:discord requires auth; useful for finance team notifications"
+        },
+        {
+          "name": "ship-agent-finance-release",
+          "chain": [
+            "ch1tty/search",
+            "orchestrator/agent_execute(ship)",
+            "ch1tty/status"
+          ],
+          "accomplishes": "Discover finance-related deployment tools, run the ship agent to release a finance service update, then verify gateway status",
+          "verified": false,
+          "notes": "ship agent orchestrates deployment pipeline; useful for finance service releases"
         }
       ],
       "prompts": [
@@ -6131,6 +6152,26 @@
           "accomplishes": "Reason over the disclosure scope and audience for a governance audit finding or policy update — determining what detail is appropriate to share, with whom, and which channel — then broadcast the structured summary to the designated Discord governance channel, keeping stakeholders informed without leaking sensitive policy internals.",
           "verified": false,
           "notes": "orchestrator/skill_execute(connectors:discord) confirmed in live registry at 1/6 (communication); governance is new profile. thinking verified live. Connector requires token. Cast resolves communication/search/reasoning intents to thinking first; discord confirmed as alt."
+        },
+        {
+          "name": "notion-update-datasource-governance",
+          "chain": [
+            "notion/API-search",
+            "notion/API-update-a-data-source"
+          ],
+          "accomplishes": "Search Notion for governance data sources then update them with current compliance or policy information",
+          "verified": false,
+          "notes": "Notion auth required; useful for keeping governance documentation current"
+        },
+        {
+          "name": "notion-delete-block-governance-cleanup",
+          "chain": [
+            "notion/API-search",
+            "notion/API-delete-a-block"
+          ],
+          "accomplishes": "Search Notion governance pages for outdated policy blocks and remove them to keep documentation clean",
+          "verified": false,
+          "notes": "Notion auth required; useful for governance doc lifecycle management"
         }
       ],
       "prompts": [
@@ -9623,6 +9664,26 @@
           "accomplishes": "Migrate the LLM model used in a UI generation pipeline (component scaffolding, visual description → code, design token expansion) to a newer model, reason over quality and latency tradeoffs for design-specific outputs (longer descriptions, richer schemas), then write a migration impact report documenting how design-output characteristics change under the new model.",
           "verified": false,
           "notes": "orchestrator/skill_execute(migration:claude-opus-migration) at 3/6 (code, finance, ops); design is new profile. thinking + fs/write_file verified live."
+        },
+        {
+          "name": "discord-design-share",
+          "chain": [
+            "orchestrator/skill_execute(connectors:discord)",
+            "ch1tty/search"
+          ],
+          "accomplishes": "Share design assets or updates to Discord channels and search for related design tools to iterate further",
+          "verified": false,
+          "notes": "connectors:discord requires auth; completes discord to 6/6 profile coverage"
+        },
+        {
+          "name": "notion-search-design-resources",
+          "chain": [
+            "notion/API-search",
+            "ch1tty/execute"
+          ],
+          "accomplishes": "Search Notion for design documentation, assets, or style guides then execute relevant tools based on the results",
+          "verified": false,
+          "notes": "Notion auth required; useful for design system documentation lookups"
         }
       ],
       "prompts": [
@@ -13289,6 +13350,26 @@
           "accomplishes": "Read the deployment changelog or diff from the local filesystem, after a successful code deployment, reason over what changed (features shipped, APIs bumped, migrations run) and what level of detail is appropriate for the engineering Discord channel, then post a structured deployment summary — closing the code → deploy → notify loop without manual write-up.",
           "verified": false,
           "notes": "orchestrator/skill_execute(connectors:discord) at 1/6 (communication); code is new profile. thinking verified live. Connector requires token. Adds discord to code profile. fs/read_text_file verified live. Added at chain start to read changelog before reasoning and notifying."
+        },
+        {
+          "name": "notion-delete-stale-code-docs",
+          "chain": [
+            "notion/API-search",
+            "notion/API-delete-a-block"
+          ],
+          "accomplishes": "Search Notion for outdated or stale code documentation blocks and remove them to keep developer docs accurate",
+          "verified": false,
+          "notes": "Notion auth required; useful for code documentation hygiene"
+        },
+        {
+          "name": "notion-search-code-context",
+          "chain": [
+            "notion/API-search",
+            "ch1tty/execute"
+          ],
+          "accomplishes": "Search Notion for code context, architecture notes, or implementation docs before executing a code-related tool",
+          "verified": false,
+          "notes": "Notion auth required; useful for context-aware code operations"
         }
       ],
       "prompts": [
@@ -16787,6 +16868,27 @@
           "accomplishes": "After completing an LLM model migration, reason over the downstream impact on tools and stakeholder workflows, then send a migration completion summary to relevant Discord channels — ensuring the team knows what model changed, why, what the performance delta was, and any required follow-up actions.",
           "verified": false,
           "notes": "orchestrator/skill_execute(migration:claude-opus-migration) at 3/6 (code, finance, ops); communication is new profile. thinking verified live. discord connector requires token."
+        },
+        {
+          "name": "chitty-register-broadcast-cloudflare-build",
+          "chain": [
+            "orchestrator/skill_execute(chittyos-devops:chitty-register)",
+            "cloudflare-builds/workers_builds_get_build_config",
+            "tasks/create"
+          ],
+          "accomplishes": "Register a new service with ChittyOS registry, retrieve its Cloudflare build configuration, then create a task to notify stakeholders of the new deployment",
+          "verified": false,
+          "notes": "All tools auth-gated; completes chitty-register and workers_builds_get_build_config to 6/6"
+        },
+        {
+          "name": "notion-update-comms-record",
+          "chain": [
+            "notion/API-search",
+            "notion/API-update-a-data-source"
+          ],
+          "accomplishes": "Search Notion for communication records or meeting notes then update the data source with new information",
+          "verified": false,
+          "notes": "Notion auth required; completes notion/API-update-a-data-source to 6/6 across profiles"
         }
       ],
       "prompts": [
@@ -20411,6 +20513,26 @@
           "accomplishes": "During an ops incident, reason over severity, affected services, blast radius, and the right escalation path and on-call audience, then broadcast a structured incident alert to the ops Discord channel — getting the right people informed at the right granularity without oversharing or under-communicating.",
           "verified": false,
           "notes": "orchestrator/skill_execute(connectors:discord) at 1/6 (communication); ops is new profile. thinking verified live. Adds discord to ops profile."
+        },
+        {
+          "name": "notion-search-ops-runbook",
+          "chain": [
+            "notion/API-search",
+            "ch1tty/execute"
+          ],
+          "accomplishes": "Search Notion for operational runbooks or incident playbooks then execute the relevant operational tool",
+          "verified": false,
+          "notes": "Notion auth required; useful for ops teams referencing Notion runbooks mid-incident"
+        },
+        {
+          "name": "notion-patch-block-ops-update",
+          "chain": [
+            "notion/API-search",
+            "notion/API-patch-block-children"
+          ],
+          "accomplishes": "Search Notion for an ops status page or incident block then patch it with updated operational status",
+          "verified": false,
+          "notes": "Notion auth required; useful for live incident status updates in Notion"
         }
       ],
       "prompts": [
