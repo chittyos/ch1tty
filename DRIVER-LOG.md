@@ -2380,3 +2380,13 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 1. Merge PR for 101st pass when CI green
 2. 102nd catalog pass: extend single-use tools to remaining profiles — `orchestrator/agent_execute(claude)` to design/communication/ops (still 3/6); `notion/API-delete-a-block` to governance/design/code (still 3/6); `chittyevidence/log_evidence` to design/code/communication (still 3/6); `notion/API-update-a-data-source` to governance/code/communication/ops (still 2/6)
 3. Fix Notion auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` to unblock cross-run board writes
+
+### 2026-06-10 (run 54 — current)
+- **Workstream advanced**: E — Alchemist catalog 104th pass
+- **Branch/PR**: `auto/E-catalog-104th-pass` → PR #301 (https://github.com/chittyos/ch1tty/pull/301)
+- **Build**: clean (`tsc`)
+- **Tests**: 938/940 pass, 2 skipped (Ollama unreachable — expected)
+- **What was done**: 104th pass: 18 new combos + 18 new prompts. Completed 6 tools from 4/6→6/6: chittyevidence/log_evidence, cloudflare-builds/workers_builds_trigger, neon/search, notion/API-create-a-data-source, notion/API-get-block-children, notion/API-query-data-source. Advanced 3 tools from 3/6→5/6: orchestrator/agent_execute(alchemist) (code+comm), browser-rendering/get_url_screenshot (code+governance), fs/edit_file (comm+design). 6/6 tool count 121→127.
+- **Catalog**: 1122→1140 combos / 485 verified (unchanged) / 1143→1161 prompts
+- **Blocker**: Notion auth 401 persists — `chitty-mcp-token notion` restores board writes.
+- **Next run**: Continue 105th+ passes: next best targets are tools at 3/6 that weren't advanced this pass (e.g. browser-rendering/get_url_screenshot needs ops+finance+design→now 3 remaining; orchestrator/agent_execute(ship) [code,design,ops] needs comm+finance+governance; tasks/get_task [code,design,ops] needs comm+finance+governance). Also: advance the 2/6 tools that are most used across the ecosystem.
