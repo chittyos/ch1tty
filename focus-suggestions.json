@@ -1,6 +1,6 @@
 {
-  "_comment": "110th pass — 1224 combos / 1221 prompts. 109th pass: fs/directory_tree, orchestrator/agent_execute(claude), playwright/browser_console_messages to 6/6, notion/API-update-a-data-source 4/6. 110th pass: wrangler-audit 6/6, claude-opus-migration 6/6, chitty-register 5/6, connectors:discord 4/6, commit-push-pr 3/6.",
-  "generatedFrom": "109th pass — 2026-06-10 — fs/directory_tree 6/6, agent_execute(claude) 6/6, browser_console_messages 6/6",
+  "_comment": "112th pass — 1238 combos / 1235 prompts. 15 tools completed to 6/6: notion/API-delete-a-block, agent_execute(ship), notion/API-patch-block-children, ch1tty/execute, tasks/get_task, linear/get_issue, commit-commands/commit-push-pr, neon/compare_database_schema, linear/create_project, github/list_issues, linear/list_projects, agent_execute(registry), agent_execute(market), agent_execute(connect), agent_execute(resolve).",
+  "generatedFrom": "112th pass — 2026-06-10 — 15 tools to 6/6 in one pass (14 combos)",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools — now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time — combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -2540,6 +2540,50 @@
           "accomplishes": "Discover finance-related deployment tools, run the ship agent to release a finance service update, then verify gateway status",
           "verified": false,
           "notes": "ship agent orchestrates deployment pipeline; useful for finance service releases"
+        },
+        {
+          "name": "finance-db-sprint-status",
+          "chain": [
+            "neon/compare_database_schema",
+            "linear/list_projects",
+            "ch1tty/execute"
+          ],
+          "accomplishes": "Compare the Neon finance database schema to detect drift before a billing cycle update, list active Linear projects for the finance sprint context, then execute a targeted ch1tty finance tool (e.g. ledger append or invoice query) to complete the billing workflow.",
+          "verified": false,
+          "notes": "neon/compare_database_schema verified. linear/list_projects verified. ch1tty/execute routes to any finance-domain tool."
+        },
+        {
+          "name": "finance-task-notion-patch-issues",
+          "chain": [
+            "tasks/get_task",
+            "notion/API-patch-block-children",
+            "github/list_issues"
+          ],
+          "accomplishes": "Retrieve an open billing task from the ChittyAgent tasks service, patch the relevant Notion finance tracker block with updated task data, then list open GitHub issues for the payment service to align engineering and finance tracking.",
+          "verified": false,
+          "notes": "tasks/get_task via tasks-mcp. notion/API-patch-block-children verified. github/list_issues verified."
+        },
+        {
+          "name": "finance-fix-commit-registry",
+          "chain": [
+            "linear/get_issue",
+            "orchestrator/skill_execute(commit-commands:commit-push-pr)",
+            "orchestrator/agent_execute(registry)"
+          ],
+          "accomplishes": "Fetch the Linear issue for a billing service bug fix, commit and push the fix with a PR via the commit-commands skill, then verify the updated service is reflected correctly in the ChittyOS registry — completing the full finance-service patch cycle.",
+          "verified": false,
+          "notes": "linear/get_issue verified. commit-push-pr automates the PR chain. registry agent checks service status post-deploy."
+        },
+        {
+          "name": "finance-connect-resolve-marketplace",
+          "chain": [
+            "orchestrator/agent_execute(connect)",
+            "orchestrator/agent_execute(resolve)",
+            "orchestrator/agent_execute(market)"
+          ],
+          "accomplishes": "Connect to a finance ChittyOS service (e.g. the billing integration or Mercury banking service), resolve a billing conflict or rate discrepancy, then check the ChittyOS marketplace for financial service integrations or payment plugins — a finance-ecosystem discovery and triage chain.",
+          "verified": false,
+          "notes": "connect, resolve, and market agents used here for financial service orchestration in ChittyOS."
         }
       ],
       "prompts": [
@@ -3282,6 +3326,22 @@
         {
           "text": "List all agents and skills and write a finance capability brief",
           "resolves_to": "finance-agent-skill-capability-brief"
+        },
+        {
+          "text": "Check Neon finance database schema drift, list Linear finance sprint projects, and execute a billing tool",
+          "resolves_to": "finance-db-sprint-status"
+        },
+        {
+          "text": "Get the billing task status, update the Notion finance tracker block, and list GitHub payment service issues",
+          "resolves_to": "finance-task-notion-patch-issues"
+        },
+        {
+          "text": "Get the Linear billing fix issue, commit-push-PR the fix, then verify the service in the ChittyOS registry",
+          "resolves_to": "finance-fix-commit-registry"
+        },
+        {
+          "text": "Connect to a finance service, resolve a billing conflict, and browse the marketplace for payment integrations",
+          "resolves_to": "finance-connect-resolve-marketplace"
         }
       ]
     },
@@ -6172,6 +6232,28 @@
           "accomplishes": "Search Notion governance pages for outdated policy blocks and remove them to keep documentation clean",
           "verified": false,
           "notes": "Notion auth required; useful for governance doc lifecycle management"
+        },
+        {
+          "name": "governance-ship-and-track",
+          "chain": [
+            "orchestrator/agent_execute(ship)",
+            "linear/create_project",
+            "ch1tty/execute"
+          ],
+          "accomplishes": "Run the ship agent to release a governance-related service (e.g. compliance policy update), create a Linear project to track the post-ship audit follow-up, then execute a specific ch1tty governance tool to verify the new deployment state.",
+          "verified": false,
+          "notes": "ship agent manages deployment workflow. linear/create_project tracks audit. ch1tty/execute routes to any namespaced governance tool."
+        },
+        {
+          "name": "governance-audit-issue-commit",
+          "chain": [
+            "tasks/get_task",
+            "linear/get_issue",
+            "orchestrator/skill_execute(commit-commands:commit-push-pr)"
+          ],
+          "accomplishes": "Retrieve the current governance audit task from the ChittyAgent tasks service, fetch the associated Linear issue for the compliance change, then commit, push, and open a PR — linking task tracking, issue management, and code delivery for governance-driven changes.",
+          "verified": false,
+          "notes": "tasks/get_task via tasks-mcp. linear/get_issue provides issue context. commit-push-pr automates the PR chain."
         }
       ],
       "prompts": [
@@ -7034,6 +7116,14 @@
         {
           "text": "Navigate to our governance portal and audit the browser console for compliance issues",
           "resolves_to": "governance-playwright-console-compliance-audit"
+        },
+        {
+          "text": "Ship a governance service release, create a Linear project for the post-release audit, then verify the state with ch1tty",
+          "resolves_to": "governance-ship-and-track"
+        },
+        {
+          "text": "Get the governance audit task, fetch the associated Linear issue, and commit-push-PR the compliance fix",
+          "resolves_to": "governance-audit-issue-commit"
         }
       ]
     },
@@ -9684,6 +9774,39 @@
           "accomplishes": "Search Notion for design documentation, assets, or style guides then execute relevant tools based on the results",
           "verified": false,
           "notes": "Notion auth required; useful for design system documentation lookups"
+        },
+        {
+          "name": "design-iteration-cleanup-and-commit",
+          "chain": [
+            "notion/API-delete-a-block",
+            "linear/get_issue",
+            "orchestrator/skill_execute(commit-commands:commit-push-pr)"
+          ],
+          "accomplishes": "Remove a stale design block from a Notion page, fetch the associated Linear issue for design context, then commit, push, and open a PR for the design iteration changes — completing a design cycle from cleanup to review.",
+          "verified": false,
+          "notes": "notion/API-delete-a-block verified. linear/get_issue verified. commit-push-pr: commit-commands plugin skill."
+        },
+        {
+          "name": "design-sprint-registry-sync",
+          "chain": [
+            "linear/create_project",
+            "github/list_issues",
+            "orchestrator/agent_execute(registry)"
+          ],
+          "accomplishes": "Create a new Linear project for a design sprint, list open GitHub issues tagged for design review, then query the ChittyOS registry to confirm which design services are certified and available — bootstrapping a design sprint with up-to-date project tracking.",
+          "verified": false,
+          "notes": "linear/create_project verified. github/list_issues verified. registry agent bridges design services in ChittyOS."
+        },
+        {
+          "name": "design-integration-resolve-marketplace",
+          "chain": [
+            "orchestrator/agent_execute(connect)",
+            "orchestrator/agent_execute(resolve)",
+            "orchestrator/agent_execute(market)"
+          ],
+          "accomplishes": "Connect to a design-relevant ChittyOS service, resolve a conflict or ambiguity in the design component registry, then browse the ChittyOS marketplace for compatible design components or plugins — a complete design-ecosystem navigation chain.",
+          "verified": false,
+          "notes": "connect, resolve, and market agents orchestrate cross-service design workflows in ChittyOS."
         }
       ],
       "prompts": [
@@ -10474,6 +10597,18 @@
         {
           "text": "Search my project for design patterns, read the specs, and analyze the visual component hierarchy",
           "resolves_to": "design-fs-search-visual-pattern-analysis"
+        },
+        {
+          "text": "Clean up stale Notion design blocks, get the Linear design issue, and open a PR for the design iteration",
+          "resolves_to": "design-iteration-cleanup-and-commit"
+        },
+        {
+          "text": "Create a new Linear design sprint project, list GitHub design issues, and verify which design services are in the registry",
+          "resolves_to": "design-sprint-registry-sync"
+        },
+        {
+          "text": "Connect to a design service, resolve a component conflict, and browse the marketplace for design integrations",
+          "resolves_to": "design-integration-resolve-marketplace"
         }
       ]
     },
@@ -13370,6 +13505,28 @@
           "accomplishes": "Search Notion for code context, architecture notes, or implementation docs before executing a code-related tool",
           "verified": false,
           "notes": "Notion auth required; useful for context-aware code operations"
+        },
+        {
+          "name": "code-sprint-init-connect",
+          "chain": [
+            "linear/create_project",
+            "github/list_issues",
+            "orchestrator/agent_execute(connect)"
+          ],
+          "accomplishes": "Create a new Linear project for a code sprint, list open GitHub issues to populate the sprint backlog, then connect to the relevant ChittyOS code service (e.g. the code agent or build service) to register the sprint work — bootstrapping a code sprint with full project, issue, and service linkage.",
+          "verified": false,
+          "notes": "linear/create_project verified. github/list_issues verified. connect agent routes to code-domain services in ChittyOS."
+        },
+        {
+          "name": "code-resolve-notion-sprint-list",
+          "chain": [
+            "notion/API-patch-block-children",
+            "orchestrator/agent_execute(resolve)",
+            "linear/list_projects"
+          ],
+          "accomplishes": "Patch a Notion code-review block with resolution notes, run the resolve agent to auto-resolve the linked code conflict or CI failure, then list all active Linear projects to confirm the resolved issue is accounted for in the current sprint — closing the code-review loop from Notion through agent resolution to project tracking.",
+          "verified": false,
+          "notes": "notion/API-patch-block-children verified. resolve agent handles code conflicts. linear/list_projects confirmed at 6/6 after this pass."
         }
       ],
       "prompts": [
@@ -14224,6 +14381,14 @@
         {
           "text": "List all skills, reason about patterns, then look up the MCP SDK docs for implementation guidance",
           "resolves_to": "code-skill-list-reasoning-sdk-docs"
+        },
+        {
+          "text": "Create a Linear code sprint project, list GitHub issues for the backlog, and connect to the code service",
+          "resolves_to": "code-sprint-init-connect"
+        },
+        {
+          "text": "Patch the Notion code-review block with resolution notes, run the resolve agent, and list Linear sprint projects",
+          "resolves_to": "code-resolve-notion-sprint-list"
         }
       ]
     },
@@ -16889,6 +17054,30 @@
           "accomplishes": "Search Notion for communication records or meeting notes then update the data source with new information",
           "verified": false,
           "notes": "Notion auth required; completes notion/API-update-a-data-source to 6/6 across profiles"
+        },
+        {
+          "name": "release-comms-schema-sprint",
+          "chain": [
+            "orchestrator/agent_execute(ship)",
+            "neon/compare_database_schema",
+            "linear/list_projects",
+            "tasks/get_task"
+          ],
+          "accomplishes": "Ship a communication service release, compare the Neon database schema to surface a data diff for stakeholder release notes, list active Linear projects to provide a sprint status update, then retrieve the broadcast task from ChittyAgent tasks to confirm the release comms workflow is tracked end-to-end — linking deployment, schema, project state, and task tracking in one release-broadcast chain.",
+          "verified": false,
+          "notes": "ship agent orchestrates release. neon/compare_database_schema surfaces schema diffs. linear/list_projects gives sprint context. tasks/get_task tracks the broadcast task via tasks-mcp."
+        },
+        {
+          "name": "broadcast-task-registry-market-chain",
+          "chain": [
+            "ch1tty/execute",
+            "tasks/get_task",
+            "orchestrator/agent_execute(registry)",
+            "orchestrator/agent_execute(market)"
+          ],
+          "accomplishes": "Execute a communication broadcast tool via ch1tty, retrieve the associated broadcast task status, check the registry for target audience services, then browse the marketplace for messaging integrations — a full broadcast orchestration chain spanning tool execution, task tracking, registry lookup, and marketplace discovery.",
+          "verified": false,
+          "notes": "ch1tty/execute routes to any comms tool. tasks/get_task tracks broadcast status. registry + market agents discover integration options."
         }
       ],
       "prompts": [
@@ -17695,6 +17884,14 @@
         {
           "text": "Navigate to our broadcast portal and triage any console errors for communication failures",
           "resolves_to": "comm-playwright-console-broadcast-triage"
+        },
+        {
+          "text": "Ship a release, compare the Neon schema for release notes, and list Linear sprint projects for status broadcast",
+          "resolves_to": "release-comms-schema-sprint"
+        },
+        {
+          "text": "Execute a broadcast tool, get the broadcast task status, check the registry for audience services, and browse the marketplace",
+          "resolves_to": "broadcast-task-registry-market-chain"
         }
       ]
     },
@@ -20533,6 +20730,16 @@
           "accomplishes": "Search Notion for an ops status page or incident block then patch it with updated operational status",
           "verified": false,
           "notes": "Notion auth required; useful for live incident status updates in Notion"
+        },
+        {
+          "name": "ops-schema-drift-with-docs",
+          "chain": [
+            "neon/compare_database_schema",
+            "context7/get-library-docs"
+          ],
+          "accomplishes": "Compare the Neon production database schema to detect schema drift before a deployment window, then fetch the relevant library documentation (e.g. Drizzle ORM or Prisma migration docs) to guide the migration strategy — combining schema analysis with authoritative library docs for ops-ready migration planning.",
+          "verified": false,
+          "notes": "neon/compare_database_schema verified. context7/get-library-docs provides up-to-date ORM/migration documentation via context7."
         }
       ],
       "prompts": [
@@ -21375,6 +21582,10 @@
         {
           "text": "Update a Notion data source for our ops feed and write a sync integrity audit report",
           "resolves_to": "ops-notion-update-datasource-sync-audit"
+        },
+        {
+          "text": "Compare Neon production schema for drift and fetch migration library docs for ops-ready migration planning",
+          "resolves_to": "ops-schema-drift-with-docs"
         }
       ]
     }
