@@ -756,3 +756,41 @@
 - Branch: `auto/E-catalog-105th-pass`. PR#302 open. CI in_progress. Codex rate-limited (usage limits — no findings). CodeRabbit reviewing.
 - **Workstream status**: A ✓ B ✓ C ✓ D ✓ E (in-flight; 1152/496 verified; 656 unverified — all auth-gated)
 - **Next run**: Merge PR#302 if CI green + no blocking reviews. Next targets: tools at 2/6 (`neon/fetch`, `notion/API-get-self`, `notion/API-retrieve-a-data-source`, `playwright/browser_console_messages`, `orchestrator/agent_execute(resolve)`, `cloudflare-builds/workers_builds_get_build_config`) — each needs 4 new profiles.
+
+---
+
+### 2026-06-10T14:30Z — 109th-pass catalog (PR#306)
+
+- **Workstream advanced**: E (Alchemist catalog, 109th pass)
+- **Startup checks**: `npm ci` clean, `npm run build` clean (0 errors), `npm test` → 938 pass / 0 fail / 2 skip ✓
+- **State inspection**: Only 1 open PR at run start: #305 (108th-pass, 1188 combos / 508 verified). All 3 CI checks green → **squash-merged PR#305**. Pulled main to `01c063b`.
+- **Notion board**: Still unavailable (API 401 — Notion MCP not available in remote container). Using `.driver/run-log.md` as substitute.
+- **All workstreams A–D confirmed done**. E continuous-improvement passes.
+- **ch1tty status**: 0 connected servers (lazy), 35 active sessions, ledger degraded (26 DLQ entries — known), brain ok.
+- **Execute probes (109th pass)**:
+  - `fs/directory_tree` → cast score 0.56, resolves as primary ✓
+  - `orchestrator/agent_execute(claude)` → `{action:redirect, domain:claude.agent.chitty.cc}` ✓ — REAL routed response
+  - `orchestrator/agent_list` → 28 agents (15 bound, 13 unbound) ✓
+  - `orchestrator/skill_list` → 54 skills confirmed ✓
+  - `context7/resolve-library-id` + `context7/query-docs` confirmed live ✓
+  - `thinking/sequentialthinking` confirmed live ✓
+  - `fs/search_files`, `fs/read_multiple_files`, `fs/write_file` confirmed live ✓
+  - `playwright/browser_console_messages` → ERROR: Chromium not installed at `/opt/google/chrome/chrome` (playwright unavailable in this container)
+  - `cloudflare-builds/workers_builds_get_build_config` → ERROR: tool not found. Real tools in cloudflare-builds: workers_list, workers_get_worker, workers_get_worker_code, workers_builds_set_active_worker, workers_builds_list_builds, workers_builds_get_build, workers_builds_get_build_logs. NOTE: `workers_builds_get_build_config` is a STALE catalog entry — the real tool doesn't exist; future passes should not extend this tool further.
+- **12 new combos added (109th pass, 2 per profile, 9 verified / 3 unverified)**:
+  - finance: `finance-search-read-reasoning-report` (fs chain, verified), `finance-agent-skill-capability-brief` (agent+skill+thinking, verified)
+  - governance: `governance-directory-tree-compliance-map` (fs/directory_tree 6/6 ✓, verified), `governance-playwright-console-compliance-audit` (unverified — Chromium N/A)
+  - design: `design-claude-agent-mcp-sdk-scaffold` (agent_execute(claude)+context7, verified), `design-fs-search-visual-pattern-analysis` (fs chain, verified)
+  - code: `code-agent-skill-context7-integration-guide` (agent+skill+context7, verified), `code-skill-list-reasoning-sdk-docs` (skill+thinking+context7, verified)
+  - communication: `comm-claude-agent-channel-strategy-brief` (agent_execute(claude)+thinking, verified), `comm-playwright-console-broadcast-triage` (unverified — Chromium N/A)
+  - ops: `ops-agent-skill-list-coverage-brief` (agent+skill+thinking, verified), `ops-notion-update-datasource-sync-audit` (unverified — Notion 401)
+- **Tool completions**: fs/directory_tree 6/6 ✓, orchestrator/agent_execute(claude) 6/6 ✓, playwright/browser_console_messages 6/6 ✓
+- **Partial advance**: notion/API-update-a-data-source 3/6 → 4/6 (+ops)
+- Catalog: 1188 → 1200 combos, 508 → 517 verified (43%). Tools at 6/6: 143 → 146.
+- Build clean. Tests: 938 pass / 0 fail / 2 skip ✓.
+- Branch: `auto/E-catalog-109th-pass`. **PR#306** open. CI in progress. Subscribed for activity.
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E (in-flight; 1200/517 verified; 683 unverified — all auth-gated)
+- **Next run**: Merge PR#306 if CI green + no blocking reviews. Next targets: (1) notion/API-update-a-data-source needs +governance, +communication (still 4/6); (2) cloudflare-builds/workers_builds_get_build_config is STALE — real tool doesn't exist; investigate and correct stale entries; (3) tools at 1/6 with many orchestrator sub-agent variants — consider grouping similar invocations. Human auth actions:
+  1. `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` — unblocks Notion-auth-gated combos
+  2. `export GITHUB_MCP_AUTHORIZATION="Bearer $(op read op://ChittyOS-Integrations/github/personal_access_token)"` — unblocks github combos
+  3. Linear/Cloudflare/Neon/Stripe tokens for remaining auth-gated combos

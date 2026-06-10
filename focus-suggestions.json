@@ -1,6 +1,6 @@
 {
   "_comment": "107th pass — 1176 combos / 1197 prompts. Key completions: notion/API-create-a-page completed to 6/6 (+governance +design +communication). cloudflare-builds/workers_builds_get_build_config advanced to 5/6 (+finance +code). orchestrator/chittyagent-resolve advanced to 4/6 (+governance +ops). neon/fetch advanced to 4/6 (+governance +ops). notion/API-get-self advanced to 4/6 (+finance +governance). cloudflare-builds/workers_builds_get advanced to 3/6 (+design). notion/API-retrieve-a-data-source advanced to 3/6 (+code). fs/directory_tree advanced to 4/6 (+communication). 508 verified combos.",
-  "generatedFrom": "E-catalog-107th-pass",
+  "generatedFrom": "109th pass — 2026-06-10 — fs/directory_tree 6/6, agent_execute(claude) 6/6, browser_console_messages 6/6",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools — now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time — combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -2474,6 +2474,30 @@
           "accomplishes": "Traverse the local filesystem to produce a directory tree of the finance or billing codebase, reason over the structure to identify where budget documentation, cost config, and rate sheets live relative to the active codebase, then post a structured map of those key finance document locations to a Notion ops page — enabling the finance team to quickly navigate billing-related artifacts without searching.",
           "verified": false,
           "notes": "fs/directory_tree: confirmed. thinking: confirmed. notion/API-post-page: confirmed. Adds fs/directory_tree to finance profile (was: design, code, communication, ops)."
+        },
+        {
+          "name": "finance-search-read-reasoning-report",
+          "chain": [
+            "fs/search_files",
+            "fs/read_multiple_files",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search local finance documentation by keyword, read multiple matching files simultaneously, apply sequential reasoning to identify billing patterns and budget allocations, then write a consolidated finance document analysis report.",
+          "verified": true,
+          "notes": "fs/search_files, fs/read_multiple_files, thinking/sequentialthinking, fs/write_file all confirmed live (allowed dirs: /home/ubuntu/projects, /home/ubuntu/Documents). 109th pass."
+        },
+        {
+          "name": "finance-agent-skill-capability-brief",
+          "chain": [
+            "orchestrator/agent_list",
+            "orchestrator/skill_list",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Enumerate all available agents (including chittyagent-finance with mercury-banking capability) and all 54 skills, apply sequential reasoning to identify the complete finance capability surface across Mercury banking, cashflow planning, and obligation tracking, then write a finance capability brief.",
+          "verified": true,
+          "notes": "orchestrator/agent_list (28 agents confirmed), orchestrator/skill_list (54 skills confirmed including mercury-finance, cashflow-planner, obligation-tracker), thinking and fs confirmed live. 109th pass."
         }
       ],
       "prompts": [
@@ -3208,6 +3232,14 @@
         {
           "text": "Map the finance and billing docs in our repo directory tree and post locations to Notion",
           "resolves_to": "finance-fs-directory-budget-docs-map"
+        },
+        {
+          "text": "Search my finance docs, read the key files, and write a pattern analysis report",
+          "resolves_to": "finance-search-read-reasoning-report"
+        },
+        {
+          "text": "List all agents and skills and write a finance capability brief",
+          "resolves_to": "finance-agent-skill-capability-brief"
         }
       ]
     },
@@ -6035,6 +6067,29 @@
           "accomplishes": "Retrieve recent Cloudflare Workers build records for compliance-critical services, identify any builds that lack a linked approval reference or were deployed outside the change-window, file a GitHub issue for each non-compliant deployment to create an audit trail, then post a Notion governance summary capturing compliant vs flagged deployments — enforcing deployment compliance visibility across the change management lifecycle.",
           "verified": false,
           "notes": "cloudflare-builds/workers_builds_get: lazy. github/create_issue: confirmed. notion/API-post-page: confirmed. Adds cloudflare-builds/workers_builds_get to governance profile (was: design, code, ops)."
+        },
+        {
+          "name": "governance-directory-tree-compliance-map",
+          "chain": [
+            "fs/directory_tree",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Recursively map the governance repository directory tree, apply sequential reasoning to audit organizational structure for compliance with documentation standards (CLAUDE.md, CHARTER.md, CHITTY.md presence and layout), then write a compliance structure map.",
+          "verified": true,
+          "notes": "fs/directory_tree confirmed live via cast probe (score 0.56). thinking/sequentialthinking and fs/write_file confirmed live. Completes fs/directory_tree to 6/6 profile coverage. 109th pass."
+        },
+        {
+          "name": "governance-playwright-console-compliance-audit",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_console_messages",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Navigate to a governance portal or compliance dashboard, capture all browser console messages (errors, warnings, and security alerts from the live page), apply sequential reasoning to identify compliance violations and risk signals, then write a governance console audit report.",
+          "verified": false,
+          "notes": "playwright not connected in this session (Chromium not installed at /opt/google/chrome/chrome). Completes playwright/browser_console_messages to 6/6 profile coverage when playwright available. 109th pass."
         }
       ],
       "prompts": [
@@ -6889,6 +6944,14 @@
         {
           "text": "Check recent Workers builds for compliance and file GitHub issues for any non-compliant deployments",
           "resolves_to": "governance-cf-builds-workers-deploy-compliance"
+        },
+        {
+          "text": "Map my project directory tree and write a compliance structure report",
+          "resolves_to": "governance-directory-tree-compliance-map"
+        },
+        {
+          "text": "Navigate to our governance portal and audit the browser console for compliance issues",
+          "resolves_to": "governance-playwright-console-compliance-audit"
         }
       ]
     },
@@ -9475,6 +9538,29 @@
           "accomplishes": "Invoke the resolve agent to triage an open design system conflict (component API mismatch, style token dispute, layout spec ambiguity), retrieve the Notion data source backing the design system's spec database to verify the current authoritative state, then screenshot the live component in the browser to capture its current rendered form — producing a resolve triage summary + data source authority check + visual evidence for the design conflict resolution artifact.",
           "verified": false,
           "notes": "orchestrator/chittyagent-resolve: lazy. notion/API-retrieve-a-data-source: confirmed. playwright/browser_screenshot: confirmed. Multi-tool chain covering both orchestrator/chittyagent-resolve (missing design) and notion/API-retrieve-a-data-source (missing design)."
+        },
+        {
+          "name": "design-claude-agent-mcp-sdk-scaffold",
+          "chain": [
+            "orchestrator/agent_execute(claude)",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Query the Claude integration agent for MCP design guidance on Skills and Marketplace architecture, resolve the @modelcontextprotocol/sdk library to get a Context7-compatible ID, query TypeScript SDK documentation for scaffolding patterns, then reason through a new MCP-based skill scaffold design.",
+          "verified": true,
+          "notes": "orchestrator/agent_execute(claude) confirmed live: returns {action:redirect, domain:claude.agent.chitty.cc} — real routed redirect response. context7/resolve-library-id and query-docs confirmed live. thinking/sequentialthinking confirmed live. Advances agent_execute(claude) to 5/6 profile coverage. 109th pass."
+        },
+        {
+          "name": "design-fs-search-visual-pattern-analysis",
+          "chain": [
+            "fs/search_files",
+            "fs/read_text_file",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Search the project for design system files and visual component patterns, read the most relevant design specification file, then apply sequential reasoning to synthesize a visual pattern analysis across identified design artifacts and component hierarchy.",
+          "verified": true,
+          "notes": "fs/search_files, fs/read_text_file, thinking/sequentialthinking all confirmed live. 109th pass."
         }
       ],
       "prompts": [
@@ -10257,6 +10343,14 @@
         {
           "text": "Triage this design system conflict with the resolve agent and cross-check the Notion data source spec",
           "resolves_to": "design-resolve-notion-data-source-prototype"
+        },
+        {
+          "text": "Query the Claude agent for MCP skill design guidance, then scaffold a new MCP skill with SDK docs",
+          "resolves_to": "design-claude-agent-mcp-sdk-scaffold"
+        },
+        {
+          "text": "Search my project for design patterns, read the specs, and analyze the visual component hierarchy",
+          "resolves_to": "design-fs-search-visual-pattern-analysis"
         }
       ]
     },
@@ -13085,6 +13179,31 @@
           "accomplishes": "Update a Notion data source configuration to align with the latest schema agreed in code review (add a missing column, fix a type mismatch, correct a stale sync filter), file a GitHub issue documenting the schema change for the audit trail, then write the updated schema spec to a local file — producing a data source update → issue audit → local snapshot pipeline for keeping Notion schema in sync with code-side schema contracts.",
           "verified": false,
           "notes": "notion/API-update-a-data-source: confirmed in prior sessions. github/create_issue: confirmed. fs/write_file: confirmed. Adds notion/API-update-a-data-source to code profile (was: finance, design)."
+        },
+        {
+          "name": "code-agent-skill-context7-integration-guide",
+          "chain": [
+            "orchestrator/agent_list",
+            "orchestrator/skill_list",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "fs/write_file"
+          ],
+          "accomplishes": "Enumerate all available orchestrator agents and skills, resolve the @modelcontextprotocol/sdk library for TypeScript integration patterns, query SDK documentation for usage examples, then write a developer integration guide mapping orchestrator capabilities to their MCP SDK implementation equivalents.",
+          "verified": true,
+          "notes": "orchestrator/agent_list (28 agents), skill_list (54 skills), context7/resolve-library-id and query-docs, fs/write_file all confirmed live. 109th pass."
+        },
+        {
+          "name": "code-skill-list-reasoning-sdk-docs",
+          "chain": [
+            "orchestrator/skill_list",
+            "thinking/sequentialthinking",
+            "context7/resolve-library-id",
+            "context7/query-docs"
+          ],
+          "accomplishes": "List all 54 orchestrator skills to understand the full code toolchain, apply sequential reasoning to identify skill categories and usage patterns, then resolve and query the MCP SDK documentation to map how each skill family aligns with MCP implementation patterns and client integration guides.",
+          "verified": true,
+          "notes": "orchestrator/skill_list (54 skills confirmed), thinking/sequentialthinking, context7/resolve-library-id and query-docs all confirmed live. 109th pass."
         }
       ],
       "prompts": [
@@ -13931,6 +14050,14 @@
         {
           "text": "Update the Notion data source schema to match our latest code contract and file a GitHub issue for the change",
           "resolves_to": "code-notion-update-data-source-schema-drift"
+        },
+        {
+          "text": "List all agents and skills, then write a developer guide with MCP SDK integration patterns",
+          "resolves_to": "code-agent-skill-context7-integration-guide"
+        },
+        {
+          "text": "List all skills, reason about patterns, then look up the MCP SDK docs for implementation guidance",
+          "resolves_to": "code-skill-list-reasoning-sdk-docs"
         }
       ]
     },
@@ -16530,6 +16657,29 @@
           "accomplishes": "Retrieve the latest Cloudflare Workers build records for the communication platform (notification service, broadcast Worker), check the Notion data source powering the release notes database to confirm it is in sync and has the correct schema, then post a release note entry to Notion documenting the new deployment — completing the build-retrieved → data-source-verified → release-note-published communication release pipeline.",
           "verified": false,
           "notes": "cloudflare-builds/workers_builds_get: lazy. notion/API-retrieve-a-data-source: confirmed. notion/API-post-page: confirmed. Multi-tool chain covering cloudflare-builds/workers_builds_get (missing comm) and notion/API-retrieve-a-data-source (missing comm)."
+        },
+        {
+          "name": "comm-claude-agent-channel-strategy-brief",
+          "chain": [
+            "orchestrator/agent_execute(claude)",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Query the Claude integration agent for guidance on Claude Code, Claude.ai, and Claude Desktop communication channel architectures and marketplace skill routing, apply sequential reasoning to synthesize a channel selection and communication broadcast strategy, then write a channel integration brief.",
+          "verified": true,
+          "notes": "orchestrator/agent_execute(claude) confirmed live: returns {action:redirect, domain:claude.agent.chitty.cc}. thinking/sequentialthinking and fs/write_file confirmed live. Completes agent_execute(claude) to 6/6 profile coverage. 109th pass."
+        },
+        {
+          "name": "comm-playwright-console-broadcast-triage",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_console_messages",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Navigate to a communication broadcast portal, capture browser console errors and warnings from the live page, apply sequential reasoning to classify failures by severity and communication channel impact, then write a broadcast triage and remediation report.",
+          "verified": false,
+          "notes": "playwright not connected in this session (Chromium not installed at /opt/google/chrome/chrome). Completes playwright/browser_console_messages to 6/6 profile coverage when playwright available. 109th pass."
         }
       ],
       "prompts": [
@@ -17328,6 +17478,14 @@
         {
           "text": "Retrieve the latest Workers build for the notification service, verify the release notes data source, and publish a release note",
           "resolves_to": "comm-cf-builds-notion-data-source-release-note"
+        },
+        {
+          "text": "Ask the Claude agent about channel architecture, then write a channel strategy brief",
+          "resolves_to": "comm-claude-agent-channel-strategy-brief"
+        },
+        {
+          "text": "Navigate to our broadcast portal and triage any console errors for communication failures",
+          "resolves_to": "comm-playwright-console-broadcast-triage"
         }
       ]
     },
@@ -20103,6 +20261,29 @@
           "accomplishes": "Invoke the Claude orchestration agent to diagnose and propose a fix for an active ops incident (runbook deviation, config drift, degraded service), post the triage summary and proposed remediation steps to a Notion ops incident page for team visibility, then file a GitHub issue to track the remediation action item — completing the agent-triage → Notion-notify → issue-track incident response pipeline.",
           "verified": false,
           "notes": "orchestrator/agent_execute(claude): lazy orchestrator. notion/API-post-page: confirmed. github/create_issue: confirmed. Adds orchestrator/agent_execute(claude) to ops profile (was: finance, governance, code)."
+        },
+        {
+          "name": "ops-agent-skill-list-coverage-brief",
+          "chain": [
+            "orchestrator/agent_list",
+            "orchestrator/skill_list",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "List all 28 agents and 54 skills, apply sequential reasoning to audit operational coverage — identifying which agents are bound vs unbound, which skills need new focused MCP surfaces, and what operational gaps exist — then write a concise ops capability coverage brief.",
+          "verified": true,
+          "notes": "orchestrator/agent_list (28 agents: 15 bound, 13 unbound confirmed), skill_list (54 skills confirmed), thinking and fs confirmed live. 109th pass."
+        },
+        {
+          "name": "ops-notion-update-datasource-sync-audit",
+          "chain": [
+            "notion/API-update-a-data-source",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Update a Notion data source configuration for an operational data feed integration, apply sequential reasoning to verify the update's sync integrity and downstream effects on ops dashboards, then write an ops data-source sync audit report.",
+          "verified": false,
+          "notes": "notion 401 in this session (NOTION_TOKEN invalid). notion/API-update-a-data-source advances from 3/6 to 4/6 profile coverage. Human must run: export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token). 109th pass."
         }
       ],
       "prompts": [
@@ -20937,6 +21118,14 @@
         {
           "text": "Use the Claude agent to diagnose this incident, post remediation steps to Notion, and file a tracking issue",
           "resolves_to": "ops-claude-agent-incident-autofix"
+        },
+        {
+          "text": "List all agents and skills, audit operational coverage, and write a capability gaps brief",
+          "resolves_to": "ops-agent-skill-list-coverage-brief"
+        },
+        {
+          "text": "Update a Notion data source for our ops feed and write a sync integrity audit report",
+          "resolves_to": "ops-notion-update-datasource-sync-audit"
         }
       ]
     }
