@@ -1,5 +1,5 @@
 {
-  "_comment": "103rd pass \u2014 1122 combos / 1143 prompts. ledger/append_entry completed 3/6\u21926/6 (code+comm+ops). fs/read_file completed 3/6\u21926/6 (governance+comm+ops). github/list_pull_requests completed 3/6\u21926/6 (governance+design+comm). neon/describe_branch completed 3/6\u21926/6 (governance+design+comm). neon/list_projects completed 3/6\u21926/6 (governance+comm+ops). notion/API-post-search 4/6\u21926/6 (finance+ops). cloudflare-builds/workers_builds_trigger 2/6\u21924/6 (code+governance). notion/API-create-a-data-source 2/6\u21924/6 (governance+design).",
+  "_comment": "104th pass \u2014 1140 combos / 1161 prompts. Completed 6 tools from 4/6 to 6/6 profile coverage: chittyevidence/log_evidence, cloudflare-builds/workers_builds_trigger, neon/search, notion/API-create-a-data-source, notion/API-get-block-children, notion/API-query-data-source. Advanced 3 tools from 3/6 to 5/6: orchestrator/agent_execute(alchemist) (added code+comm), browser-rendering/get_url_screenshot (added code+governance), fs/edit_file (added comm+design).",
   "generatedFrom": "E-catalog-103rd-pass",
   "profiles": {
     "finance": {
@@ -2385,6 +2385,28 @@
           "accomplishes": "Search Notion for finance-relevant pages (invoices, budget notes, spending records) and append a summary entry to the ledger \u2014 bridging Notion-based finance notes with the immutable ledger record.",
           "verified": false,
           "notes": "notion/API-post-search adding finance coverage (was code + governance + design + communication); ledger/append_entry verified in finance."
+        },
+        {
+          "name": "finance-neon-search-billing-reconcile",
+          "chain": [
+            "neon/search",
+            "neon/run_sql",
+            "stripe/list_invoices",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search Neon documentation to identify the billing or payments schema, run a reconciliation SQL query against the billing database, cross-reference the results with Stripe invoice history for the period, then write the consolidated reconciliation report to a local file.",
+          "verified": false
+        },
+        {
+          "name": "finance-notion-block-budget-extract",
+          "chain": [
+            "notion/API-retrieve-a-page",
+            "notion/API-get-block-children",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Retrieve a Notion budget or finance planning page and expand its full block tree to expose structured line items, reason over the breakdown to surface totals and projections, then write the parsed financial summary to a local report file for further analysis.",
+          "verified": false
         }
       ],
       "prompts": [
@@ -3087,6 +3109,14 @@
         {
           "text": "Search Notion for finance notes and sync the relevant entries into the ledger",
           "resolves_to": "notion-finance-search"
+        },
+        {
+          "text": "Search Neon for our billing schema, run a reconciliation query, and cross-check Stripe invoices",
+          "resolves_to": "finance-neon-search-billing-reconcile"
+        },
+        {
+          "text": "Pull all blocks from the budget Notion page, reason over line items, and export the summary",
+          "resolves_to": "finance-notion-block-budget-extract"
         }
       ]
     },
@@ -5812,6 +5842,27 @@
           "accomplishes": "Create a new Notion data source and log the provisioning event as governance evidence \u2014 maintaining an audit trail of data-connection changes for compliance reviews.",
           "verified": false,
           "notes": "notion/API-create-a-data-source currently only code + finance; adds governance context."
+        },
+        {
+          "name": "governance-notion-query-policy-records",
+          "chain": [
+            "notion/API-retrieve-a-database",
+            "notion/API-query-data-source",
+            "chittyevidence/log_evidence",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Retrieve the Notion policy and compliance database, query it for recently updated or open policy records, log the retrieved governance data as tamper-proof evidence for audit readiness, then reason over any gaps or expired policies to identify review priorities.",
+          "verified": false
+        },
+        {
+          "name": "governance-url-screenshot-compliance-audit",
+          "chain": [
+            "browser-rendering/get_url_screenshot",
+            "chittyevidence/log_evidence",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Screenshot a compliance dashboard or external regulatory portal at audit time, log the captured state as immutable evidence in ChittyEvidence for the governance record, then post the annotated screenshot to a Notion compliance-audit page.",
+          "verified": false
         }
       ],
       "prompts": [
@@ -6630,6 +6681,14 @@
         {
           "text": "Provision a new Notion data source and log it in the governance audit trail",
           "resolves_to": "notion-data-source-governance"
+        },
+        {
+          "text": "Query the policy database, log the records as evidence, and flag expired policies",
+          "resolves_to": "governance-notion-query-policy-records"
+        },
+        {
+          "text": "Screenshot the compliance dashboard, log it as evidence, and post it to the audit page",
+          "resolves_to": "governance-url-screenshot-compliance-audit"
         }
       ]
     },
@@ -9036,6 +9095,57 @@
           "accomplishes": "Create a new Notion data source for design assets and publish a setup-confirmation summary page \u2014 establishing the data layer for a design system documentation hub in one step.",
           "verified": false,
           "notes": "notion/API-create-a-data-source currently only code + finance; adds design context."
+        },
+        {
+          "name": "design-screenshot-log-ux-decision",
+          "chain": [
+            "playwright/browser_screenshot",
+            "chittyevidence/log_evidence",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Screenshot the current state of a UI prototype or design in the browser, log the design review milestone as immutable evidence in ChittyEvidence, then publish the annotated design state to a Notion design-log page.",
+          "verified": false
+        },
+        {
+          "name": "design-preview-build-screenshot",
+          "chain": [
+            "github/get_pull_request",
+            "cloudflare-builds/workers_builds_trigger",
+            "browser-rendering/get_url_screenshot"
+          ],
+          "accomplishes": "Retrieve the diff for a design feature branch PR, trigger a Cloudflare Workers preview build for the design changeset, then screenshot the deployed preview URL to capture the visual output for design review.",
+          "verified": false
+        },
+        {
+          "name": "design-notion-block-spec-screenshot",
+          "chain": [
+            "notion/API-get-block-children",
+            "playwright/browser_screenshot",
+            "notion/API-patch-block-children"
+          ],
+          "accomplishes": "Fetch the child blocks of a Notion design spec page to inspect its current state, take a browser screenshot of the corresponding prototype URL for visual reference, then patch the block children to append the screenshot annotation or visual review notes inline.",
+          "verified": false
+        },
+        {
+          "name": "design-notion-query-component-audit",
+          "chain": [
+            "notion/API-retrieve-a-database",
+            "notion/API-query-data-source",
+            "playwright/browser_screenshot",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Retrieve the Notion design component library database, query it for current component variants and usage status, screenshot the live preview of key components for visual validation, then publish the design system audit results to a Notion page.",
+          "verified": false
+        },
+        {
+          "name": "design-edit-design-config",
+          "chain": [
+            "fs/read_file",
+            "fs/edit_file",
+            "playwright/browser_screenshot"
+          ],
+          "accomplishes": "Read a design system configuration file (theme tokens, component config) to understand the current state, apply the design spec changes with an in-place edit, then screenshot the live preview to visually confirm the design system update took effect.",
+          "verified": false
         }
       ],
       "prompts": [
@@ -9754,6 +9864,26 @@
         {
           "text": "Set up a Notion data source for design assets and create a setup summary page",
           "resolves_to": "design-system-data-source"
+        },
+        {
+          "text": "Screenshot the prototype, log the design decision as evidence, and post to Notion",
+          "resolves_to": "design-screenshot-log-ux-decision"
+        },
+        {
+          "text": "Trigger a preview build for my design PR and screenshot the result",
+          "resolves_to": "design-preview-build-screenshot"
+        },
+        {
+          "text": "Expand the spec page blocks, screenshot the prototype, and annotate the spec inline",
+          "resolves_to": "design-notion-block-spec-screenshot"
+        },
+        {
+          "text": "Query the component library database and publish a visual design system audit",
+          "resolves_to": "design-notion-query-component-audit"
+        },
+        {
+          "text": "Update the design config file and screenshot the preview to confirm the change",
+          "resolves_to": "design-edit-design-config"
         }
       ]
     },
@@ -12456,6 +12586,27 @@
           "accomplishes": "Create a new Notion data source and immediately log the provisioning event as code-governance evidence \u2014 maintaining an audit trail of data-connection changes alongside deploys.",
           "verified": false,
           "notes": "notion/API-create-a-data-source currently only in code + finance; expanding to governance context."
+        },
+        {
+          "name": "code-alchemist-cross-backend-issue",
+          "chain": [
+            "orchestrator/agent_execute(alchemist)",
+            "context7/get-library-docs",
+            "github/create_issue"
+          ],
+          "accomplishes": "Invoke the alchemist agent to surface recurring cross-backend tool composition patterns for code workflows, retrieve library documentation for any newly suggested MCP surface, then open a GitHub issue to track the candidate new focused server or integration point.",
+          "verified": false
+        },
+        {
+          "name": "code-preview-build-visual-check",
+          "chain": [
+            "github/get_pull_request",
+            "cloudflare-builds/workers_builds_get",
+            "browser-rendering/get_url_screenshot",
+            "github/create_issue"
+          ],
+          "accomplishes": "Retrieve the PR diff for a frontend change, check if the Cloudflare Workers preview build is ready, screenshot the deployed preview URL for visual regression inspection, then open a GitHub issue summarizing the visual diff findings for code review.",
+          "verified": false
         }
       ],
       "prompts": [
@@ -13258,6 +13409,14 @@
         {
           "text": "Add a new Notion data source and record the provisioning in the audit log",
           "resolves_to": "governance-data-source-provision"
+        },
+        {
+          "text": "Use alchemist to find cross-backend code patterns, look up docs, and open a GitHub issue",
+          "resolves_to": "code-alchemist-cross-backend-issue"
+        },
+        {
+          "text": "Check my PR diff, screenshot the preview build, and file a visual-diff issue",
+          "resolves_to": "code-preview-build-visual-check"
         }
       ]
     },
@@ -15696,6 +15855,67 @@
           "accomplishes": "List all Neon projects and publish a database-infrastructure overview to Notion \u2014 giving product and business stakeholders a clear picture of the current data platform and its growth.",
           "verified": false,
           "notes": "neon/list_projects verified in code + design + finance; notion/API-post-page verified across profiles."
+        },
+        {
+          "name": "comm-connect-log-announcement-evidence",
+          "chain": [
+            "orchestrator/agent_execute(connect)",
+            "chittyevidence/log_evidence",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Use the connect agent to send a channel announcement, log the outbound communication event as tamper-proof evidence in ChittyEvidence for audit purposes, then write a broadcast summary to a Notion page for the communication trail.",
+          "verified": false
+        },
+        {
+          "name": "comm-deploy-notify-imessage",
+          "chain": [
+            "cloudflare-builds/workers_builds_trigger",
+            "tasks/create_task",
+            "imessage/send_message"
+          ],
+          "accomplishes": "Trigger a Cloudflare Workers build for the latest communication or notification worker, create a follow-up deployment task in ChittyAgent Tasks to track rollout, and send an iMessage status notification to the team.",
+          "verified": false
+        },
+        {
+          "name": "comm-neon-search-schema-publish",
+          "chain": [
+            "neon/search",
+            "neon/describe_table_schema",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search Neon for the communications-related database or schema, describe the relevant table structure to surface field names and types, then publish a plain-language schema summary to Notion for non-technical team members following the data model.",
+          "verified": false
+        },
+        {
+          "name": "comm-notion-data-source-connect-announce",
+          "chain": [
+            "notion/API-create-a-data-source",
+            "orchestrator/agent_execute(connect)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Create a new Notion data source for a team communication hub or broadcast database, use the connect agent to announce its availability to the relevant channels, then log the provisioning as a Notion confirmation page.",
+          "verified": false
+        },
+        {
+          "name": "comm-alchemist-pattern-broadcast",
+          "chain": [
+            "orchestrator/agent_execute(alchemist)",
+            "notion/API-post-page",
+            "orchestrator/agent_execute(connect)"
+          ],
+          "accomplishes": "Run the alchemist agent to surface emerging cross-backend workflow patterns relevant to communication operations, summarize the findings as a new Notion page, then use the connect agent to broadcast the updated pattern catalog to the relevant team channel.",
+          "verified": false
+        },
+        {
+          "name": "comm-edit-announcement-template",
+          "chain": [
+            "fs/read_file",
+            "thinking/sequentialthinking",
+            "fs/edit_file",
+            "orchestrator/agent_execute(connect)"
+          ],
+          "accomplishes": "Read a local announcement template file, reason over the right tone and content updates for the current communication context, edit the template in-place with the refined copy, then use the connect agent to send the updated announcement to the target channel.",
+          "verified": false
         }
       ],
       "prompts": [
@@ -16434,6 +16654,30 @@
         {
           "text": "Publish a Notion overview of all our Neon projects for the product team",
           "resolves_to": "neon-projects-infra-brief"
+        },
+        {
+          "text": "Log our channel announcement as tamper-proof evidence and post a summary to Notion",
+          "resolves_to": "comm-connect-log-announcement-evidence"
+        },
+        {
+          "text": "Trigger the notification worker build, create a rollout task, and text the team",
+          "resolves_to": "comm-deploy-notify-imessage"
+        },
+        {
+          "text": "Find the comms schema in Neon and publish a plain-language summary to Notion",
+          "resolves_to": "comm-neon-search-schema-publish"
+        },
+        {
+          "text": "Create a Notion data source for our broadcast hub and announce it to the team",
+          "resolves_to": "comm-notion-data-source-connect-announce"
+        },
+        {
+          "text": "Surface alchemist-discovered cross-backend patterns for comms and broadcast them",
+          "resolves_to": "comm-alchemist-pattern-broadcast"
+        },
+        {
+          "text": "Update our announcement template and send it out via the connect agent",
+          "resolves_to": "comm-edit-announcement-template"
         }
       ]
     },
@@ -19128,6 +19372,17 @@
           "accomplishes": "Search Notion for runbooks or ops-procedure pages matching an incident keyword, then route the matched content to the ops agent \u2014 grounding incident response in documented procedures.",
           "verified": false,
           "notes": "notion/API-post-search verified in governance + design + code + communication; orchestrator/agent_execute(ops) verified in ops."
+        },
+        {
+          "name": "ops-notion-data-source-health-snapshot",
+          "chain": [
+            "notion/API-create-a-data-source",
+            "cloudflare-builds/workers_builds_get",
+            "evidence/search",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Create a Notion data source for the ops monitoring or incident database, retrieve the current Cloudflare Workers build status, cross-reference with known incident signals from the evidence store, then write the combined ops health snapshot to a Notion page.",
+          "verified": false
         }
       ],
       "prompts": [
@@ -19934,6 +20189,10 @@
         {
           "text": "Find the runbook for this incident in Notion and route it to the ops agent",
           "resolves_to": "notion-runbook-lookup"
+        },
+        {
+          "text": "Set up the ops monitoring data source, check build status, and post a health snapshot",
+          "resolves_to": "ops-notion-data-source-health-snapshot"
         }
       ]
     }
