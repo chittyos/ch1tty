@@ -2390,3 +2390,44 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 - **Catalog**: 1122→1140 combos / 485 verified (unchanged) / 1143→1161 prompts
 - **Blocker**: Notion auth 401 persists — `chitty-mcp-token notion` restores board writes.
 - **Next run**: Continue 105th+ passes: next best targets are tools at 3/6 that weren't advanced this pass (e.g. browser-rendering/get_url_screenshot needs ops+finance+design→now 3 remaining; orchestrator/agent_execute(ship) [code,design,ops] needs comm+finance+governance; tasks/get_task [code,design,ops] needs comm+finance+governance). Also: advance the 2/6 tools that are most used across the ecosystem.
+
+### 2026-06-10T12:22Z — Session 01VLTkHSCFYaF9BbL4zZAxjy (107th pass)
+
+**Workstream advanced**: E (Alchemist brainstorm — catalog 107th pass)
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass / 0 fail / 2 skipped
+- Found 1 open PR: #303 (106th pass, 1164 combos / 508 verified / 1185 prompts, 3/3 CI green)
+- **Squash-merged PR #303** → main now at `19ef394` (1164 combos, 106th pass)
+- Workstream states: A ✅ B ✅ C ✅ D ✅ E in-progress (all confirmed via DRIVER-LOG + repo scan)
+- Notion board still 401 — DRIVER-LOG.md remains cross-run fallback
+- Coverage analysis (post 106th pass):
+  - `notion/API-create-a-page`: 3/6 → targeted for 6/6 completion
+  - `cloudflare-builds/workers_builds_get_build_config`: 3/6 → targeted for 5/6
+  - `neon/fetch`, `notion/API-get-self`, `orchestrator/chittyagent-resolve`: 2/6 each → targeted for 4/6
+  - `cloudflare-builds/workers_builds_get`, `notion/API-retrieve-a-data-source`: 2/6 → targeted for 3/6
+  - `fs/directory_tree`: 3/6 → targeted for 4/6
+- Created branch `auto/E-catalog-107th-pass`; added 12 combos + 12 prompts (2 per profile):
+  - **finance**: `finance-notion-bot-identity-check` (notion/API-get-self), `finance-billing-build-config-audit` (cloudflare-builds/workers_builds_get_build_config)
+  - **governance**: `governance-neon-fetch-schema-probe` (neon/fetch + notion/API-get-self), `governance-resolve-dispute-evidence-doc` (orchestrator/chittyagent-resolve + notion/API-create-a-page)
+  - **design**: `design-frontend-build-deploy-screenshot` (cloudflare-builds/workers_builds_get), `design-notion-component-spec-create` (notion/API-create-a-page)
+  - **code**: `code-notion-data-source-schema-validate` (notion/API-retrieve-a-data-source), `code-build-config-ci-drift-check` (cloudflare-builds/workers_builds_get_build_config)
+  - **communication**: `comm-directory-tree-template-inventory` (fs/directory_tree), `comm-notion-create-broadcast-page` (notion/API-create-a-page)
+  - **ops**: `ops-chittyagent-resolve-incident-evidence` (orchestrator/chittyagent-resolve), `ops-neon-fetch-db-api-healthcheck` (neon/fetch)
+- 0 test failures. Tests: 938 pass / 0 fail / 2 skipped ✓
+- Catalog: 1164 → **1176 combos / 508 verified (unchanged) / 1185 → 1197 prompts**
+- Pushed branch, opened PR #304; CI queued at run end
+
+**Branch / PR**: `auto/E-catalog-107th-pass` → PR #304 (https://github.com/chittyos/ch1tty/pull/304)
+
+**Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
+
+**Board state**: 1176 combos / 508 verified / 1197 prompts. notion/API-create-a-page ✅ 6/6 complete. cloudflare-builds/workers_builds_get_build_config 5/6. neon/fetch 4/6. notion/API-get-self 4/6. orchestrator/chittyagent-resolve 4/6. fs/directory_tree 4/6.
+
+**Blockers**:
+- Notion auth 401: run `chitty-mcp-token notion` or rotate integration token in workspace settings
+
+**Next run priority**:
+1. Merge PR #304 when CI green (CodeQL + Analyze checks)
+2. 108th catalog pass: tools still needing profiles — `neon/fetch` (needs design+communication), `notion/API-get-self` (needs design+communication), `orchestrator/chittyagent-resolve` (needs design+communication), `cloudflare-builds/workers_builds_get` (needs finance+governance+communication), `notion/API-retrieve-a-data-source` (needs governance+design+communication), `cloudflare-builds/workers_builds_get_build_config` (needs only communication for 6/6)
+3. Fix Notion auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` to verify the 668 unverified combos
