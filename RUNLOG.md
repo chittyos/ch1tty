@@ -57,7 +57,7 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 - **Blocker**: Notion auth 401 persists — `chitty-mcp-token notion` restores board writes.
 - **Next run**: Continue 103rd+ passes: next best targets are tools at 2/6 that weren't expanded this pass (neon/fetch, notion/API-get-self, notion/API-retrieve-a-data-source, notion/API-update-a-data-source, playwright/browser_console_messages, orchestrator/chittyagent-resolve). OR run OOF reachability simulation probes for the 6 newly completed tools.
 
-### 2026-06-10 (run 54 — current)
+### 2026-06-10 (run 55 — current)
 - **Workstream advanced**: E — Alchemist catalog 105th pass
 - **Branch/PR**: `auto/E-catalog-105th-pass` → PR #302 (pending)
 - **Build**: clean (`tsc`)
@@ -66,3 +66,15 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 - **Catalog**: 1140→1152 combos / 485→496 verified / 1161→1173 prompts
 - **Blocker**: Notion auth 401 persists. browser-rendering 401 this session.
 - **Next run**: Continue 106th pass targeting tools at 2/6: `neon/fetch`, `notion/API-get-self`, `notion/API-retrieve-a-data-source`, `playwright/browser_console_messages`, `orchestrator/agent_execute(resolve)`, `cloudflare-builds/workers_builds_get_build_config`. Each needs 4 new profiles. OR probe OOF reachability for newly completed 6/6 tools.
+
+### 2026-06-10 (run 55)
+- **Workstream advanced**: E — Alchemist catalog 106th pass
+- **Branch/PR**: `auto/E-catalog-106th-pass` → PR #303 (open, watching)
+- **Build**: clean (`tsc`)
+- **Tests**: 938/940 pass, 2 skipped (Ollama unreachable — expected)
+- **What was done**: Completed 7 tools to 6/6 profiles: `evidence/ai_search(re-evidence-search)` (+code), `orchestrator/agent_execute(dispute)` (+design), `orchestrator/agent_execute(storage)` (+code+governance), `orchestrator/agent_execute(auth)` (+design+comm), `orchestrator/agent_execute(intel)` (+design+code), `orchestrator/skill_execute(chittyos-devops:chitty-health)` (+design+comm), `fs/list_directory` (+design+comm). 12 new combos + 12 prompts, all verified:true. 6/6 tool count: 130 → 137.
+- **Catalog**: 1152→1164 combos / 1173→1185 prompts / 496→508 verified.
+- **CI note**: PR #303 shows `conclusion: failure` with 0 jobs — confirmed pre-existing environment artifact (same pattern on every branch including merged 105th-pass PR #302). Not caused by this change.
+- **Bot comments**: Codex usage limit + CodeRabbit rate limit comments on PR — both bot notifications, no action needed.
+- **Blocker**: Notion auth 401 persists — `chitty-mcp-token notion` restores board writes.
+- **Next run**: 107th pass — target 3/6 tools: `cloudflare-builds/workers_builds_get_build_config` (needs finance+code+comm), `fs/directory_tree` (needs finance+governance+comm), `notion/API-create-a-page` (needs design+governance+comm), `orchestrator/agent_execute(claude)` (needs design+comm). OR expand 2/6 tools like `neon/fetch`, `notion/API-get-self`, `notion/API-retrieve-a-data-source` to 6/6.
