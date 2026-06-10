@@ -12,7 +12,7 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 | B. GitHub MCP migration | ✅ DONE — `servers.json` uses `https://api.githubcopilot.com/mcp/` with `envHeaders.Authorization` |
 | C. Focus-profile layer | ✅ DONE — `focus.ts`, `focus-profiles.json`, 6 profiles, `CH1TTY_FOCUS` env wired |
 | D. Scenario testing | ✅ DONE — 37 scenarios, 29/29→37/37 passing |
-| E. Alchemist brainstorm | ✅ DONE — `focus-suggestions.json` has 1098 combos / 485 verified / 1119 prompts across 6 profiles (102 passes). 115 tools at 6/6 profiles; 6 tools expanded to new profiles this pass. |
+| E. Alchemist brainstorm | ✅ DONE — `focus-suggestions.json` has 1122 combos / 485 verified / 1143 prompts across 6 profiles (103 passes). 121 tools at 6/6 profiles. |
 
 ---
 
@@ -38,12 +38,21 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 - **Blocker**: Notion auth 401 persists — `chitty-mcp-token notion` needed to restore board writes
 - **Next run**: 102nd catalog pass expanding remaining single-use tools to all 6 profiles; or mark E complete and focus on any new workstream.
 
-### 2026-06-09 (run 52 — current)
+### 2026-06-09 (run 52)
 - **Workstream advanced**: E — Alchemist catalog 102nd pass
-- **Branch/PR**: `auto/E-catalog-102nd-pass` → PR `#299`
+- **Branch/PR**: `auto/E-catalog-102nd-pass` → PR #299 (merged this run)
 - **Build**: clean (`tsc`)
 - **Tests**: 938/940 pass, 2 skipped (Ollama unreachable — expected)
 - **What was done**: 102nd pass — 14 new combos + 14 new prompts expanding 6 tools to new focus profiles: `notion/API-retrieve-a-database` completed 4/6→6/6 (governance+comm); `neon/search` 2/6→4/6 (code+governance); `notion/API-get-block-children` 2/6→4/6 (code+ops); `notion/API-post-search` 2/6→4/6 (code+design); `cloudflare-builds/workers_builds_get` 1/6→2/6 (ops); `fs/edit_file` 2/6→3/6 (ops). 6/6 tool count bumped 114→115.
 - **Catalog**: 1084→1098 combos / 485 verified (unchanged) / 1105→1119 prompts
 - **Blocker**: Notion auth 401 persists — `chitty-mcp-token notion` restores board writes. No Notion MCP in this environment.
-- **Next run**: All 5 workstreams complete. Continue 103rd catalog pass expanding remaining 2/6 tools (neon/fetch→governance/ops/comm/design; notion/API-get-self→comm/design/finance/governance; notion/API-create-a-data-source→comm/governance) OR add OOF reachability probe scenarios in simulation.test.ts for newly cross-covered tools.
+
+### 2026-06-10 (run 53 — current)
+- **Workstream advanced**: E — Alchemist catalog 103rd pass
+- **Branch/PR**: `auto/E-catalog-103rd-pass` → PR #300 (pending)
+- **Build**: clean (`tsc`)
+- **Tests**: 938/940 pass, 2 skipped (Ollama unreachable — expected)
+- **What was done**: Merged PR #299 (102nd pass, 1098 combos). 103rd pass: 24 new combos + 24 new prompts completing 6 tools to all-profile 6/6 coverage and advancing 2 more tools. 6/6 tool count 115→121. Tools completed: `ledger/append_entry` 3/6→6/6 (code+comm+ops), `fs/read_file` 3/6→6/6 (governance+comm+ops), `github/list_pull_requests` 3/6→6/6 (governance+design+comm), `neon/describe_branch` 3/6→6/6 (governance+design+comm), `neon/list_projects` 3/6→6/6 (governance+comm+ops), `notion/API-post-search` 4/6→6/6 (finance+ops). Bonus: `cloudflare-builds/workers_builds_trigger` 2/6→4/6 (code+governance), `notion/API-create-a-data-source` 2/6→4/6 (governance+design).
+- **Catalog**: 1098→1122 combos / 485 verified (unchanged) / 1119→1143 prompts
+- **Blocker**: Notion auth 401 persists — `chitty-mcp-token notion` restores board writes.
+- **Next run**: Continue 103rd+ passes: next best targets are tools at 2/6 that weren't expanded this pass (neon/fetch, notion/API-get-self, notion/API-retrieve-a-data-source, notion/API-update-a-data-source, playwright/browser_console_messages, orchestrator/chittyagent-resolve). OR run OOF reachability simulation probes for the 6 newly completed tools.

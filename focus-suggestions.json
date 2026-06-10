@@ -1,6 +1,6 @@
 {
-  "_comment": "102nd pass \u2014 1098 combos / 1119 prompts. notion/API-retrieve-a-database completed 4/6\u21926/6 (governance+comm). neon/search expanded to code+governance (2/6\u21924/6). fs/edit_file added to ops (2/6\u21923/6). notion/API-post-search added to code+design (2/6\u21924/6). cloudflare-builds/workers_builds_get added to ops (1/6\u21922/6). notion/API-get-block-children added to code+ops (2/6\u21924/6). notion/API-retrieve-a-database now 6/6.",
-  "generatedFrom": "E-catalog-hundredth-pass",
+  "_comment": "103rd pass \u2014 1122 combos / 1143 prompts. ledger/append_entry completed 3/6\u21926/6 (code+comm+ops). fs/read_file completed 3/6\u21926/6 (governance+comm+ops). github/list_pull_requests completed 3/6\u21926/6 (governance+design+comm). neon/describe_branch completed 3/6\u21926/6 (governance+design+comm). neon/list_projects completed 3/6\u21926/6 (governance+comm+ops). notion/API-post-search 4/6\u21926/6 (finance+ops). cloudflare-builds/workers_builds_trigger 2/6\u21924/6 (code+governance). notion/API-create-a-data-source 2/6\u21924/6 (governance+design).",
+  "generatedFrom": "E-catalog-103rd-pass",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools \u2014 now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time \u2014 combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -2375,6 +2375,16 @@
           "accomplishes": "Cast an intent-driven billing audit: AI-search evidence for financial risk signals, reason through implications via sequential thinking, write the audit summary to a local file, and post the result to a Notion finance page.",
           "verified": true,
           "notes": "All servers confirmed connected: ch1tty, evidence, thinking, fs, notion (API-post-page)."
+        },
+        {
+          "name": "notion-finance-search",
+          "chain": [
+            "notion/API-post-search",
+            "ledger/append_entry"
+          ],
+          "accomplishes": "Search Notion for finance-relevant pages (invoices, budget notes, spending records) and append a summary entry to the ledger \u2014 bridging Notion-based finance notes with the immutable ledger record.",
+          "verified": false,
+          "notes": "notion/API-post-search adding finance coverage (was code + governance + design + communication); ledger/append_entry verified in finance."
         }
       ],
       "prompts": [
@@ -3073,6 +3083,10 @@
         {
           "text": "Cast an evidence-driven billing audit and write the summary to Notion",
           "resolves_to": "finance-evidence-cast-verified-audit"
+        },
+        {
+          "text": "Search Notion for finance notes and sync the relevant entries into the ledger",
+          "resolves_to": "notion-finance-search"
         }
       ]
     },
@@ -5738,6 +5752,66 @@
           "accomplishes": "Retrieve the child blocks of a governance decision page in Notion to inspect its current content, cross-check the claims against the evidence store, then patch the block children to append a verification annotation or correction \u2014 keeping governance records accurate and evidence-linked.",
           "verified": false,
           "notes": "FIRST use of notion/API-get-block-children in governance. evidence/ai_search and notion/API-patch-block-children are established here."
+        },
+        {
+          "name": "governance-doc-to-notion",
+          "chain": [
+            "fs/read_file",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Read a local governance document (policy, charter, decision record) and publish a structured summary page to Notion \u2014 bridging local artefacts with the central governance knowledge base.",
+          "verified": false,
+          "notes": "fs/read_file confirmed in code + design + finance; notion/API-post-page verified in governance profile."
+        },
+        {
+          "name": "pr-governance-audit",
+          "chain": [
+            "github/list_pull_requests",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "List open pull requests and generate a governance compliance brief in Notion \u2014 surfacing long-open, unreviewed, or policy-violating PRs for audit and oversight.",
+          "verified": false,
+          "notes": "github/list_pull_requests verified in code + ops + finance; notion/API-post-page verified in governance profile."
+        },
+        {
+          "name": "neon-branch-governance-evidence",
+          "chain": [
+            "neon/describe_branch",
+            "chittyevidence/log_evidence"
+          ],
+          "accomplishes": "Describe a Neon database branch and log its current schema and state as governance evidence \u2014 creating an audit trail for data governance reviews and compliance checks.",
+          "verified": false,
+          "notes": "neon/describe_branch verified in code + finance + ops; chittyevidence/log_evidence confirmed in governance profile."
+        },
+        {
+          "name": "neon-projects-governance-log",
+          "chain": [
+            "neon/list_projects",
+            "chittyevidence/log_evidence"
+          ],
+          "accomplishes": "List all Neon projects and log the complete inventory as governance evidence \u2014 establishing a data-asset record for compliance, cost attribution, and resource governance reviews.",
+          "verified": false,
+          "notes": "neon/list_projects verified in code + design + finance; chittyevidence/log_evidence confirmed in governance profile."
+        },
+        {
+          "name": "governance-gate-build",
+          "chain": [
+            "chittyevidence/log_evidence",
+            "cloudflare-builds/workers_builds_trigger"
+          ],
+          "accomplishes": "Log a governance approval or compliance-clearance event as evidence, then trigger the Cloudflare Workers build \u2014 ensuring deploy is gated on an auditable governance check.",
+          "verified": false,
+          "notes": "chittyevidence/log_evidence verified in governance; cloudflare-builds/workers_builds_trigger confirmed available."
+        },
+        {
+          "name": "notion-data-source-governance",
+          "chain": [
+            "notion/API-create-a-data-source",
+            "chittyevidence/log_evidence"
+          ],
+          "accomplishes": "Create a new Notion data source and log the provisioning event as governance evidence \u2014 maintaining an audit trail of data-connection changes for compliance reviews.",
+          "verified": false,
+          "notes": "notion/API-create-a-data-source currently only code + finance; adds governance context."
         }
       ],
       "prompts": [
@@ -6532,6 +6606,30 @@
         {
           "text": "Fetch the child blocks of our decision page, verify each claim against the evidence store, and annotate it",
           "resolves_to": "notion-get-block-children-governance-thread"
+        },
+        {
+          "text": "Read the local policy doc and publish a governance summary to Notion",
+          "resolves_to": "governance-doc-to-notion"
+        },
+        {
+          "text": "Audit open PRs for review-policy compliance and publish findings to Notion",
+          "resolves_to": "pr-governance-audit"
+        },
+        {
+          "text": "Log the current Neon branch schema state as a governance evidence record",
+          "resolves_to": "neon-branch-governance-evidence"
+        },
+        {
+          "text": "Inventory all Neon projects and log the asset list as compliance evidence",
+          "resolves_to": "neon-projects-governance-log"
+        },
+        {
+          "text": "Record governance approval and trigger the production build",
+          "resolves_to": "governance-gate-build"
+        },
+        {
+          "text": "Provision a new Notion data source and log it in the governance audit trail",
+          "resolves_to": "notion-data-source-governance"
         }
       ]
     },
@@ -8898,6 +8996,46 @@
           "accomplishes": "Search Notion for the design brief or component spec page for a current feature, navigate a browser to the live prototype or Figma embed URL extracted from the brief, then screenshot it \u2014 connecting specification intent directly to a visual capture of the implemented component.",
           "verified": false,
           "notes": "FIRST use of notion/API-post-search in design. playwright/browser_navigate and playwright/browser_take_screenshot are established here."
+        },
+        {
+          "name": "design-pr-screenshot-review",
+          "chain": [
+            "github/list_pull_requests",
+            "browser-rendering/get_url_screenshot"
+          ],
+          "accomplishes": "List pull requests touching design-system or UI files and capture screenshots of linked preview deployments \u2014 giving reviewers a visual diff alongside the code changes.",
+          "verified": false,
+          "notes": "github/list_pull_requests verified in code + ops + finance; browser-rendering/get_url_screenshot verified in design profile."
+        },
+        {
+          "name": "neon-branch-schema-to-notion",
+          "chain": [
+            "neon/describe_branch",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Describe a Neon branch's schema and publish a human-readable schema summary to Notion \u2014 grounding feature design work in the actual data model backing the product interface.",
+          "verified": false,
+          "notes": "neon/describe_branch verified in code + finance + ops; notion/API-post-page verified in design profile."
+        },
+        {
+          "name": "notion-design-brief-surface",
+          "chain": [
+            "notion/API-post-search",
+            "browser-rendering/get_url_screenshot"
+          ],
+          "accomplishes": "Search Notion for recent design briefs and brand-decision pages, then capture screenshots of linked design preview URLs \u2014 surfacing the current design direction with visual context in one step.",
+          "verified": false,
+          "notes": "notion/API-post-search verified in design + governance + code + communication; browser-rendering/get_url_screenshot verified in design."
+        },
+        {
+          "name": "design-system-data-source",
+          "chain": [
+            "notion/API-create-a-data-source",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Create a new Notion data source for design assets and publish a setup-confirmation summary page \u2014 establishing the data layer for a design system documentation hub in one step.",
+          "verified": false,
+          "notes": "notion/API-create-a-data-source currently only code + finance; adds design context."
         }
       ],
       "prompts": [
@@ -9600,6 +9738,22 @@
         {
           "text": "Find the design brief for the new onboarding flow in Notion, open the prototype URL, and screenshot it",
           "resolves_to": "notion-search-design-brief"
+        },
+        {
+          "text": "List design-system PRs and capture screenshots of their preview deployments",
+          "resolves_to": "design-pr-screenshot-review"
+        },
+        {
+          "text": "Publish a Notion schema summary from the current Neon branch for the design team",
+          "resolves_to": "neon-branch-schema-to-notion"
+        },
+        {
+          "text": "Search Notion for design briefs and capture screenshots of the linked previews",
+          "resolves_to": "notion-design-brief-surface"
+        },
+        {
+          "text": "Set up a Notion data source for design assets and create a setup summary page",
+          "resolves_to": "design-system-data-source"
         }
       ]
     },
@@ -12262,6 +12416,46 @@
           "accomplishes": "Fetch the build details for a specific Cloudflare Workers build (logs, status, triggered commit), retrieve the corresponding GitHub commit to inspect the diff, then reason over the pair to diagnose build failures or verify that the deployed code matches the expected change.",
           "verified": false,
           "notes": "FIRST use of cloudflare-builds/workers_builds_get in code (was only in ops). github/get_commit and thinking/sequentialthinking are established here."
+        },
+        {
+          "name": "build-event-to-ledger",
+          "chain": [
+            "cloudflare-builds/workers_builds_get",
+            "ledger/append_entry"
+          ],
+          "accomplishes": "Fetch a completed Cloudflare Workers build result and append a deploy event to the ops ledger \u2014 turning CI outcomes into an immutable audit trail for code delivery.",
+          "verified": false,
+          "notes": "cloudflare-builds is a real backend; ledger/append_entry verified in governance + design profiles."
+        },
+        {
+          "name": "code-merge-trigger-build",
+          "chain": [
+            "github/list_pull_requests",
+            "cloudflare-builds/workers_builds_trigger"
+          ],
+          "accomplishes": "List recently merged pull requests and trigger a Cloudflare Workers build for the matching service \u2014 automating the deploy step immediately after PR merge in code-review workflows.",
+          "verified": false,
+          "notes": "github/list_pull_requests and cloudflare-builds/workers_builds_trigger both available; combo follows a standard CI/CD pattern."
+        },
+        {
+          "name": "notion-spec-to-code-context",
+          "chain": [
+            "notion/API-post-search",
+            "context7/get-library-docs"
+          ],
+          "accomplishes": "Search Notion for technical specs or RFC pages relevant to the current task, then pull matching upstream library docs \u2014 priming the code context with both internal design decisions and current API references.",
+          "verified": false,
+          "notes": "notion/API-post-search verified in code profile; context7/get-library-docs verified across multiple profiles."
+        },
+        {
+          "name": "governance-data-source-provision",
+          "chain": [
+            "notion/API-create-a-data-source",
+            "chittyevidence/log_evidence"
+          ],
+          "accomplishes": "Create a new Notion data source and immediately log the provisioning event as code-governance evidence \u2014 maintaining an audit trail of data-connection changes alongside deploys.",
+          "verified": false,
+          "notes": "notion/API-create-a-data-source currently only in code + finance; expanding to governance context."
         }
       ],
       "prompts": [
@@ -13048,6 +13242,22 @@
         {
           "text": "Get the build details for that failed Cloudflare deploy, find the commit, and reason about what went wrong",
           "resolves_to": "cloudflare-builds-get-code-review"
+        },
+        {
+          "text": "Log the last deploy to the ledger after the Cloudflare build completes",
+          "resolves_to": "build-event-to-ledger"
+        },
+        {
+          "text": "Trigger a Workers build for the service linked to the latest merged PR",
+          "resolves_to": "code-merge-trigger-build"
+        },
+        {
+          "text": "Pull the Notion tech spec for this task and load the relevant library docs",
+          "resolves_to": "notion-spec-to-code-context"
+        },
+        {
+          "text": "Add a new Notion data source and record the provisioning in the audit log",
+          "resolves_to": "governance-data-source-provision"
         }
       ]
     },
@@ -15436,6 +15646,56 @@
           "accomplishes": "Fetch the child blocks of a Notion meeting-notes page to get the raw action items, reason over them to extract and prioritise tasks, then create each task in ChittyAgent Tasks \u2014 the full read\u2192reason\u2192act chain for meeting notes without a human relay.",
           "verified": false,
           "notes": "FIRST use of notion/API-get-block-children in communication. thinking/sequentialthinking and tasks/create_task are established here."
+        },
+        {
+          "name": "comms-task-to-ledger",
+          "chain": [
+            "tasks/list_tasks",
+            "ledger/append_entry"
+          ],
+          "accomplishes": "List recently completed communication tasks and append a milestone entry to the ledger \u2014 logging outreach and stakeholder interactions alongside financial records for a unified activity trail.",
+          "verified": false,
+          "notes": "tasks/list_tasks and ledger/append_entry both real tools; natural cross-domain combo for comms accountability."
+        },
+        {
+          "name": "template-read-to-task",
+          "chain": [
+            "fs/read_file",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Read a local message template file and create a communication task in the task tracker \u2014 turning a static template into an actionable outreach item with the template content pre-filled.",
+          "verified": false,
+          "notes": "fs/read_file verified in code + design profiles; tasks/create_task verified across multiple profiles."
+        },
+        {
+          "name": "pr-release-notes-task",
+          "chain": [
+            "github/list_pull_requests",
+            "tasks/create_task"
+          ],
+          "accomplishes": "List merged pull requests since the last release and create a draft-release-notes communication task \u2014 turning the PR list into a structured stakeholder update request.",
+          "verified": false,
+          "notes": "Natural comms-workflow pattern; both tools confirmed available."
+        },
+        {
+          "name": "neon-branch-stakeholder-update",
+          "chain": [
+            "neon/describe_branch",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Describe the current state of a Neon database branch and create a stakeholder-update task summarising the DB changes \u2014 keeping non-technical stakeholders informed of data model evolution.",
+          "verified": false,
+          "notes": "neon/describe_branch verified in code + finance + ops; tasks/create_task verified across profiles."
+        },
+        {
+          "name": "neon-projects-infra-brief",
+          "chain": [
+            "neon/list_projects",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "List all Neon projects and publish a database-infrastructure overview to Notion \u2014 giving product and business stakeholders a clear picture of the current data platform and its growth.",
+          "verified": false,
+          "notes": "neon/list_projects verified in code + design + finance; notion/API-post-page verified across profiles."
         }
       ],
       "prompts": [
@@ -16154,6 +16414,26 @@
         {
           "text": "Fetch the action items from last meeting's Notion page and create tasks for each",
           "resolves_to": "notion-get-block-children-comm-extract"
+        },
+        {
+          "text": "Log completed outreach tasks to the ledger as a communication milestone",
+          "resolves_to": "comms-task-to-ledger"
+        },
+        {
+          "text": "Read the email template file and create a follow-up comms task from it",
+          "resolves_to": "template-read-to-task"
+        },
+        {
+          "text": "List merged PRs and draft release notes as a stakeholder-communication task",
+          "resolves_to": "pr-release-notes-task"
+        },
+        {
+          "text": "Describe the DB branch changes and create a non-technical stakeholder update task",
+          "resolves_to": "neon-branch-stakeholder-update"
+        },
+        {
+          "text": "Publish a Notion overview of all our Neon projects for the product team",
+          "resolves_to": "neon-projects-infra-brief"
         }
       ]
     },
@@ -18808,6 +19088,46 @@
           "accomplishes": "Fetch the detailed status and logs for a specific Cloudflare Workers build, list all deployed workers to get the current production state, then reason over the pair to determine whether the build should be promoted or rolled back \u2014 a structured ops decision loop for deployment triage.",
           "verified": false,
           "notes": "FIRST use of cloudflare-builds/workers_builds_get in ops (was only in code). cloudflare/workers-list and thinking/sequentialthinking are established here."
+        },
+        {
+          "name": "ops-event-to-ledger",
+          "chain": [
+            "orchestrator/agent_execute(ops)",
+            "ledger/append_entry"
+          ],
+          "accomplishes": "Invoke the ops agent to surface an infra event or incident summary, then append it to the ledger \u2014 creating a durable ops log entry that feeds into audit and cost-attribution workflows.",
+          "verified": false,
+          "notes": "orchestrator/agent_execute(ops) verified in ops profile; ledger/append_entry confirmed in design + finance + governance."
+        },
+        {
+          "name": "config-read-ops-review",
+          "chain": [
+            "fs/read_file",
+            "orchestrator/agent_execute(ops)"
+          ],
+          "accomplishes": "Read a local server config or environment file and route it through the ops agent for analysis \u2014 surfacing misconfigurations, drift, or upgrade opportunities in the current runtime configuration.",
+          "verified": false,
+          "notes": "fs/read_file confirmed in code + design + finance; orchestrator/agent_execute(ops) verified in ops profile."
+        },
+        {
+          "name": "neon-projects-ops-health",
+          "chain": [
+            "neon/list_projects",
+            "orchestrator/agent_execute(ops)"
+          ],
+          "accomplishes": "List all Neon projects and route the inventory to the ops agent for health and hygiene analysis \u2014 surfacing unused branches, oversized projects, cost anomalies, or growth concerns.",
+          "verified": false,
+          "notes": "neon/list_projects verified in code + design + finance; orchestrator/agent_execute(ops) verified in ops profile."
+        },
+        {
+          "name": "notion-runbook-lookup",
+          "chain": [
+            "notion/API-post-search",
+            "orchestrator/agent_execute(ops)"
+          ],
+          "accomplishes": "Search Notion for runbooks or ops-procedure pages matching an incident keyword, then route the matched content to the ops agent \u2014 grounding incident response in documented procedures.",
+          "verified": false,
+          "notes": "notion/API-post-search verified in governance + design + code + communication; orchestrator/agent_execute(ops) verified in ops."
         }
       ],
       "prompts": [
@@ -19598,6 +19918,22 @@
         {
           "text": "Get the build details for that stalled Worker deploy, check what's currently running, and decide if we should promote or rollback",
           "resolves_to": "cloudflare-builds-get-ops-triage"
+        },
+        {
+          "text": "Surface the latest infra event from the ops agent and append it to the ledger",
+          "resolves_to": "ops-event-to-ledger"
+        },
+        {
+          "text": "Read the server config and run it through the ops agent for a health check",
+          "resolves_to": "config-read-ops-review"
+        },
+        {
+          "text": "List all Neon projects and run an ops hygiene check for cost and growth anomalies",
+          "resolves_to": "neon-projects-ops-health"
+        },
+        {
+          "text": "Find the runbook for this incident in Notion and route it to the ops agent",
+          "resolves_to": "notion-runbook-lookup"
         }
       ]
     }
