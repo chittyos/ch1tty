@@ -130,3 +130,14 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 - **Workstream state**: A✅ B✅ C✅ D✅ E ongoing.
 - **Blocker**: Notion auth 401 persists — RUNLOG.md is the cross-run fallback board.
 - **Next run**: 116th pass — priority targets: `fs/list_allowed_directories` (5/6, needs only +finance for 6/6), `orchestrator/agent_execute(token-ops)` (3/6, needs +governance+code+communication), `playwright/browser_resize` (3/6, needs +finance+governance+ops), `orchestrator/agent_execute(cleaner)` (2/6, needs +governance+design+code+communication). Completing `fs/list_allowed_directories` takes only 1 combo in finance.
+
+### 2026-06-10 (run 60)
+- **Workstream advanced**: E — Alchemist catalog 116th pass
+- **Branch/PR**: `auto/E-catalog-116th-pass` → (PR opened this run)
+- **Build**: clean (`tsc`)
+- **Tests**: 938/940 pass, 0 fail, 2 skipped (Ollama unreachable — expected)
+- **What was done**: Startup: merged PR #313 (115th pass, 1274 combos) into main. Coverage analysis: 177/380 tools at 6/6; best targets at 5/6 and 3/6. 116th pass: 12 combos + 12 prompts (2 per profile) completing **3 tools to 6/6**: `fs/list_allowed_directories` (5→6/6, +finance), `orchestrator/agent_execute(token-ops)` (3→6/6, +governance+code+communication), `playwright/browser_resize` (3→6/6, +finance+governance+ops). Advanced 3 more tools: `orchestrator/agent_execute(ui)` (2→3/6, +design+ops), `playwright/browser_tabs` (2→3/6, +design+communication), `fs/read_media_file` (2→3/6, +code+communication). Fix: initial prompts were missing `resolves_to` field — corrected before push. 6/6 tool count: **177 → 180**.
+- **Catalog**: 1274→1286 combos / 1271→1283 prompts / 6/6 count: 177→180
+- **Workstream state**: A✅ B✅ C✅ D✅ E ongoing.
+- **Blocker**: Notion auth 401 persists — RUNLOG.md is the cross-run fallback board.
+- **Next run**: 117th pass — targets at 3/6 advanced this run: `orchestrator/agent_execute(ui)` (needs +finance+governance+communication), `playwright/browser_tabs` (needs +finance+governance+ops), `fs/read_media_file` (needs +finance+design+ops). Also `orchestrator/agent_execute(cleaner)` (2/6, needs +governance+design+code+communication). With 14 well-placed combos all 4 can reach 6/6.
