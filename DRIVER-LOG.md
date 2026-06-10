@@ -9,7 +9,7 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 - [x] **B** — GitHub MCP migration: `servers.json` `github` entry migrated to hosted remote `https://api.githubcopilot.com/mcp/` with `envHeaders: { "Authorization": "GITHUB_MCP_AUTHORIZATION" }`. Deprecated `@modelcontextprotocol/server-github` removed. ✅ DONE
 - [x] **C** — Focus-profile layer: `focus-profiles.json` (6 profiles: finance, governance, design, code, communication, ops), `src/focus.ts`, full aggregator integration (env `CH1TTY_FOCUS`, per-call `focus` param on `search`/`cast`, `status` reports active focus). Tests in `test/focus.test.ts` + coverage gap tests. ✅ DONE
 - [x] **D** — Scenario testing + simulation: `sim/` harness (`scenarios.ts`, `run.ts`, `fixture-backend.ts`), `test/scenario.test.ts`, `test/simulation.test.ts`, cloudflare-builds ops coverage fixtures + scenarios. ✅ DONE
-- [x] **E** — Alchemist brainstorm: catalog in `focus-suggestions.json`. ✅ DONE — 103rd pass: 1122 combos / 485 verified / 1143 prompts across 6 profiles. 121/376 tools at 6/6 profile coverage. Latest completed tools: ledger/append_entry, fs/read_file, github/list_pull_requests, neon/describe_branch, neon/list_projects, notion/API-post-search all at 6/6.
+- [x] **E** — Alchemist brainstorm: catalog in `focus-suggestions.json`. ✅ DONE — 105th pass: 1152 combos / 496 verified / 1173 prompts across 6 profiles. 130/376 tools at 6/6 profile coverage. Latest completed: fs/edit_file, orchestrator/agent_execute(alchemist) at 6/6; browser-rendering/get_url_screenshot 6/6 combo added (unverified — 401 this session).
 
 ## Blocker
 

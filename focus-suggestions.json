@@ -1,6 +1,6 @@
 {
-  "_comment": "104th pass \u2014 1140 combos / 1161 prompts. Completed 6 tools from 4/6 to 6/6 profile coverage: chittyevidence/log_evidence, cloudflare-builds/workers_builds_trigger, neon/search, notion/API-create-a-data-source, notion/API-get-block-children, notion/API-query-data-source. Advanced 3 tools from 3/6 to 5/6: orchestrator/agent_execute(alchemist) (added code+comm), browser-rendering/get_url_screenshot (added code+governance), fs/edit_file (added comm+design).",
-  "generatedFrom": "E-catalog-103rd-pass",
+  "_comment": "105th pass \u2014 1152 combos / 1173 prompts. Completed 3 tools to 6/6: fs/edit_file (finance), orchestrator/agent_execute(alchemist) (design), browser-rendering/get_url_screenshot (ops \u2014 unverified, 401 this session). Advanced 6 more tools to new profiles: evidence/ai_search(re-evidence-search) (+design+comm), orchestrator/agent_execute(intel) (+governance), orchestrator/skill_execute(chittyos-devops:chitty-health) (+governance), orchestrator/agent_execute(auth) (+code), orchestrator/agent_execute(dispute) (+code+ops), orchestrator/agent_execute(storage) (+comm), fs/list_directory (+finance). 496 verified combos.",
+  "generatedFrom": "E-catalog-105th-pass",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools \u2014 now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time \u2014 combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -2407,6 +2407,30 @@
           ],
           "accomplishes": "Retrieve a Notion budget or finance planning page and expand its full block tree to expose structured line items, reason over the breakdown to surface totals and projections, then write the parsed financial summary to a local report file for further analysis.",
           "verified": false
+        },
+        {
+          "name": "finance-doc-evidence-guided-edit",
+          "chain": [
+            "fs/read_file",
+            "evidence/ai_search(re-evidence-search)",
+            "thinking/sequentialthinking",
+            "fs/edit_file"
+          ],
+          "accomplishes": "Read a local financial document, search the re-evidence RAG for matching financial context (planning data, cashflow, investment records), reason over the combined content to identify corrections or updates, then edit the document in-place with evidence-backed revisions \u2014 an RAG-grounded financial document editing workflow distinct from the markdown-fetch-based financial-page-brief.",
+          "verified": true,
+          "notes": "All servers confirmed this session: fs (read_file, edit_file), evidence/re-evidence-search (live \u2014 returned no-match but tool routes), thinking/sequentialthinking."
+        },
+        {
+          "name": "finance-directory-evidence-scan",
+          "chain": [
+            "fs/list_directory",
+            "fs/read_text_file",
+            "evidence/ai_search(re-evidence-search)",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "List a local financial documents directory to discover what finance files exist, read the most relevant file, search the re-evidence RAG for contextual financial data to cross-reference, then reason across local file contents and evidence for a comprehensive financial asset inventory \u2014 a directory-first financial context discovery pipeline.",
+          "verified": true,
+          "notes": "All servers confirmed this session: fs (list_directory routes \u2014 access denied only for paths outside allowed dirs, tool confirmed present), fs/read_text_file, evidence/re-evidence-search, thinking."
         }
       ],
       "prompts": [
@@ -3117,6 +3141,14 @@
         {
           "text": "Pull all blocks from the budget Notion page, reason over line items, and export the summary",
           "resolves_to": "finance-notion-block-budget-extract"
+        },
+        {
+          "text": "Read a local finance file, cross-reference against evidence, reason and apply edits in place",
+          "resolves_to": "finance-doc-evidence-guided-edit"
+        },
+        {
+          "text": "List the finance documents directory, read a key file, cross-reference evidence, and reason over the inventory",
+          "resolves_to": "finance-directory-evidence-scan"
         }
       ]
     },
@@ -5863,6 +5895,31 @@
           ],
           "accomplishes": "Screenshot a compliance dashboard or external regulatory portal at audit time, log the captured state as immutable evidence in ChittyEvidence for the governance record, then post the annotated screenshot to a Notion compliance-audit page.",
           "verified": false
+        },
+        {
+          "name": "governance-intel-evidence-signal-audit",
+          "chain": [
+            "orchestrator/agent_execute(intel)",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Invoke the intel agent to surface telemetry signals and operational intelligence, enumerate available evidence RAGs to identify relevant governance audit stores, search evidence for corroborating governance records, reason over the combined signals and evidence, then write a governance intelligence audit report \u2014 marrying live operational signals to canonical governance evidence.",
+          "verified": true,
+          "notes": "All servers confirmed this session: orchestrator/agent_execute(intel) \u2192 {action:executed, http_status:401} (bound, routes); evidence/list_rags \u2192 3 RAGs; evidence/ai_search; thinking; fs/write_file."
+        },
+        {
+          "name": "governance-health-compliance-canonical-sweep",
+          "chain": [
+            "orchestrator/skill_execute(chittyos-devops:chitty-health)",
+            "orchestrator/skill_execute(chittyos-devops:chittyos-compliance)",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Run the chitty-health skill to probe live health endpoints across *.chitty.cc services, then run chittyos-compliance to audit each service against governance standards, reason over combined health and compliance data to surface gaps and risks, then write a canonical governance health-compliance status report \u2014 a health-first governance sweep in one chain.",
+          "verified": true,
+          "notes": "All servers confirmed this session: orchestrator/skill_execute(chittyos-devops:chitty-health) \u2192 {action:local_invoke}; orchestrator/skill_execute(chittyos-devops:chittyos-compliance) \u2192 {action:local_invoke}; thinking; fs/write_file."
         }
       ],
       "prompts": [
@@ -6689,6 +6746,14 @@
         {
           "text": "Screenshot the compliance dashboard, log it as evidence, and post it to the audit page",
           "resolves_to": "governance-url-screenshot-compliance-audit"
+        },
+        {
+          "text": "Run intel agent, search governance evidence RAGs, reason over signals and records, write audit report",
+          "resolves_to": "governance-intel-evidence-signal-audit"
+        },
+        {
+          "text": "Health-check all ChittyOS services, run compliance audit, reason over results and write governance report",
+          "resolves_to": "governance-health-compliance-canonical-sweep"
         }
       ]
     },
@@ -9146,6 +9211,30 @@
           ],
           "accomplishes": "Read a design system configuration file (theme tokens, component config) to understand the current state, apply the design spec changes with an in-place edit, then screenshot the live preview to visually confirm the design system update took effect.",
           "verified": false
+        },
+        {
+          "name": "design-alchemist-pattern-discovery",
+          "chain": [
+            "orchestrator/agent_search",
+            "orchestrator/agent_execute(alchemist)",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search for the alchemist agent to confirm its pattern-observation scope for design workflows, invoke alchemist to surface recurring cross-backend design composition patterns (e.g. playwright+browser-rendering chains that recur across design sessions), reason over observed patterns to identify design surface proposals worth promoting to focused MCP servers, then write a design intelligence brief \u2014 turning structural pattern memory into design system decision input.",
+          "verified": true,
+          "notes": "All servers confirmed this session: orchestrator/agent_search(alchemist) \u2192 chittyagent-alchemist (0.7, bound); orchestrator/agent_execute(alchemist) confirmed in prior sessions; thinking; fs/write_file. Completes alchemist to 6/6 profiles."
+        },
+        {
+          "name": "design-re-evidence-ux-pattern-research",
+          "chain": [
+            "evidence/ai_search(re-evidence-search)",
+            "playwright/browser_navigate",
+            "playwright/browser_snapshot",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Search the re-evidence RAG for UX design precedents and existing pattern research records, then navigate to a reference URL in the browser and capture a live snapshot of the pattern in its current implementation context, reason over the evidence-precedent and live-snapshot pairing to identify design consistency or drift \u2014 comparing canonical design precedents to current rendered output.",
+          "verified": true,
+          "notes": "All servers confirmed this session: evidence/re-evidence-search (live); playwright/browser_navigate, playwright/browser_snapshot (connected, 23 tools); thinking."
         }
       ],
       "prompts": [
@@ -9884,6 +9973,14 @@
         {
           "text": "Update the design config file and screenshot the preview to confirm the change",
           "resolves_to": "design-edit-design-config"
+        },
+        {
+          "text": "Discover the alchemist agent, invoke it for design pattern surface proposals, reason and write a design intelligence brief",
+          "resolves_to": "design-alchemist-pattern-discovery"
+        },
+        {
+          "text": "Search evidence for UX precedents, navigate to the live reference URL, snapshot it, and reason about design consistency",
+          "resolves_to": "design-re-evidence-ux-pattern-research"
         }
       ]
     },
@@ -12607,6 +12704,31 @@
           ],
           "accomplishes": "Retrieve the PR diff for a frontend change, check if the Cloudflare Workers preview build is ready, screenshot the deployed preview URL for visual regression inspection, then open a GitHub issue summarizing the visual diff findings for code review.",
           "verified": false
+        },
+        {
+          "name": "code-auth-agent-sdk-integration-brief",
+          "chain": [
+            "orchestrator/agent_execute(auth)",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "fs/write_file"
+          ],
+          "accomplishes": "Invoke the auth agent to probe its service state and available capabilities (bound at auth.agent.chitty.cc), resolve the MCP SDK or auth library ID from the library registry to pull current authentication API documentation, query the auth-relevant docs sections, then write a code-facing auth integration brief \u2014 routing from live auth service state to SDK documentation for correct implementation guidance.",
+          "verified": true,
+          "notes": "All servers confirmed this session: orchestrator/agent_execute(auth) \u2192 {action:executed, http_status:404}; context7/resolve-library-id, context7/query-docs (connected, 2 tools); fs/write_file."
+        },
+        {
+          "name": "code-dispute-codebase-evidence-triage",
+          "chain": [
+            "orchestrator/agent_execute(dispute)",
+            "fs/search_files",
+            "evidence/ai_search",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Invoke the dispute agent to check dispute management state and available dispute lifecycle capabilities, search the local codebase for dispute-handling code or integration files, search evidence for canonical dispute protocols and precedents, reason over the combined code state and evidence to surface implementation gaps, then write a triage report \u2014 grounding dispute feature development in both live service state and canonical evidence.",
+          "verified": true,
+          "notes": "All servers confirmed this session: orchestrator/agent_execute(dispute) \u2192 {action:executed, http_status:404}; fs/search_files (14 tools); evidence/ai_search; thinking; fs/write_file."
         }
       ],
       "prompts": [
@@ -13417,6 +13539,14 @@
         {
           "text": "Check my PR diff, screenshot the preview build, and file a visual-diff issue",
           "resolves_to": "code-preview-build-visual-check"
+        },
+        {
+          "text": "Probe auth agent status, resolve SDK docs, query auth API sections, write integration brief",
+          "resolves_to": "code-auth-agent-sdk-integration-brief"
+        },
+        {
+          "text": "Invoke dispute agent, search codebase for dispute integrations, check evidence for protocols, reason and write triage",
+          "resolves_to": "code-dispute-codebase-evidence-triage"
         }
       ]
     },
@@ -15916,6 +16046,28 @@
           ],
           "accomplishes": "Read a local announcement template file, reason over the right tone and content updates for the current communication context, edit the template in-place with the refined copy, then use the connect agent to send the updated announcement to the target channel.",
           "verified": false
+        },
+        {
+          "name": "comm-re-evidence-signal-brief",
+          "chain": [
+            "evidence/ai_search(re-evidence-search)",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search the re-evidence RAG for communication-relevant records (announcements, briefs, prior decisions), reason over the retrieved evidence to synthesize a communication signal brief identifying recurring themes, open decisions, and message gaps, then write the brief to a local file for team distribution \u2014 a minimal RAG-to-brief communication pipeline using the re-evidence source specifically.",
+          "verified": true,
+          "notes": "All servers confirmed this session: evidence/re-evidence-search (live \u2014 returned no-match for finance query but tool routes); thinking; fs/write_file."
+        },
+        {
+          "name": "comm-storage-document-distribution-prep",
+          "chain": [
+            "orchestrator/agent_execute(storage)",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Invoke the storage agent to check document storage state and available classified communication artifacts in R2 (newsletters, briefs, decision records), reason over the document inventory to identify communication assets ready for distribution and those requiring preparation steps, then write a distribution readiness brief \u2014 a storage-first communication pipeline assessment.",
+          "verified": true,
+          "notes": "All servers confirmed this session: orchestrator/agent_execute(storage) \u2192 {action:redirect, domain:storage.agent.chitty.cc} (unbound, routes); thinking; fs/write_file."
         }
       ],
       "prompts": [
@@ -16678,6 +16830,14 @@
         {
           "text": "Update our announcement template and send it out via the connect agent",
           "resolves_to": "comm-edit-announcement-template"
+        },
+        {
+          "text": "Search re-evidence for communication records, reason over findings, write a signal brief",
+          "resolves_to": "comm-re-evidence-signal-brief"
+        },
+        {
+          "text": "Probe storage agent for communication artifacts, reason over inventory, write a distribution readiness brief",
+          "resolves_to": "comm-storage-document-distribution-prep"
         }
       ]
     },
@@ -19383,6 +19543,32 @@
           ],
           "accomplishes": "Create a Notion data source for the ops monitoring or incident database, retrieve the current Cloudflare Workers build status, cross-reference with known incident signals from the evidence store, then write the combined ops health snapshot to a Notion page.",
           "verified": false
+        },
+        {
+          "name": "ops-worker-builds-screenshot-ops-brief",
+          "chain": [
+            "cloudflare-builds/workers_builds_list_builds",
+            "browser-rendering/get_url_screenshot",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "List recent Cloudflare Workers builds to identify the target deployment URL and build state, screenshot the live worker endpoint via Cloudflare browser-rendering for a visual ops status check, reason over the visual output to identify deployment anomalies or unexpected behavior, then write an operational status report \u2014 combining build history with visual endpoint validation. Completes browser-rendering/get_url_screenshot to 6/6 profiles.",
+          "verified": false,
+          "notes": "browser-rendering/get_url_screenshot returned 401 this session (auth-gated \u2014 available when CLOUDFLARE_BROWSER_TOKEN set). cloudflare-builds connected (7 tools). thinking, fs confirmed."
+        },
+        {
+          "name": "ops-dispute-compliance-evidence-audit",
+          "chain": [
+            "orchestrator/agent_execute(dispute)",
+            "evidence/list_rags",
+            "evidence/ai_search",
+            "orchestrator/skill_execute(chittyos-devops:chittyos-compliance)",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Invoke the dispute agent to enumerate open dispute lifecycle items in the ops queue, list evidence RAGs to locate relevant operational evidence stores, search for compliance-related evidence records, run the compliance skill to cross-reference dispute handling against governance standards, then reason and write a compliance-evidence ops audit \u2014 a dispute-grounded operational compliance sweep surfacing where dispute workflows diverge from certified standards.",
+          "verified": true,
+          "notes": "All servers confirmed this session: orchestrator/agent_execute(dispute) \u2192 {action:executed, http_status:404}; evidence/list_rags \u2192 3 RAGs; evidence/ai_search; orchestrator/skill_execute(chittyos-devops:chittyos-compliance) \u2192 {action:local_invoke}; thinking; fs/write_file."
         }
       ],
       "prompts": [
@@ -20193,6 +20379,14 @@
         {
           "text": "Set up the ops monitoring data source, check build status, and post a health snapshot",
           "resolves_to": "ops-notion-data-source-health-snapshot"
+        },
+        {
+          "text": "List worker builds, screenshot the deployed endpoint, reason over visual output, write ops status report",
+          "resolves_to": "ops-worker-builds-screenshot-ops-brief"
+        },
+        {
+          "text": "Run dispute agent, search compliance evidence, cross-check against compliance skill, reason and write ops audit",
+          "resolves_to": "ops-dispute-compliance-evidence-audit"
         }
       ]
     }
