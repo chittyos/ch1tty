@@ -1,6 +1,6 @@
 {
-  "_comment": "106th pass — 1164 combos / 1185 prompts. Completed 7 tools to 6/6: evidence/ai_search(re-evidence-search) (+code), orchestrator/agent_execute(dispute) (+design), orchestrator/agent_execute(storage) (+code +governance), orchestrator/agent_execute(auth) (+design +communication), orchestrator/agent_execute(intel) (+design +code), orchestrator/skill_execute(chittyos-devops:chitty-health) (+design +communication), fs/list_directory (+design +communication). 508 verified combos. 6/6 tool count: 130 → 137.",
-  "generatedFrom": "E-catalog-106th-pass",
+  "_comment": "107th pass — 1176 combos / 1197 prompts. Key completions: notion/API-create-a-page completed to 6/6 (+governance +design +communication). cloudflare-builds/workers_builds_get_build_config advanced to 5/6 (+finance +code). orchestrator/chittyagent-resolve advanced to 4/6 (+governance +ops). neon/fetch advanced to 4/6 (+governance +ops). notion/API-get-self advanced to 4/6 (+finance +governance). cloudflare-builds/workers_builds_get advanced to 3/6 (+design). notion/API-retrieve-a-data-source advanced to 3/6 (+code). fs/directory_tree advanced to 4/6 (+communication). 508 verified combos.",
+  "generatedFrom": "E-catalog-107th-pass",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools — now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time — combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -2431,6 +2431,27 @@
           "accomplishes": "List a local financial documents directory to discover what finance files exist, read the most relevant file, search the re-evidence RAG for contextual financial data to cross-reference, then reason across local file contents and evidence for a comprehensive financial asset inventory — a directory-first financial context discovery pipeline.",
           "verified": true,
           "notes": "All servers confirmed this session: fs (list_directory routes — access denied only for paths outside allowed dirs, tool confirmed present), fs/read_text_file, evidence/re-evidence-search, thinking."
+        },
+        {
+          "name": "finance-notion-bot-identity-check",
+          "chain": [
+            "notion/API-get-self",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Verify the ch1tty Notion integration bot identity and confirm its authorization for the finance workspace, then post a connectivity-verification entry to the Notion finance tracker — ensuring the bot has write access before running automated finance workflows that depend on Notion.",
+          "verified": false,
+          "notes": "notion/API-get-self: retrieves the bot user associated with the integration token. notion/API-post-page: verified present. Adds notion/API-get-self to finance profile (was: code, ops)."
+        },
+        {
+          "name": "finance-billing-build-config-audit",
+          "chain": [
+            "cloudflare-builds/workers_builds_get_build_config",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Fetch the Workers Builds configuration for the billing or payment Worker (build_command, deploy_command, environment variables), reason over the config for drift, misconfiguration, or missing production flags, then post the audit findings to a Notion finance ops page — giving the finance team visibility into the build-level health of their billing services.",
+          "verified": false,
+          "notes": "cloudflare-builds/workers_builds_get_build_config: lazy, token from op://ChittyOS-Integrations/cloudflare-builds-mcp. thinking verified. notion/API-post-page verified. Adds cloudflare-builds/workers_builds_get_build_config to finance profile (was: governance, design, ops)."
         }
       ],
       "prompts": [
@@ -3149,6 +3170,14 @@
         {
           "text": "List the finance documents directory, read a key file, cross-reference evidence, and reason over the inventory",
           "resolves_to": "finance-directory-evidence-scan"
+        },
+        {
+          "text": "Verify our Notion integration bot is correctly set up for the finance workspace",
+          "resolves_to": "finance-notion-bot-identity-check"
+        },
+        {
+          "text": "Audit the Cloudflare Workers Builds config for our billing service and post findings to Notion",
+          "resolves_to": "finance-billing-build-config-audit"
         }
       ]
     },
@@ -5932,6 +5961,28 @@
           "accomplishes": "Query the storage agent for current data storage inventory (what is persisted, where, under which access policies), reason over the storage state against data governance obligations (retention, access control, residency), cross-reference against the evidence knowledge base for any prior governance findings about storage compliance, then record the audit findings as a Notion page — producing a durable, linked governance artifact for the storage layer.",
           "verified": true,
           "notes": "orchestrator/agent_execute(storage) confirmed; thinking; evidence/ai_search confirmed (chittyevidence); notion/API-post-page confirmed. Completes orchestrator/agent_execute(storage) to 6/6 profiles."
+        },
+        {
+          "name": "governance-neon-fetch-schema-probe",
+          "chain": [
+            "neon/fetch",
+            "notion/API-get-self",
+            "chittyevidence/log_evidence"
+          ],
+          "accomplishes": "Probe the Neon Data API endpoint to retrieve a governance-relevant schema or record set, verify the ch1tty Notion bot identity is authorized to write audit results, then log the Neon schema health finding to ChittyEvidence — creating a durable governance audit trail linking data-layer probe results to the evidence record.",
+          "verified": false,
+          "notes": "neon/fetch: Neon Data API fetch (requires provisioned Neon data API). notion/API-get-self: bot identity check. chittyevidence/log_evidence: confirmed in prior sessions. Adds neon/fetch + notion/API-get-self to governance profile."
+        },
+        {
+          "name": "governance-resolve-dispute-evidence-doc",
+          "chain": [
+            "orchestrator/chittyagent-resolve",
+            "evidence/ai_search",
+            "notion/API-create-a-page"
+          ],
+          "accomplishes": "Invoke the resolve agent to triage an open governance dispute item (policy exception, access-control incident, SLA breach), cross-reference the triage result against the evidence knowledge base for prior governance rulings, then create a new Notion page documenting the dispute triage summary — producing a linked, durable governance artifact for the dispute lifecycle.",
+          "verified": false,
+          "notes": "orchestrator/chittyagent-resolve: lazy, requires orchestrator connection. evidence/ai_search: confirmed (chittyevidence). notion/API-create-a-page: confirmed in prior sessions. Adds orchestrator/chittyagent-resolve + notion/API-create-a-page to governance profile."
         }
       ],
       "prompts": [
@@ -6770,6 +6821,14 @@
         {
           "text": "Audit storage agent inventory for compliance, cross-check evidence records, record findings in Notion",
           "resolves_to": "governance-storage-compliance-audit"
+        },
+        {
+          "text": "Probe the Neon Data API for our governance schema and log the health check to evidence",
+          "resolves_to": "governance-neon-fetch-schema-probe"
+        },
+        {
+          "text": "Triage this governance dispute with the resolve agent and create a Notion summary page",
+          "resolves_to": "governance-resolve-dispute-evidence-doc"
         }
       ]
     },
@@ -9313,6 +9372,27 @@
           "accomplishes": "List a design assets directory (component library, icon set, token definitions) to inventory what exists, read a specific design file (e.g. a token config or component manifest) to understand its current state, screenshot the live rendered output of the component/token in the browser, then reason over the file-system inventory + live visual state to identify organizational gaps, stale assets, or documentation drift.",
           "verified": true,
           "notes": "fs/list_directory confirmed; fs/read_file confirmed; playwright/browser_screenshot confirmed (browser_screenshot is part of the 23-tool playwright surface); thinking. Advances fs/list_directory to design profile (was: code, finance, governance, ops)."
+        },
+        {
+          "name": "design-frontend-build-deploy-screenshot",
+          "chain": [
+            "cloudflare-builds/workers_builds_get",
+            "playwright/browser_screenshot"
+          ],
+          "accomplishes": "Retrieve the latest Cloudflare Workers build record for the design frontend service (UI, brand site, or design system preview app), extract the deployed URL from the build result, then screenshot the deployed page — closing the build-to-visual-QA loop by confirming the live deployment matches the expected visual state.",
+          "verified": false,
+          "notes": "cloudflare-builds/workers_builds_get: lazy, token from op://ChittyOS-Integrations/cloudflare-builds-mcp. playwright/browser_screenshot: confirmed present. Adds cloudflare-builds/workers_builds_get to design profile (was: code, ops)."
+        },
+        {
+          "name": "design-notion-component-spec-create",
+          "chain": [
+            "notion/API-create-a-page",
+            "playwright/browser_screenshot",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Create a new Notion page for a design system component specification, screenshot the live component in the browser to capture its current visual state as a reference thumbnail, then reason over the component snapshot and any spec gaps — producing a linked, visual design-system component doc with live rendering evidence embedded in the spec.",
+          "verified": false,
+          "notes": "notion/API-create-a-page: confirmed in prior sessions. playwright/browser_screenshot: confirmed. thinking: confirmed. Adds notion/API-create-a-page to design profile (was: finance, code, ops)."
         }
       ],
       "prompts": [
@@ -10079,6 +10159,14 @@
         {
           "text": "List design assets dir, read a token config, screenshot the live render, reason over asset organization",
           "resolves_to": "design-directory-asset-organization"
+        },
+        {
+          "text": "Get the latest build for our design frontend service and screenshot the deployed result",
+          "resolves_to": "design-frontend-build-deploy-screenshot"
+        },
+        {
+          "text": "Create a Notion spec page for a new design system component and screenshot its live render",
+          "resolves_to": "design-notion-component-spec-create"
         }
       ]
     },
@@ -12863,6 +12951,28 @@
           "accomplishes": "Query the storage agent for current backend state (buckets, object counts, access patterns), read the local integration code that interfaces with the storage layer, reason over the gap between live state and code assumptions, then file a GitHub issue tracking any integration drift or work needed — closing the loop between storage observability and engineering backlog.",
           "verified": true,
           "notes": "orchestrator/agent_execute(storage) confirmed in prior sessions; fs/read_file verified; github/create_issue verified. Advances orchestrator/agent_execute(storage) to code profile (was: communication, design, finance, ops)."
+        },
+        {
+          "name": "code-notion-data-source-schema-validate",
+          "chain": [
+            "notion/API-retrieve-a-data-source",
+            "context7/get-library-docs",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Retrieve a Notion data source configured for code documentation (database schema, API reference, or changelog), cross-reference its field definitions against Context7 library documentation for the underlying package, then reason over any drift between the documented API and the Notion data model — ensuring code documentation data sources stay aligned with current library versions.",
+          "verified": false,
+          "notes": "notion/API-retrieve-a-data-source: confirmed in prior sessions. context7/get-library-docs: confirmed (context7 server). thinking: confirmed. Adds notion/API-retrieve-a-data-source to code profile (was: finance, ops)."
+        },
+        {
+          "name": "code-build-config-ci-drift-check",
+          "chain": [
+            "cloudflare-builds/workers_builds_get_build_config",
+            "github/create_issue",
+            "fs/write_file"
+          ],
+          "accomplishes": "Fetch the Workers Builds CI configuration for a code service to check whether build_command and deploy_command are up to date, file a GitHub issue capturing any detected drift (missing --env production flag, stale build_command, missing wrangler version pin), then write the fetched config snapshot to a local file for diff comparison — completing the CI config observability → issue-tracking → local-artifact pipeline.",
+          "verified": false,
+          "notes": "cloudflare-builds/workers_builds_get_build_config: lazy. github/create_issue: verified. fs/write_file: verified. Adds cloudflare-builds/workers_builds_get_build_config to code profile (was: governance, design, ops)."
         }
       ],
       "prompts": [
@@ -13693,6 +13803,14 @@
         {
           "text": "Query storage agent, read integration code, reason over drift, file a GitHub issue",
           "resolves_to": "code-storage-integration-issue"
+        },
+        {
+          "text": "Validate our code documentation Notion data source schema against the current library docs",
+          "resolves_to": "code-notion-data-source-schema-validate"
+        },
+        {
+          "text": "Check our Cloudflare Workers Builds CI config for drift and file a GitHub issue if anything is off",
+          "resolves_to": "code-build-config-ci-drift-check"
         }
       ]
     },
@@ -16248,6 +16366,28 @@
           "accomplishes": "List a communication templates directory (email templates, Slack message formats, status update scripts) to inventory what exists, read a representative template to assess its current form and coverage, reason over the template set completeness and any gaps for common communication scenarios, then publish an updated template catalog as a Notion page — making the communication asset library discoverable and up-to-date for the team.",
           "verified": true,
           "notes": "fs/list_directory confirmed; fs/read_text_file confirmed; thinking; notion/API-post-page confirmed. Completes fs/list_directory to 6/6 profiles."
+        },
+        {
+          "name": "comm-directory-tree-template-inventory",
+          "chain": [
+            "fs/directory_tree",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Generate a directory tree of the communication templates and documentation assets folder to inventory what templates, scripts, and message formats exist, reason over the structure to identify gaps in team communication coverage (missing incident-digest templates, outdated status-update scripts), then publish the curated inventory as a Notion team reference page — making the communication asset library discoverable and maintainable.",
+          "verified": false,
+          "notes": "fs/directory_tree: confirmed (fs server). thinking: confirmed. notion/API-post-page: confirmed. Adds fs/directory_tree to communication profile (was: design, code, ops)."
+        },
+        {
+          "name": "comm-notion-create-broadcast-page",
+          "chain": [
+            "notion/API-create-a-page",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Create a new structured Notion page for a team broadcast (sprint summary, incident digest, product update), reason over the required communication objectives and audience to determine the optimal page structure and key messages, then populate the page body with the curated broadcast content — producing a ready-to-share team communication artifact in one pipeline.",
+          "verified": false,
+          "notes": "notion/API-create-a-page: creates the page shell. thinking: structures the broadcast. notion/API-post-page: adds content blocks. Adds notion/API-create-a-page to communication profile (was: finance, code, ops)."
         }
       ],
       "prompts": [
@@ -17030,6 +17170,14 @@
         {
           "text": "List comms templates dir, read a template, reason over coverage gaps, publish a catalog update to Notion",
           "resolves_to": "comm-directory-template-catalog"
+        },
+        {
+          "text": "Inventory our communication templates directory and publish the catalog to Notion",
+          "resolves_to": "comm-directory-tree-template-inventory"
+        },
+        {
+          "text": "Create a Notion broadcast page for this sprint's team summary",
+          "resolves_to": "comm-notion-create-broadcast-page"
         }
       ]
     },
@@ -19761,6 +19909,28 @@
           "accomplishes": "Invoke the dispute agent to enumerate open dispute lifecycle items in the ops queue, list evidence RAGs to locate relevant operational evidence stores, search for compliance-related evidence records, run the compliance skill to cross-reference dispute handling against governance standards, then reason and write a compliance-evidence ops audit — a dispute-grounded operational compliance sweep surfacing where dispute workflows diverge from certified standards.",
           "verified": true,
           "notes": "All servers confirmed this session: orchestrator/agent_execute(dispute) → {action:executed, http_status:404}; evidence/list_rags → 3 RAGs; evidence/ai_search; orchestrator/skill_execute(chittyos-devops:chittyos-compliance) → {action:local_invoke}; thinking; fs/write_file."
+        },
+        {
+          "name": "ops-chittyagent-resolve-incident-evidence",
+          "chain": [
+            "orchestrator/chittyagent-resolve",
+            "evidence/ai_search",
+            "chittyevidence/log_evidence"
+          ],
+          "accomplishes": "Invoke the resolve agent to auto-triage an ops incident (error spike, deployment failure, SLA breach notification), cross-reference the triage result against the evidence knowledge base for prior incident patterns and known-good resolutions, then log the incident-plus-triage record to ChittyEvidence — completing the incident-to-evidence audit chain and seeding the evidence base for future similar incidents.",
+          "verified": false,
+          "notes": "orchestrator/chittyagent-resolve: lazy, requires orchestrator connection. evidence/ai_search: confirmed (chittyevidence). chittyevidence/log_evidence: confirmed in prior sessions. Adds orchestrator/chittyagent-resolve to ops profile (was: finance, code)."
+        },
+        {
+          "name": "ops-neon-fetch-db-api-healthcheck",
+          "chain": [
+            "neon/fetch",
+            "cloudflare-builds/workers_builds_get",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Probe the Neon Data API endpoint to verify the operational database layer is reachable and returning valid responses, then retrieve the latest Cloudflare Workers build status for the ops backend service to confirm the data layer and application layer are both healthy, and post a combined ops health summary to a Notion ops status page — providing a unified data+deploy health snapshot.",
+          "verified": false,
+          "notes": "neon/fetch: Neon Data API fetch (requires provisioned Neon data API). cloudflare-builds/workers_builds_get: confirmed lazy. notion/API-post-page: confirmed. Adds neon/fetch to ops profile (was: finance, code)."
         }
       ],
       "prompts": [
@@ -20579,6 +20749,14 @@
         {
           "text": "Run dispute agent, search compliance evidence, cross-check against compliance skill, reason and write ops audit",
           "resolves_to": "ops-dispute-compliance-evidence-audit"
+        },
+        {
+          "text": "Triage this ops incident with the resolve agent and log the findings to evidence",
+          "resolves_to": "ops-chittyagent-resolve-incident-evidence"
+        },
+        {
+          "text": "Run an ops healthcheck on our Neon Data API and Workers build, then post a status summary to Notion",
+          "resolves_to": "ops-neon-fetch-db-api-healthcheck"
         }
       ]
     }
