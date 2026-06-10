@@ -2452,6 +2452,28 @@
           "accomplishes": "Fetch the Workers Builds configuration for the billing or payment Worker (build_command, deploy_command, environment variables), reason over the config for drift, misconfiguration, or missing production flags, then post the audit findings to a Notion finance ops page — giving the finance team visibility into the build-level health of their billing services.",
           "verified": false,
           "notes": "cloudflare-builds/workers_builds_get_build_config: lazy, token from op://ChittyOS-Integrations/cloudflare-builds-mcp. thinking verified. notion/API-post-page verified. Adds cloudflare-builds/workers_builds_get_build_config to finance profile (was: governance, design, ops)."
+        },
+        {
+          "name": "finance-cf-builds-workers-deployment-costs",
+          "chain": [
+            "cloudflare-builds/workers_builds_get",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "List the recent Cloudflare Workers builds for the payment or billing Worker, reason over deployment frequency and build duration trends to estimate relative infrastructure cost and delivery cadence, then post a concise finance ops summary to Notion — giving the finance team visibility into deployment-level cost signals for their critical billing services.",
+          "verified": false,
+          "notes": "cloudflare-builds/workers_builds_get: lazy, token from op://ChittyOS-Integrations/cloudflare-builds-mcp. thinking: confirmed. notion/API-post-page: confirmed. Adds cloudflare-builds/workers_builds_get to finance profile (was: design, code, ops)."
+        },
+        {
+          "name": "finance-fs-directory-budget-docs-map",
+          "chain": [
+            "fs/directory_tree",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Traverse the local filesystem to produce a directory tree of the finance or billing codebase, reason over the structure to identify where budget documentation, cost config, and rate sheets live relative to the active codebase, then post a structured map of those key finance document locations to a Notion ops page — enabling the finance team to quickly navigate billing-related artifacts without searching.",
+          "verified": false,
+          "notes": "fs/directory_tree: confirmed. thinking: confirmed. notion/API-post-page: confirmed. Adds fs/directory_tree to finance profile (was: design, code, communication, ops)."
         }
       ],
       "prompts": [
@@ -3178,6 +3200,14 @@
         {
           "text": "Audit the Cloudflare Workers Builds config for our billing service and post findings to Notion",
           "resolves_to": "finance-billing-build-config-audit"
+        },
+        {
+          "text": "List recent Workers builds for our billing service and post a deployment cost summary to Notion",
+          "resolves_to": "finance-cf-builds-workers-deployment-costs"
+        },
+        {
+          "text": "Map the finance and billing docs in our repo directory tree and post locations to Notion",
+          "resolves_to": "finance-fs-directory-budget-docs-map"
         }
       ]
     },
@@ -5983,6 +6013,28 @@
           "accomplishes": "Invoke the resolve agent to triage an open governance dispute item (policy exception, access-control incident, SLA breach), cross-reference the triage result against the evidence knowledge base for prior governance rulings, then create a new Notion page documenting the dispute triage summary — producing a linked, durable governance artifact for the dispute lifecycle.",
           "verified": false,
           "notes": "orchestrator/chittyagent-resolve: lazy, requires orchestrator connection. evidence/ai_search: confirmed (chittyevidence). notion/API-create-a-page: confirmed in prior sessions. Adds orchestrator/chittyagent-resolve + notion/API-create-a-page to governance profile."
+        },
+        {
+          "name": "governance-notion-data-source-policy-registry",
+          "chain": [
+            "notion/API-retrieve-a-data-source",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Retrieve metadata for the Notion data source backing the governance policy registry (access controls, sync status, schema), reason over the data source configuration to flag stale syncs, permission mismatches, or missing compliance columns, then post a governance data source audit summary to a Notion governance page — giving the governance team a live view of their policy-data infrastructure health.",
+          "verified": false,
+          "notes": "notion/API-retrieve-a-data-source: confirmed in prior sessions. thinking: confirmed. notion/API-post-page: confirmed. Adds notion/API-retrieve-a-data-source to governance profile (was: finance, code, ops)."
+        },
+        {
+          "name": "governance-cf-builds-workers-deploy-compliance",
+          "chain": [
+            "cloudflare-builds/workers_builds_get",
+            "github/create_issue",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Retrieve recent Cloudflare Workers build records for compliance-critical services, identify any builds that lack a linked approval reference or were deployed outside the change-window, file a GitHub issue for each non-compliant deployment to create an audit trail, then post a Notion governance summary capturing compliant vs flagged deployments — enforcing deployment compliance visibility across the change management lifecycle.",
+          "verified": false,
+          "notes": "cloudflare-builds/workers_builds_get: lazy. github/create_issue: confirmed. notion/API-post-page: confirmed. Adds cloudflare-builds/workers_builds_get to governance profile (was: design, code, ops)."
         }
       ],
       "prompts": [
@@ -6829,6 +6881,14 @@
         {
           "text": "Triage this governance dispute with the resolve agent and create a Notion summary page",
           "resolves_to": "governance-resolve-dispute-evidence-doc"
+        },
+        {
+          "text": "Audit the Notion data source backing our policy registry and post the health summary",
+          "resolves_to": "governance-notion-data-source-policy-registry"
+        },
+        {
+          "text": "Check recent Workers builds for compliance and file GitHub issues for any non-compliant deployments",
+          "resolves_to": "governance-cf-builds-workers-deploy-compliance"
         }
       ]
     },
@@ -9393,6 +9453,28 @@
           "accomplishes": "Create a new Notion page for a design system component specification, screenshot the live component in the browser to capture its current visual state as a reference thumbnail, then reason over the component snapshot and any spec gaps — producing a linked, visual design-system component doc with live rendering evidence embedded in the spec.",
           "verified": false,
           "notes": "notion/API-create-a-page: confirmed in prior sessions. playwright/browser_screenshot: confirmed. thinking: confirmed. Adds notion/API-create-a-page to design profile (was: finance, code, ops)."
+        },
+        {
+          "name": "design-neon-fetch-notion-self-schema-preview",
+          "chain": [
+            "neon/fetch",
+            "notion/API-get-self",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Fetch schema data from the Neon Data API for the design system's component data store, retrieve the Notion bot identity to confirm which integration account is driving design system updates, then reason over the schema shape and integration identity to produce a design token data model preview — helping the design team understand the live data schema driving their component library before making structural changes.",
+          "verified": false,
+          "notes": "neon/fetch: Neon Data API fetch. notion/API-get-self: confirmed in prior sessions. thinking: confirmed. Multi-tool chain covering both neon/fetch (missing design) and notion/API-get-self (missing design) in one combo."
+        },
+        {
+          "name": "design-resolve-notion-data-source-prototype",
+          "chain": [
+            "orchestrator/chittyagent-resolve",
+            "notion/API-retrieve-a-data-source",
+            "playwright/browser_screenshot"
+          ],
+          "accomplishes": "Invoke the resolve agent to triage an open design system conflict (component API mismatch, style token dispute, layout spec ambiguity), retrieve the Notion data source backing the design system's spec database to verify the current authoritative state, then screenshot the live component in the browser to capture its current rendered form — producing a resolve triage summary + data source authority check + visual evidence for the design conflict resolution artifact.",
+          "verified": false,
+          "notes": "orchestrator/chittyagent-resolve: lazy. notion/API-retrieve-a-data-source: confirmed. playwright/browser_screenshot: confirmed. Multi-tool chain covering both orchestrator/chittyagent-resolve (missing design) and notion/API-retrieve-a-data-source (missing design)."
         }
       ],
       "prompts": [
@@ -10167,6 +10249,14 @@
         {
           "text": "Create a Notion spec page for a new design system component and screenshot its live render",
           "resolves_to": "design-notion-component-spec-create"
+        },
+        {
+          "text": "Fetch the design system component schema from Neon and check which Notion bot is driving updates",
+          "resolves_to": "design-neon-fetch-notion-self-schema-preview"
+        },
+        {
+          "text": "Triage this design system conflict with the resolve agent and cross-check the Notion data source spec",
+          "resolves_to": "design-resolve-notion-data-source-prototype"
         }
       ]
     },
@@ -12973,6 +13063,28 @@
           "accomplishes": "Fetch the Workers Builds CI configuration for a code service to check whether build_command and deploy_command are up to date, file a GitHub issue capturing any detected drift (missing --env production flag, stale build_command, missing wrangler version pin), then write the fetched config snapshot to a local file for diff comparison — completing the CI config observability → issue-tracking → local-artifact pipeline.",
           "verified": false,
           "notes": "cloudflare-builds/workers_builds_get_build_config: lazy. github/create_issue: verified. fs/write_file: verified. Adds cloudflare-builds/workers_builds_get_build_config to code profile (was: governance, design, ops)."
+        },
+        {
+          "name": "code-playwright-console-errors-debug-log",
+          "chain": [
+            "playwright/browser_console_messages",
+            "fs/write_file",
+            "github/create_issue"
+          ],
+          "accomplishes": "Capture all browser console messages from the running application (errors, warnings, unhandled rejections), write the full console log to a local debug artifact file for diff comparison across runs, then file a GitHub issue for any new ERROR-level messages that did not appear in the previous run — completing the console capture → local log → issue creation debugging pipeline for frontend regression detection.",
+          "verified": false,
+          "notes": "playwright/browser_console_messages: lazy (Playwright MCP). fs/write_file: confirmed. github/create_issue: confirmed. Adds playwright/browser_console_messages to code profile (was: finance, design)."
+        },
+        {
+          "name": "code-notion-update-data-source-schema-drift",
+          "chain": [
+            "notion/API-update-a-data-source",
+            "github/create_issue",
+            "fs/write_file"
+          ],
+          "accomplishes": "Update a Notion data source configuration to align with the latest schema agreed in code review (add a missing column, fix a type mismatch, correct a stale sync filter), file a GitHub issue documenting the schema change for the audit trail, then write the updated schema spec to a local file — producing a data source update → issue audit → local snapshot pipeline for keeping Notion schema in sync with code-side schema contracts.",
+          "verified": false,
+          "notes": "notion/API-update-a-data-source: confirmed in prior sessions. github/create_issue: confirmed. fs/write_file: confirmed. Adds notion/API-update-a-data-source to code profile (was: finance, design)."
         }
       ],
       "prompts": [
@@ -13811,6 +13923,14 @@
         {
           "text": "Check our Cloudflare Workers Builds CI config for drift and file a GitHub issue if anything is off",
           "resolves_to": "code-build-config-ci-drift-check"
+        },
+        {
+          "text": "Capture browser console errors from the running app, write them to a log file, and file a GitHub issue for new errors",
+          "resolves_to": "code-playwright-console-errors-debug-log"
+        },
+        {
+          "text": "Update the Notion data source schema to match our latest code contract and file a GitHub issue for the change",
+          "resolves_to": "code-notion-update-data-source-schema-drift"
         }
       ]
     },
@@ -16388,6 +16508,28 @@
           "accomplishes": "Create a new structured Notion page for a team broadcast (sprint summary, incident digest, product update), reason over the required communication objectives and audience to determine the optimal page structure and key messages, then populate the page body with the curated broadcast content — producing a ready-to-share team communication artifact in one pipeline.",
           "verified": false,
           "notes": "notion/API-create-a-page: creates the page shell. thinking: structures the broadcast. notion/API-post-page: adds content blocks. Adds notion/API-create-a-page to communication profile (was: finance, code, ops)."
+        },
+        {
+          "name": "comm-neon-resolve-chittyagent-broadcast",
+          "chain": [
+            "orchestrator/chittyagent-resolve",
+            "neon/fetch",
+            "notion/API-get-self"
+          ],
+          "accomplishes": "Run the resolve agent to triage a communication incident (content delivery failure, broadcast system outage, notification pipeline breakage), probe the Neon Data API to surface any DB-side anomalies correlated with the incident timing, then look up the Notion integration identity to confirm the correct bot is running the team's broadcast workspace — producing a triage summary that links the resolve output, data-layer health, and integration audit for the communication ops team.",
+          "verified": false,
+          "notes": "orchestrator/chittyagent-resolve: lazy. neon/fetch: Neon Data API fetch. notion/API-get-self: confirmed. Multi-tool chain covering orchestrator/chittyagent-resolve (missing comm), neon/fetch (missing comm), and notion/API-get-self (missing comm) in one combo."
+        },
+        {
+          "name": "comm-cf-builds-notion-data-source-release-note",
+          "chain": [
+            "cloudflare-builds/workers_builds_get",
+            "notion/API-retrieve-a-data-source",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Retrieve the latest Cloudflare Workers build records for the communication platform (notification service, broadcast Worker), check the Notion data source powering the release notes database to confirm it is in sync and has the correct schema, then post a release note entry to Notion documenting the new deployment — completing the build-retrieved → data-source-verified → release-note-published communication release pipeline.",
+          "verified": false,
+          "notes": "cloudflare-builds/workers_builds_get: lazy. notion/API-retrieve-a-data-source: confirmed. notion/API-post-page: confirmed. Multi-tool chain covering cloudflare-builds/workers_builds_get (missing comm) and notion/API-retrieve-a-data-source (missing comm)."
         }
       ],
       "prompts": [
@@ -17178,6 +17320,14 @@
         {
           "text": "Create a Notion broadcast page for this sprint's team summary",
           "resolves_to": "comm-notion-create-broadcast-page"
+        },
+        {
+          "text": "Triage this broadcast system incident with the resolve agent and probe Neon + Notion integration health",
+          "resolves_to": "comm-neon-resolve-chittyagent-broadcast"
+        },
+        {
+          "text": "Retrieve the latest Workers build for the notification service, verify the release notes data source, and publish a release note",
+          "resolves_to": "comm-cf-builds-notion-data-source-release-note"
         }
       ]
     },
@@ -19931,6 +20081,28 @@
           "accomplishes": "Probe the Neon Data API endpoint to verify the operational database layer is reachable and returning valid responses, then retrieve the latest Cloudflare Workers build status for the ops backend service to confirm the data layer and application layer are both healthy, and post a combined ops health summary to a Notion ops status page — providing a unified data+deploy health snapshot.",
           "verified": false,
           "notes": "neon/fetch: Neon Data API fetch (requires provisioned Neon data API). cloudflare-builds/workers_builds_get: confirmed lazy. notion/API-post-page: confirmed. Adds neon/fetch to ops profile (was: finance, code)."
+        },
+        {
+          "name": "ops-playwright-console-monitor-alert",
+          "chain": [
+            "playwright/browser_console_messages",
+            "notion/API-post-page",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Capture browser console messages from the ops dashboard or monitoring frontend to surface any JavaScript errors, failed API calls, or resource-load failures in the ops UI, reason over the captured messages to triage severity and identify root cause signals, then post a console health alert summary to a Notion ops page — giving the ops team a lightweight frontend health signal without needing full APM instrumentation.",
+          "verified": false,
+          "notes": "playwright/browser_console_messages: lazy. notion/API-post-page: confirmed. thinking: confirmed. Adds playwright/browser_console_messages to ops profile (was: finance, design)."
+        },
+        {
+          "name": "ops-claude-agent-incident-autofix",
+          "chain": [
+            "orchestrator/agent_execute(claude)",
+            "notion/API-post-page",
+            "github/create_issue"
+          ],
+          "accomplishes": "Invoke the Claude orchestration agent to diagnose and propose a fix for an active ops incident (runbook deviation, config drift, degraded service), post the triage summary and proposed remediation steps to a Notion ops incident page for team visibility, then file a GitHub issue to track the remediation action item — completing the agent-triage → Notion-notify → issue-track incident response pipeline.",
+          "verified": false,
+          "notes": "orchestrator/agent_execute(claude): lazy orchestrator. notion/API-post-page: confirmed. github/create_issue: confirmed. Adds orchestrator/agent_execute(claude) to ops profile (was: finance, governance, code)."
         }
       ],
       "prompts": [
@@ -20757,6 +20929,14 @@
         {
           "text": "Run an ops healthcheck on our Neon Data API and Workers build, then post a status summary to Notion",
           "resolves_to": "ops-neon-fetch-db-api-healthcheck"
+        },
+        {
+          "text": "Check the ops dashboard for browser console errors and post a frontend health alert to Notion",
+          "resolves_to": "ops-playwright-console-monitor-alert"
+        },
+        {
+          "text": "Use the Claude agent to diagnose this incident, post remediation steps to Notion, and file a tracking issue",
+          "resolves_to": "ops-claude-agent-incident-autofix"
         }
       ]
     }
