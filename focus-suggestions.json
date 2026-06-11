@@ -1,6 +1,6 @@
 {
-  "_comment": "121st pass \u2014 1346 combos, 1343 prompts. Completed to 6/6: plugin-dev, dispute-drafting, ux-observer-search, connectors:imessage, chittyhelper:chittyhelper, dispute-evidence, chittyagent-cloudflare (7 tools). Advanced: chittycontext (\u21925/6), ux-observer-execute (\u21925/6).",
-  "generatedFrom": "auto-driver run 63, 2026-06-11",
+  "_comment": "122nd pass \u2014 1358 combos, 1355 prompts. Completed to 6/6: orchestrator/skill_execute(chittyos-core:chittycontext), orchestrator/skill_execute(chittycommand-alpha:ux-observer), orchestrator/agent_execute(cloudflare), orchestrator/chittyagent-cloudflare, fs/move_directory, notion/API-list-data-source-templates, notion/API-retrieve-a-comment, fs/list_directory_with_sizes (8 tools). 6/6 count: 208 \u2192 216.",
+  "generatedFrom": "auto-driver run 64, 2026-06-11",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools \u2014 now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time \u2014 combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -2783,6 +2783,29 @@
           "accomplishes": "Pull iMessage billing threads via the connectors surface, gather dispute evidence artifacts from those conversations, load ChittyAgent-Cloudflare for cloud cost context, and append the combined finance summary to the ledger.",
           "verified": false,
           "notes": "connectors:imessage + dispute-evidence + chittyagent-cloudflare via orchestrator; ledger append verified."
+        },
+        {
+          "name": "finance-chittycontext-ux-observer-comment-movedir",
+          "chain": [
+            "stripe/list_invoices",
+            "orchestrator/skill_execute(chittyos-core:chittycontext)",
+            "orchestrator/skill_execute(chittycommand-alpha:ux-observer)",
+            "notion/API-retrieve-a-comment",
+            "fs/move_directory"
+          ],
+          "accomplishes": "Pull Stripe invoices, bind session financial context via ChittyContext, run UX observer to surface checkout-flow friction, retrieve a Notion invoice-review comment for additional context, then archive the processed reports to a dated directory.",
+          "verified": false
+        },
+        {
+          "name": "finance-chittyagent-cloudflare-templates-dir-sizes",
+          "chain": [
+            "orchestrator/chittyagent-cloudflare",
+            "notion/API-list-data-source-templates",
+            "fs/list_directory_with_sizes",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Query the Cloudflare agent for deployed worker billing metrics, browse Notion data-source templates for a finance reporting dashboard, audit local build artefact sizes, then publish a combined cost-and-footprint report page to Notion.",
+          "verified": false
         }
       ],
       "prompts": [
@@ -3626,6 +3649,14 @@
         {
           "text": "Pull iMessage billing threads, gather dispute evidence, load CloudFlare cost context, and ledger the summary",
           "resolves_to": "finance-imessage-connector-dispute-evidence-cloudflare-ledger"
+        },
+        {
+          "text": "Bind this month's Stripe invoices to ChittyContext, run UX observer on the checkout flow, and archive the review notes",
+          "resolves_to": "finance-chittycontext-ux-observer-comment-movedir"
+        },
+        {
+          "text": "Audit Cloudflare worker billing metrics, browse finance reporting templates, and check build artefact sizes",
+          "resolves_to": "finance-chittyagent-cloudflare-templates-dir-sizes"
         }
       ]
     },
@@ -6735,6 +6766,27 @@
           "accomplishes": "Load system design context from chittycontext for governance state awareness, execute the UX observer skill to surface interface compliance issues, search the certified services registry to enumerate governed services, and open a GitHub issue to track required governance actions.",
           "verified": false,
           "notes": "chittycontext + ux-observer execute + registry agent_search all via orchestrator lazy; github create_issue via hosted MCP."
+        },
+        {
+          "name": "governance-cloudflare-agent-execute-evidence-audit",
+          "chain": [
+            "orchestrator/agent_execute(cloudflare)",
+            "evidence/ai_search",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Trigger the Cloudflare agent to surface compliance-relevant worker configurations, search ChittyEvidence for pre-existing audit artefacts, then publish a governance record to Notion.",
+          "verified": false
+        },
+        {
+          "name": "governance-move-dir-comment-sizes-compliance",
+          "chain": [
+            "fs/move_directory",
+            "notion/API-retrieve-a-comment",
+            "fs/list_directory_with_sizes",
+            "orchestrator/skill_execute(chittyos-devops:chittyos-compliance)"
+          ],
+          "accomplishes": "Reorganise compliance document directories into the archival structure, retrieve governance-review comments from Notion, profile directory sizes for audit evidence, then run the compliance skill to certify state.",
+          "verified": false
         }
       ],
       "prompts": [
@@ -7690,6 +7742,14 @@
         {
           "text": "Load chittycontext, execute UX observer, search the certified services registry, and open a governance tracking issue",
           "resolves_to": "governance-chittycontext-ux-execute-registry-github"
+        },
+        {
+          "text": "Run a governance audit on our Cloudflare worker configurations and log the findings to Notion",
+          "resolves_to": "governance-cloudflare-agent-execute-evidence-audit"
+        },
+        {
+          "text": "Reorganise compliance docs, retrieve the governance review comment, and certify current directory state",
+          "resolves_to": "governance-move-dir-comment-sizes-compliance"
         }
       ]
     },
@@ -10569,6 +10629,28 @@
           "accomplishes": "Execute the ChittyAgent-Cloudflare agent for cloud infrastructure context relevant to the design surface, list Linear projects to identify active design sprints, and write the synthesized cloud-design status to Notion for stakeholder visibility.",
           "verified": false,
           "notes": "chittyagent-cloudflare via orchestrator lazy surface; linear listProjects via Linear MCP; notion write verified."
+        },
+        {
+          "name": "design-chittyagent-cloudflare-templates-sizes-screenshot",
+          "chain": [
+            "orchestrator/chittyagent-cloudflare",
+            "notion/API-list-data-source-templates",
+            "playwright/browser_screenshot",
+            "fs/list_directory_with_sizes"
+          ],
+          "accomplishes": "Use the Cloudflare agent to list deployed UI workers, browse Notion design-system templates for the component library, take a browser screenshot of the live UI, then audit asset directory sizes to flag bloat.",
+          "verified": false
+        },
+        {
+          "name": "design-dir-tree-github-search-screenshot",
+          "chain": [
+            "fs/directory_tree",
+            "github/search_code",
+            "playwright/browser_screenshot",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Generate a directory tree of the design system repo, search GitHub for component usages across production code, screenshot the current UI state for visual comparison, then post a Notion page with the full design-audit findings.",
+          "verified": false
         }
       ],
       "prompts": [
@@ -11457,6 +11539,14 @@
         {
           "text": "Run ChittyAgent-Cloudflare for infrastructure context, list Linear design sprints, and post the cloud-design status to Notion",
           "resolves_to": "design-chittyagent-cloudflare-linear-notion"
+        },
+        {
+          "text": "Inspect deployed UI workers, browse design-system templates, screenshot the live UI, and profile asset directory sizes",
+          "resolves_to": "design-chittyagent-cloudflare-templates-sizes-screenshot"
+        },
+        {
+          "text": "Generate a directory tree of the design system, search GitHub for component usages, screenshot, and post the visual audit",
+          "resolves_to": "design-dir-tree-github-search-screenshot"
         }
       ]
     },
@@ -14574,6 +14664,28 @@
           "accomplishes": "Resolve the library ID in Context7 to pull current documentation for the dependency in question, retrieve the Cloudflare Workers build configuration to validate the dependency integration, and open a GitHub tracking issue for the required code change.",
           "verified": false,
           "notes": "context7 resolve-library-id + cloudflare-builds get_build_config verified; github create_issue via hosted MCP."
+        },
+        {
+          "name": "code-notion-comment-codefix-context7",
+          "chain": [
+            "notion/API-retrieve-a-comment",
+            "github/search_code",
+            "context7/resolve-library-id",
+            "fs/edit_file"
+          ],
+          "accomplishes": "Retrieve a Notion code-review comment flagging a bug pattern, search GitHub for the problematic usage, look up the authoritative library docs via context7, then apply the fix directly to the source file.",
+          "verified": false
+        },
+        {
+          "name": "code-neon-agent-sql-docs-pr",
+          "chain": [
+            "orchestrator/agent_execute(neon-agent)",
+            "neon/run_sql",
+            "context7/get-library-docs",
+            "github/create_pull_request"
+          ],
+          "accomplishes": "Execute the Neon database agent to identify a performance regression, run a targeted SQL query to confirm the slow path, look up ORM migration docs via context7, then open a GitHub PR with the schema fix and migration script.",
+          "verified": false
         }
       ],
       "prompts": [
@@ -15522,6 +15634,14 @@
         {
           "text": "Resolve library ID in Context7, fetch the Cloudflare build config, and open a GitHub issue for the code change",
           "resolves_to": "code-context7-cloudflare-builds-config-github"
+        },
+        {
+          "text": "Retrieve the Notion code-review comment, find the bug in GitHub, look up the library fix, and apply the edit",
+          "resolves_to": "code-notion-comment-codefix-context7"
+        },
+        {
+          "text": "Run the Neon agent to diagnose a slow query, confirm with SQL, look up migration docs, and open a fix PR",
+          "resolves_to": "code-neon-agent-sql-docs-pr"
         }
       ]
     },
@@ -18406,6 +18526,27 @@
           "accomplishes": "Execute the ChittyAgent-Cloudflare agent to surface deployment and infrastructure communication items, create follow-up tasks in the task tracker for team action, and write the deployment communication summary to Notion for stakeholder visibility.",
           "verified": false,
           "notes": "chittyagent-cloudflare via orchestrator lazy surface; tasks lazy (tasks.chitty.cc); notion write verified."
+        },
+        {
+          "name": "comm-chittyagent-cloudflare-templates-dir-sizes-imessage",
+          "chain": [
+            "orchestrator/chittyagent-cloudflare",
+            "notion/API-list-data-source-templates",
+            "fs/list_directory_with_sizes",
+            "orchestrator/skill_execute(connectors:imessage)"
+          ],
+          "accomplishes": "Use the Cloudflare agent to fetch deployment status for the on-call audience, browse Notion templates for a stakeholder update, check build artefact sizes, then broadcast the deployment summary via the iMessage connector.",
+          "verified": false
+        },
+        {
+          "name": "comm-move-dir-imessage-status-broadcast",
+          "chain": [
+            "fs/move_directory",
+            "thinking/sequentialthinking",
+            "imessage/send_imessage"
+          ],
+          "accomplishes": "Reorganise shared communication assets into archival directories, reason through the broadcast message structure, then send an iMessage to the team announcing the new file organisation and pointing to the relevant docs.",
+          "verified": false
         }
       ],
       "prompts": [
@@ -19306,6 +19447,14 @@
         {
           "text": "Run ChittyAgent-Cloudflare for deployment items, create follow-up tasks, and write the communication summary to Notion",
           "resolves_to": "communication-chittyagent-cloudflare-tasks-notion"
+        },
+        {
+          "text": "Fetch Cloudflare deployment status, pick a stakeholder update template, check artefact sizes, and broadcast via iMessage",
+          "resolves_to": "comm-chittyagent-cloudflare-templates-dir-sizes-imessage"
+        },
+        {
+          "text": "Archive shared communication assets to a new directory and send an iMessage announcing the reorganisation",
+          "resolves_to": "comm-move-dir-imessage-status-broadcast"
         }
       ]
     },
@@ -21651,7 +21800,7 @@
           "chain": [
             "github/search_pull_requests",
             "thinking/sequentialthinking",
-            "cloudflare-builds/workers_builds_list",
+            "cloudflare-builds/workers_builds_list_builds",
             "orchestrator/skill_execute(chittyos-devops:chitty-pipelines)",
             "notion/API-post-page"
           ],
@@ -21666,7 +21815,7 @@
             "thinking/sequentialthinking",
             "orchestrator/skill_execute(mcp-dev:build-mcp-server)",
             "github/create_or_update_file",
-            "cloudflare-builds/workers_builds_list"
+            "cloudflare-builds/workers_builds_list_builds"
           ],
           "accomplishes": "Search for alchemist-discovered patterns about recurring infra tool compositions, reason through which patterns are dense enough to deserve their own MCP surface, scaffold the infrastructure MCP server using the build-mcp-server skill, commit the scaffold to GitHub, and verify the Cloudflare build queued.",
           "verified": false,
@@ -21691,7 +21840,7 @@
             "ch1tty/search",
             "evidence/ai_search",
             "neon/run_sql",
-            "cloudflare-builds/workers_builds_list",
+            "cloudflare-builds/workers_builds_list_builds",
             "notion/API-post-page"
           ],
           "accomplishes": "Use the ch1tty meta-search to discover all operational tools across every registered backend, cross-reference with evidence for past ops patterns, run a health-check SQL query, list Cloudflare Workers builds to validate the deployment pipeline state, and post the ops tool discovery summary to Notion.",
@@ -22159,7 +22308,7 @@
           "name": "neon-doc-resource-ops-playbook",
           "chain": [
             "neon/get_doc_resource",
-            "cloudflare-builds/workers_builds_list",
+            "cloudflare-builds/workers_builds_list_builds",
             "orchestrator/chittyagent-cloudflare"
           ],
           "accomplishes": "Fetch a Neon ops playbook or runbook from the documentation resource, list the latest Cloudflare Workers builds for that service, and route through the Cloudflare ops agent for any remediation \u2014 an ops-focused database+deploy incident response loop.",
@@ -22170,7 +22319,7 @@
           "name": "scrape-status-page-ops-triage",
           "chain": [
             "orchestrator/agent_execute(scrape)",
-            "cloudflare-builds/workers_builds_list",
+            "cloudflare-builds/workers_builds_list_builds",
             "orchestrator/skill_execute(chitty-deploy)"
           ],
           "accomplishes": "Scrape an external service status page or dependency health endpoint, compare it against the latest Cloudflare Workers build log, and trigger a re-deploy if the dependency is healthy \u2014 an automated ops monitoring and recovery workflow.",
@@ -22352,6 +22501,29 @@
           "accomplishes": "Capture network request traces from the production browser session for API ops analysis, query Neon for the corresponding production metrics and error rates, and run compliance checks against the ops environment to confirm post-deploy integrity.",
           "verified": false,
           "notes": "playwright browser_network_requests + neon run_sql verified; chittyos-compliance via orchestrator lazy surface."
+        },
+        {
+          "name": "ops-neon-auth-health-workflow-notion",
+          "chain": [
+            "neon/configure_neon_auth",
+            "orchestrator/skill_execute(chittyos-devops:chitty-health)",
+            "orchestrator/skill_execute(workflow:machine-management)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Configure Neon auth for a production database environment, run the health-check skill to validate all downstream services, sequence the machine management workflow for the release window, then log a signed ops report to Notion.",
+          "verified": false
+        },
+        {
+          "name": "ops-cloudflare-builds-evidence-deploy",
+          "chain": [
+            "cloudflare-builds/workers_builds_list_builds",
+            "cloudflare-builds/workers_builds_get_build_logs",
+            "evidence/ai_search",
+            "orchestrator/skill_execute(chittyos-devops:chitty-deploy)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "List all active Cloudflare worker builds, fetch logs from the latest run to identify any error patterns, search evidence for known failure signatures, trigger a clean deploy via the devops skill, then publish a post-deploy ops record to Notion.",
+          "verified": false
         }
       ],
       "prompts": [
@@ -23284,6 +23456,14 @@
         {
           "text": "Capture browser network traces, query Neon production metrics, and run compliance checks for post-deploy ops integrity",
           "resolves_to": "ops-playwright-network-neon-compliance"
+        },
+        {
+          "text": "Configure Neon auth for production, run a full health check, sequence the deployment workflow, and log the ops report",
+          "resolves_to": "ops-neon-auth-health-workflow-notion"
+        },
+        {
+          "text": "List active Cloudflare builds, fetch logs, search evidence for failures, deploy the clean build, and post the report",
+          "resolves_to": "ops-cloudflare-builds-evidence-deploy"
         }
       ]
     }
