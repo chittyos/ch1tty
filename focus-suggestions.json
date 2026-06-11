@@ -2811,7 +2811,7 @@
           "name": "finance-github-search-payment-code-ledger",
           "chain": [
             "github/search_code",
-            "ledger/record",
+            "ledger/append_entry",
             "stripe/list_invoices"
           ],
           "accomplishes": "Search codebase for payment processing patterns, record the compliance audit trail in ledger, and cross-reference findings with Stripe invoices to confirm billing code coverage",
@@ -10718,11 +10718,12 @@
           "name": "design-sdk-docs-write-component-screenshot",
           "chain": [
             "context7/resolve-library-id(@modelcontextprotocol/sdk)",
-            "fs/write_text_file",
+            "context7/get-library-docs",
+            "fs/write_file",
             "playwright/screenshot",
             "notion/API-post-page"
           ],
-          "accomplishes": "Resolve latest MCP SDK documentation, scaffold a new integration component file based on the API, screenshot the rendered prototype, and publish the design iteration in Notion",
+          "accomplishes": "Resolve the MCP SDK package to its documentation ID, fetch the SDK reference docs, scaffold a new integration component file based on the API, screenshot the rendered prototype, and publish the design iteration in Notion",
           "verified": false,
           "notes": ""
         },
@@ -14786,7 +14787,7 @@
           "chain": [
             "notion/API-create-a-comment",
             "notion/API-get-bot-info",
-            "fs/write_text_file",
+            "fs/write_file",
             "github/get_commit"
           ],
           "accomplishes": "Retrieve Notion bot configuration, annotate governance pages with implementation notes, export the code-generation script to file, and trace the base commit for reproducibility",
@@ -14798,7 +14799,7 @@
           "chain": [
             "notion/API-move-page",
             "notion/API-retrieve-a-page-property",
-            "fs/write_text_file",
+            "fs/write_file",
             "github/get_commit"
           ],
           "accomplishes": "Reorganize Notion documentation pages following a code refactor, retrieve updated page properties, write a changelog entry to file, and trace the corresponding commit for audit",
@@ -18679,7 +18680,7 @@
           "chain": [
             "github/search_code",
             "tasks/create_task",
-            "imessage/send_imessage"
+            "imessage/send_message"
           ],
           "accomplishes": "Search codebase for recently changed critical paths, create a follow-up review task from the findings, and notify the team via iMessage with a change summary",
           "verified": false,
@@ -18690,7 +18691,7 @@
           "chain": [
             "evidence/ai_search(chittyevidence-search, dispute property evidence legal hold)",
             "tasks/create_task",
-            "imessage/send_imessage"
+            "imessage/send_message"
           ],
           "accomplishes": "Search dispute evidence for relevant case findings, create a legal review task from the results, and notify stakeholders via iMessage",
           "verified": false,
@@ -22686,7 +22687,7 @@
           "chain": [
             "github/search_code",
             "cloudflare-builds/workers_builds_trigger",
-            "cloudflare-builds/workers_builds_list"
+            "cloudflare-builds/workers_builds_list_builds"
           ],
           "accomplishes": "Search for configuration changes in the codebase, trigger a Cloudflare Workers build with the identified revision, and monitor the deployment pipeline status",
           "verified": false,
