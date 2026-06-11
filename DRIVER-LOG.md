@@ -2558,7 +2558,7 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 **What happened**:
 - Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass / 0 fail / 2 skipped
 - Found PR #327 open (`auto/E-catalog-128th-pass`), CI green (CodeQL + Analyze all success, CodeRabbit reviewed)
-- Merged PR #327 → main now at 1430 combos / 1451 prompts / 242 tools at 6/6
+- Merged PR #327 → main now at 1430 combos / 1451 prompts / 241 tools at 6/6
 - Workstream states: A ✅ B ✅ C ✅ D ✅ E in-progress (confirmed via DRIVER-LOG + repo scan)
 - Notion board still 401 — DRIVER-LOG.md remains cross-run fallback
 - Coverage gap analysis (post 128th-pass):
