@@ -14673,7 +14673,7 @@
           "chain": [
             "playwright/browser_fill",
             "playwright/browser_evaluate",
-            "fs/write_text_file"
+            "fs/write_file"
           ],
           "accomplishes": "Fill a form in the browser, evaluate the resulting DOM state or JS assertions to confirm correctness, and write the test results to a local file — a frontend test workflow that bridges browser automation with filesystem CI artifacts.",
           "verified": false,
@@ -14907,7 +14907,7 @@
           "chain": [
             "evidence/ai_search(chittyevidence-search, dispute property evidence legal hold)",
             "github/create_pull_request",
-            "fs/write_text_file"
+            "fs/write_file"
           ],
           "accomplishes": "Search evidence for code-related disputes, open a pull request with the resolution, and write the investigation report to the local filesystem",
           "verified": false,
@@ -14919,7 +14919,7 @@
             "ch1tty/status",
             "neon/configure_neon_auth",
             "github/push_files",
-            "fs/write_text_file"
+            "fs/write_file"
           ],
           "accomplishes": "Check gateway status to confirm all backends are live, configure Neon authentication for the development environment, push the updated configuration files via GitHub, and write the environment summary to the local filesystem",
           "verified": false,
