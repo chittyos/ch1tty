@@ -215,3 +215,23 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 - **Next run priority**:
   1. Merge PR #320 when ready (CI 0-jobs artifact is pre-existing — safe to merge)
   2. 123rd pass: `github/search_code` is the only sub-6/6 tool at 2/6 (present in code+design, missing governance+ops+finance+communication) — 4 combos spread across profiles complete it to 6/6. Then scan 1/6 tools for strategic cross-profile expansion targeting tools with high cross-domain value.
+
+### 2026-06-11 (run 65)
+- **Workstream advanced**: E — Alchemist catalog 123rd pass
+- **Branch/PR**: `auto/E-catalog-123rd-pass` → https://github.com/chittyos/ch1tty/pull/321 (open)
+- **Build**: clean (`tsc`)
+- **Tests**: 938/940 pass, 0 fail, 2 skipped (Ollama unreachable — expected)
+- **What was done**:
+  - Startup: npm ci clean, build clean, 938/0/2. Only 1 open PR (#320, 122nd pass, all 3 CI checks green). Merged PR #320 (squash). Main advanced to 7728747 (1358 combos, 216 tools at 6/6).
+  - Coverage analysis: `github/search_code` was the single remaining sub-6/6 tool at 2/6 (code+design only). 163 tools at 1/6.
+  - 123rd pass: 12 combos + 12 prompts (2 per profile). Strategy: 4 combos targeted `github/search_code` across finance/governance/communication/ops; 8 combos expanded 1/6 tools to 2+ profiles.
+  - **`github/search_code` completed to 6/6** — catalog now has zero tools below 2/6 for the first time ✅
+  - 9 tools expanded from 1/6 → 2/6: `context7/resolve-library-id(@modelcontextprotocol/sdk)`, `evidence/ai_search(dispute)`, `fs/write_text_file`, `github/get_commit`, `neon/explain_sql_statement`, `notion/API-create-a-comment`, `notion/API-get-bot-info`, `notion/API-move-page`, `notion/API-retrieve-a-page-property`
+  - `neon/get_database_tables` jumped from 1/6 → 4/6 (code+finance+governance+design)
+  - 6/6 tool count: **216 → 217**
+- **Catalog**: 1358→**1370 combos** / 1355→**1367 prompts**
+- **Workstream state**: A✅ B✅ C✅ D✅ E ongoing.
+- **Blocker**: Notion auth 401 persists — RUNLOG.md is cross-run fallback board. Fix: `chitty-mcp-token notion` or rotate integration token.
+- **Next run priority**:
+  1. Merge PR #321 when CI green
+  2. 124th pass: all tools now ≥2/6 or 6/6. Best targets: the 9 new 2/6 tools + `neon/get_database_tables` (4/6, needs +communication+ops for 6/6). Efficient batching: tools missing the same 2 profiles can be covered in 1 combo each. ~12 combos could complete 4–5 more tools to 6/6.
