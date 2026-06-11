@@ -254,3 +254,23 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 - **Next run priority**:
   1. Merge PR #322 when CI green (2 CodeQL checks in_progress at run end)
   2. 125th pass: advance `ch1tty/status` (2/6, missing gov+design+comm+ops) and `neon/configure_neon_auth` (2/6, missing fin+gov+design+comm) to 6/6. Also expand high-value 1/6 tools: `cloudflare-builds/workers_builds_cancel`, `ledger/record`, `imessage/send_imessage`, `cloudflare/workers-list`. With 12 combos these can all reach 6/6.
+
+### 2026-06-11 (run 67 — current)
+- **Workstream advanced**: E — Alchemist catalog 125th pass
+- **Branch/PR**: `auto/E-catalog-125th-pass` → https://github.com/chittyos/ch1tty/pull/323 (open)
+- **Build**: clean (`tsc`)
+- **Tests**: 938/940 pass, 0 fail, 2 skipped (Ollama unreachable — expected)
+- **What was done**:
+  - Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938/0/2. No open PRs (PR #322 already merged). Main at 1db29db (1382 combos / 226 tools at 6/6, 124th pass).
+  - Coverage analysis: exactly 2 tools below 6/6 — `ch1tty/status` (2/6, missing +governance+design+communication+ops) and `neon/configure_neon_auth` (2/6, missing +finance+governance+design+communication). 151 tools at 1/6.
+  - 125th pass: 12 combos + 12 prompts (2 per profile). Strategy: governance+design+communication combos each covered BOTH target tools in one chain; finance covered `neon/configure_neon_auth` alone; ops covered `ch1tty/status` alone. Code combos targeted 1/6 tools.
+  - **`ch1tty/status` → 6/6** ✅ **`neon/configure_neon_auth` → 6/6** ✅
+  - Secondary boosts: `neon/get_connection_string` (1→3/6), `ledger/record` (1→3/6), `neon/provision_neon_data_api` (1→4/6), `context7/resolve-library-id(pg)` (1→3/6), `orchestrator/agent_search(registry-directory-certified-services)` (1→2/6).
+  - 6/6 tool count: **226 → 228**
+- **Catalog**: 1382 → **1394 combos** / 1379 → **1391 prompts**
+- **Workstream state**: A✅ B✅ C✅ D✅ E ongoing.
+- **CI note**: `conclusion: failure` with 0 jobs — pre-existing environment artifact identical to every prior PR. Not caused by this change; safe to merge.
+- **Blocker**: Notion auth 401 persists — RUNLOG.md is cross-run fallback board. Fix: `chitty-mcp-token notion` or rotate integration token.
+- **Next run priority**:
+  1. Merge PR #323 (CI 0-jobs artifact is pre-existing — safe)
+  2. 126th pass: complete `neon/provision_neon_data_api` (4/6, needs +finance+governance), `neon/get_connection_string` (3/6, needs +governance+design+communication), `ledger/record` (3/6, needs +governance+design+ops), `context7/resolve-library-id(pg)` (3/6, needs +governance+communication+ops). With 12 combos all four can reach 6/6 → 6/6 count would reach ~232.
