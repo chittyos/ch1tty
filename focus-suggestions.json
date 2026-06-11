@@ -1,5 +1,5 @@
 {
-  "_comment": "125th pass — 1394 combos, 1391 prompts. Completed to 6/6: ch1tty/status, neon/configure_neon_auth (2 tools). Secondary boosts: neon/get_connection_string (1→3/6), ledger/append_entry (already 6/6; phantom ledger/record removed), neon/provision_neon_data_api (1→4/6), context7/resolve-library-id(pg) (1→3/6). 6/6 count: 226 → 228.",
+  "_comment": "125th pass — 1394 combos, 1391 prompts. Completed to 6/6: ch1tty/status, neon/configure_neon_auth (2 tools). Secondary boosts: neon/get_connection_string (1→3/6), ledger/append_entry (already 6/6; phantom ledger/record removed), neon/provision_neon_data_api (1→4/6), context7/resolve-library-id(pg) (1→3/6). 6/6 count: 226 → 227.",
   "generatedFrom": "auto-driver run 67, 2026-06-11",
   "profiles": {
     "finance": {
@@ -2269,9 +2269,9 @@
             "thinking/sequentialthinking",
             "cloudflare-builds/workers_builds_list_builds"
           ],
-          "accomplishes": "Query the billing database for pending schema migrations or configuration changes, reason about verify build readinessment readiness, and list recent Cloudflare Workers builds to monitor verify build readinessment readiness.",
+          "accomplishes": "Query the billing database for pending schema migrations or configuration changes, reason about deployment readiness, and list recent Cloudflare Workers builds to verify build status before scheduling a deployment window.",
           "verified": false,
-          "notes": "FIRST cloudflare-builds/workers_builds_trigger in ENTIRE catalog. cloudflare-builds not connected (auth-gated). neon gated."
+          "notes": "Chain lists builds for readiness monitoring — not a deploy trigger. cloudflare-builds not connected (auth-gated). neon gated."
         },
         {
           "name": "finance-github-create-pr-billing-release",
@@ -2717,7 +2717,7 @@
         {
           "name": "finance-cloudflare-neon-deploy-cost-audit",
           "chain": [
-            "cloudflare/workers-deploy",
+            "cloudflare/deploy_worker",
             "orchestrator/agent_execute(neon)",
             "orchestrator/skill_execute(chitty-deploy)"
           ],
@@ -3537,7 +3537,7 @@
           "resolves_to": "finance-github-push-files-billing-report"
         },
         {
-          "text": "Trigger a Cloudflare Builds deploy for the billing worker after a schema change",
+          "text": "List recent Cloudflare builds for the billing worker and check the database for pending schema changes",
           "resolves_to": "finance-cloudflare-builds-trigger-billing-worker-deploy"
         },
         {
@@ -6795,7 +6795,7 @@
         {
           "name": "governance-cloudflare-neon-deploy-policy-gate",
           "chain": [
-            "cloudflare/workers-deploy",
+            "cloudflare/deploy_worker",
             "orchestrator/agent_execute(neon)",
             "orchestrator/skill_execute(commit-commands:commit)"
           ],
@@ -10752,7 +10752,7 @@
         {
           "name": "design-ship-deploy-preview-viewport",
           "chain": [
-            "cloudflare/workers-deploy",
+            "cloudflare/deploy_worker",
             "orchestrator/agent_search(ship)",
             "orchestrator/skill_execute(chitty-deploy)"
           ],
@@ -12529,10 +12529,10 @@
           "name": "agents-sdk-migrate-cloudflare-deploy",
           "chain": [
             "orchestrator/skill_execute",
-            "cloudflare/workers-deploy",
+            "cloudflare/deploy_worker",
             "orchestrator/provision_status"
           ],
-          "accomplishes": "Run the agents-sdk-migrate skill via orchestrator to evaluate and migrate a Cloudflare Worker to the Agents SDK, deploy it via cloudflare/workers-deploy, and confirm deployment status via provision_status.",
+          "accomplishes": "Run the agents-sdk-migrate skill via orchestrator to evaluate and migrate a Cloudflare Worker to the Agents SDK, deploy it via cloudflare/deploy_worker, and confirm deployment status via provision_status.",
           "verified": true,
           "notes": "orchestrator 13 tools connected; cloudflare bound; agents-sdk-migrate skill live (0.43 from skill_search)"
         },
@@ -15033,9 +15033,9 @@
           "chain": [
             "neon/get_connection_string",
             "context7/resolve-library-id(pg)",
-            "github/push_files"
+            "neon/run_sql"
           ],
-          "accomplishes": "Retrieve the Neon connection string for the development database, resolve the pg library documentation to validate driver compatibility, then push the updated connection configuration to GitHub.",
+          "accomplishes": "Retrieve the Neon connection string for the development database, resolve the pg library documentation to validate driver compatibility, then run a test SQL query to confirm connectivity and schema access.",
           "verified": false,
           "notes": ""
         }
@@ -18837,7 +18837,7 @@
         {
           "name": "comm-cloudflare-neon-deploy-broadcast-tasks",
           "chain": [
-            "cloudflare/workers-deploy",
+            "cloudflare/deploy_worker",
             "orchestrator/agent_execute(neon)",
             "tasks/create_task"
           ],
@@ -22554,22 +22554,22 @@
           "name": "fs-edit-config-deploy",
           "chain": [
             "fs/edit_file",
-            "cloudflare/workers-deploy"
+            "cloudflare/deploy_worker"
           ],
           "accomplishes": "Edit a local Worker configuration file (wrangler.toml or an env-var file) to update production environment variables or route bindings, then immediately deploy the updated Worker to Cloudflare — a tight edit-and-deploy ops loop without leaving the terminal.",
           "verified": false,
-          "notes": "FIRST use of fs/edit_file in ops (was in code+governance). cloudflare/workers-deploy is established in ops."
+          "notes": "FIRST use of fs/edit_file in ops (was in code+governance). cloudflare/deploy_worker is established in ops."
         },
         {
           "name": "notion-get-block-children-ops-runbook",
           "chain": [
             "notion/API-get-block-children",
             "fs/write_file",
-            "cloudflare/workers-deploy"
+            "cloudflare/deploy_worker"
           ],
           "accomplishes": "Fetch the step-by-step blocks of a Notion ops runbook page, write the procedure to a local script or config file, then execute a Cloudflare Worker deployment using the runbook's specifications — turning a human-readable Notion runbook into an executed ops action.",
           "verified": false,
-          "notes": "FIRST use of notion/API-get-block-children in ops. fs/write_file and cloudflare/workers-deploy are established here."
+          "notes": "FIRST use of notion/API-get-block-children in ops. fs/write_file and cloudflare/deploy_worker are established here."
         },
         {
           "name": "cloudflare-builds-get-ops-triage",
@@ -23039,7 +23039,7 @@
             "notion/API-move-page",
             "notion/API-get-bot-info",
             "notion/API-retrieve-a-page-property",
-            "cloudflare/workers-deploy"
+            "cloudflare/deploy_worker"
           ],
           "accomplishes": "Verify no open evidence disputes before deployment, explain the SQL migration for ops readiness, document the deployment plan as a Notion comment, move the runbook to the active ops folder, confirm the automation bot is configured, retrieve deployment metadata from page properties, then deploy to Cloudflare Workers",
           "verified": false,
@@ -23050,7 +23050,7 @@
           "chain": [
             "ch1tty/status",
             "cloudflare-builds/workers_builds_list_builds",
-            "cloudflare/workers-deploy"
+            "cloudflare/deploy_worker"
           ],
           "accomplishes": "Check gateway status to confirm all services are healthy before a deployment window, list recent Cloudflare Workers builds to verify the latest build status, and deploy to production.",
           "verified": false,
