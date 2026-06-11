@@ -2983,7 +2983,7 @@
           "chain": [
             "orchestrator/skill_execute(pr-review)",
             "orchestrator/skill_execute(chittyos-core:checkpoint)",
-            "tasks/create",
+            "tasks/create_task",
             "notion/API-post-page"
           ],
           "accomplishes": "Run a PR code review gate to confirm billing logic is sound, capture a finance checkpoint for the release, create a follow-up billing reconciliation task, and post the financial gate summary to Notion for stakeholder visibility.",
@@ -11353,7 +11353,7 @@
           "chain": [
             "orchestrator/skill_execute(chittycommand-alpha:obligation-tracker)",
             "neon/list_shared_projects",
-            "tasks/create"
+            "tasks/create_task"
           ],
           "accomplishes": "Check outstanding design obligations against the active design system commitments, enumerate shared Neon database projects to identify the design system schema, and create a task for each unresolved design contract item requiring attention in the next sprint.",
           "verified": false,
@@ -15651,9 +15651,9 @@
           "name": "code-obligation-tracker-tasks-cloudflare-build-fs",
           "chain": [
             "orchestrator/skill_execute(chittycommand-alpha:obligation-tracker)",
-            "tasks/create",
+            "tasks/create_task",
             "cloudflare-builds/workers_builds_get_build",
-            "fs/write_text_file"
+            "fs/write_file"
           ],
           "accomplishes": "Query open code obligations from ChittyCommand, retrieve the latest Cloudflare build status to check if any build blocked an obligation, create a build-fix task for each failed item, and write the obligation-plus-build summary to a local file for CI pipeline reference.",
           "verified": false,
@@ -19782,7 +19782,7 @@
             "orchestrator/agent_search(alchemist)",
             "orchestrator/skill_execute(chittyos-core:checkpoint)",
             "cloudflare-builds/workers_builds_get_build",
-            "tasks/create"
+            "tasks/create_task"
           ],
           "accomplishes": "Search for the communication MCP build skill, discover Alchemist patterns for cross-backend messaging pipelines, create a communication checkpoint in the system, retrieve the latest build to confirm the messaging service deployed correctly, and raise a broadcast task to notify stakeholders of the release.",
           "verified": false,
