@@ -1,6 +1,6 @@
 {
-  "_comment": "130th pass — 1454 combos, 1475 prompts. Completed 5 tools to 6/6: cloudflare/workers_scripts_get, orchestrator/skill_search(build-mcp-server), orchestrator/agent_search(alchemist), orchestrator/skill_execute(chittycommand-alpha:obligation-tracker), cloudflare-builds/workers_builds_get_build.",
-  "generatedFrom": "auto-driver run 69, 2026-06-11",
+  "_comment": "131st pass — 1466 combos, 1487 prompts. Completed 6 tools to 6/6: neon/list_shared_projects, notion/API-delete-a-page, orchestrator/skill_execute(pr-review), orchestrator/skill_execute(chittyos-core:checkpoint), cloudflare/workers_scripts_upload, tasks/create.",
+  "generatedFrom": "auto-driver run 70, 2026-06-11",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools — now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time — combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -2989,6 +2989,26 @@
           "accomplishes": "Run a PR code review gate to confirm billing logic is sound, capture a finance checkpoint for the release, create a follow-up billing reconciliation task, and post the financial gate summary to Notion for stakeholder visibility.",
           "verified": false,
           "notes": "orchestrator lazy; tasks/create for follow-up billing action; notion for audit trail"
+        },
+        {
+          "name": "finance-task-action-brief",
+          "chain": [
+            "orchestrator/agent_execute(finance)",
+            "orchestrator/chittyagent-market",
+            "tasks/create"
+          ],
+          "accomplishes": "Query the finance agent for current financial state, check the market agent for opportunities, then create a follow-up task targeting the most urgent financial action.",
+          "verified": false
+        },
+        {
+          "name": "mercury-financial-reporting-ledger",
+          "chain": [
+            "orchestrator/skill_execute(chittyos-finance:mercury-finance)",
+            "orchestrator/skill_search(financial-reporting)",
+            "ledger/append_entry"
+          ],
+          "accomplishes": "Pull Mercury banking data via the finance skill, search for available financial reporting tools, and append a summary entry to the ledger.",
+          "verified": false
         }
       ],
       "prompts": [
@@ -3920,6 +3940,14 @@
         {
           "text": "Run PR review gate, capture finance checkpoint, create billing task, and post to Notion",
           "resolves_to": "finance-pr-review-checkpoint-task-notion"
+        },
+        {
+          "text": "Check my financial state and market opportunities then create an action task for the most urgent item",
+          "resolves_to": "finance-task-action-brief"
+        },
+        {
+          "text": "Pull Mercury banking data and find reporting tools, then log a financial summary to the ledger",
+          "resolves_to": "mercury-financial-reporting-ledger"
         }
       ]
     },
@@ -7229,6 +7257,26 @@
           "accomplishes": "Search the skill registry for approved build MCP server skills, discover Alchemist composition patterns currently active in the governance domain, and publish a governance report on approved service compositions to Notion for regulatory audit purposes.",
           "verified": false,
           "notes": "orchestrator lazy; notion requires auth; governance lens biases toward compliance patterns"
+        },
+        {
+          "name": "dispute-docket-registry-lookup",
+          "chain": [
+            "orchestrator/agent_execute(dispute, list)",
+            "orchestrator/skill_execute(chittyos-legal:docket)",
+            "orchestrator/agent_execute(registry,list)"
+          ],
+          "accomplishes": "List active dispute cases, pull the docket for the lead case, and cross-reference the registry to find certified services involved in the matter.",
+          "verified": false
+        },
+        {
+          "name": "compliance-evidence-helper-collect",
+          "chain": [
+            "orchestrator/skill_execute(chittyos-legal:evidence-collect)",
+            "orchestrator/agent_execute(helper,query)",
+            "orchestrator/skill_search(chittyos-compliance)"
+          ],
+          "accomplishes": "Collect evidence artifacts for a compliance audit, query the helper agent for guidance on applicable regulatory frameworks, and search for relevant compliance tooling.",
+          "verified": false
         }
       ],
       "prompts": [
@@ -8272,6 +8320,14 @@
         {
           "text": "Search approved build skills, discover Alchemist governance patterns, and publish compliance report to Notion",
           "resolves_to": "governance-build-skill-alchemist-notion-report"
+        },
+        {
+          "text": "List my active disputes, pull the docket for the top case, and cross-reference the registry for related services",
+          "resolves_to": "dispute-docket-registry-lookup"
+        },
+        {
+          "text": "Collect compliance evidence, get framework guidance from the helper, and find applicable compliance tools",
+          "resolves_to": "compliance-evidence-helper-collect"
         }
       ]
     },
@@ -11358,6 +11414,26 @@
           "accomplishes": "Check outstanding design obligations against the active design system commitments, enumerate shared Neon database projects to identify the design system schema, and create a task for each unresolved design contract item requiring attention in the next sprint.",
           "verified": false,
           "notes": "obligation-tracker checks ChittyCommand obligations; neon/list_shared_projects scopes shared design DB; tasks/create raises design tickets"
+        },
+        {
+          "name": "checkpoint-deploy-create-task",
+          "chain": [
+            "orchestrator/skill_execute(chittyos-core:checkpoint)",
+            "cloudflare/workers_scripts_upload",
+            "tasks/create"
+          ],
+          "accomplishes": "Run a system checkpoint to capture pre-deploy state, upload the updated Cloudflare worker script, and create a verification task to confirm the deployment is stable.",
+          "verified": false
+        },
+        {
+          "name": "frontend-screenshot-neon-env",
+          "chain": [
+            "playwright/screenshot",
+            "orchestrator/skill_execute(claude-official:frontend-design)",
+            "neon/list_branch_computes"
+          ],
+          "accomplishes": "Screenshot the current UI, run the frontend-design skill for redesign suggestions, then list Neon branch computes to identify available environments for prototyping.",
+          "verified": false
         }
       ],
       "prompts": [
@@ -12334,6 +12410,14 @@
         {
           "text": "Check design obligations, list shared Neon projects for design system schema, and create tasks for unresolved items",
           "resolves_to": "design-obligation-tracker-neon-tasks-design-system"
+        },
+        {
+          "text": "Checkpoint the system, deploy an updated Cloudflare worker, and create a task to verify the deployment",
+          "resolves_to": "checkpoint-deploy-create-task"
+        },
+        {
+          "text": "Screenshot the UI, get frontend redesign suggestions, then find available Neon environments for prototyping",
+          "resolves_to": "frontend-screenshot-neon-env"
         }
       ]
     },
@@ -15658,6 +15742,26 @@
           "accomplishes": "Query open code obligations from ChittyCommand, retrieve the latest Cloudflare build status to check if any build blocked an obligation, create a build-fix task for each failed item, and write the obligation-plus-build summary to a local file for CI pipeline reference.",
           "verified": false,
           "notes": "obligation-tracker from ChittyCommand alpha; cloudflare-builds for build gate; fs/write_text_file outputs CI artifact"
+        },
+        {
+          "name": "feature-dev-playwright-task",
+          "chain": [
+            "orchestrator/skill_execute(feature-dev:feature-dev)",
+            "context7/resolve-library-id(playwright)",
+            "tasks/create"
+          ],
+          "accomplishes": "Run the guided feature-dev workflow for a new UI feature, resolve Playwright library docs for E2E test coverage, and create a tracking task for test implementation.",
+          "verified": false
+        },
+        {
+          "name": "gateway-cast-route-codesearch",
+          "chain": [
+            "orchestrator/agent_search(ch1tty-gateway)",
+            "orchestrator/skill_search(cast-mcp-route)",
+            "github/search_code"
+          ],
+          "accomplishes": "Discover ch1tty gateway routing capabilities via agent search, find the cast-mcp-route skill, then search the codebase for relevant implementation patterns.",
+          "verified": false
         }
       ],
       "prompts": [
@@ -16694,6 +16798,14 @@
         {
           "text": "Check code obligations, get build status, create fix tasks, and write summary to local CI artifact",
           "resolves_to": "code-obligation-tracker-tasks-cloudflare-build-fs"
+        },
+        {
+          "text": "Run guided feature development for a UI feature with Playwright test docs, then create a test coverage task",
+          "resolves_to": "feature-dev-playwright-task"
+        },
+        {
+          "text": "Find ch1tty gateway routing capabilities and the cast-mcp-route skill, then search the codebase for implementation patterns",
+          "resolves_to": "gateway-cast-route-codesearch"
         }
       ]
     },
@@ -19787,6 +19899,27 @@
           "accomplishes": "Search for the communication MCP build skill, discover Alchemist patterns for cross-backend messaging pipelines, create a communication checkpoint in the system, retrieve the latest build to confirm the messaging service deployed correctly, and raise a broadcast task to notify stakeholders of the release.",
           "verified": false,
           "notes": "tasks is comm-relevant; orchestrator lazy; cloudflare-builds for release confirmation"
+        },
+        {
+          "name": "pr-schema-review-notion-cleanup",
+          "chain": [
+            "github/list_pull_requests",
+            "orchestrator/skill_execute(pr-review)",
+            "neon/list_shared_projects",
+            "notion/API-delete-a-page"
+          ],
+          "accomplishes": "List open PRs, run the pr-review skill on the top change, check shared Neon projects for affected schemas, then delete the stale Notion draft page from the prior review cycle.",
+          "verified": false
+        },
+        {
+          "name": "imessage-telegram-notion-relay",
+          "chain": [
+            "orchestrator/agent_execute(imessage)",
+            "orchestrator/skill_execute(connectors:telegram)",
+            "notion/API-create-a-page"
+          ],
+          "accomplishes": "Fetch recent iMessage conversations via the imessage agent, relay an important thread to a Telegram channel, and create a Notion page to log the communication handoff.",
+          "verified": false
         }
       ],
       "prompts": [
@@ -20775,6 +20908,14 @@
         {
           "text": "Find comm build skill, discover Alchemist patterns, checkpoint, confirm build deployed, and raise broadcast task",
           "resolves_to": "comm-build-skill-alchemist-checkpoint-build-tasks-broadcast"
+        },
+        {
+          "text": "List open PRs, review the top change, check affected Neon schemas, and delete the stale Notion review draft",
+          "resolves_to": "pr-schema-review-notion-cleanup"
+        },
+        {
+          "text": "Fetch recent iMessages, relay the important thread to Telegram, and log the handoff in Notion",
+          "resolves_to": "imessage-telegram-notion-relay"
         }
       ]
     },
@@ -24028,6 +24169,26 @@
           "accomplishes": "List all shared Neon database projects during the ops maintenance window to scope the database cleanup, purge the deprecated ops runbook page from Notion, discover Alchemist composition patterns powering the ops pipeline, and find the build MCP server skill to trigger the final deployment stage.",
           "verified": false,
           "notes": "neon/list_shared_projects for multi-tenant DB scope; notion-delete for runbook hygiene; alchemist/build-skill complete the ops delivery chain"
+        },
+        {
+          "name": "cloudflare-upload-task-monitor",
+          "chain": [
+            "orchestrator/agent_execute(cloudflare,status)",
+            "cloudflare/workers_scripts_upload",
+            "tasks/create"
+          ],
+          "accomplishes": "Check current Cloudflare workers status, upload a revised worker script, and create an ops task to monitor deployment health and rollback readiness.",
+          "verified": false
+        },
+        {
+          "name": "resolve-pipeline-recommendation",
+          "chain": [
+            "orchestrator/agent_execute(resolve,triage)",
+            "orchestrator/skill_execute(chittyos-devops:chitty-pipelines)",
+            "orchestrator/skill_search(recommendation-engine)"
+          ],
+          "accomplishes": "Triage an active error via the resolve agent, inspect the affected service pipeline in chitty-pipelines, and search for a recommendation engine skill to suggest automated recovery strategies.",
+          "verified": false
         }
       ],
       "prompts": [
@@ -25048,6 +25209,14 @@
         {
           "text": "List Neon shared projects, purge deprecated runbook page, find Alchemist patterns, and locate the build MCP server skill for deployment",
           "resolves_to": "ops-neon-notion-alchemist-build-skill-ops-pipeline"
+        },
+        {
+          "text": "Check Cloudflare workers status, upload a revised worker script, and create a monitoring task for the deployment",
+          "resolves_to": "cloudflare-upload-task-monitor"
+        },
+        {
+          "text": "Triage an active error, inspect the service pipeline, and find a recommendation engine for automated recovery",
+          "resolves_to": "resolve-pipeline-recommendation"
         }
       ]
     }
