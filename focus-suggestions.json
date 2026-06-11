@@ -1,5 +1,5 @@
 {
-  "_comment": "126th pass — 1406 combos, 1403 prompts. Completed to 6/6: neon/provision_neon_data_api, neon/get_connection_string, context7/resolve-library-id(pg), orchestrator/agent_search(registry-directory-certified-services). Bonus: orchestrator/agent_execute(tasks,status) 1→4/6, orchestrator/agent_execute(neon,query) 1→2/6, orchestrator/agent_search(canon-...) 1→2/6, orchestrator/agent_search(market-...) 1→2/6.",
+  "_comment": "128th pass — 1430 combos, 1451 prompts. Completed all 7 tools from 2/6 to 6/6: chittyagent-finance, agent_execute(helper), cashflow-planner, agent_execute(ledger), agent_execute(stripe), skill_search(evidence-collect), skill_execute(pipeline-submit). Fixed 24 missing prompts from prior passes.",
   "generatedFrom": "auto-driver run 68, 2026-06-11",
   "profiles": {
     "finance": {
@@ -2919,6 +2919,28 @@
           "accomplishes": "Financial evidence audit: search the evidence corpus for finance-relevant items (invoices, contracts, obligations), cross-reference with the finance agent's balance snapshot, and append an immutable audit record to the ledger.",
           "verified": false,
           "notes": "orchestrator/skill_search(evidence-collect) and orchestrator/chittyagent-finance are orchestrator-dispatched; ledger/append_entry verified."
+        },
+        {
+          "name": "finance-pipeline-submit-billing-gate",
+          "chain": [
+            "orchestrator/skill_execute(pipeline-submit)",
+            "ledger/append_entry",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Submit the billing pipeline, append the transaction to the ledger, and post a billing summary to Notion — closing out an invoice cycle with a full paper trail.",
+          "verified": false,
+          "notes": "pipeline-submit gated on orchestrator skill registry"
+        },
+        {
+          "name": "finance-agent-execute-notion-records-update",
+          "chain": [
+            "orchestrator/agent_execute(notion)",
+            "ledger/append_entry",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Use the Notion agent to retrieve or create financial record pages, append updates to the ledger, and publish the current billing state.",
+          "verified": false,
+          "notes": "notion agent gated on orchestrator; notion/API-post-page verified when notion is connected"
         }
       ],
       "prompts": [
@@ -3810,6 +3832,30 @@
         {
           "text": "Search for financial evidence items, check our finance agent for balances, and log the findings",
           "resolves_to": "finance-evidence-search-audit"
+        },
+        {
+          "text": "Audit Wrangler deployment costs and write a finance cost summary report",
+          "resolves_to": "finance-wrangler-audit-cost-summary"
+        },
+        {
+          "text": "Register a new billing MCP service in the ChittyOS registry",
+          "resolves_to": "finance-register-billing-mcp-service"
+        },
+        {
+          "text": "Search for finance tools and broadcast the results to Discord",
+          "resolves_to": "discord-finance-broadcast"
+        },
+        {
+          "text": "Use the ship agent to coordinate a finance release and verify gateway status",
+          "resolves_to": "ship-agent-finance-release"
+        },
+        {
+          "text": "Submit the billing pipeline, log it in the ledger, and post a billing summary to Notion",
+          "resolves_to": "finance-pipeline-submit-billing-gate"
+        },
+        {
+          "text": "Use the Notion agent to update financial records and sync to the ledger",
+          "resolves_to": "finance-agent-execute-notion-records-update"
         }
       ]
     },
@@ -7050,6 +7096,29 @@
           "accomplishes": "Financial governance audit: invoke the finance agent for a current cash/balance snapshot, query the ledger agent for recent financial entries, then fetch the linked governance task — giving compliance reviewers a coherent, source-linked audit package.",
           "verified": false,
           "notes": "orchestrator/chittyagent-finance and orchestrator/agent_execute(ledger) are orchestrator-dispatched agents; tasks/get_task is verified connected."
+        },
+        {
+          "name": "governance-helper-agent-compliance-triage",
+          "chain": [
+            "orchestrator/agent_execute(helper)",
+            "orchestrator/skill_search(evidence-collect)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Invoke the helper agent to navigate ambiguous compliance requirements, find the evidence-collect skill for the relevant policy, and post a compliance triage report to Notion.",
+          "verified": false,
+          "notes": "helper agent gated on orchestrator"
+        },
+        {
+          "name": "governance-cashflow-stripe-fiscal-compliance",
+          "chain": [
+            "orchestrator/skill_execute(chittycommand-alpha:cashflow-planner)",
+            "orchestrator/agent_execute(stripe)",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Run the cashflow planner to model fiscal scenarios, query the Stripe agent for billing compliance data, reason through the implications, and post a governance financial review.",
+          "verified": false,
+          "notes": "cashflow-planner and stripe agent both gated on orchestrator skill/agent registry"
         }
       ],
       "prompts": [
@@ -8053,6 +8122,30 @@
         {
           "text": "Run a financial governance audit — pull balances from the finance agent, review ledger entries, and check the related task",
           "resolves_to": "governance-finance-agent-ledger-audit"
+        },
+        {
+          "text": "Run sequential reasoning as a compliance gate before executing a model migration",
+          "resolves_to": "governance-migration-compliance-gate"
+        },
+        {
+          "text": "Draft a policy announcement and broadcast it to the governance Discord channel",
+          "resolves_to": "governance-discord-policy-broadcast"
+        },
+        {
+          "text": "Search Notion and update the governance data source",
+          "resolves_to": "notion-update-datasource-governance"
+        },
+        {
+          "text": "Find and delete stale governance blocks from the Notion policy workspace",
+          "resolves_to": "notion-delete-block-governance-cleanup"
+        },
+        {
+          "text": "Triage a compliance issue using the helper agent and collect policy evidence",
+          "resolves_to": "governance-helper-agent-compliance-triage"
+        },
+        {
+          "text": "Run cashflow planning against Stripe data and produce a governance fiscal review",
+          "resolves_to": "governance-cashflow-stripe-fiscal-compliance"
         }
       ]
     },
@@ -11069,6 +11162,30 @@
           "accomplishes": "Design deliverable pipeline: submit an approved design artifact through the pipeline, document it as a Notion page for stakeholder review, then search ch1tty for related design patterns — closing the loop from production to documentation.",
           "verified": false,
           "notes": "orchestrator/skill_execute(pipeline-submit) is orchestrator-dispatched; notion/API-post-page and ch1tty/search are verified. Note: Notion API returning 401 until token is restored."
+        },
+        {
+          "name": "design-chittyagent-finance-ledger-helper-ux-cost",
+          "chain": [
+            "orchestrator/chittyagent-finance",
+            "orchestrator/agent_execute(ledger)",
+            "orchestrator/agent_execute(helper)",
+            "playwright/browser_take_screenshot"
+          ],
+          "accomplishes": "Query the finance agent for project budget state, retrieve ledger entries for cost tracking, resolve ambiguity with the helper agent, then screenshot the current UI for the cost report.",
+          "verified": false,
+          "notes": "chittyagent-finance and ledger agent gated on orchestrator"
+        },
+        {
+          "name": "design-cashflow-stripe-evidence-cost-audit",
+          "chain": [
+            "orchestrator/skill_execute(chittycommand-alpha:cashflow-planner)",
+            "orchestrator/agent_execute(stripe)",
+            "orchestrator/skill_search(evidence-collect)",
+            "playwright/browser_take_screenshot"
+          ],
+          "accomplishes": "Model design project costs with the cashflow planner, verify billing with the Stripe agent, collect evidence for the cost audit, and capture a visual snapshot of the design for the report.",
+          "verified": false,
+          "notes": "cashflow-planner and stripe agent gated on orchestrator"
         }
       ],
       "prompts": [
@@ -12005,6 +12122,30 @@
         {
           "text": "Submit our design deliverable through the pipeline, document it in Notion, and find related design patterns",
           "resolves_to": "design-pipeline-submit-notion"
+        },
+        {
+          "text": "Audit Wrangler worker output and verify visual contract compliance",
+          "resolves_to": "design-wrangler-audit-visual-contract-check"
+        },
+        {
+          "text": "Run a model migration pipeline and generate new UI component specs from the output",
+          "resolves_to": "design-migration-ui-generation-pipeline"
+        },
+        {
+          "text": "Share design assets to Discord and search for related tools",
+          "resolves_to": "discord-design-share"
+        },
+        {
+          "text": "Search Notion for existing design resources and execute the most relevant tool",
+          "resolves_to": "notion-search-design-resources"
+        },
+        {
+          "text": "Check project budget via the finance agent, query the ledger, and capture a UI cost snapshot",
+          "resolves_to": "design-chittyagent-finance-ledger-helper-ux-cost"
+        },
+        {
+          "text": "Model design costs with the cashflow planner, verify billing, collect evidence, and screenshot the result",
+          "resolves_to": "design-cashflow-stripe-evidence-cost-audit"
         }
       ]
     },
@@ -15257,6 +15398,31 @@
           "accomplishes": "Stripe-Neon payment integration: invoke the Stripe agent to process a payment event or reconcile charges, persist the transaction record to Neon via SQL, and append an immutable ledger entry — creating an end-to-end, code-verified payment audit trail.",
           "verified": false,
           "notes": "orchestrator/agent_execute(stripe) is orchestrator-dispatched; neon/run_sql verified (code-relevant server ✓); ledger/append_entry verified."
+        },
+        {
+          "name": "code-pipeline-submit-helper-evidence-build-gate",
+          "chain": [
+            "orchestrator/skill_execute(pipeline-submit)",
+            "orchestrator/agent_execute(helper)",
+            "orchestrator/skill_search(evidence-collect)",
+            "fs/write_file"
+          ],
+          "accomplishes": "Submit the build pipeline, use the helper agent to resolve dependency ambiguities, collect evidence of the build result, and write a gated build report to disk.",
+          "verified": false,
+          "notes": "pipeline-submit gated on orchestrator; fs/write_file is verified"
+        },
+        {
+          "name": "code-chittyagent-finance-stripe-ledger-cashflow-billing",
+          "chain": [
+            "orchestrator/chittyagent-finance",
+            "orchestrator/agent_execute(stripe)",
+            "orchestrator/agent_execute(ledger)",
+            "orchestrator/skill_execute(chittycommand-alpha:cashflow-planner)",
+            "neon/run_sql"
+          ],
+          "accomplishes": "Query the finance agent for billing state, retrieve Stripe transaction details, record entries in the ledger, run the cashflow planner for billing forecasting, and validate against the billing database.",
+          "verified": false,
+          "notes": "chittyagent-finance, stripe agent, ledger agent, cashflow-planner all gated on orchestrator"
         }
       ],
       "prompts": [
@@ -16253,6 +16419,30 @@
         {
           "text": "Process a Stripe payment event, write it to Neon, and record it in the ledger",
           "resolves_to": "code-stripe-neon-payment-integration"
+        },
+        {
+          "text": "Build a new MCP server surface, register it with ChittyOS, and scaffold the code",
+          "resolves_to": "code-build-register-mcp-surface"
+        },
+        {
+          "text": "Read deployment output, reason over it, and notify Discord of the deploy result",
+          "resolves_to": "code-discord-deploy-notify"
+        },
+        {
+          "text": "Find and clean up stale code documentation blocks in Notion",
+          "resolves_to": "notion-delete-stale-code-docs"
+        },
+        {
+          "text": "Search Notion for code context and run the most relevant discovered tool",
+          "resolves_to": "notion-search-code-context"
+        },
+        {
+          "text": "Submit the build pipeline, resolve dependency issues with the helper agent, and write a gated build report",
+          "resolves_to": "code-pipeline-submit-helper-evidence-build-gate"
+        },
+        {
+          "text": "Query finance agent, Stripe, and ledger, run cashflow planner, then validate against the billing database",
+          "resolves_to": "code-chittyagent-finance-stripe-ledger-cashflow-billing"
         }
       ]
     },
@@ -19274,6 +19464,30 @@
           "accomplishes": "Help-desk resolution: invoke the helper agent to resolve an inbound request, retrieve the associated task for full context, then document the resolution in Notion — turning a raw help request into a searchable, citable knowledge-base entry.",
           "verified": false,
           "notes": "orchestrator/agent_execute(helper) is orchestrator-dispatched; tasks/get_task verified (comm-relevant server ✓); notion/API-post-page verified. Note: Notion 401 until token restored."
+        },
+        {
+          "name": "comm-pipeline-submit-cashflow-stripe-notify",
+          "chain": [
+            "orchestrator/skill_execute(pipeline-submit)",
+            "orchestrator/skill_execute(chittycommand-alpha:cashflow-planner)",
+            "orchestrator/agent_execute(stripe)",
+            "tasks/get_task"
+          ],
+          "accomplishes": "Submit the communications pipeline, run the cashflow planner to model messaging costs, verify billing with the Stripe agent, and retrieve the related communications task.",
+          "verified": false,
+          "notes": "pipeline-submit, cashflow-planner, stripe agent gated on orchestrator; tasks/get_task confirmed available"
+        },
+        {
+          "name": "comm-chittyagent-finance-ledger-evidence-broadcast",
+          "chain": [
+            "orchestrator/chittyagent-finance",
+            "orchestrator/agent_execute(ledger)",
+            "orchestrator/skill_search(evidence-collect)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Query the finance agent for billing context, retrieve ledger entries for the communications budget, collect supporting evidence, and publish a broadcast summary to Notion.",
+          "verified": false,
+          "notes": "chittyagent-finance and ledger agent gated on orchestrator"
         }
       ],
       "prompts": [
@@ -20222,6 +20436,30 @@
         {
           "text": "Handle a help request via the helper agent, pull the task details, and document the resolution in Notion",
           "resolves_to": "comm-helper-task-notion-resolution"
+        },
+        {
+          "text": "Audit Wrangler worker health, reason over the results, and broadcast to the team Discord",
+          "resolves_to": "comm-wrangler-audit-team-broadcast"
+        },
+        {
+          "text": "Run a migration and post a stakeholder summary to the Discord broadcast channel",
+          "resolves_to": "comm-migration-stakeholder-summary"
+        },
+        {
+          "text": "Register a service, verify the Cloudflare build config, and create a follow-up task",
+          "resolves_to": "chitty-register-broadcast-cloudflare-build"
+        },
+        {
+          "text": "Search Notion and update the communications record",
+          "resolves_to": "notion-update-comms-record"
+        },
+        {
+          "text": "Submit the comms pipeline, model messaging costs, verify with Stripe, and retrieve the related task",
+          "resolves_to": "comm-pipeline-submit-cashflow-stripe-notify"
+        },
+        {
+          "text": "Query finance agent, retrieve ledger entries, collect evidence, and publish a broadcast summary to Notion",
+          "resolves_to": "comm-chittyagent-finance-ledger-evidence-broadcast"
         }
       ]
     },
@@ -23404,6 +23642,30 @@
           "accomplishes": "Financial operations monitoring: run the cashflow planner skill to compute burn rate and runway projections, record the current financial snapshot as an ops ledger entry, then poll ch1tty gateway status to confirm all financial backends are live — combining financial health with system health in one ops check.",
           "verified": false,
           "notes": "orchestrator/skill_execute(chittycommand-alpha:cashflow-planner) is orchestrator-dispatched; ledger/append_entry and ch1tty/status are verified."
+        },
+        {
+          "name": "ops-pipeline-submit-helper-evidence-deploy-gate",
+          "chain": [
+            "orchestrator/skill_execute(pipeline-submit)",
+            "orchestrator/agent_execute(helper)",
+            "orchestrator/skill_search(evidence-collect)",
+            "ch1tty/status"
+          ],
+          "accomplishes": "Submit the deployment pipeline, use the helper agent to resolve ambiguous deployment configurations, collect evidence of the rollout, then check gateway status to confirm the deployment is live.",
+          "verified": false,
+          "notes": "pipeline-submit and helper agent gated on orchestrator; ch1tty/status is always available"
+        },
+        {
+          "name": "ops-chittyagent-finance-ledger-stripe-billing-health",
+          "chain": [
+            "orchestrator/chittyagent-finance",
+            "orchestrator/agent_execute(ledger)",
+            "orchestrator/agent_execute(stripe)",
+            "cloudflare-builds/workers_builds_list_builds"
+          ],
+          "accomplishes": "Query the finance agent for operational billing state, check the ledger for cost entries, verify Stripe subscription health, and inspect Cloudflare build status for billing-impacting deployments.",
+          "verified": false,
+          "notes": "chittyagent-finance, ledger agent, stripe agent gated on orchestrator; cloudflare-builds gated on lazy remote"
         }
       ],
       "prompts": [
@@ -24384,6 +24646,30 @@
         {
           "text": "Run the cashflow planner, record the snapshot in the ledger, and check ch1tty gateway status",
           "resolves_to": "ops-cashflow-ledger-status"
+        },
+        {
+          "text": "Plan a hotfix with sequential reasoning then commit, push, and open a pull request",
+          "resolves_to": "ops-commit-push-pr-hotfix"
+        },
+        {
+          "text": "Draft an incident alert using sequential reasoning and post it to the Discord ops channel",
+          "resolves_to": "ops-discord-incident-alert"
+        },
+        {
+          "text": "Search Notion for the relevant ops runbook and execute the matching tool",
+          "resolves_to": "notion-search-ops-runbook"
+        },
+        {
+          "text": "Find the ops status block in Notion and patch it with the latest deployment update",
+          "resolves_to": "notion-patch-block-ops-update"
+        },
+        {
+          "text": "Submit the deployment pipeline, resolve ambiguities with the helper agent, collect evidence, and check gateway status",
+          "resolves_to": "ops-pipeline-submit-helper-evidence-deploy-gate"
+        },
+        {
+          "text": "Check ops billing health: finance agent, ledger entries, Stripe, and Cloudflare build status",
+          "resolves_to": "ops-chittyagent-finance-ledger-stripe-billing-health"
         }
       ]
     }
