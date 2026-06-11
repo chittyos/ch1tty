@@ -806,8 +806,8 @@
 - **All workstreams A–D confirmed done**. E continuous-improvement passes.
 - **ch1tty status**: 8 servers connected (cloudflare-builds: 7 tools, evidence: 3, browser-rendering: 3, context7: 2, thinking: 1, fs: 14, playwright: 23, orchestrator: 13). 33 active sessions. ledger degraded (6 DLQ entries — known).
 - **Coverage analysis**: 255 tools at 6/6; 119 tools under 6/6. Target tools for 133rd pass:
-  - `playwright/browser_close` (1/6 → 6/6): confirmed via cast (score 0.38) ✓
-  - `playwright/browser_handle_dialog` (1/6 → 6/6): confirmed via cast (score 0.44) ✓
+  - `playwright/browser_close` (1/6 → 6/6): confirmed via cast (score 0.38) ✓ — ops already covered, adding 5 missing profiles (finance, governance, design, code, communication)
+  - `playwright/browser_handle_dialog` (1/6 → 6/6): confirmed via cast (score 0.44) ✓ — communication already covered, adding 5 missing profiles (finance, governance, design, code, ops)
   - `cloudflare-builds/workers_builds_cancel` — CONFIRMED STALE (tool not found); not extended
 - **10 new verified combos added (133rd pass)**:
   - finance/finance-browser-close-session-report: navigate→screenshot→browser_close→thinking→write_file
