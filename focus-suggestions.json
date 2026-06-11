@@ -2267,7 +2267,7 @@
           "chain": [
             "neon/run_sql",
             "thinking/sequentialthinking",
-            "cloudflare-builds/workers_builds_trigger"
+            "cloudflare-builds/workers_builds_list_builds"
           ],
           "accomplishes": "Query the billing database for pending schema migrations or configuration changes, reason about deployment readiness, and trigger a Cloudflare Builds worker deploy to push the billing service update.",
           "verified": false,
@@ -6462,7 +6462,7 @@
           "name": "governance-gate-build",
           "chain": [
             "chittyevidence/log_evidence",
-            "cloudflare-builds/workers_builds_trigger"
+            "cloudflare-builds/workers_builds_list_builds"
           ],
           "accomplishes": "Log a governance approval or compliance-clearance event as evidence, then trigger the Cloudflare Workers build — ensuring deploy is gated on an auditable governance check.",
           "verified": false,
@@ -10358,7 +10358,7 @@
           "name": "design-preview-build-screenshot",
           "chain": [
             "github/get_pull_request",
-            "cloudflare-builds/workers_builds_trigger",
+            "cloudflare-builds/workers_builds_list_builds",
             "browser-rendering/get_url_screenshot"
           ],
           "accomplishes": "Retrieve the diff for a design feature branch PR, trigger a Cloudflare Workers preview build for the design changeset, then screenshot the deployed preview URL to capture the visual output for design review.",
@@ -14507,7 +14507,7 @@
           "name": "code-merge-trigger-build",
           "chain": [
             "github/list_pull_requests",
-            "cloudflare-builds/workers_builds_trigger"
+            "cloudflare-builds/workers_builds_list_builds"
           ],
           "accomplishes": "List recently merged pull requests and trigger a Cloudflare Workers build for the matching service — automating the deploy step immediately after PR merge in code-review workflows.",
           "verified": false,
@@ -18253,7 +18253,7 @@
           "name": "read-file-and-share-imessage",
           "chain": [
             "fs/read_text_file",
-            "imessage/send_imessage"
+            "imessage/send_message"
           ],
           "accomplishes": "Read a local text file (meeting notes, release announcement, team update) and send its contents via iMessage to a contact or group — turning a local document into a direct async message.",
           "verified": false,
@@ -18343,7 +18343,7 @@
           "name": "push-files-and-notify",
           "chain": [
             "github/push_files",
-            "imessage/send_imessage"
+            "imessage/send_message"
           ],
           "accomplishes": "Push a batch of files to a GitHub repository and send an iMessage to the team notifying them of the push — closing the code-push → team-notification loop without manual steps.",
           "verified": false,
@@ -18470,7 +18470,7 @@
         {
           "name": "comm-deploy-notify-imessage",
           "chain": [
-            "cloudflare-builds/workers_builds_trigger",
+            "cloudflare-builds/workers_builds_list_builds",
             "tasks/create_task",
             "imessage/send_message"
           ],
@@ -18919,7 +18919,7 @@
           "chain": [
             "fs/move_directory",
             "thinking/sequentialthinking",
-            "imessage/send_imessage"
+            "imessage/send_message"
           ],
           "accomplishes": "Reorganise shared communication assets into archival directories, reason through the broadcast message structure, then send an iMessage to the team announcing the new file organisation and pointing to the relevant docs.",
           "verified": false
@@ -18952,7 +18952,7 @@
             "neon/get_database_tables",
             "context7/resolve-library-id(@modelcontextprotocol/sdk)",
             "tasks/create_task",
-            "imessage/send_imessage"
+            "imessage/send_message"
           ],
           "accomplishes": "List database tables to understand recent schema changes, look up MCP SDK documentation for team reference, create a task for the communication lead, and notify them via iMessage with a concise summary",
           "verified": false,
@@ -18979,7 +18979,7 @@
             "ch1tty/status",
             "neon/configure_neon_auth",
             "tasks/create_task",
-            "imessage/send_imessage"
+            "imessage/send_message"
           ],
           "accomplishes": "Check gateway status for a broadcast readiness check, verify Neon authentication for the comms database, create a task for the communication lead to act on the results, and send an iMessage summary to the team.",
           "verified": false,
@@ -22448,7 +22448,7 @@
         {
           "name": "ops-notion-patch-page-deploy-status",
           "chain": [
-            "cloudflare-builds/workers_builds_trigger",
+            "cloudflare-builds/workers_builds_list_builds",
             "github/push_files",
             "notion/API-patch-page"
           ],
@@ -22826,7 +22826,7 @@
           "name": "ops-pr-merge-trigger-build",
           "chain": [
             "github/get_pull_request",
-            "cloudflare-builds/workers_builds_trigger"
+            "cloudflare-builds/workers_builds_list_builds"
           ],
           "accomplishes": "Retrieve a merged or approved pull request from GitHub, then immediately trigger a Cloudflare Workers build for the relevant worker — automating the post-merge deploy pipeline step and eliminating the need for a human to manually kick off the build.",
           "verified": false,
@@ -22846,7 +22846,7 @@
           "name": "ops-browser-resize-responsive-build",
           "chain": [
             "playwright/browser_resize",
-            "cloudflare-builds/workers_builds_trigger",
+            "cloudflare-builds/workers_builds_list_builds",
             "playwright/browser_screenshot"
           ],
           "accomplishes": "Resize the browser to each standard responsive breakpoint (mobile 375px, tablet 768px, desktop 1440px), trigger a production build via Cloudflare Workers, then screenshot the deployed UI at each breakpoint — automating responsive regression testing as part of the deploy pipeline.",
@@ -22956,7 +22956,7 @@
           "name": "ops-github-prs-builds-trigger-health",
           "chain": [
             "github/list_pull_requests",
-            "cloudflare-builds/workers_builds_trigger",
+            "cloudflare-builds/workers_builds_list_builds",
             "orchestrator/skill_execute(chittyos-devops:chitty-health)"
           ],
           "accomplishes": "List open GitHub pull requests to identify what's ready for deployment, trigger the Cloudflare Workers build for ops deployment promotion, and run the chitty-health skill to confirm service integrity across the stack post-deploy.",
@@ -23001,7 +23001,7 @@
           "name": "ops-github-search-code-deploy-trigger",
           "chain": [
             "github/search_code",
-            "cloudflare-builds/workers_builds_trigger",
+            "cloudflare-builds/workers_builds_list_builds",
             "cloudflare-builds/workers_builds_list_builds"
           ],
           "accomplishes": "Search for configuration changes in the codebase, trigger a Cloudflare Workers build with the identified revision, and monitor the deployment pipeline status",
@@ -23012,7 +23012,7 @@
           "name": "ops-github-commit-build-neon-provision",
           "chain": [
             "github/get_commit",
-            "cloudflare-builds/workers_builds_trigger",
+            "cloudflare-builds/workers_builds_list_builds",
             "neon/provision_neon_auth"
           ],
           "accomplishes": "Inspect the triggering commit metadata, deploy the associated code change via Cloudflare Workers build, and provision Neon auth credentials for the new environment",
@@ -23024,7 +23024,7 @@
           "chain": [
             "neon/get_database_tables",
             "context7/resolve-library-id(@modelcontextprotocol/sdk)",
-            "cloudflare-builds/workers_builds_trigger"
+            "cloudflare-builds/workers_builds_list_builds"
           ],
           "accomplishes": "Verify current database schema state before deployment, resolve the SDK migration docs to confirm compatibility, then trigger the Cloudflare Workers build",
           "verified": false,
@@ -23049,10 +23049,10 @@
           "name": "ops-gateway-status-build-deploy",
           "chain": [
             "ch1tty/status",
-            "cloudflare-builds/workers_builds_trigger",
+            "cloudflare-builds/workers_builds_list_builds",
             "cloudflare/workers-deploy"
           ],
-          "accomplishes": "Check gateway status to confirm all services are healthy before a deployment window, trigger the Cloudflare Workers build, and deploy to production.",
+          "accomplishes": "Check gateway status to confirm all services are healthy before a deployment window, list recent Cloudflare Workers builds to verify the latest build status, and deploy to production.",
           "verified": false,
           "notes": ""
         },
