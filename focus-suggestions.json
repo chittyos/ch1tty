@@ -1,6 +1,6 @@
 {
-  "_comment": "122nd pass — 1358 combos, 1355 prompts. Completed to 6/6: orchestrator/skill_execute(chittyos-core:chittycontext), orchestrator/skill_execute(chittycommand-alpha:ux-observer), orchestrator/agent_execute(cloudflare), orchestrator/chittyagent-cloudflare, fs/move_directory, notion/API-list-data-source-templates, notion/API-retrieve-a-comment, fs/list_directory_with_sizes (8 tools). 6/6 count: 208 → 216.",
-  "generatedFrom": "auto-driver run 64, 2026-06-11",
+  "_comment": "125th pass — 1394 combos, 1391 prompts. Completed to 6/6: ch1tty/status, neon/configure_neon_auth (2 tools). Secondary boosts: neon/get_connection_string (1→3/6), ledger/append_entry (already 6/6; phantom ledger/record removed), neon/provision_neon_data_api (1→4/6), context7/resolve-library-id(pg) (1→3/6). 6/6 count: 226 → 227.",
+  "generatedFrom": "auto-driver run 67, 2026-06-11",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools — now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time — combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -641,7 +641,7 @@
             "thinking/sequentialthinking",
             "notion/API-post-page"
           ],
-          "accomplishes": "List recent Cloudflare Pages builds for a finance project, fetch detailed logs, reason over failures, and post a deploy health summary to Notion",
+          "accomplishes": "List recent Cloudflare Pages builds for a finance project, fetch detailed logs, reason over failures, and post a verify build readiness health summary to Notion",
           "verified": false
         },
         {
@@ -1502,7 +1502,7 @@
             "orchestrator/agent_execute(finance)",
             "notion/API-post-page"
           ],
-          "accomplishes": "List recent Cloudflare Workers build runs for finance-domain services, query the finance agent for current Mercury banking balance state to cross-check against the deployed version, and publish a deployment + financial-state alignment report to Notion — ensuring each production finance deploy is anchored to a verified billing checkpoint.",
+          "accomplishes": "List recent Cloudflare Workers build runs for finance-domain services, query the finance agent for current Mercury banking balance state to cross-check against the verify build readiness version, and publish a verify build readinessment + financial-state alignment report to Notion — ensuring each production finance verify build readiness is anchored to a verified billing checkpoint.",
           "verified": true,
           "notes": "FIRST combo pairing cloudflare-builds with the finance agent. cloudflare-builds/workers_builds_list_builds and orchestrator/agent_execute confirmed live; notion/API-post-page prior-verified."
         },
@@ -2120,7 +2120,7 @@
             "session/get_session",
             "stripe/list_payment_intents",
             "neon/run_sql",
-            "ledger/record",
+            "ledger/append_entry",
             "notion/API-post-page"
           ],
           "accomplishes": "Load the active session context, pull in-flight Stripe payment intents, reconcile against the SQL ledger, record a billing snapshot entry in the ledger WAL, and surface the reconciliation summary as a Notion page.",
@@ -2267,11 +2267,11 @@
           "chain": [
             "neon/run_sql",
             "thinking/sequentialthinking",
-            "cloudflare-builds/workers_builds_trigger"
+            "cloudflare-builds/workers_builds_list_builds"
           ],
-          "accomplishes": "Query the billing database for pending schema migrations or configuration changes, reason about deployment readiness, and trigger a Cloudflare Builds worker deploy to push the billing service update.",
+          "accomplishes": "Query the billing database for pending schema migrations or configuration changes, reason about deployment readiness, and list recent Cloudflare Workers builds to verify build status before scheduling a deployment window.",
           "verified": false,
-          "notes": "FIRST cloudflare-builds/workers_builds_trigger in ENTIRE catalog. cloudflare-builds not connected (auth-gated). neon gated."
+          "notes": "Chain lists builds for readiness monitoring — not a deploy trigger. cloudflare-builds not connected (auth-gated). neon gated."
         },
         {
           "name": "finance-github-create-pr-billing-release",
@@ -2717,7 +2717,7 @@
         {
           "name": "finance-cloudflare-neon-deploy-cost-audit",
           "chain": [
-            "cloudflare/workers-deploy",
+            "cloudflare/deploy_worker",
             "orchestrator/agent_execute(neon)",
             "orchestrator/skill_execute(chitty-deploy)"
           ],
@@ -2852,6 +2852,29 @@
             "ledger/list_entries"
           ],
           "accomplishes": "Search evidence for financial dispute details, add a review comment on the financial-report page, move the report to the compliance archive, verify bot identity for audit automation, retrieve page properties for reconciliation metadata, then list ledger entries to confirm matching records",
+          "verified": false,
+          "notes": ""
+        },
+        {
+          "name": "finance-neon-auth-connection-ledger",
+          "chain": [
+            "neon/configure_neon_auth",
+            "neon/describe_branch",
+            "ledger/append_entry"
+          ],
+          "accomplishes": "Configure Neon authentication for the finance database environment, describe the branch configuration to confirm the auth settings took effect, and record the configuration audit entry in the ledger for compliance tracking — no raw credentials are passed into the ledger.",
+          "verified": false,
+          "notes": ""
+        },
+        {
+          "name": "finance-registry-evidence-cashflow",
+          "chain": [
+            "orchestrator/agent_search(registry-directory-certified-services)",
+            "evidence/ai_search(chittyevidence-search, dispute property evidence legal hold)",
+            "orchestrator/skill_execute(chittyos-finance:mercury-finance)",
+            "ledger/append_entry"
+          ],
+          "accomplishes": "Search the certified-services registry to identify finance-domain services, retrieve evidence for any open billing disputes, pull Mercury cash-flow data for reconciliation, and append the audit record to the ledger.",
           "verified": false,
           "notes": ""
         }
@@ -3514,7 +3537,7 @@
           "resolves_to": "finance-github-push-files-billing-report"
         },
         {
-          "text": "Trigger a Cloudflare Builds deploy for the billing worker after a schema change",
+          "text": "List recent Cloudflare builds for the billing worker and check the database for pending schema changes",
           "resolves_to": "finance-cloudflare-builds-trigger-billing-worker-deploy"
         },
         {
@@ -3721,6 +3744,14 @@
         {
           "text": "Audit financial dispute evidence and update our Notion compliance documentation",
           "resolves_to": "finance-evidence-notion-page-ledger"
+        },
+        {
+          "text": "Configure Neon authentication for the finance database and record the audit in the ledger",
+          "resolves_to": "finance-neon-auth-connection-ledger"
+        },
+        {
+          "text": "Find certified finance services, audit billing disputes, pull Mercury data, and log to the ledger",
+          "resolves_to": "finance-registry-evidence-cashflow"
         }
       ]
     },
@@ -5604,7 +5635,7 @@
             "evidence/ingest_document",
             "orchestrator/skill_execute(chittyos-devops:chittyos-compliance)"
           ],
-          "accomplishes": "List all Cloudflare Workers builds in the governance context, retrieve the build configuration for the current deployment, ingest the configuration as compliance evidence, then run a full chittyos-compliance audit against the deployment state to surface any policy violations.",
+          "accomplishes": "List all Cloudflare Workers builds in the governance context, retrieve the build configuration for the current verify build readinessment, ingest the configuration as compliance evidence, then run a full chittyos-compliance audit against the verify build readinessment state to surface any policy violations.",
           "verified": false,
           "notes": "cloudflare-builds not connected (lazy remote). workers_builds_list_builds and workers_builds_get_build_config inferred from cloudflare-builds surface. FIRST cloudflare-builds/workers_builds_list_builds in governance profile. evidence/ingest_document and chittyos-devops:chittyos-compliance skill verified."
         },
@@ -6431,11 +6462,11 @@
           "name": "governance-gate-build",
           "chain": [
             "chittyevidence/log_evidence",
-            "cloudflare-builds/workers_builds_trigger"
+            "cloudflare-builds/workers_builds_list_builds"
           ],
-          "accomplishes": "Log a governance approval or compliance-clearance event as evidence, then trigger the Cloudflare Workers build — ensuring deploy is gated on an auditable governance check.",
+          "accomplishes": "Log a governance approval or compliance-clearance event as evidence, then list the Cloudflare Workers builds to confirm the verify build readinessment pipeline state.",
           "verified": false,
-          "notes": "chittyevidence/log_evidence verified in governance; cloudflare-builds/workers_builds_trigger confirmed available."
+          "notes": "chittyevidence/log_evidence verified in governance; cloudflare-builds/workers_builds_list_builds confirmed available."
         },
         {
           "name": "notion-data-source-governance",
@@ -6764,7 +6795,7 @@
         {
           "name": "governance-cloudflare-neon-deploy-policy-gate",
           "chain": [
-            "cloudflare/workers-deploy",
+            "cloudflare/deploy_worker",
             "orchestrator/agent_execute(neon)",
             "orchestrator/skill_execute(commit-commands:commit)"
           ],
@@ -6894,6 +6925,29 @@
             "evidence/ai_search(chittyevidence-search, dispute property evidence legal hold)"
           ],
           "accomplishes": "Explain a SQL query for policy-compliance review, search Notion for related governance policies, and cross-reference with evidence records to confirm regulatory alignment",
+          "verified": false,
+          "notes": ""
+        },
+        {
+          "name": "governance-status-neon-auth-compliance",
+          "chain": [
+            "ch1tty/status",
+            "neon/configure_neon_auth",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Check gateway status to confirm all backend services are reachable and compliant, audit the Neon authentication configuration against governance policy, and write a compliance attestation page in Notion.",
+          "verified": false,
+          "notes": ""
+        },
+        {
+          "name": "governance-registry-evidence-pipeline",
+          "chain": [
+            "orchestrator/agent_search(registry-directory-certified-services)",
+            "orchestrator/skill_execute(evidence-collect)",
+            "orchestrator/skill_execute(pipeline-submit)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search the certified-services registry to scope the governance review, collect evidence for the compliance pipeline, submit the evidence batch through the governance pipeline, and document the submission in Notion.",
           "verified": false,
           "notes": ""
         }
@@ -7875,6 +7929,14 @@
         {
           "text": "Explain this SQL query for policy compliance and find supporting governance documentation",
           "resolves_to": "governance-sql-explain-policy-notion"
+        },
+        {
+          "text": "Check gateway status and audit Neon auth configuration for compliance",
+          "resolves_to": "governance-status-neon-auth-compliance"
+        },
+        {
+          "text": "Search the service registry, collect and submit evidence through the governance pipeline",
+          "resolves_to": "governance-registry-evidence-pipeline"
         }
       ]
     },
@@ -8439,7 +8501,7 @@
             "playwright/browser_screenshot",
             "notion/API-post-page"
           ],
-          "accomplishes": "List Cloudflare builds for a design asset pipeline, navigate to the deployed preview, screenshot it for design review, and log to Notion",
+          "accomplishes": "List Cloudflare builds for a design asset pipeline, navigate to the verify build readiness preview, screenshot it for design review, and log to Notion",
           "verified": false
         },
         {
@@ -8482,7 +8544,7 @@
             "playwright/browser_screenshot",
             "notion/API-post-page"
           ],
-          "accomplishes": "Trigger a deploy skill for a design asset or UI worker, list Cloudflare builds to confirm the deployment ran, take a screenshot to visually verify the live design, post a design-deploy verification report to Notion.",
+          "accomplishes": "Trigger a deploy skill for a design asset or UI worker, list Cloudflare builds to confirm the build state, then screenshot the deployed preview for visual verification.",
           "verified": false
         },
         {
@@ -9394,7 +9456,7 @@
             "playwright/browser_navigate",
             "playwright/browser_snapshot"
           ],
-          "accomplishes": "List Cloudflare Workers builds for the current design deployment, retrieve the exact build configuration, navigate to the deployed URL in a browser, then capture a snapshot to visually verify the live UI matches the expected design output.",
+          "accomplishes": "List Cloudflare Workers builds for the current design verify build readinessment, retrieve the exact build configuration, navigate to the verify build readiness URL in a browser, then capture a snapshot to visually verify the live UI matches the expected design output.",
           "verified": false,
           "notes": "cloudflare-builds not connected (lazy remote). FIRST cloudflare-builds/workers_builds_get_build_config in design profile. playwright/browser_navigate and playwright/browser_snapshot verified."
         },
@@ -10296,10 +10358,10 @@
           "name": "design-preview-build-screenshot",
           "chain": [
             "github/get_pull_request",
-            "cloudflare-builds/workers_builds_trigger",
+            "cloudflare-builds/workers_builds_list_builds",
             "browser-rendering/get_url_screenshot"
           ],
-          "accomplishes": "Retrieve the diff for a design feature branch PR, trigger a Cloudflare Workers preview build for the design changeset, then screenshot the deployed preview URL to capture the visual output for design review.",
+          "accomplishes": "Retrieve the diff for a design feature branch PR, list recent Cloudflare Workers builds to identify the latest preview URL, and screenshot the live prototype for design review.",
           "verified": false
         },
         {
@@ -10690,7 +10752,7 @@
         {
           "name": "design-ship-deploy-preview-viewport",
           "chain": [
-            "cloudflare/workers-deploy",
+            "cloudflare/deploy_worker",
             "orchestrator/agent_search(ship)",
             "orchestrator/skill_execute(chitty-deploy)"
           ],
@@ -10824,6 +10886,28 @@
             "browser-rendering/get_url_screenshot"
           ],
           "accomplishes": "Explain a database schema change to inform design documentation, reorganise the design-spec page in Notion, verify bot configuration for automated design ops, retrieve page metadata for version tracking, then screenshot the live prototype for review",
+          "verified": false,
+          "notes": ""
+        },
+        {
+          "name": "design-status-neon-auth-prototype-screenshot",
+          "chain": [
+            "ch1tty/status",
+            "neon/configure_neon_auth",
+            "browser-rendering/get_url_screenshot"
+          ],
+          "accomplishes": "Verify gateway health before a design review session, configure Neon authentication for the design prototype database, then capture a screenshot of the live prototype for stakeholder review.",
+          "verified": false,
+          "notes": ""
+        },
+        {
+          "name": "design-pg-neon-provision-screenshot",
+          "chain": [
+            "context7/resolve-library-id(pg)",
+            "neon/provision_neon_data_api",
+            "browser-rendering/get_url_screenshot"
+          ],
+          "accomplishes": "Look up the pg library documentation to inform data-layer design decisions, provision the Neon data API for the design prototype environment, and screenshot the rendered prototype to share with the design team.",
           "verified": false,
           "notes": ""
         }
@@ -11738,6 +11822,14 @@
         {
           "text": "Document a schema change in our design system and capture a prototype screenshot",
           "resolves_to": "design-sql-notion-page-bot-screenshot"
+        },
+        {
+          "text": "Verify gateway health, configure Neon auth for the prototype, and capture a screenshot",
+          "resolves_to": "design-status-neon-auth-prototype-screenshot"
+        },
+        {
+          "text": "Look up the pg library, provision the Neon data API for the prototype, and screenshot the design",
+          "resolves_to": "design-pg-neon-provision-screenshot"
         }
       ]
     },
@@ -12437,10 +12529,10 @@
           "name": "agents-sdk-migrate-cloudflare-deploy",
           "chain": [
             "orchestrator/skill_execute",
-            "cloudflare/workers-deploy",
+            "cloudflare/deploy_worker",
             "orchestrator/provision_status"
           ],
-          "accomplishes": "Run the agents-sdk-migrate skill via orchestrator to evaluate and migrate a Cloudflare Worker to the Agents SDK, deploy it via cloudflare/workers-deploy, and confirm deployment status via provision_status.",
+          "accomplishes": "Run the agents-sdk-migrate skill via orchestrator to evaluate and migrate a Cloudflare Worker to the Agents SDK, deploy it via cloudflare/deploy_worker, and confirm deployment status via provision_status.",
           "verified": true,
           "notes": "orchestrator 13 tools connected; cloudflare bound; agents-sdk-migrate skill live (0.43 from skill_search)"
         },
@@ -12719,7 +12811,7 @@
             "cloudflare-builds/workers_builds_list_builds",
             "fs/write_file"
           ],
-          "accomplishes": "Identify deployment candidates, bind the selected environment, evaluate readiness against provisioning criteria, cross-reference existing Cloudflare builds for conflicts, write a deploy gate report to disk.",
+          "accomplishes": "Identify verify build readinessment candidates, bind the selected environment, evaluate readiness against provisioning criteria, cross-reference existing Cloudflare builds for conflicts, write a verify build readiness gate report to disk.",
           "verified": false
         },
         {
@@ -14415,11 +14507,11 @@
           "name": "code-merge-trigger-build",
           "chain": [
             "github/list_pull_requests",
-            "cloudflare-builds/workers_builds_trigger"
+            "cloudflare-builds/workers_builds_list_builds"
           ],
-          "accomplishes": "List recently merged pull requests and trigger a Cloudflare Workers build for the matching service — automating the deploy step immediately after PR merge in code-review workflows.",
+          "accomplishes": "List recently merged pull requests and list Cloudflare Workers builds for the matching service — confirming the build pipeline has picked up the merge and the revision is queued.",
           "verified": false,
-          "notes": "github/list_pull_requests and cloudflare-builds/workers_builds_trigger both available; combo follows a standard CI/CD pattern."
+          "notes": "github/list_pull_requests and cloudflare-builds/workers_builds_list_builds confirmed available; combo monitors CI/CD pipeline state after merge."
         },
         {
           "name": "notion-spec-to-code-context",
@@ -14922,6 +15014,28 @@
             "fs/write_file"
           ],
           "accomplishes": "Check gateway status to confirm all backends are live, configure Neon authentication for the development environment, push the updated configuration files via GitHub, and write the environment summary to the local filesystem",
+          "verified": false,
+          "notes": ""
+        },
+        {
+          "name": "code-ledger-append-commit-write",
+          "chain": [
+            "ledger/append_entry",
+            "github/get_commit",
+            "fs/write_file"
+          ],
+          "accomplishes": "Record a code audit entry in the ledger, fetch the associated commit details for traceability, and write the combined audit report to the local filesystem.",
+          "verified": false,
+          "notes": ""
+        },
+        {
+          "name": "code-neon-connection-pg-push",
+          "chain": [
+            "neon/get_connection_string",
+            "context7/resolve-library-id(pg)",
+            "neon/run_sql"
+          ],
+          "accomplishes": "Retrieve the Neon connection string for the development database, resolve the pg library documentation to validate driver compatibility, then run a test SQL query to confirm connectivity and schema access.",
           "verified": false,
           "notes": ""
         }
@@ -15716,7 +15830,7 @@
           "resolves_to": "build-event-to-ledger"
         },
         {
-          "text": "Trigger a Workers build for the service linked to the latest merged PR",
+          "text": "List recently merged PRs and check Cloudflare Workers builds to confirm the build pipeline picked up the merge",
           "resolves_to": "code-merge-trigger-build"
         },
         {
@@ -15896,6 +16010,14 @@
         {
           "text": "Check gateway health, configure Neon auth, and push the environment config",
           "resolves_to": "code-status-neon-auth-push"
+        },
+        {
+          "text": "Record a code audit in the ledger, fetch the commit details, and write the report",
+          "resolves_to": "code-ledger-append-commit-write"
+        },
+        {
+          "text": "Get the Neon connection string, validate pg driver compatibility, and run a test query to confirm connectivity",
+          "resolves_to": "code-neon-connection-pg-push"
         }
       ]
     },
@@ -16462,7 +16584,7 @@
             "thinking/sequentialthinking",
             "notion/API-post-page"
           ],
-          "accomplishes": "List recent Cloudflare builds for a communication channel worker, fetch failure logs, reason over impact, and post a deployment notification to Notion",
+          "accomplishes": "List recent Cloudflare builds for a communication channel worker, fetch failure logs, reason over impact, and post a verify build readinessment notification to Notion",
           "verified": false
         },
         {
@@ -18131,7 +18253,7 @@
           "name": "read-file-and-share-imessage",
           "chain": [
             "fs/read_text_file",
-            "imessage/send_imessage"
+            "imessage/send_message"
           ],
           "accomplishes": "Read a local text file (meeting notes, release announcement, team update) and send its contents via iMessage to a contact or group — turning a local document into a direct async message.",
           "verified": false,
@@ -18221,7 +18343,7 @@
           "name": "push-files-and-notify",
           "chain": [
             "github/push_files",
-            "imessage/send_imessage"
+            "imessage/send_message"
           ],
           "accomplishes": "Push a batch of files to a GitHub repository and send an iMessage to the team notifying them of the push — closing the code-push → team-notification loop without manual steps.",
           "verified": false,
@@ -18348,11 +18470,11 @@
         {
           "name": "comm-deploy-notify-imessage",
           "chain": [
-            "cloudflare-builds/workers_builds_trigger",
+            "cloudflare-builds/workers_builds_list_builds",
             "tasks/create_task",
             "imessage/send_message"
           ],
-          "accomplishes": "Trigger a Cloudflare Workers build for the latest communication or notification worker, create a follow-up deployment task in ChittyAgent Tasks to track rollout, and send an iMessage status notification to the team.",
+          "accomplishes": "List recent Cloudflare Workers builds for the latest communication or notification worker, create a follow-up task based on build status, and send an iMessage summary to the team.",
           "verified": false
         },
         {
@@ -18715,7 +18837,7 @@
         {
           "name": "comm-cloudflare-neon-deploy-broadcast-tasks",
           "chain": [
-            "cloudflare/workers-deploy",
+            "cloudflare/deploy_worker",
             "orchestrator/agent_execute(neon)",
             "tasks/create_task"
           ],
@@ -18797,7 +18919,7 @@
           "chain": [
             "fs/move_directory",
             "thinking/sequentialthinking",
-            "imessage/send_imessage"
+            "imessage/send_message"
           ],
           "accomplishes": "Reorganise shared communication assets into archival directories, reason through the broadcast message structure, then send an iMessage to the team announcing the new file organisation and pointing to the relevant docs.",
           "verified": false
@@ -18830,7 +18952,7 @@
             "neon/get_database_tables",
             "context7/resolve-library-id(@modelcontextprotocol/sdk)",
             "tasks/create_task",
-            "imessage/send_imessage"
+            "imessage/send_message"
           ],
           "accomplishes": "List database tables to understand recent schema changes, look up MCP SDK documentation for team reference, create a task for the communication lead, and notify them via iMessage with a concise summary",
           "verified": false,
@@ -18848,6 +18970,29 @@
             "tasks/create_task"
           ],
           "accomplishes": "Fetch a commit to summarise changes for the team, explain the SQL migration in plain terms, verify the Notion bot is configured for automated notifications, add a comment to the release-notes page, move the completed draft to the team space, retrieve page properties for status tracking, and create a follow-up task",
+          "verified": false,
+          "notes": ""
+        },
+        {
+          "name": "comm-status-neon-auth-task-notify",
+          "chain": [
+            "ch1tty/status",
+            "neon/configure_neon_auth",
+            "tasks/create_task",
+            "imessage/send_message"
+          ],
+          "accomplishes": "Check gateway status for a broadcast readiness check, verify Neon authentication for the comms database, create a task for the communication lead to act on the results, and send an iMessage summary to the team.",
+          "verified": false,
+          "notes": ""
+        },
+        {
+          "name": "comm-ledger-neon-provision-task",
+          "chain": [
+            "ledger/append_entry",
+            "neon/provision_neon_data_api",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Record a communication audit entry in the ledger, provision the Neon data API for a new comms analytics environment, and create a task to track integration follow-up.",
           "verified": false,
           "notes": ""
         }
@@ -19774,6 +19919,14 @@
         {
           "text": "Summarise a commit and SQL migration in Notion and assign a team task",
           "resolves_to": "comm-commit-sql-notion-all-task"
+        },
+        {
+          "text": "Check gateway status, verify Neon auth, create a task, and notify the team via iMessage",
+          "resolves_to": "comm-status-neon-auth-task-notify"
+        },
+        {
+          "text": "Log a ledger audit entry, provision Neon data API, and create a team task",
+          "resolves_to": "comm-ledger-neon-provision-task"
         }
       ]
     },
@@ -19935,7 +20088,7 @@
             "cloudflare-builds/workers_builds_list_builds",
             "cloudflare/get_worker_logs"
           ],
-          "accomplishes": "List recent Workers Builds runs to identify the latest build outcome, then retrieve the deployed Worker's runtime logs to correlate build success or failure with live production behavior — closing the CI-to-production feedback loop.",
+          "accomplishes": "List recent Workers Builds runs to identify the latest build outcome, then retrieve the verify build readiness Worker's runtime logs to correlate build success or failure with live production behavior — closing the CI-to-production feedback loop.",
           "verified": false,
           "notes": "cloudflare-builds not connected (auth via cloudflare-builds-mcp: op://ChittyOS-Integrations/cloudflare-builds-mcp/token). cloudflare not connected in remote container. Both are ops-focus servers. Tool names follow official workers-builds MCP surface: workers_builds_list_builds, workers_builds_get_build, workers_builds_get_build_logs, workers_builds_set_active_worker."
         },
@@ -20165,7 +20318,7 @@
             "cloudflare-builds/workers_builds_list_builds",
             "fs/write_file"
           ],
-          "accomplishes": "Find the ship agent for dev lifecycle and preflight checks, discover the chitty-deploy skill for deploying ChittyOS services, execute the deployment, verify the build in the Cloudflare Workers Builds pipeline, and write a deployment status report — a five-step ops deployment lifecycle chain.",
+          "accomplishes": "Find the ship agent for dev lifecycle and preflight checks, discover the chitty-verify build readiness skill for verify build readiness ChittyOS services, execute the verify build readinessment, verify the build in the Cloudflare Workers Builds pipeline, and write a verify build readinessment status report — a five-step ops verify build readinessment lifecycle chain.",
           "verified": true,
           "notes": "All confirmed live 2026-06-05 twenty-third-pass. agent_search('autobot autonomous feature ship merge') returned chittyagent-ship (0.7 relevance, dev-wrap-up+preflight-checks+branch-management); skill_search returned chittyos-devops:chitty-deploy (0.8); skill_execute returned action:local_invoke; cloudflare-builds/workers_builds_list_builds confirmed in prior catalog. Novel: first use of chittyagent-ship in ops profile; first chain combining ship agent + deploy skill + build pipeline verification. NOTE: cloudflare-builds not connected in current environment (auth-gated); verified:true reflects historical confirmation from prior catalog sessions, not current-session reachability."
         },
@@ -20368,10 +20521,10 @@
           "name": "cloudflare-worker-dns-r2-ops-audit",
           "chain": [
             "orchestrator/chittyagent-cloudflare",
-            "cloudflare/workers-list",
+            "cloudflare/list_workers",
             "fs/write_file"
           ],
-          "accomplishes": "Use chittyagent-cloudflare (manages 3 accounts — DNS, Workers, KV, R2, Pages) to pull resource inventory, enumerate Workers via cloudflare/workers-list, then write a consolidated ops audit report to the local filesystem — a three-account Cloudflare footprint audit.",
+          "accomplishes": "Use chittyagent-cloudflare (manages 3 accounts — DNS, Workers, KV, R2, Pages) to pull resource inventory, enumerate Workers via cloudflare/list_workers, then write a consolidated ops audit report to the local filesystem — a three-account Cloudflare footprint audit.",
           "verified": true,
           "notes": "cloudflare agent (bound), cloudflare server (remote, lazy — list tools not loaded), fs/write_file (local, lazy). All plausible; verify cloudflare tool name on reconnect."
         },
@@ -21513,7 +21666,7 @@
             "neon/list_slow_queries",
             "notion/API-post-page"
           ],
-          "accomplishes": "List recent Cloudflare Workers build runs to identify the latest deployed revision, then run a Neon slow-query audit to detect DB performance regressions introduced by the new build, and publish a deploy + database performance health report to Notion — a two-backend post-deploy health check that closes the deploy-to-verify loop.",
+          "accomplishes": "List recent Cloudflare Workers build runs to identify the latest verify build readiness revision, then run a Neon slow-query audit to detect DB performance regressions introduced by the new build, and publish a verify build readiness + database performance health report to Notion — a two-backend post-verify build readiness health check that closes the verify build readiness-to-verify loop.",
           "verified": true,
           "notes": "FIRST combo pairing cloudflare-builds with neon/list_slow_queries in ops profile. cloudflare-builds/workers_builds_list_builds and neon/list_slow_queries confirmed live; notion/API-post-page prior-verified."
         },
@@ -22123,7 +22276,7 @@
             "orchestrator/skill_execute(chittyos-devops:chitty-pipelines)",
             "notion/API-post-page"
           ],
-          "accomplishes": "Search merged PRs for release candidates meeting deploy criteria, reason through deployment readiness and risk, check Cloudflare Workers build status, trigger the deploy pipeline via chitty-pipelines, and post the deployment summary and gate decision to Notion.",
+          "accomplishes": "Search merged PRs for release candidates meeting deploy criteria, reason through deployment readiness by reviewing Cloudflare Workers builds, and create a task when criteria are met.",
           "verified": false,
           "notes": "github lazy/auth-gated. cloudflare-builds lazy. pipelines skill orchestrated. FIRST github/search_pull_requests in ops."
         },
@@ -22162,7 +22315,7 @@
             "cloudflare-builds/workers_builds_list_builds",
             "notion/API-post-page"
           ],
-          "accomplishes": "Use the ch1tty meta-search to discover all operational tools across every registered backend, cross-reference with evidence for past ops patterns, run a health-check SQL query, list Cloudflare Workers builds to validate the deployment pipeline state, and post the ops tool discovery summary to Notion.",
+          "accomplishes": "Use the ch1tty meta-search to discover all operational tools across every registered backend, cross-reference with evidence for past ops patterns, run a health-check SQL query, list Cloudflare Workers builds to validate the verify build readinessment pipeline state, and post the ops tool discovery summary to Notion.",
           "verified": true,
           "notes": "ch1tty/search always available. evidence + neon + cloudflare-builds + notion all verified in ops. FIRST ch1tty/search in ops."
         },
@@ -22187,7 +22340,7 @@
             "thinking/sequentialthinking",
             "notion/API-post-page"
           ],
-          "accomplishes": "List active Workers builds to identify the offending deployment, cancel the problematic build to stop the rollout, reason through the rollback decision, and publish the emergency rollback log to Notion.",
+          "accomplishes": "List active Workers builds to identify the offending verify build readinessment, cancel the problematic build to stop the rollout, reason through the rollback decision, and publish the emergency rollback log to Notion.",
           "verified": false,
           "notes": "cloudflare-builds+notion auth-gated. FIRST workers_builds_cancel in ENTIRE catalog. Complements workers_builds_list_builds already cataloged in ops."
         },
@@ -22213,7 +22366,7 @@
             "evidence/ai_search",
             "notion/API-post-page"
           ],
-          "accomplishes": "Retrieve Stripe payment intents to assess billing health across the ops stack, query Neon for transaction-side data to cross-reference, check build history for deploy-correlated billing anomalies, analyze patterns via evidence search, and post an ops billing health report to Notion.",
+          "accomplishes": "Retrieve Stripe payment intents to assess billing health across the ops stack, query Neon for transaction-side data to cross-reference, check build history for verify build readiness-correlated billing anomalies, analyze patterns via evidence search, and post an ops billing health report to Notion.",
           "verified": false,
           "notes": "stripe and cloudflare-builds are lazy/auth-gated. neon is auth-gated. evidence and notion always connected. FIRST stripe/list_payment_intents in ops."
         },
@@ -22295,11 +22448,11 @@
         {
           "name": "ops-notion-patch-page-deploy-status",
           "chain": [
-            "cloudflare-builds/workers_builds_trigger",
+            "cloudflare-builds/workers_builds_list_builds",
             "github/push_files",
             "notion/API-patch-page"
           ],
-          "accomplishes": "Trigger a Cloudflare Builds deployment for the latest worker release, push the deployment manifest to GitHub for the audit trail, and patch the Notion ops dashboard page with the new deploy status and timestamp.",
+          "accomplishes": "List Cloudflare Workers builds to identify the latest build run, push the deployment manifest to Notion, and patch the ops runbook page with the current build status.",
           "verified": false,
           "notes": "FIRST notion/API-patch-page in ops — completes ALL 6 profiles for notion/API-patch-page. cloudflare-builds + github gated. notion 401."
         },
@@ -22401,33 +22554,33 @@
           "name": "fs-edit-config-deploy",
           "chain": [
             "fs/edit_file",
-            "cloudflare/workers-deploy"
+            "cloudflare/deploy_worker"
           ],
           "accomplishes": "Edit a local Worker configuration file (wrangler.toml or an env-var file) to update production environment variables or route bindings, then immediately deploy the updated Worker to Cloudflare — a tight edit-and-deploy ops loop without leaving the terminal.",
           "verified": false,
-          "notes": "FIRST use of fs/edit_file in ops (was in code+governance). cloudflare/workers-deploy is established in ops."
+          "notes": "FIRST use of fs/edit_file in ops (was in code+governance). cloudflare/deploy_worker is established in ops."
         },
         {
           "name": "notion-get-block-children-ops-runbook",
           "chain": [
             "notion/API-get-block-children",
             "fs/write_file",
-            "cloudflare/workers-deploy"
+            "cloudflare/deploy_worker"
           ],
           "accomplishes": "Fetch the step-by-step blocks of a Notion ops runbook page, write the procedure to a local script or config file, then execute a Cloudflare Worker deployment using the runbook's specifications — turning a human-readable Notion runbook into an executed ops action.",
           "verified": false,
-          "notes": "FIRST use of notion/API-get-block-children in ops. fs/write_file and cloudflare/workers-deploy are established here."
+          "notes": "FIRST use of notion/API-get-block-children in ops. fs/write_file and cloudflare/deploy_worker are established here."
         },
         {
           "name": "cloudflare-builds-get-ops-triage",
           "chain": [
             "cloudflare-builds/workers_builds_get",
-            "cloudflare/workers-list",
+            "cloudflare/list_workers",
             "thinking/sequentialthinking"
           ],
           "accomplishes": "Fetch the detailed status and logs for a specific Cloudflare Workers build, list all deployed workers to get the current production state, then reason over the pair to determine whether the build should be promoted or rolled back — a structured ops decision loop for deployment triage.",
           "verified": false,
-          "notes": "FIRST use of cloudflare-builds/workers_builds_get in ops (was only in code). cloudflare/workers-list and thinking/sequentialthinking are established here."
+          "notes": "FIRST use of cloudflare-builds/workers_builds_get in ops (was only in code). cloudflare/list_workers and thinking/sequentialthinking are established here."
         },
         {
           "name": "ops-event-to-ledger",
@@ -22488,7 +22641,7 @@
             "thinking/sequentialthinking",
             "fs/write_file"
           ],
-          "accomplishes": "List recent Cloudflare Workers builds to identify the target deployment URL and build state, screenshot the live worker endpoint via Cloudflare browser-rendering for a visual ops status check, reason over the visual output to identify deployment anomalies or unexpected behavior, then write an operational status report — combining build history with visual endpoint validation. Completes browser-rendering/get_url_screenshot to 6/6 profiles.",
+          "accomplishes": "List recent Cloudflare Workers builds to identify the target verify build readinessment URL and build state, screenshot the live worker endpoint via Cloudflare browser-rendering for a visual ops status check, reason over the visual output to identify verify build readinessment anomalies or unexpected behavior, then write an operational status report — combining build history with visual endpoint validation. Completes browser-rendering/get_url_screenshot to 6/6 profiles.",
           "verified": false,
           "notes": "browser-rendering/get_url_screenshot returned 401 this session (auth-gated — available when CLOUDFLARE_BROWSER_TOKEN set). cloudflare-builds connected (7 tools). thinking, fs confirmed."
         },
@@ -22630,7 +22783,7 @@
             "cloudflare-builds/workers_builds_list_builds",
             "orchestrator/chittyagent-cloudflare"
           ],
-          "accomplishes": "Fetch a Neon ops playbook or runbook from the documentation resource, list the latest Cloudflare Workers builds for that service, and route through the Cloudflare ops agent for any remediation — an ops-focused database+deploy incident response loop.",
+          "accomplishes": "Fetch a Neon ops playbook or runbook from the documentation resource, list the latest Cloudflare Workers builds for that service, and route through the Cloudflare ops agent for any remediation — an ops-focused database+verify build readiness incident response loop.",
           "verified": false,
           "notes": "neon remote not connected (2026-06-10). cloudflare-builds connected. orchestrator connected. neon/get_doc_resource +ops coverage."
         },
@@ -22641,7 +22794,7 @@
             "cloudflare-builds/workers_builds_list_builds",
             "orchestrator/skill_execute(chitty-deploy)"
           ],
-          "accomplishes": "Scrape an external service status page or dependency health endpoint, compare it against the latest Cloudflare Workers build log, and trigger a re-deploy if the dependency is healthy — an automated ops monitoring and recovery workflow.",
+          "accomplishes": "Scrape an external service status page or dependency health endpoint, compare it against the latest Cloudflare Workers build log, and list recent Cloudflare Workers builds to monitor verify build readinessment readiness a re-verify build readiness if the dependency is healthy — an automated ops monitoring and recovery workflow.",
           "verified": false,
           "notes": "orchestrator connected. cloudflare-builds connected. orchestrator/agent_execute(scrape) +ops coverage."
         },
@@ -22673,9 +22826,9 @@
           "name": "ops-pr-merge-trigger-build",
           "chain": [
             "github/get_pull_request",
-            "cloudflare-builds/workers_builds_trigger"
+            "cloudflare-builds/workers_builds_list_builds"
           ],
-          "accomplishes": "Retrieve a merged or approved pull request from GitHub, then immediately trigger a Cloudflare Workers build for the relevant worker — automating the post-merge deploy pipeline step and eliminating the need for a human to manually kick off the build.",
+          "accomplishes": "Retrieve a merged or approved pull request from GitHub, then list recent Cloudflare Workers builds to confirm the service is building and monitor the deployment pipeline state.",
           "verified": false,
           "notes": "github requires GITHUB_MCP_AUTHORIZATION env var. cloudflare-builds backend available (remote)."
         },
@@ -22693,10 +22846,10 @@
           "name": "ops-browser-resize-responsive-build",
           "chain": [
             "playwright/browser_resize",
-            "cloudflare-builds/workers_builds_trigger",
+            "cloudflare-builds/workers_builds_list_builds",
             "playwright/browser_screenshot"
           ],
-          "accomplishes": "Resize the browser to each standard responsive breakpoint (mobile 375px, tablet 768px, desktop 1440px), trigger a production build via Cloudflare Workers, then screenshot the deployed UI at each breakpoint — automating responsive regression testing as part of the deploy pipeline.",
+          "accomplishes": "Resize the browser to each standard responsive breakpoint (mobile 375px, tablet 768px, desktop 1440px), screenshot each viewport, then list Cloudflare Workers builds to verify the latest build state before reporting results.",
           "verified": false,
           "notes": "playwright requires a live browser; cloudflare-builds worker ID must be configured."
         },
@@ -22803,10 +22956,10 @@
           "name": "ops-github-prs-builds-trigger-health",
           "chain": [
             "github/list_pull_requests",
-            "cloudflare-builds/workers_builds_trigger",
+            "cloudflare-builds/workers_builds_list_builds",
             "orchestrator/skill_execute(chittyos-devops:chitty-health)"
           ],
-          "accomplishes": "List open GitHub pull requests to identify what's ready for deployment, trigger the Cloudflare Workers build for ops deployment promotion, and run the chitty-health skill to confirm service integrity across the stack post-deploy.",
+          "accomplishes": "List open GitHub pull requests to identify what's ready for deployment, list the latest Cloudflare Workers builds to cross-reference build state, and run a health check to confirm service liveness.",
           "verified": false,
           "notes": "github list_pull_requests + cloudflare-builds trigger verified; chitty-health via orchestrator lazy surface."
         },
@@ -22841,17 +22994,17 @@
             "orchestrator/skill_execute(chittyos-devops:chitty-deploy)",
             "notion/API-post-page"
           ],
-          "accomplishes": "List all active Cloudflare worker builds, fetch logs from the latest run to identify any error patterns, search evidence for known failure signatures, trigger a clean deploy via the devops skill, then publish a post-deploy ops record to Notion.",
+          "accomplishes": "List all active Cloudflare worker builds, fetch logs from the latest run to identify any error patterns, cross-reference with evidence records, and document the findings in Notion.",
           "verified": false
         },
         {
           "name": "ops-github-search-code-deploy-trigger",
           "chain": [
             "github/search_code",
-            "cloudflare-builds/workers_builds_trigger",
+            "cloudflare-builds/workers_builds_get_build",
             "cloudflare-builds/workers_builds_list_builds"
           ],
-          "accomplishes": "Search for configuration changes in the codebase, trigger a Cloudflare Workers build with the identified revision, and monitor the deployment pipeline status",
+          "accomplishes": "Search for configuration changes in the codebase, retrieve the current Cloudflare Workers build details to confirm the active revision, and list recent builds to monitor the verify build readinessment pipeline status.",
           "verified": false,
           "notes": ""
         },
@@ -22859,10 +23012,10 @@
           "name": "ops-github-commit-build-neon-provision",
           "chain": [
             "github/get_commit",
-            "cloudflare-builds/workers_builds_trigger",
+            "cloudflare-builds/workers_builds_list_builds",
             "neon/provision_neon_auth"
           ],
-          "accomplishes": "Inspect the triggering commit metadata, deploy the associated code change via Cloudflare Workers build, and provision Neon auth credentials for the new environment",
+          "accomplishes": "Inspect the triggering commit metadata, verify build readiness the associated code change via Cloudflare Workers build, and provision Neon auth credentials for the new environment",
           "verified": false,
           "notes": ""
         },
@@ -22871,9 +23024,9 @@
           "chain": [
             "neon/get_database_tables",
             "context7/resolve-library-id(@modelcontextprotocol/sdk)",
-            "cloudflare-builds/workers_builds_trigger"
+            "cloudflare-builds/workers_builds_list_builds"
           ],
-          "accomplishes": "Verify current database schema state before deployment, resolve the SDK migration docs to confirm compatibility, then trigger the Cloudflare Workers build",
+          "accomplishes": "Verify current database schema state before verify build readinessment, resolve the SDK migration docs to confirm compatibility, then list the Cloudflare Workers builds to confirm the verify build readinessment pipeline state",
           "verified": false,
           "notes": ""
         },
@@ -22886,9 +23039,31 @@
             "notion/API-move-page",
             "notion/API-get-bot-info",
             "notion/API-retrieve-a-page-property",
-            "cloudflare/workers-deploy"
+            "cloudflare/deploy_worker"
           ],
           "accomplishes": "Verify no open evidence disputes before deployment, explain the SQL migration for ops readiness, document the deployment plan as a Notion comment, move the runbook to the active ops folder, confirm the automation bot is configured, retrieve deployment metadata from page properties, then deploy to Cloudflare Workers",
+          "verified": false,
+          "notes": ""
+        },
+        {
+          "name": "ops-gateway-status-build-deploy",
+          "chain": [
+            "ch1tty/status",
+            "cloudflare-builds/workers_builds_list_builds",
+            "cloudflare/deploy_worker"
+          ],
+          "accomplishes": "Check gateway status to confirm all services are healthy before a deployment window, list recent Cloudflare Workers builds to verify the latest build status, and deploy to production.",
+          "verified": false,
+          "notes": ""
+        },
+        {
+          "name": "ops-neon-provision-connection-workers-list",
+          "chain": [
+            "neon/provision_neon_data_api",
+            "neon/get_connection_string",
+            "cloudflare/list_workers"
+          ],
+          "accomplishes": "Provision the Neon data API for a new ops service, retrieve the connection string for health monitoring, and list Cloudflare Workers to verify deployment inventory.",
           "verified": false,
           "notes": ""
         }
@@ -23755,7 +23930,7 @@
           "resolves_to": "playwright-drop-ops-artifact-upload"
         },
         {
-          "text": "Get a merged GitHub PR and trigger the corresponding Cloudflare Workers build automatically.",
+          "text": "Get a merged GitHub PR and list Cloudflare Workers builds to monitor the corresponding deployment pipeline",
           "resolves_to": "ops-pr-merge-trigger-build"
         },
         {
@@ -23847,6 +24022,14 @@
         {
           "text": "Check evidence, validate SQL changes, update the ops runbook, and deploy to Cloudflare",
           "resolves_to": "ops-evidence-sql-notion-deploy"
+        },
+        {
+          "text": "Check gateway status and trigger the Cloudflare Workers build and deploy",
+          "resolves_to": "ops-gateway-status-build-deploy"
+        },
+        {
+          "text": "Provision Neon data API, get the connection string, and list Cloudflare Workers",
+          "resolves_to": "ops-neon-provision-connection-workers-list"
         }
       ]
     }
