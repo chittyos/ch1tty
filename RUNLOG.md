@@ -235,3 +235,22 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 - **Next run priority**:
   1. Merge PR #321 when CI green
   2. 124th pass: all tools now ≥2/6 or 6/6. Best targets: the 9 new 2/6 tools + `neon/get_database_tables` (4/6, needs +communication+ops for 6/6). Efficient batching: tools missing the same 2 profiles can be covered in 1 combo each. ~12 combos could complete 4–5 more tools to 6/6.
+
+### 2026-06-11 (run 66)
+- **Workstream advanced**: E — Alchemist catalog 124th pass
+- **Branch/PR**: `auto/E-catalog-124th-pass` → https://github.com/chittyos/ch1tty/pull/322 (open, CI in_progress)
+- **Build**: clean (`tsc`)
+- **Tests**: 938/940 pass, 0 fail, 2 skipped (Ollama unreachable — expected)
+- **What was done**:
+  - Startup: built clean, 938/0/2. Merged PR #321 (123rd pass, all 3 CI green). Main at 0b72f92 (1370 combos, 217 tools at 6/6).
+  - Coverage analysis: 9 tools at 2/6, 1 at 4/6 — all with known missing profiles. Designed 12 combos (2 per profile) as efficient fat chains covering multiple tool gaps per combo.
+  - 124th pass: **9 tools completed to 6/6** (all 9 remaining sub-6/6 tools). Zero tools below 2/6 maintained. Strategy: cross-profile fat chains (up to 7 tools) covering the Notion/neon/context7/evidence/github clusters in a single pass.
+  - Completed to 6/6: `neon/get_database_tables`, `context7/resolve-library-id(@modelcontextprotocol/sdk)`, `evidence/ai_search(chittyevidence-search…)`, `github/get_commit`, `neon/explain_sql_statement`, `notion/API-create-a-comment`, `notion/API-move-page`, `notion/API-get-bot-info`, `notion/API-retrieve-a-page-property`.
+  - Bonus: `ch1tty/status` 1→2/6 (+code), `neon/configure_neon_auth` 1→2/6 (+code).
+  - 6/6 tool count: **217 → 226**
+- **Catalog**: 1370→**1382 combos** / 1367→**1379 prompts**
+- **Workstream state**: A✅ B✅ C✅ D✅ E ongoing.
+- **Blocker**: Notion auth 401 persists — RUNLOG.md is cross-run fallback board.
+- **Next run priority**:
+  1. Merge PR #322 when CI green (2 CodeQL checks in_progress at run end)
+  2. 125th pass: advance `ch1tty/status` (2/6, missing gov+design+comm+ops) and `neon/configure_neon_auth` (2/6, missing fin+gov+design+comm) to 6/6. Also expand high-value 1/6 tools: `cloudflare-builds/workers_builds_cancel`, `ledger/record`, `imessage/send_imessage`, `cloudflare/workers-list`. With 12 combos these can all reach 6/6.
