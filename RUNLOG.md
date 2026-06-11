@@ -274,3 +274,17 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 - **Next run priority**:
   1. Merge PR #323 (CI 0-jobs artifact is pre-existing — safe)
   2. 126th pass: real targets after tool-name fixes — `neon/provision_neon_data_api` (4/6, needs +governance+code), `context7/resolve-library-id(pg)` (3/6, needs +governance+communication+ops), `neon/get_connection_string` (3/6, needs +governance+design+communication), `orchestrator/agent_search(registry-directory-certified-services)` (2/6, needs +design+code+communication+ops). With 12 combos all four can reach 6/6 → 6/6 count ~231.
+
+### 2026-06-11 (run 67 — post-merge update)
+- **PR #323 merged** ✅ (auto/E-catalog-125th-pass → main)
+- **Final branch state**: 7 commits (1 catalog pass + 6 review-fix commits)
+  - `5f442e6` fix: ledger/record → ledger/append_entry (4 chains)
+  - `7371066` fix: imessage/send_imessage → send_message (5 combos), workers_builds_trigger → workers_builds_list_builds (13 combos), stale RUNLOG ref
+  - `97c4d82` fix: duplicate workers_builds_list_builds in ops-github-search-code-deploy-trigger
+  - `ccae92a` fix: stale _comment, misleading trigger/deploy accomplishes (41 combos)
+  - `dbcc224` fix: phantom cloudflare/workers-deploy → deploy_worker (9 chains), misleading finance deploy prompt, credential-push-to-github risk (code-neon-connection-pg-push), _comment count 228→227
+  - `f5720b4` fix: phantom workers-list → list_workers (3 chains), stale trigger prompts (2 combos), P1 credential-in-ledger (finance-neon-auth-connection-ledger: get_connection_string → describe_branch)
+- **Phantom tools eliminated this run**: ledger/record, imessage/send_imessage, workers_builds_trigger, cloudflare/workers-deploy, cloudflare/workers-list
+- **Security issues fixed**: raw DB credential push to GitHub (code-neon-connection-pg-push), DB connection string stored in immutable ledger (finance-neon-auth-connection-ledger)
+- **Main now at**: 1394 combos / 1391 prompts / 227 tools at 6/6
+- **Next run (128th pass)**: targets unchanged — `neon/provision_neon_data_api` (4/6, +governance+code), `context7/resolve-library-id(pg)` (3/6, +governance+communication+ops), `neon/get_connection_string` (3/6, +governance+design+communication), `orchestrator/agent_search(registry-directory-certified-services)` (2/6, +design+code+communication+ops). With 12 combos all four → 6/6; count ~231.
