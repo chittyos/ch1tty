@@ -2713,6 +2713,28 @@
           ],
           "accomplishes": "Query the ChittyOS agent registry for active financial agents, search storage backends for billing document archives, list recent Stripe invoices to compare against stored records, and reconcile any discrepancies in the ledger.",
           "verified": false
+        },
+        {
+          "name": "finance-cloudflare-neon-deploy-cost-audit",
+          "chain": [
+            "cloudflare/workers-deploy",
+            "orchestrator/agent_execute(neon)",
+            "orchestrator/skill_execute(chitty-deploy)"
+          ],
+          "accomplishes": "Deploy a Cloudflare Worker, query the Neon agent for billing schema or cost records, and run the chitty-deploy skill to finalize the release — a finance-gated deployment workflow that validates cost metadata before promoting to production.",
+          "verified": false,
+          "notes": "cloudflare not connected (lazy); orchestrator tools inferred from chittyagent surface."
+        },
+        {
+          "name": "finance-ship-registry-deploy-cost-sprint",
+          "chain": [
+            "orchestrator/agent_search(ship)",
+            "orchestrator/skill_search(chitty-deploy)",
+            "orchestrator/skill_search(registry-chitty-register-manage-service)"
+          ],
+          "accomplishes": "Search the ship-sprint agent for upcoming deployments, cross-reference with the chitty-deploy skill catalog, and look up registered services in the registry — building a full cost picture of what's shipping this sprint for finance sign-off.",
+          "verified": false,
+          "notes": "orchestrator tools inferred from chittyagent surface."
         }
       ],
       "prompts": [
@@ -3532,6 +3554,14 @@
         {
           "text": "Query the agent registry for financial agents, search storage for billing archives, list Stripe invoices, and reconcile discrepancies in the ledger.",
           "resolves_to": "finance-registry-storage-stripe-reconcile"
+        },
+        {
+          "text": "What will this sprint deployment cost? Check Cloudflare worker status, query the Neon billing data, and run the deploy skill.",
+          "resolves_to": "finance-cloudflare-neon-deploy-cost-audit"
+        },
+        {
+          "text": "Show me everything shipping this sprint and whether we have budget sign-off — search ship, cross-check deploy skill, and look up registered services.",
+          "resolves_to": "finance-ship-registry-deploy-cost-sprint"
         }
       ]
     },
@@ -6571,6 +6601,28 @@
           ],
           "accomplishes": "Run the legal dispute skill against a proposed policy change to surface IP and contractual risks, evaluate provisioning compliance criteria for the change, cross-reference the evidence store for supporting materials, and publish the governance decision to Notion.",
           "verified": false
+        },
+        {
+          "name": "governance-cloudflare-neon-deploy-policy-gate",
+          "chain": [
+            "cloudflare/workers-deploy",
+            "orchestrator/agent_execute(neon)",
+            "orchestrator/skill_execute(commit-commands:commit)"
+          ],
+          "accomplishes": "Deploy a Cloudflare Worker, query the Neon agent for compliance schema data, and commit the governance record via the commit-commands skill — enforcing a policy gate where every deployment is recorded against governance evidence in the database.",
+          "verified": false,
+          "notes": "cloudflare not connected (lazy); orchestrator tools inferred."
+        },
+        {
+          "name": "governance-ship-deploy-registry-compliance",
+          "chain": [
+            "orchestrator/agent_search(ship)",
+            "orchestrator/skill_execute(chitty-deploy)",
+            "orchestrator/agent_search(registry-directory-certified-services-catalog)"
+          ],
+          "accomplishes": "Cross-reference the ship agent's deployment manifest against the chitty-deploy skill output and validate each service in the certified-services registry — ensuring every deployment in a sprint is governance-compliant and registered.",
+          "verified": false,
+          "notes": "orchestrator tools inferred from chittyagent surface."
         }
       ],
       "prompts": [
@@ -7502,6 +7554,14 @@
         {
           "text": "Run the legal dispute skill against a proposed policy change, evaluate provisioning compliance, cross-reference evidence, and publish the governance decision.",
           "resolves_to": "governance-legal-dispute-provision-evaluate-compliance"
+        },
+        {
+          "text": "Gate this deployment on governance policy — deploy the worker, verify neon compliance schema, and commit the governance record.",
+          "resolves_to": "governance-cloudflare-neon-deploy-policy-gate"
+        },
+        {
+          "text": "Validate that every service shipping this sprint is compliance-registered — search ship agent, run deploy skill, and check the certified registry.",
+          "resolves_to": "governance-ship-deploy-registry-compliance"
         }
       ]
     },
@@ -10313,6 +10373,28 @@
           ],
           "accomplishes": "Query the agent registry for available UI and design agents, search storage backends for existing design assets and component libraries, screenshot the current prototype in the browser for comparison, and write the annotated snapshot to the design review directory.",
           "verified": false
+        },
+        {
+          "name": "design-ship-deploy-preview-viewport",
+          "chain": [
+            "cloudflare/workers-deploy",
+            "orchestrator/agent_search(ship)",
+            "orchestrator/skill_execute(chitty-deploy)"
+          ],
+          "accomplishes": "Trigger a Cloudflare Worker deploy, query the ship agent for the matching sprint card, and execute the chitty-deploy skill — then review the deployed surface for visual regressions before merging to production.",
+          "verified": false,
+          "notes": "cloudflare not connected (lazy); design team uses this as a pre-sign-off deployment preview."
+        },
+        {
+          "name": "design-neon-registry-deploy-surface-map",
+          "chain": [
+            "orchestrator/agent_execute(neon)",
+            "orchestrator/skill_search(chitty-deploy)",
+            "orchestrator/skill_search(registry-chitty-register-manage-service)"
+          ],
+          "accomplishes": "Use the Neon agent to pull database schema for UI data models, search the chitty-deploy skill catalog for deployment configurations, and look up the registry to map surface ownership — producing a design-ready topology of what components back each deployed service.",
+          "verified": false,
+          "notes": "orchestrator tools inferred from chittyagent surface."
         }
       ],
       "prompts": [
@@ -11177,6 +11259,14 @@
         {
           "text": "Query the agent registry for UI agents, search storage for design assets, screenshot the prototype, and write the annotated snapshot to the review directory.",
           "resolves_to": "design-registry-storage-agent-prototype-snapshot"
+        },
+        {
+          "text": "Preview the deployed worker surface before design sign-off — trigger Cloudflare deploy, pull the ship card, and run the deploy skill for the final review.",
+          "resolves_to": "design-ship-deploy-preview-viewport"
+        },
+        {
+          "text": "Map the deployed service topology for design review — query neon schema, search deploy skill catalog, and cross-reference the service registry.",
+          "resolves_to": "design-neon-registry-deploy-surface-map"
         }
       ]
     },
@@ -14226,6 +14316,28 @@
           ],
           "accomplishes": "Pull open engineering tasks from the tasks agent, search storage backends for associated implementation artifacts and prior art, fetch current library documentation via context7 for the relevant packages, and write an annotated scaffold context file to the working branch.",
           "verified": false
+        },
+        {
+          "name": "code-notion-datasource-templates-compliance-search",
+          "chain": [
+            "notion/API-list-data-source-templates",
+            "orchestrator/skill_execute(chittyos-devops:chittyos-compliance)",
+            "github/search_code"
+          ],
+          "accomplishes": "List Notion data-source templates for the relevant integration, run the ChittyOS compliance skill to check config against org policy, and search GitHub for any divergent code that bypasses the data-source schema — a full compliance audit trail from config to implementation.",
+          "verified": false,
+          "notes": "notion and github are code-relevant servers. orchestrator compliance skill inferred."
+        },
+        {
+          "name": "code-imessage-dispute-drafting-fs-context",
+          "chain": [
+            "imessage/get_recent_messages",
+            "orchestrator/skill_execute(chittycommand-alpha:dispute-drafting)",
+            "fs/read_file"
+          ],
+          "accomplishes": "Retrieve recent iMessage communications related to a dispute, pass them to the dispute-drafting skill to generate a draft argument, then read supporting file context from the filesystem — automating the code-side evidence preparation for legal or arbitration workflows.",
+          "verified": false,
+          "notes": "fs is code-relevant server. imessage not connected (lazy)."
         }
       ],
       "prompts": [
@@ -15150,6 +15262,14 @@
         {
           "text": "Pull open engineering tasks, search storage for implementation artifacts, fetch library docs via context7, and write a scaffold context file to the branch.",
           "resolves_to": "code-tasks-storage-context-docs-scaffold"
+        },
+        {
+          "text": "Audit our Notion data-source templates against compliance policy and search GitHub for any code that bypasses the schema.",
+          "resolves_to": "code-notion-datasource-templates-compliance-search"
+        },
+        {
+          "text": "Pull dispute-related iMessages, draft the legal argument from them, and read the supporting file context.",
+          "resolves_to": "code-imessage-dispute-drafting-fs-context"
         }
       ]
     },
@@ -17965,6 +18085,28 @@
           ],
           "accomplishes": "Query the ChittyOS agent registry for active communication and broadcast agents, reason sequentially over available channels and team routing rules to determine the best dispatch strategy, and write the communication plan to the Notion team-sync page.",
           "verified": false
+        },
+        {
+          "name": "comm-cloudflare-neon-deploy-broadcast-tasks",
+          "chain": [
+            "cloudflare/workers-deploy",
+            "orchestrator/agent_execute(neon)",
+            "tasks/create_task"
+          ],
+          "accomplishes": "After deploying a Cloudflare Worker, run the Neon agent to verify database migration status, then create a tasks record for the release communication — notifying the team that deployment succeeded and the database is in sync.",
+          "verified": false,
+          "notes": "tasks server (chittyagent-tasks) satisfies comm-server constraint. cloudflare not connected (lazy)."
+        },
+        {
+          "name": "comm-ship-deploy-broadcast-notion",
+          "chain": [
+            "orchestrator/agent_search(ship)",
+            "orchestrator/skill_execute(chitty-deploy)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Query the ship agent for the latest sprint release, run the chitty-deploy skill to confirm deployment, and post a release note page in Notion — creating a communication artifact that the team can reference after every sprint ship.",
+          "verified": false,
+          "notes": "notion satisfies comm-server constraint."
         }
       ],
       "prompts": [
@@ -18841,6 +18983,14 @@
         {
           "text": "Query the agent registry for communication agents, reason over dispatch strategy, and write the communication plan to the Notion team-sync page.",
           "resolves_to": "comm-registry-thinking-notion-team-sync"
+        },
+        {
+          "text": "Broadcast that the deployment is done and DB is in sync — deploy the worker, verify with neon agent, and create a task for the release comms.",
+          "resolves_to": "comm-cloudflare-neon-deploy-broadcast-tasks"
+        },
+        {
+          "text": "Post a sprint release note after ship — query ship agent, confirm deploy, and write the release page in Notion.",
+          "resolves_to": "comm-ship-deploy-broadcast-notion"
         }
       ]
     },
@@ -21819,6 +21969,28 @@
           ],
           "accomplishes": "Analyse cross-service deployment patterns via alchemist to detect topology drift, verify active service registrations in the agent registry against expected ops configuration, retrieve Cloudflare Workers build details for the latest release, and write a deployment audit report to file.",
           "verified": false
+        },
+        {
+          "name": "ops-imessage-notion-chittyhelper-incident-triage",
+          "chain": [
+            "imessage/get_recent_messages",
+            "notion/API-retrieve-a-comment",
+            "orchestrator/skill_execute(chittyhelper:chittyhelper)"
+          ],
+          "accomplishes": "Pull recent iMessages reporting an incident, retrieve the related Notion comment thread for ops context, and invoke the chittyhelper skill to route the incident to the right response workflow — end-to-end ops-driven incident triage from notification to action.",
+          "verified": false,
+          "notes": "imessage not connected (lazy). chittyhelper skill inferred."
+        },
+        {
+          "name": "ops-fs-move-dispute-evidence-plugin-deploy",
+          "chain": [
+            "fs/move_directory",
+            "orchestrator/skill_execute(chittyos-legal:fact-governance)",
+            "orchestrator/skill_execute(claude-official:plugin-dev)"
+          ],
+          "accomplishes": "Reorganize a local file directory for a dispute evidence bundle, apply the fact-governance skill to tag and validate each piece of evidence, then invoke the plugin-dev skill to deploy a Claude plugin that surfaces the organized evidence set — completing the ops evidence management pipeline.",
+          "verified": false,
+          "notes": "orchestrator skills inferred from chittyagent surface."
         }
       ],
       "prompts": [
@@ -22727,6 +22899,14 @@
         {
           "text": "Analyse deployment patterns via alchemist, verify agent registry against ops config, fetch Cloudflare build details, and write a deployment audit report.",
           "resolves_to": "ops-alchemist-registry-cloudflare-deploy-audit"
+        },
+        {
+          "text": "Triage this incident — pull recent iMessages, retrieve the Notion comment thread, and route through chittyhelper to the right response workflow.",
+          "resolves_to": "ops-imessage-notion-chittyhelper-incident-triage"
+        },
+        {
+          "text": "Prepare the ops evidence bundle — reorganize the file directory, tag via fact-governance, and deploy the Claude evidence plugin.",
+          "resolves_to": "ops-fs-move-dispute-evidence-plugin-deploy"
         }
       ]
     }
