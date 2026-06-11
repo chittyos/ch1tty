@@ -2859,10 +2859,10 @@
           "name": "finance-neon-auth-connection-ledger",
           "chain": [
             "neon/configure_neon_auth",
-            "neon/get_connection_string",
+            "neon/describe_branch",
             "ledger/append_entry"
           ],
-          "accomplishes": "Configure Neon authentication for the finance database environment, retrieve the connection string for billing service integration, and record the configuration audit entry in the ledger for compliance tracking.",
+          "accomplishes": "Configure Neon authentication for the finance database environment, describe the branch configuration to confirm the auth settings took effect, and record the configuration audit entry in the ledger for compliance tracking — no raw credentials are passed into the ledger.",
           "verified": false,
           "notes": ""
         },
@@ -6466,7 +6466,7 @@
           ],
           "accomplishes": "Log a governance approval or compliance-clearance event as evidence, then list the Cloudflare Workers builds to confirm the verify build readinessment pipeline state.",
           "verified": false,
-          "notes": "chittyevidence/log_evidence verified in governance; cloudflare-builds/workers_builds_trigger confirmed available."
+          "notes": "chittyevidence/log_evidence verified in governance; cloudflare-builds/workers_builds_list_builds confirmed available."
         },
         {
           "name": "notion-data-source-governance",
@@ -14511,7 +14511,7 @@
           ],
           "accomplishes": "List recently merged pull requests and list Cloudflare Workers builds for the matching service — confirming the build pipeline has picked up the merge and the revision is queued.",
           "verified": false,
-          "notes": "github/list_pull_requests and cloudflare-builds/workers_builds_trigger both available; combo follows a standard CI/CD pattern."
+          "notes": "github/list_pull_requests and cloudflare-builds/workers_builds_list_builds confirmed available; combo monitors CI/CD pipeline state after merge."
         },
         {
           "name": "notion-spec-to-code-context",
@@ -15830,7 +15830,7 @@
           "resolves_to": "build-event-to-ledger"
         },
         {
-          "text": "Trigger a Workers build for the service linked to the latest merged PR",
+          "text": "List recently merged PRs and check Cloudflare Workers builds to confirm the build pipeline picked up the merge",
           "resolves_to": "code-merge-trigger-build"
         },
         {
@@ -16016,7 +16016,7 @@
           "resolves_to": "code-ledger-append-commit-write"
         },
         {
-          "text": "Get the Neon connection string, validate pg driver compatibility, and push the config",
+          "text": "Get the Neon connection string, validate pg driver compatibility, and run a test query to confirm connectivity",
           "resolves_to": "code-neon-connection-pg-push"
         }
       ]
@@ -20521,10 +20521,10 @@
           "name": "cloudflare-worker-dns-r2-ops-audit",
           "chain": [
             "orchestrator/chittyagent-cloudflare",
-            "cloudflare/workers-list",
+            "cloudflare/list_workers",
             "fs/write_file"
           ],
-          "accomplishes": "Use chittyagent-cloudflare (manages 3 accounts — DNS, Workers, KV, R2, Pages) to pull resource inventory, enumerate Workers via cloudflare/workers-list, then write a consolidated ops audit report to the local filesystem — a three-account Cloudflare footprint audit.",
+          "accomplishes": "Use chittyagent-cloudflare (manages 3 accounts — DNS, Workers, KV, R2, Pages) to pull resource inventory, enumerate Workers via cloudflare/list_workers, then write a consolidated ops audit report to the local filesystem — a three-account Cloudflare footprint audit.",
           "verified": true,
           "notes": "cloudflare agent (bound), cloudflare server (remote, lazy — list tools not loaded), fs/write_file (local, lazy). All plausible; verify cloudflare tool name on reconnect."
         },
@@ -22575,12 +22575,12 @@
           "name": "cloudflare-builds-get-ops-triage",
           "chain": [
             "cloudflare-builds/workers_builds_get",
-            "cloudflare/workers-list",
+            "cloudflare/list_workers",
             "thinking/sequentialthinking"
           ],
           "accomplishes": "Fetch the detailed status and logs for a specific Cloudflare Workers build, list all deployed workers to get the current production state, then reason over the pair to determine whether the build should be promoted or rolled back — a structured ops decision loop for deployment triage.",
           "verified": false,
-          "notes": "FIRST use of cloudflare-builds/workers_builds_get in ops (was only in code). cloudflare/workers-list and thinking/sequentialthinking are established here."
+          "notes": "FIRST use of cloudflare-builds/workers_builds_get in ops (was only in code). cloudflare/list_workers and thinking/sequentialthinking are established here."
         },
         {
           "name": "ops-event-to-ledger",
@@ -23061,7 +23061,7 @@
           "chain": [
             "neon/provision_neon_data_api",
             "neon/get_connection_string",
-            "cloudflare/workers-list"
+            "cloudflare/list_workers"
           ],
           "accomplishes": "Provision the Neon data API for a new ops service, retrieve the connection string for health monitoring, and list Cloudflare Workers to verify deployment inventory.",
           "verified": false,
@@ -23930,7 +23930,7 @@
           "resolves_to": "playwright-drop-ops-artifact-upload"
         },
         {
-          "text": "Get a merged GitHub PR and trigger the corresponding Cloudflare Workers build automatically.",
+          "text": "Get a merged GitHub PR and list Cloudflare Workers builds to monitor the corresponding deployment pipeline",
           "resolves_to": "ops-pr-merge-trigger-build"
         },
         {
