@@ -23213,9 +23213,9 @@
           "chain": [
             "context7/resolve-library-id(pg)",
             "orchestrator/agent_search(registry-directory-certified-services)",
-            "cloudflare-builds/workers_builds_trigger"
+            "cloudflare-builds/workers_builds_list_builds"
           ],
-          "accomplishes": "Use pg documentation for the database migration playbook, search the certified service registry for ops-compatible backends, trigger the Cloudflare Workers deployment pipeline",
+          "accomplishes": "Use pg documentation for the database migration playbook, search the certified service registry for ops-compatible backends, list recent Cloudflare Workers builds to verify deployment pipeline state",
           "verified": false
         },
         {
