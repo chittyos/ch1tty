@@ -2548,3 +2548,51 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 1. Merge PR #327 if CI green and no blocking CodeRabbit findings
 2. 129th catalog pass: scan for remaining tools at 1/6 that are naturally cross-profile (e.g. `orchestrator/agent_execute(notion)`, `notion/API-delete-a-page`, `neon/list_shared_projects`); check if `orchestrator/agent_execute(cleaner)` can be spread from its current profile(s); deepen any tool clusters where coverage is thin
 3. Fix Notion auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` to unblock cross-run board writes
+
+---
+
+### 2026-06-11 — Session 01DDT2fwS69bHfYoi4h1XqYv (run 70 — 129th pass)
+
+**Workstream advanced**: E (Alchemist brainstorm — catalog 129th pass)
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass / 0 fail / 2 skipped
+- Found PR #327 open (`auto/E-catalog-128th-pass`), CI green (CodeQL + Analyze all success, CodeRabbit reviewed)
+- Merged PR #327 → main now at 1430 combos / 1451 prompts / 241 tools at 6/6
+- Workstream states: A ✅ B ✅ C ✅ D ✅ E in-progress (confirmed via DRIVER-LOG + repo scan)
+- Notion board still 401 — DRIVER-LOG.md remains cross-run fallback
+- Coverage gap analysis (post 128th-pass):
+  - 374 distinct tools; 241 at 6/6; 0 at 3-5/6; 1 at 2/6; 132 at 1/6
+  - **1 tool at 2/6**: `orchestrator/agent_execute(notion)` (finance+governance → needs code+design+comm+ops)
+  - **132 tools at 1/6**: primarily profile-specific orchestrator skills; cross-profile candidates identified
+- Created branch `auto/E-catalog-129th-pass`; added 12 combos + 12 prompts:
+  - **finance**: `finance-neon-shared-projects-notion-cleanup` (neon/list_shared_projects+notion/API-delete-a-page into finance), `finance-workers-scripts-billing-audit` (workers_scripts_get+upload into finance)
+  - **governance**: `governance-obligation-tracker-evidence-docket` (obligation-tracker from finance into governance), `governance-pr-review-checkpoint-registry-tasks` (pr-review+checkpoint+tasks/create into governance)
+  - **design**: `design-notion-agent-frontend-skill-creator` (notion-agent into design → 3/6), `design-workers-build-alchemist-neon-create` (workers_builds_get_build into design)
+  - **code**: `code-notion-agent-workers-upload-pr-review` (notion-agent into code → 4/6), `code-build-mcp-alchemist-autobot-neon-delete` (build-mcp-server+alchemist from design into code)
+  - **communication**: `comm-notion-agent-broadcast-tasks` (notion-agent into communication → 5/6), `comm-workers-scripts-domain-knowledge-imessage` (workers_scripts_get into comm → 3/6)
+  - **ops**: `ops-notion-agent-checkpoint-pipelines-build-cancel` (notion-agent into ops → 6/6 ✅), `ops-alchemist-market-ship-workers-build` (ops depth)
+- Coverage verification: orchestrator/agent_execute(notion) → 6/6 ✓; 11 tools 1→2/6 ✓; 0 test failures
+- 0 test failures. Tests: 938 pass / 0 fail / 2 skipped ✓
+- Catalog: 1430 → **1442 combos / 1451 → 1463 prompts**
+- Pushed branch, opened PR #328
+
+**Branch / PR**: `auto/E-catalog-129th-pass` → PR #328 (https://github.com/chittyos/ch1tty/pull/328)
+
+**Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
+
+**Board state**: 1442 combos / 518 verified (unchanged) / 1463 prompts. orchestrator/agent_execute(notion) ✅ 6/6. Tools at 6/6: 242. Tools at 3/6: 1 (cloudflare/workers_scripts_get). Tools at 2/6: 10. Tools at 1/6: 121.
+
+**Blockers**:
+- Notion auth 401: run `chitty-mcp-token notion` or rotate integration token in workspace settings
+
+**Next run priority**:
+1. Merge PR #328 when CI green
+2. 130th catalog pass: advance tools toward 6/6 by adding cross-profile combos:
+   - `cloudflare/workers_scripts_get` (3/6, needs design+governance+ops)
+   - `cloudflare/workers_scripts_upload` (2/6, needs design+governance+communication+ops)
+   - `neon/list_shared_projects` (2/6, needs code+design+communication+ops)
+   - `notion/API-delete-a-page` (2/6, needs code+design+communication+ops)
+   - `orchestrator/skill_execute(pr-review)` (2/6, needs design+finance+communication+ops)
+   - Pick 2 per profile: tools that can naturally cross into that profile
+3. Fix Notion auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`
