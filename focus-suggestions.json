@@ -23001,10 +23001,10 @@
           "name": "ops-github-search-code-deploy-trigger",
           "chain": [
             "github/search_code",
-            "cloudflare-builds/workers_builds_list_builds",
+            "cloudflare-builds/workers_builds_get_build",
             "cloudflare-builds/workers_builds_list_builds"
           ],
-          "accomplishes": "Search for configuration changes in the codebase, trigger a Cloudflare Workers build with the identified revision, and monitor the deployment pipeline status",
+          "accomplishes": "Search for configuration changes in the codebase, retrieve the current Cloudflare Workers build details to confirm the active revision, and list recent builds to monitor the deployment pipeline status.",
           "verified": false,
           "notes": ""
         },
