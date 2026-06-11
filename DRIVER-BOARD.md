@@ -4,7 +4,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 
 ## Workstream Status
 
-- [x] **A. Gateway up/refreshed/tested** — Build clean, 938 tests pass, 5 meta-tools confirmed, docs present. DONE.
+- [x] **A. Gateway up/refreshed/tested** — Build clean, 938 tests pass, 5 meta-tools confirmed (`ch1tty/search`, `ch1tty/execute`, `ch1tty/status`, `ch1tty/reload`, `ch1tty/cast`), docs present. DONE.
 - [x] **B. GitHub MCP migration** — `servers.json` github entry already migrated to `https://api.githubcopilot.com/mcp/` with `envHeaders` for `GITHUB_MCP_AUTHORIZATION`. No `@modelcontextprotocol/server-github` anywhere. DONE.
 - [x] **C. Focus-profile layer** — `focus-profiles.json` with 6 profiles (finance, governance, design, code, communication, ops), `CH1TTY_FOCUS` env var, per-call `focus` param on search/cast, `ch1tty/status` reports `availableFocusProfiles`, real tests in `test/focus.test.ts`. DONE.
 - [x] **D. Scenario testing + simulation** — `test/scenario.test.ts` (1157 lines), `test/simulation.test.ts` (229 lines), `sim/scenarios.ts` harness driving real Aggregator over FixtureBackends. All 6 focus profiles covered. All tests pass. DONE.
@@ -13,7 +13,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 ## Live Gateway State (as of 2026-06-11)
 
 - Connected backends: cloudflare-builds (7 tools), evidence (3), browser-rendering (3), context7 (2), thinking (1), fs (14), playwright (23), orchestrator (13) — 66 total tools
-- Not connected: chittyos, cloudflare, github, linear, notion, stripe, neon (lazy, auth-gated)
+- Not connected: chittyos, cloudflare, GitHub, linear, notion, stripe, neon (lazy, auth-gated)
 - System health: degraded (ledger DLQ has 6 entries — ledger.chitty.cc unreachable)
 - Brain: ok (embedding circuit open=false, ollama circuit open=false)
 
