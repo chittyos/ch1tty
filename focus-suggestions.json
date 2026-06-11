@@ -1,6 +1,6 @@
 {
-  "_comment": "131st pass — 1466 combos, 1487 prompts. Completed 6 tools to 6/6: neon/list_shared_projects, notion/API-delete-a-page, orchestrator/skill_execute(pr-review), orchestrator/skill_execute(chittyos-core:checkpoint), cloudflare/workers_scripts_upload, tasks/create.",
-  "generatedFrom": "auto-driver run 70, 2026-06-11",
+  "_comment": "132nd pass — 1476 combos, 1497 prompts. Completed 2 tools to 6/6: playwright/browser_press_key, playwright/browser_file_upload. All 10 new combos verified (playwright + orchestrator + cloudflare-builds + context7 connected on live gateway).",
+  "generatedFrom": "auto-driver run 71, 2026-06-11",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools — now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time — combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -3009,6 +3009,28 @@
           ],
           "accomplishes": "Pull Mercury banking data via the finance skill, search for available financial reporting tools, and append a summary entry to the ledger.",
           "verified": false
+        },
+        {
+          "name": "finance-playwright-keyboard-billing-form",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_press_key",
+            "playwright/browser_snapshot"
+          ],
+          "accomplishes": "Navigate to a financial web form (invoice submission, billing portal, payment gateway), drive keyboard shortcuts (Tab through fields, Enter to submit, Escape to dismiss dialogs) to automate form interaction without mouse clicks — testing financial UX keyboard accessibility and automating repetitive billing form entry.",
+          "verified": true,
+          "notes": "132nd pass: FIRST playwright/browser_press_key in finance. browser_navigate, browser_press_key, browser_snapshot all confirmed on live playwright backend."
+        },
+        {
+          "name": "finance-playwright-invoice-pdf-upload",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_file_upload",
+            "playwright/browser_snapshot"
+          ],
+          "accomplishes": "Navigate to an accounts-payable portal or invoice submission form, upload a PDF invoice or CSV expense report via the browser file picker, snapshot the confirmation screen to verify successful submission — automated financial document upload to external billing portals.",
+          "verified": true,
+          "notes": "132nd pass: FIRST playwright/browser_file_upload in finance. browser_navigate, browser_file_upload, browser_snapshot all confirmed on live playwright backend."
         }
       ],
       "prompts": [
@@ -3948,6 +3970,14 @@
         {
           "text": "Pull Mercury banking data and find reporting tools, then log a financial summary to the ledger",
           "resolves_to": "mercury-financial-reporting-ledger"
+        },
+        {
+          "text": "Open the billing portal, tab through the invoice form fields, and submit it via keyboard",
+          "resolves_to": "finance-playwright-keyboard-billing-form"
+        },
+        {
+          "text": "Upload this month's invoice PDF to our accounts-payable portal and screenshot the confirmation",
+          "resolves_to": "finance-playwright-invoice-pdf-upload"
         }
       ]
     },
@@ -7277,6 +7307,30 @@
           ],
           "accomplishes": "Collect evidence artifacts for a compliance audit, query the helper agent for guidance on applicable regulatory frameworks, and search for relevant compliance tooling.",
           "verified": false
+        },
+        {
+          "name": "governance-playwright-keyboard-compliance-portal",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_press_key",
+            "playwright/browser_snapshot",
+            "orchestrator/provision_status"
+          ],
+          "accomplishes": "Navigate to a ChittyOS governance or compliance portal, use keyboard shortcuts to step through access-control forms (Tab to next field, Enter to confirm, Escape to cancel), snapshot the resulting state for audit evidence, and check current provisioning status — keyboard-driven governance UI automation with session context awareness.",
+          "verified": true,
+          "notes": "132nd pass: FIRST playwright/browser_press_key in governance. browser_navigate, browser_press_key, browser_snapshot confirmed on live playwright. orchestrator/provision_status confirmed on live orchestrator."
+        },
+        {
+          "name": "governance-playwright-evidence-doc-upload",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_file_upload",
+            "playwright/browser_snapshot",
+            "orchestrator/provision_status"
+          ],
+          "accomplishes": "Navigate to a ChittyOS evidence or compliance portal, upload a governance document (audit report, evidence file, policy PDF) via the browser, snapshot the upload confirmation for the audit trail, then check provisioning status to record who performed the upload — automated governance document submission with session provenance.",
+          "verified": true,
+          "notes": "132nd pass: FIRST playwright/browser_file_upload in governance. browser_navigate, browser_file_upload, browser_snapshot confirmed on live playwright. orchestrator/provision_status confirmed on live orchestrator."
         }
       ],
       "prompts": [
@@ -8328,6 +8382,14 @@
         {
           "text": "Collect compliance evidence, get framework guidance from the helper, and find applicable compliance tools",
           "resolves_to": "compliance-evidence-helper-collect"
+        },
+        {
+          "text": "Step through the compliance form keyboard-only, screenshot the result, and check my current provisioning status",
+          "resolves_to": "governance-playwright-keyboard-compliance-portal"
+        },
+        {
+          "text": "Upload this governance audit report to the evidence portal and record who was provisioned during the upload",
+          "resolves_to": "governance-playwright-evidence-doc-upload"
         }
       ]
     },
@@ -11434,6 +11496,28 @@
           ],
           "accomplishes": "Screenshot the current UI, run the frontend-design skill for redesign suggestions, then list Neon branch computes to identify available environments for prototyping.",
           "verified": false
+        },
+        {
+          "name": "design-playwright-keyboard-prototype-nav",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_press_key",
+            "playwright/browser_take_screenshot"
+          ],
+          "accomplishes": "Navigate to a UI design prototype or interactive mockup, use keyboard shortcuts (arrow keys, Tab, Escape, Space) to trigger interactive states, transitions, and overlay dismissals, capture a screenshot of each resulting state — keyboard-driven interaction testing for design prototypes and accessibility audits.",
+          "verified": true,
+          "notes": "132nd pass: FIRST playwright/browser_press_key in design. browser_navigate, browser_press_key, browser_take_screenshot all confirmed on live playwright backend."
+        },
+        {
+          "name": "design-playwright-asset-upload-preview",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_file_upload",
+            "playwright/browser_snapshot"
+          ],
+          "accomplishes": "Navigate to a design tool or digital asset management portal, upload an image, SVG, or design file via the browser file picker, snapshot the uploaded asset's rendered preview to confirm it displays correctly — automated design asset upload testing and visual preview verification.",
+          "verified": true,
+          "notes": "132nd pass: FIRST playwright/browser_file_upload in design. browser_navigate, browser_file_upload, browser_snapshot all confirmed on live playwright backend."
         }
       ],
       "prompts": [
@@ -12418,6 +12502,14 @@
         {
           "text": "Screenshot the UI, get frontend redesign suggestions, then find available Neon environments for prototyping",
           "resolves_to": "frontend-screenshot-neon-env"
+        },
+        {
+          "text": "Open the design prototype, tab through interactive states with keyboard, and capture screenshots of each transition",
+          "resolves_to": "design-playwright-keyboard-prototype-nav"
+        },
+        {
+          "text": "Upload the new SVG asset to the DAM and snapshot its rendered preview",
+          "resolves_to": "design-playwright-asset-upload-preview"
         }
       ]
     },
@@ -15762,6 +15854,30 @@
           ],
           "accomplishes": "Discover ch1tty gateway routing capabilities via agent search, find the cast-mcp-route skill, then search the codebase for relevant implementation patterns.",
           "verified": false
+        },
+        {
+          "name": "code-playwright-keyboard-editor-shortcuts",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_press_key",
+            "playwright/browser_snapshot",
+            "context7/resolve-library-id"
+          ],
+          "accomplishes": "Navigate to a web-based code editor or IDE (CodeSandbox, StackBlitz, GitHub Codespaces web UI), fire keyboard shortcuts (Ctrl+S to save, Ctrl+Z to undo, Escape to close modals) to trigger editor commands, snapshot the editor state to confirm the action, then resolve library docs for the framework in context — keyboard-driven IDE automation combined with live documentation lookup.",
+          "verified": true,
+          "notes": "132nd pass: FIRST playwright/browser_press_key in code. browser_navigate, browser_press_key, browser_snapshot confirmed on live playwright. context7/resolve-library-id confirmed on live context7 backend."
+        },
+        {
+          "name": "code-playwright-ci-artifact-upload",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_file_upload",
+            "playwright/browser_snapshot",
+            "context7/resolve-library-id"
+          ],
+          "accomplishes": "Navigate to a web-based CI/CD interface or artifact registry, upload a build artifact, compiled binary, or wrangler config file via the browser, snapshot the upload confirmation, then look up framework documentation to cross-reference the artifact's expected format — automated artifact upload to web-based CI systems with documentation validation.",
+          "verified": true,
+          "notes": "132nd pass: FIRST playwright/browser_file_upload in code. browser_navigate, browser_file_upload, browser_snapshot confirmed on live playwright. context7/resolve-library-id confirmed on live context7 backend."
         }
       ],
       "prompts": [
@@ -16806,6 +16922,14 @@
         {
           "text": "Find ch1tty gateway routing capabilities and the cast-mcp-route skill, then search the codebase for implementation patterns",
           "resolves_to": "gateway-cast-route-codesearch"
+        },
+        {
+          "text": "Open the web IDE, trigger Ctrl+S and Ctrl+Z keyboard shortcuts, and look up library docs for this project",
+          "resolves_to": "code-playwright-keyboard-editor-shortcuts"
+        },
+        {
+          "text": "Upload the build artifact to the CI interface and cross-reference the expected format from the framework docs",
+          "resolves_to": "code-playwright-ci-artifact-upload"
         }
       ]
     },
@@ -24189,6 +24313,30 @@
           ],
           "accomplishes": "Triage an active error via the resolve agent, inspect the affected service pipeline in chitty-pipelines, and search for a recommendation engine skill to suggest automated recovery strategies.",
           "verified": false
+        },
+        {
+          "name": "ops-playwright-keyboard-dashboard-ops",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_press_key",
+            "playwright/browser_snapshot",
+            "cloudflare-builds/workers_builds_list_builds"
+          ],
+          "accomplishes": "Navigate to a Cloudflare Workers or ops monitoring dashboard, use keyboard shortcuts (Escape to dismiss error banners, Enter to confirm emergency rollback dialogs, Tab to navigate table rows) to interact without slow mouse clicks, snapshot the resulting dashboard state, then list current build runs to correlate the action's effect — keyboard-driven ops dashboard interaction with build queue awareness.",
+          "verified": true,
+          "notes": "132nd pass: FIRST playwright/browser_press_key in ops. browser_navigate, browser_press_key, browser_snapshot confirmed on live playwright. cloudflare-builds/workers_builds_list_builds confirmed on live cloudflare-builds backend."
+        },
+        {
+          "name": "ops-playwright-config-upload-builds",
+          "chain": [
+            "playwright/browser_navigate",
+            "playwright/browser_file_upload",
+            "playwright/browser_snapshot",
+            "cloudflare-builds/workers_builds_list_builds"
+          ],
+          "accomplishes": "Navigate to the Cloudflare Workers or Wrangler dashboard, upload a wrangler.toml or deploy configuration file via the browser, snapshot the config validation confirmation, then list current builds to verify the new configuration is reflected in the build queue — browser-based ops configuration upload with build-queue correlation.",
+          "verified": true,
+          "notes": "132nd pass: FIRST playwright/browser_file_upload in ops. browser_navigate, browser_file_upload, browser_snapshot confirmed on live playwright. cloudflare-builds/workers_builds_list_builds confirmed on live cloudflare-builds backend."
         }
       ],
       "prompts": [
@@ -25217,6 +25365,14 @@
         {
           "text": "Triage an active error, inspect the service pipeline, and find a recommendation engine for automated recovery",
           "resolves_to": "resolve-pipeline-recommendation"
+        },
+        {
+          "text": "Navigate to the Cloudflare dashboard, use keyboard to dismiss error banners, and list the current build queue",
+          "resolves_to": "ops-playwright-keyboard-dashboard-ops"
+        },
+        {
+          "text": "Upload the new wrangler.toml to the Workers dashboard and confirm the build queue reflects the updated config",
+          "resolves_to": "ops-playwright-config-upload-builds"
         }
       ]
     }
