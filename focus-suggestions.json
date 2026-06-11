@@ -21800,7 +21800,7 @@
           "chain": [
             "github/search_pull_requests",
             "thinking/sequentialthinking",
-            "cloudflare-builds/workers_builds_list",
+            "cloudflare-builds/workers_builds_list_builds",
             "orchestrator/skill_execute(chittyos-devops:chitty-pipelines)",
             "notion/API-post-page"
           ],
@@ -21815,7 +21815,7 @@
             "thinking/sequentialthinking",
             "orchestrator/skill_execute(mcp-dev:build-mcp-server)",
             "github/create_or_update_file",
-            "cloudflare-builds/workers_builds_list"
+            "cloudflare-builds/workers_builds_list_builds"
           ],
           "accomplishes": "Search for alchemist-discovered patterns about recurring infra tool compositions, reason through which patterns are dense enough to deserve their own MCP surface, scaffold the infrastructure MCP server using the build-mcp-server skill, commit the scaffold to GitHub, and verify the Cloudflare build queued.",
           "verified": false,
@@ -21840,7 +21840,7 @@
             "ch1tty/search",
             "evidence/ai_search",
             "neon/run_sql",
-            "cloudflare-builds/workers_builds_list",
+            "cloudflare-builds/workers_builds_list_builds",
             "notion/API-post-page"
           ],
           "accomplishes": "Use the ch1tty meta-search to discover all operational tools across every registered backend, cross-reference with evidence for past ops patterns, run a health-check SQL query, list Cloudflare Workers builds to validate the deployment pipeline state, and post the ops tool discovery summary to Notion.",
@@ -22308,7 +22308,7 @@
           "name": "neon-doc-resource-ops-playbook",
           "chain": [
             "neon/get_doc_resource",
-            "cloudflare-builds/workers_builds_list",
+            "cloudflare-builds/workers_builds_list_builds",
             "orchestrator/chittyagent-cloudflare"
           ],
           "accomplishes": "Fetch a Neon ops playbook or runbook from the documentation resource, list the latest Cloudflare Workers builds for that service, and route through the Cloudflare ops agent for any remediation \u2014 an ops-focused database+deploy incident response loop.",
@@ -22319,7 +22319,7 @@
           "name": "scrape-status-page-ops-triage",
           "chain": [
             "orchestrator/agent_execute(scrape)",
-            "cloudflare-builds/workers_builds_list",
+            "cloudflare-builds/workers_builds_list_builds",
             "orchestrator/skill_execute(chitty-deploy)"
           ],
           "accomplishes": "Scrape an external service status page or dependency health endpoint, compare it against the latest Cloudflare Workers build log, and trigger a re-deploy if the dependency is healthy \u2014 an automated ops monitoring and recovery workflow.",
@@ -22516,7 +22516,7 @@
         {
           "name": "ops-cloudflare-builds-evidence-deploy",
           "chain": [
-            "cloudflare-builds/workers_builds_list",
+            "cloudflare-builds/workers_builds_list_builds",
             "cloudflare-builds/workers_builds_get_build_logs",
             "evidence/ai_search",
             "orchestrator/skill_execute(chittyos-devops:chitty-deploy)",
