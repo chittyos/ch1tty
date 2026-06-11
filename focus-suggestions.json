@@ -2735,6 +2735,30 @@
           "accomplishes": "Search the ship-sprint agent for upcoming deployments, cross-reference with the chitty-deploy skill catalog, and look up registered services in the registry — building a full cost picture of what's shipping this sprint for finance sign-off.",
           "verified": false,
           "notes": "orchestrator tools inferred from chittyagent surface."
+        },
+        {
+          "name": "finance-imessage-fact-governance-compliance-ledger",
+          "chain": [
+            "imessage/get_recent_messages",
+            "orchestrator/skill_execute(chittyos-legal:fact-governance)",
+            "orchestrator/skill_execute(chittyos-devops:chittyos-compliance)",
+            "ledger/append_entry"
+          ],
+          "accomplishes": "Pull recent iMessage billing threads, run fact-governance analysis on the conversation artifacts, confirm compliance status via chittyos-compliance, then append the finance summary entry to the ledger.",
+          "verified": false,
+          "notes": "imessage lazy; fact-governance + chittyos-compliance via orchestrator skill surface; ledger append verified."
+        },
+        {
+          "name": "finance-registry-dir-commit-chittyhelper-ledger",
+          "chain": [
+            "orchestrator/agent_search(registry-directory-certified-services-catalog)",
+            "orchestrator/skill_execute(commit-commands:commit)",
+            "orchestrator/skill_execute(chittyhelper:chittyhelper)",
+            "ledger/append_entry"
+          ],
+          "accomplishes": "Search the certified services registry to enumerate cost-relevant services, commit the billing spec artifact, invoke ChittyHelper for advisory context on service costs, and append the finance entry to the ledger.",
+          "verified": false,
+          "notes": "orchestrator skill surface for commit + chittyhelper; registry agent_search via orchestrator; ledger append verified."
         }
       ],
       "prompts": [
@@ -3562,6 +3586,14 @@
         {
           "text": "Show me everything shipping this sprint and whether we have budget sign-off — search ship, cross-check deploy skill, and look up registered services.",
           "resolves_to": "finance-ship-registry-deploy-cost-sprint"
+        },
+        {
+          "text": "Pull my iMessage billing threads and run a compliance check, then log the summary to the ledger",
+          "resolves_to": "finance-imessage-fact-governance-compliance-ledger"
+        },
+        {
+          "text": "Search the certified services registry for costs, commit the spec, and append the finance entry to the ledger",
+          "resolves_to": "finance-registry-dir-commit-chittyhelper-ledger"
         }
       ]
     },
@@ -6623,6 +6655,30 @@
           "accomplishes": "Cross-reference the ship agent's deployment manifest against the chitty-deploy skill output and validate each service in the certified-services registry — ensuring every deployment in a sprint is governance-compliant and registered.",
           "verified": false,
           "notes": "orchestrator tools inferred from chittyagent surface."
+        },
+        {
+          "name": "governance-imessage-chitty-deploy-registry-brief",
+          "chain": [
+            "imessage/get_recent_messages",
+            "orchestrator/skill_search(chitty-deploy)",
+            "orchestrator/skill_search(registry-chitty-register-manage-service)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Surface recent iMessage stakeholder threads, check chitty-deploy for staged service surfaces, confirm registration handles via the registry skill, and post a governance brief to Notion.",
+          "verified": false,
+          "notes": "imessage lazy; chitty-deploy + registry skill_search via orchestrator surface; notion write verified."
+        },
+        {
+          "name": "governance-chittyhelper-plugin-dev-cloudflare-agent-notion",
+          "chain": [
+            "orchestrator/skill_execute(chittyhelper:chittyhelper)",
+            "orchestrator/skill_execute(claude-official:plugin-dev)",
+            "orchestrator/chittyagent-cloudflare",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Invoke ChittyHelper for advisory context, run plugin-dev to surface extension specs, query the Cloudflare chitty-agent for deployment governance state, and write the governance brief to Notion.",
+          "verified": false,
+          "notes": "All three orchestrator skills lazy; notion write verified."
         }
       ],
       "prompts": [
@@ -7562,6 +7618,14 @@
         {
           "text": "Validate that every service shipping this sprint is compliance-registered — search ship agent, run deploy skill, and check the certified registry.",
           "resolves_to": "governance-ship-deploy-registry-compliance"
+        },
+        {
+          "text": "Check iMessage threads, confirm deploy and registry status, then post a governance brief to Notion",
+          "resolves_to": "governance-imessage-chitty-deploy-registry-brief"
+        },
+        {
+          "text": "Run ChittyHelper and plugin-dev, query the Cloudflare agent, and write a governance note to Notion",
+          "resolves_to": "governance-chittyhelper-plugin-dev-cloudflare-agent-notion"
         }
       ]
     },
@@ -10395,6 +10459,30 @@
           "accomplishes": "Use the Neon agent to pull database schema for UI data models, search the chitty-deploy skill catalog for deployment configurations, and look up the registry to map surface ownership — producing a design-ready topology of what components back each deployed service.",
           "verified": false,
           "notes": "orchestrator tools inferred from chittyagent surface."
+        },
+        {
+          "name": "design-compliance-dispute-drafting-commit-notion",
+          "chain": [
+            "orchestrator/skill_execute(chittyos-devops:chittyos-compliance)",
+            "orchestrator/skill_execute(chittycommand-alpha:dispute-drafting)",
+            "orchestrator/skill_execute(commit-commands:commit)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Run compliance checks for the design surface, draft the dispute design document, commit the design spec, and post the design artifact to Notion.",
+          "verified": false,
+          "notes": "Three orchestrator skills lazy; notion write verified."
+        },
+        {
+          "name": "design-registry-plugin-dev-chittycontext-notion",
+          "chain": [
+            "orchestrator/agent_search(registry-directory-certified-services-catalog)",
+            "orchestrator/skill_execute(claude-official:plugin-dev)",
+            "orchestrator/skill_execute(chittyos-core:chittycontext)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search the certified services registry for design-relevant APIs, invoke plugin-dev to surface extension specs, load chittycontext for system design state, and write the design brief to Notion.",
+          "verified": false,
+          "notes": "Registry agent_search + plugin-dev + chittycontext all via orchestrator lazy surface; notion write verified."
         }
       ],
       "prompts": [
@@ -11267,6 +11355,14 @@
         {
           "text": "Map the deployed service topology for design review — query neon schema, search deploy skill catalog, and cross-reference the service registry.",
           "resolves_to": "design-neon-registry-deploy-surface-map"
+        },
+        {
+          "text": "Run compliance checks, draft the dispute design doc, commit the spec, and post it to Notion",
+          "resolves_to": "design-compliance-dispute-drafting-commit-notion"
+        },
+        {
+          "text": "Search the certified services registry, run plugin-dev, load chittycontext, and post a design brief to Notion",
+          "resolves_to": "design-registry-plugin-dev-chittycontext-notion"
         }
       ]
     },
@@ -14338,6 +14434,30 @@
           "accomplishes": "Retrieve recent iMessage communications related to a dispute, pass them to the dispute-drafting skill to generate a draft argument, then read supporting file context from the filesystem — automating the code-side evidence preparation for legal or arbitration workflows.",
           "verified": false,
           "notes": "fs is code-relevant server. imessage not connected (lazy)."
+        },
+        {
+          "name": "code-fact-governance-dispute-evidence-ux-observer-skill-fs",
+          "chain": [
+            "orchestrator/skill_execute(chittyos-legal:fact-governance)",
+            "orchestrator/skill_execute(chittycommand-alpha:dispute-evidence)",
+            "orchestrator/skill_search(ux-observer)",
+            "fs/write_file"
+          ],
+          "accomplishes": "Run fact-governance analysis on codebase policy, gather dispute evidence from the evidence corpus, search for UX observer patterns in the registry, and write the code analysis to disk.",
+          "verified": false,
+          "notes": "fact-governance + dispute-evidence via orchestrator lazy; ux-observer skill_search lazy; fs/write_file verified."
+        },
+        {
+          "name": "code-connectors-imessage-chittycontext-context7-fs",
+          "chain": [
+            "orchestrator/skill_execute(connectors:imessage)",
+            "orchestrator/skill_execute(chittyos-core:chittycontext)",
+            "context7/resolve-library-id",
+            "fs/write_file"
+          ],
+          "accomplishes": "Use the iMessage connector skill to pull conversation artifacts, load chittycontext for system memory state, resolve library documentation via context7, and write the code integration reference to disk.",
+          "verified": false,
+          "notes": "connectors:imessage + chittycontext via orchestrator lazy; context7 verified; fs/write_file verified."
         }
       ],
       "prompts": [
@@ -15270,6 +15390,14 @@
         {
           "text": "Pull dispute-related iMessages, draft the legal argument from them, and read the supporting file context.",
           "resolves_to": "code-imessage-dispute-drafting-fs-context"
+        },
+        {
+          "text": "Run fact-governance, gather dispute evidence, search UX observer patterns, and write the analysis to disk",
+          "resolves_to": "code-fact-governance-dispute-evidence-ux-observer-skill-fs"
+        },
+        {
+          "text": "Use the iMessage connector, load chittycontext, resolve library docs via context7, and write the reference to disk",
+          "resolves_to": "code-connectors-imessage-chittycontext-context7-fs"
         }
       ]
     },
@@ -18107,6 +18235,31 @@
           "accomplishes": "Query the ship agent for the latest sprint release, run the chitty-deploy skill to confirm deployment, and post a release note page in Notion — creating a communication artifact that the team can reference after every sprint ship.",
           "verified": false,
           "notes": "notion satisfies comm-server constraint."
+        },
+        {
+          "name": "comm-registry-dir-chitty-deploy-registry-skill-commit-notion",
+          "chain": [
+            "orchestrator/agent_search(registry-directory-certified-services-catalog)",
+            "orchestrator/skill_search(chitty-deploy)",
+            "orchestrator/skill_search(registry-chitty-register-manage-service)",
+            "orchestrator/skill_execute(commit-commands:commit)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search the certified services registry, check chitty-deploy for staged delivery hooks, confirm registration handles via the registry skill, commit the communications changelog, and post the update brief to Notion.",
+          "verified": false,
+          "notes": "Registry + deploy + registry-skill via orchestrator lazy surface; commit lazy; notion write verified."
+        },
+        {
+          "name": "comm-fact-governance-compliance-ux-observer-notion",
+          "chain": [
+            "orchestrator/skill_execute(chittyos-legal:fact-governance)",
+            "orchestrator/skill_execute(chittyos-devops:chittyos-compliance)",
+            "orchestrator/skill_execute(chittycommand-alpha:ux-observer)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Run fact-governance to surface compliance facts, execute chittyos-compliance audit, invoke ux-observer for usability findings, and post the communication brief to Notion.",
+          "verified": false,
+          "notes": "Three orchestrator skills lazy; notion write verified."
         }
       ],
       "prompts": [
@@ -18991,6 +19144,14 @@
         {
           "text": "Post a sprint release note after ship — query ship agent, confirm deploy, and write the release page in Notion.",
           "resolves_to": "comm-ship-deploy-broadcast-notion"
+        },
+        {
+          "text": "Check the services registry, confirm deploy and registration handles, commit the changelog, and post to Notion",
+          "resolves_to": "comm-registry-dir-chitty-deploy-registry-skill-commit-notion"
+        },
+        {
+          "text": "Run fact-governance, compliance audit, and ux-observer, then post the comms brief to Notion",
+          "resolves_to": "comm-fact-governance-compliance-ux-observer-notion"
         }
       ]
     },
@@ -21991,6 +22152,30 @@
           "accomplishes": "Reorganize a local file directory for a dispute evidence bundle, apply the fact-governance skill to tag and validate each piece of evidence, then invoke the plugin-dev skill to deploy a Claude plugin that surfaces the organized evidence set — completing the ops evidence management pipeline.",
           "verified": false,
           "notes": "orchestrator skills inferred from chittyagent surface."
+        },
+        {
+          "name": "ops-dispute-drafting-evidence-connectors-imessage-fs",
+          "chain": [
+            "orchestrator/skill_execute(chittycommand-alpha:dispute-drafting)",
+            "orchestrator/skill_execute(chittycommand-alpha:dispute-evidence)",
+            "orchestrator/skill_execute(connectors:imessage)",
+            "fs/write_file"
+          ],
+          "accomplishes": "Draft dispute documentation for the ops incident, compile dispute evidence from the corpus, use the iMessage connector to pull relevant conversation threads, and write the ops incident report to disk.",
+          "verified": false,
+          "notes": "All three orchestrator skills lazy; fs/write_file verified."
+        },
+        {
+          "name": "ops-ux-observer-skill-search-agent-list-health-fs",
+          "chain": [
+            "orchestrator/skill_search(ux-observer)",
+            "orchestrator/agent_list",
+            "orchestrator/skill_execute(chittyos-devops:chitty-health)",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search for UX observer patterns in the registry, list all active agents for the ops inventory, run chitty-health for system status, and write the ops health summary to disk.",
+          "verified": false,
+          "notes": "ux-observer skill_search + agent_list + chitty-health via orchestrator lazy surface; fs/write_file verified."
         }
       ],
       "prompts": [
@@ -22907,6 +23092,14 @@
         {
           "text": "Prepare the ops evidence bundle — reorganize the file directory, tag via fact-governance, and deploy the Claude evidence plugin.",
           "resolves_to": "ops-fs-move-dispute-evidence-plugin-deploy"
+        },
+        {
+          "text": "Draft dispute docs, compile evidence, pull iMessage threads, and write the ops incident report to disk",
+          "resolves_to": "ops-dispute-drafting-evidence-connectors-imessage-fs"
+        },
+        {
+          "text": "Search UX observer patterns, list active agents, run chitty-health, and write the ops health summary",
+          "resolves_to": "ops-ux-observer-skill-search-agent-list-health-fs"
         }
       ]
     }
