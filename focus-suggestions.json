@@ -2120,7 +2120,7 @@
             "session/get_session",
             "stripe/list_payment_intents",
             "neon/run_sql",
-            "ledger/record",
+            "ledger/append_entry",
             "notion/API-post-page"
           ],
           "accomplishes": "Load the active session context, pull in-flight Stripe payment intents, reconcile against the SQL ledger, record a billing snapshot entry in the ledger WAL, and surface the reconciliation summary as a Notion page.",
@@ -2860,7 +2860,7 @@
           "chain": [
             "neon/configure_neon_auth",
             "neon/get_connection_string",
-            "ledger/record"
+            "ledger/append_entry"
           ],
           "accomplishes": "Configure Neon authentication for the finance database environment, retrieve the connection string for billing service integration, and record the configuration audit entry in the ledger for compliance tracking.",
           "verified": false,
@@ -15018,9 +15018,9 @@
           "notes": ""
         },
         {
-          "name": "code-ledger-record-commit-write",
+          "name": "code-ledger-append-commit-write",
           "chain": [
-            "ledger/record",
+            "ledger/append_entry",
             "github/get_commit",
             "fs/write_file"
           ],
@@ -16013,7 +16013,7 @@
         },
         {
           "text": "Record a code audit in the ledger, fetch the commit details, and write the report",
-          "resolves_to": "code-ledger-record-commit-write"
+          "resolves_to": "code-ledger-append-commit-write"
         },
         {
           "text": "Get the Neon connection string, validate pg driver compatibility, and push the config",
@@ -18988,7 +18988,7 @@
         {
           "name": "comm-ledger-neon-provision-task",
           "chain": [
-            "ledger/record",
+            "ledger/append_entry",
             "neon/provision_neon_data_api",
             "tasks/create_task"
           ],
