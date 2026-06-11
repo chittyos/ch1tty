@@ -2777,7 +2777,7 @@
           "chain": [
             "orchestrator/skill_execute(connectors:imessage)",
             "orchestrator/skill_execute(chittycommand-alpha:dispute-evidence)",
-            "orchestrator/agent_execute(chittyagent-cloudflare)",
+            "orchestrator/agent_execute(cloudflare)",
             "ledger/append_entry"
           ],
           "accomplishes": "Pull iMessage billing threads via the connectors surface, gather dispute evidence artifacts from those conversations, load ChittyAgent-Cloudflare for cloud cost context, and append the combined finance summary to the ledger.",
@@ -6728,7 +6728,7 @@
           "name": "governance-chittycontext-ux-execute-registry-github",
           "chain": [
             "orchestrator/skill_execute(chittyos-core:chittycontext)",
-            "orchestrator/skill_execute(ux-observer)",
+            "orchestrator/skill_execute(chittycommand-alpha:ux-observer)",
             "orchestrator/agent_search(registry-directory-certified-services-catalog)",
             "github/create_issue"
           ],
@@ -10562,8 +10562,8 @@
         {
           "name": "design-chittyagent-cloudflare-linear-notion",
           "chain": [
-            "orchestrator/agent_execute(chittyagent-cloudflare)",
-            "linear/listProjects",
+            "orchestrator/agent_execute(cloudflare)",
+            "linear/list_projects",
             "notion/API-post-page"
           ],
           "accomplishes": "Execute the ChittyAgent-Cloudflare agent for cloud infrastructure context relevant to the design surface, list Linear projects to identify active design sprints, and write the synthesized cloud-design status to Notion for stakeholder visibility.",
@@ -14556,7 +14556,7 @@
         {
           "name": "code-ux-observer-execute-github-neon",
           "chain": [
-            "orchestrator/skill_execute(ux-observer)",
+            "orchestrator/skill_execute(chittycommand-alpha:ux-observer)",
             "github/search_code",
             "neon/run_sql"
           ],
@@ -18399,7 +18399,7 @@
         {
           "name": "communication-chittyagent-cloudflare-tasks-notion",
           "chain": [
-            "orchestrator/agent_execute(chittyagent-cloudflare)",
+            "orchestrator/agent_execute(cloudflare)",
             "tasks/create_task",
             "notion/API-post-page"
           ],
