@@ -2456,7 +2456,7 @@
         {
           "name": "finance-cf-builds-workers-deployment-costs",
           "chain": [
-            "cloudflare-builds/workers_builds_get",
+            "cloudflare-builds/workers_builds_list_builds",
             "thinking/sequentialthinking",
             "notion/API-post-page"
           ],
@@ -6600,7 +6600,7 @@
         {
           "name": "governance-cf-builds-workers-deploy-compliance",
           "chain": [
-            "cloudflare-builds/workers_builds_get",
+            "cloudflare-builds/workers_builds_list_builds",
             "github/create_issue",
             "notion/API-post-page"
           ],
@@ -10540,7 +10540,7 @@
         {
           "name": "design-frontend-build-deploy-screenshot",
           "chain": [
-            "cloudflare-builds/workers_builds_get",
+            "cloudflare-builds/workers_builds_list_builds",
             "playwright/browser_screenshot"
           ],
           "accomplishes": "Retrieve the latest Cloudflare Workers build record for the design frontend service (UI, brand site, or design system preview app), extract the deployed URL from the build result, then screenshot the deployed page \u2014 closing the build-to-visual-QA loop by confirming the live deployment matches the expected visual state.",
@@ -14015,7 +14015,7 @@
         {
           "name": "code-chittymac-ci-build-alert",
           "chain": [
-            "cloudflare-builds/workers_builds_get",
+            "cloudflare-builds/workers_builds_list_builds",
             "thinking/sequentialthinking",
             "chittymac/send_notification",
             "github/create_issue",
@@ -14569,7 +14569,7 @@
         {
           "name": "cloudflare-builds-get-code-review",
           "chain": [
-            "cloudflare-builds/workers_builds_get",
+            "cloudflare-builds/workers_builds_list_builds",
             "github/get_commit",
             "thinking/sequentialthinking"
           ],
@@ -14580,7 +14580,7 @@
         {
           "name": "build-event-to-ledger",
           "chain": [
-            "cloudflare-builds/workers_builds_get",
+            "cloudflare-builds/workers_builds_list_builds",
             "ledger/append_entry"
           ],
           "accomplishes": "Fetch a completed Cloudflare Workers build result and append a deploy event to the ops ledger \u2014 turning CI outcomes into an immutable audit trail for code delivery.",
@@ -14631,7 +14631,7 @@
           "name": "code-preview-build-visual-check",
           "chain": [
             "github/get_pull_request",
-            "cloudflare-builds/workers_builds_get",
+            "cloudflare-builds/workers_builds_list_builds",
             "browser-rendering/get_url_screenshot",
             "github/create_issue"
           ],
@@ -18722,7 +18722,7 @@
         {
           "name": "comm-cf-builds-notion-data-source-release-note",
           "chain": [
-            "cloudflare-builds/workers_builds_get",
+            "cloudflare-builds/workers_builds_list_builds",
             "notion/API-retrieve-a-data-source",
             "notion/API-post-page"
           ],
@@ -22715,7 +22715,7 @@
         {
           "name": "cloudflare-builds-get-ops-triage",
           "chain": [
-            "cloudflare-builds/workers_builds_get",
+            "cloudflare-builds/workers_builds_list_builds",
             "cloudflare/list_workers",
             "thinking/sequentialthinking"
           ],
@@ -22767,7 +22767,7 @@
           "name": "ops-notion-data-source-health-snapshot",
           "chain": [
             "notion/API-create-a-data-source",
-            "cloudflare-builds/workers_builds_get",
+            "cloudflare-builds/workers_builds_list_builds",
             "evidence/search",
             "notion/API-post-page"
           ],
@@ -22815,7 +22815,7 @@
           "name": "ops-neon-fetch-db-api-healthcheck",
           "chain": [
             "neon/fetch",
-            "cloudflare-builds/workers_builds_get",
+            "cloudflare-builds/workers_builds_list_builds",
             "notion/API-post-page"
           ],
           "accomplishes": "Probe the Neon Data API endpoint to verify the operational database layer is reachable and returning valid responses, then retrieve the latest Cloudflare Workers build status for the ops backend service to confirm the data layer and application layer are both healthy, and post a combined ops health summary to a Notion ops status page \u2014 providing a unified data+deploy health snapshot.",
@@ -22944,7 +22944,7 @@
           "chain": [
             "playwright/browser_navigate",
             "playwright/browser_fill",
-            "cloudflare-builds/workers_builds_get",
+            "cloudflare-builds/workers_builds_list_builds",
             "ledger/append_entry"
           ],
           "accomplishes": "Navigate to an ops health check form, fill in incident parameters, cross-reference with the latest Cloudflare build status to correlate any regressions, then log the combined outcome to the append-only ledger for audit.",
@@ -23041,7 +23041,7 @@
           "chain": [
             "orchestrator/chittyagent-alchemist",
             "orchestrator/chittyagent-registry",
-            "cloudflare-builds/workers_builds_get",
+            "cloudflare-builds/workers_builds_list_builds",
             "fs/write_file"
           ],
           "accomplishes": "Analyse cross-service deployment patterns via alchemist to detect topology drift, verify active service registrations in the agent registry against expected ops configuration, retrieve Cloudflare Workers build details for the latest release, and write a deployment audit report to file.",
@@ -23222,7 +23222,7 @@
           "name": "ops-tasks-status-build-health",
           "chain": [
             "orchestrator/agent_execute(tasks,status)",
-            "cloudflare-builds/workers_builds_get",
+            "cloudflare-builds/workers_builds_list_builds",
             "ch1tty/status"
           ],
           "accomplishes": "Check active operational task statuses, retrieve recent build metadata from Cloudflare, get a gateway status snapshot to assess overall system health",
