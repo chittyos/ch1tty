@@ -1,6 +1,6 @@
 {
-  "_comment": "122nd pass — 1358 combos, 1355 prompts. Completed to 6/6: orchestrator/skill_execute(chittyos-core:chittycontext), orchestrator/skill_execute(chittycommand-alpha:ux-observer), orchestrator/agent_execute(cloudflare), orchestrator/chittyagent-cloudflare, fs/move_directory, notion/API-list-data-source-templates, notion/API-retrieve-a-comment, fs/list_directory_with_sizes (8 tools). 6/6 count: 208 → 216.",
-  "generatedFrom": "auto-driver run 64, 2026-06-11",
+  "_comment": "125th pass — 1394 combos, 1391 prompts. Completed to 6/6: ch1tty/status, neon/configure_neon_auth (2 tools). Secondary boosts: neon/get_connection_string (1→3/6), ledger/record (1→3/6), neon/provision_neon_data_api (1→4/6), context7/resolve-library-id(pg) (1→3/6). 6/6 count: 226 → 228.",
+  "generatedFrom": "auto-driver run 67, 2026-06-11",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools — now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time — combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -2854,6 +2854,29 @@
           "accomplishes": "Search evidence for financial dispute details, add a review comment on the financial-report page, move the report to the compliance archive, verify bot identity for audit automation, retrieve page properties for reconciliation metadata, then list ledger entries to confirm matching records",
           "verified": false,
           "notes": ""
+        },
+        {
+          "name": "finance-neon-auth-connection-ledger",
+          "chain": [
+            "neon/configure_neon_auth",
+            "neon/get_connection_string",
+            "ledger/record"
+          ],
+          "accomplishes": "Configure Neon authentication for the finance database environment, retrieve the connection string for billing service integration, and record the configuration audit entry in the ledger for compliance tracking.",
+          "verified": false,
+          "notes": ""
+        },
+        {
+          "name": "finance-registry-evidence-cashflow",
+          "chain": [
+            "orchestrator/agent_search(registry-directory-certified-services)",
+            "evidence/ai_search(chittyevidence-search, dispute property evidence legal hold)",
+            "orchestrator/skill_execute(chittyos-finance:mercury-finance)",
+            "ledger/append_entry"
+          ],
+          "accomplishes": "Search the certified-services registry to identify finance-domain services, retrieve evidence for any open billing disputes, pull Mercury cash-flow data for reconciliation, and append the audit record to the ledger.",
+          "verified": false,
+          "notes": ""
         }
       ],
       "prompts": [
@@ -3721,6 +3744,14 @@
         {
           "text": "Audit financial dispute evidence and update our Notion compliance documentation",
           "resolves_to": "finance-evidence-notion-page-ledger"
+        },
+        {
+          "text": "Configure Neon authentication for the finance database and record the audit in the ledger",
+          "resolves_to": "finance-neon-auth-connection-ledger"
+        },
+        {
+          "text": "Find certified finance services, audit billing disputes, pull Mercury data, and log to the ledger",
+          "resolves_to": "finance-registry-evidence-cashflow"
         }
       ]
     },
@@ -6896,6 +6927,29 @@
           "accomplishes": "Explain a SQL query for policy-compliance review, search Notion for related governance policies, and cross-reference with evidence records to confirm regulatory alignment",
           "verified": false,
           "notes": ""
+        },
+        {
+          "name": "governance-status-neon-auth-compliance",
+          "chain": [
+            "ch1tty/status",
+            "neon/configure_neon_auth",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Check gateway status to confirm all backend services are reachable and compliant, audit the Neon authentication configuration against governance policy, and write a compliance attestation page in Notion.",
+          "verified": false,
+          "notes": ""
+        },
+        {
+          "name": "governance-registry-evidence-pipeline",
+          "chain": [
+            "orchestrator/agent_search(registry-directory-certified-services)",
+            "orchestrator/skill_execute(evidence-collect)",
+            "orchestrator/skill_execute(pipeline-submit)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search the certified-services registry to scope the governance review, collect evidence for the compliance pipeline, submit the evidence batch through the governance pipeline, and document the submission in Notion.",
+          "verified": false,
+          "notes": ""
         }
       ],
       "prompts": [
@@ -7875,6 +7929,14 @@
         {
           "text": "Explain this SQL query for policy compliance and find supporting governance documentation",
           "resolves_to": "governance-sql-explain-policy-notion"
+        },
+        {
+          "text": "Check gateway status and audit Neon auth configuration for compliance",
+          "resolves_to": "governance-status-neon-auth-compliance"
+        },
+        {
+          "text": "Search the service registry, collect and submit evidence through the governance pipeline",
+          "resolves_to": "governance-registry-evidence-pipeline"
         }
       ]
     },
@@ -10826,6 +10888,28 @@
           "accomplishes": "Explain a database schema change to inform design documentation, reorganise the design-spec page in Notion, verify bot configuration for automated design ops, retrieve page metadata for version tracking, then screenshot the live prototype for review",
           "verified": false,
           "notes": ""
+        },
+        {
+          "name": "design-status-neon-auth-prototype-screenshot",
+          "chain": [
+            "ch1tty/status",
+            "neon/configure_neon_auth",
+            "browser-rendering/get_url_screenshot"
+          ],
+          "accomplishes": "Verify gateway health before a design review session, configure Neon authentication for the design prototype database, then capture a screenshot of the live prototype for stakeholder review.",
+          "verified": false,
+          "notes": ""
+        },
+        {
+          "name": "design-pg-neon-provision-screenshot",
+          "chain": [
+            "context7/resolve-library-id(pg)",
+            "neon/provision_neon_data_api",
+            "browser-rendering/get_url_screenshot"
+          ],
+          "accomplishes": "Look up the pg library documentation to inform data-layer design decisions, provision the Neon data API for the design prototype environment, and screenshot the rendered prototype to share with the design team.",
+          "verified": false,
+          "notes": ""
         }
       ],
       "prompts": [
@@ -11738,6 +11822,14 @@
         {
           "text": "Document a schema change in our design system and capture a prototype screenshot",
           "resolves_to": "design-sql-notion-page-bot-screenshot"
+        },
+        {
+          "text": "Verify gateway health, configure Neon auth for the prototype, and capture a screenshot",
+          "resolves_to": "design-status-neon-auth-prototype-screenshot"
+        },
+        {
+          "text": "Look up the pg library, provision the Neon data API for the prototype, and screenshot the design",
+          "resolves_to": "design-pg-neon-provision-screenshot"
         }
       ]
     },
@@ -14924,6 +15016,28 @@
           "accomplishes": "Check gateway status to confirm all backends are live, configure Neon authentication for the development environment, push the updated configuration files via GitHub, and write the environment summary to the local filesystem",
           "verified": false,
           "notes": ""
+        },
+        {
+          "name": "code-ledger-record-commit-write",
+          "chain": [
+            "ledger/record",
+            "github/get_commit",
+            "fs/write_file"
+          ],
+          "accomplishes": "Record a code audit entry in the ledger, fetch the associated commit details for traceability, and write the combined audit report to the local filesystem.",
+          "verified": false,
+          "notes": ""
+        },
+        {
+          "name": "code-neon-connection-pg-push",
+          "chain": [
+            "neon/get_connection_string",
+            "context7/resolve-library-id(pg)",
+            "github/push_files"
+          ],
+          "accomplishes": "Retrieve the Neon connection string for the development database, resolve the pg library documentation to validate driver compatibility, then push the updated connection configuration to GitHub.",
+          "verified": false,
+          "notes": ""
         }
       ],
       "prompts": [
@@ -15896,6 +16010,14 @@
         {
           "text": "Check gateway health, configure Neon auth, and push the environment config",
           "resolves_to": "code-status-neon-auth-push"
+        },
+        {
+          "text": "Record a code audit in the ledger, fetch the commit details, and write the report",
+          "resolves_to": "code-ledger-record-commit-write"
+        },
+        {
+          "text": "Get the Neon connection string, validate pg driver compatibility, and push the config",
+          "resolves_to": "code-neon-connection-pg-push"
         }
       ]
     },
@@ -18850,6 +18972,29 @@
           "accomplishes": "Fetch a commit to summarise changes for the team, explain the SQL migration in plain terms, verify the Notion bot is configured for automated notifications, add a comment to the release-notes page, move the completed draft to the team space, retrieve page properties for status tracking, and create a follow-up task",
           "verified": false,
           "notes": ""
+        },
+        {
+          "name": "comm-status-neon-auth-task-notify",
+          "chain": [
+            "ch1tty/status",
+            "neon/configure_neon_auth",
+            "tasks/create_task",
+            "imessage/send_imessage"
+          ],
+          "accomplishes": "Check gateway status for a broadcast readiness check, verify Neon authentication for the comms database, create a task for the communication lead to act on the results, and send an iMessage summary to the team.",
+          "verified": false,
+          "notes": ""
+        },
+        {
+          "name": "comm-ledger-neon-provision-task",
+          "chain": [
+            "ledger/record",
+            "neon/provision_neon_data_api",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Record a communication audit entry in the ledger, provision the Neon data API for a new comms analytics environment, and create a task to track integration follow-up.",
+          "verified": false,
+          "notes": ""
         }
       ],
       "prompts": [
@@ -19774,6 +19919,14 @@
         {
           "text": "Summarise a commit and SQL migration in Notion and assign a team task",
           "resolves_to": "comm-commit-sql-notion-all-task"
+        },
+        {
+          "text": "Check gateway status, verify Neon auth, create a task, and notify the team via iMessage",
+          "resolves_to": "comm-status-neon-auth-task-notify"
+        },
+        {
+          "text": "Log a ledger audit entry, provision Neon data API, and create a team task",
+          "resolves_to": "comm-ledger-neon-provision-task"
         }
       ]
     },
@@ -22891,6 +23044,28 @@
           "accomplishes": "Verify no open evidence disputes before deployment, explain the SQL migration for ops readiness, document the deployment plan as a Notion comment, move the runbook to the active ops folder, confirm the automation bot is configured, retrieve deployment metadata from page properties, then deploy to Cloudflare Workers",
           "verified": false,
           "notes": ""
+        },
+        {
+          "name": "ops-gateway-status-build-deploy",
+          "chain": [
+            "ch1tty/status",
+            "cloudflare-builds/workers_builds_trigger",
+            "cloudflare/workers-deploy"
+          ],
+          "accomplishes": "Check gateway status to confirm all services are healthy before a deployment window, trigger the Cloudflare Workers build, and deploy to production.",
+          "verified": false,
+          "notes": ""
+        },
+        {
+          "name": "ops-neon-provision-connection-workers-list",
+          "chain": [
+            "neon/provision_neon_data_api",
+            "neon/get_connection_string",
+            "cloudflare/workers-list"
+          ],
+          "accomplishes": "Provision the Neon data API for a new ops service, retrieve the connection string for health monitoring, and list Cloudflare Workers to verify deployment inventory.",
+          "verified": false,
+          "notes": ""
         }
       ],
       "prompts": [
@@ -23847,6 +24022,14 @@
         {
           "text": "Check evidence, validate SQL changes, update the ops runbook, and deploy to Cloudflare",
           "resolves_to": "ops-evidence-sql-notion-deploy"
+        },
+        {
+          "text": "Check gateway status and trigger the Cloudflare Workers build and deploy",
+          "resolves_to": "ops-gateway-status-build-deploy"
+        },
+        {
+          "text": "Provision Neon data API, get the connection string, and list Cloudflare Workers",
+          "resolves_to": "ops-neon-provision-connection-workers-list"
         }
       ]
     }
