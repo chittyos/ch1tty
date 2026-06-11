@@ -25046,7 +25046,7 @@
           "resolves_to": "ops-workers-get-pr-review-obligation-release-cycle"
         },
         {
-          "text": "List Neon shared projects, purge deprecated runbook page, find Alchemist patterns, and trigger build skill",
+          "text": "List Neon shared projects, purge deprecated runbook page, find Alchemist patterns, and locate the build MCP server skill for deployment",
           "resolves_to": "ops-neon-notion-alchemist-build-skill-ops-pipeline"
         }
       ]
