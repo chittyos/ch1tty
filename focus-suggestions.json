@@ -2806,6 +2806,29 @@
           ],
           "accomplishes": "Query the Cloudflare agent for deployed worker billing metrics, browse Notion data-source templates for a finance reporting dashboard, audit local build artefact sizes, then publish a combined cost-and-footprint report page to Notion.",
           "verified": false
+        },
+        {
+          "name": "finance-github-search-payment-code-ledger",
+          "chain": [
+            "github/search_code",
+            "ledger/record",
+            "stripe/list_invoices"
+          ],
+          "accomplishes": "Search codebase for payment processing patterns, record the compliance audit trail in ledger, and cross-reference findings with Stripe invoices to confirm billing code coverage",
+          "verified": false,
+          "notes": ""
+        },
+        {
+          "name": "finance-neon-schema-stripe-reconcile",
+          "chain": [
+            "neon/get_database_tables",
+            "neon/explain_sql_statement",
+            "stripe/list_invoices",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Inspect Neon financial table schema, explain slow invoice query execution plans, reconcile results against Stripe billing data, and document optimization findings in Notion",
+          "verified": false,
+          "notes": ""
         }
       ],
       "prompts": [
@@ -3657,6 +3680,14 @@
         {
           "text": "Audit Cloudflare worker billing metrics, browse finance reporting templates, and check build artefact sizes",
           "resolves_to": "finance-chittyagent-cloudflare-templates-dir-sizes"
+        },
+        {
+          "text": "Search our codebase for payment processing patterns and reconcile with Stripe invoices",
+          "resolves_to": "finance-github-search-payment-code-ledger"
+        },
+        {
+          "text": "Analyse Neon financial table schemas and reconcile slow invoice queries against Stripe billing",
+          "resolves_to": "finance-neon-schema-stripe-reconcile"
         }
       ]
     },
@@ -6787,6 +6818,29 @@
           ],
           "accomplishes": "Reorganise compliance document directories into the archival structure, retrieve governance-review comments from Notion, profile directory sizes for audit evidence, then run the compliance skill to certify state.",
           "verified": false
+        },
+        {
+          "name": "governance-github-search-code-compliance-audit",
+          "chain": [
+            "github/search_code",
+            "evidence/search",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search codebase for security and compliance-critical patterns (auth, data retention, access control), retrieve supporting evidence from AutoRAG, and document audit findings in Notion",
+          "verified": false,
+          "notes": ""
+        },
+        {
+          "name": "governance-neon-shared-schema-policy",
+          "chain": [
+            "neon/list_shared_projects",
+            "neon/get_database_tables",
+            "evidence/search",
+            "notion/API-create-a-comment"
+          ],
+          "accomplishes": "Review shared Neon projects for data retention policy compliance, inspect schemas for sensitive fields, retrieve relevant governance evidence, and annotate findings in Notion",
+          "verified": false,
+          "notes": ""
         }
       ],
       "prompts": [
@@ -7750,6 +7804,14 @@
         {
           "text": "Reorganise compliance docs, retrieve the governance review comment, and certify current directory state",
           "resolves_to": "governance-move-dir-comment-sizes-compliance"
+        },
+        {
+          "text": "Audit codebase for security compliance patterns and document findings with supporting evidence",
+          "resolves_to": "governance-github-search-code-compliance-audit"
+        },
+        {
+          "text": "Review shared Neon project schemas for data-retention policy compliance and annotate findings",
+          "resolves_to": "governance-neon-shared-schema-policy"
         }
       ]
     },
@@ -10651,6 +10713,30 @@
           ],
           "accomplishes": "Generate a directory tree of the design system repo, search GitHub for component usages across production code, screenshot the current UI state for visual comparison, then post a Notion page with the full design-audit findings.",
           "verified": false
+        },
+        {
+          "name": "design-sdk-docs-write-component-screenshot",
+          "chain": [
+            "context7/resolve-library-id(@modelcontextprotocol/sdk)",
+            "fs/write_text_file",
+            "playwright/screenshot",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Resolve latest MCP SDK documentation, scaffold a new integration component file based on the API, screenshot the rendered prototype, and publish the design iteration in Notion",
+          "verified": false,
+          "notes": ""
+        },
+        {
+          "name": "design-neon-schema-visualise-prototype",
+          "chain": [
+            "neon/create_project",
+            "neon/get_database_tables",
+            "playwright/screenshot",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Provision a Neon sandbox for a new data-model design, inspect its initial table schema, take a browser screenshot of the schema visualiser, and document the design milestone in Notion",
+          "verified": false,
+          "notes": ""
         }
       ],
       "prompts": [
@@ -11547,6 +11633,14 @@
         {
           "text": "Generate a directory tree of the design system, search GitHub for component usages, screenshot, and post the visual audit",
           "resolves_to": "design-dir-tree-github-search-screenshot"
+        },
+        {
+          "text": "Use MCP SDK docs to scaffold a new component, screenshot the prototype, and log it in Notion",
+          "resolves_to": "design-sdk-docs-write-component-screenshot"
+        },
+        {
+          "text": "Provision a Neon sandbox, inspect its schema, and screenshot the schema visualiser for design review",
+          "resolves_to": "design-neon-schema-visualise-prototype"
         }
       ]
     },
@@ -14686,6 +14780,30 @@
           ],
           "accomplishes": "Execute the Neon database agent to identify a performance regression, run a targeted SQL query to confirm the slow path, look up ORM migration docs via context7, then open a GitHub PR with the schema fix and migration script.",
           "verified": false
+        },
+        {
+          "name": "code-notion-governance-export-scripts",
+          "chain": [
+            "notion/API-create-a-comment",
+            "notion/API-get-bot-info",
+            "fs/write_text_file",
+            "github/get_commit"
+          ],
+          "accomplishes": "Retrieve Notion bot configuration, annotate governance pages with implementation notes, export the code-generation script to file, and trace the base commit for reproducibility",
+          "verified": false,
+          "notes": ""
+        },
+        {
+          "name": "code-notion-move-page-property-commit",
+          "chain": [
+            "notion/API-move-page",
+            "notion/API-retrieve-a-page-property",
+            "fs/write_text_file",
+            "github/get_commit"
+          ],
+          "accomplishes": "Reorganize Notion documentation pages following a code refactor, retrieve updated page properties, write a changelog entry to file, and trace the corresponding commit for audit",
+          "verified": false,
+          "notes": ""
         }
       ],
       "prompts": [
@@ -15642,6 +15760,14 @@
         {
           "text": "Run the Neon agent to diagnose a slow query, confirm with SQL, look up migration docs, and open a fix PR",
           "resolves_to": "code-neon-agent-sql-docs-pr"
+        },
+        {
+          "text": "Export Notion governance page annotations and bot config to a code-generation script",
+          "resolves_to": "code-notion-governance-export-scripts"
+        },
+        {
+          "text": "Reorganise Notion docs after a refactor, retrieve updated properties, and trace the commit",
+          "resolves_to": "code-notion-move-page-property-commit"
         }
       ]
     },
@@ -18547,6 +18673,28 @@
           ],
           "accomplishes": "Reorganise shared communication assets into archival directories, reason through the broadcast message structure, then send an iMessage to the team announcing the new file organisation and pointing to the relevant docs.",
           "verified": false
+        },
+        {
+          "name": "comm-github-search-code-notify-team",
+          "chain": [
+            "github/search_code",
+            "tasks/create_task",
+            "imessage/send_imessage"
+          ],
+          "accomplishes": "Search codebase for recently changed critical paths, create a follow-up review task from the findings, and notify the team via iMessage with a change summary",
+          "verified": false,
+          "notes": ""
+        },
+        {
+          "name": "comm-dispute-evidence-task-notify",
+          "chain": [
+            "evidence/ai_search(chittyevidence-search, dispute property evidence legal hold)",
+            "tasks/create_task",
+            "imessage/send_imessage"
+          ],
+          "accomplishes": "Search dispute evidence for relevant case findings, create a legal review task from the results, and notify stakeholders via iMessage",
+          "verified": false,
+          "notes": ""
         }
       ],
       "prompts": [
@@ -19455,6 +19603,14 @@
         {
           "text": "Archive shared communication assets to a new directory and send an iMessage announcing the reorganisation",
           "resolves_to": "comm-move-dir-imessage-status-broadcast"
+        },
+        {
+          "text": "Search codebase for critical path changes and notify the team via iMessage with a task",
+          "resolves_to": "comm-github-search-code-notify-team"
+        },
+        {
+          "text": "Search dispute evidence, create a legal review task, and notify stakeholders via iMessage",
+          "resolves_to": "comm-dispute-evidence-task-notify"
         }
       ]
     },
@@ -22524,6 +22680,28 @@
           ],
           "accomplishes": "List all active Cloudflare worker builds, fetch logs from the latest run to identify any error patterns, search evidence for known failure signatures, trigger a clean deploy via the devops skill, then publish a post-deploy ops record to Notion.",
           "verified": false
+        },
+        {
+          "name": "ops-github-search-code-deploy-trigger",
+          "chain": [
+            "github/search_code",
+            "cloudflare-builds/workers_builds_trigger",
+            "cloudflare-builds/workers_builds_list"
+          ],
+          "accomplishes": "Search for configuration changes in the codebase, trigger a Cloudflare Workers build with the identified revision, and monitor the deployment pipeline status",
+          "verified": false,
+          "notes": ""
+        },
+        {
+          "name": "ops-github-commit-build-neon-provision",
+          "chain": [
+            "github/get_commit",
+            "cloudflare-builds/workers_builds_trigger",
+            "neon/provision_neon_auth"
+          ],
+          "accomplishes": "Inspect the triggering commit metadata, deploy the associated code change via Cloudflare Workers build, and provision Neon auth credentials for the new environment",
+          "verified": false,
+          "notes": ""
         }
       ],
       "prompts": [
@@ -23464,6 +23642,14 @@
         {
           "text": "List active Cloudflare builds, fetch logs, search evidence for failures, deploy the clean build, and post the report",
           "resolves_to": "ops-cloudflare-builds-evidence-deploy"
+        },
+        {
+          "text": "Search for config changes in code, trigger a Cloudflare Workers build, and monitor the pipeline",
+          "resolves_to": "ops-github-search-code-deploy-trigger"
+        },
+        {
+          "text": "Inspect the trigger commit, deploy via Cloudflare Workers, and provision Neon auth for the new environment",
+          "resolves_to": "ops-github-commit-build-neon-provision"
         }
       ]
     }
