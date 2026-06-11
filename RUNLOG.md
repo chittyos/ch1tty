@@ -265,15 +265,15 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   - Coverage analysis: exactly 2 tools below 6/6 — `ch1tty/status` (2/6, missing +governance+design+communication+ops) and `neon/configure_neon_auth` (2/6, missing +finance+governance+design+communication). 151 tools at 1/6.
   - 125th pass: 12 combos + 12 prompts (2 per profile). Strategy: governance+design+communication combos each covered BOTH target tools in one chain; finance covered `neon/configure_neon_auth` alone; ops covered `ch1tty/status` alone. Code combos targeted 1/6 tools.
   - **`ch1tty/status` → 6/6** ✅ **`neon/configure_neon_auth` → 6/6** ✅
-  - Secondary boosts: `neon/get_connection_string` (→3/6), `neon/provision_neon_data_api` (→4/6), `context7/resolve-library-id(pg)` (→3/6), `orchestrator/agent_search(registry-directory-certified-services)` (→2/6). NOTE: `ledger/record` was phantom (not a real tool — ledger-mcp only has `append_entry`); replaced by post-review fix commit alongside `imessage/send_imessage` → `send_message` and `cloudflare-builds/workers_builds_trigger` → `workers_builds_list_builds` (18 pre-existing combos also fixed). Net real 6/6 gain after fixes: 226 → **227**.
-  - 6/6 tool count: **226 → 227** (after Codex-review tool-name fixes; phantom `workers_builds_trigger` removed from count)
+  - Secondary boosts: `neon/get_connection_string` (→3/6), `neon/provision_neon_data_api` (→4/6), `context7/resolve-library-id(pg)` (→3/6), `orchestrator/agent_search(registry-directory-certified-services)` (→2/6). NOTE: `ledger/record` was phantom (not a real tool — ledger-mcp only has `append_entry`); replaced by post-review fix commit alongside `imessage/send_imessage` → `send_message`, `cloudflare-builds/workers_builds_trigger` → `workers_builds_list_builds`, `cloudflare/workers-deploy` → `deploy_worker`, `cloudflare/workers-list` → `list_workers` (18+ pre-existing combos fixed). Several phantom tools that were previously counted at 6/6 were removed; their replacement tools were already 6/6. Net real 6/6 count after all fixes: **226** (verified by script).
+  - 6/6 tool count: **226** (script-verified on merged catalog; the "226→227" note was wrong — additional phantom removals offset the +2 new tools)
 - **Catalog**: 1382 → **1394 combos** / 1379 → **1391 prompts**
 - **Workstream state**: A✅ B✅ C✅ D✅ E ongoing.
 - **CI note**: `conclusion: failure` with 0 jobs — pre-existing environment artifact identical to every prior PR. Not caused by this change; safe to merge.
 - **Blocker**: Notion auth 401 persists — RUNLOG.md is cross-run fallback board. Fix: `chitty-mcp-token notion` or rotate integration token.
 - **Next run priority**:
   1. Merge PR #323 (CI 0-jobs artifact is pre-existing — safe)
-  2. 126th pass: real targets after tool-name fixes — `neon/provision_neon_data_api` (4/6, needs +governance+code), `context7/resolve-library-id(pg)` (3/6, needs +governance+communication+ops), `neon/get_connection_string` (3/6, needs +governance+design+communication), `orchestrator/agent_search(registry-directory-certified-services)` (2/6, needs +design+code+communication+ops). With 12 combos all four can reach 6/6 → 6/6 count ~231.
+  2. 126th pass: real targets after tool-name fixes — `neon/provision_neon_data_api` (4/6, needs +governance+code), `context7/resolve-library-id(pg)` (3/6, needs +governance+communication+ops), `neon/get_connection_string` (3/6, needs +governance+design+communication), `orchestrator/agent_search(registry-directory-certified-services)` (2/6, needs +design+code+communication+ops). With 12 combos all four can reach 6/6 → 6/6 count ~230.
 
 ### 2026-06-11 (run 67 — post-merge update)
 - **PR #323 merged** ✅ (auto/E-catalog-125th-pass → main)
@@ -286,5 +286,5 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   - `f5720b4` fix: phantom workers-list → list_workers (3 chains), stale trigger prompts (2 combos), P1 credential-in-ledger (finance-neon-auth-connection-ledger: get_connection_string → describe_branch)
 - **Phantom tools eliminated this run**: ledger/record, imessage/send_imessage, workers_builds_trigger, cloudflare/workers-deploy, cloudflare/workers-list
 - **Security issues fixed**: raw DB credential push to GitHub (code-neon-connection-pg-push), DB connection string in immutable ledger (finance-neon-auth-connection-ledger)
-- **Main now at**: 1394 combos / 1391 prompts / 227 tools at 6/6
-- **Next run (126th pass)**: `neon/provision_neon_data_api` (4/6, +governance+code), `context7/resolve-library-id(pg)` (3/6, +governance+communication+ops), `neon/get_connection_string` (3/6, +governance+design+communication), `orchestrator/agent_search(registry-directory-certified-services)` (2/6, +design+code+communication+ops). All four → 6/6; count ~231.
+- **Main now at**: 1394 combos / 1391 prompts / 226 tools at 6/6 (script-verified)
+- **Next run (126th pass)**: `neon/provision_neon_data_api` (4/6, +governance+code), `context7/resolve-library-id(pg)` (3/6, +governance+communication+ops), `neon/get_connection_string` (3/6, +governance+design+communication), `orchestrator/agent_search(registry-directory-certified-services)` (2/6, +design+code+communication+ops). All four → 6/6; count ~230.
