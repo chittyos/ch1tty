@@ -1,6 +1,6 @@
 {
-  "_comment": "Ch1tty focus-based suggestions catalog. 1642 combos, 1663 prompts across 6 focus profiles.",
-  "generatedFrom": "auto-driver run 82, 2026-06-12",
+  "_comment": "Ch1tty focus-based suggestions catalog. 1654 combos, 1663 prompts across 6 focus profiles. Generated from auto-driver run 80, 2026-06-12; updated run 84.",
+  "generatedFrom": "auto-driver run 80, 2026-06-12; updated run 84 (146th pass)",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools — now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time — combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -1666,10 +1666,11 @@
             "orchestrator/skill_execute(chittyos-devops:chitty-health)",
             "playwright/browser_take_screenshot"
           ],
-          "accomplishes": "Full 25-step billing intelligence pipeline: cast \u2192 orchestrator \u2192 evidence \u2192 context7 \u2192 neon schema inspection \u2192 thinking synthesis \u2192 playwright automation \u2192 fs write \u2192 notion artifact \u2192 neon slow query audit \u2192 playwright console trace \u2192 session lifecycle checkpoint \u2192 chitty health \u2192 **render-pdf billing report** \u2014 FIRST 25-step chain in catalog, FIRST playwright/browser_take_screenshot in finance.",
+          "accomplishes": "Full 25-step billing intelligence pipeline: cast → orchestrator → evidence → context7 → neon schema inspection → thinking synthesis → playwright automation → fs write → notion artifact → neon slow query audit → playwright console trace → session lifecycle checkpoint → chitty health → **render-pdf billing report** — FIRST 25-step chain in catalog, FIRST playwright/browser_take_screenshot in finance.",
           "verified": true,
           "notes": "Extends the verified 24-step finance apex with playwright/browser_take_screenshot as the final archival step. render-pdf generates a printable billing report from the session output. Verified: playwright connected."
-        },        {
+        },
+        {
           "name": "finance-render-pdf-billing-statement",
           "chain": [
             "neon/run_sql",
@@ -1678,10 +1679,11 @@
             "playwright/browser_take_screenshot",
             "notion/API-post-page"
           ],
-          "accomplishes": "Query billing data from Neon, fetch the Notion billing tracker page, navigate browser to the billing URL, take a screenshot of the rendered view, and post the screenshot link back to Notion \u2014 finance screenshot archival chain.",
+          "accomplishes": "Query billing data from Neon, fetch the Notion billing tracker page, navigate browser to the billing URL, take a screenshot of the rendered view, and post the screenshot link back to Notion — finance screenshot archival chain.",
           "verified": true,
-          "notes": "Verified: neon connected (lazy but works), playwright connected, notion connected. browser_navigate added before browser_take_screenshot \u2014 page must be loaded before capture."
-        },        {
+          "notes": "Verified: neon connected (lazy but works), playwright connected, notion connected. browser_navigate added before browser_take_screenshot — page must be loaded before capture."
+        },
+        {
           "name": "auth-agent-token-ops-mercury-sweep",
           "chain": [
             "orchestrator/agent_search",
@@ -3362,6 +3364,19 @@
           "accomplishes": "Drive guided feature development to build a finance dashboard, find Discord/Telegram connectors to notify the finance team, clean up stale service entries, and validate outcomes against the Neon database.",
           "verified": false,
           "notes": "145th pass Set B (T4+T5+T6). neon/run_sql satisfies finance backend constraint."
+        },
+        {
+          "name": "compliance-audit-finance-billing",
+          "chain": [
+            "orchestrator/skill_search(compliance audit certify)",
+            "orchestrator/skill_execute(chittyos-devops:chittyos-compliance)",
+            "orchestrator/skill_search(billing-compliance)",
+            "orchestrator/skill_execute",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Find and run the compliance certification skill, discover and execute the billing compliance skill, then reason through both compliance postures via sequential thinking to produce a comprehensive financial compliance assessment.",
+          "verified": false,
+          "notes": "146th pass. orchestrator/skill_search(compliance audit certify) 1/6→finance + orchestrator/skill_search(billing-compliance) 1/6→finance simultaneously. orchestrator + thinking connected."
         }
       ],
       "prompts": [
@@ -5604,9 +5619,10 @@
             "thinking/sequentialthinking",
             "notion/API-post-page"
           ],
-          "accomplishes": "Navigate Playwright to a regulatory policy document URL, render the loaded page as PDF, search the evidence store for supporting precedents and prior rulings, reason through the combined material to identify compliance gaps, and publish the governance brief to Notion \u2014 a document-first compliance chain.",
+          "accomplishes": "Navigate Playwright to a regulatory policy document URL, render the loaded page as PDF, search the evidence store for supporting precedents and prior rulings, reason through the combined material to identify compliance gaps, and publish the governance brief to Notion — a document-first compliance chain.",
           "verified": false,
-          "notes": "playwright/browser_navigate required before render_to_pdf to load the policy page into the Playwright session. Render-then-evidence governance compliance chain."        },
+          "notes": "playwright/browser_navigate required before render_to_pdf to load the policy page into the Playwright session. Render-then-evidence governance compliance chain."
+        },
         {
           "name": "governance-stripe-invoice-compliance-audit",
           "chain": [
@@ -6223,7 +6239,8 @@
           "verified": false,
           "notes": "playwright/browser_navigate added before render_to_pdf (required to load the target page into the Playwright session). All tools from connected backends: playwright, evidence, thinking, fs."
         },
-        {          "name": "governance-twenty-three-step-policy-apex-chain",
+        {
+          "name": "governance-twenty-three-step-policy-apex-chain",
           "chain": [
             "ch1tty/cast",
             "orchestrator/agent_search",
@@ -6415,8 +6432,9 @@
           ],
           "accomplishes": "The apex policy governance chain extending the 25-step base with a final PDF render of the archived compliance document — creating a portable, signed-off policy artifact from the complete governance workflow.",
           "verified": false,
-          "notes": "Extends governance-twenty-five-step-policy-apex-chain (unverified \u2014 tasks/update_task gated at step 25). verified=false until tasks backend connects. playwright/browser_take_screenshot confirmed in all other profiles."
-        },        {
+          "notes": "Extends governance-twenty-five-step-policy-apex-chain (unverified — tasks/update_task gated at step 25). verified=false until tasks backend connects. playwright/browser_take_screenshot confirmed in all other profiles."
+        },
+        {
           "name": "governance-chittyagent-auth-access-audit",
           "chain": [
             "orchestrator/agent_search",
@@ -8105,6 +8123,64 @@
           "accomplishes": "Run feature development workflow to scaffold a governance compliance tool, find Discord/Telegram connectors to broadcast policy updates, apply core cleanup to retire obsolete configurations, and reason through the governance approval pipeline.",
           "verified": false,
           "notes": "145th pass Set B (T4+T5+T6). thinking satisfies governance backend constraint."
+        },
+        {
+          "name": "mercury-finance-governance-audit",
+          "chain": [
+            "orchestrator/skill_execute(chittyos-finance:mercury-finance)",
+            "evidence/ai_search",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Run the Mercury Finance skill to reconcile cross-entity transaction state, search evidence docs for applicable financial regulations, and persist the governance audit record to a Notion compliance page.",
+          "verified": false,
+          "notes": "146th pass. orchestrator/skill_execute(chittyos-finance:mercury-finance) 1/6→governance. orchestrator + evidence connected; notion auth-gated (lazy)."
+        },
+        {
+          "name": "code-review-governance-evidence-log",
+          "chain": [
+            "orchestrator/skill_execute(claude-official:code-review)",
+            "evidence/ai_search",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Run the Claude code-review skill on a governance-critical changeset, search evidence docs for architectural and compliance precedents, and log the review outcome to a Notion governance audit page.",
+          "verified": false,
+          "notes": "146th pass. orchestrator/skill_execute(claude-official:code-review) 1/6→governance. orchestrator + evidence connected; notion auth-gated."
+        },
+        {
+          "name": "billing-compliance-governance-legal",
+          "chain": [
+            "orchestrator/skill_search(billing-compliance)",
+            "orchestrator/skill_execute",
+            "evidence/ai_search",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Find the billing compliance skill, execute it to run compliance checks, search evidence docs for billing regulations and legal precedents, and persist the compliance findings to a Notion governance record.",
+          "verified": false,
+          "notes": "146th pass. orchestrator/skill_search(billing-compliance) 1/6→governance. orchestrator + evidence connected; notion auth-gated."
+        },
+        {
+          "name": "feature-dev-governance-evidence-log",
+          "chain": [
+            "orchestrator/skill_search(feature-dev guided development codebase)",
+            "orchestrator/skill_execute(feature-dev:feature-dev)",
+            "evidence/ai_search",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Discover and run guided feature development with full codebase context, search evidence docs for design patterns and architectural precedents, and log the feature delivery record to a Notion governance page.",
+          "verified": false,
+          "notes": "146th pass. orchestrator/skill_search(feature-dev guided development codebase) 1/6→governance. orchestrator + evidence connected; notion auth-gated."
+        },
+        {
+          "name": "compliance-audit-governance-evidence",
+          "chain": [
+            "orchestrator/skill_search(compliance audit certify)",
+            "orchestrator/skill_execute(chittyos-devops:chittyos-compliance)",
+            "evidence/ai_search",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Find the compliance certification skill, run it against ChittyOS services, search evidence docs for regulatory requirements and certifications, and record the full audit outcome in a Notion governance page.",
+          "verified": false,
+          "notes": "146th pass. orchestrator/skill_search(compliance audit certify) 1/6→governance. orchestrator + evidence connected; notion auth-gated."
         }
       ],
       "prompts": [
@@ -17551,6 +17627,31 @@
           "accomplishes": "Run guided feature development to scaffold an integration module, find the Discord/Telegram connector for CI notifications, clean up stale service entries, list Workers for deployment validation, and search GitHub for existing integration patterns.",
           "verified": false,
           "notes": "145th pass Set B (T4+T5+T6). cloudflare-builds + github satisfy code backend constraint."
+        },
+        {
+          "name": "evidence-collect-code-audit",
+          "chain": [
+            "orchestrator/skill_execute(chittyos-legal:evidence-collect)",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "fs/write_file"
+          ],
+          "accomplishes": "Stage legal or compliance evidence through the canonical pipeline ingest, resolve the relevant library docs for the technology under audit via Context7, pull full documentation, and write a combined code-evidence audit report.",
+          "verified": false,
+          "notes": "146th pass. orchestrator/skill_execute(chittyos-legal:evidence-collect) 1/6→code. orchestrator + context7 + fs connected."
+        },
+        {
+          "name": "billing-compliance-code-sdk-context",
+          "chain": [
+            "orchestrator/skill_search(billing-compliance)",
+            "orchestrator/skill_execute",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "fs/write_file"
+          ],
+          "accomplishes": "Discover and run the billing compliance skill, resolve relevant billing/payments SDK documentation via Context7, pull full library docs for implementation reference, and write a code-level compliance implementation guide.",
+          "verified": false,
+          "notes": "146th pass. orchestrator/skill_search(billing-compliance) 1/6→code. orchestrator + context7 + fs connected."
         }
       ],
       "prompts": [
@@ -26875,6 +26976,56 @@
           "accomplishes": "Run guided feature development to automate an operational provisioning workflow, find Discord/Telegram connectors for ops alerting, apply core cleanup to remove obsolete dead services and config drift, and search for any remaining skill gaps in the orchestrator registry.",
           "verified": false,
           "notes": "145th pass Set B (T4+T5+T6). orchestrator/skill_search satisfies ops backend constraint."
+        },
+        {
+          "name": "mercury-finance-ops-neon-sync",
+          "chain": [
+            "orchestrator/skill_execute(chittyos-finance:mercury-finance)",
+            "neon/run_sql",
+            "cloudflare-builds/workers_list",
+            "fs/write_file"
+          ],
+          "accomplishes": "Execute the Mercury Finance skill to sync cross-entity account balances, query Neon for ledger reconciliation, enumerate Cloudflare Workers to map financial service endpoints, and write a unified ops finance summary.",
+          "verified": false,
+          "notes": "146th pass. orchestrator/skill_execute(chittyos-finance:mercury-finance) 1/6→ops. orchestrator + cloudflare-builds + fs connected; neon auth-gated."
+        },
+        {
+          "name": "code-review-ops-cloudflare-deploy",
+          "chain": [
+            "orchestrator/skill_execute(claude-official:code-review)",
+            "orchestrator/skill_execute(commit-commands:commit-push-pr)",
+            "cloudflare-builds/workers_build_start",
+            "cloudflare-builds/workers_get_worker",
+            "fs/write_file"
+          ],
+          "accomplishes": "Run Claude code review on a Cloudflare Worker changeset, commit and open a PR via the commit skill, trigger a Workers build, verify the deployed worker is live, and write a deploy summary report.",
+          "verified": false,
+          "notes": "146th pass. orchestrator/skill_execute(claude-official:code-review) 1/6→ops. orchestrator + cloudflare-builds + fs all connected."
+        },
+        {
+          "name": "evidence-collect-ops-compliance-check",
+          "chain": [
+            "orchestrator/skill_execute(chittyos-legal:evidence-collect)",
+            "cloudflare-builds/workers_list",
+            "neon/run_sql",
+            "fs/write_file"
+          ],
+          "accomplishes": "Ingest compliance evidence through the canonical pipeline, enumerate deployed Workers to scope the infrastructure under review, query Neon for service compliance records, and write a combined ops-compliance report.",
+          "verified": false,
+          "notes": "146th pass. orchestrator/skill_execute(chittyos-legal:evidence-collect) 1/6→ops. orchestrator + cloudflare-builds + fs connected; neon auth-gated."
+        },
+        {
+          "name": "feature-dev-ops-deploy-builds",
+          "chain": [
+            "orchestrator/skill_search(feature-dev guided development codebase)",
+            "orchestrator/skill_execute(feature-dev:feature-dev)",
+            "orchestrator/skill_execute(commit-commands:commit-push-pr)",
+            "cloudflare-builds/workers_build_start",
+            "fs/write_file"
+          ],
+          "accomplishes": "Discover and run the feature-dev skill to produce a reviewed changeset, commit and open a PR, trigger a Cloudflare Workers build to deploy the feature, and record the full delivery pipeline outcome.",
+          "verified": false,
+          "notes": "146th pass. orchestrator/skill_search(feature-dev guided development codebase) 1/6→ops. orchestrator + cloudflare-builds + fs connected."
         }
       ],
       "prompts": [
