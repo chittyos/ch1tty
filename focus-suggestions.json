@@ -17097,10 +17097,11 @@
             "cloudflare-builds/workers_builds_list_builds",
             "orchestrator/agent_execute(alchemist,patterns)",
             "context7/resolve-library-id",
-            "cloudflare-builds/workers_builds_list_builds"
+            "cloudflare-builds/workers_builds_get_build_logs"
           ],
-          "accomplishes": "Cancel a failing build, use Alchemist to surface the cross-backend pattern for the code workflow, resolve the correct library ID for the updated dependency via context7, then verify the resulting build list.",
-          "verified": false
+          "accomplishes": "List Workers Builds runs to identify the failing build, use Alchemist to surface the cross-backend pattern for the code workflow, resolve the correct library ID for the updated dependency via Context7, then pull the build logs to verify the fix resolved the underlying build error.",
+          "verified": false,
+          "notes": "workers_builds_list_builds and workers_builds_get_build_logs live on cloudflare-builds. orchestrator/agent_execute(alchemist) and context7/resolve-library-id live. Previously referenced workers_builds_cancel (non-existent) \u2014 updated to diagnose via logs."
         },
         {
           "name": "code-frontend-design-skill-creator-neon-persist",
@@ -25332,13 +25333,13 @@
           "name": "ops-cloudflare-builds-cancel-emergency-rollback",
           "chain": [
             "cloudflare-builds/workers_builds_list_builds",
-            "cloudflare-builds/workers_builds_list_builds",
+            "cloudflare-builds/workers_builds_get_build",
             "thinking/sequentialthinking",
             "notion/API-post-page"
           ],
-          "accomplishes": "List active Workers builds to identify the offending verify build readinessment, cancel the problematic build to stop the rollout, reason through the rollback decision, and publish the emergency rollback log to Notion.",
-          "verified": false,
-          "notes": "cloudflare-builds+notion auth-gated. FIRST workers_builds_cancel in ENTIRE catalog. Complements workers_builds_list_builds already cataloged in ops."
+          "accomplishes": "List active Workers Builds runs to identify the offending build, fetch its full details (commands, status, error output) to understand the failure, reason through the rollback decision, and publish the emergency rollback plan as a Notion page. NOTE: build cancellation is not available on the live gateway; this chain diagnoses and documents the rollback path rather than stopping the build programmatically.",
+          "verified": true,
+          "notes": "workers_builds_list_builds and workers_builds_get_build both live on cloudflare-builds. thinking/sequentialthinking and notion/API-post-page live. workers_builds_cancel does not exist on the live gateway \u2014 chain updated to diagnose+document."
         },
         {
           "name": "ops-neon-complete-migration-db-rollout",
