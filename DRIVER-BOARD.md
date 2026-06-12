@@ -8,7 +8,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **B. GitHub MCP migration** — `servers.json` github entry already migrated to `https://api.githubcopilot.com/mcp/` with `envHeaders` for `GITHUB_MCP_AUTHORIZATION`. No `@modelcontextprotocol/server-github` anywhere. DONE.
 - [x] **C. Focus-profile layer** — `focus-profiles.json` with 6 profiles (finance, governance, design, code, communication, ops), `CH1TTY_FOCUS` env var, per-call `focus` param on search/cast, `ch1tty/status` reports `availableFocusProfiles`, real tests in `test/focus.test.ts`. DONE.
 - [x] **D. Scenario testing + simulation** — `test/scenario.test.ts` (1157 lines), `test/simulation.test.ts` (229 lines), `sim/scenarios.ts` harness driving real Aggregator over FixtureBackends. All 6 focus profiles covered. All tests pass. DONE.
-- [ ] **E. Alchemist brainstorm** — `focus-suggestions.json` suggestions catalog, actively growing. 1726 combos as of run 89 (152nd pass); 358 tools at 6/6, 9 tools at 1/6, 1 tool at 2/6, 4 tools at 3/6.
+- [ ] **E. Alchemist brainstorm** — `focus-suggestions.json` suggestions catalog, actively growing. 1738 combos as of run 90 (153rd pass — clean sweep); 367 tools at 6/6, 0 tools at 1/6, 1 tool at 2/6, 4 tools at 3/6.
 
 ## Live Gateway State (as of 2026-06-12)
 
@@ -24,6 +24,38 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 90 — 2026-06-12 (auto-driver)
+
+**Workstream advanced**: E (catalog — 153rd pass, CLEAN SWEEP: 9 tools 1/6→6/6)
+**Branch/PR**: `auto/E-153rd-catalog-pass` → (open this run)
+**Build**: clean (0 errors)
+**Tests**: 938 pass, 0 fail, 2 skipped (940 total, 45 suites)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 938/0/2. No open PRs (PR #360 already merged). Confirmed workstream states: A✅ B✅ C✅ D✅ E in-progress.
+- Coverage analysis confirmed: 9 tools at 1/6 (clean baseline matching Run 89's board), 1 at 2/6, 4 at 3/6, 358 at 6/6 — all matching origin/main.
+- Note: local `main` was diverged from origin/main (50-commit gap). Reset local main to origin/main before creating branch.
+- **153rd pass — clean sweep of all 9 remaining 1/6 tools**:
+  - Set A (code cluster): `agent_search(claude integration mcp marketplace skills architecture)` + `agent_search(notes apple semantic search RAG embeddings)`
+  - Set B (communication cluster): `skill_search(chittycontext state entity binding)` + `agent_search(notion workspace database)`
+  - Set C (ops cluster): `agent_search(market artifact marketplace plugin install publish)` + `agent_search(registry catalog certified services directory)` + `agent_search(resolve error triage severity auto-resolution)` + `skill_search(compliance-audit-scaffold-certify)` + `skill_search(compliance-audit-scaffold-certify-monitor)`
+- Strategy: 12 combos (2 per profile). finance/governance/design get all 9 tools (4+5 per combo pair). communication gets A+C (7 tools). code gets B+C (7 tools). ops gets A+B (4 tools).
+- Constraints satisfied: communication combos include `thinking/sequentialthinking`; code combos include `context7/` + `cloudflare-builds/`.
+- All 9 verified at 6/6 post-patch. 0 tools remain at 1/6 — first time catalog has a clean 1/6 sweep since inception.
+- Coverage: 1726 → 1738 combos, 1735 → 1747 prompts, 358 → 367 tools at 6/6, 9 → 0 tools at 1/6.
+
+**Next run priority**:
+- Merge this PR when CI is green (known repo-wide CI infrastructure issue since 2026-06-10).
+- 154th pass: advance the 4 tools at 3/6 (scrape cluster) + 1 tool at 2/6 (neon finance):
+  - `agent_execute(scrape, status)` [code,governance,ops] → needs communication,design,finance
+  - `agent_search(scrape browser automation job queue web)` [communication,finance,governance] → needs code,design,ops
+  - `agent_search(scrape)` [code,governance,ops] → needs communication,design,finance
+  - `skill_search(chittyhelper architectural navigation service discovery)` [code,governance,ops] → needs communication,design,finance
+  - `agent_search(neon database finance banking neon sql)` [finance,ops] → needs code,communication,design,governance
+  - All 5 tools → 6/6 in ~10 combos (4+4+2 missing profiles across the 5 tools). After that, workstream E fully complete.
 
 ---
 
