@@ -27,6 +27,54 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 
 ---
 
+### Run 83 — 2026-06-12 (auto-driver)
+
+**Workstream advanced**: E (catalog accuracy — Codex P2 playwright tool name fixes)
+**Branch/PR**: `auto/E-browser-rendering-render-pdf-fix` → #350 (open, rebased onto main)
+**Build**: clean (0 errors)
+**Tests**: 938 pass, 0 fail, 2 skipped (940 total, 45 suites)
+
+**What was done**:
+- Addressed 3 Codex P2 findings on PR #350 commit `539d53b`:
+  1. `playwright/render_to_pdf` does not exist on live server (no PDF tool anywhere on live gateway). 25 catalog entries replaced with `playwright/browser_take_screenshot`.
+  2. `playwright/navigate` (introduced by commit `539d53b`) is wrong — live server uses `browser_*` prefix. 4 entries replaced with `playwright/browser_navigate`.
+  3. `finance-render-pdf-billing-statement` called browser_take_screenshot with no page loaded — prepended `playwright/browser_navigate` to chain.
+- Fixed `sim/fixture-backend.ts` playwright section: `navigate/screenshot/click/render_to_pdf` → `browser_navigate/browser_take_screenshot/browser_click/browser_snapshot` (all verified against live gateway output).
+- Fixed `sim/scenarios.ts` design scenarios: `design.click-action` expect → `playwright/browser_click`, intent tightened to "click on page element by css selector" to avoid 0.333 score tie with `browser_take_screenshot` on the "the/page" keyword pair; `design.navigate` expect → `playwright/browser_navigate`; notes updated.
+- Rebased branch onto main (PR #351 had merged while PR #350 was open). Resolved 5+4+5 conflict markers across 3 rebase steps by always taking our branch version for notes/accomplishes text.
+- Updated PR #350 title + description to reflect full scope.
+
+**Catalog state after run**:
+- 1642 combos (unchanged — replacements, not additions)
+- 0 `playwright/render_to_pdf` entries (was 25)
+- 0 `playwright/navigate` entries (was 4)
+- `playwright/browser_take_screenshot`: all archival screenshot chains
+- Fixture playwright section: 4 real live tools
+
+**Next run priority**:
+- Merge PR #350 when reviewed (CI infra issue still blocks automated CI; tests pass locally).
+- 145th pass already done (PR #351 merged). 146th pass: target 6 from remaining ~55 at 1/6. Suggested Set A: `orchestrator/agent_search(finance mercury banking cash flow)`, `orchestrator/skill_search(chittyos-compliance)`, `orchestrator/skill_search(machine-management)`. Set B: `orchestrator/skill_execute(feature-dev:feature-dev)`, `orchestrator/skill_search(discord telegram connector integration message channel)`, `orchestrator/skill_execute(chittyos-core:chitty-cleanup)`.
+
+---
+
+### Run 82 — 2026-06-12 (auto-driver)
+
+**Workstream advanced**: E (catalog accuracy — Codex P2 fixes + browser-rendering alignment)
+**Branch/PRs**: `auto/E-cloudflare-builds-fixture-scenarios` (Codex fixes) → #347 merged; `auto/E-browser-rendering-tool-names` → #349 merged
+**Build**: clean (0 errors)
+**Tests**: 938 pass, 0 fail, 2 skipped (940 total, 45 suites)
+
+**What was done**:
+- Addressed Codex P2 findings on PR #347: two combos still advertised build cancellation after the bulk `workers_builds_cancel` replacement. Fixed `finance-neon-query-build-cancel-report` (removed cancel claim) and `finance-billing-build-config-audit` (chain swapped to `workers_get_worker`, accomplishes updated to match actual tool capabilities). PR #347 merged.
+- Identified and fixed browser-rendering tool name drift: live gateway exposes `get_url_html_content`, `get_url_markdown`, `get_url_screenshot` (not the stale `render_page`/`capture_screenshot` in fixture+catalog). Fixed: 3 new tools in fixture, 5 redesigned scenarios with keyword-score-verified intents, 2 test assertions updated, 112 catalog occurrences replaced. PR #349 merged.
+- Post-merge: found `browser-rendering/render-pdf` (hyphen, 18 combos) also missed by the mass replace — not a live tool. Replaced with `playwright/render_to_pdf` (connected, actually renders to PDF).
+- Coverage: 1630 combos, 554 verified / 319 at 6/6 / 55 at 1/6.
+
+**Next run priority**:
+- 145th pass: target 6 from remaining 55 at 1/6. Suggested Set A (finance/governance/ops): `orchestrator/agent_search(finance mercury banking cash flow)`, `orchestrator/skill_search(chittyos-compliance)`, `orchestrator/skill_search(machine-management)`. Set B (code/communication/ops): `orchestrator/skill_execute(feature-dev:feature-dev)`, `orchestrator/skill_search(discord telegram connector integration message channel)`, `orchestrator/skill_execute(chittyos-core:chitty-cleanup)`.
+
+---
+
 ### Run 81 — 2026-06-12 (auto-driver)
 
 **Workstream advanced**: E (Alchemist catalog — 144th pass)

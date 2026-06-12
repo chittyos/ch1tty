@@ -145,11 +145,11 @@ export const FIXTURE_TOOLS: Record<string, FixtureTool[]> = {
     { name: 'get_url_screenshot', description: 'Get page screenshot' },
   ],
   playwright: [
-    { name: 'navigate', description: 'Navigate a Playwright browser session to a URL' },
-    { name: 'screenshot', description: 'Take a screenshot of the current Playwright page and save it' },
-    { name: 'click', description: 'Click an element on the current Playwright page by selector' },
-    // near-miss: a playwright "render"-shaped tool to compete with browser-rendering/get_url_html_content
-    { name: 'render_to_pdf', description: 'Render the current Playwright page to a PDF file' },
+    { name: 'browser_navigate', description: 'Navigate to a URL' },
+    { name: 'browser_take_screenshot', description: 'Take a screenshot of the current page' },
+    { name: 'browser_click', description: 'Perform click on a web page' },
+    // near-miss: browser_snapshot captures page content like browser-rendering tools
+    { name: 'browser_snapshot', description: 'Capture accessibility snapshot of the current page, this is better than screenshot' },
   ],
   cowork: [
     { name: 'start_session', description: 'Start a Claude Co-Work desktop collaboration session' },
