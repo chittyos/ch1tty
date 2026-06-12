@@ -34,7 +34,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 **Tests**: 938 pass, 0 fail, 2 skipped (940 total, 45 suites)
 
 **What was done**:
-- Startup: `npm ci` clean, `npm run build` clean, 938/0/2. One open PR: #335 (136th pass, CI all green — CodeQL + Analyze both success). Merged #335 via GitHub MCP. Reset local main to 79212de (1522 combos / 275 tools at 6/6 / 99 at 1/6).
+- Startup: `npm ci` clean, `npm run build` clean, 938/0/2. PR #335 (136th pass, CI all green — CodeQL + Analyze both success) was merged via GitHub MCP. Reset local main to 79212de (1522 combos / 275 tools at 6/6 / 99 at 1/6).
 - Confirmed workstream states: A✅ B✅ C✅ D✅ E in-progress.
 - DRIVER-BOARD.md confirmed as cross-run fallback (Notion still unreachable).
 - 137th pass: bipartite strategy — Set A=[neon/provision_neon_auth, orchestrator/agent_execute(resolve,triage), orchestrator/agent_execute(imessage)] + Set B=[neon/delete_branch, orchestrator/agent_execute(autobot,start), orchestrator/agent_execute(scrape,monitor)]. 12 combos (2/profile × 6 profiles) + 12 prompts. Each set appears once per profile → 6/6 for all 6 target tools.
