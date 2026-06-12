@@ -8,7 +8,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **B. GitHub MCP migration** — `servers.json` github entry already migrated to `https://api.githubcopilot.com/mcp/` with `envHeaders` for `GITHUB_MCP_AUTHORIZATION`. No `@modelcontextprotocol/server-github` anywhere. DONE.
 - [x] **C. Focus-profile layer** — `focus-profiles.json` with 6 profiles (finance, governance, design, code, communication, ops), `CH1TTY_FOCUS` env var, per-call `focus` param on search/cast, `ch1tty/status` reports `availableFocusProfiles`, real tests in `test/focus.test.ts`. DONE.
 - [x] **D. Scenario testing + simulation** — `test/scenario.test.ts` (1157 lines), `test/simulation.test.ts` (229 lines), `sim/scenarios.ts` harness driving real Aggregator over FixtureBackends. All 6 focus profiles covered. All tests pass. DONE.
-- [ ] **E. Alchemist brainstorm** — `focus-suggestions.json` suggestions catalog, actively growing. 1606 combos, 317 tools at 6/6, 60 at 1/6 (as of run 80, 143rd pass).
+- [ ] **E. Alchemist brainstorm** — `focus-suggestions.json` suggestions catalog, actively growing. 1630 combos, 321 tools at 6/6, 55 at 1/6 (as of run 81, 144th pass).
 
 ## Live Gateway State (as of 2026-06-12)
 
@@ -24,6 +24,30 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 81 — 2026-06-12 (auto-driver)
+
+**Workstream advanced**: E (Alchemist catalog — 144th pass)
+**Branch/PR**: `auto/E-catalog-144th-pass` → https://github.com/chittyos/ch1tty/pull/348
+**Build**: clean (0 errors)
+**Tests**: 938 pass, 0 fail, 2 skipped (940 total, 45 suites)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 938/0/2. 1 open PR: #347 (cloudflare-builds fixture fixes, all 3 CI green). Merged PR #347 (squash). Main updated to e50b70a (1618 combos / 312 tools at 6/6).
+- Post-merge analysis: 60 tools at 1/6, 1 at 3/6, 2 at 5/6, 312 at 6/6. PR #347 fixed 28 wrong cloudflare-builds tool names (net effect: 317 → 312 at 6/6 after phantom names removed; real coverage increased).
+- Near-complete targets: `workers_list` (5/6, missing governance), `workers_get_worker_code` (5/6, missing communication), `workers_get_worker` (3/6, missing design+code+ops).
+- 144th pass: bipartite strategy. Set A (finance/governance/code): `orchestrator/agent_search(finance banking neon)`, `orchestrator/skill_search(docket court county circuit)`, `orchestrator/agent_search(helper-architectural-navigation-service-discovery)`. Set B (communication/ops/code): `orchestrator/skill_execute(broadcast)`, `orchestrator/agent_search(ship-workflow)`, `orchestrator/skill_execute(agents-sdk-migrate)`.
+- Folded 3 near-complete cloudflare-builds tools as bonuses in their missing-profile combos (G1+governance for workers_list, COM1+communication for workers_get_worker_code, D1+C1+O1+design+code+ops for workers_get_worker).
+- 12 combos + 12 prompts. All 9 target tools confirmed at 6/6 post-patch.
+- Coverage: 1618 → 1630 combos / 1639 → 1651 prompts / 312 → 321 tools at 6/6 / 60 → 55 tools at 1/6.
+- PR #348 open, CI (CodeQL) in_progress. CodeRabbit rate-limit comment — bot notification, no action needed.
+- Subscribed to PR #348 for CI/review monitoring.
+
+**Next run priority**:
+- Merge PR #348 when CI green (or manually, CI known repo-wide infra issue).
+- 145th pass: target 6 from remaining 55 at 1/6. Suggested Set A (finance/governance/ops): `orchestrator/agent_search(finance mercury banking cash flow)` [finance], `orchestrator/skill_search(chittyos-compliance)` [governance], `orchestrator/skill_search(machine-management)` [ops]. Set B (code/communication/ops): `orchestrator/skill_execute(feature-dev:feature-dev)` [code], `orchestrator/skill_search(discord telegram connector integration message channel)` [communication], `orchestrator/skill_execute(chittyos-core:chitty-cleanup)` [ops] → 6 tools to 6/6 in 12 combos.
 
 ---
 
