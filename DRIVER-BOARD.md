@@ -8,7 +8,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **B. GitHub MCP migration** — `servers.json` github entry already migrated to `https://api.githubcopilot.com/mcp/` with `envHeaders` for `GITHUB_MCP_AUTHORIZATION`. No `@modelcontextprotocol/server-github` anywhere. DONE.
 - [x] **C. Focus-profile layer** — `focus-profiles.json` with 6 profiles (finance, governance, design, code, communication, ops), `CH1TTY_FOCUS` env var, per-call `focus` param on search/cast, `ch1tty/status` reports `availableFocusProfiles`, real tests in `test/focus.test.ts`. DONE.
 - [x] **D. Scenario testing + simulation** — `test/scenario.test.ts` (1157 lines), `test/simulation.test.ts` (229 lines), `sim/scenarios.ts` harness driving real Aggregator over FixtureBackends. All 6 focus profiles covered. All tests pass. DONE.
-- [ ] **E. Alchemist brainstorm** — `focus-suggestions.json` suggestions catalog, actively growing. 1714 combos as of run 88 (151st pass); 353 tools at 6/6, 15 tools at 1/6, 6 tools at 2/6.
+- [ ] **E. Alchemist brainstorm** — `focus-suggestions.json` suggestions catalog, actively growing. 1726 combos as of run 89 (152nd pass); 358 tools at 6/6, 9 tools at 1/6, 1 tool at 2/6, 4 tools at 3/6.
 
 ## Live Gateway State (as of 2026-06-12)
 
@@ -24,6 +24,44 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 89 — 2026-06-12 (auto-driver)
+
+**Workstream advanced**: E (catalog — 152nd pass, 6 tools 1/6→6/6, 3 phantom fixes, 4 bonus tools 2/6→3/6)
+**Branch/PR**: `auto/E-152nd-catalog-pass` → https://github.com/chittyos/ch1tty/pull/360 (open this run)
+**Build**: clean (0 errors)
+**Tests**: 938 pass, 0 fail, 2 skipped (940 total, 45 suites)
+
+**What was done**:
+- Startup: continued from run 88 context. PR #359 (board cosmetic update) open → merged via GitHub MCP. PR #358 already merged.
+- Confirmed workstream states: A✅ B✅ C✅ D✅ E in-progress.
+- Coverage analysis: 16 tools at 1/6 (including 1 phantom `orchestrator/chittyagent-market` duplicate), 5 tools at 2/6.
+- **Phantom fixes** (3 total, found via live gateway tool search confirming 13 real orchestrator tools):
+  - `orchestrator/chittyagent-market` (×2 in finance combos) → `orchestrator/agent_execute(market)`
+  - `orchestrator/chittyagent-ship` (×1 in code combo) → `orchestrator/agent_execute(ship)`
+  - After fixes: 15 at 1/6, 5 at 2/6 (clean baseline).
+- **152nd pass** — governance cluster × 3 + code cluster × 3 → 6/6:
+  - `orchestrator/agent_search(tasks inter-agent work queue notion assign)` [gov] → all 5 missing profiles
+  - `orchestrator/agent_search(registry service catalog certified directory)` [gov] → all 5 missing profiles
+  - `orchestrator/agent_search(helper service discovery architectural navigation intent)` [gov] → all 5 missing profiles
+  - `orchestrator/agent_execute(ship)` [code] → all 5 missing profiles
+  - `orchestrator/skill_execute(user:chico)` [code] → all 5 missing profiles
+  - `orchestrator/skill_execute(commit-commands:clean-gone)` [code] → all 5 missing profiles
+- **Bonus** 2/6→3/6: agent_search(scrape browser...), agent_execute(scrape,status), agent_search(scrape), skill_search(chittyhelper...)
+- 12 combos + 12 prompts. Fixed a prompt-format regression mid-run (new prompts as plain strings → test caught it → converted to `{text, resolves_to}` objects).
+- Constraints: communication combos include `thinking/sequentialthinking`; code combo includes `context7/resolve-library-id`.
+- Coverage: 1714 → 1726 combos, 1723 → 1735 prompts, 353 → 358 tools at 6/6, 15 → 9 at 1/6, 5 → 1 at 2/6, 0 → 4 at 3/6.
+
+**Next run priority**:
+- Merge PR #360 when CI green (CodeQL checks; known CI yml infra issue persists).
+- 153rd pass: target remaining 9 at 1/6. Clusters:
+  - code×2: agent_search(notes apple semantic search RAG embeddings), agent_search(claude integration mcp marketplace skills architecture)
+  - communication×2: skill_search(chittycontext state entity binding), agent_search(notion workspace database)
+  - ops×3: skill_search(compliance-audit-scaffold-certify), skill_search(compliance-audit-scaffold-certify-monitor), agent_search(resolve error triage severity auto-resolution)
+  - ops+×2: agent_search(market artifact marketplace plugin install publish), agent_search(registry catalog certified services directory)
+  - Pick 6, each needs 5 more profiles (can do all 9 in a single pass for a clean sweep).
 
 ---
 
