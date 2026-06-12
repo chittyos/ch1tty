@@ -3189,7 +3189,7 @@
         {
           "name": "finance-builds-dispute-playwright-sql",
           "chain": [
-            "cloudflare-builds/workers_builds_list_deployments",
+            "cloudflare-builds/workers_builds_list_builds",
             "orchestrator/agent_execute(dispute, list)",
             "context7/resolve-library-id(playwright)",
             "neon/run_sql"
@@ -7840,7 +7840,7 @@
         {
           "name": "governance-builds-dispute-playwright-evidence",
           "chain": [
-            "cloudflare-builds/workers_builds_list_deployments",
+            "cloudflare-builds/workers_builds_list_builds",
             "orchestrator/agent_execute(dispute, list)",
             "context7/resolve-library-id(playwright)",
             "evidence/ai_search"
@@ -12377,7 +12377,7 @@
         {
           "name": "design-builds-dispute-playwright-screenshot",
           "chain": [
-            "cloudflare-builds/workers_builds_list_deployments",
+            "cloudflare-builds/workers_builds_list_builds",
             "orchestrator/agent_execute(dispute, list)",
             "context7/resolve-library-id(playwright)",
             "playwright/screenshot"
@@ -17091,7 +17091,7 @@
         {
           "name": "code-builds-dispute-playwright-docs",
           "chain": [
-            "cloudflare-builds/workers_builds_list_deployments",
+            "cloudflare-builds/workers_builds_list_builds",
             "orchestrator/agent_execute(dispute, list)",
             "context7/resolve-library-id(playwright)",
             "context7/query-docs"
@@ -17179,7 +17179,8 @@
             "orchestrator/agent_search(dispute legal evidence management)",
             "orchestrator/skill_search(cast-mcp-route)",
             "neon/run_sql",
-            "context7/resolve-library-id"
+            "context7/resolve-library-id",
+            "context7/query-docs"
           ],
           "accomplishes": "Search for Neon database schema agents to understand the codebase data model and migration schema, look up dispute and legal evidence management agents to surface open security incidents or compliance issues in the repository, use the cast-mcp-route skill to route code intent queries to the optimal MCP tool, run a Neon SQL query to extract build and deployment metrics, then resolve a library ID via Context7 to fetch the latest dependency documentation.",
           "verified": false,
@@ -21598,7 +21599,7 @@
         {
           "name": "comm-builds-dispute-playwright-sequential",
           "chain": [
-            "cloudflare-builds/workers_builds_list_deployments",
+            "cloudflare-builds/workers_builds_list_builds",
             "orchestrator/agent_execute(dispute, list)",
             "context7/resolve-library-id(playwright)",
             "thinking/sequentialthinking"
@@ -26182,11 +26183,11 @@
             "neon/delete_branch",
             "orchestrator/agent_execute(autobot,start)",
             "orchestrator/agent_execute(scrape,monitor)",
-            "cloudflare-builds/workers_builds_list_deployments"
+            "cloudflare-builds/workers_builds_list_builds"
           ],
           "accomplishes": "Remove a Neon branch after a production deployment completes, kick Autobot to run post-deploy validation tasks, list Cloudflare deployments to confirm rollout status, and monitor the deployment endpoint to verify health.",
           "verified": false,
-          "notes": "cloudflare-builds/workers_builds_list_deployments connected; neon/delete_branch, autobot, scrape,monitor lazy"
+          "notes": "cloudflare-builds/workers_builds_list_builds connected; neon/delete_branch, autobot, scrape,monitor lazy"
         },
         {
           "name": "ops-cleaner-cloudflare-branch-cleanup-deployments",
@@ -26194,7 +26195,7 @@
             "orchestrator/agent_search(cleaner)",
             "orchestrator/agent_search(cloudflare dns workers kv r2 pages)",
             "orchestrator/skill_execute(chittyos-devops:branch-cleanup)",
-            "cloudflare-builds/workers_builds_list_deployments"
+            "cloudflare-builds/workers_builds_list_builds"
           ],
           "accomplishes": "Invoke the branch-cleaner agent to find all stale ops branches, search Cloudflare DNS/KV/R2/Workers/Pages for orphaned infra tied to old branches, execute the devops branch-cleanup skill, then list Cloudflare Workers deployments to confirm no active production deployments reference the pruned branch names.",
           "verified": false,
@@ -26227,7 +26228,7 @@
         {
           "name": "ops-builds-dispute-playwright-build-detail",
           "chain": [
-            "cloudflare-builds/workers_builds_list_deployments",
+            "cloudflare-builds/workers_builds_list_builds",
             "orchestrator/agent_execute(dispute, list)",
             "context7/resolve-library-id(playwright)",
             "cloudflare-builds/workers_builds_get_build"
@@ -26289,7 +26290,7 @@
           "chain": [
             "orchestrator/skill_search(cashflow-planner)",
             "orchestrator/skill_execute(chittyos-legal:docket)",
-            "cloudflare-builds/workers_builds_list_deployments",
+            "cloudflare-builds/workers_builds_list_builds",
             "thinking/sequentialthinking"
           ],
           "accomplishes": "Search cashflow planning tools to monitor ops infrastructure cost trends and budget burn, execute the legal docket skill to check deployment contracts and SLA obligations, list Cloudflare Workers deployment history to correlate cost spikes with releases, then reason through the ops spending analysis and remediation steps.",
@@ -26302,7 +26303,7 @@
             "orchestrator/skill_search(frontend design UI web component interface)",
             "playwright/browser_run_code_unsafe",
             "orchestrator/agent_search(imessage message contact normalization)",
-            "cloudflare-builds/workers_builds_list_deployments"
+            "cloudflare-builds/workers_builds_list_builds"
           ],
           "accomplishes": "Search for frontend design components needed for ops monitoring dashboards, execute browser code to validate the deployment status UI in a staging environment, look up iMessage contacts for ops on-call notifications, then fetch recent Cloudflare Workers deployments to confirm rollout health.",
           "verified": false,
@@ -26314,7 +26315,7 @@
             "orchestrator/agent_search(neon database postgres schema)",
             "orchestrator/agent_search(dispute legal evidence management)",
             "orchestrator/skill_search(cast-mcp-route)",
-            "cloudflare-builds/workers_builds_list_deployments"
+            "cloudflare-builds/workers_builds_list_builds"
           ],
           "accomplishes": "Search for Neon database schema agents to understand the ops data model and deployment schema, look up dispute and legal evidence management agents to surface SLA violations or incident evidence requiring resolution, use the cast-mcp-route skill to route ops intent to the optimal deployment backend, then list Cloudflare Workers deployments to verify the current infrastructure state.",
           "verified": false,
