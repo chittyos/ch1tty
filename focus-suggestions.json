@@ -1666,9 +1666,9 @@
             "orchestrator/skill_execute(chittyos-devops:chitty-health)",
             "playwright/render_to_pdf"
           ],
-          "accomplishes": "Full 25-step billing intelligence pipeline: cast \u2192 orchestrator \u2192 evidence \u2192 context7 \u2192 neon schema inspection \u2192 thinking synthesis \u2192 playwright automation \u2192 fs write \u2192 notion artifact \u2192 neon slow query audit \u2192 playwright console trace \u2192 session lifecycle checkpoint \u2192 chitty health \u2192 **render-pdf billing report** \u2014 FIRST 25-step chain in catalog, FIRST playwright/render_to_pdf in finance.",          "verified": true,
-          "notes": "Extends the verified 24-step finance apex with playwright/render_to_pdf as the final archival step. render-pdf generates a printable billing report from the session output. Verified: browser-rendering connected."
-        },
+          "accomplishes": "Full 25-step billing intelligence pipeline: cast \u2192 orchestrator \u2192 evidence \u2192 context7 \u2192 neon schema inspection \u2192 thinking synthesis \u2192 playwright automation \u2192 fs write \u2192 notion artifact \u2192 neon slow query audit \u2192 playwright console trace \u2192 session lifecycle checkpoint \u2192 chitty health \u2192 **render-pdf billing report** \u2014 FIRST 25-step chain in catalog, FIRST playwright/render_to_pdf in finance.",
+          "verified": true,
+          "notes": "Extends the verified 24-step finance apex with playwright/render_to_pdf as the final archival step. render-pdf generates a printable billing report from the session output. Verified: playwright connected."        },
         {
           "name": "finance-render-pdf-billing-statement",
           "chain": [
@@ -1677,9 +1677,9 @@
             "playwright/render_to_pdf",
             "notion/API-post-page"
           ],
-          "accomplishes": "Query billing data from Neon, fetch the Notion billing tracker page, render the combined view as a PDF statement, and post the PDF link back to Notion \u2014 FIRST playwright/render_to_pdf standalone in finance.",          "verified": true,
-          "notes": "Verified: neon connected (lazy but works), browser-rendering connected, notion connected."
-        },
+          "accomplishes": "Query billing data from Neon, fetch the Notion billing tracker page, render the combined view as a PDF statement, and post the PDF link back to Notion \u2014 FIRST playwright/render_to_pdf standalone in finance.",
+          "verified": true,
+          "notes": "Verified: neon connected (lazy but works), playwright connected, notion connected."        },
         {
           "name": "auth-agent-token-ops-mercury-sweep",
           "chain": [
@@ -5597,14 +5597,14 @@
         {
           "name": "governance-render-pdf-evidence-policy",
           "chain": [
+            "playwright/navigate",
             "playwright/render_to_pdf",
             "evidence/ai_search",
             "thinking/sequentialthinking",
             "notion/API-post-page"
           ],
-          "accomplishes": "Render a regulatory policy document as PDF via Cloudflare browser rendering, search the evidence store for supporting precedents and prior rulings, reason through the combined material to identify compliance gaps, and publish the governance brief to Notion — a document-first compliance chain.",
-          "verified": false,
-          "notes": "FIRST use of playwright/render_to_pdf in governance profile. Render-then-evidence governance compliance chain."
+          "accomplishes": "Navigate Playwright to a regulatory policy document URL, render the loaded page as PDF, search the evidence store for supporting precedents and prior rulings, reason through the combined material to identify compliance gaps, and publish the governance brief to Notion \u2014 a document-first compliance chain.",          "verified": false,
+          "notes": "playwright/navigate required before render_to_pdf to load the policy page into the Playwright session. Render-then-evidence governance compliance chain."
         },
         {
           "name": "governance-stripe-invoice-compliance-audit",
@@ -6211,16 +6211,17 @@
         {
           "name": "governance-render-pdf-evidence-archive",
           "chain": [
+            "playwright/navigate",
             "playwright/render_to_pdf",
             "evidence/ingest_document",
             "evidence/ai_search",
             "thinking/sequentialthinking",
             "fs/write_file"
           ],
-          "accomplishes": "Render a policy document page as PDF, ingest it into the evidence AutoRAG, AI-search for related compliance references, synthesize the compliance gap via sequential thinking, and write the analysis report to disk.",
-          "verified": true,
-          "notes": "FIRST playwright/render_to_pdf \u2192 evidence/ingest_document chain in governance. All tools from connected backends: browser-rendering, evidence, thinking, fs (verified 2026-06-08)."        },
-        {
+          "accomplishes": "Navigate Playwright to a policy document URL, render the loaded page as PDF, ingest it into the evidence AutoRAG, AI-search for related compliance references, synthesize the compliance gap via sequential thinking, and write the analysis report to disk.",
+          "verified": false,
+          "notes": "playwright/navigate added before render_to_pdf (required to load the target page into the Playwright session). All tools from connected backends: playwright, evidence, thinking, fs."
+        },        {
           "name": "governance-twenty-three-step-policy-apex-chain",
           "chain": [
             "ch1tty/cast",
@@ -9624,9 +9625,9 @@
             "playwright/render_to_pdf",
             "notion/API-post-page"
           ],
-          "accomplishes": "Scrape agent queues browser automation jobs, playwright captures screenshots of target pages, browser-rendering generates PDFs, and notion stores the design corpus for reference and review.",
+          "accomplishes": "Scrape agent queues browser automation jobs, playwright captures screenshots of target pages, playwright generates PDFs, and notion stores the design corpus for reference and review.",
           "verified": true,
-          "notes": "scrape bound; playwright+browser-rendering connected; notion/API-post-page connected"
+          "notes": "scrape bound; playwright connected; notion/API-post-page connected"
         },
         {
           "name": "chatgpt-ui-agent-design-audit",
