@@ -495,6 +495,12 @@ export class Aggregator {
       ...(focus && focused(t) ? { inFocus: true } : {}),
     }));
 
+    // Catalog suggestions: when focus is active and a query provides intent,
+    // surface ranked combos+prompts from the suggestions catalog alongside tools.
+    const focusSuggestions = (focusName && query)
+      ? getSuggestionsForFocus(focusName, this.suggestionsCatalog, { intent: query })
+      : null;
+
     return {
       content: [{
         type: 'text',
@@ -504,6 +510,7 @@ export class Aggregator {
           ...(partialFallback ? { mode: 'partial' } : {}),
           ...(focusName ? { focus: focusName } : {}),
           ...(sessionId ? { sessionId } : {}),
+          ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
           tools: results,
         }, null, 2),
       }],
