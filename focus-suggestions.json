@@ -18098,9 +18098,9 @@
             "orchestrator/agent_search(market-artifact-plugin-install-publish)",
             "orchestrator/skill_execute(chittycommand-alpha:recommendation-engine)",
             "context7/resolve-library-id",
-            "context7/get-library-docs"
+            "context7/query-docs"
           ],
-          "accomplishes": "Search the marketplace for code-relevant plugins and SDK packages, run the recommendation engine to rank them by development fit, then resolve and fetch library documentation from context7 to verify API compatibility for the recommended packages.",
+          "accomplishes": "Search the marketplace for code-relevant plugins and SDK packages, run the recommendation engine to rank them by development fit, then resolve the library ID and query context7 documentation to verify API compatibility for the recommended packages.",
           "verified": false,
           "notes": "150th pass Set A ops→code. Covers market-artifact-plugin-install-publish, recommendation-engine in code profile."
         },
@@ -27733,9 +27733,9 @@
             "orchestrator/agent_search(autobot feature workflow sovereignty canonical)",
             "orchestrator/skill_execute(chittycommand-alpha:data-ingestion)",
             "orchestrator/skill_execute(chittycommand-alpha:recommendation-engine)",
-            "cloudflare-builds/workers_build_start"
+            "cloudflare-builds/workers_builds_list_builds"
           ],
-          "accomplishes": "Consult autobot to identify canonical ops workflow-sovereignty patterns for the target domain, ingest relevant pipeline metrics, run the recommendation engine to rank next automation steps, then trigger a Cloudflare Worker build to deploy the prioritized pipeline service.",
+          "accomplishes": "Consult autobot to identify canonical ops workflow-sovereignty patterns for the target domain, ingest relevant pipeline metrics, run the recommendation engine to rank next automation steps, then list recent Cloudflare Worker builds to confirm the pipeline deployment state.",
           "verified": false,
           "notes": "150th pass Set B code→ops (autobot) + Set A ops bonus. Covers autobot in ops profile."
         }
@@ -28908,7 +28908,7 @@
           "resolves_to": "ops-neon-notes-opus-deploy-list-verify"
         },
         {
-          "text": "Search for SDK migration skills for ops automation, resolve pipeline blockers, then list Cloudflare deployments to confirm production state",
+          "text": "Search for SDK migration skills for ops automation, resolve pipeline blockers, then list Cloudflare Worker builds to confirm the post-migration deployment state",
           "resolves_to": "ops-sdk-migrate-resolve-deployments"
         },
         {
