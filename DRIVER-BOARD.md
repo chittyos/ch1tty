@@ -30,7 +30,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 ### Run 90 — 2026-06-12 (auto-driver)
 
 **Workstream advanced**: E (catalog — 153rd pass, CLEAN SWEEP: 9 tools 1/6→6/6)
-**Branch/PR**: `auto/E-153rd-catalog-pass` → (open this run)
+**Branch/PR**: `auto/E-153rd-catalog-pass` → https://github.com/chittyos/ch1tty/pull/361 ✅ MERGED
 **Build**: clean (0 errors)
 **Tests**: 938 pass, 0 fail, 2 skipped (940 total, 45 suites)
 
