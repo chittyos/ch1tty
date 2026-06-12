@@ -8,7 +8,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **B. GitHub MCP migration** — `servers.json` github entry already migrated to `https://api.githubcopilot.com/mcp/` with `envHeaders` for `GITHUB_MCP_AUTHORIZATION`. No `@modelcontextprotocol/server-github` anywhere. DONE.
 - [x] **C. Focus-profile layer** — `focus-profiles.json` with 6 profiles (finance, governance, design, code, communication, ops), `CH1TTY_FOCUS` env var, per-call `focus` param on search/cast, `ch1tty/status` reports `availableFocusProfiles`, real tests in `test/focus.test.ts`. DONE.
 - [x] **D. Scenario testing + simulation** — `test/scenario.test.ts` (1157 lines), `test/simulation.test.ts` (229 lines), `sim/scenarios.ts` harness driving real Aggregator over FixtureBackends. All 6 focus profiles covered. All tests pass. DONE.
-- [ ] **E. Alchemist brainstorm** — `focus-suggestions.json` suggestions catalog, actively growing. 1702 combos as of run 87 (150th pass); 347 tools at 6/6, 21 tools at 1/6.
+- [ ] **E. Alchemist brainstorm** — `focus-suggestions.json` suggestions catalog, actively growing. 1714 combos as of run 88 (151st pass); 353 tools at 6/6, 15 tools at 1/6, 6 tools at 2/6.
 
 ## Live Gateway State (as of 2026-06-12)
 
@@ -24,6 +24,35 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 88 — 2026-06-12 (auto-driver)
+
+**Workstream advanced**: E (catalog — 151st pass, 6 tools 3/6→6/6, 6 bonus 1/6→2/6)
+**Branch/PR**: `auto/E-151st-catalog-pass` → (open this run)
+**Build**: clean (0 errors)
+**Tests**: 938 pass, 0 fail, 2 skipped (940 total, 45 suites)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 938/0/2. One open PR: #357 (150th pass, 1702 combos). Merged PR #357 via GitHub MCP (squash). Reset local main to c50d189.
+- Confirmed workstream states: A✅ B✅ C✅ D✅ E in-progress.
+- Coverage analysis: 21 tools at 1/6, 6 tools at 3/6, 0 at 2/6, 347 at 6/6.
+- 151st pass: targeted all 6 tools at 3/6 → 6/6 in 12 combos across all 6 profiles:
+  - `orchestrator/skill_execute(chittyos-finance:mercury-finance)` [had: finance,gov,ops] +code,+comm,+design → 6/6
+  - `orchestrator/skill_search(compliance audit certify)` [had: finance,gov,ops] +code,+comm,+design → 6/6
+  - `orchestrator/skill_execute(chittyos-legal:evidence-collect)` [had: gov,code,ops] +finance,+comm,+design → 6/6
+  - `orchestrator/skill_execute(claude-official:code-review)` [had: gov,code,ops] +finance,+comm,+design → 6/6
+  - `orchestrator/skill_search(feature-dev guided development codebase)` [had: gov,code,ops] +finance,+comm,+design → 6/6
+  - `orchestrator/skill_search(billing-compliance)` [had: finance,gov,code] +comm,+design,+ops → 6/6
+  - Bonus: 6 tools at 1/6 advanced to 2/6 (agent_search(neon db finance), chittyagent-market, agent_search(scrape browser web), agent_execute(scrape,status), agent_search(scrape), skill_search(chittyhelper...))
+- 12 combos + 12 prompts. All verified post-patch.
+- All constraints satisfied: communication combos include `thinking/sequentialthinking`; code combos include `context7/` + `cloudflare-builds/`.
+- Coverage: 1702 → 1714 combos, 1711 → 1723 prompts, 347 → 353 tools at 6/6, 21 → 15 tools at 1/6, 0 → 6 tools at 2/6, 6 → 0 tools at 3/6.
+
+**Next run priority**:
+- Merge this PR when CI green (or manually — CI known repo-wide infra issue since 2026-06-10).
+- 152nd pass: target 6 from remaining 15 at 1/6. Best cluster: code group (agent_search(scrape), agent_search(notes...), agent_search(claude integration mcp marketplace...), chittyagent-ship, skill_execute(user:chico), skill_execute(commit-commands:clean-gone)) and governance group (agent_search(tasks...), agent_search(registry service catalog...), agent_search(helper service discovery...)) — pick 6, each needs 5 more profiles.
 
 ---
 
