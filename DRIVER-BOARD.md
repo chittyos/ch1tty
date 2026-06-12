@@ -8,7 +8,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **B. GitHub MCP migration** — `servers.json` github entry already migrated to `https://api.githubcopilot.com/mcp/` with `envHeaders` for `GITHUB_MCP_AUTHORIZATION`. No `@modelcontextprotocol/server-github` anywhere. DONE.
 - [x] **C. Focus-profile layer** — `focus-profiles.json` with 6 profiles (finance, governance, design, code, communication, ops), `CH1TTY_FOCUS` env var, per-call `focus` param on search/cast, `ch1tty/status` reports `availableFocusProfiles`, real tests in `test/focus.test.ts`. DONE.
 - [x] **D. Scenario testing + simulation** — `test/scenario.test.ts` (1157 lines), `test/simulation.test.ts` (229 lines), `sim/scenarios.ts` harness driving real Aggregator over FixtureBackends. All 6 focus profiles covered. All tests pass. DONE.
-- [ ] **E. Alchemist brainstorm** — `focus-suggestions.json` suggestions catalog, actively growing. 1678 combos as of run 85 (148th pass); 336 tools at 6/6, 33 tools at 1/6.
+- [ ] **E. Alchemist brainstorm** — `focus-suggestions.json` suggestions catalog, actively growing. 1690 combos as of run 86 (149th pass); 342 tools at 6/6, 27 tools at 1/6.
 
 ## Live Gateway State (as of 2026-06-12)
 
@@ -24,6 +24,27 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 86 — 2026-06-12 (auto-driver)
+
+**Workstream advanced**: E (catalog — 149th pass, 6 tools 1/6→6/6)
+**Branch/PR**: `auto/E-149th-catalog-pass` → (open this run)
+**Build**: clean (0 errors)
+**Tests**: 938 pass, 0 fail, 2 skipped (940 total, 45 suites)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 938/0/2. No open PRs. Board shows Run 85 at 1678 combos / 336 tools at 6/6 / 33 at 1/6. PR #355 (148th pass) confirmed merged in main.
+- Confirmed workstream states: A✅ B✅ C✅ D✅ E in-progress.
+- 149th pass: bipartite strategy. Set A (ops→all): `cloudflare-builds/workers_builds_list_deployments`, `cloudflare-builds/workers_builds_set_active_worker`, `orchestrator/skill_execute(chittyos-devops:chitty-pipelines)`. Set B (code→all): `orchestrator/agent_execute(neon-agent)`, `orchestrator/agent_execute(notes,status)`, `orchestrator/skill_search(claude-opus-migration)`.
+- 12 combos (2/profile × 6 profiles) + 12 prompts. All 6 tools confirmed at 6/6 post-patch.
+- All constraints satisfied: communication combos include `thinking/sequentialthinking`; code combos include `context7/` and `cloudflare-builds/`.
+- Coverage: 1678 → 1690 combos, 1687 → 1699 prompts, 336 → 342 tools at 6/6, 33 → 27 tools at 1/6.
+
+**Next run priority**:
+- Merge this PR when CI green (or manually — CI known repo-wide infra issue since 2026-06-10).
+- 150th pass: target 6 from remaining 27 at 1/6. Suggested Set A (governance/ops): `orchestrator/skill_search(chittyos-compliance)`, `orchestrator/skill_search(machine-management)`, `orchestrator/agent_execute(security-scanner)`. Set B (code/communication): `orchestrator/skill_execute(claude-official:hookify)`, `orchestrator/skill_search(checkpoint)`, `orchestrator/agent_execute(scrape,status)` → 6 tools to 6/6 in 12 combos.
 
 ---
 
