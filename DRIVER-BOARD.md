@@ -30,7 +30,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 ### Run 77 — 2026-06-12 (auto-driver)
 
 **Workstream advanced**: E (Alchemist catalog — 140th pass)
-**Branch/PR**: `auto/E-catalog-140th-pass` → (PR opened this run)
+**Branch/PR**: `auto/E-catalog-140th-pass` → https://github.com/chittyos/ch1tty/pull/341
 **Build**: clean (0 errors)
 **Tests**: 938 pass, 0 fail, 2 skipped (940 total, 45 suites)
 
