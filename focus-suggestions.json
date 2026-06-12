@@ -3424,14 +3424,14 @@
         {
           "name": "finance-deploy-inventory-activate-pipeline-billing",
           "chain": [
-            "cloudflare-builds/workers_builds_list_deployments",
             "cloudflare-builds/workers_builds_set_active_worker",
+            "cloudflare-builds/workers_builds_list_builds",
             "orchestrator/skill_execute(chittyos-devops:chitty-pipelines)",
             "fs/write_file"
           ],
-          "accomplishes": "List Cloudflare deployment history, activate the latest stable worker build, run chitty-pipelines to wire up the billing data flow, and write a deployment report \u2014 an end-to-end deploy-and-activate sequence for finance infrastructure.",
+          "accomplishes": "Select the target Cloudflare Worker for the session, list its recent build history, run chitty-pipelines to wire up the billing data flow, and write a build-status report \u2014 an end-to-end build-inspect-and-activate sequence for finance infrastructure.",
           "verified": false,
-          "notes": "workers_builds_list_deployments and workers_builds_set_active_worker connected (cloudflare-builds backend). skill_execute(chittyos-devops:chitty-pipelines) inferred from orchestrator surface. fs/write_file verified."
+          "notes": "workers_builds_set_active_worker sets the active Worker ID for the session (must precede list_builds). workers_builds_list_builds lists build runs for that worker. Both connected (cloudflare-builds backend). skill_execute(chittyos-devops:chitty-pipelines) inferred from orchestrator surface. fs/write_file verified."
         },
         {
           "name": "finance-neon-notes-opus-migration-billing-report",
@@ -8318,14 +8318,14 @@
         {
           "name": "governance-deploy-audit-activate-pipeline-evidence",
           "chain": [
-            "cloudflare-builds/workers_builds_list_deployments",
             "cloudflare-builds/workers_builds_set_active_worker",
+            "cloudflare-builds/workers_builds_list_builds",
             "orchestrator/skill_execute(chittyos-devops:chitty-pipelines)",
             "evidence/ai_search"
           ],
-          "accomplishes": "Audit all active Cloudflare deployment versions for compliance (list + cross-reference with evidence RAG), activate the governance-certified build, and run chitty-pipelines to propagate the approved data flow to downstream services.",
+          "accomplishes": "Select the target Cloudflare Worker for the session, list its build history to audit which builds have run, run chitty-pipelines to propagate the governance-approved data flow, and cross-reference build provenance with the evidence RAG for compliance.",
           "verified": false,
-          "notes": "evidence/ai_search verified (connected). workers_builds_list_deployments and workers_builds_set_active_worker connected; skill_execute(chittyos-devops:chitty-pipelines) inferred."
+          "notes": "workers_builds_set_active_worker sets the active Worker ID (must precede list_builds). workers_builds_list_builds lists build runs \u2014 no deployment promotion occurs. evidence/ai_search verified (connected). skill_execute(chittyos-devops:chitty-pipelines) inferred."
         },
         {
           "name": "governance-neon-notes-opus-sdk-policy-audit",
@@ -13040,14 +13040,14 @@
         {
           "name": "design-deploy-inventory-activate-pipeline-screenshot",
           "chain": [
-            "cloudflare-builds/workers_builds_list_deployments",
             "cloudflare-builds/workers_builds_set_active_worker",
+            "cloudflare-builds/workers_builds_list_builds",
             "orchestrator/skill_execute(chittyos-devops:chitty-pipelines)",
             "browser-rendering/get_url_screenshot"
           ],
-          "accomplishes": "Enumerate Cloudflare deployment history, swap in the new design-ready worker build, activate the front-end data pipeline, then screenshot the live URL to confirm visual correctness of the deployed design.",
+          "accomplishes": "Select the target Cloudflare Worker for the session, inspect its recent build history, run chitty-pipelines to wire the front-end data flow, then screenshot the live URL to verify visual correctness of the current deployment.",
           "verified": false,
-          "notes": "browser-rendering/get_url_screenshot verified (connected). workers_builds_list_deployments and workers_builds_set_active_worker connected; skill_execute(chittyos-devops:chitty-pipelines) inferred."
+          "notes": "workers_builds_set_active_worker sets the active Worker ID (must precede list_builds). workers_builds_list_builds lists build runs \u2014 does not promote a build. browser-rendering/get_url_screenshot verified (connected). skill_execute(chittyos-devops:chitty-pipelines) inferred."
         },
         {
           "name": "design-neon-notes-opus-migration-layout-plan",
@@ -17974,27 +17974,27 @@
         {
           "name": "code-deploy-list-activate-worker-library-lookup",
           "chain": [
-            "cloudflare-builds/workers_builds_list_deployments",
             "cloudflare-builds/workers_builds_set_active_worker",
+            "cloudflare-builds/workers_builds_list_builds",
             "orchestrator/skill_execute(chittyos-devops:chitty-pipelines)",
             "context7/resolve-library-id",
             "context7/get-library-docs"
           ],
-          "accomplishes": "List and activate a new Cloudflare Workers build, run chitty-pipelines to wire it to downstream services, then resolve the relevant library and fetch SDK docs to validate API compatibility of the newly deployed code.",
+          "accomplishes": "Select the target Cloudflare Worker for the session, list its recent builds to confirm the deployed version, run chitty-pipelines to wire it to downstream services, then resolve the relevant library and fetch SDK docs to validate API compatibility.",
           "verified": false,
-          "notes": "context7/ tools verified (connected). workers_builds_list_deployments and workers_builds_set_active_worker connected (cloudflare-builds backend); skill_execute(chittyos-devops:chitty-pipelines) inferred."
+          "notes": "workers_builds_set_active_worker sets the active Worker ID (must precede list_builds); workers_builds_list_builds lists build runs \u2014 no deployment promotion. context7/ tools verified (connected). skill_execute(chittyos-devops:chitty-pipelines) inferred."
         },
         {
           "name": "code-deploy-activate-pipeline-build-logs-verify",
           "chain": [
-            "cloudflare-builds/workers_builds_list_deployments",
             "cloudflare-builds/workers_builds_set_active_worker",
+            "cloudflare-builds/workers_builds_list_builds",
             "orchestrator/skill_execute(chittyos-devops:chitty-pipelines)",
             "cloudflare-builds/workers_builds_get_build_logs"
           ],
-          "accomplishes": "Identify all deployment versions, activate the freshest build, run chitty-pipelines for downstream wiring, then retrieve build logs to verify the pipeline is processing correctly \u2014 a full deploy-activate-verify loop for code infrastructure.",
+          "accomplishes": "Select the target Cloudflare Worker for the session, list its build runs to identify the latest, run chitty-pipelines for downstream wiring, then retrieve build logs to verify the pipeline is processing correctly \u2014 a full inspect-wire-verify loop.",
           "verified": false,
-          "notes": "All cloudflare-builds tools connected. skill_execute(chittyos-devops:chitty-pipelines) inferred from orchestrator surface."
+          "notes": "workers_builds_set_active_worker sets the active Worker ID (must precede list_builds). workers_builds_list_builds lists build runs. workers_builds_get_build_logs fetches logs for a specific build UUID. All cloudflare-builds tools connected. skill_execute(chittyos-devops:chitty-pipelines) inferred."
         }
       ],
       "prompts": [
@@ -22668,14 +22668,14 @@
         {
           "name": "comm-deploy-list-activate-pipeline-stakeholder-report",
           "chain": [
-            "cloudflare-builds/workers_builds_list_deployments",
             "cloudflare-builds/workers_builds_set_active_worker",
+            "cloudflare-builds/workers_builds_list_builds",
             "orchestrator/skill_execute(chittyos-devops:chitty-pipelines)",
             "thinking/sequentialthinking"
           ],
-          "accomplishes": "List active Cloudflare deployments, flip to the latest stable build, activate the comms data pipeline, then use sequential reasoning to draft a stakeholder update summarising the deployment change and its impact.",
+          "accomplishes": "Select the target Cloudflare Worker for the session, inspect its build history to confirm what is deployed, activate the comms data pipeline, then use sequential reasoning to draft a stakeholder update summarising the current build state and pipeline change.",
           "verified": false,
-          "notes": "thinking/sequentialthinking required for communication profile. workers_builds_list_deployments and workers_builds_set_active_worker connected; skill_execute(chittyos-devops:chitty-pipelines) inferred."
+          "notes": "workers_builds_set_active_worker sets the active Worker ID (must precede list_builds); no deployment promotion occurs. thinking/sequentialthinking required for communication profile. skill_execute(chittyos-devops:chitty-pipelines) inferred."
         },
         {
           "name": "comm-neon-notes-opus-migration-announcement",
@@ -27493,7 +27493,8 @@
             "orchestrator/skill_execute(chittyos-legal:pipeline-submit)",
             "orchestrator/skill_execute(claude-official:hookify)",
             "orchestrator/skill_execute(claude-official:claude-api)",
-            "cloudflare-builds/workers_builds_list_deployments"
+            "cloudflare-builds/workers_builds_set_active_worker",
+            "cloudflare-builds/workers_builds_list_builds"
           ],
           "accomplishes": "Submit the ops deployment pipeline, hookify post-deploy health alerts, look up Claude API SDK docs for automation hooks, and list active Worker deployments to confirm rollout."
         },
@@ -27548,11 +27549,12 @@
             "orchestrator/agent_execute(neon-agent)",
             "orchestrator/agent_execute(notes,status)",
             "orchestrator/skill_search(claude-opus-migration)",
-            "cloudflare-builds/workers_builds_list_deployments"
+            "cloudflare-builds/workers_builds_set_active_worker",
+            "cloudflare-builds/workers_builds_list_builds"
           ],
-          "accomplishes": "Query the Neon ops database for deployment metadata and service health, reconcile against notes-agent infra state, fetch Claude Opus migration docs for the ops stack upgrade, then list active Cloudflare builds to verify the ops pipeline is running the correct version.",
+          "accomplishes": "Query the Neon ops database for deployment metadata and service health, reconcile against notes-agent infra state, fetch Claude Opus migration docs for the ops stack upgrade, select the target Cloudflare Worker for the session, then list its builds to verify the ops pipeline is running the expected build.",
           "verified": false,
-          "notes": "workers_builds_list_deployments connected (cloudflare-builds backend). agent_execute(neon-agent), agent_execute(notes,status), skill_search(claude-opus-migration) inferred from orchestrator surface."
+          "notes": "workers_builds_set_active_worker sets the active Worker ID (must precede list_builds); workers_builds_list_builds lists builds \u2014 no deployment promotion. agent_execute(neon-agent), agent_execute(notes,status), skill_search(claude-opus-migration) inferred from orchestrator surface."
         }
       ],
       "prompts": [
