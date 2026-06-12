@@ -8,7 +8,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **B. GitHub MCP migration** — `servers.json` github entry already migrated to `https://api.githubcopilot.com/mcp/` with `envHeaders` for `GITHUB_MCP_AUTHORIZATION`. No `@modelcontextprotocol/server-github` anywhere. DONE.
 - [x] **C. Focus-profile layer** — `focus-profiles.json` with 6 profiles (finance, governance, design, code, communication, ops), `CH1TTY_FOCUS` env var, per-call `focus` param on search/cast, `ch1tty/status` reports `availableFocusProfiles`, real tests in `test/focus.test.ts`. DONE.
 - [x] **D. Scenario testing + simulation** — `test/scenario.test.ts` (1157 lines), `test/simulation.test.ts` (229 lines), `sim/scenarios.ts` harness driving real Aggregator over FixtureBackends. All 6 focus profiles covered. All tests pass. DONE.
-- [ ] **E. Alchemist brainstorm** — `focus-suggestions.json` suggestions catalog, actively growing. 1594 combos, 311 tools at 6/6, 66 at 1/6 (as of run 79, 142nd pass).
+- [ ] **E. Alchemist brainstorm** — `focus-suggestions.json` suggestions catalog, actively growing. 1606 combos, 317 tools at 6/6, 60 at 1/6 (as of run 80, 143rd pass).
 
 ## Live Gateway State (as of 2026-06-12)
 
@@ -24,6 +24,29 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 80 — 2026-06-12 (auto-driver)
+
+**Workstream advanced**: E (Alchemist catalog — 143rd pass)
+**Branch/PR**: `auto/E-catalog-143rd-pass` → https://github.com/chittyos/ch1tty/pull/346
+**Build**: clean (0 errors)
+**Tests**: 938 pass, 0 fail, 2 skipped (940 total, 45 suites)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 938/0/2. No open PRs. Board shows Run 79 at 1594 combos / 311 tools at 6/6 / 66 at 1/6.
+- Confirmed workstream states: A✅ B✅ C✅ D✅ E in-progress.
+- Note: local `main` was behind `origin/main` (50-commit divergence); reset local main to origin/main before creating branch.
+- 143rd pass: bipartite strategy. Set A (currently 1/6 in finance/governance/code): `orchestrator/agent_search(neon database postgres schema)`, `orchestrator/agent_search(dispute legal evidence management)`, `orchestrator/skill_search(cast-mcp-route)`. Set B (currently 1/6 in finance/communication/ops): `orchestrator/skill_search(financial-reporting)`, `orchestrator/skill_search(domain-knowledge)`, `orchestrator/skill_search(recommendation-engine)`.
+- 12 combos (2/profile × 6 profiles) + 12 prompts. All 6 tools confirmed at 6/6 post-patch.
+- Constraints: communication combos include `thinking/sequentialthinking`; code combos include `context7/` + `neon/`.
+- Coverage: 1594 → 1606 combos, 1615 → 1627 prompts, 311 → 317 tools at 6/6, 66 → 60 tools at 1/6.
+- CI: 2 CodeQL checks in-progress at time of run (known pattern). CodeRabbit rate-limit comment — no action needed.
+
+**Next run priority**:
+- Merge PR #346 when CI green (or manually, CI still has known repo-wide 0-jobs infra failure).
+- 144th pass: target 6 from remaining 60 at 1/6. Suggested Set A (finance/governance/code): `orchestrator/agent_search(finance banking neon)`, `orchestrator/skill_search(docket court county circuit)`, `orchestrator/agent_search(helper-architectural-navigation-service-discovery)`. Set B (communication/ops/code): `orchestrator/skill_search(broadcast)`, `orchestrator/agent_search(ship-workflow)`, `orchestrator/skill_search(agents-sdk-migrate)` → 6 tools to 6/6 in 12 combos.
 
 ---
 
