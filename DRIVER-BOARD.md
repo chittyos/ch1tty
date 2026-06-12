@@ -8,7 +8,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **B. GitHub MCP migration** — `servers.json` github entry already migrated to `https://api.githubcopilot.com/mcp/` with `envHeaders` for `GITHUB_MCP_AUTHORIZATION`. No `@modelcontextprotocol/server-github` anywhere. DONE.
 - [x] **C. Focus-profile layer** — `focus-profiles.json` with 6 profiles (finance, governance, design, code, communication, ops), `CH1TTY_FOCUS` env var, per-call `focus` param on search/cast, `ch1tty/status` reports `availableFocusProfiles`, real tests in `test/focus.test.ts`. DONE.
 - [x] **D. Scenario testing + simulation** — `test/scenario.test.ts` (1157 lines), `test/simulation.test.ts` (229 lines), `sim/scenarios.ts` harness driving real Aggregator over FixtureBackends. All 6 focus profiles covered. All tests pass. DONE.
-- [ ] **E. Alchemist brainstorm** — `focus-suggestions.json` suggestions catalog, actively growing. See run log below for current pass number.
+- [ ] **E. Alchemist brainstorm** — `focus-suggestions.json` suggestions catalog, actively growing. 1570 combos, 299 tools at 6/6, 78 at 1/6 (as of run 77, 140th pass).
 
 ## Live Gateway State (as of 2026-06-12)
 
@@ -27,10 +27,31 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 
 ---
 
+### Run 77 — 2026-06-12 (auto-driver)
+
+**Workstream advanced**: E (Alchemist catalog — 140th pass)
+**Branch/PR**: `auto/E-catalog-140th-pass` → https://github.com/chittyos/ch1tty/pull/341
+**Build**: clean (0 errors)
+**Tests**: 938 pass, 0 fail, 2 skipped (940 total, 45 suites)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 938/0/2. Two open PRs: #339 (board update) + #340 (139th pass, 1558 combos). Merged both via GitHub MCP. Pulled main to 0b28756 (1558 combos / 293 tools at 6/6 / 83 at 1/6).
+- Confirmed workstream states: A✅ B✅ C✅ D✅ E in-progress.
+- 140th pass: bipartite strategy. Set A (finance/governance/design, 1/6 each): `orchestrator/agent_execute(finance)`, `orchestrator/agent_execute(helper,query)`, `orchestrator/agent_search(chatgpt mcp guidance custom gpt design templates)`. Set B (ops/code/communication, 1/6 each): `neon/list_organizations`, `orchestrator/agent_execute(claude,guidance)`, `neon/list_docs_resources`.
+- 12 combos (2/profile × 6 profiles) + 12 prompts. All 6 tools confirmed at 6/6 post-patch.
+- All constraints satisfied: communication combos include `thinking/sequentialthinking`; code combos include `context7/`.
+- Coverage: 1558 → 1570 combos, 1579 → 1591 prompts, 293 → 299 tools at 6/6, 83 → 78 tools at 1/6.
+
+**Next run priority**:
+- Merge this PR when CI green.
+- 141st pass: target 6 from remaining 78 at 1/6. Suggested Set A (code/ops/governance, 1/6 each): `orchestrator/agent_execute(neon-agent)`, `orchestrator/agent_execute(notes,status)`, `orchestrator/agent_execute(registry,list)`. Set B (code/ops/communication, 1/6 each): `orchestrator/agent_execute(scrape, status)`, `orchestrator/agent_search(alchemist pattern composition mcp daemon)`, `orchestrator/agent_search(imessage message contact normalization)` → 6 tools to 6/6 in 12 combos.
+
+---
+
 ### Run 76 — 2026-06-12 (auto-driver)
 
 **Workstream advanced**: E (Alchemist catalog — 139th pass)
-**Branch/PR**: `auto/E-catalog-139th-pass` → (PR opened this run)
+**Branch/PR**: `auto/E-catalog-139th-pass` → https://github.com/chittyos/ch1tty/pull/340 ✅ MERGED
 **Build**: clean (0 errors)
 **Tests**: 938 pass, 0 fail, 2 skipped (940 total, 45 suites)
 
