@@ -223,3 +223,120 @@ test('cast: discovered when a resource matches but no tools are registered', asy
     await agg.shutdown();
   }
 });
+
+// ── 6. no_match with active focus — catalog suggestions are surfaced ──────────
+
+test('cast: no_match with active focus includes catalog suggestions', async () => {
+  const catalog = {
+    finance: {
+      description: 'Finance focus',
+      combos: [
+        {
+          name: 'invoice-tracker',
+          chain: ['stripe/list_invoices', 'notion/API-post-page'],
+          accomplishes: 'track stripe invoices in notion',
+          verified: false,
+        },
+      ],
+      prompts: [
+        { text: 'List all unpaid invoices', resolves_to: 'stripe/list_invoices' },
+      ],
+    },
+  };
+
+  const backend = new FixtureBackend();
+  backend.defineServer('finance-srv', {
+    tools: [
+      {
+        name: 'noop_tool',
+        description: 'does nothing with quantum flux capacitors',
+        inputSchema: { type: 'object', properties: {} },
+        response: { content: [{ type: 'text', text: 'noop' }] },
+      },
+    ],
+  });
+  const path = dlqPath('focus-nomatch');
+  const agg = new Aggregator(
+    [{ id: 'finance-srv', name: 'Finance', type: 'remote', access: 'readwrite', category: 'finance', endpoint: 'https://finance.test/mcp', lazy: true }],
+    {
+      backendFactory: () => backend,
+      embedEnabled: false,
+      ledgerDlqPath: path,
+      suggestionsCatalog: catalog,
+      coordinator: new KeywordOnlyCoordinator({}, { enabled: false }, path),
+      focus: 'finance',
+    },
+  );
+
+  try {
+    // Intent has no overlap with "quantum flux capacitors" — forces no_match
+    const result = await agg.callTool('ch1tty/cast', { intent: 'xyzzy frobulate unknownterm' });
+    assert.equal(result.isError, undefined);
+
+    const data = JSON.parse(result.content[0].text as string);
+    assert.equal(data.cast, 'no_match');
+    assert.ok(data.suggestions, 'suggestions field present on no_match with focus');
+    assert.ok(Array.isArray(data.suggestions.combos) && data.suggestions.combos.length > 0, 'combos present');
+    assert.equal(data.suggestions.combos[0].name, 'invoice-tracker');
+    assert.ok(Array.isArray(data.suggestions.prompts) && data.suggestions.prompts.length > 0, 'prompts present');
+  } finally {
+    await agg.shutdown();
+  }
+});
+
+// ── 7. discovered with active focus — catalog suggestions are surfaced ─────────
+
+test('cast: discovered with active focus includes catalog suggestions', async () => {
+  const catalog = {
+    ops: {
+      description: 'Ops focus',
+      combos: [
+        {
+          name: 'deploy-verify',
+          chain: ['cloudflare-builds/workers_builds_list', 'fs/read_file'],
+          accomplishes: 'list cloudflare builds then read a local log',
+          verified: true,
+        },
+      ],
+      prompts: [
+        { text: 'Check latest deployment status', resolves_to: 'cloudflare-builds/workers_builds_list' },
+      ],
+    },
+  };
+
+  const backend = new FixtureBackend();
+  backend.defineServer('ops-srv', {
+    tools: [],
+    prompts: [
+      { name: 'deploy-runbook', description: 'runbook for production deployment procedures' },
+    ],
+  });
+  const path = dlqPath('focus-discovered');
+  const agg = new Aggregator(
+    [{ id: 'ops-srv', name: 'Ops', type: 'remote', access: 'readwrite', category: 'ops', endpoint: 'https://ops.test/mcp', lazy: true }],
+    {
+      backendFactory: () => backend,
+      embedEnabled: false,
+      ledgerDlqPath: path,
+      suggestionsCatalog: catalog,
+      coordinator: new KeywordOnlyCoordinator({}, { enabled: false }, path),
+      focus: 'ops',
+    },
+  );
+
+  try {
+    // "production deployment runbook" matches the prompt but no tools → discovered
+    const result = await agg.callTool('ch1tty/cast', { intent: 'production deployment runbook' });
+    assert.equal(result.isError, undefined);
+
+    const data = JSON.parse(result.content[0].text as string);
+    assert.equal(data.cast, 'discovered');
+    assert.ok(Array.isArray(data.prompts) && data.prompts.length > 0, 'prompts surfaced');
+    assert.ok(data.suggestions, 'suggestions field present on discovered with focus');
+    assert.ok(Array.isArray(data.suggestions.combos) && data.suggestions.combos.length > 0, 'combos present');
+    assert.equal(data.suggestions.combos[0].name, 'deploy-verify');
+    assert.ok(Array.isArray(data.suggestions.prompts) && data.suggestions.prompts.length > 0, 'prompts present');
+  } finally {
+    await agg.shutdown();
+  }
+});
