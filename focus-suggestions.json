@@ -3269,6 +3269,30 @@
           "accomplishes": "Search for finance dashboard frontend design components, run browser code to extract live pricing and balance data from the billing UI, look up iMessage contact normalization to route invoice alerts to the finance team, then fetch Stripe invoices to confirm the current billing state.",
           "verified": false,
           "notes": "playwright connected; orchestrator connected; stripe lazy/auth-gated (inferred from @stripe/mcp)."
+        },
+        {
+          "name": "finance-neon-dispute-cast-route",
+          "chain": [
+            "orchestrator/agent_search(neon database postgres schema)",
+            "orchestrator/agent_search(dispute legal evidence management)",
+            "orchestrator/skill_search(cast-mcp-route)",
+            "neon/run_sql"
+          ],
+          "accomplishes": "Search for Neon database schema agents to surface financial schema and SQL capabilities, look up dispute and legal evidence agents to identify outstanding billing disputes, find the cast-mcp-route skill to route complex financial queries to the right MCP surface, then run a Neon SQL query to extract the current financial position.",
+          "verified": false,
+          "notes": "neon lazy/auth-gated; orchestrator connected."
+        },
+        {
+          "name": "finance-reporting-knowledge-recommendation",
+          "chain": [
+            "orchestrator/skill_search(financial-reporting)",
+            "orchestrator/skill_search(domain-knowledge)",
+            "orchestrator/skill_search(recommendation-engine)",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Search for financial reporting skills to generate the periodic P&L and cash flow summary, look up domain knowledge skills to surface relevant regulatory and accounting standards, find recommendation engine skills for AI-driven financial optimization insights, then use sequential thinking to synthesize them into an actionable finance strategy.",
+          "verified": false,
+          "notes": "orchestrator connected; thinking connected."
         }
       ],
       "prompts": [
@@ -4296,6 +4320,14 @@
         {
           "text": "Find a finance dashboard design component, run browser code to pull live billing data, look up iMessage contacts to send invoice alerts, and list Stripe invoices to confirm current billing state.",
           "resolves_to": "finance-design-browser-imessage"
+        },
+        {
+          "text": "Find Neon schema agents to map the financial data model, surface billing dispute agents, use cast-mcp-route to route the query, and run a SQL query against the finance database.",
+          "resolves_to": "finance-neon-dispute-cast-route"
+        },
+        {
+          "text": "Generate a financial report, surface domain knowledge and accounting standards, run the recommendation engine for cash flow optimization, and synthesize the finance strategy.",
+          "resolves_to": "finance-reporting-knowledge-recommendation"
         }
       ]
     },
@@ -7888,6 +7920,30 @@
           "accomplishes": "Surface frontend design component guidelines for the governance portal, use browser code execution to validate the governance UI against accessibility and policy requirements, look up iMessage contacts to notify policy leads of any non-compliance findings, then search the evidence store for supporting regulatory documentation.",
           "verified": false,
           "notes": "playwright connected; orchestrator connected; evidence connected."
+        },
+        {
+          "name": "governance-neon-dispute-cast-route",
+          "chain": [
+            "orchestrator/agent_search(neon database postgres schema)",
+            "orchestrator/agent_search(dispute legal evidence management)",
+            "orchestrator/skill_search(cast-mcp-route)",
+            "neon/describe_table_schema"
+          ],
+          "accomplishes": "Search for Neon database schema agents to understand the governance data model and evidence storage schema, look up dispute and legal evidence management agents to surface active compliance disputes and their resolution state, find the cast-mcp-route skill to route governance intent queries to the canonical MCP surface, then describe the governance table schema to verify data integrity.",
+          "verified": false,
+          "notes": "neon lazy/auth-gated; orchestrator connected."
+        },
+        {
+          "name": "governance-reporting-knowledge-recommendation",
+          "chain": [
+            "orchestrator/skill_search(financial-reporting)",
+            "orchestrator/skill_search(domain-knowledge)",
+            "orchestrator/skill_search(recommendation-engine)",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search for financial reporting skills to generate governance compliance reports covering regulatory adherence and audit trails, surface domain knowledge skills to pull canonical governance rules and compliance standards, find recommendation engine skills to prioritize governance remediation actions, then write the governance compliance brief to Notion for stakeholder review.",
+          "verified": false,
+          "notes": "orchestrator connected; notion lazy/auth-gated."
         }
       ],
       "prompts": [
@@ -9027,6 +9083,14 @@
         {
           "text": "Find frontend design component guidelines for the governance portal, validate the governance UI via browser code execution, look up iMessage contacts to notify policy leads, then search the evidence store for regulatory documentation.",
           "resolves_to": "governance-design-browser-imessage"
+        },
+        {
+          "text": "Search for Neon schema agents to map governance data, surface legal dispute and evidence agents, use cast-mcp-route to resolve the intent, and describe the governance table schema.",
+          "resolves_to": "governance-neon-dispute-cast-route"
+        },
+        {
+          "text": "Generate a governance compliance report, surface domain knowledge and policy standards, use the recommendation engine to prioritize remediation actions, and post the compliance brief to Notion.",
+          "resolves_to": "governance-reporting-knowledge-recommendation"
         }
       ]
     },
@@ -12393,6 +12457,30 @@
           "accomplishes": "Execute browser code to run an interactive design prototype and capture live UI behavior, look up iMessage contact normalization to route design approval notifications to reviewers, take a screenshot of the final rendered component for design review, then look up the relevant component library docs for implementation reference.",
           "verified": false,
           "notes": "playwright connected; orchestrator connected; browser-rendering connected; context7 connected."
+        },
+        {
+          "name": "design-neon-dispute-cast-route",
+          "chain": [
+            "orchestrator/agent_search(neon database postgres schema)",
+            "orchestrator/agent_search(dispute legal evidence management)",
+            "orchestrator/skill_search(cast-mcp-route)",
+            "playwright/screenshot"
+          ],
+          "accomplishes": "Search for Neon database schema agents to understand the design system data model and component storage schema, look up dispute and legal evidence management agents to surface any design IP disputes or license compliance issues, use the cast-mcp-route skill to route design intent queries to the appropriate MCP surface, then take a screenshot to visually verify the current UI state.",
+          "verified": false,
+          "notes": "playwright connected; orchestrator connected; neon lazy/auth-gated."
+        },
+        {
+          "name": "design-reporting-knowledge-recommendation",
+          "chain": [
+            "orchestrator/skill_search(financial-reporting)",
+            "orchestrator/skill_search(domain-knowledge)",
+            "orchestrator/skill_search(recommendation-engine)",
+            "browser-rendering/screenshot"
+          ],
+          "accomplishes": "Search for financial reporting skills to generate the design system cost and resource utilization report, surface domain knowledge skills to pull design standards and brand guidelines, find recommendation engine skills for AI-driven design optimization suggestions, then capture a browser screenshot to verify the current visual state of the design system.",
+          "verified": false,
+          "notes": "browser-rendering connected; orchestrator connected."
         }
       ],
       "prompts": [
@@ -13465,6 +13553,14 @@
         {
           "text": "Run browser code to test a live design prototype, look up iMessage contact normalization to route design approval notifications, capture a screenshot of the rendered component, then look up component library docs for implementation reference.",
           "resolves_to": "design-browser-imessage-screenshot"
+        },
+        {
+          "text": "Find Neon schema agents for the design system data model, surface IP dispute agents, use cast-mcp-route to resolve the design query, and screenshot the current UI state.",
+          "resolves_to": "design-neon-dispute-cast-route"
+        },
+        {
+          "text": "Generate a design resource utilization report, surface brand guidelines via domain knowledge, use the recommendation engine for design optimization suggestions, and screenshot the design system.",
+          "resolves_to": "design-reporting-knowledge-recommendation"
         }
       ]
     },
@@ -17075,6 +17171,32 @@
           "accomplishes": "Search for frontend component library patterns to implement in the codebase, look up iMessage contact normalization APIs to integrate push notification logic, resolve the framework library documentation via Context7, then query Neon to verify the database schema supports the new frontend feature.",
           "verified": false,
           "notes": "orchestrator connected; context7 connected; neon lazy/auth-gated."
+        },
+        {
+          "name": "code-neon-dispute-cast-route",
+          "chain": [
+            "orchestrator/agent_search(neon database postgres schema)",
+            "orchestrator/agent_search(dispute legal evidence management)",
+            "orchestrator/skill_search(cast-mcp-route)",
+            "neon/run_sql",
+            "context7/resolve-library-id"
+          ],
+          "accomplishes": "Search for Neon database schema agents to understand the codebase data model and migration schema, look up dispute and legal evidence management agents to surface open security incidents or compliance issues in the repository, use the cast-mcp-route skill to route code intent queries to the optimal MCP tool, run a Neon SQL query to extract build and deployment metrics, then resolve a library ID via Context7 to fetch the latest dependency documentation.",
+          "verified": false,
+          "notes": "context7 connected; orchestrator connected; neon lazy/auth-gated."
+        },
+        {
+          "name": "code-reporting-knowledge-recommendation",
+          "chain": [
+            "orchestrator/skill_search(financial-reporting)",
+            "orchestrator/skill_search(domain-knowledge)",
+            "orchestrator/skill_search(recommendation-engine)",
+            "neon/run_sql",
+            "context7/get-library-docs"
+          ],
+          "accomplishes": "Search for financial reporting skills to generate the engineering cost and infrastructure spend report, surface domain knowledge skills to pull architectural standards and coding guidelines, find recommendation engine skills for AI-driven code quality and refactoring recommendations, run a Neon SQL query to extract build metrics, then fetch Context7 docs to validate the latest API contracts.",
+          "verified": false,
+          "notes": "orchestrator connected; neon lazy/auth-gated; context7 connected."
         }
       ],
       "prompts": [
@@ -18207,6 +18329,14 @@
         {
           "text": "Search for frontend component patterns to implement, look up iMessage contact normalization APIs for push notification integration, resolve framework library docs via Context7, then query Neon to verify database schema support.",
           "resolves_to": "code-frontend-imessage-context7"
+        },
+        {
+          "text": "Find Neon schema agents for the codebase data model, surface security dispute agents, use cast-mcp-route to resolve code queries, run a Neon SQL query, and fetch dependency docs via Context7.",
+          "resolves_to": "code-neon-dispute-cast-route"
+        },
+        {
+          "text": "Generate an infrastructure cost report, surface architectural standards via domain knowledge, use the recommendation engine for code quality improvements, run a Neon SQL metrics query, and fetch API contract docs.",
+          "resolves_to": "code-reporting-knowledge-recommendation"
         }
       ]
     },
@@ -21548,6 +21678,30 @@
           "accomplishes": "Search for frontend design components for messaging UIs (inbox, notification center, chat widget), run browser code to test the communication component in a live environment, reason through accessibility and UX sequencing for the messaging flow, then capture a screenshot of the messaging UI for stakeholder review.",
           "verified": false,
           "notes": "playwright connected; thinking connected; browser-rendering connected."
+        },
+        {
+          "name": "comm-neon-dispute-cast-route",
+          "chain": [
+            "orchestrator/agent_search(neon database postgres schema)",
+            "orchestrator/agent_search(dispute legal evidence management)",
+            "orchestrator/skill_search(cast-mcp-route)",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Search for Neon database schema agents to understand the messaging and contact data model, look up dispute and legal evidence management agents to surface active communication disputes or message retention compliance issues, use the cast-mcp-route skill to route communication intent to the optimal backend, then apply sequential thinking to plan the multi-channel outreach strategy.",
+          "verified": false,
+          "notes": "orchestrator connected; thinking connected; neon lazy/auth-gated."
+        },
+        {
+          "name": "comm-reporting-knowledge-recommendation",
+          "chain": [
+            "orchestrator/skill_search(financial-reporting)",
+            "orchestrator/skill_search(domain-knowledge)",
+            "orchestrator/skill_search(recommendation-engine)",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Search for financial reporting skills to generate the communication cost and engagement ROI report, surface domain knowledge skills to pull communication playbooks and channel-specific best practices, find recommendation engine skills for AI-driven outreach optimization recommendations, then use sequential thinking to sequence the multi-channel communication strategy.",
+          "verified": false,
+          "notes": "orchestrator connected; thinking connected."
         }
       ],
       "prompts": [
@@ -22620,6 +22774,14 @@
         {
           "text": "Find frontend design components for messaging UIs, run browser code to test the communication component live, reason through accessibility and UX sequencing, then capture a screenshot of the messaging UI for stakeholder review.",
           "resolves_to": "comm-frontend-browser-design"
+        },
+        {
+          "text": "Find Neon schema agents for the contact data model, surface message compliance dispute agents, use cast-mcp-route to route the communication query, and plan the outreach strategy with sequential thinking.",
+          "resolves_to": "comm-neon-dispute-cast-route"
+        },
+        {
+          "text": "Generate a communication engagement ROI report, surface channel playbooks via domain knowledge, use the recommendation engine for outreach optimization, and sequence the multi-channel strategy with sequential thinking.",
+          "resolves_to": "comm-reporting-knowledge-recommendation"
         }
       ]
     },
@@ -26145,6 +26307,30 @@
           "accomplishes": "Search for frontend design components needed for ops monitoring dashboards, execute browser code to validate the deployment status UI in a staging environment, look up iMessage contacts for ops on-call notifications, then fetch recent Cloudflare Workers deployments to confirm rollout health.",
           "verified": false,
           "notes": "playwright connected; orchestrator connected; cloudflare-builds connected."
+        },
+        {
+          "name": "ops-neon-dispute-cast-route",
+          "chain": [
+            "orchestrator/agent_search(neon database postgres schema)",
+            "orchestrator/agent_search(dispute legal evidence management)",
+            "orchestrator/skill_search(cast-mcp-route)",
+            "cloudflare-builds/workers_builds_list_deployments"
+          ],
+          "accomplishes": "Search for Neon database schema agents to understand the ops data model and deployment schema, look up dispute and legal evidence management agents to surface SLA violations or incident evidence requiring resolution, use the cast-mcp-route skill to route ops intent to the optimal deployment backend, then list Cloudflare Workers deployments to verify the current infrastructure state.",
+          "verified": false,
+          "notes": "cloudflare-builds connected; orchestrator connected; neon lazy/auth-gated."
+        },
+        {
+          "name": "ops-reporting-knowledge-recommendation",
+          "chain": [
+            "orchestrator/skill_search(financial-reporting)",
+            "orchestrator/skill_search(domain-knowledge)",
+            "orchestrator/skill_search(recommendation-engine)",
+            "cloudflare-builds/workers_builds_list"
+          ],
+          "accomplishes": "Search for financial reporting skills to generate the infrastructure cost and resource utilization report, surface domain knowledge skills to pull operations runbooks and SRE best practices, find recommendation engine skills for AI-driven capacity planning and optimization recommendations, then list Cloudflare Workers builds to verify the current deployment pipeline state.",
+          "verified": false,
+          "notes": "cloudflare-builds connected; orchestrator connected."
         }
       ],
       "prompts": [
@@ -27257,6 +27443,14 @@
         {
           "text": "Find frontend design components for ops dashboards, run browser code to validate the deployment status UI, look up iMessage contacts for on-call notifications, then list recent Cloudflare Workers deployments to confirm rollout health.",
           "resolves_to": "ops-design-browser-imessage"
+        },
+        {
+          "text": "Find Neon schema agents for the ops data model, surface SLA dispute and evidence agents, use cast-mcp-route to route the ops query, and list Cloudflare Workers deployments to verify infrastructure state.",
+          "resolves_to": "ops-neon-dispute-cast-route"
+        },
+        {
+          "text": "Generate an infrastructure cost and utilization report, surface SRE runbooks via domain knowledge, use the recommendation engine for capacity planning, and list Cloudflare Workers builds.",
+          "resolves_to": "ops-reporting-knowledge-recommendation"
         }
       ]
     }
