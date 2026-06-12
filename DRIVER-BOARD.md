@@ -8,7 +8,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **B. GitHub MCP migration** — `servers.json` github entry already migrated to `https://api.githubcopilot.com/mcp/` with `envHeaders` for `GITHUB_MCP_AUTHORIZATION`. No `@modelcontextprotocol/server-github` anywhere. DONE.
 - [x] **C. Focus-profile layer** — `focus-profiles.json` with 6 profiles (finance, governance, design, code, communication, ops), `CH1TTY_FOCUS` env var, per-call `focus` param on search/cast, `ch1tty/status` reports `availableFocusProfiles`, real tests in `test/focus.test.ts`. DONE.
 - [x] **D. Scenario testing + simulation** — `test/scenario.test.ts` (1157 lines), `test/simulation.test.ts` (229 lines), `sim/scenarios.ts` harness driving real Aggregator over FixtureBackends. All 6 focus profiles covered. All tests pass. DONE.
-- [ ] **E. Alchemist brainstorm** — `focus-suggestions.json` suggestions catalog, actively growing. 1570 combos, 299 tools at 6/6, 78 at 1/6 (as of run 77, 140th pass).
+- [ ] **E. Alchemist brainstorm** — `focus-suggestions.json` suggestions catalog, actively growing. 1582 combos, 305 tools at 6/6, 72 at 1/6 (as of run 78, 141st pass).
 
 ## Live Gateway State (as of 2026-06-12)
 
@@ -24,6 +24,27 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 78 — 2026-06-12 (auto-driver)
+
+**Workstream advanced**: E (Alchemist catalog — 141st pass)
+**Branch/PR**: `auto/E-catalog-141st-pass` → (PR opened this run)
+**Build**: clean (0 errors)
+**Tests**: 938 pass, 0 fail, 2 skipped (940 total, 45 suites)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 938/0/2. One open PR: #341 (140th pass, 1570 combos). Board showed Run 77 had opened PR #341 but not logged the run. Merged PR #341 via GitHub MCP. Reset local main to f7a71d0 (1570 combos / 299 tools at 6/6 / 78 at 1/6).
+- Confirmed workstream states: A✅ B✅ C✅ D✅ E in-progress.
+- 141st pass: bipartite strategy. Set A (finance/governance/design, 1/6 each): `orchestrator/skill_search(obligation-tracker)`, `orchestrator/agent_execute(registry,list)`, `orchestrator/agent_execute(chatgpt,status)`. Set B (ops/code/communication, 1/6 each): `orchestrator/skill_search(incident-responder)`, `playwright/browser_type`, `orchestrator/skill_execute(connectors:telegram)`.
+- 12 combos (2/profile × 6 profiles) + 12 prompts. All 6 tools confirmed at 6/6 post-patch.
+- All constraints satisfied: communication combos include `thinking/sequentialthinking`; code combos include `context7/`.
+- Coverage: 1570 → 1582 combos, 1591 → 1603 prompts, 299 → 305 tools at 6/6, 78 → 72 tools at 1/6.
+
+**Next run priority**:
+- Merge this PR when CI green (or manually, CI still broken repo-wide).
+- 142nd pass: target 6 from remaining 72 at 1/6. Suggested Set A (finance/governance/design): `orchestrator/skill_search(cashflow-planner)`, `orchestrator/skill_execute(chittyos-legal:docket)`, `orchestrator/skill_search(frontend design UI web component interface)`. Set B (ops/code/communication): `orchestrator/agent_search(alchemist pattern composition mcp daemon)`, `playwright/browser_run_code_unsafe`, `orchestrator/agent_search(imessage message contact normalization)` → 6 tools to 6/6 in 12 combos.
 
 ---
 
