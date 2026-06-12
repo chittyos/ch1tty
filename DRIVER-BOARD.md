@@ -8,7 +8,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **B. GitHub MCP migration** — `servers.json` github entry already migrated to `https://api.githubcopilot.com/mcp/` with `envHeaders` for `GITHUB_MCP_AUTHORIZATION`. No `@modelcontextprotocol/server-github` anywhere. DONE.
 - [x] **C. Focus-profile layer** — `focus-profiles.json` with 6 profiles (finance, governance, design, code, communication, ops), `CH1TTY_FOCUS` env var, per-call `focus` param on search/cast, `ch1tty/status` reports `availableFocusProfiles`, real tests in `test/focus.test.ts`. DONE.
 - [x] **D. Scenario testing + simulation** — `test/scenario.test.ts` (1157 lines), `test/simulation.test.ts` (229 lines), `sim/scenarios.ts` harness driving real Aggregator over FixtureBackends. All 6 focus profiles covered. All tests pass. DONE.
-- [ ] **E. Alchemist brainstorm** — `focus-suggestions.json` suggestions catalog, actively growing. 1630 combos, 321 tools at 6/6, 55 at 1/6 (as of run 81, 144th pass).
+- [ ] **E. Alchemist brainstorm** — `focus-suggestions.json` suggestions catalog, actively growing. 1654 combos as of run 84 (146th pass); 6 tools lifted to 3/6, ~43 tools remaining at 1/6.
 
 ## Live Gateway State (as of 2026-06-12)
 
@@ -24,6 +24,34 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 84 — 2026-06-12 (auto-driver)
+
+**Workstream advanced**: E (catalog — 146th pass, 6 tools lifted 1/6→3/6)
+**Branch/PR**: `auto/E-146th-catalog-pass` → (open this run)
+**Build**: clean (0 errors)
+**Tests**: 938 pass, 0 fail, 2 skipped (940 total, 45 suites)
+
+**What was done**:
+- Merged PR #350 (playwright browser_ prefix fixes, run-83 log) via squash — CI green (CodeQL), CodeRabbit Stage-1 issues resolved in Stage 3.
+- Closed stale PR #352 (run-82 board log already subsumed in PR #350 DRIVER-BOARD.md).
+- 146th catalog pass: added 12 combos for 6 tools at 1/6, promoting each to 3/6:
+  1. `orchestrator/skill_execute(chittyos-finance:mercury-finance)` finance→+governance,+ops
+  2. `orchestrator/skill_execute(claude-official:code-review)` code→+governance,+ops
+  3. `orchestrator/skill_execute(chittyos-legal:evidence-collect)` governance→+code,+ops
+  4. `orchestrator/skill_search(billing-compliance)` finance→+governance,+code
+  5. `orchestrator/skill_search(feature-dev guided development codebase)` code→+governance,+ops
+  6. `orchestrator/skill_search(compliance audit certify)` ops→+governance,+finance (bonus: combo 12 lifts billing-compliance→finance simultaneously)
+
+**Catalog state after run**:
+- 1654 combos (was 1642)
+- 6 tools: 1/6 → 3/6
+- ~43 orchestrator tools still at 1/6
+
+**Next run priority**:
+- 147th pass: target 6 more from remaining ~43 at 1/6. Suggested: `orchestrator/skill_execute(chittyos-legal:pipeline-submit)` [gov→code,ops], `orchestrator/skill_execute(claude-official:hookify)` [gov→code,ops], `orchestrator/skill_execute(claude-official:claude-api)` [comm→code,governance], `orchestrator/skill_execute(chittycommand-alpha:dispute-tracker)` [gov→finance,ops], `orchestrator/skill_search(broadcast)` [comm→finance,ops], `orchestrator/skill_search(checkpoint)` [ops→governance,code].
 
 ---
 
