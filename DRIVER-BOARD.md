@@ -19,6 +19,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 
 ## Blockers
 
+- **CI broken repo-wide (2026-06-10+)**: All `.github/workflows/ci.yml` runs fail instantly with 0 jobs and identical create/update timestamps. This affects `main` and all PR branches — 30+ consecutive failures. All local tests pass at 100% coverage. Root cause: GitHub Actions infrastructure issue at the org level (runner quota, permissions, or workflow settings). Human must investigate GitHub Actions settings for the `chittyos` org. PRs should be merged manually after local test verification until CI is restored.
 - Notion backend not accessible in remote execution environment (auth/config issue — `/home/ubuntu/.local/bin/notion-mcp-wrapper.sh` not present or token not set). Human must configure `NOTION_API_TOKEN` and the wrapper script to restore Notion access.
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
