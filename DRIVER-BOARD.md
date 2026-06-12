@@ -9,6 +9,8 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **C. Focus-profile layer** — `focus-profiles.json` with 6 profiles (finance, governance, design, code, communication, ops), `CH1TTY_FOCUS` env var, per-call `focus` param on search/cast, `ch1tty/status` reports `availableFocusProfiles`, real tests in `test/focus.test.ts`. DONE.
 - [x] **D. Scenario testing + simulation** — `test/scenario.test.ts` (1157 lines), `test/simulation.test.ts` (229 lines), `sim/scenarios.ts` harness driving real Aggregator over FixtureBackends. All 6 focus profiles covered. All tests pass. DONE.
 - [x] **E. Alchemist brainstorm** — `focus-suggestions.json` suggestions catalog COMPLETE. 1750 combos, 1759 prompts across 6 profiles (154th pass); **372/372 tools at 6/6 — 100% complete coverage**. DONE (run 91, 2026-06-12).
+- [x] **F. Cast miss-path focus suggestions** — `cast: no_match` and `cast: discovered` now surface catalog suggestions when focus is active. PR #365 MERGED. DONE (run 92, 2026-06-12).
+- [ ] **G. Search focus suggestions** — `ch1tty/search` now includes ranked catalog suggestions (combos + prompts) alongside tool results when focus is active and a query is present. PR #368 open, awaiting CodeRabbit review + manual merge.
 
 ## Live Gateway State (as of 2026-06-12)
 
@@ -24,6 +26,34 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 93 — 2026-06-12 (auto-driver)
+
+**Workstream advanced**: G (new — ch1tty/search focus catalog suggestions)
+**Branch/PR**: `auto/G-search-focus-suggestions` → https://github.com/chittyos/ch1tty/pull/368 (open; CodeRabbit in-progress; CI in-progress CodeQL; Codex usage-limit comment — informational)
+**Build**: clean (0 errors)
+**Tests**: 945 pass, 0 fail, 2 skipped (947 total, 45 suites) — +5 new tests
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 940/0/2 (was 940 on main post-F merge).
+- Checked open PRs: PR #365 (Workstream F, cast miss-path suggestions) confirmed MERGED. PR #367 is a Dependabot esbuild bump. No other open PRs.
+- Board read: A✅ B✅ C✅ D✅ E✅ F✅. Chose Workstream G: extend focus catalog suggestions to `ch1tty/search`.
+- **Change**: `handleSearch` in `aggregator.ts` — added 4 lines to compute `getSuggestionsForFocus(focusName, this.suggestionsCatalog, { intent: query })` when both focus is active AND query is non-empty, and include the result as `suggestions` in the response JSON. Zero change to the server-summary (no-query) path.
+- **Tests**: 5 new tests in `test/search-focus-suggestions.test.ts`:
+  1. focus + query → suggestions included (combos + prompts)
+  2. no focus → no suggestions field
+  3. focus + no query (server summary) → no suggestions
+  4. suggestions ranked by query relevance (tax-related combo ranks first on "tax charges" query)
+  5. per-call `focus: "none"` suppresses suggestions even with env focus set
+- PR #368 opened. CodeRabbit in-progress. CI has 2 CodeQL checks in-progress (known pattern — CodeQL sometimes succeeds even when 0-jobs CI infra issue blocks the main workflow). Codex usage limit comment — informational, no action.
+- Subscribed to PR #368 for CI/review monitoring.
+
+**Next run priority**:
+- Merge PR #368 once CodeRabbit review is complete and no actionable findings (or merge manually after confirming clean).
+- Next workstream candidate: `resolvedFromCatalog` flag on `cast: executed` when the winning tool chain matches a catalog combo — annotates responses so clients can distinguish catalog-sourced executions from raw keyword resolutions.
+- CI blocker still active: human must investigate GitHub Actions settings for `chittyos` org.
 
 ---
 
