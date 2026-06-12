@@ -29,7 +29,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 
 ### Run 86 — 2026-06-12 (auto-driver)
 
-**Workstream advanced**: E (catalog — 149th pass, 6 tools 1/6→6/6)
+**Workstream advanced**: E (catalog — 149th pass, 5 tools 1/6→6/6 + phantom cleared)
 **Branch/PR**: `auto/E-149th-catalog-pass` → (open this run)
 **Build**: clean (0 errors)
 **Tests**: 938 pass, 0 fail, 2 skipped (940 total, 45 suites)
@@ -37,10 +37,10 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 **What was done**:
 - Startup: `npm ci` clean, `npm run build` clean, 938/0/2. No open PRs. Board shows Run 85 at 1678 combos / 336 tools at 6/6 / 33 at 1/6. PR #355 (148th pass) confirmed merged in main.
 - Confirmed workstream states: A✅ B✅ C✅ D✅ E in-progress.
-- 149th pass: bipartite strategy. Set A (ops→all): `cloudflare-builds/workers_builds_list_deployments`, `cloudflare-builds/workers_builds_set_active_worker`, `orchestrator/skill_execute(chittyos-devops:chitty-pipelines)`. Set B (code→all): `orchestrator/agent_execute(neon-agent)`, `orchestrator/agent_execute(notes,status)`, `orchestrator/skill_search(claude-opus-migration)`.
-- 12 combos (2/profile × 6 profiles) + 12 prompts. All 6 tools confirmed at 6/6 post-patch.
+- 149th pass: bipartite strategy. Set A (ops→all): `cloudflare-builds/workers_builds_set_active_worker`, `orchestrator/skill_execute(chittyos-devops:chitty-pipelines)` (2 real tools lifted); note — `workers_builds_list_deployments` identified as phantom (not in live gateway or fixtures; correct name is `workers_builds_list_builds` which was already at 6/6). Set B (code→all): `orchestrator/agent_execute(neon-agent)`, `orchestrator/agent_execute(notes,status)`, `orchestrator/skill_search(claude-opus-migration)`.
+- 12 combos (2/profile × 6 profiles) + 12 prompts. Codex P2 fixes: replaced phantom `workers_builds_list_deployments` with `workers_builds_list_builds` in all 8 affected combos, corrected `workers_builds_set_active_worker` accomplishes text (session selector, not deployment activator), fixed misleading prompt text.
 - All constraints satisfied: communication combos include `thinking/sequentialthinking`; code combos include `context7/` and `cloudflare-builds/`.
-- Coverage: 1678 → 1690 combos, 1687 → 1699 prompts, 336 → 342 tools at 6/6, 33 → 27 tools at 1/6.
+- Coverage: 1678 → 1690 combos, 1687 → 1699 prompts, 336 → 342 tools at 6/6, 33 → 27 tools at 1/6. (Phantom `workers_builds_list_deployments` removed from catalog entirely.)
 
 **Next run priority**:
 - Merge this PR when CI green (or manually — CI known repo-wide infra issue since 2026-06-10).

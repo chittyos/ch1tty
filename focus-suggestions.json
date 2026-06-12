@@ -19181,7 +19181,7 @@
           "resolves_to": "code-deploy-list-activate-worker-library-lookup"
         },
         {
-          "text": "Activate the new Cloudflare build, wire up the pipelines, then pull build logs to verify the deployment processed correctly",
+          "text": "Select the target Cloudflare Worker, list its recent builds, run chitty-pipelines, then pull build logs to verify the pipeline processed correctly",
           "resolves_to": "code-deploy-activate-pipeline-build-logs-verify"
         }
       ]
