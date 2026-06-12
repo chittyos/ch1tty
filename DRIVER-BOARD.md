@@ -8,7 +8,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **B. GitHub MCP migration** — `servers.json` github entry already migrated to `https://api.githubcopilot.com/mcp/` with `envHeaders` for `GITHUB_MCP_AUTHORIZATION`. No `@modelcontextprotocol/server-github` anywhere. DONE.
 - [x] **C. Focus-profile layer** — `focus-profiles.json` with 6 profiles (finance, governance, design, code, communication, ops), `CH1TTY_FOCUS` env var, per-call `focus` param on search/cast, `ch1tty/status` reports `availableFocusProfiles`, real tests in `test/focus.test.ts`. DONE.
 - [x] **D. Scenario testing + simulation** — `test/scenario.test.ts` (1157 lines), `test/simulation.test.ts` (229 lines), `sim/scenarios.ts` harness driving real Aggregator over FixtureBackends. All 6 focus profiles covered. All tests pass. DONE.
-- [ ] **E. Alchemist brainstorm** — `focus-suggestions.json` suggestions catalog, actively growing. 1666 combos as of run 85 (147th pass); 6 tools lifted to 6/6, ~39 tools remaining at 1/6.
+- [ ] **E. Alchemist brainstorm** — `focus-suggestions.json` suggestions catalog, actively growing. 1678 combos as of run 85 (148th pass); 336 tools at 6/6, 33 tools at 1/6.
 
 ## Live Gateway State (as of 2026-06-12)
 
@@ -29,28 +29,23 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 
 ### Run 85 — 2026-06-12 (auto-driver)
 
-**Workstream advanced**: E (catalog — 147th pass, 6 tools from 1/6 → 6/6)
-**Branch/PR**: `auto/E-147th-catalog-pass` → (open this run)
+**Workstream advanced**: E (catalog — 148th pass, 6 tools 1/6→6/6)
+**Branch/PR**: `auto/E-148th-catalog-pass` → https://github.com/chittyos/ch1tty/pull/355
 **Build**: clean (0 errors)
 **Tests**: 938 pass, 0 fail, 2 skipped (940 total, 45 suites)
 
 **What was done**:
-- Startup: `npm ci` clean, `npm run build` clean, 938/0/2. No open PRs. Board shows Run 84 at 1654 combos / 324 tools at 6/6 / 44 tools at 1/6.
+- Startup: `npm ci` clean, `npm run build` clean, 938/0/2. One open PR: #354 (147th pass) — all 3 CI checks green. Merged PR #354 via GitHub MCP. Reset local main to 2bca481 (1666 combos / 330 tools at 6/6 / 39 at 1/6).
 - Confirmed workstream states: A✅ B✅ C✅ D✅ E in-progress.
-- 147th pass: bipartite strategy targeting 6 tools from 1/6 (Run 84 suggestions). Each tool placed in the 5 profiles where it was missing:
-  1. `orchestrator/skill_execute(chittyos-legal:pipeline-submit)` [had: governance → now 6/6]
-  2. `orchestrator/skill_execute(claude-official:hookify)` [had: governance → now 6/6]
-  3. `orchestrator/skill_execute(claude-official:claude-api)` [had: communication → now 6/6]
-  4. `orchestrator/skill_execute(chittycommand-alpha:dispute-tracker)` [had: governance → now 6/6]
-  5. `orchestrator/skill_search(broadcast)` [had: communication → now 6/6]
-  6. `orchestrator/skill_search(checkpoint)` [had: ops → now 6/6]
+- 148th pass: bipartite strategy. Set A (code→all): `context7/get-library-docs`, `orchestrator/skill_search(ship branch management preflight)`, `orchestrator/skill_execute(chittyos-devops:agents-sdk-migrate)`. Set B (ops→all): `cloudflare-builds/workers_build_start`, `orchestrator/skill_search(pipelines cloudflare stream sql sink R2)`, `orchestrator/skill_execute(claude-official:claude-md-improver)`.
 - 12 combos (2/profile × 6 profiles) + 12 prompts. All 6 tools confirmed at 6/6 post-patch.
-- All constraints satisfied: communication combos include `thinking/sequentialthinking`; code combos include `context7/` + `neon/`; ops combos include `cloudflare-builds/`.
-- Note: `cloudflare-builds/workers_builds_list_deployments` newly introduced in ops combo (corrected name from run 82 bulk rename) → appeared at 1/6 (one more than expected net reduction).
-- Coverage: 1654 → 1666 combos / 324 → 330 tools at 6/6 / 44 → 39 tools at 1/6.
+- All constraints satisfied: communication combos include `thinking/sequentialthinking`; code combos include `context7/` + `cloudflare-builds/`.
+- Coverage: 1666 → 1678 combos, 1675 → 1687 prompts, 330 → 336 tools at 6/6, 39 → 33 tools at 1/6.
+- PR #355 open, CI in-progress at time of run (CodeQL + Analyze); CodeRabbit skipped (no reviewable changes — data-only JSON, expected).
 
 **Next run priority**:
-- 148th pass: target 6 from remaining 39 at 1/6. Suggested Set A (ops cluster): `cloudflare-builds/workers_build_start` [ops→others], `cloudflare-builds/workers_builds_set_active_worker` [ops→others], `orchestrator/skill_execute(chittyos-devops:chitty-pipelines)` [ops→others]. Set B (code cluster): `context7/get-library-docs` [code→others], `orchestrator/agent_execute(notes,status)` [code→others], `orchestrator/agent_search(resolve)` [code→others].
+- Merge PR #355 when CI green (or manually — CI known repo-wide infra issue since 2026-06-10).
+- 149th pass: target 6 from remaining 33 at 1/6. Suggested Set A (ops): `cloudflare-builds/workers_builds_list_deployments`, `cloudflare-builds/workers_builds_set_active_worker`, `orchestrator/skill_execute(chittyos-devops:chitty-pipelines)`. Set B (code): `orchestrator/agent_execute(neon-agent)`, `orchestrator/agent_execute(notes,status)`, `orchestrator/skill_search(claude-opus-migration)` → 6 tools to 6/6 in 12 combos.
 
 ---
 
