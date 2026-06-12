@@ -2445,13 +2445,13 @@
         {
           "name": "finance-billing-build-config-audit",
           "chain": [
-            "cloudflare-builds/workers_builds_get_build",
+            "cloudflare-builds/workers_get_worker",
             "thinking/sequentialthinking",
             "notion/API-post-page"
           ],
-          "accomplishes": "Fetch the Workers Builds configuration for the billing or payment Worker (build_command, deploy_command, environment variables), reason over the config for drift, misconfiguration, or missing production flags, then post the audit findings to a Notion finance ops page \u2014 giving the finance team visibility into the build-level health of their billing services.",
+          "accomplishes": "Fetch the Workers script configuration for the billing or payment Worker (routes, bindings, triggers, script metadata), reason over the config for drift, misconfiguration, or missing production flags, then post the audit findings to a Notion finance ops page \u2014 giving the finance team visibility into the script-level health of their billing services.",
           "verified": false,
-          "notes": "cloudflare-builds/workers_builds_get_build_config: lazy, token from op://ChittyOS-Integrations/cloudflare-builds-mcp. thinking verified. notion/API-post-page verified. Adds cloudflare-builds/workers_builds_get_build_config to finance profile (was: governance, design, ops)."
+          "notes": "cloudflare-builds/workers_get_worker: returns Worker script configuration details by name. thinking verified. notion/API-post-page verified."
         },
         {
           "name": "finance-cf-builds-workers-deployment-costs",
@@ -3113,7 +3113,7 @@
             "cloudflare-builds/workers_builds_list_builds",
             "fs/write_file"
           ],
-          "accomplishes": "Identify and tune slow Neon DB queries draining finance service SLA, cancel the CI build that triggered the problematic schema migration, and write the remediation report to the finance audit trail.",
+          "accomplishes": "Identify and tune slow Neon DB queries draining finance service SLA, list recent CI builds to identify the build that triggered the problematic schema migration, and write the remediation report to the finance audit trail. (Note: build cancellation is not available; use build identification to guide manual rollback.)",
           "verified": false
         },
         {
