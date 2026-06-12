@@ -3478,8 +3478,8 @@
             "fs/write_file"
           ],
           "accomplishes": "Collect legal evidence for a matter, run a code review over the associated implementation changes, then query the Neon database for cost or billing records linked to that matter, and write the combined evidence + code quality + financial record to disk — creating a finance-grade legal cost report that ties legal evidence to its engineering and billing context.",
-          "verified": true,
-          "notes": "neon/run_sql connected; fs/write_file connected; evidence-collect and code-review confirmed in prior passes. Advances evidence-collect and code-review to finance profile."
+          "verified": false,
+          "notes": "neon/run_sql connected; fs/write_file connected; evidence-collect and code-review confirmed in prior passes. Advances evidence-collect and code-review to finance profile. NOTE (Codex P2): marked unverified — neon/run_sql requires Neon auth; Neon is lazy/auth-gated in current gateway. Re-verify once Neon is connected."
         },
         {
           "name": "finance-featuredev-neon-build-cost-report",
@@ -18235,8 +18235,8 @@
             "fs/write_file"
           ],
           "accomplishes": "Search for the compliance-audit-certify skill to identify active compliance workflows, resolve the relevant compliance or audit library ID in context7, search GitHub code for usage patterns of that library across the codebase, then write a structured compliance scan report to disk — creating a repeatable audit artifact that links live skill state to actual code coverage.",
-          "verified": true,
-          "notes": "orchestrator/skill_search(compliance audit certify) confirmed in catalog; context7/resolve-library-id connected; github/search_code (GitHub MCP connected); fs/write_file (fs-mcp connected). Advances compliance audit certify to code profile."
+          "verified": false,
+          "notes": "orchestrator/skill_search(compliance audit certify) confirmed in catalog; context7/resolve-library-id connected; github/search_code (GitHub MCP connected); fs/write_file (fs-mcp connected). Advances compliance audit certify to code profile. NOTE (Codex P2): marked unverified — github/search_code requires GitHub connection; GitHub is lazy/auth-gated in current gateway. Re-verify once GitHub MCP is connected."
         }
       ],
       "prompts": [
@@ -27917,13 +27917,13 @@
           "name": "ops-neon-finance-market-infra-overview",
           "chain": [
             "orchestrator/agent_search(neon database finance banking neon sql)",
-            "orchestrator/chittyagent-market",
+            "orchestrator/agent_execute(market)",
             "neon/list_projects",
             "cloudflare-builds/workers_get_worker"
           ],
           "accomplishes": "Search for the Neon finance/banking agent to surface database and analytics capabilities, invoke the ChittyOS market agent to check marketplace and plugin availability, enumerate active Neon projects for database-layer ops visibility, then fetch the current Worker configuration — providing an infrastructure overview that connects data layer, marketplace, and compute into a unified ops snapshot for finance-adjacent systems.",
           "verified": true,
-          "notes": "neon/list_projects + cloudflare-builds/workers_get_worker confirmed connected; orchestrator/agent_search and orchestrator/chittyagent-market confirmed in catalog. Advances agent_search(neon database finance banking neon sql) and chittyagent-market from 1/6 to ops profile."
+          "notes": "neon/list_projects + cloudflare-builds/workers_get_worker confirmed connected; neon/list_projects + cloudflare-builds/workers_get_worker confirmed connected; orchestrator/agent_search(neon database finance banking neon sql) confirmed in catalog; orchestrator/agent_execute(market) — callable form (Codex P2: replaced chittyagent-market phantom with agent_execute form). Advances agent_search(neon database finance banking neon sql) and chittyagent-market from 1/6 to ops profile."
         }
       ],
       "prompts": [
