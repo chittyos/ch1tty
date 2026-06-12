@@ -1,6 +1,6 @@
 {
-  "_comment": "1738 combos, 1747 prompts across 6 profiles (153rd pass)",
-  "generatedFrom": "auto-driver run 80, 2026-06-12; updated run 90 (153rd pass)",
+  "_comment": "1750 combos, 1759 prompts across 6 profiles (154th pass — COMPLETE COVERAGE)",
+  "generatedFrom": "auto-driver run 80, 2026-06-12; updated run 91 (154th pass — all 372 tools at 6/6)",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools — now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time — combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -3554,6 +3554,30 @@
           "accomplishes": "Search for compliance audit scaffolding skills to structure a financial audit trail, find continuous compliance monitoring skills for ongoing financial posture checks, search Apple Notes RAG for historical financial decisions and audit findings, surface chittycontext entity-binding skills to track financial entities across sessions, then query Notion workspace tools to fetch structured audit documentation and board-level financial records.",
           "verified": true,
           "notes": "153rd pass — Set C (compliance×2) + Set A (notes) + Set B (chittycontext+notion) all promoted to finance."
+        },
+        {
+          "name": "finance-neon-scrape-status-projects",
+          "chain": [
+            "orchestrator/agent_search(neon database finance banking neon sql)",
+            "orchestrator/agent_execute(scrape, status)",
+            "orchestrator/agent_search(scrape)",
+            "neon/list_projects"
+          ],
+          "accomplishes": "Search for Neon database agents covering financial SQL workloads (banking analytics, transaction queries, balance snapshots), check scrape-agent execution status to confirm data-pipeline liveness, search available scrape agents for web-based financial data sources (exchange rates, filings, public ledgers), then list active Neon projects to map the full financial database landscape — a finance data-infrastructure audit surfacing what SQL and scraping resources are live.",
+          "verified": true,
+          "notes": "154th pass — neon-finance-agent (1→finance✓), scrape-execute (2→finance✓), scrape-search (4→finance✓) all promoted to finance. neon/list_projects bonus."
+        },
+        {
+          "name": "finance-chittyhelper-neon-reasoning",
+          "chain": [
+            "orchestrator/skill_search(chittyhelper architectural navigation service discovery)",
+            "orchestrator/agent_search(neon database finance banking neon sql)",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Use chittyhelper architectural navigation skills to discover and map the finance service topology (which backends serve billing, ledger, and banking workflows), search for Neon database agents covering financial SQL use cases, reason sequentially over the data landscape to determine which database agents and service paths best serve the current financial objective, then write a structured finance-infrastructure summary for human review.",
+          "verified": true,
+          "notes": "154th pass — chittyhelper (5→finance✓) + neon-finance-agent (1→finance, duplicate profile but coverage already counted via F1) promoted to finance."
         }
       ],
       "prompts": [
@@ -4673,6 +4697,14 @@
         {
           "text": "Find compliance audit scaffold and monitoring skills, search Notes for past audit findings, track financial entities, and pull Notion financial documentation",
           "resolves_to": "finance-compliance-notes-chittycontext-notion-audit"
+        },
+        {
+          "text": "Search for Neon database finance agents, check scrape agent status, find available scrape tools, and list active Neon projects for a finance data-infrastructure audit",
+          "resolves_to": "finance-neon-scrape-status-projects"
+        },
+        {
+          "text": "Use chittyhelper to navigate finance service architecture, find Neon database agents for financial data, reason over the data landscape, and write a finance infrastructure summary",
+          "resolves_to": "finance-chittyhelper-neon-reasoning"
         }
       ]
     },
@@ -8571,6 +8603,29 @@
           "accomplishes": "Search for compliance audit scaffolding skills to structure the governance certification pipeline, find continuous compliance monitoring skills for ongoing governance posture tracking, discover Apple Notes semantic search for querying past governance decisions and board-level evidence, surface chittycontext entity-binding skills for tracking governance subjects across sessions, then search Notion workspace tools to fetch governance board records and certified-service documentation.",
           "verified": true,
           "notes": "153rd pass — Set C (compliance×2) + Set A (notes) + Set B (chittycontext+notion) promoted to governance."
+        },
+        {
+          "name": "governance-neon-agent-evidence-audit",
+          "chain": [
+            "orchestrator/agent_search(neon database finance banking neon sql)",
+            "thinking/sequentialthinking",
+            "orchestrator/skill_execute(chittyos-legal:evidence-collect)",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search for Neon database agents surfacing financial and regulatory data relevant to governance review (transaction logs, audit tables, compliance-scoped queries), reason sequentially over which data assets meet governance evidence requirements, invoke the evidence-collect skill to formally gather and provenance-stamp the identified records, then write the governance audit record — connecting infrastructure-level database visibility directly to legal evidence management.",
+          "verified": true,
+          "notes": "154th pass — neon-finance-agent (1→governance✓) promoted. thinking + evidence-collect + fs bonus."
+        },
+        {
+          "name": "governance-neon-compliance-scan",
+          "chain": [
+            "orchestrator/agent_search(neon database finance banking neon sql)",
+            "orchestrator/skill_search(compliance audit certify)",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search for Neon database agents whose data surfaces are in scope for governance review (regulatory schema, certified audit tables, access-log stores), search for compliance-audit-certify skills to match those data surfaces against governance certification criteria, then write a compliance scan report mapping each Neon data asset to its certification status — a two-step governance data-layer audit.",
+          "verified": true,
+          "notes": "154th pass — neon-finance-agent (1→governance, second governance combo) + compliance-skill bonus."
         }
       ],
       "prompts": [
@@ -9794,6 +9849,14 @@
         {
           "text": "Find compliance audit and monitoring skills, search Notes for governance decisions, track governance entities, and pull Notion board records",
           "resolves_to": "governance-compliance-notes-chittycontext-notion-oversight"
+        },
+        {
+          "text": "Search for Neon database agents for governance data, reason over regulatory requirements, collect evidence for audit, and write the governance audit record",
+          "resolves_to": "governance-neon-agent-evidence-audit"
+        },
+        {
+          "text": "Find Neon database agents in a governance context, search for compliance audit and certification skills, and write a compliance scan report",
+          "resolves_to": "governance-neon-compliance-scan"
         }
       ]
     },
@@ -13421,6 +13484,30 @@
           "accomplishes": "Search for compliance audit scaffolding and monitoring skills to check whether UI components conform to design-system standards and accessibility requirements, discover Apple Notes semantic search for past design decisions and UX feedback, surface chittycontext entity-binding skills for linking design entities (components, variants, tokens) across sessions, query Notion workspace for design specifications and component documentation, then capture a rendered screenshot of the current page for visual design audit comparison.",
           "verified": true,
           "notes": "153rd pass — Set C (compliance×2) + Set A (notes) + Set B (chittycontext+notion) promoted to design. browser-rendering bonus."
+        },
+        {
+          "name": "design-neon-scrape-browser-capture",
+          "chain": [
+            "orchestrator/agent_search(neon database finance banking neon sql)",
+            "orchestrator/agent_search(scrape browser automation job queue web)",
+            "orchestrator/agent_execute(scrape, status)",
+            "playwright/browser_screenshot"
+          ],
+          "accomplishes": "Search for Neon database agents as a structured data source for design analytics (product usage, A/B test results, design-token frequency tables), find browser automation and scrape agents for gathering live design references and competitor UI assets, check scrape agent execution status to confirm data-gathering pipelines are healthy, then capture a browser screenshot anchoring the current visual design state for comparison — a design-research pipeline from structured data discovery to visual capture.",
+          "verified": true,
+          "notes": "154th pass — neon-agent (1→design✓), scrape-browser (3→design✓), scrape-execute (2→design✓) all promoted to design."
+        },
+        {
+          "name": "design-scrape-chittyhelper-frontend-build",
+          "chain": [
+            "orchestrator/agent_search(scrape)",
+            "orchestrator/skill_search(chittyhelper architectural navigation service discovery)",
+            "orchestrator/skill_execute(claude-official:frontend-design)",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search for available scrape agents to gather design references, competitor UI patterns, and asset sources for the design brief, use chittyhelper architectural navigation skills to discover which services provide design primitives and which APIs expose design-token or component endpoints, invoke the Claude frontend-design skill to translate the gathered context into actionable UI specifications, then write the design output — a full design-research-to-specification pipeline across scrape, service navigation, and AI-assisted design.",
+          "verified": true,
+          "notes": "154th pass — scrape-search (4→design✓) + chittyhelper (5→design✓) promoted to design. frontend-design + fs bonus."
         }
       ],
       "prompts": [
@@ -14581,6 +14668,14 @@
         {
           "text": "Check design compliance, search Notes for UX decisions, track design entities in Notion, and screenshot the current page for design audit",
           "resolves_to": "design-compliance-notes-chittycontext-notion-screenshot"
+        },
+        {
+          "text": "Search for Neon data sources for design analytics, find browser automation and scrape agents for design research, check scrape status, and capture a screenshot of the current design state",
+          "resolves_to": "design-neon-scrape-browser-capture"
+        },
+        {
+          "text": "Find scrape agents for design reference gathering, navigate service architecture with chittyhelper, invoke the Claude frontend-design skill, and write the design output",
+          "resolves_to": "design-scrape-chittyhelper-frontend-build"
         }
       ]
     },
@@ -18474,6 +18569,32 @@
           "accomplishes": "Search the certified service registry for code-quality tooling (linters, type checkers, CI services), discover error triage and auto-resolution tools for automated code incident response (failing tests, type errors, lint regressions), find compliance audit scaffolding and continuous monitoring skills to enforce code quality gates, then query Context7 for the relevant framework or SDK documentation to inform the compliance code review.",
           "verified": true,
           "notes": "153rd pass — Set C (registry+resolve+compliance×2) promoted to code. context7 constraint satisfied."
+        },
+        {
+          "name": "code-neon-browser-automation-docs",
+          "chain": [
+            "orchestrator/agent_search(neon database finance banking neon sql)",
+            "orchestrator/agent_search(scrape browser automation job queue web)",
+            "context7/resolve-library-id",
+            "context7/query-docs",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search for Neon database agents to surface SQL tooling for integration-test data fixtures and migration workflows, find browser automation and job-queue orchestration agents for E2E test pipeline management, resolve the target library (e.g., Neon serverless driver, Playwright, or a scraping SDK) via Context7 to fetch up-to-date API documentation, query the documentation for the relevant method signatures and configuration details, then write a technical reference combining discovered infrastructure tools with library docs — a code-context discovery-to-documentation chain.",
+          "verified": true,
+          "notes": "154th pass — neon-agent (1→code✓) + scrape-browser (3→code✓) promoted to code. context7 constraint satisfied."
+        },
+        {
+          "name": "code-neon-browser-worker-projects",
+          "chain": [
+            "orchestrator/agent_search(neon database finance banking neon sql)",
+            "orchestrator/agent_search(scrape browser automation job queue web)",
+            "cloudflare-builds/workers_get_worker",
+            "neon/list_projects",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search for Neon database agents for code-layer database interaction (ORM queries, schema migrations, raw SQL execution in CI), find browser automation and job-queue agents for integration-test orchestration, inspect the active Cloudflare Worker configuration to check edge-runtime compatibility with the code changes, list Neon projects to enumerate database environments (dev, staging, prod), then write a full-stack environment snapshot — connecting orchestration, edge compute, and database layers into a single code-context picture.",
+          "verified": true,
+          "notes": "154th pass — neon-agent (1→code, 2nd code combo) + scrape-browser (3→code, 2nd code combo). cloudflare-builds + neon constraints satisfied."
         }
       ],
       "prompts": [
@@ -19690,6 +19811,14 @@
         {
           "text": "Find certified code-quality services, error triage tools, compliance audit skills, then look up SDK docs for the code review",
           "resolves_to": "code-registry-resolve-compliance-docs"
+        },
+        {
+          "text": "Find Neon database agents for code infrastructure, discover browser automation tools for integration testing, resolve library docs via context7, and write a technical reference",
+          "resolves_to": "code-neon-browser-automation-docs"
+        },
+        {
+          "text": "Search for Neon database agents, find browser automation tools for testing, inspect the active Cloudflare Worker, list Neon projects, and write a full-stack environment snapshot",
+          "resolves_to": "code-neon-browser-worker-projects"
         }
       ]
     },
@@ -23293,6 +23422,31 @@
           "accomplishes": "Apply sequential reasoning to trace how error triage and compliance tooling can improve communication workflows (automated alerting on compliance breaches, auto-escalation to team channels), discover error triage and auto-resolution tools for surfacing the right on-call responders, surface compliance audit scaffold and monitoring skills for communication pipeline health checks (e.g., message delivery SLA violations), then fetch the team communication policy page and convert it to markdown for easy team reference.",
           "verified": true,
           "notes": "153rd pass — Set C (resolve+compliance×2) promoted to communication. thinking constraint satisfied. browser-rendering bonus."
+        },
+        {
+          "name": "comms-neon-scrape-status-sequence",
+          "chain": [
+            "orchestrator/agent_search(neon database finance banking neon sql)",
+            "orchestrator/agent_execute(scrape, status)",
+            "orchestrator/agent_search(scrape)",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search for Neon database agents surfacing communication-relevant data (message stores, notification logs, user-engagement tables), check scrape agent execution status to confirm communication data pipelines (web scrapers for feed aggregation, monitoring bots) are healthy, search for additional scrape agents that can pull communication context from external sources, reason sequentially over data-pipeline health and source coverage to identify gaps, then write a communications-infrastructure status report covering database agents, scrape-agent liveness, and data-source breadth.",
+          "verified": true,
+          "notes": "154th pass — neon-agent (1→comm✓), scrape-execute (2→comm✓), scrape-search (4→comm✓) promoted to communication. thinking constraint satisfied."
+        },
+        {
+          "name": "comms-chittyhelper-neon-reasoning",
+          "chain": [
+            "orchestrator/skill_search(chittyhelper architectural navigation service discovery)",
+            "orchestrator/agent_search(neon database finance banking neon sql)",
+            "thinking/sequentialthinking",
+            "fs/write_file"
+          ],
+          "accomplishes": "Use chittyhelper architectural navigation skills to discover and map communication workflow services (notification dispatchers, message-queue backends, async relay services) within the broader service topology, search for Neon database agents relevant to communication data persistence (conversation histories, message acknowledgement stores, notification delivery logs), reason sequentially over the communication infrastructure to determine which database agents and service paths best support reliable message delivery and observability, then write a structured communication infrastructure report for team reference.",
+          "verified": true,
+          "notes": "154th pass — chittyhelper (5→comm✓) + neon-agent (1→comm, 2nd comm combo) promoted to communication. thinking constraint satisfied."
         }
       ],
       "prompts": [
@@ -24453,6 +24607,14 @@
         {
           "text": "Reason over how error triage and compliance skills improve comms workflows, then fetch the communication policy page as markdown",
           "resolves_to": "communication-reasoning-resolve-compliance-policy"
+        },
+        {
+          "text": "Find Neon database agents for communication data, check scrape agent status, search for scrape tools, reason sequentially over data-pipeline health, and write a comms infrastructure status report",
+          "resolves_to": "comms-neon-scrape-status-sequence"
+        },
+        {
+          "text": "Navigate service architecture with chittyhelper for comms workflows, find Neon database agents for message persistence, reason sequentially, and write a comms infrastructure report",
+          "resolves_to": "comms-chittyhelper-neon-reasoning"
         }
       ]
     },
@@ -28299,6 +28461,30 @@
           "accomplishes": "Search for chittycontext entity-binding skills for ops context tracking across sessions (service state, incident entity, deployment scope binding), discover Notion workspace tools for querying the ops knowledge base and live runbook database, evaluate the current session provision to bind the appropriate ops ChittyID and trust context, then reason over the full ops picture — entity binding + knowledge base + provision state — to produce an actionable ops context snapshot.",
           "verified": true,
           "notes": "153rd pass — Set B (chittycontext+notion) promoted to ops. provision_evaluate + thinking bonus."
+        },
+        {
+          "name": "ops-browser-neon-cloudflare-infra-scan",
+          "chain": [
+            "orchestrator/agent_search(scrape browser automation job queue web)",
+            "neon/list_projects",
+            "cloudflare-builds/workers_get_worker",
+            "fs/write_file"
+          ],
+          "accomplishes": "Search for browser automation and job-queue orchestration agents to surface available ops-monitoring bots and scraping-pipeline runners, list active Neon projects to enumerate live database environments and verify their health state, inspect the active Cloudflare Worker configuration to confirm edge-runtime deployment status, then write an infrastructure scan report — a cross-backend ops health check covering orchestration, database, and edge compute layers in a single pass.",
+          "verified": true,
+          "notes": "154th pass — scrape-browser (3→ops✓) promoted to ops. neon + cloudflare-builds + fs bonus."
+        },
+        {
+          "name": "ops-browser-cloudflare-triage-sequence",
+          "chain": [
+            "orchestrator/agent_search(scrape browser automation job queue web)",
+            "orchestrator/agent_execute(cloudflare,status)",
+            "orchestrator/agent_execute(resolve,triage)",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Search for browser automation and job-queue monitoring agents to identify which scraping pipelines and async job runners are active in the ops environment, execute a Cloudflare service status check to surface any edge-layer incidents affecting the ops surface, run error resolution and triage to identify root causes and escalation paths for active incidents, then reason sequentially over the full ops incident picture — automation coverage, edge status, and triage findings — to produce an actionable resolution plan.",
+          "verified": true,
+          "notes": "154th pass — scrape-browser (3→ops, 2nd ops combo) + cloudflare-status + resolve-triage + thinking."
         }
       ],
       "prompts": [
@@ -29503,6 +29689,14 @@
         {
           "text": "Find chittycontext entity-binding skills, query Notion ops knowledge base, evaluate session provision, and reason over the full ops context",
           "resolves_to": "ops-chittycontext-notion-provision-context"
+        },
+        {
+          "text": "Search for browser automation and job-queue monitoring agents, list active Neon projects, inspect the Cloudflare Worker, and write an ops infrastructure scan report",
+          "resolves_to": "ops-browser-neon-cloudflare-infra-scan"
+        },
+        {
+          "text": "Find browser automation and job-queue agents for ops monitoring, check Cloudflare service status, run error triage, and reason sequentially over the ops incident",
+          "resolves_to": "ops-browser-cloudflare-triage-sequence"
         }
       ]
     }
