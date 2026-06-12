@@ -45,7 +45,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
   - `orchestrator/skill_execute(claude-official:code-review)` [had: gov,code,ops] +finance,+comm,+design → 6/6
   - `orchestrator/skill_search(feature-dev guided development codebase)` [had: gov,code,ops] +finance,+comm,+design → 6/6
   - `orchestrator/skill_search(billing-compliance)` [had: finance,gov,code] +comm,+design,+ops → 6/6
-  - Bonus: 6 tools at 1/6 advanced to 2/6 (agent_search(neon db finance), chittyagent-market, agent_search(scrape browser web), agent_execute(scrape,status), agent_search(scrape), skill_search(chittyhelper...))
+  - Bonus: 6 tools at 1/6 advanced to 2/6 (agent_search(neon db finance), agent_execute(market), agent_search(scrape browser web), agent_execute(scrape,status), agent_search(scrape), skill_search(chittyhelper...))
 - 12 combos + 12 prompts. All verified post-patch.
 - All constraints satisfied: communication combos include `thinking/sequentialthinking`; code combos include `context7/` + `cloudflare-builds/`.
 - Coverage: 1702 → 1714 combos, 1711 → 1723 prompts, 347 → 353 tools at 6/6, 21 → 15 tools at 1/6, 0 → 6 tools at 2/6, 6 → 0 tools at 3/6.

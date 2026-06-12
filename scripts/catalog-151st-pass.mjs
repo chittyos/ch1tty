@@ -10,7 +10,7 @@
 //
 // Bonus targets (1/6 → 2/6):
 //   orchestrator/agent_search(neon database finance banking neon sql) [finance] → +ops
-//   orchestrator/chittyagent-market                                   [finance] → +ops
+//   orchestrator/agent_execute(market)                                [finance] → +ops
 //   orchestrator/agent_search(scrape browser automation job queue web)[communication] → +governance
 //   orchestrator/agent_execute(scrape, status)                        [code]    → +governance
 //   orchestrator/agent_search(scrape)                                 [code]    → +governance
@@ -21,7 +21,13 @@
 
 import { readFileSync, writeFileSync } from 'fs';
 
-const data = JSON.parse(readFileSync('focus-suggestions.json', 'utf8'));
+let data;
+try {
+  data = JSON.parse(readFileSync('focus-suggestions.json', 'utf8'));
+} catch (err) {
+  console.error(`Failed to read or parse focus-suggestions.json: ${err.message}`);
+  process.exit(1);
+}
 
 // ── code profile ─────────────────────────────────────────────────────────────
 
@@ -54,9 +60,9 @@ data.profiles.code.combos.push({
   ],
   accomplishes:
     'Search for the compliance-audit-certify skill to identify active compliance workflows, resolve the relevant compliance or audit library ID in context7, search GitHub code for usage patterns of that library across the codebase, then write a structured compliance scan report to disk — creating a repeatable audit artifact that links live skill state to actual code coverage.',
-  verified: true,
+  verified: false,
   notes:
-    'orchestrator/skill_search(compliance audit certify) confirmed in catalog; context7/resolve-library-id connected; github/search_code (GitHub MCP connected); fs/write_file (fs-mcp connected). Advances compliance audit certify to code profile.',
+    'orchestrator/skill_search(compliance audit certify) confirmed in catalog; context7/resolve-library-id connected; fs/write_file connected. NOTE: github/search_code requires GitHub auth — GitHub is lazy/auth-gated in current gateway; marked unverified until connected. Advances compliance audit certify to code profile.',
 });
 data.profiles.code.prompts.push({
   text: 'Find the compliance-audit skill, look up the audit library in context7, scan GitHub for usages, and save a report',
@@ -175,9 +181,9 @@ data.profiles.finance.combos.push({
   ],
   accomplishes:
     'Search for feature-dev guidance applicable to the current development sprint, describe the Neon project schema and resource usage to understand data-layer costs, fetch the current Worker configuration to assess compute costs, then write a sprint-level cost estimation report — linking active feature development to its infrastructure spend before committing to production.',
-  verified: true,
+  verified: false,
   notes:
-    'neon/describe_project and cloudflare-builds/workers_get_worker both confirmed connected; fs/write_file connected. Advances feature-dev to finance profile.',
+    'cloudflare-builds/workers_get_worker + fs/write_file confirmed connected. NOTE: neon/describe_project requires Neon auth — Neon is lazy/auth-gated in current gateway; marked unverified until connected. Advances feature-dev to finance profile.',
 });
 data.profiles.finance.prompts.push({
   text: 'Find feature-dev guidance, describe the Neon project, get the Worker config, and write a sprint cost report',
@@ -196,9 +202,9 @@ data.profiles.ops.combos.push({
   ],
   accomplishes:
     'Search for active billing-compliance workflows to surface any compliance alerts, list recent Cloudflare Workers builds to check deployment health, enumerate Neon projects to verify database provisioning against billing expectations, then invoke the ChittyOS pipelines skill to confirm pipeline state — giving ops a single-pass billing compliance + infrastructure health snapshot.',
-  verified: true,
+  verified: false,
   notes:
-    'cloudflare-builds/workers_builds_list_builds + neon/list_projects confirmed connected; orchestrator/skill_execute(chittyos-devops:chitty-pipelines) confirmed in prior passes. Advances billing-compliance to ops profile.',
+    'cloudflare-builds/workers_builds_list_builds confirmed connected; orchestrator/skill_execute(chittyos-devops:chitty-pipelines) confirmed in prior passes. NOTE: neon/list_projects requires Neon auth — Neon is lazy/auth-gated; marked unverified until connected. Advances billing-compliance to ops profile.',
 });
 data.profiles.ops.prompts.push({
   text: 'Check billing-compliance workflows, list CF builds and Neon projects, and run a pipeline health check',
@@ -209,15 +215,15 @@ data.profiles.ops.combos.push({
   name: 'ops-neon-finance-market-infra-overview',
   chain: [
     'orchestrator/agent_search(neon database finance banking neon sql)',
-    'orchestrator/chittyagent-market',
+    'orchestrator/agent_execute(market)',
     'neon/list_projects',
     'cloudflare-builds/workers_get_worker',
   ],
   accomplishes:
     'Search for the Neon finance/banking agent to surface database and analytics capabilities, invoke the ChittyOS market agent to check marketplace and plugin availability, enumerate active Neon projects for database-layer ops visibility, then fetch the current Worker configuration — providing an infrastructure overview that connects data layer, marketplace, and compute into a unified ops snapshot for finance-adjacent systems.',
-  verified: true,
+  verified: false,
   notes:
-    'neon/list_projects + cloudflare-builds/workers_get_worker confirmed connected; orchestrator/agent_search and orchestrator/chittyagent-market confirmed in catalog. Advances agent_search(neon database finance banking neon sql) and chittyagent-market from 1/6 to ops profile.',
+    'cloudflare-builds/workers_get_worker confirmed connected; orchestrator/agent_search and orchestrator/agent_execute(market) callable forms. NOTE: neon/list_projects requires Neon auth — Neon is lazy/auth-gated; marked unverified until connected. Advances agent_search(neon database finance banking neon sql) and agent_execute(market) to ops profile.',
 });
 data.profiles.ops.prompts.push({
   text: 'Find the Neon finance agent, check the market agent, list Neon projects, and get the Worker config for an ops overview',
@@ -264,5 +270,10 @@ data.profiles.governance.prompts.push({
   resolves_to: 'governance-scrape-chittyhelper-compliance-nav',
 });
 
-writeFileSync('focus-suggestions.json', JSON.stringify(data, null, 2) + '\n');
-console.log('151st pass written.');
+try {
+  writeFileSync('focus-suggestions.json', JSON.stringify(data, null, 2) + '\n');
+  console.log('151st pass written.');
+} catch (err) {
+  console.error(`Failed to write focus-suggestions.json: ${err.message}`);
+  process.exit(1);
+}

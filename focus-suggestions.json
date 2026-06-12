@@ -3490,8 +3490,8 @@
             "fs/write_file"
           ],
           "accomplishes": "Search for feature-dev guidance applicable to the current development sprint, describe the Neon project schema and resource usage to understand data-layer costs, fetch the current Worker configuration to assess compute costs, then write a sprint-level cost estimation report — linking active feature development to its infrastructure spend before committing to production.",
-          "verified": true,
-          "notes": "neon/describe_project and cloudflare-builds/workers_get_worker both confirmed connected; fs/write_file connected. Advances feature-dev to finance profile."
+          "verified": false,
+          "notes": "neon/describe_project and cloudflare-builds/workers_get_worker both confirmed connected; fs/write_file connected. Advances feature-dev to finance profile. NOTE (CodeRabbit): marked unverified — neon/describe_project requires Neon auth (lazy/auth-gated)."
         }
       ],
       "prompts": [
@@ -27910,8 +27910,8 @@
             "orchestrator/skill_execute(chittyos-devops:chitty-pipelines)"
           ],
           "accomplishes": "Search for active billing-compliance workflows to surface any compliance alerts, list recent Cloudflare Workers builds to check deployment health, enumerate Neon projects to verify database provisioning against billing expectations, then invoke the ChittyOS pipelines skill to confirm pipeline state — giving ops a single-pass billing compliance + infrastructure health snapshot.",
-          "verified": true,
-          "notes": "cloudflare-builds/workers_builds_list_builds + neon/list_projects confirmed connected; orchestrator/skill_execute(chittyos-devops:chitty-pipelines) confirmed in prior passes. Advances billing-compliance to ops profile."
+          "verified": false,
+          "notes": "cloudflare-builds/workers_builds_list_builds + neon/list_projects confirmed connected; orchestrator/skill_execute(chittyos-devops:chitty-pipelines) confirmed in prior passes. Advances billing-compliance to ops profile. NOTE (CodeRabbit): marked unverified — neon/list_projects requires Neon auth (lazy/auth-gated)."
         },
         {
           "name": "ops-neon-finance-market-infra-overview",
@@ -27922,8 +27922,8 @@
             "cloudflare-builds/workers_get_worker"
           ],
           "accomplishes": "Search for the Neon finance/banking agent to surface database and analytics capabilities, invoke the ChittyOS market agent to check marketplace and plugin availability, enumerate active Neon projects for database-layer ops visibility, then fetch the current Worker configuration — providing an infrastructure overview that connects data layer, marketplace, and compute into a unified ops snapshot for finance-adjacent systems.",
-          "verified": true,
-          "notes": "neon/list_projects + cloudflare-builds/workers_get_worker confirmed connected; neon/list_projects + cloudflare-builds/workers_get_worker confirmed connected; orchestrator/agent_search(neon database finance banking neon sql) confirmed in catalog; orchestrator/agent_execute(market) — callable form (Codex P2: replaced chittyagent-market phantom with agent_execute form). Advances agent_search(neon database finance banking neon sql) and chittyagent-market from 1/6 to ops profile."
+          "verified": false,
+          "notes": "neon/list_projects + cloudflare-builds/workers_get_worker confirmed connected; neon/list_projects + cloudflare-builds/workers_get_worker confirmed connected; orchestrator/agent_search(neon database finance banking neon sql) confirmed in catalog; orchestrator/agent_execute(market) — callable form (Codex P2: replaced chittyagent-market phantom with agent_execute form). Advances agent_search(neon database finance banking neon sql) and chittyagent-market from 1/6 to ops profile. NOTE (CodeRabbit): marked unverified — neon/list_projects requires Neon auth (lazy/auth-gated)."
         }
       ],
       "prompts": [
