@@ -71,7 +71,7 @@ test('focus reorders a cross-focus near-miss (lens flips the winner)', async () 
     const p = await runFocusBiasProbe(aggregator, sc!);
     // Without focus the out-of-focus pdf tool wins; with design focus it loses.
     assert.equal(p.noFocusTop, 'pdf/render_pdf', `without focus top was ${p.noFocusTop}`);
-    assert.equal(p.withFocusTop, 'browser-rendering/render_page', `with focus top was ${p.withFocusTop}`);
+    assert.equal(p.withFocusTop, 'browser-rendering/get_url_html_content', `with focus top was ${p.withFocusTop}`);
     assert.ok(p.reordered, 'focus should have reordered the winner');
   } finally {
     await aggregator.shutdown();
@@ -123,7 +123,7 @@ test('out-of-focus tools stay reachable via search (lens, not gate)', async () =
       'github tool unreachable under governance focus',
     );
     assert.ok(
-      await outOfFocusReachable(aggregator, 'headless', 'governance', 'browser-rendering/render_page'),
+      await outOfFocusReachable(aggregator, 'html content', 'governance', 'browser-rendering/get_url_html_content'),
       'browser-rendering tool unreachable under governance focus',
     );
     assert.ok(
@@ -132,7 +132,7 @@ test('out-of-focus tools stay reachable via search (lens, not gate)', async () =
     );
     // ops focus (covers ecosystem+code) — desktop/communication/documents tools still reachable
     assert.ok(
-      await outOfFocusReachable(aggregator, 'render page', 'ops', 'browser-rendering/render_page'),
+      await outOfFocusReachable(aggregator, 'html content', 'ops', 'browser-rendering/get_url_html_content'),
       'browser-rendering tool unreachable under ops focus',
     );
     assert.ok(

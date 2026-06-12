@@ -140,14 +140,15 @@ export const FIXTURE_TOOLS: Record<string, FixtureTool[]> = {
 
   // ── design / desktop ─────────────────────────────────────────
   'browser-rendering': [
-    { name: 'render_page', description: 'Render a web page to HTML or PDF via headless browser' },
-    { name: 'capture_screenshot', description: 'Capture a screenshot of a rendered web page or URL' },
+    { name: 'get_url_html_content', description: 'Get page HTML content' },
+    { name: 'get_url_markdown', description: 'Get page converted into Markdown' },
+    { name: 'get_url_screenshot', description: 'Get page screenshot' },
   ],
   playwright: [
     { name: 'navigate', description: 'Navigate a Playwright browser session to a URL' },
     { name: 'screenshot', description: 'Take a screenshot of the current Playwright page and save it' },
     { name: 'click', description: 'Click an element on the current Playwright page by selector' },
-    // near-miss: a playwright "render"-shaped tool to compete with browser-rendering/render_page
+    // near-miss: a playwright "render"-shaped tool to compete with browser-rendering/get_url_html_content
     { name: 'render_to_pdf', description: 'Render the current Playwright page to a PDF file' },
   ],
   cowork: [

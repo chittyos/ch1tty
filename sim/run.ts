@@ -63,11 +63,11 @@ async function main(): Promise<void> {
     stripeUnderCommunication: await outOfFocusReachable(aggregator, 'invoice', 'communication', 'stripe/create_invoice'),
     // governance focus — code/desktop/communication tools still reachable
     githubUnderGovernance: await outOfFocusReachable(aggregator, 'pull request', 'governance', 'github/create_pull_request'),
-    browserRenderingUnderGovernance: await outOfFocusReachable(aggregator, 'headless', 'governance', 'browser-rendering/render_page'),
+    browserRenderingUnderGovernance: await outOfFocusReachable(aggregator, 'html content', 'governance', 'browser-rendering/get_url_html_content'),
     imessageUnderGovernance: await outOfFocusReachable(aggregator, 'message', 'governance', 'imessage/send_message'),
     // ops focus (ecosystem+code) — communication/desktop/documents tools still reachable
     imessageUnderOps: await outOfFocusReachable(aggregator, 'message', 'ops', 'imessage/send_message'),
-    browserRenderingUnderOps: await outOfFocusReachable(aggregator, 'headless', 'ops', 'browser-rendering/render_page'),
+    browserRenderingUnderOps: await outOfFocusReachable(aggregator, 'html content', 'ops', 'browser-rendering/get_url_html_content'),
     notionUnderOps: await outOfFocusReachable(aggregator, 'page', 'ops', 'notion/create_page'),
   };
 

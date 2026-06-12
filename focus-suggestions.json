@@ -1158,14 +1158,14 @@
         {
           "name": "finance-browser-render-billing-page-brief",
           "chain": [
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "thinking/sequentialthinking",
             "fs/write_file",
             "notion/API-post-page"
           ],
           "accomplishes": "Render a billing or payment service page to extract full structured content, apply sequential reasoning to produce a concise financial brief, write the brief to a local file, then publish it as a Notion finance reference page \u2014 a 4-step render-to-brief pipeline.",
           "verified": true,
-          "notes": "FIRST browser-rendering/render_page in finance profile. All tools on confirmed-connected backends: browser-rendering (3 tools), thinking (1 tool), fs (14 tools), notion (22 tools). 2026-06-07 sixty-fourth-pass."
+          "notes": "FIRST browser-rendering/get_url_html_content in finance profile. All tools on confirmed-connected backends: browser-rendering (3 tools), thinking (1 tool), fs (14 tools), notion (22 tools). 2026-06-07 sixty-fourth-pass."
         },
         {
           "name": "finance-thirteen-step-billing-research-chain",
@@ -3177,7 +3177,7 @@
         {
           "name": "finance-screenshot-neonauth-balances-invoices",
           "chain": [
-            "browser-rendering/capture_screenshot",
+            "browser-rendering/get_url_screenshot",
             "neon/get_neon_auth_config",
             "orchestrator/agent_execute(finance,balances)",
             "stripe/list_invoices"
@@ -5795,14 +5795,14 @@
         {
           "name": "governance-browser-policy-render-evidence-sync",
           "chain": [
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "evidence/ai_search",
             "thinking/sequentialthinking",
             "notion/create_page"
           ],
           "accomplishes": "Render a governance or compliance policy page to extract its full text/HTML structure, cross-reference with the evidence base for related compliance context and historical precedent, apply sequential reasoning to identify gaps or conflicts, then document findings in a Notion policy-brief page \u2014 a fully automated policy-intelligence pipeline.",
           "verified": true,
-          "notes": "All tools on confirmed-connected servers (browser-rendering: 3 tools, evidence: 3 tools, thinking: 1 tool, notion: 22 tools). 2026-06-07 sixty-second-pass. FIRST browser-rendering/render_page in governance profile. Cast scores: browser-rendering/render_page (render/extract ~0.75), evidence/ai_search (search/reference ~0.75), thinking/sequentialthinking (reason/gaps ~0.50)."
+          "notes": "All tools on confirmed-connected servers (browser-rendering: 3 tools, evidence: 3 tools, thinking: 1 tool, notion: 22 tools). 2026-06-07 sixty-second-pass. FIRST browser-rendering/get_url_html_content in governance profile. Cast scores: browser-rendering/get_url_html_content (render/extract ~0.75), evidence/ai_search (search/reference ~0.75), thinking/sequentialthinking (reason/gaps ~0.50)."
         },
         {
           "name": "governance-playwright-audit-dashboard-doc",
@@ -5905,11 +5905,11 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page"
+            "browser-rendering/get_url_html_content"
           ],
           "accomplishes": "Extends the 15-step policy chain with a final rendered-page archive step \u2014 captures a browser-rendered version of the Notion page for a durable compliance record. Full 16-step governance pipeline: cast \u2192 agent \u2192 skill \u2192 evidence \u2192 library docs \u2192 reasoning \u2192 symbol audit \u2192 screenshot \u2192 local report \u2192 Notion page \u2192 block update \u2192 render archive.",
           "verified": true,
-          "notes": "FIRST 16-step chain in governance profile; max rises 15\u219216. Adds browser-rendering/render_page as step 16 to create a rendered snapshot of the final Notion governance page. All tools on confirmed-connected servers: ch1tty, orchestrator, evidence, context7, thinking/sequentialthinking, serena, playwright, fs, notion, browser-rendering."
+          "notes": "FIRST 16-step chain in governance profile; max rises 15\u219216. Adds browser-rendering/get_url_html_content as step 16 to create a rendered snapshot of the final Notion governance page. All tools on confirmed-connected servers: ch1tty, orchestrator, evidence, context7, thinking/sequentialthinking, serena, playwright, fs, notion, browser-rendering."
         },
         {
           "name": "governance-notion-search-retrieve-patch-cycle",
@@ -5942,7 +5942,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "fs/write_file"
           ],
           "accomplishes": "FIRST 17-step chain in governance: full policy audit pipeline concluding with fs/write_file to save rendered policy snapshot to disk",
@@ -6006,7 +6006,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "fs/write_file",
             "notion/API-retrieve-a-page"
           ],
@@ -6046,7 +6046,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "fs/write_file",
             "notion/API-retrieve-a-page",
             "neon/run_sql"
@@ -6085,7 +6085,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "fs/write_file",
             "notion/API-retrieve-a-page",
             "neon/run_sql",
@@ -6125,7 +6125,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "fs/write_file",
             "notion/API-retrieve-a-page",
             "neon/run_sql",
@@ -6166,7 +6166,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "fs/write_file",
             "notion/API-retrieve-a-page",
             "neon/run_sql",
@@ -6209,7 +6209,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "fs/write_file",
             "notion/API-retrieve-a-page",
             "neon/run_sql",
@@ -6251,7 +6251,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "fs/write_file",
             "notion/API-retrieve-a-page",
             "neon/run_sql",
@@ -6295,7 +6295,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "fs/write_file",
             "notion/API-retrieve-a-page",
             "neon/run_sql",
@@ -6370,7 +6370,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "fs/write_file",
             "notion/API-retrieve-a-page",
             "neon/run_sql",
@@ -6417,7 +6417,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "fs/write_file",
             "notion/API-retrieve-a-page",
             "neon/run_sql",
@@ -6463,7 +6463,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "fs/write_file",
             "notion/API-retrieve-a-page",
             "neon/run_sql",
@@ -6538,7 +6538,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "fs/write_file",
             "notion/API-retrieve-a-page",
             "neon/run_sql",
@@ -6587,7 +6587,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "fs/write_file",
             "notion/API-retrieve-a-page",
             "neon/run_sql",
@@ -7890,7 +7890,7 @@
         {
           "name": "governance-screenshot-neonauth-balances-notion",
           "chain": [
-            "browser-rendering/capture_screenshot",
+            "browser-rendering/get_url_screenshot",
             "neon/get_neon_auth_config",
             "orchestrator/agent_execute(finance,balances)",
             "notion/API-post-page"
@@ -10306,14 +10306,14 @@
         {
           "name": "design-browser-render-page-ux-archive",
           "chain": [
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "playwright/browser_take_screenshot",
             "fs/write_file",
             "notion/API-post-page"
           ],
           "accomplishes": "Render a live UI page to extract its full DOM and visual structure, immediately capture a browser screenshot of the same page for pixel-accurate visual reference, save both artifacts to a local archive directory, then publish a Notion design reference page embedding both the rendered markup and screenshot \u2014 a 4-step render-and-archive pipeline for design documentation.",
           "verified": true,
-          "notes": "FIRST browser-rendering/render_page in design profile. Pairs render_page (structure extraction) with playwright screenshot (visual capture) for dual-artifact design archiving. All tools on confirmed-connected backends: browser-rendering (3 tools), playwright (23 tools), fs (14 tools), notion (22 tools). 2026-06-07 sixty-fourth-pass."
+          "notes": "FIRST browser-rendering/get_url_html_content in design profile. Pairs get_url_html_content (structure extraction) with playwright screenshot (visual capture) for dual-artifact design archiving. All tools on confirmed-connected backends: browser-rendering (3 tools), playwright (23 tools), fs (14 tools), notion (22 tools). 2026-06-07 sixty-fourth-pass."
         },
         {
           "name": "design-fifteen-step-ux-full-chain",
@@ -10332,11 +10332,11 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page"
+            "browser-rendering/get_url_html_content"
           ],
-          "accomplishes": "Complete 15-step UX pipeline with a final render stage: intent resolution \u2192 skill discovery \u2192 skill execution \u2192 evidence list \u2192 evidence search \u2192 library ID resolution \u2192 library docs \u2192 sequential reasoning \u2192 symbol audit \u2192 screenshot capture \u2192 local spec \u2192 Notion design page \u2192 block update \u2192 rendered page output. Design joins the catalog's 15-step maximum, with browser-rendering/render_page as the final validation step \u2014 rendering the result page to confirm the design outcome.",
+          "accomplishes": "Complete 15-step UX pipeline with a final render stage: intent resolution \u2192 skill discovery \u2192 skill execution \u2192 evidence list \u2192 evidence search \u2192 library ID resolution \u2192 library docs \u2192 sequential reasoning \u2192 symbol audit \u2192 screenshot capture \u2192 local spec \u2192 Notion design page \u2192 block update \u2192 rendered page output. Design joins the catalog's 15-step maximum, with browser-rendering/get_url_html_content as the final validation step \u2014 rendering the result page to confirm the design outcome.",
           "verified": true,
-          "notes": "FIRST 15-step chain in design profile; max rises 14\u219215. Design now matches catalog record. Extends design-fourteen-step-ux-full-chain by adding browser-rendering/render_page as a final render-verification step. FIRST 15-step chain that includes browser-rendering as a terminal step. All tools on confirmed-connected servers."
+          "notes": "FIRST 15-step chain in design profile; max rises 14\u219215. Design now matches catalog record. Extends design-fourteen-step-ux-full-chain by adding browser-rendering/get_url_html_content as a final render-verification step. FIRST 15-step chain that includes browser-rendering as a terminal step. All tools on confirmed-connected servers."
         },
         {
           "name": "design-playwright-interaction-test-capture",
@@ -10368,12 +10368,12 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page"
           ],
           "accomplishes": "Extends the 15-step UX chain by adding Notion page retrieval as the final verification step \u2014 confirms the rendered page was persisted correctly. Full 16-step design pipeline: cast \u2192 agent + skill discovery \u2192 evidence \u2192 library docs \u2192 reasoning \u2192 symbol audit \u2192 screenshot \u2192 local report \u2192 Notion create \u2192 block update \u2192 browser render \u2192 page retrieve.",
           "verified": true,
-          "notes": "FIRST 16-step chain in design profile; max rises 15\u219216. Adds notion/API-retrieve-a-page as step 16 after browser-rendering/render_page (step 15). All tools on confirmed-connected servers: ch1tty, orchestrator, evidence, context7, thinking/sequentialthinking, serena, playwright, fs, notion, browser-rendering."
+          "notes": "FIRST 16-step chain in design profile; max rises 15\u219216. Adds notion/API-retrieve-a-page as step 16 after browser-rendering/get_url_html_content (step 15). All tools on confirmed-connected servers: ch1tty, orchestrator, evidence, context7, thinking/sequentialthinking, serena, playwright, fs, notion, browser-rendering."
         },
         {
           "name": "design-playwright-select-option-capture",
@@ -10405,7 +10405,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file"
           ],
@@ -10467,7 +10467,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "fs/read_file"
@@ -10506,7 +10506,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "fs/read_file",
@@ -10545,7 +10545,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "fs/read_file",
@@ -10584,7 +10584,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "fs/read_file",
@@ -10624,7 +10624,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "fs/read_file",
@@ -10668,7 +10668,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "fs/read_file",
@@ -10710,7 +10710,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "fs/read_file",
@@ -10754,7 +10754,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "fs/read_file",
@@ -10828,7 +10828,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "fs/read_file",
@@ -10875,7 +10875,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "fs/read_file",
@@ -10921,7 +10921,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "fs/read_file",
@@ -10996,7 +10996,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "fs/read_file",
@@ -11045,7 +11045,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "fs/read_file",
@@ -11460,7 +11460,7 @@
           "name": "design-asset-commit-and-preview",
           "chain": [
             "github/create_or_update_file",
-            "browser-rendering/render_page"
+            "browser-rendering/get_url_html_content"
           ],
           "accomplishes": "Commit a design config file or SVG asset to GitHub and render a browser preview of the updated page \u2014 closing the design \u2192 commit \u2192 visual-verify loop in a single chain.",
           "verified": false,
@@ -11470,7 +11470,7 @@
           "name": "network-intercept-design-data",
           "chain": [
             "playwright/browser_network_request",
-            "browser-rendering/render_page"
+            "browser-rendering/get_url_html_content"
           ],
           "accomplishes": "Intercept a network request carrying dynamic design data (e.g. a design-token API or a CMS content endpoint) and immediately render the page it feeds \u2014 useful for design QA of data-driven components.",
           "verified": false,
@@ -11510,7 +11510,7 @@
           "name": "design-sql-token-preview",
           "chain": [
             "neon/run_sql_transaction",
-            "browser-rendering/render_page"
+            "browser-rendering/get_url_html_content"
           ],
           "accomplishes": "Write updated design tokens or theme values to the database via a SQL transaction, then render the page to see the visual update live \u2014 closing the design-token \u2192 DB \u2192 preview loop.",
           "verified": false,
@@ -11520,7 +11520,7 @@
           "name": "file-info-design-asset-audit",
           "chain": [
             "fs/get_file_info",
-            "browser-rendering/render_page"
+            "browser-rendering/get_url_html_content"
           ],
           "accomplishes": "Inspect file metadata (size, modified date, MIME type) for a design asset, then render the associated page to verify the asset is serving correctly \u2014 a quick design-asset health check.",
           "verified": false,
@@ -11530,7 +11530,7 @@
           "name": "notion-block-to-design-render",
           "chain": [
             "notion/API-retrieve-a-block",
-            "browser-rendering/render_page"
+            "browser-rendering/get_url_html_content"
           ],
           "accomplishes": "Retrieve a design specification block from Notion (wireframe notes, color tokens, layout rules) and render the target page in the browser to compare implementation against the spec block.",
           "verified": false,
@@ -11563,7 +11563,7 @@
           "chain": [
             "serena/search_code",
             "playwright/browser_take_screenshot",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "fs/write_file"
           ],
           "accomplishes": "Search component implementation code with Serena, take a screenshot of the rendered component in Playwright, render the full page snapshot via browser-rendering for a pixel-accurate reference, and write the combined verification report to disk.",
@@ -12443,7 +12443,7 @@
             "neon/provision_neon_auth",
             "orchestrator/agent_execute(resolve,triage)",
             "orchestrator/agent_execute(imessage)",
-            "browser-rendering/capture_screenshot"
+            "browser-rendering/get_url_screenshot"
           ],
           "accomplishes": "Provision Neon auth for a design preview API, auto-triage any connectivity issues, screenshot the live preview, and message the screenshot link to the designer via iMessage.",
           "verified": false,
@@ -12455,7 +12455,7 @@
             "neon/delete_branch",
             "orchestrator/agent_execute(autobot,start)",
             "orchestrator/agent_execute(scrape,monitor)",
-            "browser-rendering/capture_screenshot"
+            "browser-rendering/get_url_screenshot"
           ],
           "accomplishes": "Tear down the Neon branch used for a design spike, trigger Autobot to clean up preview CDN assets, scrape-monitor the staging URL, and screenshot it to catch visual regressions post-cleanup.",
           "verified": false,
@@ -12488,7 +12488,7 @@
         {
           "name": "design-screenshot-neonauth-balances-url-render",
           "chain": [
-            "browser-rendering/capture_screenshot",
+            "browser-rendering/get_url_screenshot",
             "neon/get_neon_auth_config",
             "orchestrator/agent_execute(finance,balances)",
             "browser-rendering/get_url_screenshot"
@@ -12574,7 +12574,7 @@
           "chain": [
             "playwright/browser_run_code_unsafe",
             "orchestrator/agent_search(imessage message contact normalization)",
-            "browser-rendering/capture_screenshot",
+            "browser-rendering/get_url_screenshot",
             "context7/resolve-library-id"
           ],
           "accomplishes": "Execute browser code to run an interactive design prototype and capture live UI behavior, look up iMessage contact normalization to route design approval notifications to reviewers, take a screenshot of the final rendered component for design review, then look up the relevant component library docs for implementation reference.",
@@ -12599,7 +12599,7 @@
             "orchestrator/skill_search(financial-reporting)",
             "orchestrator/skill_search(domain-knowledge)",
             "orchestrator/skill_search(recommendation-engine)",
-            "browser-rendering/capture_screenshot"
+            "browser-rendering/get_url_screenshot"
           ],
           "accomplishes": "Search for financial reporting skills to generate the design system cost and resource utilization report, surface domain knowledge skills to pull design standards and brand guidelines, find recommendation engine skills for AI-driven design optimization suggestions, then capture a browser screenshot to verify the current visual state of the design system.",
           "verified": false,
@@ -15216,14 +15216,14 @@
         {
           "name": "code-browser-render-page-docs-verify",
           "chain": [
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "context7/query-docs",
             "thinking/sequentialthinking",
             "fs/write_file"
           ],
           "accomplishes": "Render a live documentation or API reference page to extract its full structured content, query the library documentation index for the same library to cross-reference with the live page, apply sequential reasoning to identify discrepancies, outdated sections, or implementation gaps, then write a verified documentation summary to a local file \u2014 a 4-step render-and-verify docs pipeline.",
           "verified": true,
-          "notes": "FIRST browser-rendering/render_page in code profile. Combines live page rendering with context7 library docs for cross-reference verification. All tools on confirmed-connected backends: browser-rendering (3 tools), context7 (2 tools), thinking (1 tool), fs (14 tools). 2026-06-07 sixty-fourth-pass."
+          "notes": "FIRST browser-rendering/get_url_html_content in code profile. Combines live page rendering with context7 library docs for cross-reference verification. All tools on confirmed-connected backends: browser-rendering (3 tools), context7 (2 tools), thinking (1 tool), fs (14 tools). 2026-06-07 sixty-fourth-pass."
         },
         {
           "name": "code-sixteen-step-impl-deploy-archive-chain",
@@ -15243,11 +15243,11 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page"
+            "browser-rendering/get_url_html_content"
           ],
           "accomplishes": "Extends the 15-step impl+deploy chain by adding a final browser-rendered archive of the Notion deploy page. Full 16-step code pipeline: cast \u2192 agent discovery + execution \u2192 skill discovery + execution \u2192 evidence \u2192 library docs \u2192 reasoning \u2192 symbol audit \u2192 screenshot \u2192 local report \u2192 Notion page \u2192 block update \u2192 browser render archive.",
           "verified": true,
-          "notes": "FIRST 16-step chain in code profile; max rises 15\u219216. Adds browser-rendering/render_page as step 16 to archive the Notion deployment page as a rendered snapshot. All tools on confirmed-connected servers: ch1tty, orchestrator, evidence, context7, thinking/sequentialthinking, serena, playwright, fs, notion, browser-rendering."
+          "notes": "FIRST 16-step chain in code profile; max rises 15\u219216. Adds browser-rendering/get_url_html_content as step 16 to archive the Notion deployment page as a rendered snapshot. All tools on confirmed-connected servers: ch1tty, orchestrator, evidence, context7, thinking/sequentialthinking, serena, playwright, fs, notion, browser-rendering."
         },
         {
           "name": "code-html-symbol-library-docs-pipeline",
@@ -15281,7 +15281,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page"
           ],
           "accomplishes": "FIRST 17-step chain in code: full implementation and deploy pipeline \u2014 cast through render then retrieve the published Notion doc to confirm archival",
@@ -15345,7 +15345,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file"
           ],
@@ -15384,7 +15384,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "neon/list_slow_queries"
@@ -15424,7 +15424,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "neon/list_slow_queries",
@@ -15464,7 +15464,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "neon/list_slow_queries",
@@ -15504,7 +15504,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "neon/list_slow_queries",
@@ -15548,7 +15548,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "neon/list_slow_queries",
@@ -15592,7 +15592,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "neon/list_slow_queries",
@@ -15636,7 +15636,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "neon/list_slow_queries",
@@ -15706,7 +15706,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "neon/list_slow_queries",
@@ -15754,7 +15754,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "neon/list_slow_queries",
@@ -15800,7 +15800,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "neon/list_slow_queries",
@@ -15875,7 +15875,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "neon/list_slow_queries",
@@ -15924,7 +15924,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "neon/list_slow_queries",
@@ -17265,7 +17265,7 @@
         {
           "name": "code-screenshot-neonauth-balances-build",
           "chain": [
-            "browser-rendering/capture_screenshot",
+            "browser-rendering/get_url_screenshot",
             "neon/get_neon_auth_config",
             "orchestrator/agent_execute(finance,balances)",
             "cloudflare-builds/workers_builds_get_build"
@@ -19693,14 +19693,14 @@
         {
           "name": "comm-browser-render-broadcast-publish",
           "chain": [
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "thinking/sequentialthinking",
             "fs/write_file",
             "notion/API-post-page"
           ],
           "accomplishes": "Render a live communication channel or broadcast platform page to extract its full structured content and current message layout, apply sequential reasoning to summarize the broadcast state and identify communication gaps or opportunities, write a broadcast analysis to a local file, then publish the communication brief as a Notion page \u2014 a 4-step render-to-publish broadcast pipeline.",
           "verified": true,
-          "notes": "FIRST browser-rendering/render_page in communication profile. All tools on confirmed-connected backends: browser-rendering (3 tools), thinking (1 tool), fs (14 tools), notion (22 tools). 2026-06-07 sixty-fourth-pass."
+          "notes": "FIRST browser-rendering/get_url_html_content in communication profile. All tools on confirmed-connected backends: browser-rendering (3 tools), thinking (1 tool), fs (14 tools), notion (22 tools). 2026-06-07 sixty-fourth-pass."
         },
         {
           "name": "comm-fifteen-step-broadcast-full-chain",
@@ -19756,11 +19756,11 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page"
+            "browser-rendering/get_url_html_content"
           ],
           "accomplishes": "Extends the 15-step broadcast chain by adding a browser-rendered archive of the Notion communication page. Full 16-step communication pipeline: cast \u2192 agent discovery + execution \u2192 skill discovery + execution \u2192 evidence \u2192 library docs \u2192 reasoning \u2192 symbol audit \u2192 screenshot \u2192 local report \u2192 Notion page \u2192 block update \u2192 browser render archive.",
           "verified": true,
-          "notes": "FIRST 16-step chain in communication profile; max rises 15\u219216. Adds browser-rendering/render_page as step 16 to capture a rendered snapshot of the Notion broadcast page. All tools on confirmed-connected servers: ch1tty, orchestrator, evidence, context7, thinking/sequentialthinking, serena, playwright, fs, notion, browser-rendering."
+          "notes": "FIRST 16-step chain in communication profile; max rises 15\u219216. Adds browser-rendering/get_url_html_content as step 16 to capture a rendered snapshot of the Notion broadcast page. All tools on confirmed-connected servers: ch1tty, orchestrator, evidence, context7, thinking/sequentialthinking, serena, playwright, fs, notion, browser-rendering."
         },
         {
           "name": "comm-connect-agent-evidence-brief",
@@ -19793,7 +19793,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page"
           ],
           "accomplishes": "FIRST 17-step chain in communication: full broadcast pipeline \u2014 cast through render then retrieve published Notion content to confirm dispatch",
@@ -19853,7 +19853,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file"
           ],
@@ -19892,7 +19892,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "neon/run_sql"
@@ -19931,7 +19931,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "neon/run_sql",
@@ -19970,7 +19970,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "neon/run_sql",
@@ -20010,7 +20010,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "neon/run_sql",
@@ -20054,7 +20054,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "neon/run_sql",
@@ -20096,7 +20096,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "neon/run_sql",
@@ -20140,7 +20140,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "neon/run_sql",
@@ -20211,7 +20211,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "neon/run_sql",
@@ -20257,7 +20257,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "neon/run_sql",
@@ -20303,7 +20303,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "neon/run_sql",
@@ -20376,7 +20376,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "neon/run_sql",
@@ -20425,7 +20425,7 @@
             "fs/write_file",
             "notion/API-post-page",
             "notion/API-update-a-block",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-retrieve-a-page",
             "fs/write_file",
             "neon/run_sql",
@@ -20450,13 +20450,13 @@
           "chain": [
             "evidence/ai_search",
             "neon/run_sql",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "notion/API-post-page",
             "quality/analyze"
           ],
           "accomplishes": "Search communication evidence for prior broadcast patterns, query Neon for audience/metrics data, render a full HTML preview of the broadcast output via browser-rendering, post the finalized broadcast plan to Notion, then quality-analyze the communication \u2014 a fully verified multi-backend broadcast audit trace.",
           "verified": true,
-          "notes": "All 5 tools from live connected backends: evidence (remote, verified), neon/run_sql (local, verified), browser-rendering/render_page (remote, verified in many combos), notion (local, verified), quality (local, verified). No auth-gated tools. Adds browser-rendering depth to communication profile."
+          "notes": "All 5 tools from live connected backends: evidence (remote, verified), neon/run_sql (local, verified), browser-rendering/get_url_html_content (remote, verified in many combos), notion (local, verified), quality (local, verified). No auth-gated tools. Adds browser-rendering depth to communication profile."
         },
         {
           "name": "comm-github-issue-broadcast-notion",
@@ -21836,7 +21836,7 @@
         {
           "name": "comm-screenshot-neonauth-balances-sequential",
           "chain": [
-            "browser-rendering/capture_screenshot",
+            "browser-rendering/get_url_screenshot",
             "neon/get_neon_auth_config",
             "orchestrator/agent_execute(finance,balances)",
             "thinking/sequentialthinking"
@@ -21923,7 +21923,7 @@
             "orchestrator/skill_search(frontend design UI web component interface)",
             "playwright/browser_run_code_unsafe",
             "thinking/sequentialthinking",
-            "browser-rendering/capture_screenshot"
+            "browser-rendering/get_url_screenshot"
           ],
           "accomplishes": "Search for frontend design components for messaging UIs (inbox, notification center, chat widget), run browser code to test the communication component in a live environment, reason through accessibility and UX sequencing for the messaging flow, then capture a screenshot of the messaging UI for stakeholder review.",
           "verified": false,
@@ -24490,14 +24490,14 @@
         {
           "name": "ops-browser-render-incident-visual",
           "chain": [
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "evidence/ai_search",
             "thinking/sequentialthinking",
             "notion/API-post-page"
           ],
           "accomplishes": "Render a live monitoring dashboard, status page, or incident-tracking page to extract its full current state, cross-reference with the evidence store for prior incident patterns and historical context, apply sequential reasoning to synthesize a concise incident brief, then publish the visual incident report directly to a Notion ops page \u2014 a 4-step render-to-incident-report pipeline.",
           "verified": true,
-          "notes": "FIRST browser-rendering/render_page in ops profile. All tools on confirmed-connected backends: browser-rendering (3 tools), evidence (3 tools), thinking (1 tool), notion (22 tools). 2026-06-07 sixty-fourth-pass."
+          "notes": "FIRST browser-rendering/get_url_html_content in ops profile. All tools on confirmed-connected backends: browser-rendering (3 tools), evidence (3 tools), thinking (1 tool), notion (22 tools). 2026-06-07 sixty-fourth-pass."
         },
         {
           "name": "ops-thirteen-step-incident-serena-chain",
@@ -24697,11 +24697,11 @@
             "notion/API-update-a-block",
             "notion/API-retrieve-a-page",
             "fs/write_file",
-            "browser-rendering/render_page"
+            "browser-rendering/get_url_html_content"
           ],
           "accomplishes": "Complete incident ops mega-pipeline: cast \u2192 discover agents + skills \u2192 evidence search \u2192 ops/infra docs \u2192 reasoning \u2192 codebase scan \u2192 screenshot \u2192 write file \u2192 create Notion page \u2192 update block \u2192 retrieve page \u2192 write incident report \u2192 render the final report as HTML. First 18-step chain in ops.",
           "verified": true,
-          "notes": "Extends ops-seventeen-step-incident-chain by appending browser-rendering/render_page as step 18. All 17 prior steps verified from parent combo."
+          "notes": "Extends ops-seventeen-step-incident-chain by appending browser-rendering/get_url_html_content as step 18. All 17 prior steps verified from parent combo."
         },
         {
           "name": "ops-session-create-tasks-incident-resolve",
@@ -24737,7 +24737,7 @@
             "notion/API-update-a-block",
             "notion/API-retrieve-a-page",
             "fs/write_file",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "neon/list_slow_queries"
           ],
           "accomplishes": "Comprehensive 19-step incident pipeline: orchestrate agents through the full ops workflow \u2014 evidence search for prior incidents, runbook docs, sequential root-cause analysis, browser screenshots, filesystem writes, Notion publishing with block updates, report retrieval, final postmortem write, live browser render for sharing, and a Neon slow-query audit to detect any database-layer contributing factors \u2014 FIRST 19-step chain in ops.",
@@ -24776,7 +24776,7 @@
             "notion/API-update-a-block",
             "notion/API-retrieve-a-page",
             "fs/write_file",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "neon/list_slow_queries",
             "playwright/browser_navigate_back"
           ],
@@ -24816,7 +24816,7 @@
             "notion/API-update-a-block",
             "notion/API-retrieve-a-page",
             "fs/write_file",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "neon/list_slow_queries",
             "playwright/browser_navigate_back",
             "thinking/sequentialthinking"
@@ -24856,7 +24856,7 @@
             "notion/API-update-a-block",
             "notion/API-retrieve-a-page",
             "fs/write_file",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "neon/list_slow_queries",
             "playwright/browser_navigate_back",
             "thinking/sequentialthinking",
@@ -24900,7 +24900,7 @@
             "notion/API-update-a-block",
             "notion/API-retrieve-a-page",
             "fs/write_file",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "neon/list_slow_queries",
             "playwright/browser_navigate_back",
             "thinking/sequentialthinking",
@@ -24943,7 +24943,7 @@
             "notion/API-update-a-block",
             "notion/API-retrieve-a-page",
             "fs/write_file",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "neon/list_slow_queries",
             "playwright/browser_navigate_back",
             "thinking/sequentialthinking",
@@ -24988,7 +24988,7 @@
             "notion/API-update-a-block",
             "notion/API-retrieve-a-page",
             "fs/write_file",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "neon/list_slow_queries",
             "playwright/browser_navigate_back",
             "thinking/sequentialthinking",
@@ -25059,7 +25059,7 @@
             "notion/API-update-a-block",
             "notion/API-retrieve-a-page",
             "fs/write_file",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "neon/list_slow_queries",
             "playwright/browser_navigate_back",
             "thinking/sequentialthinking",
@@ -25105,7 +25105,7 @@
             "notion/API-update-a-block",
             "notion/API-retrieve-a-page",
             "fs/write_file",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "neon/list_slow_queries",
             "playwright/browser_navigate_back",
             "thinking/sequentialthinking",
@@ -25151,7 +25151,7 @@
             "notion/API-update-a-block",
             "notion/API-retrieve-a-page",
             "fs/write_file",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "neon/list_slow_queries",
             "playwright/browser_navigate_back",
             "thinking/sequentialthinking",
@@ -25199,7 +25199,7 @@
             "notion/API-update-a-block",
             "notion/API-retrieve-a-page",
             "fs/write_file",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "neon/list_slow_queries",
             "playwright/browser_navigate_back",
             "thinking/sequentialthinking",
@@ -25249,7 +25249,7 @@
             "notion/API-update-a-block",
             "notion/API-retrieve-a-page",
             "fs/write_file",
-            "browser-rendering/render_page",
+            "browser-rendering/get_url_html_content",
             "neon/list_slow_queries",
             "playwright/browser_navigate_back",
             "thinking/sequentialthinking",
@@ -26526,7 +26526,7 @@
         {
           "name": "ops-screenshot-neonauth-balances-incident",
           "chain": [
-            "browser-rendering/capture_screenshot",
+            "browser-rendering/get_url_screenshot",
             "neon/get_neon_auth_config",
             "orchestrator/agent_execute(finance,balances)",
             "orchestrator/skill_search(incident-responder)"
