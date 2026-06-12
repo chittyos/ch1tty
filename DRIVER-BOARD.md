@@ -11,7 +11,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **E. Alchemist brainstorm** — `focus-suggestions.json` suggestions catalog COMPLETE. 1750 combos, 1759 prompts across 6 profiles (154th pass); **372/372 tools at 6/6 — 100% complete coverage**. DONE (run 91, 2026-06-12).
 - [x] **F. Cast miss-path focus suggestions** — `cast: no_match` and `cast: discovered` now surface catalog suggestions when focus is active. PR #365 MERGED. DONE (run 92, 2026-06-12).
 - [x] **G. Search focus suggestions** — `ch1tty/search` now includes ranked catalog suggestions (combos + prompts) alongside tool results when focus is active and a query is present. PR #368 ✅ MERGED (run 93, 2026-06-12). 5 new tests, 945/0/2. DONE.
-- [ ] **H. resolvedFromCatalog on cast: executed/plan** — When the resolved tool is chain[0] of a curated catalog combo in the active focus, the cast response includes `resolvedFromCatalog: { name, chain, accomplishes }`. PR #370 (run 94, 2026-06-12). 7 new tests, 952/0/2. IN PROGRESS.
+- [x] **H. resolvedFromCatalog on cast: executed/plan** — When the resolved tool is chain[0] of a curated catalog combo in the active focus, the cast response includes `resolvedFromCatalog: { name, chain, accomplishes }`. PR #370 ✅ MERGED (run 94, 2026-06-12). 7 new tests, 952/0/2. DONE.
 
 ## Live Gateway State (as of 2026-06-12)
 
