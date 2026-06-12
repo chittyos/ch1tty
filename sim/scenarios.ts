@@ -357,6 +357,20 @@ export const SCENARIOS: Scenario[] = [
     expect: 'cloudflare-builds/workers_builds_get_build_logs',
     note: 'near-misses: cloudflare/get_worker_logs (logs+worker+cloudflare but "build logs" not "worker logs"), cloudflare-builds/workers_builds_get_build (get+build but not logs+failed+diagnose+errors).',
   },
+  {
+    id: 'ops.list-account-workers',
+    focus: 'ops',
+    intent: 'list all workers in the cloudflare account to find the worker id for the builds pipeline',
+    expect: 'cloudflare-builds/workers_list',
+    note: 'near-miss: cloudflare/list_workers (list+workers but "account"+"builds"+"pipeline" discriminate toward cloudflare-builds/workers_list)',
+  },
+  {
+    id: 'ops.get-worker-source-code',
+    focus: 'ops',
+    intent: 'get the source code of the worker script for code review and audit',
+    expect: 'cloudflare-builds/workers_get_worker_code',
+    note: 'near-miss: cloudflare-builds/workers_get_worker (same server; "source code"+"review"+"audit" uniquely scores workers_get_worker_code)',
+  },
 
   // ── governance follow-up scenarios ───────────────────────────
   {
