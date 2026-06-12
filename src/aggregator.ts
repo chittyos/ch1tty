@@ -846,6 +846,12 @@ export class Aggregator {
     // No matches across any surface
     let resolvedBy: 'brain' | 'keyword' = castRoute === 'brain' ? 'brain' : 'keyword';
 
+    // Compute catalog suggestions early — needed on all three paths (no_match,
+    // discovered, executed/plan) so miss responses can still surface relevant chains.
+    const focusSuggestions = focusName
+      ? getSuggestionsForFocus(focusName, this.suggestionsCatalog, { intent })
+      : null;
+
     if (scoredTools.length === 0 && scoredPrompts.length === 0 && scoredResources.length === 0) {
       return {
         content: [{
@@ -854,6 +860,7 @@ export class Aggregator {
             cast: 'no_match',
             resolvedBy,
             intent,
+            ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
             hint: 'No tools, prompts, or resources matched your intent. Try ch1tty/search with different keywords.',
           }, null, 2),
         }],
@@ -904,14 +911,11 @@ export class Aggregator {
             intent,
             hint: 'No executable tools matched, but related prompts/resources found.',
             ...related,
+            ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
           }, null, 2),
         }],
       };
     }
-
-    const focusSuggestions = focusName
-      ? getSuggestionsForFocus(focusName, this.suggestionsCatalog, { intent })
-      : null;
 
     // Step 2: Confirm mode — return the plan without executing
     if (confirm) {
