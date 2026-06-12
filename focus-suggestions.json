@@ -8389,9 +8389,10 @@
             "orchestrator/skill_search(agents-sdk-migrate)",
             "orchestrator/agent_search(autobot feature workflow sovereignty canonical)",
             "orchestrator/agent_search(resolve)",
-            "context7/resolve-library-id"
+            "context7/resolve-library-id",
+            "context7/query-docs"
           ],
-          "accomplishes": "Search for agents SDK migration skills required for governance workflow compliance, consult autobot for canonical sovereignty and workflow governance patterns, resolve any migration blockers with the triage agent, then look up library documentation to verify governance API compatibility.",
+          "accomplishes": "Search for agents SDK migration skills required for governance workflow compliance, consult autobot for canonical sovereignty and workflow governance patterns, resolve any migration blockers with the triage agent, then resolve the library ID and query context7 documentation to verify governance API compatibility.",
           "verified": false,
           "notes": "150th pass Set B code→governance. Covers agents-sdk-migrate, autobot, resolve in governance profile."
         }
@@ -18110,9 +18111,9 @@
             "orchestrator/skill_execute(chittycommand-alpha:data-ingestion)",
             "orchestrator/agent_search(autobot feature workflow sovereignty canonical)",
             "orchestrator/skill_search(agents-sdk-migrate)",
-            "cloudflare-builds/workers_builds_get_build_logs"
+            "cloudflare-builds/workers_builds_list_builds"
           ],
-          "accomplishes": "Run data ingestion to pull repository metrics into the code pipeline, consult autobot for canonical workflow and sovereignty patterns applicable to the codebase, search for agents SDK migration skills to plan the upgrade path, then pull Cloudflare build logs to verify the post-migration build succeeded.",
+          "accomplishes": "Run data ingestion to pull repository metrics into the code pipeline, consult autobot for canonical workflow and sovereignty patterns applicable to the codebase, search for agents SDK migration skills to plan the upgrade path, then list recent Cloudflare Worker builds to confirm the post-migration deployment state.",
           "verified": false,
           "notes": "150th pass Set A ops→code (data-ingestion) + Set B code bonus. Covers data-ingestion, autobot, agents-sdk-migrate in code profile."
         }
@@ -28912,7 +28913,7 @@
           "resolves_to": "ops-sdk-migrate-resolve-deployments"
         },
         {
-          "text": "Consult autobot for canonical ops patterns, ingest pipeline metrics, run the recommendation engine for next automation steps, then trigger the Cloudflare build",
+          "text": "Consult autobot for canonical ops patterns, ingest pipeline metrics, run the recommendation engine for next automation steps, then list recent builds to confirm deployment state",
           "resolves_to": "ops-autobot-ingest-recommend-pipeline"
         }
       ]
