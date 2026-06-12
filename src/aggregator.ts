@@ -28,6 +28,7 @@ import {
   loadSuggestionsCatalog,
   clearSuggestionsCache,
   getSuggestionsForFocus,
+  findCatalogCombo,
   resolveSuggestionsCatalogPath,
 } from './suggestions.js';
 import type { FocusSuggestions } from './suggestions.js';
@@ -924,6 +925,11 @@ export class Aggregator {
       };
     }
 
+    // Check if the resolved tool is the entry-point of a curated catalog combo.
+    const catalogCombo = focusName
+      ? findCatalogCombo(best.namespacedName, focusName, this.suggestionsCatalog)
+      : null;
+
     // Step 2: Confirm mode — return the plan without executing
     if (confirm) {
       return {
@@ -942,6 +948,7 @@ export class Aggregator {
               score: best.score,
               inputSchema: best.inputSchema,
             },
+            ...(catalogCombo ? { resolvedFromCatalog: { name: catalogCombo.name, chain: catalogCombo.chain, accomplishes: catalogCombo.accomplishes } } : {}),
             alternatives,
             ...related,
             ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
@@ -970,6 +977,7 @@ export class Aggregator {
             ...(focusName ? { focus: focusName } : {}),
             resolved: best.namespacedName,
             score: best.score,
+            ...(catalogCombo ? { resolvedFromCatalog: { name: catalogCombo.name, chain: catalogCombo.chain, accomplishes: catalogCombo.accomplishes } } : {}),
             ...(alternatives.length > 0 ? { alternatives } : {}),
             ...related,
             ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
