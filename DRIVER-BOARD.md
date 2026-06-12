@@ -27,6 +27,33 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 
 ---
 
+### Run 92 — 2026-06-12 (auto-driver)
+
+**Workstream advanced**: F (new — cast miss-path focus suggestions fix)
+**Branch/PR**: `auto/F-cast-nomatch-focus-suggestions` → https://github.com/chittyos/ch1tty/pull/365 (awaiting CodeRabbit review + manual merge; CI known-broken 0-jobs infra issue)
+**Build**: clean (0 errors)
+**Tests**: 940 pass, 0 fail, 2 skipped (942 total, 45 suites) — +2 new tests
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 940/0/2.
+- One open PR: #362 (stale board update, conflicts with main — closed as superseded).
+- All workstreams A–E confirmed done. Chose new Workstream F: fix real behavioural gap in `cast` miss paths.
+- **Root cause found**: `focusSuggestions` in `aggregator.ts` was computed at line 912, AFTER the `no_match` (line 849) and `discovered` (line 897) early-return branches. Both miss paths silently dropped catalog suggestions even when a focus lens was active — making the catalog invisible exactly when a user would benefit most (when tool resolution fails).
+- **Fix**: moved `focusSuggestions` computation before the first early return; added `...(focusSuggestions ? { suggestions: focusSuggestions } : {})` to both `no_match` and `discovered` responses.
+- **Tests**: added 2 new tests in `test/cast-no-match.test.ts`:
+  - `cast: no_match with active focus includes catalog suggestions`
+  - `cast: discovered with active focus includes catalog suggestions`
+- PR #365 opened. CodeRabbit reviewing. CI failed with 0 jobs (known org-level infra issue). Codex bot hit usage limit (informational only).
+- PR #362 closed (stale, merge conflicts, content already in board).
+
+**Next run priority**:
+- Merge PR #365 once CodeRabbit review is complete (or merge manually after confirming no actionable findings).
+- All 5 original workstreams (A–E) remain DONE. Workstream F (cast miss-path suggestions) is the new active workstream.
+- CI blocker still active: human must investigate GitHub Actions settings for `chittyos` org.
+- Consider: (1) `ch1tty/search` returning focus suggestions when focus is active (currently only `cast` does); (2) adding `resolvedFromCatalog` flag to `cast: executed` when the executed chain matches a catalog combo.
+
+---
+
 ### Run 91 — 2026-06-12 (auto-driver)
 
 **Workstream advanced**: E (catalog — 154th pass, FINAL — 5 tools → 6/6, 100% complete coverage)
