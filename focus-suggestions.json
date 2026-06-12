@@ -17414,7 +17414,7 @@
             "context7/get-library-docs",
             "neon/run_sql"
           ],
-          "accomplishes": "Locate finance-connected Neon data agents, surface docket rules, inspect the Worker source for compliance, pull relevant library docs from context7, and run the validation SQL query.",
+          "accomplishes": "Locate finance-connected Neon data agents, surface docket rules, inspect the Worker configuration and metadata for compliance scope, pull relevant library docs from context7, and run the validation SQL query.",
           "verified": false,
           "notes": "144th pass: T1+T2+B3(code hit for workers_get_worker)."
         },
