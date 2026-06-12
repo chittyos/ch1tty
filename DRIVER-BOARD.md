@@ -10,7 +10,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **D. Scenario testing + simulation** — `test/scenario.test.ts` (1157 lines), `test/simulation.test.ts` (229 lines), `sim/scenarios.ts` harness driving real Aggregator over FixtureBackends. All 6 focus profiles covered. All tests pass. DONE.
 - [ ] **E. Alchemist brainstorm** — `focus-suggestions.json` suggestions catalog, actively growing. See run log below for current pass number.
 
-## Live Gateway State (as of 2026-06-11)
+## Live Gateway State (as of 2026-06-12)
 
 - Connected backends: cloudflare-builds (7 tools), evidence (3), browser-rendering (3), context7 (2), thinking (1), fs (14), playwright (23), orchestrator (13) — 66 total tools
 - Not connected: chittyos, cloudflare, GitHub, linear, notion, stripe, neon (lazy, auth-gated)
@@ -23,6 +23,32 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 72 — 2026-06-12 (auto-driver)
+
+**Workstream advanced**: E (Alchemist catalog — 134th pass)
+**Branch/PR**: `auto/E-catalog-134th-pass` → https://github.com/chittyos/ch1tty/pull/333
+**Build**: clean (0 errors)
+**Tests**: 938 pass, 0 fail, 2 skipped (940 total, 45 suites)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 938/0/2. No open PRs. Main at acb7697 (1486 combos / 257 tools at 6/6, 133rd pass).
+- Coverage analysis: 117 tools at 1/6; bimodal distribution (no tools at 2-5/6). Selected 6 high-value targets clustered by missing-profile overlap for efficient combo routing.
+- 134th pass: 12 combos (2/profile) + 12 prompts advancing 6 tools from 1/6 → 6/6:
+  - `playwright/screenshot` ✅ (design→all)
+  - `playwright/browser_select_option` ✅ (design→all)
+  - `neon/list_branch_computes` ✅ (design→all)
+  - `neon/create_project` ✅ (design→all)
+  - `orchestrator/agent_execute(cloudflare,status)` ✅ (ops→all) — confirmed: orchestrator routing works
+  - `orchestrator/skill_execute(workflow:ship)` ✅ (ops→all) — confirmed: returns local skill instructions
+- Fixed prompt format bug (initial draft used `prompt`+`focus` fields; test requires `text`+`resolves_to`).
+- 6/6 count: 257 → 263. 1/6 count: 117 → 111. Total: 1498 combos / 1519 prompts.
+
+**Next run priority**:
+- Merge PR #333 when CI green
+- 135th pass: `orchestrator/chittyagent-storage` + `orchestrator/agent_execute(ops)` (both ops 1/6, same 5 missing profiles) → 2 tools to 6/6 in 5 shared combos. Also: `orchestrator/chittyagent-dispute` + `orchestrator/chittyagent-chatgpt` (both communication 1/6).
 
 ---
 
