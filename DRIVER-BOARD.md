@@ -27,6 +27,24 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 
 ---
 
+### Run 82 — 2026-06-12 (auto-driver)
+
+**Workstream advanced**: E (catalog accuracy — Codex P2 fixes + browser-rendering alignment)
+**Branch/PRs**: `auto/E-cloudflare-builds-fixture-scenarios` (Codex fixes) → #347 merged; `auto/E-browser-rendering-tool-names` → #349 merged
+**Build**: clean (0 errors)
+**Tests**: 938 pass, 0 fail, 2 skipped (940 total, 45 suites)
+
+**What was done**:
+- Addressed Codex P2 findings on PR #347: two combos still advertised build cancellation after the bulk `workers_builds_cancel` replacement. Fixed `finance-neon-query-build-cancel-report` (removed cancel claim) and `finance-billing-build-config-audit` (chain swapped to `workers_get_worker`, accomplishes updated to match actual tool capabilities). PR #347 merged.
+- Identified and fixed browser-rendering tool name drift: live gateway exposes `get_url_html_content`, `get_url_markdown`, `get_url_screenshot` (not the stale `render_page`/`capture_screenshot` in fixture+catalog). Fixed: 3 new tools in fixture, 5 redesigned scenarios with keyword-score-verified intents, 2 test assertions updated, 112 catalog occurrences replaced. PR #349 merged.
+- Post-merge: found `browser-rendering/render-pdf` (hyphen, 18 combos) also missed by the mass replace — not a live tool. Replaced with `playwright/render_to_pdf` (connected, actually renders to PDF).
+- Coverage: 1630 combos, 554 verified / 319 at 6/6 / 55 at 1/6.
+
+**Next run priority**:
+- 145th pass: target 6 from remaining 55 at 1/6. Suggested Set A (finance/governance/ops): `orchestrator/agent_search(finance mercury banking cash flow)`, `orchestrator/skill_search(chittyos-compliance)`, `orchestrator/skill_search(machine-management)`. Set B (code/communication/ops): `orchestrator/skill_execute(feature-dev:feature-dev)`, `orchestrator/skill_search(discord telegram connector integration message channel)`, `orchestrator/skill_execute(chittyos-core:chitty-cleanup)`.
+
+---
+
 ### Run 81 — 2026-06-12 (auto-driver)
 
 **Workstream advanced**: E (Alchemist catalog — 144th pass)

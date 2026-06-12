@@ -1,6 +1,6 @@
 {
   "_comment": "Ch1tty focus-based suggestions catalog. 1642 combos, 1663 prompts across 6 focus profiles.",
-  "generatedFrom": "auto-driver run 80, 2026-06-12",
+  "generatedFrom": "auto-driver run 82, 2026-06-12",
   "profiles": {
     "finance": {
       "description": "Billing, payments, and financial ecosystem tools — now extended with the append-only ChittyLedger (ledger-mcp) and ChittyAgent Tasks (tasks-mcp) for immutable audit trails and billing workflow tracking. NOTE: stripe, tasks, and ledger backends were NOT connected on the live gateway at generation time — combos involving them are verified:false. Stripe tool names follow the @stripe/mcp surface and are plausible but unverified.",
@@ -1664,22 +1664,20 @@
             "playwright/browser_console_messages",
             "orchestrator/skill_execute(chittyos-core:new-session)",
             "orchestrator/skill_execute(chittyos-devops:chitty-health)",
-            "browser-rendering/render-pdf"
+            "playwright/render_to_pdf"
           ],
-          "accomplishes": "Full 25-step billing intelligence pipeline: cast → orchestrator → evidence → context7 → neon schema inspection → thinking synthesis → playwright automation → fs write → notion artifact → neon slow query audit → playwright console trace → session lifecycle checkpoint → chitty health → **render-pdf billing report** — FIRST 25-step chain in catalog, FIRST browser-rendering/render-pdf in finance.",
-          "verified": true,
-          "notes": "Extends the verified 24-step finance apex with browser-rendering/render-pdf as the final archival step. render-pdf generates a printable billing report from the session output. Verified: browser-rendering connected."
+          "accomplishes": "Full 25-step billing intelligence pipeline: cast \u2192 orchestrator \u2192 evidence \u2192 context7 \u2192 neon schema inspection \u2192 thinking synthesis \u2192 playwright automation \u2192 fs write \u2192 notion artifact \u2192 neon slow query audit \u2192 playwright console trace \u2192 session lifecycle checkpoint \u2192 chitty health \u2192 **render-pdf billing report** \u2014 FIRST 25-step chain in catalog, FIRST playwright/render_to_pdf in finance.",          "verified": true,
+          "notes": "Extends the verified 24-step finance apex with playwright/render_to_pdf as the final archival step. render-pdf generates a printable billing report from the session output. Verified: browser-rendering connected."
         },
         {
           "name": "finance-render-pdf-billing-statement",
           "chain": [
             "neon/run_sql",
             "notion/API-retrieve-a-page",
-            "browser-rendering/render-pdf",
+            "playwright/render_to_pdf",
             "notion/API-post-page"
           ],
-          "accomplishes": "Query billing data from Neon, fetch the Notion billing tracker page, render the combined view as a PDF statement, and post the PDF link back to Notion — FIRST browser-rendering/render-pdf standalone in finance.",
-          "verified": true,
+          "accomplishes": "Query billing data from Neon, fetch the Notion billing tracker page, render the combined view as a PDF statement, and post the PDF link back to Notion \u2014 FIRST playwright/render_to_pdf standalone in finance.",          "verified": true,
           "notes": "Verified: neon connected (lazy but works), browser-rendering connected, notion connected."
         },
         {
@@ -1738,7 +1736,7 @@
             "playwright/browser_console_messages",
             "orchestrator/skill_execute(chittyos-core:new-session)",
             "orchestrator/skill_execute(chittyos-devops:chitty-health)",
-            "browser-rendering/render-pdf",
+            "playwright/render_to_pdf",
             "fs/move_file"
           ],
           "accomplishes": "The apex billing operations chain — intent discovery → agent reasoning → skill execution → evidence search → context lookup → schema inspection → sequential planning → symbol search → screenshot → file write → Notion post → block update → page retrieve → file read → slow-query analysis → browser click → console inspection → new-session → health check → PDF render → ARCHIVE (fs/move_file). The first 26-step chain in the suggestions catalog.",
@@ -1785,7 +1783,7 @@
             "playwright/browser_console_messages",
             "orchestrator/skill_execute(chittyos-core:new-session)",
             "orchestrator/skill_execute(chittyos-devops:chitty-health)",
-            "browser-rendering/render-pdf",
+            "playwright/render_to_pdf",
             "fs/move_file",
             "playwright/browser_navigate_back"
           ],
@@ -1831,7 +1829,7 @@
             "playwright/browser_console_messages",
             "orchestrator/skill_execute(chittyos-core:new-session)",
             "orchestrator/skill_execute(chittyos-devops:chitty-health)",
-            "browser-rendering/render-pdf",
+            "playwright/render_to_pdf",
             "fs/move_file",
             "playwright/browser_navigate_back",
             "quality/analyze"
@@ -1879,7 +1877,7 @@
             "playwright/browser_console_messages",
             "orchestrator/skill_execute(chittyos-core:new-session)",
             "orchestrator/skill_execute(chittyos-devops:chitty-health)",
-            "browser-rendering/render-pdf",
+            "playwright/render_to_pdf",
             "fs/move_file",
             "playwright/browser_navigate_back",
             "quality/analyze",
@@ -1929,7 +1927,7 @@
             "playwright/browser_console_messages",
             "orchestrator/skill_execute(chittyos-core:new-session)",
             "orchestrator/skill_execute(chittyos-devops:chitty-health)",
-            "browser-rendering/render-pdf",
+            "playwright/render_to_pdf",
             "fs/move_file",
             "playwright/browser_navigate_back",
             "quality/analyze",
@@ -5599,14 +5597,14 @@
         {
           "name": "governance-render-pdf-evidence-policy",
           "chain": [
-            "browser-rendering/render-pdf",
+            "playwright/render_to_pdf",
             "evidence/ai_search",
             "thinking/sequentialthinking",
             "notion/API-post-page"
           ],
           "accomplishes": "Render a regulatory policy document as PDF via Cloudflare browser rendering, search the evidence store for supporting precedents and prior rulings, reason through the combined material to identify compliance gaps, and publish the governance brief to Notion — a document-first compliance chain.",
           "verified": false,
-          "notes": "FIRST use of browser-rendering/render-pdf in governance profile. Render-then-evidence governance compliance chain."
+          "notes": "FIRST use of playwright/render_to_pdf in governance profile. Render-then-evidence governance compliance chain."
         },
         {
           "name": "governance-stripe-invoice-compliance-audit",
@@ -6213,7 +6211,7 @@
         {
           "name": "governance-render-pdf-evidence-archive",
           "chain": [
-            "browser-rendering/render-pdf",
+            "playwright/render_to_pdf",
             "evidence/ingest_document",
             "evidence/ai_search",
             "thinking/sequentialthinking",
@@ -6221,8 +6219,7 @@
           ],
           "accomplishes": "Render a policy document page as PDF, ingest it into the evidence AutoRAG, AI-search for related compliance references, synthesize the compliance gap via sequential thinking, and write the analysis report to disk.",
           "verified": true,
-          "notes": "FIRST browser-rendering/render-pdf → evidence/ingest_document chain in governance. All tools from connected backends: browser-rendering, evidence, thinking, fs (verified 2026-06-08)."
-        },
+          "notes": "FIRST playwright/render_to_pdf \u2192 evidence/ingest_document chain in governance. All tools from connected backends: browser-rendering, evidence, thinking, fs (verified 2026-06-08)."        },
         {
           "name": "governance-twenty-three-step-policy-apex-chain",
           "chain": [
@@ -6412,12 +6409,11 @@
             "orchestrator/skill_execute(claude-official:hookify)",
             "orchestrator/skill_execute(chittyos-core:new-session)",
             "tasks/update_task",
-            "browser-rendering/render-pdf"
+            "playwright/render_to_pdf"
           ],
           "accomplishes": "The apex policy governance chain extending the 25-step base with a final PDF render of the archived compliance document — creating a portable, signed-off policy artifact from the complete governance workflow.",
           "verified": false,
-          "notes": "Extends governance-twenty-five-step-policy-apex-chain (unverified — tasks/update_task gated at step 25). verified=false until tasks backend connects. browser-rendering/render-pdf confirmed in all other profiles."
-        },
+          "notes": "Extends governance-twenty-five-step-policy-apex-chain (unverified \u2014 tasks/update_task gated at step 25). verified=false until tasks backend connects. playwright/render_to_pdf confirmed in all other profiles."        },
         {
           "name": "governance-chittyagent-auth-access-audit",
           "chain": [
@@ -6459,7 +6455,7 @@
             "orchestrator/skill_execute(claude-official:hookify)",
             "orchestrator/skill_execute(chittyos-core:new-session)",
             "tasks/update_task",
-            "browser-rendering/render-pdf",
+            "playwright/render_to_pdf",
             "fs/move_file"
           ],
           "accomplishes": "27-step governance policy lifecycle pipeline: cast intent → agent discovery → skill dispatch → RAG → SDK docs → reasoning → serena symbols → playwright screenshot → fs snapshot → notion policy page → block update → browser render → fs save → notion retrieve → neon SQL compliance query → file info → notion publish → evidence ingest → hookify skill → session register → task update → PDF archive → file move. Completes full audit-to-archive policy workflow.",
@@ -6505,7 +6501,7 @@
             "orchestrator/skill_execute(claude-official:hookify)",
             "orchestrator/skill_execute(chittyos-core:new-session)",
             "tasks/update_task",
-            "browser-rendering/render-pdf",
+            "playwright/render_to_pdf",
             "fs/move_file",
             "quality/analyze"
           ],
@@ -6580,7 +6576,7 @@
             "orchestrator/skill_execute(claude-official:hookify)",
             "orchestrator/skill_execute(chittyos-core:new-session)",
             "tasks/update_task",
-            "browser-rendering/render-pdf",
+            "playwright/render_to_pdf",
             "fs/move_file",
             "quality/analyze",
             "notion/API-patch-page"
@@ -6629,7 +6625,7 @@
             "orchestrator/skill_execute(claude-official:hookify)",
             "orchestrator/skill_execute(chittyos-core:new-session)",
             "tasks/update_task",
-            "browser-rendering/render-pdf",
+            "playwright/render_to_pdf",
             "fs/move_file",
             "quality/analyze",
             "notion/API-patch-page",
@@ -9625,7 +9621,7 @@
           "chain": [
             "orchestrator/agent_execute(scrape)",
             "playwright/screenshot",
-            "browser-rendering/render-pdf",
+            "playwright/render_to_pdf",
             "notion/API-post-page"
           ],
           "accomplishes": "Scrape agent queues browser automation jobs, playwright captures screenshots of target pages, browser-rendering generates PDFs, and notion stores the design corpus for reference and review.",
@@ -15707,12 +15703,12 @@
           "chain": [
             "context7/resolve-library-id(@modelcontextprotocol/sdk)",
             "context7/query-docs",
-            "browser-rendering/render-pdf",
+            "playwright/render_to_pdf",
             "evidence/ingest_document"
           ],
           "accomplishes": "Resolve the @modelcontextprotocol/sdk library ID via Context7, fetch its current documentation, render the docs page as a PDF for offline archival reference, then ingest the PDF artifact into evidence for retrieval during code reviews and architecture sessions.",
           "verified": true,
-          "notes": "All steps verified: context7 connected (resolve-library-id + query-docs confirmed), browser-rendering/render-pdf verified, evidence/ingest_document verified. FIRST browser-rendering/render-pdf in code profile."
+          "notes": "All steps verified: context7 connected (resolve-library-id + query-docs confirmed), playwright/render_to_pdf verified, evidence/ingest_document verified. FIRST playwright/render_to_pdf in code profile."
         },
         {
           "name": "code-twenty-five-step-impl-apex-chain",
@@ -20244,13 +20240,13 @@
           "name": "comm-browser-render-pdf-press-release",
           "chain": [
             "playwright/browser_navigate",
-            "browser-rendering/render-pdf",
+            "playwright/render_to_pdf",
             "notion/API-post-page",
             "orchestrator/skill_execute(connectors:discord)"
           ],
           "accomplishes": "Navigate to a published press release or announcement page, render it as a polished PDF for distribution, post the PDF artifact to a Notion broadcast database, then distribute the announcement via the Discord connector to the relevant team channels.",
           "verified": false,
-          "notes": "playwright/browser_navigate, browser-rendering/render-pdf, and notion/API-post-page all verified. connectors:discord not connected (lazy). FIRST browser-rendering/render-pdf in communication profile."
+          "notes": "playwright/browser_navigate, playwright/render_to_pdf, and notion/API-post-page all verified. connectors:discord not connected (lazy). FIRST playwright/render_to_pdf in communication profile."
         },
         {
           "name": "comm-twenty-five-step-broadcast-apex-chain",
@@ -25125,12 +25121,12 @@
             "orchestrator/agent_execute(resolve)",
             "neon/list_slow_queries",
             "thinking/sequentialthinking",
-            "browser-rendering/render-pdf",
+            "playwright/render_to_pdf",
             "evidence/ingest_document"
           ],
           "accomplishes": "Execute the resolve agent to triage the current incident, pull slow-query data from Neon for database performance context, reason through root cause with sequential thinking, render the incident dashboard or runbook as a PDF, then ingest the complete incident report into evidence for audit and post-mortem archival.",
           "verified": true,
-          "notes": "All steps verified: orchestrator/agent_execute(resolve) verified, neon/list_slow_queries verified, thinking/sequentialthinking verified, browser-rendering/render-pdf verified, evidence/ingest_document verified. FIRST browser-rendering/render-pdf in ops profile."
+          "notes": "All steps verified: orchestrator/agent_execute(resolve) verified, neon/list_slow_queries verified, thinking/sequentialthinking verified, playwright/render_to_pdf verified, evidence/ingest_document verified. FIRST playwright/render_to_pdf in ops profile."
         },
         {
           "name": "ops-twenty-five-step-incident-apex-chain",
