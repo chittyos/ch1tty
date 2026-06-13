@@ -254,6 +254,7 @@ export class SessionCoordinator {
   getSnapshot(): {
     activeSessions: number;
     boundEntity: boolean;
+    topTools: string[];
     ledger: ReturnType<LedgerClient['getStats']>;
     brain: ReturnType<OllamaBrain['getStats']>;
     embeddingBrain: ReturnType<EmbeddingBrain['getStats']>;
@@ -278,9 +279,21 @@ export class SessionCoordinator {
       ...(ctx.sessionFocus ? { sessionFocus: ctx.sessionFocus } : {}),
     }));
 
+    const globalToolCounts = new Map<string, number>();
+    for (const ctx of this.contexts.values()) {
+      for (const [tool, pattern] of ctx.toolPatterns) {
+        globalToolCounts.set(tool, (globalToolCounts.get(tool) ?? 0) + pattern.count);
+      }
+    }
+    const topTools = [...globalToolCounts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([tool]) => tool);
+
     return {
       activeSessions: sessions.length,
       boundEntity: sessions.some((s) => s.entity !== undefined),
+      topTools,
       ledger: this.ledger.getStats(),
       brain: this.brain.getStats(),
       embeddingBrain: this.embeddingBrain.getStats(),
