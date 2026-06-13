@@ -42,7 +42,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 ### Run 103 — 2026-06-13 (auto-driver)
 
 **Workstream advanced**: Q (new — `ch1tty/search explain: true`)
-**Branch/PR**: `auto/Q-search-explain` → PR to be opened
+**Branch/PR**: `auto/Q-search-explain` → https://github.com/chittyos/ch1tty/pull/388 ✅ MERGED
 **Build**: clean (0 errors)
 **Tests**: 1018 pass, 0 fail, 2 skipped (+7 new tests)
 
