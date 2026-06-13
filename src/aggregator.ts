@@ -295,6 +295,7 @@ export class Aggregator {
             category: { type: 'string', description: 'Filter by category (ecosystem, code, search, reasoning, desktop, documents, communication)' },
             focus: { type: 'string', description: 'Focus profile to bias results toward (e.g. "finance", "governance", "design"). A soft lens — out-of-focus tools still appear. Use "none" to override the env default. Overrides CH1TTY_FOCUS for this call.' },
             limit: { type: 'number', description: 'Max results to return (default 20)' },
+            explain: { type: 'boolean', description: 'If true, include an explanation field in the response showing how results were ranked: match mode (and/partial), focus boost contributions, per-result relevance scores, recency signals, and a human-readable rationale. Useful for debugging ranking decisions (default: false).' },
           },
         },
       },
@@ -391,6 +392,7 @@ export class Aggregator {
     const serverFilter = typeof args.server === 'string' ? args.server : undefined;
     const categoryFilter = typeof args.category === 'string' ? args.category : undefined;
     const limit = typeof args.limit === 'number' ? args.limit : 20;
+    const explain = args.explain === true;
     const { name: focusName, profile: focus } = this.resolveActiveFocus(args.focus);
 
     const registry = await this.getRegistry();
@@ -520,6 +522,10 @@ export class Aggregator {
       ? getSuggestionsForFocus(focusName, this.suggestionsCatalog, { intent: query })
       : null;
 
+    const explanation = explain
+      ? buildSearchExplanation(matches, results, relevanceMap, partialFallback, focusName, focus, recentServerIds)
+      : null;
+
     return {
       content: [{
         type: 'text',
@@ -530,6 +536,7 @@ export class Aggregator {
           ...(focusName ? { focus: focusName } : {}),
           ...(sessionId ? { sessionId } : {}),
           ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
+          ...(explanation ? { explanation } : {}),
           tools: results,
         }, null, 2),
       }],
@@ -1440,6 +1447,49 @@ function buildCastExplanation(
   return {
     method: resolvedBy,
     ...(focusName ? { focus: focusName, focusBoost, winnerInFocus } : {}),
+    topCandidates,
+    rationale,
+  };
+}
+
+function buildSearchExplanation(
+  allMatches: NamespacedTool[],
+  topResults: Array<{ tool: string; score?: number; inFocus?: boolean; recentlyUsed?: boolean }>,
+  relevanceMap: Map<string, number>,
+  partialFallback: boolean,
+  focusName: string | undefined,
+  focus: FocusProfile | null | undefined,
+  recentServerIds: Set<string>,
+): object {
+  const matchMode = partialFallback ? 'partial' : 'and';
+  const focusBoost = focus?.boost ?? 0.5;
+
+  const topCandidates = topResults.slice(0, 5).map((r) => ({
+    tool: r.tool,
+    relevanceScore: relevanceMap.get(r.tool) ?? 0,
+    ...(r.inFocus ? { inFocus: true } : {}),
+    ...(r.recentlyUsed ? { recentlyUsed: true } : {}),
+  }));
+
+  const inFocusCount = topResults.filter((r) => r.inFocus).length;
+  const parts: string[] = [];
+  parts.push(`Keyword search (${matchMode === 'partial' ? 'OR/partial fallback — no tool matched all terms' : 'AND mode'})`);
+  if (topCandidates.length > 0) {
+    const top = topCandidates[0];
+    parts.push(`top result: "${top.tool}" (relevance: ${top.relevanceScore.toFixed(2)})`);
+  }
+  if (focusName) {
+    parts.push(`"${focusName}" focus active — ${inFocusCount} of ${Math.min(topResults.length, 5)} top results in focus (boost +${focusBoost})`);
+  }
+  if (allMatches.length > topResults.length) {
+    parts.push(`showing ${topResults.length} of ${allMatches.length} matches`);
+  }
+  const rationale = parts.join('; ') + '.';
+
+  return {
+    method: 'keyword' as const,
+    matchMode,
+    ...(focusName ? { focus: focusName, focusBoost } : {}),
     topCandidates,
     rationale,
   };

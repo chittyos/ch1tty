@@ -20,6 +20,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **N. cast `chain_executed` summary field** — `cast: chain_executed` now includes a top-level `summary` string joining all successful step text outputs with `\n\n`, giving LLM clients a single string without iterating `steps`. Absent when no steps produce text. PR #382 ✅ MERGED (run 100, 2026-06-13). 7 new tests, 994/0/2. DONE.
 - [x] **O. cast `dryRun` mode** — `dryRun: true` on `ch1tty/cast` resolves intent and returns `cast: resolved` (tool name + score + catalog combo) without executing. Lighter than `confirm: true`. Takes precedence over `confirm` when both set. PR #384 ✅ MERGED (run 101, 2026-06-13). 7 new tests, 1001/0/2. DONE.
 - [x] **P. cast `explain` mode** — `explain: true` adds `explanation: { method, focus?, focusBoost?, winnerInFocus?, topCandidates, rationale }` to ALL cast response shapes (executed/plan/resolved/chain_executed/discovered/no_match). Orthogonal to all other modes. PR #386 ✅ MERGED (run 102, 2026-06-13). 10 new tests, 1011/0/2. DONE.
+- [x] **Q. search `explain` mode** — `explain: true` on `ch1tty/search` adds `explanation: { method: 'keyword', matchMode, focus?, focusBoost?, topCandidates[{tool, relevanceScore, inFocus?, recentlyUsed?}], rationale }`. Parallel to cast explain; surfaces ranking transparency (AND vs partial/OR fallback, focus boost, per-result scores). PR #388 ✅ MERGED (run 103, 2026-06-13). 7 new tests, 1018/0/2. DONE.
 
 ## Live Gateway State (as of 2026-06-13)
 
@@ -35,6 +36,36 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 103 — 2026-06-13 (auto-driver)
+
+**Workstream advanced**: Q (new — `ch1tty/search explain: true`)
+**Branch/PR**: `auto/Q-search-explain` → PR to be opened
+**Build**: clean (0 errors)
+**Tests**: 1018 pass, 0 fail, 2 skipped (+7 new tests)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 1011/0/2 on main (PR #386 already merged). Only open PR: #375 (Dependabot esbuild bump). Board confirmed: A✅ through P✅.
+- Notion wrapper still missing — DRIVER-BOARD.md continues as fallback.
+- **Change** (`src/aggregator.ts`):
+  1. Added `explain` boolean param to `ch1tty/search` inputSchema (after `limit`).
+  2. Extracted `const explain = args.explain === true` in `handleSearch`.
+  3. Added `buildSearchExplanation(...)` call after `focusSuggestions` computation; result included as `explanation` in search response when `explain: true`.
+  4. Added `buildSearchExplanation` pure function at end of file — takes `allMatches`, `topResults`, `relevanceMap`, `partialFallback`, `focusName`, `focus`, `recentServerIds`; returns `{ method: 'keyword', matchMode, focus?, focusBoost?, topCandidates, rationale }`. `topCandidates` carries per-result `{ tool, relevanceScore, inFocus?, recentlyUsed? }`.
+- **7 new tests** in `test/search-explain.test.ts`:
+  1. `explain: true` → `explanation` field present
+  2. `explanation.method === 'keyword'`
+  3. `topCandidates[0].tool` matches `tools[0].tool` (top-ranked result)
+  4. `explain` omitted → no `explanation` field
+  5. Focus active → `explanation` has `focus` and `focusBoost`
+  6. Partial fallback (OR mode) → `matchMode === 'partial'`; AND match → `matchMode === 'and'`
+  7. `rationale` is a non-empty string mentioning the top tool
+
+**Next run priority**:
+- Workstream R candidates: (a) session-sticky focus — persist active focus per-session via coordinator so clients don't re-pass `focus` on every call; (b) `ch1tty/search` `inFocusOnly: true` filter — hard filter (not lens) for clients that want only in-focus tools; (c) Dependabot esbuild PR #375 review/merge (security fix in dev dep).
+- Blockers unchanged: CI broken org-wide (human must fix GitHub Actions), Notion unreachable (human must configure wrapper), Ledger DLQ entries (ledger.chitty.cc unreachable).
 
 ---
 
