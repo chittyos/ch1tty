@@ -27,9 +27,11 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **U. `ch1tty/status` per-session topTools** — `coordinator.getSnapshot()` now includes `topTools: string[]` on each session entry — top 5 most-called namespaced tool names sorted by count descending, `[]` when no calls made. Operators can inspect which tools each active session uses, not just the count. PR #397 ✅ MERGED (run 107, 2026-06-13). 7 new tests, 1046/0/2. DONE.
 - [x] **V. `ch1tty/status` coordinator-level global topTools** — `coordinator.getSnapshot()` adds `topTools: string[]` at the coordinator top level, aggregating tool call counts across ALL active sessions; top 10 globally. Complements per-session topTools (U). PR #399 ✅ MERGED (run 108, 2026-06-13). 7 new tests, 1053/0/2. DONE.
 - [x] **W. `ch1tty/status` catalog stats + activeFocusSuggestions** — `getStatusSnapshot()` now includes `catalog: { loaded, totalCombos, byFocus, activeFocusSuggestions }`. When a focus is active and the suggestions catalog has an entry for it, `activeFocusSuggestions` surfaces the top 3 combos + prompts — a quick compass for operators. PR #401 ✅ MERGED (run 109, 2026-06-13). 7 new tests, 1053/0/2. DONE.
-- [ ] **X. `ch1tty/execute` dryRun mode** — `dryRun: true` on `ch1tty/execute` resolves the namespaced tool to server + bare name and returns `{ status: "dry_run", server, tool, args }` without calling the backend. Mirrors cast's dryRun for the direct-invocation path. Unknown server/tool errors still fire. PR #404 open (run 110, 2026-06-13). 7 new tests, 1001/0/2. Awaiting merge.
+- [x] **X. `ch1tty/execute` dryRun mode** — `dryRun: true` on `ch1tty/execute` resolves the namespaced tool to server + bare name and returns `{ status: "dry_run", server, tool, args }` without calling the backend. Mirrors cast's dryRun for the direct-invocation path. Unknown server/tool errors still fire. PR #404 ✅ MERGED (run 110, 2026-06-13). 7 new tests, 1001/0/2. DONE.
+- [x] **Y. `ch1tty/cast` scope parameter** — `scope` parameter on `ch1tty/cast` hard-filters the registry to a specific server or category before intent resolution. Allows callers to restrict cast to a bounded tool namespace without modifying focus. PR #406 ✅ MERGED (run 111, 2026-06-13). DONE.
+- [ ] **IIII. Branch coverage sweep** — 4 branch gaps closed in `aggregator.ts` + `suggestions.ts`: explain truncation note (1582-1583), suggestions nopath fallback (38), relevanceMap ??0 (1566), recentlyUsed spread (1568). suggestions.ts now 100% branch. PR #407 open (run 112, 2026-06-13). 4 new tests, 1081/0/2. Awaiting merge.
 
-## Live Gateway State (as of 2026-06-13 run 110)
+## Live Gateway State (as of 2026-06-13 run 112)
 
 - Connected backends: cloudflare-builds (7 tools), evidence (3), browser-rendering (3), context7 (2), thinking (1), fs (14), playwright (23), orchestrator (13) — 66 total tools
 - Not connected: chittyos, cloudflare, GitHub, linear, notion, stripe, neon (lazy, auth-gated)
@@ -38,7 +40,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Active sessions: 105, active focus: none
 
 
-## Live Gateway State (as of 2026-06-13 run 106)
+## Live Gateway State (as of 2026-06-13 run 110)
 
 - Connected backends: cloudflare-builds (7 tools), evidence (3), browser-rendering (3), context7 (2), thinking (1), fs (14), playwright (23), orchestrator (13) — 66 total tools
 - Not connected: chittyos, cloudflare, GitHub, linear, notion, stripe, neon (lazy, auth-gated)
@@ -52,6 +54,45 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 112 — 2026-06-13 (auto-driver)
+
+**Workstream advanced**: IIII — branch coverage sweep (4 gaps in aggregator.ts + suggestions.ts)
+**Branch/PR**: `auto/IIII-search-explain-nopath-catalog-gaps` → https://github.com/chittyos/ch1tty/pull/407 (open)
+**Build**: clean (0 errors)
+**Tests**: 1081 pass, 0 fail, 2 skipped (+4 new tests)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean. Discovered origin/main had diverged; reset to origin/main (dfb6297 — PR #406 scope parameter already merged). PR #404 (X — execute dryRun) confirmed merged; PR #406 (Y — cast scope) confirmed merged. Marked both ✅ in board.
+- **Coverage sweep (IIII)**: Identified 4 uncovered branches via `npm run coverage`:
+  1. `aggregator.ts:1582-1583` — `buildSearchExplanation` truncation note fires when `allMatches.length > topResults.length`. Triggered by 25-tool backend + `limit:2` + `explain:true`.
+  2. `suggestions.ts:38` — `path ?? resolveSuggestionsCatalogPath()` right-side fires when `loadSuggestionsCatalog()` called without argument. All prior callers passed explicit paths; right-side was dead.
+  3. `aggregator.ts:1566` — `relevanceMap.get(r.tool) ?? 0` right-side fires when `relevanceMap` is empty (no query, server-only search). Triggered by `{ server: 'widgets', explain: true }` with no query.
+  4. `aggregator.ts:1568` — `recentlyUsed: true` spread fires when server appears in session's `recentServerIds`. Triggered by executing a neon tool then searching with same sessionId + `explain:true`.
+- 4 new tests in `test/iiii-search-explain-nopath-catalog-gaps.test.ts`.
+- CodeRabbit review: 2 findings — (1) cache cleanup after suggestions test; (2) add `server:'neon'` for deterministic recentlyUsed test. Both addressed in fix commit `4233ff8`. Both comments marked ✅ resolved.
+- **Coverage after**: `suggestions.ts` branch 98.14% → **100%**; `aggregator.ts` branch 98.32% → 98.78%; all-files branch 99.35% → **99.57%**.
+- PR #407 open, `mergeable_state: "clean"`. CodeRabbit rate-limited (55 min cooldown after fix commit).
+
+**Next run priority**:
+- Merge PR #407 once CodeRabbit cooldown passes or manually after local test verification.
+- Remaining aggregator.ts branch gaps (lines 979, 1081-1082, 1125, 1147-1148, 1152): scope parameter paths and chain_executed focus+explanation — more complex, require scope + chain integration. Leave for dedicated workstream Z.
+- Dependabot PR #375 (esbuild dev-only bump) still open — low-risk merge candidate.
+- Persistent blockers: CI broken org-wide (human must fix GitHub Actions), Notion unreachable, Ledger DLQ 6 entries.
+
+---
+
+### Run 111 — 2026-06-13 (auto-driver)
+
+**Workstream advanced**: Y — `ch1tty/cast` scope parameter (PR #406 merged)
+**Branch/PR**: PR #406 ✅ MERGED
+**Build**: clean (0 errors)
+
+**What was done**:
+- Added `scope` parameter to `ch1tty/cast` — hard-filters the registry to a specific server or category before intent resolution. Allows callers to restrict cast to a bounded tool namespace without modifying the focus lens.
+- PR #406 merged to origin/main (dfb6297).
 
 ---
 
