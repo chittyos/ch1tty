@@ -373,6 +373,22 @@ export class Aggregator {
               type: 'boolean',
               description: 'If true, include an explanation field in the response showing how the tool was selected: resolution method (brain or keyword), whether focus boosted the winner, top-scored candidates with scores, and a human-readable rationale. Works with all modes — executed, plan, dryRun, chain_executed, discovered, no_match (default: false).',
             },
+            scope: {
+              type: 'object',
+              description: 'Hard-filter the registry before intent resolution — only tools matching ALL specified constraints are considered. Applied before focus boosting. Use to restrict cast to a specific server or category without changing the active focus.',
+              properties: {
+                servers: {
+                  type: 'array',
+                  items: { type: 'string' },
+                  description: 'Restrict resolution to tools from these server ids (e.g. ["neon", "cloudflare"]).',
+                },
+                categories: {
+                  type: 'array',
+                  items: { type: 'string' },
+                  description: 'Restrict resolution to tools in these categories (e.g. ["code", "ecosystem"]).',
+                },
+              },
+            },
           },
           required: ['intent'],
         },
@@ -855,6 +871,17 @@ export class Aggregator {
 
     const terms = intent.toLowerCase().split(/\s+/).filter((t) => t.length > 2);
 
+    // Parse scope — hard filter applied to the registry before intent scoring.
+    const scopeArg = (typeof args.scope === 'object' && args.scope !== null && !Array.isArray(args.scope))
+      ? args.scope as Record<string, unknown>
+      : null;
+    const scopeServers = Array.isArray(scopeArg?.servers)
+      ? (scopeArg.servers as unknown[]).filter((s): s is string => typeof s === 'string')
+      : null;
+    const scopeCategories = Array.isArray(scopeArg?.categories)
+      ? (scopeArg.categories as unknown[]).filter((s): s is string => typeof s === 'string')
+      : null;
+
     // Step 1: Score tools, prompts, and resources in parallel (Ch1tty searching itself)
     const [registryResult, promptsResult, resourcesResult] = await Promise.allSettled([
       this.getRegistry(),
@@ -866,7 +893,15 @@ export class Aggregator {
       throw registryResult.reason;
     }
 
-    const registry = registryResult.value;
+    // Apply scope hard-filter before scoring so intent resolution only sees allowed tools.
+    let registry = registryResult.value;
+    if (scopeServers && scopeServers.length > 0) {
+      registry = registry.filter((t) => scopeServers.includes(t.serverId));
+    }
+    if (scopeCategories && scopeCategories.length > 0) {
+      registry = registry.filter((t) => scopeCategories.includes(t.category));
+    }
+
     const allPrompts = promptsResult.status === 'fulfilled'
       ? promptsResult.value.prompts
       : (() => {
@@ -940,6 +975,8 @@ export class Aggregator {
         confirm,
         candidate_count: scoredTools.length,
         ...(focusName ? { focus: focusName } : {}),
+        ...(scopeServers ? { scope_servers: scopeServers } : {}),
+        ...(scopeCategories ? { scope_categories: scopeCategories } : {}),
       });
     }
 
@@ -976,6 +1013,11 @@ export class Aggregator {
       ? getSuggestionsForFocus(focusName, this.suggestionsCatalog, { intent })
       : null;
 
+    // Build optional scope annotation (computed here so it's available on all code paths below).
+    const scopeAnnotation = (scopeServers || scopeCategories)
+      ? { ...(scopeServers ? { servers: scopeServers } : {}), ...(scopeCategories ? { categories: scopeCategories } : {}) }
+      : null;
+
     if (scoredTools.length === 0 && scoredPrompts.length === 0 && scoredResources.length === 0) {
       return {
         content: [{
@@ -984,6 +1026,7 @@ export class Aggregator {
             cast: 'no_match',
             resolvedBy,
             intent,
+            ...(scopeAnnotation ? { scope: scopeAnnotation } : {}),
             ...(explain ? { explanation: buildCastExplanation(resolvedBy, undefined, [], focusName, focus) } : {}),
             ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
             hint: 'No tools, prompts, or resources matched your intent. Try ch1tty/search with different keywords.',
@@ -1035,6 +1078,7 @@ export class Aggregator {
             cast: 'discovered',
             resolvedBy,
             intent,
+            ...(scopeAnnotation ? { scope: scopeAnnotation } : {}),
             ...(explanation ? { explanation } : {}),
             hint: 'No executable tools matched, but related prompts/resources found.',
             ...related,
@@ -1121,6 +1165,7 @@ export class Aggregator {
             resolvedBy,
             intent,
             ...(focusName ? { focus: focusName } : {}),
+            ...(scopeAnnotation ? { scope: scopeAnnotation } : {}),
             ...(explanation ? { explanation } : {}),
             resolved: { tool: best.namespacedName, score: best.score },
             ...(catalogCombo ? { catalogCombo: { name: catalogCombo.name, chain: catalogCombo.chain, accomplishes: catalogCombo.accomplishes } } : {}),
@@ -1139,6 +1184,7 @@ export class Aggregator {
             resolvedBy,
             intent,
             ...(focusName ? { focus: focusName } : {}),
+            ...(scopeAnnotation ? { scope: scopeAnnotation } : {}),
             ...(explanation ? { explanation } : {}),
             resolved: {
               tool: best.namespacedName,
@@ -1176,6 +1222,7 @@ export class Aggregator {
             resolvedBy,
             intent,
             ...(focusName ? { focus: focusName } : {}),
+            ...(scopeAnnotation ? { scope: scopeAnnotation } : {}),
             ...(explanation ? { explanation } : {}),
             resolved: best.namespacedName,
             score: best.score,
