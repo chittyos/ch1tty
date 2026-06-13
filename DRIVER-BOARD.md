@@ -33,7 +33,15 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **Z. `ch1tty/status` short mode** — `short: true` param returns condensed snapshot omitting `servers[]` and `coordinator.sessions[]` while preserving all health fields, counts, focus, and catalog stats. PR #409 ✅ MERGED (run 113, 2026-06-13). 7 new tests, 1088/0/2. DONE.
 - [x] **AA. `ch1tty/search` offset pagination** — `offset: number` param skips N results before returning the page, pairing with `limit` to iterate through large registries. `total` always reflects the full unsliced count. `offset` field included in response when non-zero. PR #411 ✅ MERGED (run 114, 2026-06-13). 7 new tests, 1095/0/2. DONE.
 - [x] **BB. `ch1tty/execute` per-call timeout** — `timeout: number` ms param overrides `CH1TTY_REMOTE_TIMEOUT_MS` for a single call. Threaded via `Backend.callTool` options bag → `RemoteProxy` (uses it) and `ChildManager` (uses it). Non-positive values treated as absent. `FixtureBackend` records `timeoutMs` in `CallRecord`. PR #413 ✅ MERGED (run 115, 2026-06-13). 8 new tests, 1103/0/2. DONE.
-- [ ] **CC. `ch1tty/cast` per-call timeout** — `timeout: number` param on `ch1tty/cast` mirrors BB: overrides `CH1TTY_REMOTE_TIMEOUT_MS` for a single cast call. Threaded through both execution paths: normal single-tool execute (Step 3) and each step of auto-chain execution (`chain: true`). Non-positive values treated as absent. dryRun short-circuits before backend — timeout has no effect. No changes to `handleExecute`, `RemoteProxy`, or `ChildManager`. PR #414 open (run 116, 2026-06-13). 8 new tests, 1111/0/2.
+- [x] **CC. `ch1tty/cast` per-call timeout** — `timeout: number` param on `ch1tty/cast` mirrors BB: overrides `CH1TTY_REMOTE_TIMEOUT_MS` for a single cast call. Threaded through both execution paths: normal single-tool execute (Step 3) and each step of auto-chain execution (`chain: true`). Non-positive values treated as absent. dryRun short-circuits before backend — timeout has no effect. No changes to `handleExecute`, `RemoteProxy`, or `ChildManager`. PR #414 ✅ MERGED (run 116, 2026-06-13). 8 new tests, 1111/0/2. DONE.
+- [ ] **DD. Explicit `sessionId` param on search/execute/cast** — Stateless HTTP server-to-server callers can now pass `sessionId` in args to participate in coordinator session tracking (sticky focus, affinity, topTools) without a long-lived transport session. `args.sessionId` takes priority over the transport-derived session ID. When no context exists, one is lazily created. `coordinator.hasSession()` added. PR #415 open (run 117, 2026-06-13). 8 new tests, 1119/0/2.
+
+## Live Gateway State (as of 2026-06-13 run 117)
+
+- Connected backends: cloudflare-builds (7 tools), evidence (3), browser-rendering (3), context7 (2), thinking (1), fs (14), playwright (23), orchestrator (13) — 66 total tools
+- Not connected: chittyos, cloudflare, GitHub, linear, notion, stripe, neon (lazy, auth-gated)
+- System health: degraded (ledger DLQ has 6 entries — ledger.chitty.cc unreachable)
+- Brain: ok (embedding circuit open=false, ollama circuit open=false)
 
 ## Live Gateway State (as of 2026-06-13 run 116)
 
@@ -65,6 +73,43 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 117 — 2026-06-13 (auto-driver)
+
+**Workstream advanced**: DD (new — explicit `sessionId` param on `ch1tty/search`, `ch1tty/execute`, `ch1tty/cast`)
+**Branch/PR**: `auto/DD-explicit-session-id` → https://github.com/chittyos/ch1tty/pull/415 (open)
+**Build**: clean (0 errors)
+**Tests**: 1119 pass, 0 fail, 2 skipped (+8 new tests from 1111 baseline)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 1111/0/2 on main (CC — PR #414 on main as commit `49a2e15`). Board read: A✅ through BB✅, CC open (PR #414). PR #414 confirmed on origin/main → marked CC ✅ done.
+- **Workstream DD: explicit `sessionId` param on `ch1tty/search`, `ch1tty/execute`, `ch1tty/cast`**
+  - Gap: stateless HTTP server-to-server callers that don't maintain long-lived MCP transport sessions can't participate in coordinator session tracking (sticky focus, affinity, topTools) — they get no automatic `sessionId` from the transport layer.
+  - **`src/aggregator.ts`** (5 edits):
+    1. `ch1tty/search` inputSchema: added `sessionId: string` property after `inFocusOnly` with description.
+    2. `ch1tty/execute` inputSchema: added `sessionId: string` property after `timeout`.
+    3. `ch1tty/cast` inputSchema: added `sessionId: string` property after `timeout`.
+    4. `handleSearch`, `handleExecute`, `handleCast`: each extracts `const effectiveSessionId = typeof args.sessionId === 'string' && args.sessionId ? args.sessionId : sessionId` and uses it throughout instead of `sessionId`.
+    5. `handleMetaTool`: lazily calls `this.coordinator.onSessionStart(explicitSid, 'http')` when `args.sessionId` is present and `this.coordinator.hasSession(explicitSid)` is false — so truly stateless callers need no prior session handshake.
+  - **`src/coordinator.ts`** (1 edit): added `hasSession(sessionId: string): boolean { return this.contexts.has(sessionId); }` for context existence check.
+  - **8 new tests** in `test/explicit-session-id.test.ts`:
+    1. `search: args.sessionId` → sticky focus set, retrievable via `coordinator.getSessionFocus`
+    2. subsequent `search` with same `args.sessionId` inherits sticky focus (no per-call `focus` param)
+    3. `execute: args.sessionId` → tool call recorded in coordinator `topTools`
+    4. `cast: args.sessionId` → sticky focus persists in coordinator
+    5. cast sets focus via `args.sessionId` → subsequent search with same `args.sessionId` uses it (cross-meta-tool propagation)
+    6. `args.sessionId` overrides transport sessionId (tracking under explicit id, not transport id)
+    7. `sessionId` param visible in `ch1tty/search` inputSchema as `type: 'string'`
+    8. `sessionId` param visible in `ch1tty/execute` and `ch1tty/cast` inputSchema
+- CI: 0-jobs infra failure (known ongoing issue). CodeRabbit reviewing (in progress at run end). Codex usage-limit comment — informational, no action.
+- PR #415 opened (ready for review, not draft).
+
+**Next run priority**:
+- Check if PR #415 (DD) CodeRabbit review completed with no actionable findings. Merge and mark DD ✅ done.
+- Workstream EE candidates: (a) `ch1tty/search` `sessionContext` annotation — add `callCount: number` and `lastUsedMs: number` to `recentlyUsed` tool entries (currently just a boolean); (b) `ch1tty/status` DLQ entry count — expose the ledger dead-letter queue count + path in the status snapshot for operator visibility; (c) Dependabot PR #375 merge (esbuild dev-only bump, long overdue).
+- Persistent blockers: CI broken org-wide (human must fix GitHub Actions), Notion unreachable, Ledger DLQ 6 entries.
 
 ---
 
