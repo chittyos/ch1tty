@@ -24,8 +24,16 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **R. search `inFocusOnly` hard filter** — `inFocusOnly: true` on `ch1tty/search` hard-filters results to only in-focus tools when a focus profile is active. No-op without active focus. Applies to both tool-search and server-summary paths. Response includes `inFocusOnly: true` field. PR #390 ✅ MERGED (run 104, 2026-06-13). 7 new tests, 1025/0/2. DONE.
 - [x] **S. Session-sticky focus** — Explicit `focus` param on `ch1tty/search` or `ch1tty/cast` is persisted per-session via `SessionCoordinator`. Subsequent calls in the same session without a `focus` param inherit the stored focus automatically. Priority: per-call > session-sticky > `CH1TTY_FOCUS` env default. `focus:"none"` clears the session focus. PR #392 ✅ MERGED (run 105, 2026-06-13). 7 new tests, 1032/0/2. DONE.
 - [x] **T. `ch1tty/status` session focus reporting** — `coordinator.getSnapshot()` now includes `sessionFocus?: string` on each session entry under `coordinator.sessions`. Present only when explicitly set; absent when none set or cleared via `focus:"none"`; env default does not write `sessionFocus`. PR #394 ✅ MERGED (run 106, 2026-06-13). 7 new tests, 1039/0/2. DONE.
+- [x] **U. `ch1tty/status` per-session topTools** — `coordinator.getSnapshot()` now includes `topTools: string[]` on each session entry — top 5 most-called namespaced tool names sorted by count descending, `[]` when no calls made. Operators can inspect which tools each active session uses, not just the count. PR #397 ✅ MERGED (run 107, 2026-06-13). 7 new tests, 1046/0/2. DONE.
 
-## Live Gateway State (as of 2026-06-13)
+## Live Gateway State (as of 2026-06-13 run 107)
+
+- Connected backends: cloudflare-builds (7 tools), evidence (3), browser-rendering (3), context7 (2), thinking (1), fs (14), playwright (23), orchestrator (13) — 66 total tools
+- Not connected: chittyos, cloudflare, GitHub, linear, notion, stripe, neon (lazy, auth-gated)
+- System health: degraded (ledger DLQ has 6 entries — ledger.chitty.cc unreachable)
+- Brain: ok (embedding circuit open=false, ollama circuit open=false)
+
+## Live Gateway State (as of 2026-06-13 run 106)
 
 - Connected backends: cloudflare-builds (7 tools), evidence (3), browser-rendering (3), context7 (2), thinking (1), fs (14), playwright (23), orchestrator (13) — 66 total tools
 - Not connected: chittyos, cloudflare, GitHub, linear, notion, stripe, neon (lazy, auth-gated)
@@ -39,6 +47,36 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 107 — 2026-06-13 (auto-driver)
+
+**Workstream advanced**: U (new — `ch1tty/status` per-session topTools)
+**Branch/PR**: `auto/U-status-per-session-top-tools` → https://github.com/chittyos/ch1tty/pull/397 ✅ MERGED
+**Build**: clean (0 errors)
+**Tests**: 1046 pass, 0 fail, 2 skipped (+7 new tests)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 1039/0/2 on main (PR #394 merged). Only open PR: #375 (Dependabot esbuild bump). Board confirmed A✅ through T✅. Notion wrapper still missing — DRIVER-BOARD.md continues as fallback.
+- **Workstream U: per-session topTools in `ch1tty/status`**
+  - Problem: `coordinator.getSnapshot()` already exposed `toolPatterns: number` (a count of unique tools called), but gave no visibility into *which* tools a session was using. Operators had to guess or instrument separately.
+  - **`src/coordinator.ts`** (5 lines): in `getSnapshot()`, added `topTools: string[]` field to the session entry type and computed it by sorting `ctx.toolPatterns.values()` by count descending, slicing to 5, and mapping to `p.tool`. Uses the same sort logic as the existing `getToolPatterns()` helper.
+  - **7 new tests** in `test/status-top-tools.test.ts`:
+    1. Session with no tool calls → `topTools: []`
+    2. Single tool call → `topTools` contains that tool
+    3. Most-called tool ranks first (3 calls vs 1 call)
+    4. Capped at 5 even with 7 unique tools called
+    5. Entries are namespaced tool names (`serverId/toolName`)
+    6. Empty array immediately after session start (before any calls)
+    7. Two sessions → independent `topTools` per session
+- Bot comments: Codex usage-limit + CodeRabbit rate-limit — both informational, no action.
+- CI: 0-jobs infra failure (known ongoing issue). Merged manually after local test verification.
+- PR #397 opened and merged.
+
+**Next run priority**:
+- Workstream V candidates: (a) `ch1tty/search` `sessionContext: true` — annotate search results with whether each tool matches the calling session's recent tool patterns (recentlyUsed flag enhancement — currently bool, could add `callCount: number` and `lastUsedMs: number`); (b) `ch1tty/status` global top-tools aggregated across all sessions — `topTools: string[]` at the coordinator level, not just per-session; (c) Dependabot esbuild PR #375 review/merge (dev-only security bump, low priority).
+- Blockers unchanged: CI broken org-wide (human must fix GitHub Actions), Notion unreachable, Ledger DLQ 6 entries.
 
 ---
 
