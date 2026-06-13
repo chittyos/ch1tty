@@ -399,6 +399,7 @@ export class Aggregator {
                 },
               },
             },
+            timeout: { type: 'number', description: 'Per-call timeout in milliseconds applied to each backend execution within cast. Overrides CH1TTY_REMOTE_TIMEOUT_MS for this call only. Applied to each step in chain execution and to normal single-tool execution. Non-positive values are ignored (default: use CH1TTY_REMOTE_TIMEOUT_MS or 120000ms).' },
           },
           required: ['intent'],
         },
@@ -881,6 +882,7 @@ export class Aggregator {
     const confirm = !dryRun && args.confirm === true;
     const autoChain = args.chain === true;
     const explain = args.explain === true;
+    const castTimeoutMs = typeof args.timeout === 'number' && args.timeout > 0 ? Math.floor(args.timeout) : undefined;
     const { name: focusName, profile: focus } = this.resolveActiveFocus(args.focus, sessionId);
 
     if (!intent) {
@@ -1140,7 +1142,7 @@ export class Aggregator {
         } else {
           stepArgs = {};
         }
-        const r = await this.handleExecute({ tool: stepTool, args: stepArgs }, sessionId);
+        const r = await this.handleExecute({ tool: stepTool, args: stepArgs, ...(castTimeoutMs !== undefined ? { timeout: castTimeoutMs } : {}) }, sessionId);
         if (r.isError) {
           const firstContent = r.content[0] as { type?: string; text?: unknown } | undefined;
           const errText = typeof firstContent?.text === 'string' ? firstContent.text : JSON.stringify(r.content);
@@ -1229,7 +1231,7 @@ export class Aggregator {
 
     // Step 3: Execute (Ch1tty executing through itself)
     const result = await this.handleExecute(
-      { tool: best.namespacedName, args: toolArgs },
+      { tool: best.namespacedName, args: toolArgs, ...(castTimeoutMs !== undefined ? { timeout: castTimeoutMs } : {}) },
       sessionId,
     );
 
