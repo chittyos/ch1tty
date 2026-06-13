@@ -21,6 +21,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **O. cast `dryRun` mode** — `dryRun: true` on `ch1tty/cast` resolves intent and returns `cast: resolved` (tool name + score + catalog combo) without executing. Lighter than `confirm: true`. Takes precedence over `confirm` when both set. PR #384 ✅ MERGED (run 101, 2026-06-13). 7 new tests, 1001/0/2. DONE.
 - [x] **P. cast `explain` mode** — `explain: true` adds `explanation: { method, focus?, focusBoost?, winnerInFocus?, topCandidates, rationale }` to ALL cast response shapes (executed/plan/resolved/chain_executed/discovered/no_match). Orthogonal to all other modes. PR #386 ✅ MERGED (run 102, 2026-06-13). 10 new tests, 1011/0/2. DONE.
 - [x] **Q. search `explain` mode** — `explain: true` on `ch1tty/search` adds `explanation: { method: 'keyword', matchMode, focus?, focusBoost?, topCandidates[{tool, relevanceScore, inFocus?, recentlyUsed?}], rationale }`. Parallel to cast explain; surfaces ranking transparency (AND vs partial/OR fallback, focus boost, per-result scores). PR #388 ✅ MERGED (run 103, 2026-06-13). 7 new tests, 1018/0/2. DONE.
+- [ ] **R. search `inFocusOnly` hard filter** — `inFocusOnly: true` on `ch1tty/search` hard-filters results to only in-focus tools when a focus profile is active. No-op without active focus. Applies to both tool-search and server-summary paths. Response includes `inFocusOnly: true` field. PR open (run 104, 2026-06-13). 7 new tests, 1025/0/2.
 
 ## Live Gateway State (as of 2026-06-13)
 
@@ -36,6 +37,38 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 104 — 2026-06-13 (auto-driver)
+
+**Workstream advanced**: R (new — `ch1tty/search inFocusOnly: true` hard filter)
+**Branch/PR**: `auto/R-search-in-focus-only` → PR open (see below)
+**Build**: clean (0 errors)
+**Tests**: 1025 pass, 0 fail, 2 skipped (+7 new tests)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 1018/0/2 on main (PR #388 already merged). Only open PR: #375 (Dependabot esbuild bump). Board confirmed: A✅ through Q✅.
+- Notion wrapper still missing — DRIVER-BOARD.md continues as fallback.
+- **Change** (`src/aggregator.ts`):
+  1. Added `inFocusOnly` boolean param to `ch1tty/search` inputSchema (after `explain`). Description: hard filter, no-op without active focus.
+  2. Extracted `const inFocusOnly = args.inFocusOnly === true;` in `handleSearch`.
+  3. Added hard-filter block after server/category/query filters, before relevance scoring: `if (inFocusOnly && focus) { matches = matches.filter(t => isInFocus(focus, t)); }`.
+  4. Server-summary path: when `inFocusOnly && focus`, filter server list to only in-focus servers (before the soft-lens sort, which is now skipped when hard filter is active).
+  5. Added `...(inFocusOnly && focus ? { inFocusOnly: true } : {})` to both the server-summary and the main search response JSON.
+- **7 new tests** in `test/search-in-focus-only.test.ts`:
+  1. `inFocusOnly: true` + finance focus + query → only stripe (in-focus) tools returned, context7 excluded
+  2. `inFocusOnly: true` + no active focus → no-op, same tools as without flag
+  3. `inFocusOnly: false` + focus → lens behavior preserved (out-of-focus tools present)
+  4. `inFocusOnly: true` + focus → response JSON has `inFocusOnly: true` field
+  5. `inFocusOnly: true` + focus → every tool in results has `inFocus: true`
+  6. Server summary + `inFocusOnly: true` + focus → only in-focus servers listed; stripe present, context7 excluded
+  7. `inFocusOnly: true` + focus + server filter → intersection: in-focus server returns tools; out-of-focus server returns empty
+
+**Next run priority**:
+- Merge PR (this run) once created; mark Workstream R ✅ done.
+- Workstream S candidates: (a) session-sticky focus — persist active focus per-session via coordinator so clients don't re-pass `focus` on every call; (b) Dependabot esbuild PR #375 review/merge (dev-only bump, security-tagged).
+- Blockers unchanged: CI broken org-wide (human must fix GitHub Actions), Notion unreachable (human must configure wrapper), Ledger DLQ entries (ledger.chitty.cc unreachable).
 
 ---
 

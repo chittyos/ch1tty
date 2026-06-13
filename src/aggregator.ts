@@ -296,6 +296,7 @@ export class Aggregator {
             focus: { type: 'string', description: 'Focus profile to bias results toward (e.g. "finance", "governance", "design"). A soft lens — out-of-focus tools still appear. Use "none" to override the env default. Overrides CH1TTY_FOCUS for this call.' },
             limit: { type: 'number', description: 'Max results to return (default 20)' },
             explain: { type: 'boolean', description: 'If true, include an explanation field in the response showing how results were ranked: match mode (and/partial), focus boost contributions, per-result relevance scores, recency signals, and a human-readable rationale. Useful for debugging ranking decisions (default: false).' },
+            inFocusOnly: { type: 'boolean', description: 'If true and a focus profile is active, return only tools that are within the active focus (hard filter). Out-of-focus tools are excluded. No-op when no focus is active. Overrides the default lens behavior for this call (default: false).' },
           },
         },
       },
@@ -393,6 +394,7 @@ export class Aggregator {
     const categoryFilter = typeof args.category === 'string' ? args.category : undefined;
     const limit = typeof args.limit === 'number' ? args.limit : 20;
     const explain = args.explain === true;
+    const inFocusOnly = args.inFocusOnly === true;
     const { name: focusName, profile: focus } = this.resolveActiveFocus(args.focus);
 
     const registry = await this.getRegistry();
@@ -442,6 +444,11 @@ export class Aggregator {
       }
     }
 
+    // Hard filter: when inFocusOnly is requested and a focus is active, drop out-of-focus tools entirely.
+    if (inFocusOnly && focus) {
+      matches = matches.filter((t) => isInFocus(focus, t));
+    }
+
     // If no filters at all, return a summary of available servers instead of all tools
     if (!query && !serverFilter && !categoryFilter) {
       let serverSummary = this.activeConfigs().map((c) => {
@@ -449,8 +456,12 @@ export class Aggregator {
         const inFocus = focus ? isInFocus(focus, { serverId: c.id, category: c.category }) : false;
         return { server: c.id, name: c.name, category: c.category, tools: count, ...(focus ? { inFocus } : {}) };
       });
+      // Hard filter for server summary: when inFocusOnly is set, drop out-of-focus servers.
+      if (inFocusOnly && focus) {
+        serverSummary = serverSummary.filter((s) => s.inFocus);
+      }
       // Soft lens: surface in-focus servers first; out-of-focus stay listed.
-      if (focus) {
+      if (focus && !inFocusOnly) {
         serverSummary = [...serverSummary].sort((a, b) => Number(b.inFocus) - Number(a.inFocus));
       }
 
@@ -462,6 +473,7 @@ export class Aggregator {
             hint: 'Use query, server, or category to search for specific tools',
             ...(entity?.chittyId ? { entity: entity.chittyId, identityClass: entity.identityClass } : {}),
             ...(focusName ? { focus: focusName } : {}),
+            ...(inFocusOnly && focus ? { inFocusOnly: true } : {}),
             servers: serverSummary,
             totalTools: registry.length,
           }, null, 2),
@@ -534,6 +546,7 @@ export class Aggregator {
           total: matches.length,
           ...(partialFallback ? { mode: 'partial' } : {}),
           ...(focusName ? { focus: focusName } : {}),
+          ...(inFocusOnly && focus ? { inFocusOnly: true } : {}),
           ...(sessionId ? { sessionId } : {}),
           ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
           ...(explanation ? { explanation } : {}),
