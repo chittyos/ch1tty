@@ -299,7 +299,7 @@ export class Aggregator {
     return [
       {
         name: `${META_SERVER_ID}${SEPARATOR}search`,
-        description: 'Search the tool registry. Returns matching tool names, descriptions, and input schemas. Use before execute.',
+        description: 'Search the tool registry. Returns matching tool names, descriptions, and input schemas. When a sessionId is active, also returns sessionContext: { recentTools, callCount, activeSessionFocus? } for one-shot session awareness. Use before execute.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -454,6 +454,16 @@ export class Aggregator {
 
     const registry = await this.getRegistry();
 
+    // Session context summary — surfaces recent activity + sticky focus in a single response.
+    let sessionContext: { recentTools: string[]; callCount: number; activeSessionFocus?: string } | undefined;
+    if (effectiveSessionId) {
+      const patterns = this.coordinator.getToolPatterns(effectiveSessionId, 1000);
+      const recentTools = patterns.slice(0, 5).map((p) => p.tool);
+      const callCount = patterns.reduce((sum, p) => sum + p.count, 0);
+      const activeSessionFocus = this.coordinator.getSessionFocus(effectiveSessionId);
+      sessionContext = { recentTools, callCount, ...(activeSessionFocus ? { activeSessionFocus } : {}) };
+    }
+
     // Build session context for relevance boosting (coordinator + session tracker)
     const recentServerIds = new Set<string>();
     if (effectiveSessionId) {
@@ -529,6 +539,7 @@ export class Aggregator {
             ...(entity?.chittyId ? { entity: entity.chittyId, identityClass: entity.identityClass } : {}),
             ...(focusName ? { focus: focusName } : {}),
             ...(inFocusOnly && focus ? { inFocusOnly: true } : {}),
+            ...(sessionContext ? { sessionContext } : {}),
             servers: serverSummary,
             totalTools: registry.length,
           }, null, 2),
@@ -614,6 +625,7 @@ export class Aggregator {
           ...(focusName ? { focus: focusName } : {}),
           ...(inFocusOnly && focus ? { inFocusOnly: true } : {}),
           ...(effectiveSessionId ? { sessionId: effectiveSessionId } : {}),
+          ...(sessionContext ? { sessionContext } : {}),
           ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
           ...(explanation ? { explanation } : {}),
           tools: results,
