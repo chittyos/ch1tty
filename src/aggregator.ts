@@ -587,6 +587,7 @@ export class Aggregator {
     activeSessions: number;
     focus: { active: string; categories: ServerCategory[]; servers: string[]; boost: number } | null;
     availableFocusProfiles: string[];
+    catalog: { loaded: boolean; totalCombos: number; byFocus: Record<string, number> };
     systemHealth: { status: 'ok' | 'warn' | 'degraded'; brainDegraded: boolean; ledgerStatus: 'ok' | 'warn' | 'degraded' };
     brainHealth: { status: 'ok' | 'degraded'; embeddingCircuitOpen: boolean; ollamaCircuitOpen: boolean };
     ledgerHealth: { status: 'ok' | 'warn' | 'degraded'; dropped: number; buffered: number; flushErrors: number; dlqEntries: number; dlqPath: string };
@@ -617,6 +618,14 @@ export class Aggregator {
 
     const brainDegraded = embeddingCircuitOpen || ollamaCircuitOpen;
     const ledgerStatus: 'ok' | 'warn' | 'degraded' = ledgerDegraded ? 'degraded' : ledgerWarn ? 'warn' : 'ok';
+
+    const catalogByFocus: Record<string, number> = {};
+    let catalogTotalCombos = 0;
+    for (const [focusName, entry] of Object.entries(this.suggestionsCatalog)) {
+      catalogByFocus[focusName] = entry.combos.length;
+      catalogTotalCombos += entry.combos.length;
+    }
+    const catalogLoaded = catalogTotalCombos > 0 || Object.keys(this.suggestionsCatalog).length > 0;
     // P1: brain circuit open → warn, not degraded. Brain is optional (keyword fallback always
     // available); opening a brain circuit must not drain load-balanced instances that can still serve.
     const systemStatus: 'ok' | 'warn' | 'degraded' = ledgerStatus === 'degraded'
@@ -636,6 +645,7 @@ export class Aggregator {
       activeSessions: this.sessions.count,
       focus: this.activeFocusSnapshot(),
       availableFocusProfiles: Object.keys(this.focusProfiles.profiles),
+      catalog: { loaded: catalogLoaded, totalCombos: catalogTotalCombos, byFocus: catalogByFocus },
       systemHealth: { status: systemStatus, brainDegraded, ledgerStatus },
       brainHealth: {
         status: brainDegraded ? 'degraded' : 'ok',
