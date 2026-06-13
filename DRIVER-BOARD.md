@@ -30,7 +30,8 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **X. `ch1tty/execute` dryRun mode** — `dryRun: true` on `ch1tty/execute` resolves the namespaced tool to server + bare name and returns `{ status: "dry_run", server, tool, args }` without calling the backend. Mirrors cast's dryRun for the direct-invocation path. Unknown server/tool errors still fire. PR #404 ✅ MERGED (run 110, 2026-06-13). 7 new tests, 1001/0/2. DONE.
 - [x] **Y. `ch1tty/cast` scope parameter** — `scope` parameter on `ch1tty/cast` hard-filters the registry to a specific server or category before intent resolution. Allows callers to restrict cast to a bounded tool namespace without modifying focus. PR #406 ✅ MERGED (run 111, 2026-06-13). DONE.
 - [x] **IIII. Branch coverage sweep** — 4 branch gaps closed in `aggregator.ts` + `suggestions.ts`: explain truncation note (1582-1583), suggestions nopath fallback (38), relevanceMap ??0 (1566), recentlyUsed spread (1568). suggestions.ts now 100% branch. PR #407 ✅ MERGED (run 113, 2026-06-13). 4 new tests, 1081/0/2. DONE.
-- [ ] **Z. `ch1tty/status` short mode** — `short: true` param returns condensed snapshot omitting `servers[]` and `coordinator.sessions[]` while preserving all health fields, counts, focus, and catalog stats. Useful for lightweight health polling (large gateways have 100+ sessions and 50+ servers making full status unwieldy). PR #409 open (run 113, 2026-06-13). 7 new tests, 1088/0/2. Awaiting merge.
+- [x] **Z. `ch1tty/status` short mode** — `short: true` param returns condensed snapshot omitting `servers[]` and `coordinator.sessions[]` while preserving all health fields, counts, focus, and catalog stats. PR #409 ✅ MERGED (run 113, 2026-06-13). 7 new tests, 1088/0/2. DONE.
+- [ ] **AA. `ch1tty/search` offset pagination** — `offset: number` param skips N results before returning the page, pairing with `limit` to iterate through large registries. `total` always reflects the full unsliced count. `offset` field included in response when non-zero. PR #411 open (run 114, 2026-06-13). 7 new tests, 1095/0/2. Awaiting merge.
 
 ## Live Gateway State (as of 2026-06-13 run 113)
 
@@ -55,6 +56,40 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 114 — 2026-06-13 (auto-driver)
+
+**Workstream advanced**: AA (new — `ch1tty/search offset` pagination)
+**Branch/PR**: `auto/AA-search-offset-pagination` → PR open this run
+**Build**: clean (0 errors)
+**Tests**: 1095 pass, 0 fail, 2 skipped (+7 new tests from 1088 baseline)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 1088/0/2 on main. No open workstream PRs (only Dependabot #375). Board read: A✅ through Y✅, IIII✅, Z open (PR #409). Confirmed PR #409 is actually MERGED (merged_at 2026-06-13T17:19:09Z). Marked Z ✅ done in board.
+- **Workstream AA: `ch1tty/search` offset pagination**
+  - Gap: `ch1tty/search` had `limit` but no `offset`, making it impossible to iterate through large registries in pages. Large deployments with 100+ tools per server needed multiple keyword queries to approximate paging.
+  - **`src/aggregator.ts`** (4 edits):
+    1. `ch1tty/search` inputSchema: added `offset: number` property after `limit` with description explaining page-pair usage.
+    2. `handleSearch`: extracted `const offset = typeof args.offset === 'number' && args.offset > 0 ? Math.floor(args.offset) : 0`.
+    3. Changed `matches.slice(0, limit)` to `matches.slice(offset, offset + limit)` — pagination applied after sorting.
+    4. Added `...(offset > 0 ? { offset } : {})` to response JSON (omitted when 0/default).
+  - `total` already reflected full match count — no change needed; it naturally shows the full page-able set.
+  - Server-summary (no-query) path not changed — offset is only meaningful on filtered/searched tool lists.
+  - **7 new tests** in `test/search-offset-pagination.test.ts`:
+    1. `offset: 0` → same results as default (no offset field in response)
+    2. `offset: N` → first result is the N+1th from the unsliced list
+    3. two consecutive pages concatenate to equal a single larger-limit query
+    4. `offset >= total` → empty tools, `matches: 0`, `total` unchanged
+    5. `offset` field appears in response JSON only when non-zero
+    6. `total` reflects full count regardless of offset
+    7. `offset` works together with keyword query
+
+**Next run priority**:
+- Check if PR (AA) CI clears. Merge and mark AA ✅ done.
+- Workstream BB candidates: (a) `ch1tty/execute` `timeout` ms param — per-call timeout override complementing `CH1TTY_REMOTE_TIMEOUT_MS`; (b) Dependabot PR #375 merge (esbuild dev-only bump, long overdue); (c) `ch1tty/search` `cursor`-based pagination (alternative to offset for stable iteration).
+- Persistent blockers: CI broken org-wide (human must fix GitHub Actions), Notion unreachable, Ledger DLQ 6 entries.
 
 ---
 
