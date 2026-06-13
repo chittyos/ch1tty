@@ -27,8 +27,9 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **U. `ch1tty/status` per-session topTools** — `coordinator.getSnapshot()` now includes `topTools: string[]` on each session entry — top 5 most-called namespaced tool names sorted by count descending, `[]` when no calls made. Operators can inspect which tools each active session uses, not just the count. PR #397 ✅ MERGED (run 107, 2026-06-13). 7 new tests, 1046/0/2. DONE.
 - [x] **V. `ch1tty/status` coordinator-level global topTools** — `coordinator.getSnapshot()` adds `topTools: string[]` at the coordinator top level, aggregating tool call counts across ALL active sessions; top 10 globally. Complements per-session topTools (U). PR #399 ✅ MERGED (run 108, 2026-06-13). 7 new tests, 1053/0/2. DONE.
 - [x] **W. `ch1tty/status` catalog stats + activeFocusSuggestions** — `getStatusSnapshot()` now includes `catalog: { loaded, totalCombos, byFocus, activeFocusSuggestions }`. When a focus is active and the suggestions catalog has an entry for it, `activeFocusSuggestions` surfaces the top 3 combos + prompts — a quick compass for operators. PR #401 ✅ MERGED (run 109, 2026-06-13). 7 new tests, 1053/0/2. DONE.
+- [ ] **X. `ch1tty/execute` dryRun mode** — `dryRun: true` on `ch1tty/execute` resolves the namespaced tool to server + bare name and returns `{ status: "dry_run", server, tool, args }` without calling the backend. Mirrors cast's dryRun for the direct-invocation path. Unknown server/tool errors still fire. PR #404 open (run 110, 2026-06-13). 7 new tests, 1001/0/2. Awaiting merge.
 
-## Live Gateway State (as of 2026-06-13 run 109)
+## Live Gateway State (as of 2026-06-13 run 110)
 
 - Connected backends: cloudflare-builds (7 tools), evidence (3), browser-rendering (3), context7 (2), thinking (1), fs (14), playwright (23), orchestrator (13) — 66 total tools
 - Not connected: chittyos, cloudflare, GitHub, linear, notion, stripe, neon (lazy, auth-gated)
@@ -51,6 +52,37 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 110 — 2026-06-13 (auto-driver)
+
+**Workstream advanced**: X (new — `dryRun` mode for `ch1tty/execute`)
+**Branch/PR**: `auto/X-execute-dry-run` → https://github.com/chittyos/ch1tty/pull/404 (open)
+**Build**: clean (0 errors)
+**Tests**: 1001 pass, 0 fail, 2 skipped (+7 new tests)
+
+**What was done**:
+- Startup: merged PRs #399 (V), #400 (board-108), #401 (W), #402 (board-109) — all 4 had 3/3 CI checks green. #402 had a merge conflict (both #400 and #402 touched DRIVER-BOARD.md); resolved by rebasing #402 onto origin/main and force-pushing, then merging. Board now shows A✅ through W✅.
+- Baseline on fresh origin/main: `npm ci` clean, `npm run build` clean, 994/0/2.
+- **Workstream X: `dryRun` mode for `ch1tty/execute`**
+  - Gap: `ch1tty/cast` had `dryRun: true` (workstream O) that previewed resolution without executing. `ch1tty/execute` had no equivalent — callers testing a specific namespaced tool could not preview it without side effects.
+  - **`src/aggregator.ts`** (8 lines): Added `dryRun?: boolean` to the `ch1tty/execute` inputSchema. In `handleExecute`, extracted `const dryRun = args.dryRun === true`. After backend lookup but before `backend.callTool`, if `dryRun` returns early with `{ status: "dry_run", server: serverId, tool: name, args: toolArgs }`. Unknown server/tool errors fire before the dry-run gate (resolution happens first).
+  - **7 new tests** in `test/execute-dry-run.test.ts`:
+    1. `dryRun: true` → `status: "dry_run"` with `server`, `tool`, `args` fields
+    2. `dryRun: true` makes zero backend calls (verified via `getCallLog()`)
+    3. `dryRun: false` → normal execution (backend called)
+    4. `dryRun` omitted → normal execution (backend called)
+    5. `args` passed with `dryRun` → echoed back in dry_run response
+    6. Unknown server with `dryRun: true` → `isError` (resolution fails first)
+    7. `tool` field in response is bare name without `serverId/` prefix
+- Bot comments on PR: Codex usage-limit + CodeRabbit rate-limit — both informational, no action.
+- PR #404 opened (ready for review, not draft).
+
+**Next run priority**:
+- Check if PR #404 (X) CI has cleared. Merge and mark X ✅ done.
+- Workstream Y candidates: (a) `ch1tty/search` `sessionContext` annotation — add `callCount: number` and `lastUsedMs: number` to `recentlyUsed` tool entries (currently just a boolean); (b) `ch1tty/status` DLQ summary — expose ledger dead-letter queue entry count + path in status snapshot for operator visibility; (c) Dependabot #375 merge (esbuild dev-only bump).
+- Persistent blockers: CI broken org-wide (human must fix GitHub Actions), Notion unreachable, Ledger DLQ 6 entries.
 
 ---
 
