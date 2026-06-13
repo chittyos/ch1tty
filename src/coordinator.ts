@@ -44,6 +44,8 @@ export interface SessionContext {
   toolPatterns: Map<string, ToolPattern>;
   stagingComplete: boolean;
   serverAffinity: Map<string, number>; // serverId → recency score
+  /** Sticky focus profile set by the last explicit focus param in this session. */
+  sessionFocus?: string;
 }
 
 // ── Coordinator ───────────────────────────────────────────────
@@ -204,6 +206,17 @@ export class SessionCoordinator {
   /** Get entity context for a session (for search enrichment). */
   getEntityContext(sessionId: string): EntityContext | undefined {
     return this.contexts.get(sessionId)?.entity;
+  }
+
+  /** Persist the active focus profile for a session. Pass undefined to clear. */
+  setSessionFocus(sessionId: string, focusName: string | undefined): void {
+    const ctx = this.contexts.get(sessionId);
+    if (ctx) ctx.sessionFocus = focusName;
+  }
+
+  /** Retrieve the sticky focus profile for a session, if one was set. */
+  getSessionFocus(sessionId: string): string | undefined {
+    return this.contexts.get(sessionId)?.sessionFocus;
   }
 
   /** Get top tool patterns for a session. */

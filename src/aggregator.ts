@@ -135,18 +135,31 @@ export class Aggregator {
   }
 
   /**
-   * Resolve the active focus profile for a call. A per-call `focus` arg overrides
-   * the env/process default. The escape-hatch values "" / "none" explicitly mean
-   * "no focus" (override an env default); an absent arg falls back to the default.
+   * Resolve the active focus profile for a call.
+   *
+   * Priority: per-call `focus` arg > session-sticky focus > process default (CH1TTY_FOCUS).
+   * "" / "none" explicitly suppress focus and also clear the session-sticky focus.
+   * A valid per-call focus name is persisted as the new session-sticky focus.
    */
-  private resolveActiveFocus(perCall: unknown): { name?: string; profile?: FocusProfile } {
+  private resolveActiveFocus(perCall: unknown, sessionId?: string): { name?: string; profile?: FocusProfile } {
     let name: string | undefined;
     if (typeof perCall === 'string') {
       const trimmed = perCall.trim();
-      name = trimmed === '' || trimmed.toLowerCase() === 'none' ? undefined : trimmed;
+      if (trimmed === '' || trimmed.toLowerCase() === 'none') {
+        if (sessionId) this.coordinator.setSessionFocus(sessionId, undefined);
+        name = undefined;
+      } else {
+        if (sessionId) this.coordinator.setSessionFocus(sessionId, trimmed);
+        name = trimmed;
+      }
     } else {
-      const def = typeof this.defaultFocus === 'string' ? this.defaultFocus.trim() : undefined;
-      name = !def || def.toLowerCase() === 'none' ? undefined : def;
+      const sessionFocus = sessionId ? this.coordinator.getSessionFocus(sessionId) : undefined;
+      if (sessionFocus) {
+        name = sessionFocus;
+      } else {
+        const def = typeof this.defaultFocus === 'string' ? this.defaultFocus.trim() : undefined;
+        name = !def || def.toLowerCase() === 'none' ? undefined : def;
+      }
     }
     return { name, profile: resolveFocus(this.focusProfiles, name) };
   }
@@ -395,7 +408,7 @@ export class Aggregator {
     const limit = typeof args.limit === 'number' ? args.limit : 20;
     const explain = args.explain === true;
     const inFocusOnly = args.inFocusOnly === true;
-    const { name: focusName, profile: focus } = this.resolveActiveFocus(args.focus);
+    const { name: focusName, profile: focus } = this.resolveActiveFocus(args.focus, sessionId);
 
     const registry = await this.getRegistry();
 
@@ -807,7 +820,7 @@ export class Aggregator {
     const confirm = !dryRun && args.confirm === true;
     const autoChain = args.chain === true;
     const explain = args.explain === true;
-    const { name: focusName, profile: focus } = this.resolveActiveFocus(args.focus);
+    const { name: focusName, profile: focus } = this.resolveActiveFocus(args.focus, sessionId);
 
     if (!intent) {
       return {
