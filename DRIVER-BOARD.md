@@ -36,6 +36,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **CC. `ch1tty/cast` per-call timeout** — `timeout: number` param on `ch1tty/cast` mirrors BB: overrides `CH1TTY_REMOTE_TIMEOUT_MS` for a single cast call. Threaded through both execution paths: normal single-tool execute (Step 3) and each step of auto-chain execution (`chain: true`). Non-positive values treated as absent. dryRun short-circuits before backend — timeout has no effect. No changes to `handleExecute`, `RemoteProxy`, or `ChildManager`. PR #414 ✅ MERGED (run 116, 2026-06-13). 8 new tests, 1111/0/2. DONE.
 - [x] **DD. Explicit `sessionId` param on search/execute/cast** — Stateless HTTP server-to-server callers can now pass `sessionId` in args to participate in coordinator session tracking (sticky focus, affinity, topTools) without a long-lived transport session. `args.sessionId` takes priority over the transport-derived session ID. When no context exists, one is lazily created. `coordinator.hasSession()` added. PR #415 ✅ MERGED (run 117 → confirmed merged at HEAD of main, 2026-06-13). 8 new tests, 1119/0/2. DONE.
 - [x] **EE. `ch1tty/search` recentlyUsed enrichment** — `recentlyUsed` in search results now carries per-tool usage data: `{ callCount: N, lastUsedMs: T }` when the exact tool was called in the session; `true` retained as server-level fallback. Adds `SessionCoordinator.getToolPattern()`. 4 existing tests updated to truthy checks. PR #416 ✅ MERGED (run 118, 2026-06-13). 7 new tests, 1126/0/2. DONE.
+- [x] **FF. `ch1tty/search` sessionContext field** — When a sessionId is active, `ch1tty/search` now returns `sessionContext: { recentTools: string[], callCount: number, activeSessionFocus?: string }` — one-shot session awareness alongside tool results, no separate `ch1tty/status` call needed. Included in both the query path and no-query server-summary path. PR #418 ✅ MERGED (run 119, 2026-06-13). 7 new tests, 1133/0/2. DONE.
 
 ## Live Gateway State (as of 2026-06-13 run 117)
 
@@ -74,6 +75,39 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 119 — 2026-06-13 (auto-driver)
+
+**Workstream advanced**: FF (new — `ch1tty/search` sessionContext field)
+**Branch/PR**: `auto/FF-search-session-context` → https://github.com/chittyos/ch1tty/pull/418 ✅ MERGED
+**Build**: clean (0 errors)
+**Tests**: 1133 pass, 0 fail, 2 skipped (+7 new tests from 1126 baseline)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 1126/0/2 on origin/main. Board read: A✅ through EE✅, no open PRs. 0 open PRs confirmed via GitHub MCP. Notion unreachable, Ledger DLQ 6 entries — both unchanged blockers.
+- **Workstream FF: `ch1tty/search` sessionContext field**
+  - Gap: after DD (explicit sessionId) and EE (per-tool recentlyUsed), callers still needed a separate `ch1tty/status` call to get basic session-level awareness — which tools have been called, total count, and what focus is sticky. For stateless HTTP callers passing `sessionId` explicitly, this round-trip adds latency.
+  - **`src/aggregator.ts`** (4 edits):
+    1. Updated `ch1tty/search` description to advertise the new `sessionContext` response field.
+    2. `handleSearch`: after computing `effectiveSessionId`, computes `sessionContext` when set — calls `coordinator.getToolPatterns(id, 1000)` → top 5 = `recentTools`, sum of counts = `callCount`; calls `coordinator.getSessionFocus(id)` → `activeSessionFocus?` when set.
+    3. Server-summary response (no-query path): added `...(sessionContext ? { sessionContext } : {})`.
+    4. Main search response (query path): added `...(sessionContext ? { sessionContext } : {})`.
+  - **7 new tests** in `test/search-session-context.test.ts`:
+    1. No sessionId → `sessionContext` field absent
+    2. sessionId, zero calls → `recentTools:[]`, `callCount:0`, no `activeSessionFocus`
+    3. After tool call → `recentTools` contains called tool
+    4. 6 distinct tools called → `recentTools` capped at 5
+    5. 2+1 calls → `callCount:3` (summed across tools)
+    6. Sticky focus set via search → `activeSessionFocus:"code"` in next search
+    7. Focus cleared with `"none"` → `activeSessionFocus` absent in next search
+- CI: 0-jobs infra failure (known ongoing issue). Codex usage-limit + CodeRabbit rate-limit — both informational. Merged manually after local test verification.
+- PR #418 merged.
+
+**Next run priority**:
+- Workstream GG candidates: (a) `ch1tty/search` description param on the tool schema — add `description` field to each tool result alongside `inputSchema`, so callers don't need to do a separate lookup; (b) `ch1tty/execute` `sessionContext` response — mirror FF by returning session context in execute responses when sessionId is present; (c) `ch1tty/status` `ledgerDlq` field — expose DLQ path + entry count in status so operators can find the WAL without inspecting logs.
+- Persistent blockers: CI broken org-wide (human must fix GitHub Actions), Notion unreachable, Ledger DLQ 6 entries.
 
 ---
 
