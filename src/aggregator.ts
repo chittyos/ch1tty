@@ -321,6 +321,7 @@ export class Aggregator {
           properties: {
             tool: { type: 'string', description: 'Namespaced tool name from search results (e.g. "neon/list_projects")' },
             args: { type: 'object', description: 'Arguments to pass to the tool' },
+            dryRun: { type: 'boolean', description: 'If true, resolve the tool and return what would be called (server, tool, args) without executing. Makes zero backend calls. Useful for previewing or sandboxing (default: false).' },
           },
           required: ['tool'],
         },
@@ -576,6 +577,7 @@ export class Aggregator {
     const toolArgs = (typeof args.args === 'object' && args.args !== null && !Array.isArray(args.args))
       ? args.args as Record<string, unknown>
       : {};
+    const dryRun = args.dryRun === true;
 
     if (!toolName) {
       return {
@@ -607,6 +609,13 @@ export class Aggregator {
           text: `Unknown server "${serverId}". Known servers: ${knownServers}`,
         }],
         isError: true,
+      };
+    }
+
+    if (dryRun) {
+      return {
+        content: [{ type: 'text', text: JSON.stringify({ status: 'dry_run', server: serverId, tool: name, args: toolArgs }) }],
+        isError: false,
       };
     }
 
