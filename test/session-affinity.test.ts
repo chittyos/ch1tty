@@ -182,8 +182,8 @@ test('search marks recently-used server tools with recentlyUsed:true', async () 
   const neonTools = data.tools.filter((t: { server: string }) => t.server === 'neon');
   assert.ok(neonTools.length > 0, 'neon tools are in results');
   assert.ok(
-    neonTools.every((t: { recentlyUsed?: boolean }) => t.recentlyUsed === true),
-    'all neon tools carry recentlyUsed:true after executing a neon tool',
+    neonTools.every((t: { recentlyUsed?: boolean | object }) => !!t.recentlyUsed),
+    'all neon tools carry a truthy recentlyUsed (bool or {callCount,lastUsedMs}) after executing a neon tool',
   );
 });
 

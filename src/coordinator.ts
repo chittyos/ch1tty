@@ -233,6 +233,11 @@ export class SessionCoordinator {
       .slice(0, limit);
   }
 
+  /** Get the usage pattern for a specific tool in a session, or undefined if never called. */
+  getToolPattern(sessionId: string, tool: string): ToolPattern | undefined {
+    return this.contexts.get(sessionId)?.toolPatterns.get(tool);
+  }
+
   /** Log a decision to the ledger on behalf of the entity. */
   logDecision(sessionId: string, decision: string, reasoning?: string, topic?: string): void {
     this.recordToLedger(sessionId, 'decision', {

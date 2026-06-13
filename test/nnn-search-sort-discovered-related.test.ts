@@ -206,7 +206,7 @@ test('handleSearch sort: equal relevance + equal focus → recently-used server 
     assert.ok(data.tools.length >= 2, 'both tools must appear in results');
     // beta is recent, alpha is not; both have equal relevance + no focus → beta first.
     assert.equal(data.tools[0].server, 'beta', 'recently-used server must rank above non-recent at equal relevance+focus');
-    assert.equal(data.tools[0].recentlyUsed, true, 'recent winner must be marked recentlyUsed:true');
+    assert.ok(!!data.tools[0].recentlyUsed, 'recent winner must have a truthy recentlyUsed (bool or {callCount,lastUsedMs})');
     // alpha still present (recency is a tiebreaker, not a filter).
     assert.ok(data.tools.some((t: { server: string }) => t.server === 'alpha'), 'non-recent alpha must still appear');
   } finally {
