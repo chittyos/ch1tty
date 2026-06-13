@@ -39,6 +39,7 @@ export interface FixtureServerDef {
 export interface CallRecord {
   serverId: string;
   tool: string;
+  args: Record<string, unknown>;
   durationMs: number;
   isError: boolean;
 }
@@ -97,7 +98,7 @@ export class FixtureBackend implements Backend {
   async callTool(
     serverId: string,
     toolName: string,
-    _args?: Record<string, unknown>,
+    args?: Record<string, unknown>,
   ): Promise<ToolCallResult> {
     const def = this.servers.get(serverId);
     if (!def) {
@@ -117,14 +118,14 @@ export class FixtureBackend implements Backend {
     if (def.latencyMs) await sleep(def.latencyMs);
     if (tool.response === 'error') {
       const durationMs = Date.now() - start;
-      this.callLog.push({ serverId, tool: toolName, durationMs, isError: true });
+      this.callLog.push({ serverId, tool: toolName, args: args ?? {}, durationMs, isError: true });
       return {
         content: [{ type: 'text', text: `Simulated error in ${serverId}/${toolName}` }],
         isError: true,
       };
     }
     const durationMs = Date.now() - start;
-    this.callLog.push({ serverId, tool: toolName, durationMs, isError: false });
+    this.callLog.push({ serverId, tool: toolName, args: args ?? {}, durationMs, isError: false });
     return tool.response;
   }
 
@@ -509,15 +510,15 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
   context7: {
     tools: [
       {
-        name: 'get-library-docs',
+        name: 'query-docs',
         description: 'Get library documentation and code examples for a package by library ID',
         inputSchema: {
           type: 'object',
           properties: {
             libraryId: { type: 'string' },
-            topic: { type: 'string' },
+            query: { type: 'string' },
           },
-          required: ['libraryId'],
+          required: ['libraryId', 'query'],
         },
         response: text(JSON.stringify({
           libraryId: '/modelcontextprotocol/typescript-sdk',
@@ -634,45 +635,126 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
     ],
   },
 
+  'cloudflare-builds': {
+    tools: [
+      {
+        name: 'workers_builds_list_builds',
+        description: 'List recent Cloudflare Workers Builds build runs with status, timestamps, and error summaries for a Worker',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            workerId: { type: 'string' },
+            page: { type: 'number' },
+            perPage: { type: 'number' },
+          },
+          required: [],
+        },
+        response: text(JSON.stringify([
+          { buildUUID: 'uuid-abc', worker: 'ch1tty-gateway', status: 'success', triggered_at: '2026-06-05T06:00:00Z', duration_ms: 45000 },
+          { buildUUID: 'uuid-xyz', worker: 'ch1tty-gateway', status: 'failed', triggered_at: '2026-06-04T22:00:00Z', error: 'Build command exited with code 1' },
+        ])),
+      },
+      {
+        name: 'workers_builds_get_build',
+        description: 'Get details of a specific Cloudflare Workers Builds build run including configuration, status, and deployment outcome',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            buildUUID: { type: 'string' },
+          },
+          required: ['buildUUID'],
+        },
+        response: text(JSON.stringify({
+          buildUUID: 'uuid-xyz',
+          worker: 'ch1tty-gateway',
+          status: 'failed',
+          triggered_at: '2026-06-04T22:00:00Z',
+          error: 'Build command exited with code 1',
+        })),
+      },
+      {
+        name: 'workers_builds_get_build_logs',
+        description: 'Get build logs from a specific Cloudflare Workers Builds run for debugging failed builds and deployment errors',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            buildUUID: { type: 'string' },
+          },
+          required: ['buildUUID'],
+        },
+        response: text(JSON.stringify({
+          buildUUID: 'uuid-xyz',
+          logs: 'Error: Build command exited with code 1\nnpm ERR! missing script: build',
+        })),
+      },
+      {
+        name: 'workers_builds_set_active_worker',
+        description: 'Set the active Worker ID for subsequent Workers Builds API calls in this session',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            workerId: { type: 'string' },
+          },
+          required: ['workerId'],
+        },
+        response: text(JSON.stringify({ workerId: 'ch1tty-gateway', status: 'active' })),
+      },
+    ],
+  },
+
   orchestrator: {
     tools: [
       {
-        name: 'run_job',
-        description: 'Run a scheduled or ad-hoc job via the ChittyAgent Orchestrator',
+        name: 'skill_search',
+        description: 'Search for skills by intent, keyword, or trigger — returns ranked matches with relevance scores for skill discovery',
         inputSchema: {
           type: 'object',
           properties: {
-            job_name: { type: 'string' },
-            payload: { type: 'object' },
-          },
-          required: ['job_name'],
-        },
-        response: text(JSON.stringify({ job_id: 'job-xyz789', status: 'running', started_at: '2026-05-30T04:00:00Z' })),
-      },
-      {
-        name: 'get_job_status',
-        description: 'Get the current status and result of an orchestrator job by job ID',
-        inputSchema: {
-          type: 'object',
-          properties: { job_id: { type: 'string' } },
-          required: ['job_id'],
-        },
-        response: text(JSON.stringify({ job_id: 'job-xyz789', status: 'completed', result: { ok: true }, duration_ms: 1234 })),
-      },
-      {
-        name: 'list_jobs',
-        description: 'List recent orchestrator jobs with their status and outcome',
-        inputSchema: {
-          type: 'object',
-          properties: {
-            status: { type: 'string', enum: ['running', 'completed', 'failed', 'all'] },
+            query: { type: 'string' },
             limit: { type: 'number' },
+          },
+          required: ['query'],
+        },
+        response: text(JSON.stringify([{ id: 'chittyos-devops:chitty-deploy', name: 'chitty-deploy', score: 0.92 }])),
+      },
+      {
+        name: 'skill_execute',
+        description: 'Execute a registered skill by ID or name with arguments — delegates to skill MCP server, agent worker, or returns local instructions',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            skill_id: { type: 'string' },
+            args: { type: 'object' },
+          },
+          required: ['skill_id'],
+        },
+        response: text(JSON.stringify({ ok: true, skill_id: 'chittyos-devops:chitty-deploy', result: { deployed: true } })),
+      },
+      {
+        name: 'agent_list',
+        description: 'List all agents in the ChittyAgent ecosystem with binding status, capabilities, domains, and tool counts',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            status_filter: { type: 'string', enum: ['bound', 'unbound', 'all'] },
           },
         },
         response: text(JSON.stringify([
-          { job_id: 'job-abc', job_name: 'db-backup', status: 'completed', duration_ms: 820 },
-          { job_id: 'job-def', job_name: 'cache-warm', status: 'failed', error: 'upstream timeout' },
+          { id: 'cloudflare', status: 'bound', capabilities: ['deploy', 'dns'], tools: 14 },
+          { id: 'notion', status: 'bound', capabilities: ['pages', 'databases'], tools: 22 },
         ])),
+      },
+      {
+        name: 'provision_evaluate',
+        description: 'Evaluate which ChittyID context entity should serve this session with TY-VY-RY scoring for identity, connectivity, and authority',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            intent: { type: 'string' },
+            support_type: { type: 'string' },
+          },
+        },
+        response: text(JSON.stringify({ session_id: 'sess-abc123', decision: 'bind_existing', candidate: 'chittyagent-devops', ty: 4.2, vy: 3.8, ry: 4.0 })),
       },
     ],
   },

@@ -28,9 +28,10 @@ import {
   loadSuggestionsCatalog,
   clearSuggestionsCache,
   getSuggestionsForFocus,
+  findCatalogCombo,
   resolveSuggestionsCatalogPath,
 } from './suggestions.js';
-import type { FocusSuggestions } from './suggestions.js';
+import type { FocusSuggestions, SuggestedCombo, SuggestedPrompt } from './suggestions.js';
 
 const SEPARATOR = '/';
 const META_SERVER_ID = 'ch1tty';
@@ -99,6 +100,7 @@ export class Aggregator {
   private configPath?: string;
   private focusProfiles: FocusProfiles;
   private suggestionsCatalog: Record<string, FocusSuggestions>;
+  private suggestionsCatalogPath?: string;
   private defaultFocus?: string;
   private backendFactory?: (config: ServerConfig) => Backend;
   private startedAt = Date.now();
@@ -119,8 +121,13 @@ export class Aggregator {
     this.backendFactory = options?.backendFactory;
     this.focusProfiles = options?.focusProfiles
       ?? loadFocusProfilesFromPath(options?.focusProfilesPath ?? resolveFocusProfilesPath());
-    this.suggestionsCatalog = options?.suggestionsCatalog
-      ?? loadSuggestionsCatalog(options?.suggestionsCatalogPath ?? resolveSuggestionsCatalogPath());
+    if (options?.suggestionsCatalog !== undefined) {
+      this.suggestionsCatalog = options.suggestionsCatalog;
+      // No disk path — reload will preserve the injected catalog.
+    } else {
+      this.suggestionsCatalogPath = options?.suggestionsCatalogPath ?? resolveSuggestionsCatalogPath();
+      this.suggestionsCatalog = loadSuggestionsCatalog(this.suggestionsCatalogPath);
+    }
     this.configs = configs;
     const embedConfig = options?.embedEnabled === false ? { enabled: false } : {};
     this.coordinator = options?.coordinator ?? new SessionCoordinator({}, embedConfig, options?.ledgerDlqPath);
@@ -128,18 +135,31 @@ export class Aggregator {
   }
 
   /**
-   * Resolve the active focus profile for a call. A per-call `focus` arg overrides
-   * the env/process default. The escape-hatch values "" / "none" explicitly mean
-   * "no focus" (override an env default); an absent arg falls back to the default.
+   * Resolve the active focus profile for a call.
+   *
+   * Priority: per-call `focus` arg > session-sticky focus > process default (CH1TTY_FOCUS).
+   * "" / "none" explicitly suppress focus and also clear the session-sticky focus.
+   * A valid per-call focus name is persisted as the new session-sticky focus.
    */
-  private resolveActiveFocus(perCall: unknown): { name?: string; profile?: FocusProfile } {
+  private resolveActiveFocus(perCall: unknown, sessionId?: string): { name?: string; profile?: FocusProfile } {
     let name: string | undefined;
     if (typeof perCall === 'string') {
       const trimmed = perCall.trim();
-      name = trimmed === '' || trimmed.toLowerCase() === 'none' ? undefined : trimmed;
+      if (trimmed === '' || trimmed.toLowerCase() === 'none') {
+        if (sessionId) this.coordinator.setSessionFocus(sessionId, undefined);
+        name = undefined;
+      } else {
+        if (sessionId) this.coordinator.setSessionFocus(sessionId, trimmed);
+        name = trimmed;
+      }
     } else {
-      const def = typeof this.defaultFocus === 'string' ? this.defaultFocus.trim() : undefined;
-      name = !def || def.toLowerCase() === 'none' ? undefined : def;
+      const sessionFocus = sessionId ? this.coordinator.getSessionFocus(sessionId) : undefined;
+      if (sessionFocus) {
+        name = sessionFocus;
+      } else {
+        const def = typeof this.defaultFocus === 'string' ? this.defaultFocus.trim() : undefined;
+        name = !def || def.toLowerCase() === 'none' ? undefined : def;
+      }
     }
     return { name, profile: resolveFocus(this.focusProfiles, name) };
   }
@@ -249,6 +269,7 @@ export class Aggregator {
 
       const results = await Promise.allSettled(toolPromises);
       this.registry = results.flatMap((r) =>
+        /* c8 ignore next -- each toolPromise has its own try/catch, so rejected never occurs */
         r.status === 'fulfilled' ? r.value : [],
       );
       this.registryExpiresAt = Date.now() + Aggregator.REGISTRY_TTL;
@@ -287,6 +308,8 @@ export class Aggregator {
             category: { type: 'string', description: 'Filter by category (ecosystem, code, search, reasoning, desktop, documents, communication)' },
             focus: { type: 'string', description: 'Focus profile to bias results toward (e.g. "finance", "governance", "design"). A soft lens — out-of-focus tools still appear. Use "none" to override the env default. Overrides CH1TTY_FOCUS for this call.' },
             limit: { type: 'number', description: 'Max results to return (default 20)' },
+            explain: { type: 'boolean', description: 'If true, include an explanation field in the response showing how results were ranked: match mode (and/partial), focus boost contributions, per-result relevance scores, recency signals, and a human-readable rationale. Useful for debugging ranking decisions (default: false).' },
+            inFocusOnly: { type: 'boolean', description: 'If true and a focus profile is active, return only tools that are within the active focus (hard filter). Out-of-focus tools are excluded. No-op when no focus is active. Overrides the default lens behavior for this call (default: false).' },
           },
         },
       },
@@ -298,6 +321,7 @@ export class Aggregator {
           properties: {
             tool: { type: 'string', description: 'Namespaced tool name from search results (e.g. "neon/list_projects")' },
             args: { type: 'object', description: 'Arguments to pass to the tool' },
+            dryRun: { type: 'boolean', description: 'If true, resolve the tool and return what would be called (server, tool, args) without executing. Makes zero backend calls. Useful for previewing or sandboxing (default: false).' },
           },
           required: ['tool'],
         },
@@ -333,9 +357,21 @@ export class Aggregator {
               type: 'boolean',
               description: 'If true, return the execution plan without running it (default: false)',
             },
+            dryRun: {
+              type: 'boolean',
+              description: 'If true, resolve the intent and return only the matched tool name, score, and catalog combo — without executing or returning the full plan. Lighter than confirm: true. Takes precedence over confirm when both are set (default: false).',
+            },
             focus: {
               type: 'string',
               description: 'Focus profile to bias resolution toward (e.g. "finance", "governance", "design"). A soft lens — out-of-focus tools stay candidates. Use "none" to override the env default. Overrides CH1TTY_FOCUS for this call.',
+            },
+            chain: {
+              type: 'boolean',
+              description: 'If true and the resolved tool is the first step of a catalog combo, auto-execute all remaining chain steps sequentially (default: false). Requires an active focus. Each step receives the previous step\'s text output as previousResult in its args, enabling data chaining between steps. Returns cast: chain_executed with per-step results.',
+            },
+            explain: {
+              type: 'boolean',
+              description: 'If true, include an explanation field in the response showing how the tool was selected: resolution method (brain or keyword), whether focus boosted the winner, top-scored candidates with scores, and a human-readable rationale. Works with all modes — executed, plan, dryRun, chain_executed, discovered, no_match (default: false).',
             },
           },
           required: ['intent'],
@@ -371,7 +407,9 @@ export class Aggregator {
     const serverFilter = typeof args.server === 'string' ? args.server : undefined;
     const categoryFilter = typeof args.category === 'string' ? args.category : undefined;
     const limit = typeof args.limit === 'number' ? args.limit : 20;
-    const { name: focusName, profile: focus } = this.resolveActiveFocus(args.focus);
+    const explain = args.explain === true;
+    const inFocusOnly = args.inFocusOnly === true;
+    const { name: focusName, profile: focus } = this.resolveActiveFocus(args.focus, sessionId);
 
     const registry = await this.getRegistry();
 
@@ -420,6 +458,11 @@ export class Aggregator {
       }
     }
 
+    // Hard filter: when inFocusOnly is requested and a focus is active, drop out-of-focus tools entirely.
+    if (inFocusOnly && focus) {
+      matches = matches.filter((t) => isInFocus(focus, t));
+    }
+
     // If no filters at all, return a summary of available servers instead of all tools
     if (!query && !serverFilter && !categoryFilter) {
       let serverSummary = this.activeConfigs().map((c) => {
@@ -427,8 +470,12 @@ export class Aggregator {
         const inFocus = focus ? isInFocus(focus, { serverId: c.id, category: c.category }) : false;
         return { server: c.id, name: c.name, category: c.category, tools: count, ...(focus ? { inFocus } : {}) };
       });
+      // Hard filter for server summary: when inFocusOnly is set, drop out-of-focus servers.
+      if (inFocusOnly && focus) {
+        serverSummary = serverSummary.filter((s) => s.inFocus);
+      }
       // Soft lens: surface in-focus servers first; out-of-focus stay listed.
-      if (focus) {
+      if (focus && !inFocusOnly) {
         serverSummary = [...serverSummary].sort((a, b) => Number(b.inFocus) - Number(a.inFocus));
       }
 
@@ -440,6 +487,7 @@ export class Aggregator {
             hint: 'Use query, server, or category to search for specific tools',
             ...(entity?.chittyId ? { entity: entity.chittyId, identityClass: entity.identityClass } : {}),
             ...(focusName ? { focus: focusName } : {}),
+            ...(inFocusOnly && focus ? { inFocusOnly: true } : {}),
             servers: serverSummary,
             totalTools: registry.length,
           }, null, 2),
@@ -488,10 +536,21 @@ export class Aggregator {
       category: t.category,
       description: t.description,
       inputSchema: t.inputSchema,
+      /* c8 ignore next -- every tool in matches was scored into relevanceMap; ?? 0 never fires when size > 0 */
       ...(relevanceMap.size > 0 ? { score: relevanceMap.get(t.namespacedName) ?? 0 } : {}),
       ...(recentServerIds.has(t.serverId) ? { recentlyUsed: true } : {}),
       ...(focus && focused(t) ? { inFocus: true } : {}),
     }));
+
+    // Catalog suggestions: when focus is active and a query provides intent,
+    // surface ranked combos+prompts from the suggestions catalog alongside tools.
+    const focusSuggestions = (focusName && query)
+      ? getSuggestionsForFocus(focusName, this.suggestionsCatalog, { intent: query })
+      : null;
+
+    const explanation = explain
+      ? buildSearchExplanation(matches, results, relevanceMap, partialFallback, focusName, focus, recentServerIds)
+      : null;
 
     return {
       content: [{
@@ -501,7 +560,10 @@ export class Aggregator {
           total: matches.length,
           ...(partialFallback ? { mode: 'partial' } : {}),
           ...(focusName ? { focus: focusName } : {}),
+          ...(inFocusOnly && focus ? { inFocusOnly: true } : {}),
           ...(sessionId ? { sessionId } : {}),
+          ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
+          ...(explanation ? { explanation } : {}),
           tools: results,
         }, null, 2),
       }],
@@ -515,6 +577,7 @@ export class Aggregator {
     const toolArgs = (typeof args.args === 'object' && args.args !== null && !Array.isArray(args.args))
       ? args.args as Record<string, unknown>
       : {};
+    const dryRun = args.dryRun === true;
 
     if (!toolName) {
       return {
@@ -549,6 +612,13 @@ export class Aggregator {
       };
     }
 
+    if (dryRun) {
+      return {
+        content: [{ type: 'text', text: JSON.stringify({ status: 'dry_run', server: serverId, tool: name, args: toolArgs }) }],
+        isError: false,
+      };
+    }
+
     try {
       const result = await backend.callTool(serverId, name, toolArgs);
       if (sessionId) {
@@ -577,6 +647,12 @@ export class Aggregator {
     activeSessions: number;
     focus: { active: string; categories: ServerCategory[]; servers: string[]; boost: number } | null;
     availableFocusProfiles: string[];
+    catalog: {
+      loaded: boolean;
+      totalCombos: number;
+      byFocus: Record<string, number>;
+      activeFocusSuggestions: { combos: SuggestedCombo[]; prompts: SuggestedPrompt[] } | null;
+    };
     systemHealth: { status: 'ok' | 'warn' | 'degraded'; brainDegraded: boolean; ledgerStatus: 'ok' | 'warn' | 'degraded' };
     brainHealth: { status: 'ok' | 'degraded'; embeddingCircuitOpen: boolean; ollamaCircuitOpen: boolean };
     ledgerHealth: { status: 'ok' | 'warn' | 'degraded'; dropped: number; buffered: number; flushErrors: number; dlqEntries: number; dlqPath: string };
@@ -607,6 +683,14 @@ export class Aggregator {
 
     const brainDegraded = embeddingCircuitOpen || ollamaCircuitOpen;
     const ledgerStatus: 'ok' | 'warn' | 'degraded' = ledgerDegraded ? 'degraded' : ledgerWarn ? 'warn' : 'ok';
+
+    const catalogByFocus: Record<string, number> = {};
+    let catalogTotalCombos = 0;
+    for (const [focusName, entry] of Object.entries(this.suggestionsCatalog)) {
+      catalogByFocus[focusName] = entry.combos.length;
+      catalogTotalCombos += entry.combos.length;
+    }
+    const catalogLoaded = catalogTotalCombos > 0 || Object.keys(this.suggestionsCatalog).length > 0;
     // P1: brain circuit open → warn, not degraded. Brain is optional (keyword fallback always
     // available); opening a brain circuit must not drain load-balanced instances that can still serve.
     const systemStatus: 'ok' | 'warn' | 'degraded' = ledgerStatus === 'degraded'
@@ -614,6 +698,11 @@ export class Aggregator {
       : brainDegraded || ledgerStatus === 'warn'
         ? 'warn'
         : 'ok';
+
+    const focusSnap = this.activeFocusSnapshot();
+    const activeFocusSuggestions = focusSnap
+      ? getSuggestionsForFocus(focusSnap.active, this.suggestionsCatalog, { maxCombos: 3, maxPrompts: 3 })
+      : null;
 
     return {
       gateway: 'ch1tty',
@@ -624,8 +713,14 @@ export class Aggregator {
       totalTools: statuses.reduce((sum, s) => sum + s.toolCount, 0),
       registryCached: Date.now() < this.registryExpiresAt,
       activeSessions: this.sessions.count,
-      focus: this.activeFocusSnapshot(),
+      focus: focusSnap,
       availableFocusProfiles: Object.keys(this.focusProfiles.profiles),
+      catalog: {
+        loaded: catalogLoaded,
+        totalCombos: catalogTotalCombos,
+        byFocus: catalogByFocus,
+        activeFocusSuggestions,
+      },
       systemHealth: { status: systemStatus, brainDegraded, ledgerStatus },
       brainHealth: {
         status: brainDegraded ? 'degraded' : 'ok',
@@ -662,8 +757,10 @@ export class Aggregator {
 
     try {
       const newConfig = loadConfigFromPath(this.configPath);
-      clearSuggestionsCache();
-      this.suggestionsCatalog = loadSuggestionsCatalog();
+      if (this.suggestionsCatalogPath) {
+        clearSuggestionsCache();
+        this.suggestionsCatalog = loadSuggestionsCatalog(this.suggestionsCatalogPath);
+      }
       const oldIds = new Set(this.configs.map((c) => c.id));
       const newIds = new Set(newConfig.servers.map((c) => c.id));
 
@@ -691,11 +788,13 @@ export class Aggregator {
         }
       }
 
+      const freshness = this.catalogFreshnessCheck();
       const result = {
         reloaded: true,
         added: added.map((c) => c.id),
         removed: removed.map((c) => c.id),
         totalServers: this.activeConfigs().length,
+        catalog: freshness,
       };
 
       log.info(`Config reloaded: +${added.length} -${removed.length} servers`);
@@ -710,6 +809,30 @@ export class Aggregator {
     }
   }
 
+  /** Scan the loaded catalog for combo chain tools whose server ID isn't in the active config. */
+  private catalogFreshnessCheck(): { totalCombos: number; phantomServerIds: string[] } {
+    const configuredIds = new Set(this.configs.map((c) => c.id));
+    const phantomSet = new Set<string>();
+    let totalCombos = 0;
+
+    for (const profile of Object.values(this.suggestionsCatalog)) {
+      totalCombos += profile.combos.length;
+      for (const combo of profile.combos) {
+        for (const toolName of combo.chain) {
+          const slashIdx = toolName.indexOf('/');
+          if (slashIdx > 0) {
+            const serverId = toolName.slice(0, slashIdx);
+            if (!configuredIds.has(serverId)) {
+              phantomSet.add(serverId);
+            }
+          }
+        }
+      }
+    }
+
+    return { totalCombos, phantomServerIds: [...phantomSet].sort() };
+  }
+
   // ── Cast (sub-meta → master-meta) ───────────────────────────
 
   private async handleCast(args: Record<string, unknown>, sessionId?: string): Promise<ToolCallResult> {
@@ -717,8 +840,11 @@ export class Aggregator {
     const toolArgs = (typeof args.args === 'object' && args.args !== null && !Array.isArray(args.args))
       ? args.args as Record<string, unknown>
       : {};
-    const confirm = args.confirm === true;
-    const { name: focusName, profile: focus } = this.resolveActiveFocus(args.focus);
+    const dryRun = args.dryRun === true;
+    const confirm = !dryRun && args.confirm === true;
+    const autoChain = args.chain === true;
+    const explain = args.explain === true;
+    const { name: focusName, profile: focus } = this.resolveActiveFocus(args.focus, sessionId);
 
     if (!intent) {
       return {
@@ -844,6 +970,12 @@ export class Aggregator {
     // No matches across any surface
     let resolvedBy: 'brain' | 'keyword' = castRoute === 'brain' ? 'brain' : 'keyword';
 
+    // Compute catalog suggestions early — needed on all three paths (no_match,
+    // discovered, executed/plan) so miss responses can still surface relevant chains.
+    const focusSuggestions = focusName
+      ? getSuggestionsForFocus(focusName, this.suggestionsCatalog, { intent })
+      : null;
+
     if (scoredTools.length === 0 && scoredPrompts.length === 0 && scoredResources.length === 0) {
       return {
         content: [{
@@ -852,6 +984,8 @@ export class Aggregator {
             cast: 'no_match',
             resolvedBy,
             intent,
+            ...(explain ? { explanation: buildCastExplanation(resolvedBy, undefined, [], focusName, focus) } : {}),
+            ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
             hint: 'No tools, prompts, or resources matched your intent. Try ch1tty/search with different keywords.',
           }, null, 2),
         }],
@@ -870,6 +1004,7 @@ export class Aggregator {
       score: t.score,
       description: t.description,
     }));
+    const explanation = explain ? buildCastExplanation(resolvedBy, best, scoredTools, focusName, focus) : null;
 
     // Build related prompts/resources context
     const related: Record<string, unknown> = {};
@@ -900,18 +1035,101 @@ export class Aggregator {
             cast: 'discovered',
             resolvedBy,
             intent,
+            ...(explanation ? { explanation } : {}),
             hint: 'No executable tools matched, but related prompts/resources found.',
             ...related,
+            ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
           }, null, 2),
         }],
       };
     }
 
-    const focusSuggestions = focusName
-      ? getSuggestionsForFocus(focusName, this.suggestionsCatalog, { intent })
+    // Check if the resolved tool is the entry-point of a curated catalog combo.
+    const catalogCombo = focusName
+      ? findCatalogCombo(best.namespacedName, focusName, this.suggestionsCatalog)
       : null;
 
-    // Step 2: Confirm mode — return the plan without executing
+    // When the combo has more than one step, surface the remaining chain so
+    // clients know what to invoke next to complete the workflow.
+    const chainContinuation = (catalogCombo && catalogCombo.chain.length > 1)
+      ? {
+          nextTool: catalogCombo.chain[1],
+          remainingChain: catalogCombo.chain.slice(1),
+          hint: `Continue the '${catalogCombo.name}' workflow: ${catalogCombo.chain.slice(1).join(' → ')}.`,
+        }
+      : null;
+
+    // Step 2a: Auto-chain execution — run all combo steps sequentially when chain: true
+    if (!confirm && autoChain && catalogCombo && catalogCombo.chain.length > 1) {
+      const steps: Array<{ step: number; tool: string; ok: boolean; content?: unknown[]; error?: string }> = [];
+      let previousStepOutput: string | null = null;
+      const allTexts: string[] = [];
+
+      for (let i = 0; i < catalogCombo.chain.length; i++) {
+        const stepTool = catalogCombo.chain[i];
+        let stepArgs: Record<string, unknown>;
+        if (i === 0) {
+          stepArgs = toolArgs;
+        } else if (previousStepOutput !== null) {
+          stepArgs = { previousResult: previousStepOutput };
+        } else {
+          stepArgs = {};
+        }
+        const r = await this.handleExecute({ tool: stepTool, args: stepArgs }, sessionId);
+        if (r.isError) {
+          const firstContent = r.content[0] as { type?: string; text?: unknown } | undefined;
+          const errText = typeof firstContent?.text === 'string' ? firstContent.text : JSON.stringify(r.content);
+          steps.push({ step: i, tool: stepTool, ok: false, error: errText });
+          previousStepOutput = null;
+        } else {
+          const textParts = (r.content as Array<{ type?: string; text?: unknown }>)
+            .filter((c) => c.type === 'text' && typeof c.text === 'string')
+            .map((c) => c.text as string);
+          previousStepOutput = textParts.length > 0 ? textParts.join('\n') : null;
+          if (previousStepOutput !== null) allTexts.push(previousStepOutput);
+          steps.push({ step: i, tool: stepTool, ok: true, content: r.content });
+        }
+      }
+
+      const chainSummary = allTexts.length > 0 ? allTexts.join('\n\n') : undefined;
+
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            cast: 'chain_executed',
+            resolvedBy,
+            intent,
+            ...(focusName ? { focus: focusName } : {}),
+            ...(explanation ? { explanation } : {}),
+            catalog: { name: catalogCombo.name, chain: catalogCombo.chain, accomplishes: catalogCombo.accomplishes },
+            steps,
+            ...(chainSummary !== undefined ? { summary: chainSummary } : {}),
+            ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
+          }, null, 2),
+        }],
+      };
+    }
+
+    // Step 2b: Dry-run mode — return only resolved tool + score + catalog match, no execution, no schema
+    if (dryRun) {
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            cast: 'resolved',
+            resolvedBy,
+            intent,
+            ...(focusName ? { focus: focusName } : {}),
+            ...(explanation ? { explanation } : {}),
+            resolved: { tool: best.namespacedName, score: best.score },
+            ...(catalogCombo ? { catalogCombo: { name: catalogCombo.name, chain: catalogCombo.chain, accomplishes: catalogCombo.accomplishes } } : {}),
+          }, null, 2),
+        }],
+      };
+    }
+
+    // Step 2c: Confirm mode — return the plan without executing
     if (confirm) {
       return {
         content: [{
@@ -921,6 +1139,7 @@ export class Aggregator {
             resolvedBy,
             intent,
             ...(focusName ? { focus: focusName } : {}),
+            ...(explanation ? { explanation } : {}),
             resolved: {
               tool: best.namespacedName,
               server: best.serverId,
@@ -929,6 +1148,8 @@ export class Aggregator {
               score: best.score,
               inputSchema: best.inputSchema,
             },
+            ...(catalogCombo ? { resolvedFromCatalog: { name: catalogCombo.name, chain: catalogCombo.chain, accomplishes: catalogCombo.accomplishes } } : {}),
+            ...(chainContinuation ? { chainContinuation } : {}),
             alternatives,
             ...related,
             ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
@@ -955,8 +1176,11 @@ export class Aggregator {
             resolvedBy,
             intent,
             ...(focusName ? { focus: focusName } : {}),
+            ...(explanation ? { explanation } : {}),
             resolved: best.namespacedName,
             score: best.score,
+            ...(catalogCombo ? { resolvedFromCatalog: { name: catalogCombo.name, chain: catalogCombo.chain, accomplishes: catalogCombo.accomplishes } } : {}),
+            ...(chainContinuation ? { chainContinuation } : {}),
             ...(alternatives.length > 0 ? { alternatives } : {}),
             ...related,
             ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
@@ -1115,6 +1339,7 @@ export class Aggregator {
 
     const results = await Promise.allSettled(resourcePromises);
     return {
+      /* c8 ignore next -- each resourcePromise has its own try/catch, so rejected never occurs */
       resources: results.flatMap((r) => r.status === 'fulfilled' ? r.value : []),
     };
   }
@@ -1142,6 +1367,7 @@ export class Aggregator {
 
     const results = await Promise.allSettled(templatePromises);
     return {
+      /* c8 ignore next -- each templatePromise has its own try/catch, so rejected never occurs */
       resourceTemplates: results.flatMap((r) => r.status === 'fulfilled' ? r.value : []),
     };
   }
@@ -1191,6 +1417,7 @@ export class Aggregator {
 
     const results = await Promise.allSettled(promptPromises);
     return {
+      /* c8 ignore next -- each promptPromise has its own try/catch, so rejected never occurs */
       prompts: results.flatMap((r) => r.status === 'fulfilled' ? r.value : []),
     };
   }
@@ -1233,4 +1460,87 @@ export class Aggregator {
     await Promise.allSettled(shutdowns);
     this.backends.clear();
   }
+}
+
+// ── Cast explanation helper ────────────────────────────────────────────────
+
+type ScoredNamespacedTool = NamespacedTool & { score: number };
+
+function buildCastExplanation(
+  resolvedBy: 'brain' | 'keyword',
+  best: ScoredNamespacedTool | undefined,
+  scoredTools: ScoredNamespacedTool[],
+  focusName: string | undefined,
+  focus: FocusProfile | null | undefined,
+): object {
+  const topCandidates = scoredTools.slice(0, 5).map((t) => ({ tool: t.namespacedName, score: t.score }));
+  const winnerInFocus = best && focus ? isInFocus(focus, best) : false;
+  const focusBoost = focus?.boost ?? 0.5;
+
+  let rationale: string;
+  if (!best) {
+    rationale = `No tool candidates found via ${resolvedBy} routing.`;
+  } else {
+    const parts: string[] = [`Resolved "${best.namespacedName}" via ${resolvedBy} (score: ${best.score.toFixed(3)})`];
+    if (focusName && winnerInFocus) {
+      parts.push(`boosted by "${focusName}" focus (+${focusBoost})`);
+    } else if (focusName) {
+      parts.push(`("${focusName}" focus active; winner is out-of-focus)`);
+    }
+    if (topCandidates.length > 1) {
+      const runner = topCandidates[1];
+      parts.push(`over runner-up "${runner.tool}" (${runner.score.toFixed(3)})`);
+    }
+    rationale = parts.join(' ');
+  }
+
+  return {
+    method: resolvedBy,
+    ...(focusName ? { focus: focusName, focusBoost, winnerInFocus } : {}),
+    topCandidates,
+    rationale,
+  };
+}
+
+function buildSearchExplanation(
+  allMatches: NamespacedTool[],
+  topResults: Array<{ tool: string; score?: number; inFocus?: boolean; recentlyUsed?: boolean }>,
+  relevanceMap: Map<string, number>,
+  partialFallback: boolean,
+  focusName: string | undefined,
+  focus: FocusProfile | null | undefined,
+  recentServerIds: Set<string>,
+): object {
+  const matchMode = partialFallback ? 'partial' : 'and';
+  const focusBoost = focus?.boost ?? 0.5;
+
+  const topCandidates = topResults.slice(0, 5).map((r) => ({
+    tool: r.tool,
+    relevanceScore: relevanceMap.get(r.tool) ?? 0,
+    ...(r.inFocus ? { inFocus: true } : {}),
+    ...(r.recentlyUsed ? { recentlyUsed: true } : {}),
+  }));
+
+  const inFocusCount = topResults.filter((r) => r.inFocus).length;
+  const parts: string[] = [];
+  parts.push(`Keyword search (${matchMode === 'partial' ? 'OR/partial fallback — no tool matched all terms' : 'AND mode'})`);
+  if (topCandidates.length > 0) {
+    const top = topCandidates[0];
+    parts.push(`top result: "${top.tool}" (relevance: ${top.relevanceScore.toFixed(2)})`);
+  }
+  if (focusName) {
+    parts.push(`"${focusName}" focus active — ${inFocusCount} of ${Math.min(topResults.length, 5)} top results in focus (boost +${focusBoost})`);
+  }
+  if (allMatches.length > topResults.length) {
+    parts.push(`showing ${topResults.length} of ${allMatches.length} matches`);
+  }
+  const rationale = parts.join('; ') + '.';
+
+  return {
+    method: 'keyword' as const,
+    matchMode,
+    ...(focusName ? { focus: focusName, focusBoost } : {}),
+    topCandidates,
+    rationale,
+  };
 }

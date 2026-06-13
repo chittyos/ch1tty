@@ -9,11 +9,11 @@
  *
  * Tests (12 total):
  *   Unit (getSuggestionsForFocus directly):
- *     1. no intent → catalog order preserved
+ *     1. no intent → verified combos first, then unverified in catalog order
  *     2. intent with matching terms → best-matching combo first
  *     3. intent with partial matches → partial-match combo before zero-match
- *     4. all-zero scores → catalog order preserved (no sort applied)
- *     5. short-only terms (all ≤2 chars) → catalog order preserved (excluded from scoring)
+ *     4. all-zero scores → verified combos first (tiebreaker), catalog order within each group
+ *     5. short-only terms (all ≤2 chars) → verified-first (treated as zero scores)
  *     6. prompts ranked by intent relevance
  *     7. maxCombos/maxPrompts limits applied after ranking
  *     8. unknown focus name → null (unchanged from before)
@@ -21,7 +21,7 @@
  *
  *   Integration (via cast confirm:true through Aggregator):
  *     10. cast:plan with focus + relevant intent → top combo matches intent
- *     11. cast:plan with focus + unrelated intent → suggestions present (no crash), catalog order
+ *     11. cast:plan with focus + unrelated intent → suggestions present (no crash), verified-first
  *     12. cast:plan without focus → no suggestions field
  */
 import assert from 'node:assert/strict';
@@ -80,14 +80,16 @@ const FINANCE_PROFILE: FocusSuggestions = {
 
 const CATALOG: Record<string, FocusSuggestions> = { finance: FINANCE_PROFILE };
 
-// ── 1. No intent → catalog order preserved ───────────────────────────────────
+// ── 1. No intent → verified combos first, then unverified in catalog order ────
 
-test('getSuggestionsForFocus: no intent → combos in catalog order', () => {
+test('getSuggestionsForFocus: no intent → verified combos first', () => {
+  // Fixture catalog order: payment-flow (unverified), invoice-tracker (unverified), database-snapshot (verified)
+  // Expected after sort: database-snapshot (verified) first, then payment-flow, invoice-tracker (catalog order within unverified group)
   const result = getSuggestionsForFocus('finance', CATALOG);
   assert.ok(result, 'result should not be null');
-  assert.equal(result.combos[0].name, 'payment-flow', 'first combo is first in catalog');
-  assert.equal(result.combos[1].name, 'invoice-tracker', 'second combo is second in catalog');
-  assert.equal(result.combos[2].name, 'database-snapshot', 'third combo is third in catalog');
+  assert.equal(result.combos[0].name, 'database-snapshot', 'verified combo floats to top');
+  assert.equal(result.combos[1].name, 'payment-flow', 'first unverified combo in catalog order');
+  assert.equal(result.combos[2].name, 'invoice-tracker', 'second unverified combo in catalog order');
 });
 
 // ── 2. Intent with matching terms → best-matching combo first ────────────────
@@ -111,23 +113,23 @@ test('getSuggestionsForFocus: intent "invoice" → invoice-tracker before databa
   assert.equal(result.combos[0].name, 'invoice-tracker', 'invoice-tracker scores highest');
 });
 
-// ── 4. All-zero scores → catalog order preserved ─────────────────────────────
+// ── 4. All-zero scores → verified-first tiebreaker ───────────────────────────
 
 test('getSuggestionsForFocus: intent with no matches → catalog order preserved', () => {
   const result = getSuggestionsForFocus('finance', CATALOG, { intent: 'kubernetes orchestration' });
   assert.ok(result, 'result should not be null');
-  // All combos score 0 (no matching terms in their haystacks) → sort not applied → catalog order
-  assert.equal(result.combos[0].name, 'payment-flow', 'catalog order preserved when all scores are 0');
-  assert.equal(result.combos[1].name, 'invoice-tracker', 'catalog order preserved for second');
+  // All combos score 0 (no matching terms) → verified tiebreaker → database-snapshot (verified) first
+  assert.equal(result.combos[0].name, 'database-snapshot', 'verified combo surfaces first when all scores are 0');
+  assert.equal(result.combos[1].name, 'payment-flow', 'first unverified combo in catalog order');
 });
 
-// ── 5. Short-only terms (all ≤2 chars) → catalog order preserved ─────────────
+// ── 5. Short-only terms (all ≤2 chars) → verified-first (treated as zero scores)
 
 test('getSuggestionsForFocus: intent with only ≤2-char terms → catalog order preserved', () => {
-  // "of" and "in" are 2 chars → excluded → terms=[] → no scoring
+  // "of" and "in" are 2 chars → excluded → terms=[] → verified tiebreaker applies
   const result = getSuggestionsForFocus('finance', CATALOG, { intent: 'of in to' });
   assert.ok(result, 'result should not be null');
-  assert.equal(result.combos[0].name, 'payment-flow', 'catalog order preserved for short-only terms');
+  assert.equal(result.combos[0].name, 'database-snapshot', 'verified combo surfaces first for short-only terms');
 });
 
 // ── 6. Prompts ranked by intent relevance ────────────────────────────────────

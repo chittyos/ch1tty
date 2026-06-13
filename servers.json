@@ -13,7 +13,9 @@
       "access": "readwrite",
       "category": "ecosystem",
       "command": "node",
-      "args": ["./apps/tasks-mcp/dist/index.js"],
+      "args": [
+        "./apps/tasks-mcp/dist/index.js"
+      ],
       "env": {
         "CHITTY_TASKS_URL": "https://tasks.chitty.cc",
         "CHITTY_TASKS_TOKEN": "op://ChittyOS-Integrations/chittytasks/token"
@@ -31,7 +33,9 @@
       "access": "readwrite",
       "category": "ecosystem",
       "command": "node",
-      "args": ["./apps/ledger-mcp/dist/index.js"],
+      "args": [
+        "./apps/ledger-mcp/dist/index.js"
+      ],
       "env": {
         "CHITTY_LEDGER_URL": "https://ledger.chitty.cc",
         "CHITTY_LEDGER_TOKEN": "op://ChittyOS-Integrations/chittyledger/token"
@@ -49,7 +53,9 @@
       "access": "readwrite",
       "category": "ecosystem",
       "command": "node",
-      "args": ["./apps/session-coordinator-mcp/dist/index.js"],
+      "args": [
+        "./apps/session-coordinator-mcp/dist/index.js"
+      ],
       "env": {
         "CHITTY_SESSION_URL": "https://session.chitty.cc",
         "CHITTY_SESSION_TOKEN": "op://ChittyOS-Integrations/chittysession/token"
@@ -67,7 +73,9 @@
       "access": "readwrite",
       "category": "ecosystem",
       "command": "node",
-      "args": ["./apps/evidence-mcp/dist/index.js"],
+      "args": [
+        "./apps/evidence-mcp/dist/index.js"
+      ],
       "env": {
         "CHITTY_EVIDENCE_URL": "https://evidence.chitty.cc",
         "CHITTY_EVIDENCE_TOKEN": "op://ChittyOS-Integrations/chittyevidence/token"
@@ -98,6 +106,20 @@
       "category": "ecosystem",
       "endpoint": "https://mcp.cloudflare.com/mcp",
       "authTokenKey": "cloudflare-mcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "_comment": "Cloudflare Workers Builds MCP — official CF MCP for managing Workers Builds (CI deploy config, build/deploy commands, build runs). Used to programmatically fix chittyentity dashboard config drift on chittyagent-{quo,ch1tty,ui} (build_command + --env production on deploy_command, see chittyentity#336). OAuth via DCR; access token brokered as 'cloudflare-builds-mcp'."
+    },
+    {
+      "id": "cloudflare-builds",
+      "name": "Cloudflare Workers Builds",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "ecosystem",
+      "endpoint": "https://builds.mcp.cloudflare.com/mcp",
+      "authTokenKey": "cloudflare-builds-mcp",
       "lazy": true,
       "enabled": true
     },
@@ -169,14 +191,12 @@
       "type": "local",
       "access": "readwrite",
       "category": "documents",
-      "command": "npx",
+      "command": "/home/ubuntu/.local/bin/notion-mcp-wrapper.sh",
       "args": [
         "-y",
         "@notionhq/notion-mcp-server"
       ],
-      "env": {
-        "NOTION_TOKEN": "op://ChittyOS-Integrations/notion/api_token"
-      },
+      "env": {},
       "lazy": true,
       "enabled": true
     },

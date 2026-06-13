@@ -24,6 +24,7 @@ const DEAD_LETTER_PATH = process.env.CH1TTY_LEDGER_DLQ ?? join(homedir(), '.ch1t
  * Best-effort and synchronous (called from shutdown / drop paths).
  */
 function writeDeadLetter(entries: LedgerEntry[], dlqPath: string): void {
+  /* c8 ignore next -- all callers guard with buffer.length > 0 before calling; defensive only */
   if (entries.length === 0) return;
   try {
     mkdirSync(dirname(dlqPath), { recursive: true });

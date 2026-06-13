@@ -34,6 +34,7 @@ const CATEGORY_BY_SERVER: Record<string, ServerConfig['category']> = {
   notion: 'documents',
   orchestrator: 'ecosystem',
   cloudflare: 'ecosystem',
+  'cloudflare-builds': 'ecosystem',
   fs: 'ecosystem',
   'browser-rendering': 'desktop',
   playwright: 'desktop',
@@ -114,6 +115,20 @@ export const SCENARIOS: Scenario[] = [
     expect: 'ledger/append_entry',
     note: 'near-misses: tasks/record_billing_event (billing but task not ledger), stripe/record_charge (payment but not ledger)',
   },
+  {
+    id: 'finance.list-subscriptions',
+    focus: 'finance',
+    intent: 'list active subscriptions for a customer',
+    expect: 'stripe/list_subscriptions',
+    note: 'near-misses: tasks/list_tasks (list keyword); stripe uniquely has subscriptions',
+  },
+  {
+    id: 'finance.list-ledger-namespaces',
+    focus: 'finance',
+    intent: 'list all ledger namespaces',
+    expect: 'ledger/list_namespaces',
+    note: 'near-miss: ledger/list_entries (same server, list+ledger but not namespaces)',
+  },
 
   // ── GOVERNANCE journey ───────────────────────────────────────
   {
@@ -164,25 +179,41 @@ export const SCENARIOS: Scenario[] = [
   {
     id: 'design.render',
     focus: 'design',
-    intent: 'render this web page to pdf via headless browser',
-    expect: 'browser-rendering/render_page',
-    note: 'near-miss: playwright/render_to_pdf',
+    intent: 'get the html content of a web page via headless browser',
+    expect: 'browser-rendering/get_url_html_content',
+    note: 'near-miss: browser-rendering/get_url_markdown (same server, "page" term shared; "html" uniquely scores get_url_html_content)',
   },
   {
     id: 'design.screenshot',
     focus: 'design',
-    intent: 'capture a screenshot of the rendered web page',
-    expect: 'browser-rendering/capture_screenshot',
-    note: 'near-miss: playwright/screenshot',
+    intent: 'get a screenshot of a web page url via headless browser rendering',
+    expect: 'browser-rendering/get_url_screenshot',
+    note: 'near-miss: playwright/browser_take_screenshot (screenshot keyword); url+browser+rendering discriminate toward get_url_screenshot',
+  },
+  {
+    id: 'design.click-action',
+    focus: 'design',
+    intent: 'click on page element by css selector',
+    expect: 'playwright/browser_click',
+    note: 'near-misses: playwright/browser_take_screenshot (page keyword), browser-rendering/get_url_html_content (page keyword); click uniquely scores playwright/browser_click',
+  },
+  {
+    id: 'design.navigate',
+    focus: 'design',
+    intent: 'navigate the browser to a url',
+    expect: 'playwright/browser_navigate',
+    note: 'near-miss: browser-rendering/get_url_html_content (url keyword); navigate+browser uniquely matches playwright/browser_navigate',
   },
   {
     // REORDER probe: cross-focus near-miss. Without focus, pdf/render_pdf (documents,
     // out of the design lens) is a strong literal match. With the design focus, the
     // +0.5 boost must lift the in-focus browser-rendering tool above it.
+    // Score trace (11 terms): pdf/render_pdf=5/11=0.455, get_url_html_content=4/11=0.364;
+    // with design boost: 0.364+0.5=0.864 > 0.455.
     id: 'design.render-document-reorder',
     focus: 'design',
-    intent: 'render a web page document to a pdf file',
-    expect: 'browser-rendering/render_page',
+    intent: 'render a web page document to html content and save as file with layout',
+    expect: 'browser-rendering/get_url_html_content',
     note: 'cross-focus near-miss: pdf/render_pdf (documents) should win WITHOUT focus, lose WITH design focus',
   },
 
@@ -205,7 +236,7 @@ export const SCENARIOS: Scenario[] = [
     id: 'code.lookup-docs',
     focus: 'code',
     intent: 'get the library documentation and code examples for this package',
-    expect: 'context7/get-library-docs',
+    expect: 'context7/query-docs',
     note: 'near-miss: notion/query_database (query + documents); context7 is in-focus via code profile servers list',
   },
   {
@@ -215,14 +246,28 @@ export const SCENARIOS: Scenario[] = [
     expect: 'linear/list_issues',
     note: 'linear is in-focus via code profile servers list; near-miss: github/create_issue (issue keyword)',
   },
+  {
+    id: 'code.run-sql',
+    focus: 'code',
+    intent: 'run a sql query against the database',
+    expect: 'neon/run_sql',
+    note: 'near-miss: neon/list_projects (same server, database keyword); run+sql uniquely matches neon/run_sql',
+  },
+  {
+    id: 'code.read-file',
+    focus: 'code',
+    intent: 'read the contents of a configuration file',
+    expect: 'fs/read_file',
+    note: 'near-miss: fs/write_file (file keyword); read+contents uniquely scores fs/read_file; fs is in-focus via code profile servers list',
+  },
 
   // ── communication focus ──────────────────────────────────────────────────────
   {
     id: 'comm.send-message',
     focus: 'communication',
-    intent: 'send a text message to the team about the deployment status',
+    intent: 'send a direct sms or text message to a contact',
     expect: 'imessage/send_message',
-    note: 'near-miss: cowork/start_session (session keyword, out-of-focus desktop)',
+    note: 'near-miss: imessage/search_messages (same server, search vs send); sms/text/contact trio uniquely scores send_message over any orchestrator or ops tool',
   },
   {
     id: 'comm.search-notes',
@@ -245,6 +290,20 @@ export const SCENARIOS: Scenario[] = [
     expect: 'tasks/create_task',
     note: 'near-miss: imessage/send_message (message keyword), notion/create_page (create keyword); tasks in communication profile via servers list',
   },
+  {
+    id: 'comm.create-note',
+    focus: 'communication',
+    intent: 'create a new note in Apple Notes',
+    expect: 'chittymac/create_note',
+    note: 'near-misses: chittymac/search_notes and chittymac/list_notes (apple+notes keywords); create+new distinguishes create_note',
+  },
+  {
+    id: 'comm.list-conversations',
+    focus: 'communication',
+    intent: 'list recent imessage conversations',
+    expect: 'imessage/list_conversations',
+    note: 'near-miss: imessage/search_messages (same server, imessage keyword); list+conversations uniquely matches list_conversations; imessage serverId exact match gives nameBonus',
+  },
 
   // ── ops journey ──────────────────────────────────────────────
   {
@@ -252,28 +311,28 @@ export const SCENARIOS: Scenario[] = [
     focus: 'ops',
     intent: 'deploy the cloudflare worker script to production',
     expect: 'cloudflare/deploy_worker',
-    note: 'near-misses: orchestrator/execute (execute keyword), orchestrator/run_job (run keyword)',
+    note: 'near-misses: orchestrator/skill_execute (execute keyword), fs/write_file (write/deploy keyword)',
   },
   {
     id: 'ops.list-workers',
     focus: 'ops',
     intent: 'list all deployed cloudflare workers and their status',
     expect: 'cloudflare/list_workers',
-    note: 'near-misses: tasks/list_tasks (list keyword), orchestrator/list_jobs (list keyword)',
+    note: 'near-misses: tasks/list_tasks (list keyword), orchestrator/agent_list (list keyword)',
   },
   {
-    id: 'ops.run-backup-job',
+    id: 'ops.skill-search',
     focus: 'ops',
-    intent: 'run a scheduled database backup orchestrator job',
-    expect: 'orchestrator/run_job',
-    note: 'near-misses: neon/run_sql (run+database keywords), orchestrator/list_jobs (same server+orchestrator)',
+    intent: 'search for a skill to run a scheduled database backup job',
+    expect: 'orchestrator/skill_search',
+    note: 'near-misses: neon/run_sql (run+database), orchestrator/agent_search (search+orchestrator but agent not skill)',
   },
   {
-    id: 'ops.failed-jobs',
+    id: 'ops.list-agents',
     focus: 'ops',
-    intent: 'list recent failed orchestrator jobs for incident triage',
-    expect: 'orchestrator/list_jobs',
-    note: 'near-misses: tasks/list_tasks (list+tasks keyword), orchestrator/run_job (same server+job)',
+    intent: 'list all orchestrator agents for incident triage and status check',
+    expect: 'orchestrator/agent_list',
+    note: 'near-misses: tasks/list_tasks (list+tasks keyword), orchestrator/skill_list (list+orchestrator but skills not agents)',
   },
   {
     // REORDER probe: cross-focus near-miss. Without focus, chittymac/list_notes
@@ -285,6 +344,34 @@ export const SCENARIOS: Scenario[] = [
     intent: 'list notes in filesystem folder',
     expect: 'fs/list_directory',
     note: 'REORDER: without ops focus chittymac/list_notes wins (0.75); with ops focus fs/list_directory wins (1.00)',
+  },
+  {
+    id: 'ops.build-status',
+    focus: 'ops',
+    intent: 'list recent build runs and check build status for the cloudflare workers builds pipeline',
+    expect: 'cloudflare-builds/workers_builds_list_builds',
+    note: 'near-misses: cloudflare/list_workers (list+workers but not build+runs+status+timestamps), orchestrator/agent_list (list keyword). Both are ecosystem so both get ops boost; workers_builds_list_builds wins on keyword specificity.',
+  },
+  {
+    id: 'ops.build-logs',
+    focus: 'ops',
+    intent: 'get the build logs for the failed cloudflare workers builds run to diagnose the deployment error',
+    expect: 'cloudflare-builds/workers_builds_get_build_logs',
+    note: 'near-misses: cloudflare/get_worker_logs (logs+worker+cloudflare but "build logs" not "worker logs"), cloudflare-builds/workers_builds_get_build (get+build but not logs+failed+diagnose+errors).',
+  },
+  {
+    id: 'ops.list-account-workers',
+    focus: 'ops',
+    intent: 'list all workers in the cloudflare account to find the worker id for the builds pipeline',
+    expect: 'cloudflare-builds/workers_list',
+    note: 'near-miss: cloudflare/list_workers (list+workers but "account"+"builds"+"pipeline" discriminate toward cloudflare-builds/workers_list)',
+  },
+  {
+    id: 'ops.get-worker-source-code',
+    focus: 'ops',
+    intent: 'get the source code of the worker script for code review and audit',
+    expect: 'cloudflare-builds/workers_get_worker_code',
+    note: 'near-miss: cloudflare-builds/workers_get_worker (same server; "source code"+"review"+"audit" uniquely scores workers_get_worker_code)',
   },
 
   // ── governance follow-up scenarios ───────────────────────────
@@ -409,4 +496,213 @@ export async function outOfFocusReachable(
   const text = result.content.find((c) => c.type === 'text');
   if (!text || text.type !== 'text') return false;
   return text.text.includes(expectTool);
+}
+
+/**
+ * A mis-resolution event: a scenario where the correct tool is NOT the top
+ * resolution when run without focus. May or may not be corrected by applying focus.
+ */
+export interface MisresolutionEvent {
+  id: string;
+  intent: string;
+  focus: string;
+  expected: string;
+  /** Tool that won without focus (the "intruder"). */
+  noFocusTop: string | null;
+  noFocusExpectedScore: number | null;
+  noFocusTopScore: number | null;
+  /** Whether applying focus corrects the resolution (expected tool wins). */
+  correctedByFocus: boolean;
+  withFocusTop: string | null;
+}
+
+/**
+ * Surface mis-resolutions across all focused scenarios: run each scenario
+ * without focus, identify cases where the wrong tool wins, and classify them
+ * as focus-correctable or uncorrectable. Uncorrectable mis-resolutions mean
+ * the correct tool loses even with focus applied — a genuine scoring bug.
+ *
+ * Returns ONLY scenarios that mis-resolve without focus. Focus-correct
+ * resolutions (expected tool already wins without focus) are not returned —
+ * they are not mis-resolutions.
+ */
+export async function surfaceMisresolutions(
+  aggregator: Aggregator,
+): Promise<MisresolutionEvent[]> {
+  const events: MisresolutionEvent[] = [];
+  for (const sc of SCENARIOS) {
+    if (!sc.focus) continue;
+    const without = await castPlan(aggregator, sc.intent, 'none');
+    const noFocusTop = without.resolved?.tool ?? null;
+    if (noFocusTop === sc.expect) continue; // already resolves correctly without focus
+    const withF = await castPlan(aggregator, sc.intent, sc.focus);
+    const withFocusTop = withF.resolved?.tool ?? null;
+    events.push({
+      id: sc.id,
+      intent: sc.intent,
+      focus: sc.focus,
+      expected: sc.expect,
+      noFocusTop,
+      noFocusExpectedScore: scoreOf(without, sc.expect),
+      noFocusTopScore: without.resolved?.score ?? null,
+      correctedByFocus: withFocusTop === sc.expect,
+      withFocusTop,
+    });
+  }
+  return events;
+}
+
+// ── Failure scenarios ──────────────────────────────────────────────────────────
+// Tests for execute-level error propagation and degraded-backend graceful
+// degradation. These exercise the aggregator's error-handling paths, not just
+// its resolution paths.
+
+export interface FailureScenarioResult {
+  id: string;
+  description: string;
+  pass: boolean;
+  ms: number;
+  detail: string;
+}
+
+/**
+ * Build an Aggregator with failure injections for targeted failure testing.
+ * `degradedServers` have their listTools throw (backend connectivity loss).
+ * `toolErrors` (`serverId/toolName`) have their callTool return isError: true.
+ */
+export function buildDegradedAggregator(opts: {
+  degradedServers?: string[];
+  toolErrors?: string[];
+}): { aggregator: Aggregator; backend: FixtureBackend } {
+  const backend = new FixtureBackend();
+  for (const s of opts.degradedServers ?? []) backend.setDegraded(s);
+  for (const te of opts.toolErrors ?? []) {
+    const sep = te.lastIndexOf('/');
+    if (sep > 0) backend.setToolError(te.slice(0, sep), te.slice(sep + 1));
+  }
+  const aggregator = new Aggregator(fixtureConfigs(), {
+    backendFactory: () => backend,
+  });
+  return { aggregator, backend };
+}
+
+/**
+ * Execute a tool that has been injected to fail; verify isError is propagated
+ * through the aggregator's execute path unchanged.
+ */
+export async function runExecuteErrorScenario(
+  aggregator: Aggregator,
+  tool: string,
+  args: Record<string, unknown> = {},
+): Promise<FailureScenarioResult> {
+  const id = `execute-error:${tool}`;
+  const t0 = performance.now();
+  const result = await aggregator.callTool('ch1tty/execute', { tool, args });
+  const ms = Math.round((performance.now() - t0) * 100) / 100;
+  const pass = result.isError === true;
+  return {
+    id,
+    description: `execute ${tool} with error injection → isError propagated`,
+    pass,
+    ms,
+    detail: pass
+      ? 'isError=true propagated correctly'
+      : `expected isError=true, got isError=${JSON.stringify(result.isError)}`,
+  };
+}
+
+/**
+ * Search with a degraded backend; verify no crash and a specific tool from a
+ * working server still appears in results (lens remains, degraded tools absent).
+ */
+export async function runDegradedSearchScenario(
+  aggregator: Aggregator,
+  opts: {
+    id: string;
+    query: string;
+    focus?: string;
+    degradedServer: string;
+    expectToolFromOther: string;
+  },
+): Promise<FailureScenarioResult> {
+  const t0 = performance.now();
+  try {
+    const result = await aggregator.callTool('ch1tty/search', {
+      query: opts.query,
+      focus: opts.focus,
+      limit: 50,
+    });
+    const ms = Math.round((performance.now() - t0) * 100) / 100;
+    if (result.isError) {
+      return {
+        id: opts.id,
+        description: `search "${opts.query}" with ${opts.degradedServer} degraded`,
+        pass: false,
+        ms,
+        detail: `search returned isError`,
+      };
+    }
+    const text = result.content.find((c) => c.type === 'text');
+    const body = text?.type === 'text' ? text.text : '';
+    const hasExpected = body.includes(opts.expectToolFromOther);
+    return {
+      id: opts.id,
+      description: `search "${opts.query}" with ${opts.degradedServer} degraded — ${opts.expectToolFromOther} reachable`,
+      pass: hasExpected,
+      ms,
+      detail: hasExpected
+        ? `"${opts.expectToolFromOther}" found in results`
+        : `"${opts.expectToolFromOther}" absent`,
+    };
+  } catch (err) {
+    const ms = Math.round((performance.now() - t0) * 100) / 100;
+    return {
+      id: opts.id,
+      description: `search with ${opts.degradedServer} degraded`,
+      pass: false,
+      ms,
+      detail: `unexpected throw: ${(err as Error).message}`,
+    };
+  }
+}
+
+/**
+ * Cast with a degraded backend; verify no crash and the resolved tool does
+ * not come from the degraded server (its tools are absent from the registry).
+ */
+export async function runDegradedCastScenario(
+  aggregator: Aggregator,
+  opts: {
+    id: string;
+    intent: string;
+    focus?: string;
+    degradedServer: string;
+  },
+): Promise<FailureScenarioResult> {
+  const t0 = performance.now();
+  try {
+    const plan = await castPlan(aggregator, opts.intent, opts.focus);
+    const ms = Math.round((performance.now() - t0) * 100) / 100;
+    const resolved = plan.resolved?.tool ?? null;
+    const fromDegraded = resolved?.startsWith(`${opts.degradedServer}/`) ?? false;
+    const pass = !fromDegraded;
+    return {
+      id: opts.id,
+      description: `cast "${opts.intent.slice(0, 40)}" with ${opts.degradedServer} degraded — graceful fallback`,
+      pass,
+      ms,
+      detail: pass
+        ? `resolved to ${resolved ?? '(null)'} — degraded server excluded`
+        : `resolved to ${resolved} — should not resolve to degraded ${opts.degradedServer}`,
+    };
+  } catch (err) {
+    const ms = Math.round((performance.now() - t0) * 100) / 100;
+    return {
+      id: opts.id,
+      description: `cast with ${opts.degradedServer} degraded`,
+      pass: false,
+      ms,
+      detail: `unexpected throw: ${(err as Error).message}`,
+    };
+  }
 }

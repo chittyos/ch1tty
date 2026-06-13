@@ -39,7 +39,9 @@ export class HttpMcpServer {
   }
 
   private handleRequest(req: IncomingMessage, res: ServerResponse): void {
+    /* c8 ignore next -- req.url is always defined for a real HTTP request */
     const url = req.url ?? '/';
+    /* c8 ignore next -- split('?',1)[0] is always defined since url is req.url ?? '/' */
     const path = url.split('?', 1)[0] ?? '/';
 
     // GPT Actions facade
@@ -250,6 +252,7 @@ export class HttpMcpServer {
       this.server.listen(this.port, this.bindAddress, () => {
         this.server.removeListener('error', reject);
         const addr = this.server.address();
+        /* c8 ignore next -- addr is always a non-null AddressInfo object on a successful bind */
         this.boundPort = typeof addr === 'object' && addr ? addr.port : this.port;
         resolve();
       });

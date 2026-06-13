@@ -68,7 +68,7 @@ const FOCUS_PROFILES = {
     ops: {
       description: 'Deployment, infrastructure monitoring, and DevOps tooling',
       categories: ['ecosystem' as const, 'code' as const],
-      servers: ['cloudflare', 'neon', 'github', 'orchestrator', 'fs'],
+      servers: ['cloudflare', 'cloudflare-builds', 'neon', 'github', 'orchestrator', 'fs'],
       boost: 0.5,
     },
   },
@@ -87,6 +87,7 @@ const FIXTURE_CONFIGS: ServerConfig[] = [
   { id: 'imessage', name: 'iMessage', type: 'remote', access: 'readwrite', category: 'communication', endpoint: 'https://fixture.imessage' },
   { id: 'chittymac', name: 'Apple Notes', type: 'remote', access: 'readwrite', category: 'communication', endpoint: 'https://fixture.chittymac' },
   { id: 'cloudflare', name: 'Cloudflare Platform', type: 'remote', access: 'readwrite', category: 'ecosystem', endpoint: 'https://fixture.cloudflare' },
+  { id: 'cloudflare-builds', name: 'Cloudflare Workers Builds', type: 'remote', access: 'readwrite', category: 'ecosystem', endpoint: 'https://fixture.cloudflare-builds' },
   { id: 'orchestrator', name: 'Orchestrator', type: 'remote', access: 'readwrite', category: 'ecosystem', endpoint: 'https://fixture.orchestrator' },
   { id: 'fs', name: 'Filesystem', type: 'remote', access: 'readwrite', category: 'desktop', endpoint: 'https://fixture.fs' },
 ];
@@ -510,13 +511,13 @@ test('scenario: latency — slow backend completes without timeout', async () =>
   const elapsed = Date.now() - start;
 
   assert.equal(result.isError, undefined);
-  // Verify the call actually took the simulated latency
-  assert.ok(elapsed >= 50, `expected ≥50ms latency, got ${elapsed}ms`);
+  // Verify the call actually took the simulated latency (±5ms OS timer tolerance)
+  assert.ok(elapsed >= 45, `expected ≥45ms latency, got ${elapsed}ms`);
 
-  // Call log should show the duration
+  // Call log should show the duration (±5ms OS timer tolerance)
   const calls = fixture.getCallLog();
   assert.ok(calls.length > 0);
-  assert.ok(calls[0].durationMs >= 50, `call log duration should reflect latency, got ${calls[0].durationMs}ms`);
+  assert.ok(calls[0].durationMs >= 45, `call log duration should reflect latency, got ${calls[0].durationMs}ms`);
 });
 
 test('scenario: latency — parallel registry refresh handles multiple slow backends', async () => {
@@ -693,14 +694,14 @@ test('scenario: code focus — multi-step: search library docs → execute → d
   assert.equal(searchResult.isError, undefined);
   const found = parseSearch(searchResult);
   assert.ok(
-    found.tools && found.tools.some((t) => t.tool === 'context7/get-library-docs'),
-    'should find context7/get-library-docs',
+    found.tools && found.tools.some((t) => t.tool === 'context7/query-docs'),
+    'should find context7/query-docs',
   );
 
   // Step 2: get library docs
   const docsResult = await aggregator.callTool('ch1tty/execute', {
-    tool: 'context7/get-library-docs',
-    args: { libraryId: '/modelcontextprotocol/typescript-sdk', topic: 'server setup' },
+    tool: 'context7/query-docs',
+    args: { libraryId: '/modelcontextprotocol/typescript-sdk', query: 'server setup' },
   }, sessionId);
   assert.equal(docsResult.isError, undefined);
 
@@ -715,7 +716,7 @@ test('scenario: code focus — multi-step: search library docs → execute → d
 
   // Verify call log shows both backend invocations
   const toolNames = fixture.getCallLog().map((c) => `${c.serverId}/${c.tool}`);
-  assert.ok(toolNames.includes('context7/get-library-docs'), 'context7 should have been called');
+  assert.ok(toolNames.includes('context7/query-docs'), 'context7 should have been called');
   assert.ok(toolNames.includes('notion/create_page'), 'notion should have been called');
 });
 
@@ -1114,5 +1115,43 @@ test('scenario: ops REORDER — with ops focus fs/list_directory overtakes chitt
   assert.ok(
     (searchData.tools ?? []).some((t) => t.tool === 'chittymac/list_notes'),
     'chittymac/list_notes must remain discoverable via search (lens-not-gate) even when ops focus is active',
+  );
+});
+
+test('scenario: ops focus — cast "list recent build runs" resolves to cloudflare-builds', async () => {
+  // workers_builds_list_builds wins on keyword specificity over cloudflare/list_workers:
+  // intent matches "list", "recent", "build", "runs", "status", "cloudflare", "workers", "builds" → score ~0.875
+  // cloudflare/list_workers matches "list", "cloudflare", "workers" → score ~0.375
+  // Both are ops-boosted (+0.5, ecosystem category), so workers_builds_list_builds wins overall.
+  const { aggregator } = buildAggregator(FIXTURE_CONFIGS, undefined, { focus: 'ops' });
+
+  const result = await aggregator.callTool('ch1tty/cast', {
+    intent: 'list recent build runs and check build status for the cloudflare workers builds pipeline',
+    focus: 'ops',
+    confirm: true,
+  });
+
+  assert.equal(result.isError, undefined);
+  const cast = parseCast(result);
+  const resolved = cast.resolved as { tool: string; score: number } | undefined;
+  assert.ok(resolved, 'cast should resolve a tool');
+  assert.equal(
+    resolved.tool,
+    'cloudflare-builds/workers_builds_list_builds',
+    `expected cloudflare-builds/workers_builds_list_builds; got ${resolved.tool} (score ${resolved.score})`,
+  );
+  assert.ok((resolved.score ?? 0) >= 1.0, `boosted score should be ≥1.0, got ${resolved.score}`);
+
+  // lens-not-gate: cloudflare/list_workers must still be discoverable via search
+  const searchResult = await aggregator.callTool('ch1tty/search', {
+    query: 'list workers',
+    focus: 'ops',
+    limit: 30,
+  });
+  assert.equal(searchResult.isError, undefined);
+  const searchData = parseSearch(searchResult);
+  assert.ok(
+    (searchData.tools ?? []).some((t) => t.tool === 'cloudflare/list_workers'),
+    'cloudflare/list_workers must remain discoverable via search even when cloudflare-builds ranks higher',
   );
 });

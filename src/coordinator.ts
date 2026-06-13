@@ -44,6 +44,8 @@ export interface SessionContext {
   toolPatterns: Map<string, ToolPattern>;
   stagingComplete: boolean;
   serverAffinity: Map<string, number>; // serverId → recency score
+  /** Sticky focus profile set by the last explicit focus param in this session. */
+  sessionFocus?: string;
 }
 
 // ── Coordinator ───────────────────────────────────────────────
@@ -206,6 +208,17 @@ export class SessionCoordinator {
     return this.contexts.get(sessionId)?.entity;
   }
 
+  /** Persist the active focus profile for a session. Pass undefined to clear. */
+  setSessionFocus(sessionId: string, focusName: string | undefined): void {
+    const ctx = this.contexts.get(sessionId);
+    if (ctx) ctx.sessionFocus = focusName;
+  }
+
+  /** Retrieve the sticky focus profile for a session, if one was set. */
+  getSessionFocus(sessionId: string): string | undefined {
+    return this.contexts.get(sessionId)?.sessionFocus;
+  }
+
   /** Get top tool patterns for a session. */
   getToolPatterns(sessionId: string, limit = 10): ToolPattern[] {
     const ctx = this.contexts.get(sessionId);
@@ -241,6 +254,7 @@ export class SessionCoordinator {
   getSnapshot(): {
     activeSessions: number;
     boundEntity: boolean;
+    topTools: string[];
     ledger: ReturnType<LedgerClient['getStats']>;
     brain: ReturnType<OllamaBrain['getStats']>;
     embeddingBrain: ReturnType<EmbeddingBrain['getStats']>;
@@ -248,19 +262,38 @@ export class SessionCoordinator {
       sessionId: string;
       entity?: string;
       toolPatterns: number;
+      topTools: string[];
       stagingComplete: boolean;
+      sessionFocus?: string;
     }>;
   } {
     const sessions = [...this.contexts.entries()].map(([id, ctx]) => ({
       sessionId: id,
       entity: ctx.entity?.chittyId,
       toolPatterns: ctx.toolPatterns.size,
+      topTools: [...ctx.toolPatterns.values()]
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5)
+        .map((p) => p.tool),
       stagingComplete: ctx.stagingComplete,
+      ...(ctx.sessionFocus ? { sessionFocus: ctx.sessionFocus } : {}),
     }));
+
+    const globalToolCounts = new Map<string, number>();
+    for (const ctx of this.contexts.values()) {
+      for (const [tool, pattern] of ctx.toolPatterns) {
+        globalToolCounts.set(tool, (globalToolCounts.get(tool) ?? 0) + pattern.count);
+      }
+    }
+    const topTools = [...globalToolCounts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([tool]) => tool);
 
     return {
       activeSessions: sessions.length,
       boundEntity: sessions.some((s) => s.entity !== undefined),
+      topTools,
       ledger: this.ledger.getStats(),
       brain: this.brain.getStats(),
       embeddingBrain: this.embeddingBrain.getStats(),

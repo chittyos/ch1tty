@@ -97,31 +97,48 @@ export function getSuggestionsForFocus(
     ? intent.toLowerCase().split(/\s+/).filter((t) => t.length > 2)
     : [];
 
-  let combos = profile.combos;
-  let prompts = profile.prompts;
+  // Rank combos: intent score (primary) → verified (tiebreaker) → catalog order (stable)
+  const comboScores = profile.combos.map((c) =>
+    terms.length > 0 ? scoreCombo(c, terms) : 0,
+  );
+  const combos = profile.combos
+    .map((c, i) => ({ c, score: comboScores[i], i }))
+    .sort(
+      (a, b) =>
+        b.score - a.score ||
+        (b.c.verified ? 1 : 0) - (a.c.verified ? 1 : 0) ||
+        a.i - b.i,
+    )
+    .map(({ c }) => c);
 
-  if (terms.length > 0) {
-    const comboScores = profile.combos.map((c) => scoreCombo(c, terms));
-    const promptScores = profile.prompts.map((p) => scorePrompt(p, terms));
-    const anyComboScored = comboScores.some((s) => s > 0);
-    const anyPromptScored = promptScores.some((s) => s > 0);
-
-    if (anyComboScored) {
-      combos = [...profile.combos]
-        .map((c, i) => ({ c, score: comboScores[i] }))
-        .sort((a, b) => b.score - a.score)
-        .map(({ c }) => c);
-    }
-    if (anyPromptScored) {
-      prompts = [...profile.prompts]
-        .map((p, i) => ({ p, score: promptScores[i] }))
-        .sort((a, b) => b.score - a.score)
-        .map(({ p }) => p);
-    }
-  }
+  // Rank prompts: intent score (primary) → catalog order (stable)
+  const promptScores = profile.prompts.map((p) =>
+    terms.length > 0 ? scorePrompt(p, terms) : 0,
+  );
+  const prompts = profile.prompts
+    .map((p, i) => ({ p, score: promptScores[i], i }))
+    .sort((a, b) => b.score - a.score || a.i - b.i)
+    .map(({ p }) => p);
 
   return {
     combos: combos.slice(0, maxCombos),
     prompts: prompts.slice(0, maxPrompts),
   };
+}
+
+/**
+ * Find the first catalog combo whose chain starts with the given tool name.
+ * Returns null when no match or the focus has no catalog entry.
+ *
+ * Used by cast: executed / cast: plan to annotate the response when the
+ * resolved tool is the entry-point of a curated workflow in the active focus.
+ */
+export function findCatalogCombo(
+  toolName: string,
+  focusName: string,
+  catalog: Record<string, FocusSuggestions>,
+): SuggestedCombo | null {
+  const profile = catalog[focusName];
+  if (!profile) return null;
+  return profile.combos.find((c) => c.chain[0] === toolName) ?? null;
 }

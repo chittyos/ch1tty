@@ -18,10 +18,15 @@ process.env.CH1TTY_EMBED_ENABLED = 'false';
 
 const {
   SCENARIOS,
+  buildDegradedAggregator,
   buildSimAggregator,
   outOfFocusReachable,
+  runDegradedCastScenario,
+  runDegradedSearchScenario,
+  runExecuteErrorScenario,
   runFocusBiasProbe,
   runScenario,
+  surfaceMisresolutions,
 } = await import('../sim/scenarios.js');
 
 test('cast resolves every scenario to its expected in-focus tool', async () => {
@@ -66,7 +71,7 @@ test('focus reorders a cross-focus near-miss (lens flips the winner)', async () 
     const p = await runFocusBiasProbe(aggregator, sc!);
     // Without focus the out-of-focus pdf tool wins; with design focus it loses.
     assert.equal(p.noFocusTop, 'pdf/render_pdf', `without focus top was ${p.noFocusTop}`);
-    assert.equal(p.withFocusTop, 'browser-rendering/render_page', `with focus top was ${p.withFocusTop}`);
+    assert.equal(p.withFocusTop, 'browser-rendering/get_url_html_content', `with focus top was ${p.withFocusTop}`);
     assert.ok(p.reordered, 'focus should have reordered the winner');
   } finally {
     await aggregator.shutdown();
@@ -118,7 +123,7 @@ test('out-of-focus tools stay reachable via search (lens, not gate)', async () =
       'github tool unreachable under governance focus',
     );
     assert.ok(
-      await outOfFocusReachable(aggregator, 'headless', 'governance', 'browser-rendering/render_page'),
+      await outOfFocusReachable(aggregator, 'html content', 'governance', 'browser-rendering/get_url_html_content'),
       'browser-rendering tool unreachable under governance focus',
     );
     assert.ok(
@@ -127,7 +132,7 @@ test('out-of-focus tools stay reachable via search (lens, not gate)', async () =
     );
     // ops focus (covers ecosystem+code) — desktop/communication/documents tools still reachable
     assert.ok(
-      await outOfFocusReachable(aggregator, 'render page', 'ops', 'browser-rendering/render_page'),
+      await outOfFocusReachable(aggregator, 'html content', 'ops', 'browser-rendering/get_url_html_content'),
       'browser-rendering tool unreachable under ops focus',
     );
     assert.ok(
@@ -138,6 +143,86 @@ test('out-of-focus tools stay reachable via search (lens, not gate)', async () =
       await outOfFocusReachable(aggregator, 'create page', 'ops', 'notion/create_page'),
       'notion tool unreachable under ops focus',
     );
+  } finally {
+    await aggregator.shutdown();
+  }
+});
+
+test('no uncorrectable mis-resolutions (focus must fix every OOF intruder)', async () => {
+  // Run every focused scenario WITHOUT focus to find cases where the wrong tool wins.
+  // Classify each as corrected-by-focus or uncorrectable. Uncorrectable = scoring bug.
+  // Focus-correctable mis-resolutions are diagnostic but expected (that is the point of focus).
+  const { aggregator } = buildSimAggregator();
+  try {
+    const events = await surfaceMisresolutions(aggregator);
+    const uncorrected = events.filter((e) => !e.correctedByFocus);
+
+    // Print the mis-resolution report regardless of outcome for diagnostic visibility.
+    if (events.length > 0) {
+      const corrected = events.filter((e) => e.correctedByFocus);
+      for (const e of corrected) {
+        console.log(
+          `  [mis-resolution corrected] ${e.id}: "${e.noFocusTop}" wins without focus → ` +
+          `"${e.expected}" wins with ${e.focus} focus`,
+        );
+      }
+      for (const e of uncorrected) {
+        console.log(
+          `  [UNCORRECTED MIS-RESOLUTION] ${e.id}: "${e.noFocusTop}" wins BOTH with and without ` +
+          `${e.focus} focus — expected "${e.expected}"`,
+        );
+      }
+    }
+
+    assert.equal(
+      uncorrected.length,
+      0,
+      `${uncorrected.length} uncorrectable mis-resolution(s): ` +
+      uncorrected.map((e) => `${e.id}(expected=${e.expected},got=${e.noFocusTop})`).join(', '),
+    );
+  } finally {
+    await aggregator.shutdown();
+  }
+});
+
+test('execute-level error propagated when tool fails', async () => {
+  const { aggregator } = buildDegradedAggregator({ toolErrors: ['neon/run_sql'] });
+  try {
+    const r = await runExecuteErrorScenario(aggregator, 'neon/run_sql', { project_id: 'p1', sql: 'SELECT 1' });
+    assert.ok(r.pass, r.detail);
+  } finally {
+    await aggregator.shutdown();
+  }
+});
+
+test('degraded backend: search does not crash, working-server tools reachable', async () => {
+  // github degraded — linear still provides code-category tools in the registry
+  const { aggregator } = buildDegradedAggregator({ degradedServers: ['github'] });
+  try {
+    const r = await runDegradedSearchScenario(aggregator, {
+      id: 'degraded-search.github-down',
+      query: 'issues project',
+      focus: 'code',
+      degradedServer: 'github',
+      expectToolFromOther: 'linear/list_issues',
+    });
+    assert.ok(r.pass, r.detail);
+  } finally {
+    await aggregator.shutdown();
+  }
+});
+
+test('degraded backend: cast does not crash, resolves without degraded server tools', async () => {
+  // stripe degraded — cast for invoice must not crash and must not resolve to stripe/*
+  const { aggregator } = buildDegradedAggregator({ degradedServers: ['stripe'] });
+  try {
+    const r = await runDegradedCastScenario(aggregator, {
+      id: 'degraded-cast.stripe-down',
+      intent: 'create an invoice for the customer with line items',
+      focus: 'finance',
+      degradedServer: 'stripe',
+    });
+    assert.ok(r.pass, r.detail);
   } finally {
     await aggregator.shutdown();
   }

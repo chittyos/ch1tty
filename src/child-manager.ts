@@ -169,6 +169,7 @@ export class ChildManager implements Backend {
 
     // Log child stderr
     const stderr = transport.stderr;
+    /* c8 ignore next -- StdioClientTransport always provides stderr when stderr:'pipe' */
     if (stderr) {
       const readable = stderr as import('node:stream').Readable;
       readable.on('data', (chunk: Buffer) => {
@@ -177,6 +178,7 @@ export class ChildManager implements Backend {
     }
 
     await client.connect(transport);
+    /* c8 ignore next -- doSpawn success path covered by integration tests; unit tests verify error handling only */
     return { client, transport, toolCache: null, resourceCache: null, promptCache: null };
   }
 

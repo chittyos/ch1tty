@@ -99,12 +99,22 @@ export const FIXTURE_TOOLS: Record<string, FixtureTool[]> = {
     { name: 'create_invoice_page', description: 'Create a Notion page documenting an invoice record' },
   ],
   orchestrator: [
-    { name: 'search', description: 'Search the orchestrator capability index for skills and agents' },
-    { name: 'execute', description: 'Execute a registered orchestrator capability by name' },
-    // ops-specific tools — included so ops scenarios can resolve to orchestrator
-    { name: 'run_job', description: 'Run a registered orchestrator job by name or ID' },
-    { name: 'get_job_status', description: 'Retrieve current result and outcome for an orchestrator job by job ID' },
-    { name: 'list_jobs', description: 'List recent orchestrator jobs, including any failures and completions' },
+    // Provisioning layer — identity/session binding
+    { name: 'provision_evaluate', description: 'Evaluate which ChittyID context entity should serve this session with TY-VY-RY scoring for identity, connectivity, and authority' },
+    { name: 'provision_bind', description: 'Bind a session to a ChittyID context after provision_evaluate decision — executes the provisioning action' },
+    { name: 'provision_fork', description: 'Fork a specialist context from an existing generalist entity inheriting domain strengths' },
+    { name: 'provision_status', description: 'Get current provisioning state: active session binding, TY-VY-RY profile, recent decisions audit trail' },
+    { name: 'provision_candidates', description: 'List TY-VY-RY scored candidates for session hints without making a provisioning decision — for review or override' },
+    // Skill layer — find and execute registered ChittyOS skills
+    { name: 'skill_list', description: 'List all available skills in the ChittyOS ecosystem with names, descriptions, triggers, and execution type' },
+    { name: 'skill_search', description: 'Search for skills by intent, keyword, or trigger — returns ranked matches with relevance scores for skill discovery' },
+    { name: 'skill_execute', description: 'Execute a registered skill by ID or name with arguments — delegates to skill MCP server, agent worker, or returns local instructions' },
+    { name: 'skill_register', description: 'Register or update a skill in the skill index with triggers, plugin, and execution type' },
+    // Agent layer — discover and route to specialist agents
+    { name: 'agent_list', description: 'List all agents in the ChittyAgent ecosystem with binding status, capabilities, domains, and tool counts' },
+    { name: 'agent_search', description: 'Search for agents by capability, domain, or keyword — find which agent handles a specific task' },
+    { name: 'agent_execute', description: 'Execute a request on an agent through the orchestrator using the agent protocol envelope with focal trust gating' },
+    { name: 'agent_register', description: 'Register or update agent metadata in the index including capabilities, descriptions, and tool counts' },
   ],
 
   // ── ops / ecosystem + code ───────────────────────────────────
@@ -112,6 +122,15 @@ export const FIXTURE_TOOLS: Record<string, FixtureTool[]> = {
     { name: 'deploy_worker', description: 'Deploy a Cloudflare Worker script to production with routing configuration' },
     { name: 'list_workers', description: 'List all deployed Cloudflare Workers with current route configurations' },
     { name: 'get_worker_logs', description: 'Retrieve recent logs and errors from a deployed Cloudflare Worker' },
+  ],
+  'cloudflare-builds': [
+    { name: 'workers_builds_list_builds', description: 'List recent Cloudflare Workers Builds build runs with status, timestamps, and error summaries for a Worker' },
+    { name: 'workers_builds_get_build', description: 'Get details of a specific Cloudflare Workers Builds build run including configuration, status, and deployment outcome' },
+    { name: 'workers_builds_get_build_logs', description: 'Get build logs from a specific Cloudflare Workers Builds run for debugging failed builds and deployment errors' },
+    { name: 'workers_builds_set_active_worker', description: 'Set the active Worker ID for subsequent Workers Builds API calls in this session' },
+    { name: 'workers_list', description: 'List all Workers in the Cloudflare account, returning worker IDs for use with the builds pipeline' },
+    { name: 'workers_get_worker', description: 'Get configuration details of a Cloudflare Worker script by name' },
+    { name: 'workers_get_worker_code', description: 'Get the full source code of a Cloudflare Worker script for code review or audit' },
   ],
   fs: [
     { name: 'read_file', description: 'Read the contents of a file from the filesystem by path' },
@@ -121,15 +140,16 @@ export const FIXTURE_TOOLS: Record<string, FixtureTool[]> = {
 
   // ── design / desktop ─────────────────────────────────────────
   'browser-rendering': [
-    { name: 'render_page', description: 'Render a web page to HTML or PDF via headless browser' },
-    { name: 'capture_screenshot', description: 'Capture a screenshot of a rendered web page or URL' },
+    { name: 'get_url_html_content', description: 'Get page HTML content' },
+    { name: 'get_url_markdown', description: 'Get page converted into Markdown' },
+    { name: 'get_url_screenshot', description: 'Get page screenshot' },
   ],
   playwright: [
-    { name: 'navigate', description: 'Navigate a Playwright browser session to a URL' },
-    { name: 'screenshot', description: 'Take a screenshot of the current Playwright page and save it' },
-    { name: 'click', description: 'Click an element on the current Playwright page by selector' },
-    // near-miss: a playwright "render"-shaped tool to compete with browser-rendering/render_page
-    { name: 'render_to_pdf', description: 'Render the current Playwright page to a PDF file' },
+    { name: 'browser_navigate', description: 'Navigate to a URL' },
+    { name: 'browser_take_screenshot', description: 'Take a screenshot of the current page' },
+    { name: 'browser_click', description: 'Perform click on a web page' },
+    // near-miss: browser_snapshot captures page content like browser-rendering tools
+    { name: 'browser_snapshot', description: 'Capture accessibility snapshot of the current page, this is better than screenshot' },
   ],
   cowork: [
     { name: 'start_session', description: 'Start a Claude Co-Work desktop collaboration session' },
@@ -149,7 +169,7 @@ export const FIXTURE_TOOLS: Record<string, FixtureTool[]> = {
   context7: [
     { name: 'resolve-library-id', description: 'Resolve a package name or description to a Context7-compatible library ID' },
     // near-miss for governance.evidence-search: a "search library docs" tool competes with chittyevidence/search_documents
-    { name: 'get-library-docs', description: 'Get documentation and code examples for a library from the Context7 context window' },
+    { name: 'query-docs', description: 'Get documentation and code examples for a library from the Context7 context window' },
   ],
 
   // ── communication / messaging ────────────────────────────────
@@ -181,6 +201,21 @@ export class FixtureBackend implements Backend {
   /** Records of callTool invocations, for harness inspection. */
   readonly calls: Array<{ serverId: string; toolName: string; args?: Record<string, unknown> }> = [];
 
+  /** Servers whose listTools will throw (simulates connectivity loss). */
+  private readonly _degraded = new Set<string>();
+  /** Tools (`serverId/toolName`) whose callTool returns isError: true. */
+  private readonly _toolErrors = new Set<string>();
+
+  /** Mark a server as degraded — listTools will throw for this server. */
+  setDegraded(serverId: string): void {
+    this._degraded.add(serverId);
+  }
+
+  /** Mark a specific tool as failing — callTool will return isError: true. */
+  setToolError(serverId: string, toolName: string): void {
+    this._toolErrors.add(`${serverId}/${toolName}`);
+  }
+
   registerServer(config: ServerConfig): void {
     this.configs.set(config.id, config);
   }
@@ -191,10 +226,13 @@ export class FixtureBackend implements Backend {
 
   getStatus(serverId: string): BackendStatus {
     const tools = FIXTURE_TOOLS[serverId] ?? [];
-    return { connected: this.configs.has(serverId), toolCount: tools.length, toolCacheAge: 0 };
+    return { connected: this.configs.has(serverId) && !this._degraded.has(serverId), toolCount: tools.length, toolCacheAge: 0 };
   }
 
   async listTools(serverId: string): Promise<ToolEntry[]> {
+    if (this._degraded.has(serverId)) {
+      throw new Error(`[sim] backend "${serverId}" is degraded`);
+    }
     const tools = FIXTURE_TOOLS[serverId] ?? [];
     return tools.map((t) => ({
       name: t.name,
@@ -205,6 +243,12 @@ export class FixtureBackend implements Backend {
 
   async callTool(serverId: string, toolName: string, args?: Record<string, unknown>): Promise<ToolCallResult> {
     this.calls.push({ serverId, toolName, args });
+    if (this._toolErrors.has(`${serverId}/${toolName}`)) {
+      return {
+        content: [{ type: 'text', text: `[sim] tool ${serverId}/${toolName} returned an error` } as ContentItem],
+        isError: true,
+      };
+    }
     const known = (FIXTURE_TOOLS[serverId] ?? []).some((t) => t.name === toolName);
     if (!known) {
       return {
