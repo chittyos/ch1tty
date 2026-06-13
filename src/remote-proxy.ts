@@ -206,7 +206,7 @@ export class RemoteProxy implements Backend {
     }
   }
 
-  async callTool(serverId: string, toolName: string, args: Record<string, unknown> = {}): Promise<ToolCallResult> {
+  async callTool(serverId: string, toolName: string, args: Record<string, unknown> = {}, options?: { timeoutMs?: number }): Promise<ToolCallResult> {
     const config = this.configs.get(serverId);
     if (!config) {
       return {
@@ -226,7 +226,7 @@ export class RemoteProxy implements Backend {
       const conn = await this.connectWithReconnect(serverId);
       const result = await withTimeout(
         conn.client.callTool({ name: toolName, arguments: args }),
-        getCallTimeoutMs(),
+        options?.timeoutMs ?? getCallTimeoutMs(),
         `callTool ${serverId}/${toolName}`,
       );
       this.breaker.recordSuccess(serverId);

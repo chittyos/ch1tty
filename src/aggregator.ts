@@ -323,6 +323,7 @@ export class Aggregator {
             tool: { type: 'string', description: 'Namespaced tool name from search results (e.g. "neon/list_projects")' },
             args: { type: 'object', description: 'Arguments to pass to the tool' },
             dryRun: { type: 'boolean', description: 'If true, resolve the tool and return what would be called (server, tool, args) without executing. Makes zero backend calls. Useful for previewing or sandboxing (default: false).' },
+            timeout: { type: 'number', description: 'Per-call timeout in milliseconds. Overrides CH1TTY_REMOTE_TIMEOUT_MS for this call only. Ignored for local (stdio) backends. Minimum 1ms; non-positive values are ignored (default: use CH1TTY_REMOTE_TIMEOUT_MS or 120000ms).' },
           },
           required: ['tool'],
         },
@@ -605,6 +606,7 @@ export class Aggregator {
       ? args.args as Record<string, unknown>
       : {};
     const dryRun = args.dryRun === true;
+    const timeoutMs = typeof args.timeout === 'number' && args.timeout > 0 ? Math.floor(args.timeout) : undefined;
 
     if (!toolName) {
       return {
@@ -647,7 +649,7 @@ export class Aggregator {
     }
 
     try {
-      const result = await backend.callTool(serverId, name, toolArgs);
+      const result = await backend.callTool(serverId, name, toolArgs, timeoutMs !== undefined ? { timeoutMs } : undefined);
       if (sessionId) {
         this.sessions.recordToolCall(sessionId, toolName);
         this.coordinator.onToolCall(sessionId, toolName);
