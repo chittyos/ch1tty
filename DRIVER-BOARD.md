@@ -23,6 +23,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **Q. search `explain` mode** — `explain: true` on `ch1tty/search` adds `explanation: { method: 'keyword', matchMode, focus?, focusBoost?, topCandidates[{tool, relevanceScore, inFocus?, recentlyUsed?}], rationale }`. Parallel to cast explain; surfaces ranking transparency (AND vs partial/OR fallback, focus boost, per-result scores). PR #388 ✅ MERGED (run 103, 2026-06-13). 7 new tests, 1018/0/2. DONE.
 - [x] **R. search `inFocusOnly` hard filter** — `inFocusOnly: true` on `ch1tty/search` hard-filters results to only in-focus tools when a focus profile is active. No-op without active focus. Applies to both tool-search and server-summary paths. Response includes `inFocusOnly: true` field. PR #390 ✅ MERGED (run 104, 2026-06-13). 7 new tests, 1025/0/2. DONE.
 - [x] **S. Session-sticky focus** — Explicit `focus` param on `ch1tty/search` or `ch1tty/cast` is persisted per-session via `SessionCoordinator`. Subsequent calls in the same session without a `focus` param inherit the stored focus automatically. Priority: per-call > session-sticky > `CH1TTY_FOCUS` env default. `focus:"none"` clears the session focus. PR #392 ✅ MERGED (run 105, 2026-06-13). 7 new tests, 1032/0/2. DONE.
+- [ ] **T. `ch1tty/status` session focus reporting** — `coordinator.getSnapshot()` now includes `sessionFocus?: string` on each session entry under `coordinator.sessions`. Present only when explicitly set; absent when none set or cleared via `focus:"none"`; env default does not write `sessionFocus`. PR #394 open (run 106, 2026-06-13). 7 new tests, 1039/0/2. Pending merge.
 
 ## Live Gateway State (as of 2026-06-13)
 
@@ -38,6 +39,36 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 106 — 2026-06-13 (auto-driver)
+
+**Workstream advanced**: T (new — `ch1tty/status` session focus reporting)
+**Branch/PR**: `auto/T-status-session-focus-reporting` → https://github.com/chittyos/ch1tty/pull/394 (open; CodeQL in_progress; Codex usage-limit + CodeRabbit in-progress — both informational)
+**Build**: clean (0 errors)
+**Tests**: 1039 pass, 0 fail, 2 skipped (+7 new tests)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 1032/0/2 on main (PR #392 merged). Only open PR: #375 (Dependabot esbuild bump). Board confirmed A✅ through S✅. Notion wrapper still missing — DRIVER-BOARD.md continues as fallback.
+- **Workstream T: session focus reporting in `ch1tty/status`**
+  - Problem: `coordinator.getSnapshot()` mapped session entries without the `sessionFocus` field that `SessionContext` already held (set by workstream S). Operators could not inspect which sessions had a sticky focus active.
+  - **`src/coordinator.ts`** (2 lines): added `sessionFocus?: string` to the `sessions` array type and `...(ctx.sessionFocus ? { sessionFocus: ctx.sessionFocus } : {})` spread into the session object in `.map()`.
+  - **7 new tests** in `test/status-session-focus.test.ts`:
+    1. No sessions → `coordinator.sessions` is `[]`
+    2. Session with no focus → no `sessionFocus` field on entry
+    3. Focus set via search → `sessionFocus` in coordinator.sessions
+    4. Focus cleared via `focus:"none"` → `sessionFocus` absent
+    5. Two sessions different focus → independent `sessionFocus` per session
+    6. Focus set via cast → `sessionFocus` in coordinator.sessions
+    7. Process env default `CH1TTY_FOCUS` does not write `sessionFocus` on entries
+- Bot comments: Codex usage-limit + CodeRabbit in-progress — both informational, no action.
+- PR #394 open; subscribed to activity; CodeQL in_progress at run end.
+
+**Next run priority**:
+- Merge PR #394 once CodeQL completes (or manually after local test confirmation). Mark T ✅ done.
+- Workstream U candidates: (a) `ch1tty/status` per-session top-tools report — add `topTools: string[]` (most-used tools in this session) from coordinator toolPatterns; (b) `ch1tty/search` `sessionContext: true` — annotate results with whether they match calling session's recent patterns; (c) Dependabot esbuild PR #375 review/merge (dev-only bump).
+- Blockers unchanged: CI broken org-wide (human must fix GitHub Actions), Notion unreachable, Ledger DLQ 6 entries.
 
 ---
 
