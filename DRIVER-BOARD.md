@@ -31,7 +31,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **Y. `ch1tty/cast` scope parameter** — `scope` parameter on `ch1tty/cast` hard-filters the registry to a specific server or category before intent resolution. Allows callers to restrict cast to a bounded tool namespace without modifying focus. PR #406 ✅ MERGED (run 111, 2026-06-13). DONE.
 - [x] **IIII. Branch coverage sweep** — 4 branch gaps closed in `aggregator.ts` + `suggestions.ts`: explain truncation note (1582-1583), suggestions nopath fallback (38), relevanceMap ??0 (1566), recentlyUsed spread (1568). suggestions.ts now 100% branch. PR #407 ✅ MERGED (run 113, 2026-06-13). 4 new tests, 1081/0/2. DONE.
 - [x] **Z. `ch1tty/status` short mode** — `short: true` param returns condensed snapshot omitting `servers[]` and `coordinator.sessions[]` while preserving all health fields, counts, focus, and catalog stats. PR #409 ✅ MERGED (run 113, 2026-06-13). 7 new tests, 1088/0/2. DONE.
-- [ ] **AA. `ch1tty/search` offset pagination** — `offset: number` param skips N results before returning the page, pairing with `limit` to iterate through large registries. `total` always reflects the full unsliced count. `offset` field included in response when non-zero. PR #411 open (run 114, 2026-06-13). 7 new tests, 1095/0/2. Awaiting merge.
+- [x] **AA. `ch1tty/search` offset pagination** — `offset: number` param skips N results before returning the page, pairing with `limit` to iterate through large registries. `total` always reflects the full unsliced count. `offset` field included in response when non-zero. PR #411 ✅ MERGED (run 114, 2026-06-13). 7 new tests, 1095/0/2. DONE.
 
 ## Live Gateway State (as of 2026-06-13 run 113)
 
