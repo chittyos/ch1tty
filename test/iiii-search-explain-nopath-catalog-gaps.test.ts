@@ -111,15 +111,20 @@ test('search explain: rationale includes "showing X of Y" when limit < total mat
 test('loadSuggestionsCatalog() without argument falls back to resolveSuggestionsCatalogPath()', () => {
   // Clear module cache so the next call reloads from disk via the path resolver.
   clearSuggestionsCache();
-  // Call without any argument → `path` is undefined → `??` evaluates the right side.
-  const catalog = loadSuggestionsCatalog();
-  // The real focus-suggestions.json lives at process.cwd() = repo root.
-  assert.equal(typeof catalog, 'object', 'should return an object');
-  // The catalog has the 6 focus profiles.
-  const profiles = Object.keys(catalog);
-  assert.ok(profiles.length >= 6, `expected ≥6 profiles, got ${profiles.length}: ${profiles.join(', ')}`);
-  assert.ok(profiles.includes('finance'), 'finance profile should be present');
-  assert.ok(profiles.includes('ops'), 'ops profile should be present');
+  try {
+    // Call without any argument → `path` is undefined → `??` evaluates the right side.
+    const catalog = loadSuggestionsCatalog();
+    // The real focus-suggestions.json lives at process.cwd() = repo root.
+    assert.equal(typeof catalog, 'object', 'should return an object');
+    // The catalog has the 6 focus profiles.
+    const profiles = Object.keys(catalog);
+    assert.ok(profiles.length >= 6, `expected ≥6 profiles, got ${profiles.length}: ${profiles.join(', ')}`);
+    assert.ok(profiles.includes('finance'), 'finance profile should be present');
+    assert.ok(profiles.includes('ops'), 'ops profile should be present');
+  } finally {
+    // Reset cache so subsequent tests aren't affected by the module-level state.
+    clearSuggestionsCache();
+  }
 });
 
 // ── Test 3: aggregator.ts 1566 — relevanceMap ?? 0 right side (no-query search) ─
@@ -209,9 +214,11 @@ test('search explain: recentlyUsed:true appears in topCandidates after executing
       sessionId,
     );
 
-    // Search for sql tools with explain:true using the same sessionId.
+    // Search neon tools only with explain:true — server filter ensures Neon tools
+    // always appear in topCandidates, making the recentlyUsed assertion deterministic.
     const result = await agg.callTool('ch1tty/search', {
       query: 'sql database',
+      server: 'neon',
       explain: true,
     }, sessionId);
 
