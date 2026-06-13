@@ -25,9 +25,10 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **S. Session-sticky focus** — Explicit `focus` param on `ch1tty/search` or `ch1tty/cast` is persisted per-session via `SessionCoordinator`. Subsequent calls in the same session without a `focus` param inherit the stored focus automatically. Priority: per-call > session-sticky > `CH1TTY_FOCUS` env default. `focus:"none"` clears the session focus. PR #392 ✅ MERGED (run 105, 2026-06-13). 7 new tests, 1032/0/2. DONE.
 - [x] **T. `ch1tty/status` session focus reporting** — `coordinator.getSnapshot()` now includes `sessionFocus?: string` on each session entry under `coordinator.sessions`. Present only when explicitly set; absent when none set or cleared via `focus:"none"`; env default does not write `sessionFocus`. PR #394 ✅ MERGED (run 106, 2026-06-13). 7 new tests, 1039/0/2. DONE.
 - [x] **U. `ch1tty/status` per-session topTools** — `coordinator.getSnapshot()` now includes `topTools: string[]` on each session entry — top 5 most-called namespaced tool names sorted by count descending, `[]` when no calls made. Operators can inspect which tools each active session uses, not just the count. PR #397 ✅ MERGED (run 107, 2026-06-13). 7 new tests, 1046/0/2. DONE.
-- [ ] **V. `ch1tty/status` coordinator-level global topTools** — `coordinator.getSnapshot()` now includes `topTools: string[]` at the coordinator top level, aggregating tool call counts across ALL active sessions and returning top 10 most-called tools globally. Complements per-session topTools (U). PR #399 open (run 108, 2026-06-13). 7 new tests, 1053/0/2. Awaiting merge.
+- [x] **V. `ch1tty/status` coordinator-level global topTools** — `coordinator.getSnapshot()` now includes `topTools: string[]` at the coordinator top level, aggregating tool call counts across ALL active sessions and returning top 10 most-called tools globally. Complements per-session topTools (U). PR #399 ✅ MERGED (run 108, 2026-06-13). 7 new tests, 1053/0/2. DONE.
+- [x] **W. `ch1tty/status` activeFocusSuggestions** — When a focus profile is active, `ch1tty/status` now includes top 3 combos and prompts from the suggestions catalog for that focus under `catalog.activeFocusSuggestions` — a quick compass for operators. When no focus or focus not in catalog, field is null. Also adds `catalog.loaded`, `catalog.totalCombos`, `catalog.byFocus`. PR #401 ✅ MERGED (parallel session, 2026-06-13). 7 new tests, 1060/0/2. DONE.
 
-## Live Gateway State (as of 2026-06-13 run 108)
+## Live Gateway State (as of 2026-06-13 post-run 108)
 
 - Connected backends: cloudflare-builds (7 tools), evidence (3), browser-rendering (3), context7 (2), thinking (1), fs (14), playwright (23), orchestrator (13) — 66 total tools
 - Not connected: chittyos, cloudflare, GitHub, linear, notion, stripe, neon (lazy, auth-gated)
@@ -48,6 +49,23 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 108 post-merge — 2026-06-13 (auto-driver)
+
+**Workstream advanced**: V marked DONE (PR #399 merged); W discovered + marked DONE (PR #401 merged by parallel session)
+**Build**: clean | **Tests**: 1060 pass, 0 fail, 2 skipped
+
+**What happened**:
+- PR #399 (Workstream V — coordinator global topTools) merged ✅
+- PR #400 (board update) merged ✅
+- PR #401 (Workstream W — `activeFocusSuggestions` in status) merged by parallel session ✅ — 7 new tests, 1060/0/2
+- Board updated: V ✅ DONE, W ✅ DONE (both recorded)
+
+**Next run priority**:
+- Workstream X: enrich `recentlyUsed` on `ch1tty/search` results with `callCount: number` + `lastUsedMs: number` (currently just a boolean), giving clients richer session-context signal without a new tool.
+- Blockers unchanged: CI broken org-wide, Notion unreachable, Ledger DLQ 6 entries.
 
 ---
 
