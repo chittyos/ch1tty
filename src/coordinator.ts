@@ -203,6 +203,11 @@ export class SessionCoordinator {
     return this.contexts.get(sessionId)?.serverAffinity ?? new Map();
   }
 
+  /** True if a session context exists for the given sessionId. */
+  hasSession(sessionId: string): boolean {
+    return this.contexts.has(sessionId);
+  }
+
   /** Get entity context for a session (for search enrichment). */
   getEntityContext(sessionId: string): EntityContext | undefined {
     return this.contexts.get(sessionId)?.entity;
