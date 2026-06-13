@@ -262,6 +262,7 @@ export class SessionCoordinator {
       entity?: string;
       toolPatterns: number;
       stagingComplete: boolean;
+      sessionFocus?: string;
     }>;
   } {
     const sessions = [...this.contexts.entries()].map(([id, ctx]) => ({
@@ -269,6 +270,7 @@ export class SessionCoordinator {
       entity: ctx.entity?.chittyId,
       toolPatterns: ctx.toolPatterns.size,
       stagingComplete: ctx.stagingComplete,
+      ...(ctx.sessionFocus ? { sessionFocus: ctx.sessionFocus } : {}),
     }));
 
     return {
