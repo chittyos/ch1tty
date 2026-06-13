@@ -308,6 +308,7 @@ export class Aggregator {
             category: { type: 'string', description: 'Filter by category (ecosystem, code, search, reasoning, desktop, documents, communication)' },
             focus: { type: 'string', description: 'Focus profile to bias results toward (e.g. "finance", "governance", "design"). A soft lens — out-of-focus tools still appear. Use "none" to override the env default. Overrides CH1TTY_FOCUS for this call.' },
             limit: { type: 'number', description: 'Max results to return (default 20)' },
+            offset: { type: 'number', description: 'Number of results to skip before returning the first result (default 0). Pair with limit to page through large result sets: offset:20, limit:20 returns the second page of 20.' },
             explain: { type: 'boolean', description: 'If true, include an explanation field in the response showing how results were ranked: match mode (and/partial), focus boost contributions, per-result relevance scores, recency signals, and a human-readable rationale. Useful for debugging ranking decisions (default: false).' },
             inFocusOnly: { type: 'boolean', description: 'If true and a focus profile is active, return only tools that are within the active focus (hard filter). Out-of-focus tools are excluded. No-op when no focus is active. Overrides the default lens behavior for this call (default: false).' },
           },
@@ -431,6 +432,7 @@ export class Aggregator {
     const serverFilter = typeof args.server === 'string' ? args.server : undefined;
     const categoryFilter = typeof args.category === 'string' ? args.category : undefined;
     const limit = typeof args.limit === 'number' ? args.limit : 20;
+    const offset = typeof args.offset === 'number' && args.offset > 0 ? Math.floor(args.offset) : 0;
     const explain = args.explain === true;
     const inFocusOnly = args.inFocusOnly === true;
     const { name: focusName, profile: focus } = this.resolveActiveFocus(args.focus, sessionId);
@@ -554,7 +556,7 @@ export class Aggregator {
       });
     }
 
-    const results = matches.slice(0, limit).map((t) => ({
+    const results = matches.slice(offset, offset + limit).map((t) => ({
       tool: t.namespacedName,
       server: t.serverId,
       category: t.category,
@@ -582,6 +584,7 @@ export class Aggregator {
         text: JSON.stringify({
           matches: results.length,
           total: matches.length,
+          ...(offset > 0 ? { offset } : {}),
           ...(partialFallback ? { mode: 'partial' } : {}),
           ...(focusName ? { focus: focusName } : {}),
           ...(inFocusOnly && focus ? { inFocusOnly: true } : {}),
