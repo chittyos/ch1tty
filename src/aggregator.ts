@@ -964,7 +964,9 @@ export class Aggregator {
         const stepArgs = i === 0 ? toolArgs : {};
         const r = await this.handleExecute({ tool: stepTool, args: stepArgs }, sessionId);
         if (r.isError) {
-          steps.push({ step: i, tool: stepTool, ok: false, error: String((r.content[0] as { text?: unknown }).text ?? r.content[0]) });
+          const firstContent = r.content[0] as { type?: string; text?: unknown } | undefined;
+          const errText = typeof firstContent?.text === 'string' ? firstContent.text : JSON.stringify(r.content);
+          steps.push({ step: i, tool: stepTool, ok: false, error: errText });
         } else {
           steps.push({ step: i, tool: stepTool, ok: true, content: r.content });
         }
