@@ -993,6 +993,7 @@ export class Aggregator {
     if (!confirm && autoChain && catalogCombo && catalogCombo.chain.length > 1) {
       const steps: Array<{ step: number; tool: string; ok: boolean; content?: unknown[]; error?: string }> = [];
       let previousStepOutput: string | null = null;
+      const allTexts: string[] = [];
 
       for (let i = 0; i < catalogCombo.chain.length; i++) {
         const stepTool = catalogCombo.chain[i];
@@ -1015,9 +1016,12 @@ export class Aggregator {
             .filter((c) => c.type === 'text' && typeof c.text === 'string')
             .map((c) => c.text as string);
           previousStepOutput = textParts.length > 0 ? textParts.join('\n') : null;
+          if (previousStepOutput !== null) allTexts.push(previousStepOutput);
           steps.push({ step: i, tool: stepTool, ok: true, content: r.content });
         }
       }
+
+      const chainSummary = allTexts.length > 0 ? allTexts.join('\n\n') : undefined;
 
       return {
         content: [{
@@ -1029,6 +1033,7 @@ export class Aggregator {
             ...(focusName ? { focus: focusName } : {}),
             catalog: { name: catalogCombo.name, chain: catalogCombo.chain, accomplishes: catalogCombo.accomplishes },
             steps,
+            ...(chainSummary !== undefined ? { summary: chainSummary } : {}),
             ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
           }, null, 2),
         }],
