@@ -12,6 +12,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **F. Cast miss-path focus suggestions** — `cast: no_match` and `cast: discovered` now surface catalog suggestions when focus is active. PR #365 MERGED. DONE (run 92, 2026-06-12).
 - [x] **G. Search focus suggestions** — `ch1tty/search` now includes ranked catalog suggestions (combos + prompts) alongside tool results when focus is active and a query is present. PR #368 ✅ MERGED (run 93, 2026-06-12). 5 new tests, 945/0/2. DONE.
 - [x] **H. resolvedFromCatalog on cast: executed/plan** — When the resolved tool is chain[0] of a curated catalog combo in the active focus, the cast response includes `resolvedFromCatalog: { name, chain, accomplishes }`. PR #370 ✅ MERGED (run 94, 2026-06-12). 7 new tests, 952/0/2. DONE.
+- [ ] **I. chainContinuation hint on cast: executed/plan** — When resolvedFromCatalog fires on a multi-step combo, both cast: executed and cast: plan now include `chainContinuation: { nextTool, remainingChain, hint }` so clients know what to invoke next without parsing the full chain. PR #372 open (run 95, 2026-06-13). 7 new tests, 959/0/2. Awaiting merge.
 
 ## Live Gateway State (as of 2026-06-12)
 
@@ -27,6 +28,36 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 95 — 2026-06-13 (auto-driver)
+
+**Workstream advanced**: I (new — chainContinuation hint on cast: executed/plan)
+**Branch/PR**: `auto/I-chain-continuation-hint` → https://github.com/chittyos/ch1tty/pull/372 (open; CodeQL queued; Codex + CodeRabbit usage-limit comments — informational, no action)
+**Build**: clean (0 errors)
+**Tests**: 959 pass, 0 fail, 2 skipped (961 total, 45 suites) — +7 new tests
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 952/0/2 on main. Only open PR: #367 (Dependabot esbuild bump — dev-only transitive dep).
+- Board read: A✅ B✅ C✅ D✅ E✅ F✅ G✅ H✅. All workstreams done. Chose Workstream I from run-94 next-priority note.
+- **Notion wrapper still missing** (`/home/ubuntu/.local/bin/notion-mcp-wrapper.sh`). Board continues as DRIVER-BOARD.md.
+- **Change**: `src/aggregator.ts` — after `catalogCombo` is computed, derive `chainContinuation` when `catalogCombo !== null && catalogCombo.chain.length > 1`: `{ nextTool: chain[1], remainingChain: chain.slice(1), hint: "Continue the '<name>' workflow: <remaining>.." }`. Added `...(chainContinuation ? { chainContinuation } : {})` to both `cast: plan` (line ~952) and `cast: executed` (line ~981). No new imports — uses existing `catalogCombo` variable only.
+- **Tests**: 7 new tests in `test/cast-chain-continuation.test.ts`:
+  1. cast: executed + multi-step combo → chainContinuation present with correct shape
+  2. cast: executed + single-step combo (chain.length === 1) → chainContinuation absent
+  3. cast: executed without focus → chainContinuation absent
+  4. cast: plan + multi-step combo → chainContinuation present
+  5. chainContinuation.nextTool === chain[1] (using a 3-step cloudflare combo)
+  6. chainContinuation.remainingChain deep-equals chain.slice(1) of matched combo
+  7. chainContinuation.hint contains combo name and next tool names
+- PR #372 opened. CodeQL checks queued. Codex + CodeRabbit both hit usage limits (rate-limit comments — informational, no action). Subscribed to PR #372 for CI/review monitoring.
+
+**Next run priority**:
+- Merge PR #372 once CodeQL checks complete (or manually after local test verification).
+- Mark Workstream I ✅ done.
+- Blockers unchanged: CI broken org-wide (human must investigate GitHub Actions), Notion unreachable (human must configure wrapper script), Ledger DLQ has 6 entries (ledger.chitty.cc unreachable).
+- Potential Workstream J candidates: (1) `cast` multi-step auto-chain — auto-execute chain steps in sequence when `chainContinuation` is present and a new `chain: true` arg is passed; (2) catalog freshness check — verify focus-suggestions.json combos against live gateway tool list on `ch1tty/reload`; (3) Dependabot esbuild PR #367 review/merge (security fix in 0.28.1 for `\` path traversal in dev server HTTP).
 
 ---
 

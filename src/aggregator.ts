@@ -930,6 +930,16 @@ export class Aggregator {
       ? findCatalogCombo(best.namespacedName, focusName, this.suggestionsCatalog)
       : null;
 
+    // When the combo has more than one step, surface the remaining chain so
+    // clients know what to invoke next to complete the workflow.
+    const chainContinuation = (catalogCombo && catalogCombo.chain.length > 1)
+      ? {
+          nextTool: catalogCombo.chain[1],
+          remainingChain: catalogCombo.chain.slice(1),
+          hint: `Continue the '${catalogCombo.name}' workflow: ${catalogCombo.chain.slice(1).join(' → ')}.`,
+        }
+      : null;
+
     // Step 2: Confirm mode — return the plan without executing
     if (confirm) {
       return {
@@ -949,6 +959,7 @@ export class Aggregator {
               inputSchema: best.inputSchema,
             },
             ...(catalogCombo ? { resolvedFromCatalog: { name: catalogCombo.name, chain: catalogCombo.chain, accomplishes: catalogCombo.accomplishes } } : {}),
+            ...(chainContinuation ? { chainContinuation } : {}),
             alternatives,
             ...related,
             ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
@@ -978,6 +989,7 @@ export class Aggregator {
             resolved: best.namespacedName,
             score: best.score,
             ...(catalogCombo ? { resolvedFromCatalog: { name: catalogCombo.name, chain: catalogCombo.chain, accomplishes: catalogCombo.accomplishes } } : {}),
+            ...(chainContinuation ? { chainContinuation } : {}),
             ...(alternatives.length > 0 ? { alternatives } : {}),
             ...related,
             ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
