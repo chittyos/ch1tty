@@ -32,7 +32,15 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **IIII. Branch coverage sweep** — 4 branch gaps closed in `aggregator.ts` + `suggestions.ts`: explain truncation note (1582-1583), suggestions nopath fallback (38), relevanceMap ??0 (1566), recentlyUsed spread (1568). suggestions.ts now 100% branch. PR #407 ✅ MERGED (run 113, 2026-06-13). 4 new tests, 1081/0/2. DONE.
 - [x] **Z. `ch1tty/status` short mode** — `short: true` param returns condensed snapshot omitting `servers[]` and `coordinator.sessions[]` while preserving all health fields, counts, focus, and catalog stats. PR #409 ✅ MERGED (run 113, 2026-06-13). 7 new tests, 1088/0/2. DONE.
 - [x] **AA. `ch1tty/search` offset pagination** — `offset: number` param skips N results before returning the page, pairing with `limit` to iterate through large registries. `total` always reflects the full unsliced count. `offset` field included in response when non-zero. PR #411 ✅ MERGED (run 114, 2026-06-13). 7 new tests, 1095/0/2. DONE.
-- [ ] **BB. `ch1tty/execute` per-call timeout** — `timeout: number` ms param overrides `CH1TTY_REMOTE_TIMEOUT_MS` for a single call. Threaded via `Backend.callTool` options bag → `RemoteProxy` (uses it) and `ChildManager` (uses it). Non-positive values treated as absent. `FixtureBackend` records `timeoutMs` in `CallRecord`. PR #413 open (run 115, 2026-06-13). 8 new tests, 1103/0/2.
+- [x] **BB. `ch1tty/execute` per-call timeout** — `timeout: number` ms param overrides `CH1TTY_REMOTE_TIMEOUT_MS` for a single call. Threaded via `Backend.callTool` options bag → `RemoteProxy` (uses it) and `ChildManager` (uses it). Non-positive values treated as absent. `FixtureBackend` records `timeoutMs` in `CallRecord`. PR #413 ✅ MERGED (run 115, 2026-06-13). 8 new tests, 1103/0/2. DONE.
+- [ ] **CC. `ch1tty/cast` per-call timeout** — `timeout: number` param on `ch1tty/cast` mirrors BB: overrides `CH1TTY_REMOTE_TIMEOUT_MS` for a single cast call. Threaded through both execution paths: normal single-tool execute (Step 3) and each step of auto-chain execution (`chain: true`). Non-positive values treated as absent. dryRun short-circuits before backend — timeout has no effect. No changes to `handleExecute`, `RemoteProxy`, or `ChildManager`. PR #414 open (run 116, 2026-06-13). 8 new tests, 1111/0/2.
+
+## Live Gateway State (as of 2026-06-13 run 116)
+
+- Connected backends: cloudflare-builds (7 tools), evidence (3), browser-rendering (3), context7 (2), thinking (1), fs (14), playwright (23), orchestrator (13) — 66 total tools
+- Not connected: chittyos, cloudflare, GitHub, linear, notion, stripe, neon (lazy, auth-gated)
+- System health: degraded (ledger DLQ has 6 entries — ledger.chitty.cc unreachable)
+- Brain: ok (embedding circuit open=false, ollama circuit open=false)
 
 ## Live Gateway State (as of 2026-06-13 run 113)
 
@@ -57,6 +65,43 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 116 — 2026-06-13 (auto-driver)
+
+**Workstream advanced**: CC (new — `ch1tty/cast` per-call timeout parameter)
+**Branch/PR**: `auto/CC-cast-per-call-timeout` → https://github.com/chittyos/ch1tty/pull/414 (open)
+**Build**: clean (0 errors)
+**Tests**: 1111 pass, 0 fail, 2 skipped (+8 new tests from 1103 baseline)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 1103/0/2 on origin/main. Board read: A✅ through AA✅, BB open (PR #413). PR #413 confirmed MERGED (merged_at 2026-06-13T19:16:10Z). Marked BB ✅ done in board. Notion unreachable, Ledger DLQ 6 entries — both unchanged blockers.
+- Reset local main to origin/main (3098008 — BB merged).
+- **Workstream CC: `ch1tty/cast` per-call timeout parameter**
+  - Gap: `ch1tty/execute` gained a `timeout` param in BB (#413), but `ch1tty/cast` — which internally calls `handleExecute` for both normal execution and chain-step execution — had no equivalent. Callers with slow AI chain steps couldn't vary timeout without touching the global env var.
+  - **`src/aggregator.ts`** (3 edits):
+    1. `ch1tty/cast` inputSchema: added `timeout: number` property after `scope` with description explaining per-step chain application.
+    2. `handleCast`: extracted `const castTimeoutMs = typeof args.timeout === 'number' && args.timeout > 0 ? Math.floor(args.timeout) : undefined` (after `explain` extraction).
+    3. Both `handleExecute` call sites in `handleCast` spread `...(castTimeoutMs !== undefined ? { timeout: castTimeoutMs } : {})` into the args dict — line 1143 (chain loop) and line 1231 (normal execute). `handleExecute` already extracts `timeout` from args and passes it to `Backend.callTool` options.
+  - No changes to `handleExecute`, `RemoteProxy`, `ChildManager`, or `types.ts` — all groundwork was laid by BB.
+  - **8 new tests** in `test/cast-timeout.test.ts`:
+    1. `timeout: N` threaded to `callTool` options as `timeoutMs` on executed path
+    2. `timeout` omitted → `timeoutMs` undefined in options
+    3. `timeout: 0` treated as absent (timeoutMs undefined)
+    4. `timeout: -1` treated as absent (timeoutMs undefined)
+    5. `dryRun: true` takes precedence — zero backend calls even with `timeout` set
+    6. `chain: true` + `timeout: N` → `timeoutMs` threaded to each chain step (both steps receive it)
+    7. `timeout: 1` (minimum positive) accepted and threaded
+    8. `timeout` param visible in `ch1tty/cast` inputSchema
+- Webhook events on PR #414: Codex usage-limit + CodeRabbit in-progress — both informational, no action.
+- CI: 2 CodeQL checks queued/in_progress at run end (known pattern — CodeQL often completes green).
+- PR #414 opened (ready for review, not draft).
+
+**Next run priority**:
+- Check if PR #414 (CC) CI has cleared (CodeQL). Merge and mark CC ✅ done.
+- Workstream DD candidates: (a) `ch1tty/execute` `sessionId` param — let callers pass an explicit sessionId for tool-call tracking (currently session is established at the transport layer; explicit param enables tracking in server-to-server calls that don't maintain transport sessions); (b) Dependabot PR #375 merge (esbuild dev-only security bump, long overdue); (c) `ch1tty/search` `sessionId` param — same rationale, enables session-sticky focus + affinity from HTTP callers that don't maintain transport sessions.
+- Persistent blockers: CI broken org-wide (human must fix GitHub Actions), Notion unreachable, Ledger DLQ 6 entries.
 
 ---
 
