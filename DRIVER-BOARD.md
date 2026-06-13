@@ -34,7 +34,8 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **AA. `ch1tty/search` offset pagination** — `offset: number` param skips N results before returning the page, pairing with `limit` to iterate through large registries. `total` always reflects the full unsliced count. `offset` field included in response when non-zero. PR #411 ✅ MERGED (run 114, 2026-06-13). 7 new tests, 1095/0/2. DONE.
 - [x] **BB. `ch1tty/execute` per-call timeout** — `timeout: number` ms param overrides `CH1TTY_REMOTE_TIMEOUT_MS` for a single call. Threaded via `Backend.callTool` options bag → `RemoteProxy` (uses it) and `ChildManager` (uses it). Non-positive values treated as absent. `FixtureBackend` records `timeoutMs` in `CallRecord`. PR #413 ✅ MERGED (run 115, 2026-06-13). 8 new tests, 1103/0/2. DONE.
 - [x] **CC. `ch1tty/cast` per-call timeout** — `timeout: number` param on `ch1tty/cast` mirrors BB: overrides `CH1TTY_REMOTE_TIMEOUT_MS` for a single cast call. Threaded through both execution paths: normal single-tool execute (Step 3) and each step of auto-chain execution (`chain: true`). Non-positive values treated as absent. dryRun short-circuits before backend — timeout has no effect. No changes to `handleExecute`, `RemoteProxy`, or `ChildManager`. PR #414 ✅ MERGED (run 116, 2026-06-13). 8 new tests, 1111/0/2. DONE.
-- [ ] **DD. Explicit `sessionId` param on search/execute/cast** — Stateless HTTP server-to-server callers can now pass `sessionId` in args to participate in coordinator session tracking (sticky focus, affinity, topTools) without a long-lived transport session. `args.sessionId` takes priority over the transport-derived session ID. When no context exists, one is lazily created. `coordinator.hasSession()` added. PR #415 open (run 117, 2026-06-13). 8 new tests, 1119/0/2.
+- [x] **DD. Explicit `sessionId` param on search/execute/cast** — Stateless HTTP server-to-server callers can now pass `sessionId` in args to participate in coordinator session tracking (sticky focus, affinity, topTools) without a long-lived transport session. `args.sessionId` takes priority over the transport-derived session ID. When no context exists, one is lazily created. `coordinator.hasSession()` added. PR #415 ✅ MERGED (run 117 → confirmed merged at HEAD of main, 2026-06-13). 8 new tests, 1119/0/2. DONE.
+- [ ] **EE. `ch1tty/search` recentlyUsed enrichment** — `recentlyUsed` in search results now carries per-tool usage data: `{ callCount: N, lastUsedMs: T }` when the exact tool was called in the session; `true` retained as server-level fallback. Adds `SessionCoordinator.getToolPattern()`. 4 existing tests updated to truthy checks. PR #416 open (run 118, 2026-06-13). 7 new tests, 1126/0/2.
 
 ## Live Gateway State (as of 2026-06-13 run 117)
 
@@ -73,6 +74,40 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 118 — 2026-06-13 (auto-driver)
+
+**Workstream advanced**: EE (new — `ch1tty/search` recentlyUsed enrichment with per-tool callCount + lastUsedMs)
+**Branch/PR**: `auto/EE-search-recentlyused-rich` → https://github.com/chittyos/ch1tty/pull/416 (open)
+**Build**: clean (0 errors)
+**Tests**: 1126 pass, 0 fail, 2 skipped (+7 new tests from 1119 baseline)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 1119/0/2 on main. Board read: A✅ through CC✅, DD open (PR #415). Confirmed PR #415 is already merged (HEAD of main is `8fdbb06 feat(meta-tools): explicit sessionId param`). Marked DD ✅ done.
+- **Workstream EE: `ch1tty/search` recentlyUsed enrichment**
+  - Gap: `recentlyUsed: true` fired at server granularity — any tool from a recently-used server got the flag, even if that specific tool was never called. Callers had no way to distinguish "this exact tool was called 3 times" from "the same server was used for a different tool".
+  - **`src/coordinator.ts`** (1 edit): Added `getToolPattern(sessionId, tool): ToolPattern | undefined` — single-tool lookup by exact namespaced name (`serverId/toolName`) in session context.
+  - **`src/aggregator.ts`** (2 edits):
+    1. `handleSearch` results map: each tool now calls `this.coordinator.getToolPattern(effectiveSessionId, t.namespacedName)`. If found: `recentlyUsed: { callCount: pattern.count, lastUsedMs: pattern.lastUsed }`. Else if server in `recentServerIds`: `recentlyUsed: true` (unchanged fallback). Else: no field.
+    2. `buildSearchExplanation` function signature + topCandidates map: type updated from `recentlyUsed?: boolean` to `recentlyUsed?: { callCount: number; lastUsedMs: number } | true`; spread passes through the value as-is.
+  - **4 existing tests fixed** (search changed from `=== true` to `!!recentlyUsed` truthy): `execute-search-shutdown.test.ts` (×2), `session-affinity.test.ts`, `iiii-search-explain-nopath-catalog-gaps.test.ts`, `nnn-search-sort-discovered-related.test.ts`.
+  - **7 new tests** in `test/search-recentlyused-rich.test.ts`:
+    1. Tool called once → `recentlyUsed: { callCount: 1, lastUsedMs: T }`
+    2. Tool called twice → `callCount: 2`
+    3. Server used (different tool executed) → `recentlyUsed: true` (server-level fallback preserved)
+    4. No tool calls in session → no `recentlyUsed` field
+    5. No sessionId → no `recentlyUsed` even for matching server
+    6. `explain: true` → topCandidates carries richer object form
+    7. `lastUsedMs` is a recent epoch-ms timestamp
+- CI on PR #416: CodeQL in_progress at run end (known pattern). Codex usage-limit + CodeRabbit in-progress — both informational.
+- PR #416 opened (ready for review, not draft).
+
+**Next run priority**:
+- Check if PR #416 (EE) CodeQL completed green. Merge and mark EE ✅ done.
+- Workstream FF candidates: (a) `ch1tty/search` `sessionContext` summary field — add `{ recentTools: string[], activeSessionFocus?: string }` to search response when sessionId is active, giving clients session-level awareness in a single call; (b) Dependabot PR #375 merge (esbuild dev-only bump, long overdue); (c) `ch1tty/execute` `explain` mode — return `{ server, tool, args, resolvedIn }` resolution details without executing (lighter than dryRun, which is already present — wait, dryRun already exists. Skip.)
+- Persistent blockers: CI broken org-wide, Notion unreachable, Ledger DLQ 6 entries.
 
 ---
 

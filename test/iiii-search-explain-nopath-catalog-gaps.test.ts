@@ -223,12 +223,13 @@ test('search explain: recentlyUsed:true appears in topCandidates after executing
     }, sessionId);
 
     const parsed = JSON.parse(result.content[0].text as string);
-    const topCandidates: Array<{ tool: string; recentlyUsed?: boolean }> =
+    const topCandidates: Array<{ tool: string; recentlyUsed?: boolean | { callCount: number; lastUsedMs: number } }> =
       parsed.explanation?.topCandidates ?? [];
 
-    // At least one candidate from the neon server must carry recentlyUsed:true.
-    const hasRecent = topCandidates.some((c) => c.recentlyUsed === true);
-    assert.ok(hasRecent, `expected at least one topCandidate with recentlyUsed:true; got: ${JSON.stringify(topCandidates)}`);
+    // At least one candidate from the neon server must carry a truthy recentlyUsed
+    // (boolean true for server-level, or { callCount, lastUsedMs } for tool-level).
+    const hasRecent = topCandidates.some((c) => !!c.recentlyUsed);
+    assert.ok(hasRecent, `expected at least one topCandidate with truthy recentlyUsed; got: ${JSON.stringify(topCandidates)}`);
   } finally {
     await agg.shutdown();
   }

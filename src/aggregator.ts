@@ -571,17 +571,27 @@ export class Aggregator {
       });
     }
 
-    const results = matches.slice(offset, offset + limit).map((t) => ({
-      tool: t.namespacedName,
-      server: t.serverId,
-      category: t.category,
-      description: t.description,
-      inputSchema: t.inputSchema,
-      /* c8 ignore next -- every tool in matches was scored into relevanceMap; ?? 0 never fires when size > 0 */
-      ...(relevanceMap.size > 0 ? { score: relevanceMap.get(t.namespacedName) ?? 0 } : {}),
-      ...(recentServerIds.has(t.serverId) ? { recentlyUsed: true } : {}),
-      ...(focus && focused(t) ? { inFocus: true } : {}),
-    }));
+    const results = matches.slice(offset, offset + limit).map((t) => {
+      // Per-tool usage enrichment: prefer exact-tool pattern (callCount + lastUsedMs) over
+      // server-level boolean. Falls back to `true` when the server was used but not this tool.
+      const recentPattern = effectiveSessionId
+        ? this.coordinator.getToolPattern(effectiveSessionId, t.namespacedName)
+        : undefined;
+      const recentlyUsedVal: { callCount: number; lastUsedMs: number } | true | undefined = recentPattern
+        ? { callCount: recentPattern.count, lastUsedMs: recentPattern.lastUsed }
+        : (recentServerIds.has(t.serverId) ? true : undefined);
+      return {
+        tool: t.namespacedName,
+        server: t.serverId,
+        category: t.category,
+        description: t.description,
+        inputSchema: t.inputSchema,
+        /* c8 ignore next -- every tool in matches was scored into relevanceMap; ?? 0 never fires when size > 0 */
+        ...(relevanceMap.size > 0 ? { score: relevanceMap.get(t.namespacedName) ?? 0 } : {}),
+        ...(recentlyUsedVal !== undefined ? { recentlyUsed: recentlyUsedVal } : {}),
+        ...(focus && focused(t) ? { inFocus: true } : {}),
+      };
+    });
 
     // Catalog suggestions: when focus is active and a query provides intent,
     // surface ranked combos+prompts from the suggestions catalog alongside tools.
@@ -1589,7 +1599,7 @@ function buildCastExplanation(
 
 function buildSearchExplanation(
   allMatches: NamespacedTool[],
-  topResults: Array<{ tool: string; score?: number; inFocus?: boolean; recentlyUsed?: boolean }>,
+  topResults: Array<{ tool: string; score?: number; inFocus?: boolean; recentlyUsed?: { callCount: number; lastUsedMs: number } | true }>,
   relevanceMap: Map<string, number>,
   partialFallback: boolean,
   focusName: string | undefined,
@@ -1603,7 +1613,7 @@ function buildSearchExplanation(
     tool: r.tool,
     relevanceScore: relevanceMap.get(r.tool) ?? 0,
     ...(r.inFocus ? { inFocus: true } : {}),
-    ...(r.recentlyUsed ? { recentlyUsed: true } : {}),
+    ...(r.recentlyUsed !== undefined ? { recentlyUsed: r.recentlyUsed } : {}),
   }));
 
   const inFocusCount = topResults.filter((r) => r.inFocus).length;

@@ -191,13 +191,13 @@ test('search recentlyUsed via session-tracker fallback (no coordinator context)'
     const searchResult = await agg.callTool('ch1tty/search', { query: 'neon' }, sessionId);
     const data = JSON.parse(searchResult.content[0].text as string);
 
-    const neonTools = (data.tools as Array<{ server: string; recentlyUsed?: boolean }>)
+    const neonTools = (data.tools as Array<{ server: string; recentlyUsed?: boolean | { callCount: number; lastUsedMs: number } }>)
       .filter((t) => t.server === 'neon');
 
     assert.ok(neonTools.length > 0, 'should find neon tools');
     assert.ok(
-      neonTools.every((t) => t.recentlyUsed === true),
-      `all neon tools should have recentlyUsed:true via session-tracker fallback; got: ${JSON.stringify(neonTools)}`,
+      neonTools.every((t) => !!t.recentlyUsed),
+      `all neon tools should carry recentlyUsed (bool or object); got: ${JSON.stringify(neonTools)}`,
     );
 
     // tasks tools should NOT be marked recentlyUsed
@@ -247,7 +247,7 @@ test('search: coordinator-affinity recently-used server tools sort before non-re
       `neon (recently used via coordinator) should precede tasks; firstNeonIdx=${firstNeonIdx}, firstTasksIdx=${firstTasksIdx}`,
     );
 
-    assert.equal(tools[firstNeonIdx].recentlyUsed, true, 'first neon tool: recentlyUsed:true');
+    assert.ok(!!tools[firstNeonIdx].recentlyUsed, 'first neon tool: recentlyUsed must be truthy (bool or object)');
     assert.equal(tools[firstTasksIdx].recentlyUsed, undefined, 'first tasks tool: no recentlyUsed flag');
   } finally {
     await agg.shutdown();
