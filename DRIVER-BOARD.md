@@ -22,6 +22,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **P. cast `explain` mode** — `explain: true` adds `explanation: { method, focus?, focusBoost?, winnerInFocus?, topCandidates, rationale }` to ALL cast response shapes (executed/plan/resolved/chain_executed/discovered/no_match). Orthogonal to all other modes. PR #386 ✅ MERGED (run 102, 2026-06-13). 10 new tests, 1011/0/2. DONE.
 - [x] **Q. search `explain` mode** — `explain: true` on `ch1tty/search` adds `explanation: { method: 'keyword', matchMode, focus?, focusBoost?, topCandidates[{tool, relevanceScore, inFocus?, recentlyUsed?}], rationale }`. Parallel to cast explain; surfaces ranking transparency (AND vs partial/OR fallback, focus boost, per-result scores). PR #388 ✅ MERGED (run 103, 2026-06-13). 7 new tests, 1018/0/2. DONE.
 - [x] **R. search `inFocusOnly` hard filter** — `inFocusOnly: true` on `ch1tty/search` hard-filters results to only in-focus tools when a focus profile is active. No-op without active focus. Applies to both tool-search and server-summary paths. Response includes `inFocusOnly: true` field. PR #390 ✅ MERGED (run 104, 2026-06-13). 7 new tests, 1025/0/2. DONE.
+- [x] **S. Session-sticky focus** — Explicit `focus` param on `ch1tty/search` or `ch1tty/cast` is persisted per-session via `SessionCoordinator`. Subsequent calls in the same session without a `focus` param inherit the stored focus automatically. Priority: per-call > session-sticky > `CH1TTY_FOCUS` env default. `focus:"none"` clears the session focus. PR #392 ✅ MERGED (run 105, 2026-06-13). 7 new tests, 1032/0/2. DONE.
 
 ## Live Gateway State (as of 2026-06-13)
 
@@ -37,6 +38,36 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 105 — 2026-06-13 (auto-driver)
+
+**Workstream advanced**: S (new — session-sticky focus)
+**Branch/PR**: `auto/S-session-sticky-focus` → https://github.com/chittyos/ch1tty/pull/392 ✅ MERGED
+**Build**: clean (0 errors)
+**Tests**: 1032 pass, 0 fail, 2 skipped (+7 new tests)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 1025/0/2 on main (PR #390 already merged). Only open PR: #375 (Dependabot esbuild bump). Board confirmed: A✅ through R✅. Notion wrapper still missing — DRIVER-BOARD.md continues as fallback.
+- **Workstream S: session-sticky focus**
+  - Problem: clients calling `ch1tty/search` or `ch1tty/cast` must re-pass `focus` on every call even when working within a consistent domain focus throughout a session.
+  - **`src/coordinator.ts`**: Added `sessionFocus?: string` field to `SessionContext`. Added `setSessionFocus(sessionId, focusName)` and `getSessionFocus(sessionId)` methods.
+  - **`src/aggregator.ts`**: Extended `resolveActiveFocus(perCall, sessionId?)` — when a per-call `focus` string is explicitly provided, it's written to the session context (valid name) or cleared (""/"none"). When no per-call focus is provided, the session-stored focus is used before falling back to the process default (`CH1TTY_FOCUS`). `handleSearch` and `handleCast` now pass `sessionId` through to `resolveActiveFocus`.
+  - **7 new tests** in `test/session-sticky-focus.test.ts`:
+    1. `search: explicit focus param → stored as session-sticky focus` (coordinator getSessionFocus)
+    2. `search: subsequent call without focus → session-sticky focus used` (focus field + inFocus: true on tools)
+    3. `search: focus:"none" clears session-sticky focus` (undefined after clear, no focus in next response)
+    4. `cast: explicit focus param → stored as session-sticky focus`
+    5. `cast sets focus → subsequent search uses it` (cross-meta-tool propagation)
+    6. `session isolation: sticky focus in A does not affect session B`
+    7. `process default CH1TTY_FOCUS used when no session focus is set`
+- Bot comments: Codex usage limit + CodeRabbit rate limit — both informational, no action.
+- Merged PR #392 manually (CI org-wide 0-jobs infra issue; CodeQL in_progress as expected).
+
+**Next run priority**:
+- Workstream T candidates: (a) `ch1tty/status` session focus reporting — when a session is active, include the session-sticky focus in the per-session snapshot under `coordinator.sessions`; (b) focus persistence across reload — when `ch1tty/reload` is called in a session, preserve the session-sticky focus (currently it's unaffected since reload doesn't touch coordinator contexts, but worth validating); (c) Dependabot esbuild PR #375 review/merge.
+- Blockers unchanged: CI broken org-wide (human must fix GitHub Actions), Notion unreachable (human must configure wrapper), Ledger DLQ 6 entries (ledger.chitty.cc unreachable).
 
 ---
 
