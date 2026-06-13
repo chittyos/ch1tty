@@ -17,6 +17,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **K. cast `chain: true` auto-chain execution** — When `chain: true` is passed to `ch1tty/cast` and the resolved tool is chain[0] of a catalog combo (active focus required), cast auto-executes ALL combo steps sequentially and returns `cast: chain_executed` with per-step `{ step, tool, ok, content|error }` results. Step failures are recorded but do not abort the chain. PR #376 ✅ MERGED (run 97, 2026-06-13). 7 new tests (+ 1 fix commit), 973/0/2. DONE.
 - [x] **L. `ch1tty/reload` catalog freshness check** — After reload, response includes `catalog: { totalCombos, phantomServerIds }`. `phantomServerIds` lists server IDs referenced in catalog combo chains but absent from the post-reload active config (sorted, deduplicated). Also fixed: reload now respects a stored `suggestionsCatalogPath` field instead of always loading from default disk path. PR #378 ✅ MERGED (run 98, 2026-06-13). 7 new tests, 980/0/2. DONE.
 - [x] **M. cast `chain: true` step-output forwarding** — Each step in a `chain: true` execution now receives the prior step's text output as `previousResult` in its args, enabling data chaining between steps. Failed or non-text steps clear `previousResult` so the next step gets `{}`. Also: `FixtureBackend.callTool` now records args in `CallRecord` for test assertions. PR #380 ✅ MERGED (run 99, 2026-06-13). 7 new tests, 987/0/2. DONE.
+- [ ] **N. cast `chain_executed` summary field** — `cast: chain_executed` now includes a top-level `summary` string joining all successful step text outputs with `\n\n`, giving LLM clients a single string without iterating `steps`. Absent when no steps produce text. PR #382 open (run 100, 2026-06-13). 7 new tests, 994/0/2. IN PROGRESS.
 
 ## Live Gateway State (as of 2026-06-13)
 
@@ -32,6 +33,33 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 100 — 2026-06-13 (auto-driver)
+
+**Workstream advanced**: N (new — `cast: chain_executed` summary field)
+**Branch/PR**: `auto/N-chain-executed-summary` → https://github.com/chittyos/ch1tty/pull/382 (open; CI 0-jobs infra issue; Codex usage-limit + CodeRabbit rate-limit comments — both informational, no action)
+**Build**: clean (0 errors)
+**Tests**: 994 pass, 0 fail, 2 skipped (+7 new tests)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean. One open PR: #375 (Dependabot esbuild bump — dev-only transitive dep, not actioned). Board confirmed: A✅ through M✅ (all merged). Notion wrapper still missing — DRIVER-BOARD.md continues as fallback.
+- **Change** (`src/aggregator.ts`): In the `chain: true` auto-execution block, added `allTexts: string[]` to accumulate successful step text outputs. After the loop, `chainSummary = allTexts.join('\n\n')` (undefined if empty). Included as `summary` in `chain_executed` response. Failed steps and non-text steps do not contribute. Two-line change; no new imports.
+- **Tests**: 7 new tests in `test/cast-chain-summary.test.ts`:
+  1. `summary` field present when steps produce text
+  2. `summary` joins outputs with `\n\n`
+  3. `summary` absent when steps produce only non-text content
+  4. single text-producing step: `summary` equals that step's output
+  5. failed step does not contribute to `summary`
+  6. 3-step chain: `summary` joins all 3 outputs in order
+  7. all-non-text steps: `summary` absent
+- PR #382 opened. CI known-broken org-wide (0-jobs infra issue). Tests pass locally.
+
+**Next run priority**:
+- Check PR #382: if CodeQL checks completed green, merge and mark Workstream N ✅ done.
+- Workstream O candidates: (a) `ch1tty/cast` `dryRun` mode — resolve + catalog-match without executing, lighter than `confirm: true` plan; (b) Dependabot esbuild PR #375 review/merge (dev-only bump).
+- Blockers unchanged: CI broken org-wide (human must fix GitHub Actions), Notion unreachable (human must configure wrapper), Ledger DLQ 6 entries.
 
 ---
 
