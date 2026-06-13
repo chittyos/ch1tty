@@ -15,6 +15,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **I. chainContinuation hint on cast: executed/plan** — When resolvedFromCatalog fires on a multi-step combo, both cast: executed and cast: plan now include `chainContinuation: { nextTool, remainingChain, hint }` so clients know what to invoke next without parsing the full chain. PR #372 ✅ MERGED (run 95, 2026-06-13). 7 new tests, 959/0/2. DONE.
 - [x] **J. Catalog stats in ch1tty/status** — `ch1tty/status` now includes `catalog: { loaded, totalCombos, byFocus }` in the snapshot. PR #374 ✅ MERGED (run 96, 2026-06-13). 7 new tests, 966/0/2. DONE.
 - [x] **K. cast `chain: true` auto-chain execution** — When `chain: true` is passed to `ch1tty/cast` and the resolved tool is chain[0] of a catalog combo (active focus required), cast auto-executes ALL combo steps sequentially and returns `cast: chain_executed` with per-step `{ step, tool, ok, content|error }` results. Step failures are recorded but do not abort the chain. PR #376 ✅ MERGED (run 97, 2026-06-13). 7 new tests (+ 1 fix commit), 973/0/2. DONE.
+- [ ] **L. `ch1tty/reload` catalog freshness check** — After reload, response includes `catalog: { totalCombos, phantomServerIds }`. `phantomServerIds` lists server IDs referenced in catalog combo chains but absent from the post-reload active config (sorted, deduplicated). Also fixed: reload now respects a stored `suggestionsCatalogPath` field instead of always loading from default disk path. PR #378 open (run 98, 2026-06-13). 7 new tests, 980/0/2.
 
 ## Live Gateway State (as of 2026-06-13)
 
@@ -30,6 +31,36 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 98 — 2026-06-13 (auto-driver)
+
+**Workstream advanced**: L (new — `ch1tty/reload` catalog freshness check)
+**Branch/PR**: `auto/L-reload-catalog-freshness` → https://github.com/chittyos/ch1tty/pull/378 (open; CodeQL in-progress; Codex usage-limit comment — informational; CodeRabbit in-progress)
+**Build**: clean (0 errors)
+**Tests**: 982 total, 980 pass, 0 fail, 2 skipped (+7 new tests)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean. Only open PR: #375 (Dependabot esbuild bump — dev-only transitive dep, not actioned). Board confirmed: A✅ B✅ C✅ D✅ E✅ F✅ G✅ H✅ I✅ J✅ K✅ (all merged).
+- Notion wrapper still missing. Board continues as DRIVER-BOARD.md.
+- **Change 1** (`src/aggregator.ts`): New private `catalogFreshnessCheck()` method — iterates all profile combos in `this.suggestionsCatalog`, parses server IDs from `serverId/toolName` format, diffs against `this.configs` post-rebuild, returns `{ totalCombos, phantomServerIds: [...sorted] }`. Called from `handleReload()` after rebuild; result included in reload response as `catalog` field.
+- **Change 2** (`src/aggregator.ts`): Fixed latent bug — reload was calling `loadSuggestionsCatalog()` with no path, overwriting any injected catalog. Now stores `suggestionsCatalogPath` as a class field (set in constructor when catalog is loaded from disk; left undefined when catalog is injected). `handleReload` only reloads from disk when path is set.
+- **Tests**: 7 new tests in `test/reload-catalog-freshness.test.ts`:
+  1. empty catalog → `totalCombos:0`, `phantomServerIds:[]`
+  2. catalog referencing only configured servers → no phantoms
+  3. catalog referencing unknown server → phantom reported
+  4. `totalCombos` sums across all focus profiles
+  5. `phantomServerIds` sorted alphabetically
+  6. multiple phantom server IDs deduplicated and all reported
+  7. `catalog` key present even when config is unchanged
+- PR #378 opened. CI known-broken org-wide (0-jobs infra issue). CodeQL in-progress. Tests pass locally.
+
+**Next run priority**:
+- Merge PR #378 once CodeRabbit review is complete and no actionable findings (or merge manually after confirming clean).
+- Mark Workstream L ✅ done.
+- Blockers unchanged: CI broken org-wide (human must investigate GitHub Actions), Notion unreachable (human must configure wrapper script), Ledger DLQ has entries (ledger.chitty.cc unreachable).
+- Workstream M candidates: (1) cast `chain: true` step-output forwarding — pass step N text output as `_previousOutput` context arg to step N+1 (opt-in via `passOutput: true`); (2) Dependabot esbuild PR #375 review/merge; (3) `ch1tty/cast` `dryRun` mode — resolve without executing, return resolved tool + catalog match without side effects (differs from `confirm: true` which returns a full plan; dryRun is lighter).
 
 ---
 

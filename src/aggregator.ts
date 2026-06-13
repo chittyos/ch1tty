@@ -100,6 +100,7 @@ export class Aggregator {
   private configPath?: string;
   private focusProfiles: FocusProfiles;
   private suggestionsCatalog: Record<string, FocusSuggestions>;
+  private suggestionsCatalogPath?: string;
   private defaultFocus?: string;
   private backendFactory?: (config: ServerConfig) => Backend;
   private startedAt = Date.now();
@@ -120,8 +121,13 @@ export class Aggregator {
     this.backendFactory = options?.backendFactory;
     this.focusProfiles = options?.focusProfiles
       ?? loadFocusProfilesFromPath(options?.focusProfilesPath ?? resolveFocusProfilesPath());
-    this.suggestionsCatalog = options?.suggestionsCatalog
-      ?? loadSuggestionsCatalog(options?.suggestionsCatalogPath ?? resolveSuggestionsCatalogPath());
+    if (options?.suggestionsCatalog !== undefined) {
+      this.suggestionsCatalog = options.suggestionsCatalog;
+      // No disk path — reload will preserve the injected catalog.
+    } else {
+      this.suggestionsCatalogPath = options?.suggestionsCatalogPath ?? resolveSuggestionsCatalogPath();
+      this.suggestionsCatalog = loadSuggestionsCatalog(this.suggestionsCatalogPath);
+    }
     this.configs = configs;
     const embedConfig = options?.embedEnabled === false ? { enabled: false } : {};
     this.coordinator = options?.coordinator ?? new SessionCoordinator({}, embedConfig, options?.ledgerDlqPath);
@@ -686,8 +692,10 @@ export class Aggregator {
 
     try {
       const newConfig = loadConfigFromPath(this.configPath);
-      clearSuggestionsCache();
-      this.suggestionsCatalog = loadSuggestionsCatalog();
+      if (this.suggestionsCatalogPath) {
+        clearSuggestionsCache();
+        this.suggestionsCatalog = loadSuggestionsCatalog(this.suggestionsCatalogPath);
+      }
       const oldIds = new Set(this.configs.map((c) => c.id));
       const newIds = new Set(newConfig.servers.map((c) => c.id));
 
@@ -715,11 +723,13 @@ export class Aggregator {
         }
       }
 
+      const freshness = this.catalogFreshnessCheck();
       const result = {
         reloaded: true,
         added: added.map((c) => c.id),
         removed: removed.map((c) => c.id),
         totalServers: this.activeConfigs().length,
+        catalog: freshness,
       };
 
       log.info(`Config reloaded: +${added.length} -${removed.length} servers`);
@@ -732,6 +742,30 @@ export class Aggregator {
         isError: true,
       };
     }
+  }
+
+  /** Scan the loaded catalog for combo chain tools whose server ID isn't in the active config. */
+  private catalogFreshnessCheck(): { totalCombos: number; phantomServerIds: string[] } {
+    const configuredIds = new Set(this.configs.map((c) => c.id));
+    const phantomSet = new Set<string>();
+    let totalCombos = 0;
+
+    for (const profile of Object.values(this.suggestionsCatalog)) {
+      totalCombos += profile.combos.length;
+      for (const combo of profile.combos) {
+        for (const toolName of combo.chain) {
+          const slashIdx = toolName.indexOf('/');
+          if (slashIdx > 0) {
+            const serverId = toolName.slice(0, slashIdx);
+            if (!configuredIds.has(serverId)) {
+              phantomSet.add(serverId);
+            }
+          }
+        }
+      }
+    }
+
+    return { totalCombos, phantomServerIds: [...phantomSet].sort() };
   }
 
   // ── Cast (sub-meta → master-meta) ───────────────────────────
