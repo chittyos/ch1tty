@@ -341,6 +341,10 @@ export class Aggregator {
               type: 'boolean',
               description: 'If true, return the execution plan without running it (default: false)',
             },
+            dryRun: {
+              type: 'boolean',
+              description: 'If true, resolve the intent and return only the matched tool name, score, and catalog combo — without executing or returning the full plan. Lighter than confirm: true. Takes precedence over confirm when both are set (default: false).',
+            },
             focus: {
               type: 'string',
               description: 'Focus profile to bias resolution toward (e.g. "finance", "governance", "design"). A soft lens — out-of-focus tools stay candidates. Use "none" to override the env default. Overrides CH1TTY_FOCUS for this call.',
@@ -775,7 +779,8 @@ export class Aggregator {
     const toolArgs = (typeof args.args === 'object' && args.args !== null && !Array.isArray(args.args))
       ? args.args as Record<string, unknown>
       : {};
-    const confirm = args.confirm === true;
+    const dryRun = args.dryRun === true;
+    const confirm = !dryRun && args.confirm === true;
     const autoChain = args.chain === true;
     const { name: focusName, profile: focus } = this.resolveActiveFocus(args.focus);
 
@@ -1040,7 +1045,24 @@ export class Aggregator {
       };
     }
 
-    // Step 2b: Confirm mode — return the plan without executing
+    // Step 2b: Dry-run mode — return only resolved tool + score + catalog match, no execution, no schema
+    if (dryRun) {
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            cast: 'resolved',
+            resolvedBy,
+            intent,
+            ...(focusName ? { focus: focusName } : {}),
+            resolved: { tool: best.namespacedName, score: best.score },
+            ...(catalogCombo ? { catalogCombo: { name: catalogCombo.name, chain: catalogCombo.chain, accomplishes: catalogCombo.accomplishes } } : {}),
+          }, null, 2),
+        }],
+      };
+    }
+
+    // Step 2c: Confirm mode — return the plan without executing
     if (confirm) {
       return {
         content: [{

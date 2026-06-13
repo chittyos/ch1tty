@@ -18,6 +18,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **L. `ch1tty/reload` catalog freshness check** — After reload, response includes `catalog: { totalCombos, phantomServerIds }`. `phantomServerIds` lists server IDs referenced in catalog combo chains but absent from the post-reload active config (sorted, deduplicated). Also fixed: reload now respects a stored `suggestionsCatalogPath` field instead of always loading from default disk path. PR #378 ✅ MERGED (run 98, 2026-06-13). 7 new tests, 980/0/2. DONE.
 - [x] **M. cast `chain: true` step-output forwarding** — Each step in a `chain: true` execution now receives the prior step's text output as `previousResult` in its args, enabling data chaining between steps. Failed or non-text steps clear `previousResult` so the next step gets `{}`. Also: `FixtureBackend.callTool` now records args in `CallRecord` for test assertions. PR #380 ✅ MERGED (run 99, 2026-06-13). 7 new tests, 987/0/2. DONE.
 - [x] **N. cast `chain_executed` summary field** — `cast: chain_executed` now includes a top-level `summary` string joining all successful step text outputs with `\n\n`, giving LLM clients a single string without iterating `steps`. Absent when no steps produce text. PR #382 ✅ MERGED (run 100, 2026-06-13). 7 new tests, 994/0/2. DONE.
+- [ ] **O. cast `dryRun` mode** — `dryRun: true` on `ch1tty/cast` resolves intent and returns `cast: resolved` (tool name + score + catalog combo) without executing. Lighter than `confirm: true`. Takes precedence over `confirm` when both set. PR #384 open (run 101, 2026-06-13). 7 new tests, 1001/0/2. IN PROGRESS.
 
 ## Live Gateway State (as of 2026-06-13)
 
@@ -33,6 +34,34 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 101 — 2026-06-13 (auto-driver)
+
+**Workstream advanced**: O (new — `cast: dryRun` mode)
+**Branch/PR**: `auto/O-cast-dry-run` → https://github.com/chittyos/ch1tty/pull/384 (open; CI 0-jobs infra issue; CodeRabbit rate-limited — informational)
+**Build**: clean (0 errors)
+**Tests**: 1001 pass, 0 fail, 2 skipped (+7 new tests)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 994/0/2 on main (PR #382 already merged). Only open PR: #375 (Dependabot esbuild bump).
+- Board read: A✅ through N✅ confirmed. Notion wrapper still missing. DRIVER-BOARD.md continues as fallback.
+- **Change** (`src/aggregator.ts`): (1) Added `dryRun` boolean param to `ch1tty/cast` inputSchema. (2) Extracted `const dryRun = args.dryRun === true` before `confirm`; `confirm` now short-circuits to `false` when `dryRun` is set. (3) Added dryRun response block between autoChain and confirm blocks: returns `cast: 'resolved'` with `{ resolvedBy, intent, focus?, resolved: { tool, score }, catalogCombo? }` — no execution, no inputSchema, no alternatives.
+- **Tests**: 7 new tests in `test/cast-dry-run.test.ts` (1 fix: `resetCallLog` → `clearCallLog`):
+  1. `dryRun: true` → `cast: resolved` with tool name + score
+  2. focus + catalog match → `catalogCombo` present
+  3. no focus → `catalogCombo` absent
+  4. `dryRun: true` makes zero backend calls (verified via `getCallLog()`)
+  5. takes precedence over `confirm: true`
+  6. no-match intent → still `cast: no_match`
+  7. active focus → `focus` field in response
+- PR #384 opened. CI known-broken (0-jobs infra). CodeRabbit rate-limited. Tests pass locally.
+
+**Next run priority**:
+- Check PR #384: if CodeQL checks complete green, merge and mark Workstream O ✅ done.
+- Workstream P candidates: (a) `ch1tty/cast` `explain` mode — return human-readable rationale for why the resolved tool was chosen (score breakdown, focus boost contribution); (b) per-session focus override via coordinator so focus persists across multiple calls in a session without re-passing the param each time.
+- Blockers unchanged: CI broken org-wide (human must fix GitHub Actions), Notion unreachable, Ledger DLQ 6 entries.
 
 ---
 
