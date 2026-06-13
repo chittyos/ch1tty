@@ -329,7 +329,15 @@ export class Aggregator {
       {
         name: `${META_SERVER_ID}${SEPARATOR}status`,
         description: 'Gateway status — connected servers, tool counts, cache ages',
-        inputSchema: { type: 'object' },
+        inputSchema: {
+          type: 'object',
+          properties: {
+            short: {
+              type: 'boolean',
+              description: 'If true, return a condensed snapshot: omit the servers list and coordinator session details. Health fields, counts, focus, and catalog stats are preserved. Use for lightweight health checks (default: false).',
+            },
+          },
+        },
       },
       {
         name: `${META_SERVER_ID}${SEPARATOR}reload`,
@@ -403,7 +411,7 @@ export class Aggregator {
       case 'execute':
         return this.handleExecute(args, sessionId);
       case 'status':
-        return this.handleStatus();
+        return this.handleStatus(args);
       case 'reload':
         return this.handleReload();
       case 'cast':
@@ -756,10 +764,18 @@ export class Aggregator {
     };
   }
 
-  private async handleStatus(): Promise<ToolCallResult> {
-    const summary = this.getStatusSnapshot();
+  private async handleStatus(args: Record<string, unknown> = {}): Promise<ToolCallResult> {
+    const snapshot = this.getStatusSnapshot();
+    const short = args.short === true;
+    if (short) {
+      const { servers: _servers, coordinator, ...rest } = snapshot;
+      const { sessions: _sessions, ...coordinatorShort } = coordinator;
+      return {
+        content: [{ type: 'text', text: JSON.stringify({ ...rest, coordinator: coordinatorShort }, null, 2) }],
+      };
+    }
     return {
-      content: [{ type: 'text', text: JSON.stringify(summary, null, 2) }],
+      content: [{ type: 'text', text: JSON.stringify(snapshot, null, 2) }],
     };
   }
 
