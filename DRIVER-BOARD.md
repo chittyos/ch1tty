@@ -29,9 +29,10 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **W. `ch1tty/status` catalog stats + activeFocusSuggestions** — `getStatusSnapshot()` now includes `catalog: { loaded, totalCombos, byFocus, activeFocusSuggestions }`. When a focus is active and the suggestions catalog has an entry for it, `activeFocusSuggestions` surfaces the top 3 combos + prompts — a quick compass for operators. PR #401 ✅ MERGED (run 109, 2026-06-13). 7 new tests, 1053/0/2. DONE.
 - [x] **X. `ch1tty/execute` dryRun mode** — `dryRun: true` on `ch1tty/execute` resolves the namespaced tool to server + bare name and returns `{ status: "dry_run", server, tool, args }` without calling the backend. Mirrors cast's dryRun for the direct-invocation path. Unknown server/tool errors still fire. PR #404 ✅ MERGED (run 110, 2026-06-13). 7 new tests, 1001/0/2. DONE.
 - [x] **Y. `ch1tty/cast` scope parameter** — `scope` parameter on `ch1tty/cast` hard-filters the registry to a specific server or category before intent resolution. Allows callers to restrict cast to a bounded tool namespace without modifying focus. PR #406 ✅ MERGED (run 111, 2026-06-13). DONE.
-- [ ] **IIII. Branch coverage sweep** — 4 branch gaps closed in `aggregator.ts` + `suggestions.ts`: explain truncation note (1582-1583), suggestions nopath fallback (38), relevanceMap ??0 (1566), recentlyUsed spread (1568). suggestions.ts now 100% branch. PR #407 open (run 112, 2026-06-13). 4 new tests, 1081/0/2. Awaiting merge.
+- [x] **IIII. Branch coverage sweep** — 4 branch gaps closed in `aggregator.ts` + `suggestions.ts`: explain truncation note (1582-1583), suggestions nopath fallback (38), relevanceMap ??0 (1566), recentlyUsed spread (1568). suggestions.ts now 100% branch. PR #407 ✅ MERGED (run 113, 2026-06-13). 4 new tests, 1081/0/2. DONE.
+- [ ] **Z. `ch1tty/status` short mode** — `short: true` param returns condensed snapshot omitting `servers[]` and `coordinator.sessions[]` while preserving all health fields, counts, focus, and catalog stats. Useful for lightweight health polling (large gateways have 100+ sessions and 50+ servers making full status unwieldy). PR #409 open (run 113, 2026-06-13). 7 new tests, 1088/0/2. Awaiting merge.
 
-## Live Gateway State (as of 2026-06-13 run 112)
+## Live Gateway State (as of 2026-06-13 run 113)
 
 - Connected backends: cloudflare-builds (7 tools), evidence (3), browser-rendering (3), context7 (2), thinking (1), fs (14), playwright (23), orchestrator (13) — 66 total tools
 - Not connected: chittyos, cloudflare, GitHub, linear, notion, stripe, neon (lazy, auth-gated)
@@ -54,6 +55,48 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 113 — 2026-06-13 (auto-driver)
+
+**Workstream advanced**: Z (new — `ch1tty/status short: true` condensed snapshot)
+**Branch/PR**: `auto/Z-status-short-mode` → https://github.com/chittyos/ch1tty/pull/409 (open)
+**Build**: clean (0 errors)
+**Tests**: 1088 pass, 0 fail, 2 skipped (+7 new tests from 1081 baseline)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 1081/0/2 on main (after merging PRs #407 + #408 this run).
+- Board read: A✅ through Y✅, IIII open (PR #407). Stale PR #403 (mark V done) closed as superseded.
+- **Merged PRs**:
+  - PR #407 (IIII — 4 branch coverage gaps): `mergeable_state: clean`, squash merged. IIII marked DONE.
+  - PR #408 (board run 112 — mark X+Y done): squash merged.
+  - PR #403 (mark V done — stale): closed (superseded by #408).
+- Baseline after merges: 1081 pass, 0 fail, 2 skipped.
+- **Workstream Z: `ch1tty/status short: true` condensed snapshot**
+  - Gap: full `ch1tty/status` in production (100+ sessions, 50+ servers) returns a large JSON payload. Lightweight health checks need only counts, health fields, and focus state — not `servers[]` or `coordinator.sessions[]`.
+  - **`src/aggregator.ts`** (3 edits):
+    1. `ch1tty/status` inputSchema: added `short: boolean` property with description.
+    2. `handleMetaTool` status case: passed `args` to `handleStatus(args)` (was `handleStatus()`).
+    3. `handleStatus(args)`: when `short: true`, destructures snapshot — omits `servers`, replaces `coordinator` with `coordinator` minus `sessions[]`. Default (`short: false` / omitted) is unchanged.
+  - **7 new tests** in `test/status-short-mode.test.ts`:
+    1. `short: true` → `servers` field absent
+    2. `short: true` → `coordinator.sessions` absent
+    3. `short` omitted → `servers` field present
+    4. `short: false` → `servers` + `coordinator.sessions` both present
+    5. `short: true` → `systemHealth`, `brainHealth`, `ledgerHealth` preserved
+    6. `short: true` → `coordinator.activeSessions` count preserved
+    7. `short: true` → `gateway`, `uptime`, `totalServers`, `connectedServers` preserved
+- Bot comments on PR #409: Codex usage-limit + CodeRabbit rate-limit — both informational, no action needed.
+- CI: 2 CodeQL checks (queued/in_progress at run end — known pattern; CodeQL often completes green even when main 0-jobs CI fails).
+- PR #409 opened (ready for review, not draft).
+
+**Next run priority**:
+- Check if PR #409 (Z) CI has cleared (CodeQL). Merge and mark Z ✅ done.
+- Workstream AA candidates: (a) `ch1tty/search` `offset` pagination param — pair with existing `limit` to enable iterating through large registries in pages; (b) `ch1tty/execute` `timeout` ms param — per-call timeout override (complement to `CH1TTY_REMOTE_TIMEOUT_MS` env var); (c) Dependabot #375 merge (esbuild dev-only bump).
+- Persistent blockers: CI broken org-wide (human must fix GitHub Actions), Notion unreachable, Ledger DLQ 6 entries.
+
+---
 
 ---
 
