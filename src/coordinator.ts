@@ -261,6 +261,7 @@ export class SessionCoordinator {
       sessionId: string;
       entity?: string;
       toolPatterns: number;
+      topTools: string[];
       stagingComplete: boolean;
       sessionFocus?: string;
     }>;
@@ -269,6 +270,10 @@ export class SessionCoordinator {
       sessionId: id,
       entity: ctx.entity?.chittyId,
       toolPatterns: ctx.toolPatterns.size,
+      topTools: [...ctx.toolPatterns.values()]
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5)
+        .map((p) => p.tool),
       stagingComplete: ctx.stagingComplete,
       ...(ctx.sessionFocus ? { sessionFocus: ctx.sessionFocus } : {}),
     }));
