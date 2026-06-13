@@ -347,7 +347,7 @@ export class Aggregator {
             },
             chain: {
               type: 'boolean',
-              description: 'If true and the resolved tool is the first step of a catalog combo, auto-execute all remaining chain steps sequentially (default: false). Requires an active focus. Returns cast: chain_executed with per-step results.',
+              description: 'If true and the resolved tool is the first step of a catalog combo, auto-execute all remaining chain steps sequentially (default: false). Requires an active focus. Each step receives the previous step\'s text output as previousResult in its args, enabling data chaining between steps. Returns cast: chain_executed with per-step results.',
             },
           },
           required: ['intent'],
@@ -992,16 +992,29 @@ export class Aggregator {
     // Step 2a: Auto-chain execution — run all combo steps sequentially when chain: true
     if (!confirm && autoChain && catalogCombo && catalogCombo.chain.length > 1) {
       const steps: Array<{ step: number; tool: string; ok: boolean; content?: unknown[]; error?: string }> = [];
+      let previousStepOutput: string | null = null;
 
       for (let i = 0; i < catalogCombo.chain.length; i++) {
         const stepTool = catalogCombo.chain[i];
-        const stepArgs = i === 0 ? toolArgs : {};
+        let stepArgs: Record<string, unknown>;
+        if (i === 0) {
+          stepArgs = toolArgs;
+        } else if (previousStepOutput !== null) {
+          stepArgs = { previousResult: previousStepOutput };
+        } else {
+          stepArgs = {};
+        }
         const r = await this.handleExecute({ tool: stepTool, args: stepArgs }, sessionId);
         if (r.isError) {
           const firstContent = r.content[0] as { type?: string; text?: unknown } | undefined;
           const errText = typeof firstContent?.text === 'string' ? firstContent.text : JSON.stringify(r.content);
           steps.push({ step: i, tool: stepTool, ok: false, error: errText });
+          previousStepOutput = null;
         } else {
+          const textParts = (r.content as Array<{ type?: string; text?: unknown }>)
+            .filter((c) => c.type === 'text' && typeof c.text === 'string')
+            .map((c) => c.text as string);
+          previousStepOutput = textParts.length > 0 ? textParts.join('\n') : null;
           steps.push({ step: i, tool: stepTool, ok: true, content: r.content });
         }
       }

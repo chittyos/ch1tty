@@ -16,6 +16,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **J. Catalog stats in ch1tty/status** — `ch1tty/status` now includes `catalog: { loaded, totalCombos, byFocus }` in the snapshot. PR #374 ✅ MERGED (run 96, 2026-06-13). 7 new tests, 966/0/2. DONE.
 - [x] **K. cast `chain: true` auto-chain execution** — When `chain: true` is passed to `ch1tty/cast` and the resolved tool is chain[0] of a catalog combo (active focus required), cast auto-executes ALL combo steps sequentially and returns `cast: chain_executed` with per-step `{ step, tool, ok, content|error }` results. Step failures are recorded but do not abort the chain. PR #376 ✅ MERGED (run 97, 2026-06-13). 7 new tests (+ 1 fix commit), 973/0/2. DONE.
 - [x] **L. `ch1tty/reload` catalog freshness check** — After reload, response includes `catalog: { totalCombos, phantomServerIds }`. `phantomServerIds` lists server IDs referenced in catalog combo chains but absent from the post-reload active config (sorted, deduplicated). Also fixed: reload now respects a stored `suggestionsCatalogPath` field instead of always loading from default disk path. PR #378 ✅ MERGED (run 98, 2026-06-13). 7 new tests, 980/0/2. DONE.
+- [ ] **M. cast `chain: true` step-output forwarding** — Each step in a `chain: true` execution now receives the prior step's text output as `previousResult` in its args, enabling data chaining between steps. Failed or non-text steps clear `previousResult` so the next step gets `{}`. Also: `FixtureBackend.callTool` now records args in `CallRecord` for test assertions. PR #380 open (run 99, 2026-06-13). 7 new tests, 987/0/2.
 
 ## Live Gateway State (as of 2026-06-13)
 
@@ -61,6 +62,38 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Mark Workstream L ✅ done.
 - Blockers unchanged: CI broken org-wide (human must investigate GitHub Actions), Notion unreachable (human must configure wrapper script), Ledger DLQ has entries (ledger.chitty.cc unreachable).
 - Workstream M candidates: (1) cast `chain: true` step-output forwarding — pass step N text output as `_previousOutput` context arg to step N+1 (opt-in via `passOutput: true`); (2) Dependabot esbuild PR #375 review/merge; (3) `ch1tty/cast` `dryRun` mode — resolve without executing, return resolved tool + catalog match without side effects (differs from `confirm: true` which returns a full plan; dryRun is lighter).
+
+---
+
+### Run 99 — 2026-06-13 (auto-driver)
+
+**Workstream advanced**: L merged + M new (cast chain step-output forwarding)
+**Branch/PR**: `auto/M-chain-step-output-forward` → https://github.com/chittyos/ch1tty/pull/380 (open, 2 CodeQL checks in_progress)
+**Build**: clean (0 errors)
+**Tests**: 987 pass, 0 fail, 2 skipped (989 total, 45 suites) — +7 new tests
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 973/975 pass on main. Only open PR: #378 (Workstream L, all 3 CI checks ✅ green). Merged PR #378 (squash). Main advanced to cce9f49 (Workstream L done, 980/982 tests).
+- Board read: A✅ through K✅ confirmed, L just merged. Chose Workstream M (step-output forwarding, top of run-98 next-priority list).
+- **Notion wrapper still missing** — DRIVER-BOARD.md is the cross-run fallback.
+- **`src/aggregator.ts`**: Updated `chain` param description. In auto-chain loop, added `previousStepOutput: string | null` tracking. Steps 1..N receive `{ previousResult: previousStepOutput }` when prior step succeeded with text content; receive `{}` when prior step failed or returned non-text. Text extraction: filter `r.content` for `type === 'text'` items and join with `\n`.
+- **`test/fixture-backend.ts`**: Added `args: Record<string, unknown>` field to `CallRecord`; `callTool` now records received args. Additive change — no existing tests broken.
+- **7 new tests in `test/cast-chain-step-forward.test.ts`**:
+  1. step 1 receives `previousResult` = step 0 text output
+  2. step 0 receives original `args` (no `previousResult`)
+  3. 3-step chain: step 2 gets `previousResult` from step 1
+  4. failed step → next step receives `{}` (no `previousResult`)
+  5. non-text content (image) → next step receives `{}`
+  6. `chain: false` → single backend call, no forwarding
+  7. `previousResult` value equals exact text from prior step
+- Fix: initial test used `toolArgs:` instead of `args:` — caught by 1-test failure, corrected before push.
+- Bot comments on PR #380: Codex usage limit + CodeRabbit rate limit — both informational, no action needed.
+
+**Next run priority**:
+1. Merge PR #380 when CodeQL checks complete (in_progress at run end — expect green).
+2. Mark Workstream M ✅ done.
+3. Workstream N candidates: (a) `cast: chain_executed` top-level `summary` field — condense all step text outputs for LLM clients; (b) `ch1tty/cast` `dryRun` mode — resolve + plan without executing; (c) Dependabot esbuild PR #375 (dev-only bump, low priority).
+4. Blockers unchanged: CI broken org-wide (human must fix GitHub Actions), Notion unreachable (human must configure wrapper), Ledger DLQ 6 entries.
 
 ---
 
