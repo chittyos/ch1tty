@@ -13,8 +13,10 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **G. Search focus suggestions** — `ch1tty/search` now includes ranked catalog suggestions (combos + prompts) alongside tool results when focus is active and a query is present. PR #368 ✅ MERGED (run 93, 2026-06-12). 5 new tests, 945/0/2. DONE.
 - [x] **H. resolvedFromCatalog on cast: executed/plan** — When the resolved tool is chain[0] of a curated catalog combo in the active focus, the cast response includes `resolvedFromCatalog: { name, chain, accomplishes }`. PR #370 ✅ MERGED (run 94, 2026-06-12). 7 new tests, 952/0/2. DONE.
 - [x] **I. chainContinuation hint on cast: executed/plan** — When resolvedFromCatalog fires on a multi-step combo, both cast: executed and cast: plan now include `chainContinuation: { nextTool, remainingChain, hint }` so clients know what to invoke next without parsing the full chain. PR #372 ✅ MERGED (run 95, 2026-06-13). 7 new tests, 959/0/2. DONE.
+- [x] **J. Catalog stats in ch1tty/status** — `ch1tty/status` now includes `catalog: { loaded, totalCombos, byFocus }` in the snapshot. PR #374 ✅ MERGED (run 96, 2026-06-13). 7 new tests, 966/0/2. DONE.
+- [ ] **K. cast `chain: true` auto-chain execution** — When `chain: true` is passed to `ch1tty/cast` and the resolved tool is chain[0] of a catalog combo (active focus required), cast auto-executes ALL combo steps sequentially and returns `cast: chain_executed` with per-step `{ step, tool, ok, content|error }` results. Step failures are recorded but do not abort the chain. PR in progress (run 97, 2026-06-13).
 
-## Live Gateway State (as of 2026-06-12)
+## Live Gateway State (as of 2026-06-13)
 
 - Connected backends: cloudflare-builds (7 tools), evidence (3), browser-rendering (3), context7 (2), thinking (1), fs (14), playwright (23), orchestrator (13) — 66 total tools
 - Not connected: chittyos, cloudflare, GitHub, linear, notion, stripe, neon (lazy, auth-gated)
@@ -28,6 +30,35 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 97 — 2026-06-13 (auto-driver)
+
+**Workstream advanced**: K (new — cast `chain: true` multi-step auto-chain execution)
+**Branch/PR**: `auto/K-cast-auto-chain` → (PR opened this run)
+**Build**: clean (0 errors)
+**Tests**: 973 pass, 0 fail, 2 skipped (975 total, 45 suites) — +7 new tests
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean. Only open PR: #375 (Dependabot esbuild bump — dev-only transitive dep, not actioned). Board read: A✅ B✅ C✅ D✅ E✅ F✅ G✅ H✅ I✅ J✅ (confirmed via git log — PR #374 merged for Workstream J catalog stats).
+- **Notion wrapper still missing** (`/home/ubuntu/.local/bin/notion-mcp-wrapper.sh`). Board continues as DRIVER-BOARD.md.
+- **Change**: `src/aggregator.ts` — (1) Added `chain` boolean param to `ch1tty/cast` inputSchema with clear description. (2) Extracted `const autoChain = args.chain === true;` in `handleCast`. (3) Added auto-chain execution block between `chainContinuation` computation and the existing `if (confirm)` gate: when `!confirm && autoChain && catalogCombo && catalogCombo.chain.length > 1`, iterates through all chain steps, executes step 0 with provided `toolArgs`, steps 1..N with `{}`, collects per-step `{ step, tool, ok, content|error }`, returns `cast: chain_executed` JSON. Step failures (isError) are recorded as `ok: false` with an `error` field but do not abort the chain.
+- **Tests**: 7 new tests in `test/cast-auto-chain.test.ts`:
+  1. `chain: true` + multi-step combo → `cast: chain_executed`, steps.length === 2
+  2. steps carry correct tool names + `ok: true`
+  3. `chain: true` + single-step combo → `cast: executed` (unchanged)
+  4. `chain: false` (omitted) + multi-step combo → `cast: executed`
+  5. `chain: true` without focus → `cast: executed` (no catalogCombo match)
+  6. failed step (fixture returns error) → `ok: false` with error field; chain completes
+  7. `chain_executed` records neon server affinity via coordinator
+- PR opened. CI known-broken org-wide (0-jobs infra issue). Tests pass locally.
+
+**Next run priority**:
+- Merge PR #K (this run) once CodeQL checks complete (or manually after local test verification).
+- Mark Workstream K ✅ done.
+- Blockers unchanged: CI broken org-wide (human must investigate GitHub Actions), Notion unreachable (human must configure wrapper script), Ledger DLQ has entries (ledger.chitty.cc unreachable).
+- Workstream L candidates: (1) cast `chain: true` step-output forwarding — pass step N output as `previousResult` arg context to step N+1; (2) `ch1tty/reload` catalog freshness check — after reload, diff focus-suggestions.json tool names against live registry, surface phantom tool names in reload response; (3) Dependabot esbuild PR #375 review/merge.
 
 ---
 

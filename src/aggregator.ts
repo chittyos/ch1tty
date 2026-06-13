@@ -339,6 +339,10 @@ export class Aggregator {
               type: 'string',
               description: 'Focus profile to bias resolution toward (e.g. "finance", "governance", "design"). A soft lens — out-of-focus tools stay candidates. Use "none" to override the env default. Overrides CH1TTY_FOCUS for this call.',
             },
+            chain: {
+              type: 'boolean',
+              description: 'If true and the resolved tool is the first step of a catalog combo, auto-execute all remaining chain steps sequentially (default: false). Requires an active focus. Returns cast: chain_executed with per-step results.',
+            },
           },
           required: ['intent'],
         },
@@ -738,6 +742,7 @@ export class Aggregator {
       ? args.args as Record<string, unknown>
       : {};
     const confirm = args.confirm === true;
+    const autoChain = args.chain === true;
     const { name: focusName, profile: focus } = this.resolveActiveFocus(args.focus);
 
     if (!intent) {
@@ -950,7 +955,40 @@ export class Aggregator {
         }
       : null;
 
-    // Step 2: Confirm mode — return the plan without executing
+    // Step 2a: Auto-chain execution — run all combo steps sequentially when chain: true
+    if (!confirm && autoChain && catalogCombo && catalogCombo.chain.length > 1) {
+      const steps: Array<{ step: number; tool: string; ok: boolean; content?: unknown[]; error?: string }> = [];
+
+      for (let i = 0; i < catalogCombo.chain.length; i++) {
+        const stepTool = catalogCombo.chain[i];
+        const stepArgs = i === 0 ? toolArgs : {};
+        const r = await this.handleExecute({ tool: stepTool, args: stepArgs }, sessionId);
+        if (r.isError) {
+          const firstContent = r.content[0] as { type?: string; text?: unknown } | undefined;
+          const errText = typeof firstContent?.text === 'string' ? firstContent.text : JSON.stringify(r.content);
+          steps.push({ step: i, tool: stepTool, ok: false, error: errText });
+        } else {
+          steps.push({ step: i, tool: stepTool, ok: true, content: r.content });
+        }
+      }
+
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            cast: 'chain_executed',
+            resolvedBy,
+            intent,
+            ...(focusName ? { focus: focusName } : {}),
+            catalog: { name: catalogCombo.name, chain: catalogCombo.chain, accomplishes: catalogCombo.accomplishes },
+            steps,
+            ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
+          }, null, 2),
+        }],
+      };
+    }
+
+    // Step 2b: Confirm mode — return the plan without executing
     if (confirm) {
       return {
         content: [{
