@@ -31,7 +31,7 @@ import {
   findCatalogCombo,
   resolveSuggestionsCatalogPath,
 } from './suggestions.js';
-import type { FocusSuggestions } from './suggestions.js';
+import type { FocusSuggestions, SuggestedCombo, SuggestedPrompt } from './suggestions.js';
 
 const SEPARATOR = '/';
 const META_SERVER_ID = 'ch1tty';
@@ -638,7 +638,12 @@ export class Aggregator {
     activeSessions: number;
     focus: { active: string; categories: ServerCategory[]; servers: string[]; boost: number } | null;
     availableFocusProfiles: string[];
-    catalog: { loaded: boolean; totalCombos: number; byFocus: Record<string, number> };
+    catalog: {
+      loaded: boolean;
+      totalCombos: number;
+      byFocus: Record<string, number>;
+      activeFocusSuggestions: { combos: SuggestedCombo[]; prompts: SuggestedPrompt[] } | null;
+    };
     systemHealth: { status: 'ok' | 'warn' | 'degraded'; brainDegraded: boolean; ledgerStatus: 'ok' | 'warn' | 'degraded' };
     brainHealth: { status: 'ok' | 'degraded'; embeddingCircuitOpen: boolean; ollamaCircuitOpen: boolean };
     ledgerHealth: { status: 'ok' | 'warn' | 'degraded'; dropped: number; buffered: number; flushErrors: number; dlqEntries: number; dlqPath: string };
@@ -685,6 +690,11 @@ export class Aggregator {
         ? 'warn'
         : 'ok';
 
+    const focusSnap = this.activeFocusSnapshot();
+    const activeFocusSuggestions = focusSnap
+      ? getSuggestionsForFocus(focusSnap.active, this.suggestionsCatalog, { maxCombos: 3, maxPrompts: 3 })
+      : null;
+
     return {
       gateway: 'ch1tty',
       version: VERSION,
@@ -694,9 +704,14 @@ export class Aggregator {
       totalTools: statuses.reduce((sum, s) => sum + s.toolCount, 0),
       registryCached: Date.now() < this.registryExpiresAt,
       activeSessions: this.sessions.count,
-      focus: this.activeFocusSnapshot(),
+      focus: focusSnap,
       availableFocusProfiles: Object.keys(this.focusProfiles.profiles),
-      catalog: { loaded: catalogLoaded, totalCombos: catalogTotalCombos, byFocus: catalogByFocus },
+      catalog: {
+        loaded: catalogLoaded,
+        totalCombos: catalogTotalCombos,
+        byFocus: catalogByFocus,
+        activeFocusSuggestions,
+      },
       systemHealth: { status: systemStatus, brainDegraded, ledgerStatus },
       brainHealth: {
         status: brainDegraded ? 'degraded' : 'ok',
