@@ -353,6 +353,10 @@ export class Aggregator {
               type: 'boolean',
               description: 'If true and the resolved tool is the first step of a catalog combo, auto-execute all remaining chain steps sequentially (default: false). Requires an active focus. Each step receives the previous step\'s text output as previousResult in its args, enabling data chaining between steps. Returns cast: chain_executed with per-step results.',
             },
+            explain: {
+              type: 'boolean',
+              description: 'If true, include an explanation field in the response showing how the tool was selected: resolution method (brain or keyword), whether focus boosted the winner, top-scored candidates with scores, and a human-readable rationale. Works with all modes — executed, plan, dryRun, chain_executed, discovered, no_match (default: false).',
+            },
           },
           required: ['intent'],
         },
@@ -782,6 +786,7 @@ export class Aggregator {
     const dryRun = args.dryRun === true;
     const confirm = !dryRun && args.confirm === true;
     const autoChain = args.chain === true;
+    const explain = args.explain === true;
     const { name: focusName, profile: focus } = this.resolveActiveFocus(args.focus);
 
     if (!intent) {
@@ -922,6 +927,7 @@ export class Aggregator {
             cast: 'no_match',
             resolvedBy,
             intent,
+            ...(explain ? { explanation: buildCastExplanation(resolvedBy, undefined, [], focusName, focus) } : {}),
             ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
             hint: 'No tools, prompts, or resources matched your intent. Try ch1tty/search with different keywords.',
           }, null, 2),
@@ -941,6 +947,7 @@ export class Aggregator {
       score: t.score,
       description: t.description,
     }));
+    const explanation = explain ? buildCastExplanation(resolvedBy, best, scoredTools, focusName, focus) : null;
 
     // Build related prompts/resources context
     const related: Record<string, unknown> = {};
@@ -971,6 +978,7 @@ export class Aggregator {
             cast: 'discovered',
             resolvedBy,
             intent,
+            ...(explanation ? { explanation } : {}),
             hint: 'No executable tools matched, but related prompts/resources found.',
             ...related,
             ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
@@ -1036,6 +1044,7 @@ export class Aggregator {
             resolvedBy,
             intent,
             ...(focusName ? { focus: focusName } : {}),
+            ...(explanation ? { explanation } : {}),
             catalog: { name: catalogCombo.name, chain: catalogCombo.chain, accomplishes: catalogCombo.accomplishes },
             steps,
             ...(chainSummary !== undefined ? { summary: chainSummary } : {}),
@@ -1055,6 +1064,7 @@ export class Aggregator {
             resolvedBy,
             intent,
             ...(focusName ? { focus: focusName } : {}),
+            ...(explanation ? { explanation } : {}),
             resolved: { tool: best.namespacedName, score: best.score },
             ...(catalogCombo ? { catalogCombo: { name: catalogCombo.name, chain: catalogCombo.chain, accomplishes: catalogCombo.accomplishes } } : {}),
           }, null, 2),
@@ -1072,6 +1082,7 @@ export class Aggregator {
             resolvedBy,
             intent,
             ...(focusName ? { focus: focusName } : {}),
+            ...(explanation ? { explanation } : {}),
             resolved: {
               tool: best.namespacedName,
               server: best.serverId,
@@ -1108,6 +1119,7 @@ export class Aggregator {
             resolvedBy,
             intent,
             ...(focusName ? { focus: focusName } : {}),
+            ...(explanation ? { explanation } : {}),
             resolved: best.namespacedName,
             score: best.score,
             ...(catalogCombo ? { resolvedFromCatalog: { name: catalogCombo.name, chain: catalogCombo.chain, accomplishes: catalogCombo.accomplishes } } : {}),
@@ -1391,4 +1403,44 @@ export class Aggregator {
     await Promise.allSettled(shutdowns);
     this.backends.clear();
   }
+}
+
+// ── Cast explanation helper ────────────────────────────────────────────────
+
+type ScoredNamespacedTool = NamespacedTool & { score: number };
+
+function buildCastExplanation(
+  resolvedBy: 'brain' | 'keyword',
+  best: ScoredNamespacedTool | undefined,
+  scoredTools: ScoredNamespacedTool[],
+  focusName: string | undefined,
+  focus: FocusProfile | null | undefined,
+): object {
+  const topCandidates = scoredTools.slice(0, 5).map((t) => ({ tool: t.namespacedName, score: t.score }));
+  const winnerInFocus = best && focus ? isInFocus(focus, best) : false;
+  const focusBoost = focus?.boost ?? 0.5;
+
+  let rationale: string;
+  if (!best) {
+    rationale = `No tool candidates found via ${resolvedBy} routing.`;
+  } else {
+    const parts: string[] = [`Resolved "${best.namespacedName}" via ${resolvedBy} (score: ${best.score.toFixed(3)})`];
+    if (focusName && winnerInFocus) {
+      parts.push(`boosted by "${focusName}" focus (+${focusBoost})`);
+    } else if (focusName) {
+      parts.push(`("${focusName}" focus active; winner is out-of-focus)`);
+    }
+    if (topCandidates.length > 1) {
+      const runner = topCandidates[1];
+      parts.push(`over runner-up "${runner.tool}" (${runner.score.toFixed(3)})`);
+    }
+    rationale = parts.join(' ');
+  }
+
+  return {
+    method: resolvedBy,
+    ...(focusName ? { focus: focusName, focusBoost, winnerInFocus } : {}),
+    topCandidates,
+    rationale,
+  };
 }
