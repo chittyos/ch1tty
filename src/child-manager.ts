@@ -222,7 +222,7 @@ export class ChildManager implements Backend {
     }
   }
 
-  async callTool(serverId: string, toolName: string, args: Record<string, unknown> = {}): Promise<ToolCallResult> {
+  async callTool(serverId: string, toolName: string, args: Record<string, unknown> = {}, options?: { timeoutMs?: number }): Promise<ToolCallResult> {
     if (!this.breaker.isAllowed(serverId)) {
       return {
         content: [{ type: 'text', text: `Backend "${serverId}" is temporarily unavailable (circuit open). Try again shortly.` }],
@@ -234,7 +234,7 @@ export class ChildManager implements Backend {
       const conn = await this.spawnWithReconnect(serverId);
       const result = await withTimeout(
         conn.client.callTool({ name: toolName, arguments: args }),
-        CALL_TIMEOUT_MS,
+        options?.timeoutMs ?? CALL_TIMEOUT_MS,
         `callTool ${serverId}/${toolName}`,
       );
       this.breaker.recordSuccess(serverId);

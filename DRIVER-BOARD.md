@@ -32,6 +32,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **IIII. Branch coverage sweep** — 4 branch gaps closed in `aggregator.ts` + `suggestions.ts`: explain truncation note (1582-1583), suggestions nopath fallback (38), relevanceMap ??0 (1566), recentlyUsed spread (1568). suggestions.ts now 100% branch. PR #407 ✅ MERGED (run 113, 2026-06-13). 4 new tests, 1081/0/2. DONE.
 - [x] **Z. `ch1tty/status` short mode** — `short: true` param returns condensed snapshot omitting `servers[]` and `coordinator.sessions[]` while preserving all health fields, counts, focus, and catalog stats. PR #409 ✅ MERGED (run 113, 2026-06-13). 7 new tests, 1088/0/2. DONE.
 - [x] **AA. `ch1tty/search` offset pagination** — `offset: number` param skips N results before returning the page, pairing with `limit` to iterate through large registries. `total` always reflects the full unsliced count. `offset` field included in response when non-zero. PR #411 ✅ MERGED (run 114, 2026-06-13). 7 new tests, 1095/0/2. DONE.
+- [ ] **BB. `ch1tty/execute` per-call timeout** — `timeout: number` ms param overrides `CH1TTY_REMOTE_TIMEOUT_MS` for a single call. Threaded via `Backend.callTool` options bag → `RemoteProxy` (uses it) and `ChildManager` (uses it). Non-positive values treated as absent. `FixtureBackend` records `timeoutMs` in `CallRecord`. PR #413 open (run 115, 2026-06-13). 8 new tests, 1103/0/2.
 
 ## Live Gateway State (as of 2026-06-13 run 113)
 
@@ -56,6 +57,45 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 115 — 2026-06-13 (auto-driver)
+
+**Workstream advanced**: BB (new — `ch1tty/execute` per-call timeout parameter)
+**Branch/PR**: `auto/BB-execute-per-call-timeout` → https://github.com/chittyos/ch1tty/pull/413 (open)
+**Build**: clean (0 errors)
+**Tests**: 1103 pass, 0 fail, 2 skipped (+8 new tests from 1095 baseline)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 1095/0/2 on main (PR #411 merged for AA — offset pagination). Board read: A✅ through AA✅. Only open PR: #375 (Dependabot esbuild dev-only bump). Notion unreachable, Ledger DLQ 6 entries — both unchanged blockers.
+- **Workstream BB: `ch1tty/execute` per-call timeout parameter**
+  - Gap: `CH1TTY_REMOTE_TIMEOUT_MS` env var sets a global call timeout for all backends. Callers with mixed workloads (fast lookups vs long AI-generation) couldn't vary the timeout per call without forking the process or reconfiguring globally.
+  - **`src/types.ts`** (1 line): Added `options?: { timeoutMs?: number }` 4th param to `Backend.callTool` interface.
+  - **`src/aggregator.ts`** (3 edits):
+    1. Added `timeout: number` property to `ch1tty/execute` inputSchema with description (after `dryRun`).
+    2. Extracted `const timeoutMs = typeof args.timeout === 'number' && args.timeout > 0 ? Math.floor(args.timeout) : undefined` in `handleExecute`.
+    3. Changed `backend.callTool(serverId, name, toolArgs)` to pass `timeoutMs !== undefined ? { timeoutMs } : undefined` as 4th arg.
+  - **`src/remote-proxy.ts`** (2 edits): Added `options?: { timeoutMs?: number }` param to `callTool`; changed `getCallTimeoutMs()` to `options?.timeoutMs ?? getCallTimeoutMs()` in `withTimeout` call.
+  - **`src/child-manager.ts`** (2 edits): Added `options?: { timeoutMs?: number }` param to `callTool`; changed `CALL_TIMEOUT_MS` to `options?.timeoutMs ?? CALL_TIMEOUT_MS`.
+  - **`test/fixture-backend.ts`** (3 edits): Added `timeoutMs?: number` to `CallRecord`; added `options?: { timeoutMs?: number }` to `callTool` signature; records `options?.timeoutMs` in both error and success log entries.
+  - **8 new tests** in `test/execute-timeout.test.ts`:
+    1. `timeout: N` threaded to `callTool` options as `timeoutMs`
+    2. `timeout` omitted → `timeoutMs` undefined in options
+    3. `timeout: 0` treated as absent (undefined)
+    4. `timeout: -1` treated as absent (undefined)
+    5. `dryRun: true` takes precedence — zero backend calls even with `timeout` set
+    6. `timeout` and `args` co-exist and thread correctly
+    7. `timeout: 1` (minimum positive) accepted and threaded
+    8. `timeout` param visible in `ch1tty/execute` inputSchema
+- Bot comments on PR #413: Codex usage-limit + CodeRabbit rate-limit — both informational, no action.
+- CI: 2 CodeQL checks in_progress at run end (known pattern — typically completes green).
+- PR #413 opened (ready for review, not draft).
+
+**Next run priority**:
+- Check if PR #413 (BB) CI has cleared (CodeQL). Merge and mark BB ✅ done.
+- Workstream CC candidates: (a) `ch1tty/cast` per-call timeout — mirror the execute timeout param on cast so chain execution respects per-call overrides; (b) Dependabot PR #375 merge (esbuild dev-only bump, long overdue); (c) `ch1tty/execute` `sessionId` param — let callers pass an explicit sessionId for tool-call tracking (currently session tracking is done at the transport layer).
+- Persistent blockers: CI broken org-wide (human must fix GitHub Actions), Notion unreachable, Ledger DLQ 6 entries.
 
 ---
 

@@ -42,6 +42,7 @@ export interface CallRecord {
   args: Record<string, unknown>;
   durationMs: number;
   isError: boolean;
+  timeoutMs?: number;
 }
 
 function sleep(ms: number): Promise<void> {
@@ -99,6 +100,7 @@ export class FixtureBackend implements Backend {
     serverId: string,
     toolName: string,
     args?: Record<string, unknown>,
+    options?: { timeoutMs?: number },
   ): Promise<ToolCallResult> {
     const def = this.servers.get(serverId);
     if (!def) {
@@ -118,14 +120,14 @@ export class FixtureBackend implements Backend {
     if (def.latencyMs) await sleep(def.latencyMs);
     if (tool.response === 'error') {
       const durationMs = Date.now() - start;
-      this.callLog.push({ serverId, tool: toolName, args: args ?? {}, durationMs, isError: true });
+      this.callLog.push({ serverId, tool: toolName, args: args ?? {}, durationMs, isError: true, timeoutMs: options?.timeoutMs });
       return {
         content: [{ type: 'text', text: `Simulated error in ${serverId}/${toolName}` }],
         isError: true,
       };
     }
     const durationMs = Date.now() - start;
-    this.callLog.push({ serverId, tool: toolName, args: args ?? {}, durationMs, isError: false });
+    this.callLog.push({ serverId, tool: toolName, args: args ?? {}, durationMs, isError: false, timeoutMs: options?.timeoutMs });
     return tool.response;
   }
 
