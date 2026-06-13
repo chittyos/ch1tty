@@ -311,6 +311,7 @@ export class Aggregator {
             offset: { type: 'number', description: 'Number of results to skip before returning the first result (default 0). Pair with limit to page through large result sets: offset:20, limit:20 returns the second page of 20.' },
             explain: { type: 'boolean', description: 'If true, include an explanation field in the response showing how results were ranked: match mode (and/partial), focus boost contributions, per-result relevance scores, recency signals, and a human-readable rationale. Useful for debugging ranking decisions (default: false).' },
             inFocusOnly: { type: 'boolean', description: 'If true and a focus profile is active, return only tools that are within the active focus (hard filter). Out-of-focus tools are excluded. No-op when no focus is active. Overrides the default lens behavior for this call (default: false).' },
+            sessionId: { type: 'string', description: 'Explicit session ID. When provided, always takes priority over the transport-derived session ID — enabling stateless HTTP server-to-server callers to participate in session tracking (sticky focus, affinity, topTools). A session context is created lazily on first use.' },
           },
         },
       },
@@ -324,6 +325,7 @@ export class Aggregator {
             args: { type: 'object', description: 'Arguments to pass to the tool' },
             dryRun: { type: 'boolean', description: 'If true, resolve the tool and return what would be called (server, tool, args) without executing. Makes zero backend calls. Useful for previewing or sandboxing (default: false).' },
             timeout: { type: 'number', description: 'Per-call timeout in milliseconds. Overrides CH1TTY_REMOTE_TIMEOUT_MS for this call only. Ignored for local (stdio) backends. Minimum 1ms; non-positive values are ignored (default: use CH1TTY_REMOTE_TIMEOUT_MS or 120000ms).' },
+            sessionId: { type: 'string', description: 'Explicit session ID. When provided, always takes priority over the transport-derived session ID — enabling stateless HTTP server-to-server callers to participate in session tracking (sticky focus, affinity, topTools). A session context is created lazily on first use.' },
           },
           required: ['tool'],
         },
@@ -400,6 +402,7 @@ export class Aggregator {
               },
             },
             timeout: { type: 'number', description: 'Per-call timeout in milliseconds applied to each backend execution within cast. Overrides CH1TTY_REMOTE_TIMEOUT_MS for this call only. Applied to each step in chain execution and to normal single-tool execution. Non-positive values are ignored (default: use CH1TTY_REMOTE_TIMEOUT_MS or 120000ms).' },
+            sessionId: { type: 'string', description: 'Explicit session ID. When provided, always takes priority over the transport-derived session ID — enabling stateless HTTP server-to-server callers to participate in session tracking (sticky focus, affinity, topTools). A session context is created lazily on first use.' },
           },
           required: ['intent'],
         },
@@ -408,6 +411,15 @@ export class Aggregator {
   }
 
   private async handleMetaTool(toolName: string, args: Record<string, unknown>, sessionId?: string): Promise<ToolCallResult> {
+    // Lazily create a coordinator session context when an explicit args.sessionId is
+    // provided but no transport session exists for that ID. This enables stateless
+    // HTTP callers to participate in session tracking without a prior onSessionStart.
+    if (typeof args.sessionId === 'string' && args.sessionId) {
+      const explicitSid = args.sessionId;
+      if (!this.coordinator.hasSession(explicitSid)) {
+        await this.coordinator.onSessionStart(explicitSid, 'http');
+      }
+    }
     switch (toolName) {
       case 'search':
         return this.handleSearch(args, sessionId);
@@ -437,21 +449,22 @@ export class Aggregator {
     const offset = typeof args.offset === 'number' && args.offset > 0 ? Math.floor(args.offset) : 0;
     const explain = args.explain === true;
     const inFocusOnly = args.inFocusOnly === true;
-    const { name: focusName, profile: focus } = this.resolveActiveFocus(args.focus, sessionId);
+    const effectiveSessionId = typeof args.sessionId === 'string' && args.sessionId ? args.sessionId : sessionId;
+    const { name: focusName, profile: focus } = this.resolveActiveFocus(args.focus, effectiveSessionId);
 
     const registry = await this.getRegistry();
 
     // Build session context for relevance boosting (coordinator + session tracker)
     const recentServerIds = new Set<string>();
-    if (sessionId) {
+    if (effectiveSessionId) {
       // Coordinator affinity (richer — tracks all tool calls with timestamps)
-      const affinity = this.coordinator.getServerAffinity(sessionId);
+      const affinity = this.coordinator.getServerAffinity(effectiveSessionId);
       for (const serverId of affinity.keys()) {
         recentServerIds.add(serverId);
       }
       // Fallback to session tracker if coordinator hasn't seen this session
       if (recentServerIds.size === 0) {
-        for (const tool of this.sessions.getRecentTools(sessionId)) {
+        for (const tool of this.sessions.getRecentTools(effectiveSessionId)) {
           const sep = tool.indexOf(SEPARATOR);
           if (sep > 0) recentServerIds.add(tool.slice(0, sep));
         }
@@ -507,7 +520,7 @@ export class Aggregator {
         serverSummary = [...serverSummary].sort((a, b) => Number(b.inFocus) - Number(a.inFocus));
       }
 
-      const entity = sessionId ? this.coordinator.getEntityContext(sessionId) : undefined;
+      const entity = effectiveSessionId ? this.coordinator.getEntityContext(effectiveSessionId) : undefined;
       return {
         content: [{
           type: 'text',
@@ -590,7 +603,7 @@ export class Aggregator {
           ...(partialFallback ? { mode: 'partial' } : {}),
           ...(focusName ? { focus: focusName } : {}),
           ...(inFocusOnly && focus ? { inFocusOnly: true } : {}),
-          ...(sessionId ? { sessionId } : {}),
+          ...(effectiveSessionId ? { sessionId: effectiveSessionId } : {}),
           ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
           ...(explanation ? { explanation } : {}),
           tools: results,
@@ -608,6 +621,7 @@ export class Aggregator {
       : {};
     const dryRun = args.dryRun === true;
     const timeoutMs = typeof args.timeout === 'number' && args.timeout > 0 ? Math.floor(args.timeout) : undefined;
+    const effectiveSessionId = typeof args.sessionId === 'string' && args.sessionId ? args.sessionId : sessionId;
 
     if (!toolName) {
       return {
@@ -651,9 +665,9 @@ export class Aggregator {
 
     try {
       const result = await backend.callTool(serverId, name, toolArgs, timeoutMs !== undefined ? { timeoutMs } : undefined);
-      if (sessionId) {
-        this.sessions.recordToolCall(sessionId, toolName);
-        this.coordinator.onToolCall(sessionId, toolName);
+      if (effectiveSessionId) {
+        this.sessions.recordToolCall(effectiveSessionId, toolName);
+        this.coordinator.onToolCall(effectiveSessionId, toolName);
       }
       return result;
     } catch (err) {
@@ -883,7 +897,8 @@ export class Aggregator {
     const autoChain = args.chain === true;
     const explain = args.explain === true;
     const castTimeoutMs = typeof args.timeout === 'number' && args.timeout > 0 ? Math.floor(args.timeout) : undefined;
-    const { name: focusName, profile: focus } = this.resolveActiveFocus(args.focus, sessionId);
+    const effectiveSessionId = typeof args.sessionId === 'string' && args.sessionId ? args.sessionId : sessionId;
+    const { name: focusName, profile: focus } = this.resolveActiveFocus(args.focus, effectiveSessionId);
 
     if (!intent) {
       return {
@@ -967,7 +982,7 @@ export class Aggregator {
       if (focus) {
         const seen = new Set(scoredTools.map((t) => t.namespacedName));
         let added = 0;
-        for (const t of this.scoreIntent(intent, registry, sessionId)) {
+        for (const t of this.scoreIntent(intent, registry, effectiveSessionId)) {
           if (added >= 5) break;
           if (!seen.has(t.namespacedName) && isInFocus(focus, t)) {
             scoredTools.push(t);
@@ -979,7 +994,7 @@ export class Aggregator {
       }
       castRoute = 'brain';
     } else {
-      scoredTools = this.scoreIntent(intent, registry, sessionId);
+      scoredTools = this.scoreIntent(intent, registry, effectiveSessionId);
       castRoute = 'fallback';
     }
 
@@ -991,8 +1006,8 @@ export class Aggregator {
       scoredTools = applyFocusBias(focus, scoredTools);
     }
 
-    if (sessionId) {
-      this.coordinator.ledger.record(sessionId, 'cast_route', {
+    if (effectiveSessionId) {
+      this.coordinator.ledger.record(effectiveSessionId, 'cast_route', {
         intent: intent.slice(0, 200),
         route: castRoute,
         confirm,
@@ -1142,7 +1157,7 @@ export class Aggregator {
         } else {
           stepArgs = {};
         }
-        const r = await this.handleExecute({ tool: stepTool, args: stepArgs, ...(castTimeoutMs !== undefined ? { timeout: castTimeoutMs } : {}) }, sessionId);
+        const r = await this.handleExecute({ tool: stepTool, args: stepArgs, ...(castTimeoutMs !== undefined ? { timeout: castTimeoutMs } : {}) }, effectiveSessionId);
         if (r.isError) {
           const firstContent = r.content[0] as { type?: string; text?: unknown } | undefined;
           const errText = typeof firstContent?.text === 'string' ? firstContent.text : JSON.stringify(r.content);
@@ -1232,7 +1247,7 @@ export class Aggregator {
     // Step 3: Execute (Ch1tty executing through itself)
     const result = await this.handleExecute(
       { tool: best.namespacedName, args: toolArgs, ...(castTimeoutMs !== undefined ? { timeout: castTimeoutMs } : {}) },
-      sessionId,
+      effectiveSessionId,
     );
 
     // Return cast metadata + related context + raw tool output
