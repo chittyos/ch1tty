@@ -25,14 +25,17 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **S. Session-sticky focus** — Explicit `focus` param on `ch1tty/search` or `ch1tty/cast` is persisted per-session via `SessionCoordinator`. Subsequent calls in the same session without a `focus` param inherit the stored focus automatically. Priority: per-call > session-sticky > `CH1TTY_FOCUS` env default. `focus:"none"` clears the session focus. PR #392 ✅ MERGED (run 105, 2026-06-13). 7 new tests, 1032/0/2. DONE.
 - [x] **T. `ch1tty/status` session focus reporting** — `coordinator.getSnapshot()` now includes `sessionFocus?: string` on each session entry under `coordinator.sessions`. Present only when explicitly set; absent when none set or cleared via `focus:"none"`; env default does not write `sessionFocus`. PR #394 ✅ MERGED (run 106, 2026-06-13). 7 new tests, 1039/0/2. DONE.
 - [x] **U. `ch1tty/status` per-session topTools** — `coordinator.getSnapshot()` now includes `topTools: string[]` on each session entry — top 5 most-called namespaced tool names sorted by count descending, `[]` when no calls made. Operators can inspect which tools each active session uses, not just the count. PR #397 ✅ MERGED (run 107, 2026-06-13). 7 new tests, 1046/0/2. DONE.
-- [ ] **V. `ch1tty/status` coordinator-level global topTools** — `coordinator.getSnapshot()` now includes `topTools: string[]` at the coordinator top level, aggregating tool call counts across ALL active sessions and returning top 10 most-called tools globally. Complements per-session topTools (U). PR #399 open (run 108, 2026-06-13). 7 new tests, 1053/0/2. Awaiting merge.
+- [x] **V. `ch1tty/status` coordinator-level global topTools** — `coordinator.getSnapshot()` adds `topTools: string[]` at the coordinator top level, aggregating tool call counts across ALL active sessions; top 10 globally. Complements per-session topTools (U). PR #399 ✅ MERGED (run 108, 2026-06-13). 7 new tests, 1053/0/2. DONE.
+- [x] **W. `ch1tty/status` catalog stats + activeFocusSuggestions** — `getStatusSnapshot()` now includes `catalog: { loaded, totalCombos, byFocus, activeFocusSuggestions }`. When a focus is active and the suggestions catalog has an entry for it, `activeFocusSuggestions` surfaces the top 3 combos + prompts — a quick compass for operators. PR #401 ✅ MERGED (run 109, 2026-06-13). 7 new tests, 1053/0/2. DONE.
 
-## Live Gateway State (as of 2026-06-13 run 108)
+## Live Gateway State (as of 2026-06-13 run 109)
 
 - Connected backends: cloudflare-builds (7 tools), evidence (3), browser-rendering (3), context7 (2), thinking (1), fs (14), playwright (23), orchestrator (13) — 66 total tools
 - Not connected: chittyos, cloudflare, GitHub, linear, notion, stripe, neon (lazy, auth-gated)
 - System health: degraded (ledger DLQ has 6 entries — ledger.chitty.cc unreachable)
 - Brain: ok (embedding circuit open=false, ollama circuit open=false)
+- Active sessions: 105, active focus: none
+
 
 ## Live Gateway State (as of 2026-06-13 run 106)
 
@@ -51,10 +54,34 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 
 ---
 
+### Run 109 — 2026-06-13 (auto-driver)
+
+**Workstream advanced**: W (new — `catalog.activeFocusSuggestions` in `ch1tty/status`)
+**Branch/PR**: `auto/W-status-active-focus-suggestions` → https://github.com/chittyos/ch1tty/pull/401 ✅ MERGED
+**Build**: clean (0 errors)
+**Tests**: 920 pass, 0 fail, 2 skipped on origin/main base (+7 new tests)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean. Two open PRs: #399 (V — global topTools) and #400 (board update for run 108). Notion unreachable — DRIVER-BOARD.md continues as fallback.
+- Discovered local `main` and `origin/main` have diverged histories; W was created from local main, which caused `mergeable_state: "dirty"` on the PR. Resolved by cherry-picking onto origin/main and force-pushing.
+- **Workstream W: catalog stats + activeFocusSuggestions in `ch1tty/status`**
+  - Gap: `origin/main` exposes `catalog: { loaded, totalCombos, byFocus }` but no per-call suggestions. When focus is active, callers had to make a separate `ch1tty/search` call to discover relevant combos/prompts.
+  - **`src/aggregator.ts`**: Added `SuggestedCombo`/`SuggestedPrompt` imports; extended `catalog` return type with `activeFocusSuggestions`; computed `focusSnap` and `activeFocusSuggestions` via `getSuggestionsForFocus()` (maxCombos: 3, maxPrompts: 3) before the return.
+  - **7 new tests** in `test/status-catalog-suggestions.test.ts`: empty catalog stats; loaded catalog byFocus counts; null when no focus; null when focus not in catalog; top-3 cap; fewer-than-3 passthrough; loaded:true on zero-combo entry.
+- CodeRabbit review: no actionable issues. Merge conflict resolved via cherry-pick onto origin/main.
+- PR #401 merged (run 110, 2026-06-13).
+
+**Next run priority**:
+- V (#399) and W (#401) both merged. Mark both DONE.
+- Next workstream X candidates: (a) expose `catalog.activeFocusSuggestions` via `ch1tty/search` response too; (b) `ch1tty/execute` `dryRun` mode; (c) Dependabot #375 merge.
+- Persistent blockers: Notion unreachable, Ledger DLQ 6 entries (ledger.chitty.cc unreachable).
+
+---
+
 ### Run 108 — 2026-06-13 (auto-driver)
 
 **Workstream advanced**: V (new — coordinator-level global topTools in `ch1tty/status`)
-**Branch/PR**: `auto/V-status-global-top-tools` → https://github.com/chittyos/ch1tty/pull/399 (open)
+**Branch/PR**: `auto/V-status-global-top-tools` → https://github.com/chittyos/ch1tty/pull/399 ✅ MERGED
 **Build**: clean (0 errors)
 **Tests**: 1053 pass, 0 fail, 2 skipped (+7 new tests)
 
@@ -72,11 +99,11 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
     6. Capped at 10 even with more than 10 unique tools
     7. Ended session's tools absent (context deleted on `onSessionEnd`)
 - CI: CodeQL in_progress at PR open. Codex usage-limit + CodeRabbit rate-limit comments — both informational, no action.
-- PR #399 opened (ready for review, not draft).
+- PR #399 opened and merged (run 110, 2026-06-13).
 
 **Next run priority**:
 - Merge PR #399 if CI clears (CodeQL only; org-wide CI still broken for main workflow).
-- Workstream W candidates: (a) `ch1tty/search` session-context annotation — enrich `recentlyUsed` with `callCount: number` and `lastUsedMs: number` so clients know recency/frequency, not just boolean; (b) `ch1tty/execute` `dryRun` mode — return what would be called without executing (parallel to cast dryRun from O); (c) Dependabot esbuild PR #375 merge (dev-only bump, low priority).
+- Workstream W candidates: (a) `ch1tty/search` session-context annotation; (b) `ch1tty/execute` `dryRun` mode; (c) Dependabot esbuild PR #375 merge.
 - Blockers unchanged: CI broken org-wide (human must fix GitHub Actions), Notion unreachable, Ledger DLQ 6 entries.
 
 ---
