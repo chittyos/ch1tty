@@ -19,6 +19,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **M. cast `chain: true` step-output forwarding** — Each step in a `chain: true` execution now receives the prior step's text output as `previousResult` in its args, enabling data chaining between steps. Failed or non-text steps clear `previousResult` so the next step gets `{}`. Also: `FixtureBackend.callTool` now records args in `CallRecord` for test assertions. PR #380 ✅ MERGED (run 99, 2026-06-13). 7 new tests, 987/0/2. DONE.
 - [x] **N. cast `chain_executed` summary field** — `cast: chain_executed` now includes a top-level `summary` string joining all successful step text outputs with `\n\n`, giving LLM clients a single string without iterating `steps`. Absent when no steps produce text. PR #382 ✅ MERGED (run 100, 2026-06-13). 7 new tests, 994/0/2. DONE.
 - [x] **O. cast `dryRun` mode** — `dryRun: true` on `ch1tty/cast` resolves intent and returns `cast: resolved` (tool name + score + catalog combo) without executing. Lighter than `confirm: true`. Takes precedence over `confirm` when both set. PR #384 ✅ MERGED (run 101, 2026-06-13). 7 new tests, 1001/0/2. DONE.
+- [x] **P. cast `explain` mode** — `explain: true` adds `explanation: { method, focus?, focusBoost?, winnerInFocus?, topCandidates, rationale }` to ALL cast response shapes (executed/plan/resolved/chain_executed/discovered/no_match). Orthogonal to all other modes. PR #386 ✅ MERGED (run 102, 2026-06-13). 10 new tests, 1011/0/2. DONE.
 
 ## Live Gateway State (as of 2026-06-13)
 
@@ -34,6 +35,42 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 102 — 2026-06-13 (auto-driver)
+
+**Workstream advanced**: P (new — `cast: explain` mode)
+**Branch/PR**: `auto/P-cast-explain-mode` → https://github.com/chittyos/ch1tty/pull/386 ✅ MERGED
+**Build**: clean (0 errors)
+**Tests**: 1011 pass, 0 fail, 2 skipped (+10 new tests)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 1001/0/2 on main (PR #384 already merged). Only open PR: #375 (Dependabot esbuild bump). Board confirmed: A✅ through O✅.
+- Notion wrapper still missing — DRIVER-BOARD.md continues as fallback.
+- **Change** (`src/aggregator.ts`):
+  1. Added `explain` boolean param to `ch1tty/cast` inputSchema (after `chain`).
+  2. Extracted `const explain = args.explain === true` alongside other mode flags.
+  3. Computed `explanation = explain ? buildCastExplanation(...) : null` after alternatives are resolved (post resolvedBy refinement).
+  4. Added `...(explanation ? { explanation } : {})` to all 6 response shapes: `no_match` (minimal, topCandidates: []), `discovered`, `resolved` (dryRun), `plan` (confirm), `chain_executed`, `executed`.
+  5. Added `buildCastExplanation` module-level pure function at end of file — takes `resolvedBy`, `best`, `scoredTools`, `focusName`, `focus`; returns `{ method, focus?, focusBoost?, winnerInFocus?, topCandidates, rationale }`.
+- **10 new tests** in `test/cast-explain.test.ts`:
+  1. `explain: true` → `explanation` present on `cast: executed`
+  2. `explanation.method === 'keyword'` for keyword-only coordinator
+  3. `topCandidates[0].tool` is the winning tool with numeric score
+  4. `explain` omitted → no `explanation` field
+  5. Focus active → `explanation` has `focus`, `focusBoost`, `winnerInFocus`
+  6. `confirm: true` + `explain: true` → `explanation` on `cast: plan`
+  7. `dryRun: true` + `explain: true` → `explanation` on `cast: resolved`
+  8. No-match intent → `explanation` on `cast: no_match`, `topCandidates: []`
+  9. `rationale` is a non-empty string mentioning the resolved tool
+  10. `winnerInFocus: false` when winner category is outside the focus lens
+- PR #386 opened and merged (CI 0-jobs known infra issue; tests pass locally).
+- Bot comments: Codex usage-limit + CodeRabbit rate-limit — both informational, no action.
+
+**Next run priority**:
+- Workstream Q candidates: (a) `cast` session-sticky focus — once a focus is set via `cast`/`search`, persist it for the session via coordinator so clients don't re-pass `focus` on every call; (b) `ch1tty/search` `explain: true` — add parallel explanation field to search results showing how ranking was determined (focus boost, recency, keyword score contributions); (c) Dependabot esbuild PR #375 review/merge (dev-only bump).
+- Blockers unchanged: CI broken org-wide (human must fix GitHub Actions), Notion unreachable (human must configure wrapper), Ledger DLQ entries (ledger.chitty.cc unreachable).
 
 ---
 
