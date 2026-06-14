@@ -635,7 +635,7 @@ export class Aggregator {
       : null;
 
     const explanation = explain
-      ? buildSearchExplanation(matches, results, relevanceMap, partialFallback, focusName, focus, recentServerIds)
+      ? buildSearchExplanation(matches, results, relevanceMap, partialFallback, focusName, focus, recentServerIds, minScore)
       : null;
 
     return {
@@ -1725,6 +1725,7 @@ function buildSearchExplanation(
   focusName: string | undefined,
   focus: FocusProfile | null | undefined,
   recentServerIds: Set<string>,
+  minScore: number = 0,
 ): object {
   const matchMode = partialFallback ? 'partial' : 'and';
   const focusBoost = focus?.boost ?? 0.5;
@@ -1746,6 +1747,9 @@ function buildSearchExplanation(
   if (focusName) {
     parts.push(`"${focusName}" focus active — ${inFocusCount} of ${Math.min(topResults.length, 5)} top results in focus (boost +${focusBoost})`);
   }
+  if (minScore > 0) {
+    parts.push(`minScore: ${minScore} applied — tools below this relevance threshold were excluded`);
+  }
   if (allMatches.length > topResults.length) {
     parts.push(`showing ${topResults.length} of ${allMatches.length} matches`);
   }
@@ -1755,6 +1759,7 @@ function buildSearchExplanation(
     method: 'keyword' as const,
     matchMode,
     ...(focusName ? { focus: focusName, focusBoost } : {}),
+    ...(minScore > 0 ? { minScore } : {}),
     topCandidates,
     rationale,
   };
