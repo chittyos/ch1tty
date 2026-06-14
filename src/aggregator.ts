@@ -318,7 +318,7 @@ export class Aggregator {
       },
       {
         name: `${META_SERVER_ID}${SEPARATOR}execute`,
-        description: 'Execute a tool by its namespaced name (serverId/toolName). Use search to discover available tools first. When a sessionId is active, a second content item with sessionContext: { recentTools, callCount, activeSessionFocus? } is appended to the response for one-shot session awareness.',
+        description: 'Execute a tool by its namespaced name (serverId/toolName). Use search to discover available tools first. When a sessionId is active, sessionContext: { recentTools, callCount, activeSessionFocus? } is included in the response for one-shot session awareness — appended as a second content item on normal execution, embedded in the dry_run JSON when dryRun: true.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -704,8 +704,22 @@ export class Aggregator {
     }
 
     if (dryRun) {
+      let dryRunSessionContext: { recentTools: string[]; callCount: number; activeSessionFocus?: string } | undefined;
+      if (effectiveSessionId && this.coordinator.hasSession(effectiveSessionId)) {
+        const patterns = this.coordinator.getToolPatterns(effectiveSessionId, 1000);
+        const recentTools = patterns.slice(0, 5).map((p) => p.tool);
+        const callCount = patterns.reduce((sum, p) => sum + p.count, 0);
+        const activeSessionFocus = this.coordinator.getSessionFocus(effectiveSessionId);
+        dryRunSessionContext = { recentTools, callCount, ...(activeSessionFocus ? { activeSessionFocus } : {}) };
+      }
       return {
-        content: [{ type: 'text', text: JSON.stringify({ status: 'dry_run', server: serverId, tool: name, args: toolArgs }) }],
+        content: [{ type: 'text', text: JSON.stringify({
+          status: 'dry_run',
+          server: serverId,
+          tool: name,
+          args: toolArgs,
+          ...(dryRunSessionContext ? { sessionContext: dryRunSessionContext } : {}),
+        }) }],
         isError: false,
       };
     }
