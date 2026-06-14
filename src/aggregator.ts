@@ -627,6 +627,9 @@ export class Aggregator {
     // minScore hard filter: drop tools with relevance below the threshold.
     // Only meaningful when a query is present (scores are only computed then).
     if (minScore > 0 && relevanceMap.size > 0) {
+      // ?? 0 right side is structurally unreachable: relevanceMap is built from `matches`
+      // in the same scope — every tool in matches is scored when relevanceMap.size > 0.
+      /* c8 ignore next */
       matches = matches.filter((t) => (relevanceMap.get(t.namespacedName) ?? 0) >= minScore);
     }
 
@@ -1301,12 +1304,16 @@ export class Aggregator {
             cast: 'chain_executed',
             resolvedBy,
             intent,
+            // focusName is always truthy here (catalogCombo requires it — see line ~1238)
+            /* c8 ignore next */
             ...(focusName ? { focus: focusName } : {}),
             ...(explanation ? { explanation } : {}),
             catalog: { name: catalogCombo.name, chain: catalogCombo.chain, accomplishes: catalogCombo.accomplishes },
             steps,
             ...(chainSummary !== undefined ? { summary: chainSummary } : {}),
             ...(chainSessionContext ? { sessionContext: chainSessionContext } : {}),
+            // focusSuggestions is always truthy when catalogCombo is non-null (same catalog lookup)
+            /* c8 ignore next */
             ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
           }, null, 2),
         }],
