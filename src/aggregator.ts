@@ -1552,6 +1552,7 @@ export class Aggregator {
   // ── Lifecycle ───────────────────────────────────────────────
 
   async shutdown(): Promise<void> {
+    this.coordinator.close();
     // Flush ledger before shutting down backends
     await this.coordinator.ledger.shutdown();
 

@@ -37,6 +37,16 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **DD. Explicit `sessionId` param on search/execute/cast** — Stateless HTTP server-to-server callers can now pass `sessionId` in args to participate in coordinator session tracking (sticky focus, affinity, topTools) without a long-lived transport session. `args.sessionId` takes priority over the transport-derived session ID. When no context exists, one is lazily created. `coordinator.hasSession()` added. PR #415 ✅ MERGED (run 117 → confirmed merged at HEAD of main, 2026-06-13). 8 new tests, 1119/0/2. DONE.
 - [x] **EE. `ch1tty/search` recentlyUsed enrichment** — `recentlyUsed` in search results now carries per-tool usage data: `{ callCount: N, lastUsedMs: T }` when the exact tool was called in the session; `true` retained as server-level fallback. Adds `SessionCoordinator.getToolPattern()`. 4 existing tests updated to truthy checks. PR #416 ✅ MERGED (run 118, 2026-06-13). 7 new tests, 1126/0/2. DONE.
 - [x] **FF. `ch1tty/search` sessionContext field** — When a sessionId is active, `ch1tty/search` now returns `sessionContext: { recentTools: string[], callCount: number, activeSessionFocus?: string }` — one-shot session awareness alongside tool results, no separate `ch1tty/status` call needed. Included in both the query path and no-query server-summary path. PR #418 ✅ MERGED (run 119, 2026-06-13). 7 new tests, 1133/0/2. DONE.
+- [ ] **GG. `ch1tty/search` serverName field** — Each tool result now includes `serverName` (human-readable backend name, e.g. `"Neon Database"`) alongside the existing `server` id field. PR #419 OPEN (run 120 context, 2026-06-14). 7 new tests, 1140/0/2. Awaiting CI/merge.
+- [ ] **HH. Session TTL eviction** — `SessionContext.lastActiveAt` tracked on create + every tool call. Background sweep (default every 5 min) evicts staging-complete sessions inactive longer than `CH1TTY_SESSION_TTL_MS` (default 1h). `evictStaleSessions(now?, ttlMs?)` public for test injection. `close()` stops timer. `getSnapshot()` reports `evictedSessions` + `sessionTtlMs`. Wired into `Aggregator.shutdown()`. PR #420 OPEN (run 120, 2026-06-14). 11 new tests, 1145/0/2. Awaiting CI/merge.
+
+## Live Gateway State (as of 2026-06-14 run 120)
+
+- Connected backends: cloudflare-builds (7 tools), evidence (3), browser-rendering (3), context7 (2), thinking (1), fs (14), playwright (23), orchestrator (13) — 66 total tools
+- Not connected: chittyos, cloudflare, GitHub (needs GITHUB_MCP_AUTHORIZATION), linear, notion, stripe, neon (lazy, auth-gated)
+- System health: degraded (ledger DLQ has 6 entries — ledger.chitty.cc unreachable)
+- Brain: ok (embedding circuit open=false; 18 timeouts logged — Ollama unavailable but circuit cycling normally)
+- Active sessions: 114 (mostly stale HTTP sessions — HH eviction will clean these up once deployed)
 
 ## Live Gateway State (as of 2026-06-13 run 117)
 
@@ -75,6 +85,41 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 120 — 2026-06-14 (auto-driver)
+
+**Workstream advanced**: HH (new — session TTL eviction in coordinator)
+**Branch/PR**: `auto/HH-session-ttl-eviction` → https://github.com/chittyos/ch1tty/pull/420 (open)
+**Build**: clean (0 errors)
+**Tests**: 1145 pass, 0 fail, 2 skipped (+12 new tests from 1133 baseline)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 1133/0/2 on HEAD. Board read: A✅ through FF✅, GG open (PR #419 for serverName in search). `ch1tty/status` confirmed: 5 meta-tools registered, 8 connected servers, 66 tools. Gateway up.
+- **Observed**: 114 active sessions in coordinator snapshot, most with `toolPatterns:0` — stale HTTP sessions from prior autonomous runs never triggering `onSessionEnd`. Embedding brain: 18 timeouts, 0 successes — circuit cycling normally (opens on 3 consecutive failures, resets after 60s cooldown).
+- **Workstream HH: session TTL eviction**
+  - Gap: coordinator session map grows without bound on long-lived gateways; HTTP sessions don't reliably trigger `onSessionEnd` on disconnect.
+  - **`src/coordinator.ts`** (5 edits):
+    1. `SessionContext`: added `lastActiveAt: number` field.
+    2. Class fields: `evictedSessions`, `evictionTimer`, `sessionTtlMs`.
+    3. Constructor: reads `CH1TTY_SESSION_TTL_MS` (default 3 600 000 = 1h) + `CH1TTY_SESSION_EVICT_INTERVAL_MS` (default 300 000 = 5min); starts `setInterval` with `.unref()` when both > 0.
+    4. `onSessionStart`: sets `lastActiveAt: Date.now()`.
+    5. `onToolCall`: updates `ctx.lastActiveAt = Date.now()`.
+    6. New `evictStaleSessions(now?, ttlMs?)`: public, injectable clock for tests; skips `!stagingComplete` sessions; increments `evictedSessions`.
+    7. New `close()`: clears eviction timer.
+    8. `getSnapshot()`: return type + body now includes `evictedSessions` and `sessionTtlMs`.
+  - **`src/aggregator.ts`** (1 edit): `shutdown()` now calls `this.coordinator.close()` before ledger shutdown.
+  - **`CLAUDE.md`** (1 edit): documented `CH1TTY_SESSION_TTL_MS` and `CH1TTY_SESSION_EVICT_INTERVAL_MS` env vars.
+  - **11 new tests** in `test/hh-session-ttl-eviction.test.ts`: expired eviction, within-TTL survival, tool-call refresh, staging-incomplete guard, multi-session eviction, cumulative counter, snapshot fields, ttlMs=0 disables, onSessionEnd non-duplication, close idempotent, env var reading.
+- CI: 0-jobs infra failure (known ongoing issue). CodeRabbit review in progress — no actionable findings yet. Codex usage limit reached — no action.
+- PR #419 (GG): still open, awaiting CI/merge.
+- PR #420 (HH): opened, CI in progress (CodeQL analysis running).
+
+**Next run priority**:
+- Merge GG (#419) and HH (#420) once CI/review complete (or manual merge after local verification).
+- Workstream II candidates: (a) `ch1tty/execute` sessionContext response — mirror FF by returning `sessionContext` in execute results when sessionId is active; (b) `ch1tty/status` short mode: include `evictedSessions` in condensed view; (c) `ch1tty/search` `inputSchema` summary — add schema param count to search results.
+- Persistent blockers: CI broken org-wide (human must fix GitHub Actions), Notion unreachable, Ledger DLQ 6 entries, GitHub API backend needs `GITHUB_MCP_AUTHORIZATION`.
 
 ---
 

@@ -46,6 +46,8 @@ export interface SessionContext {
   serverAffinity: Map<string, number>; // serverId → recency score
   /** Sticky focus profile set by the last explicit focus param in this session. */
   sessionFocus?: string;
+  /** Epoch ms of the last activity (create or tool call). Used for TTL eviction. */
+  lastActiveAt: number;
 }
 
 // ── Coordinator ───────────────────────────────────────────────
@@ -57,6 +59,9 @@ export class SessionCoordinator {
   readonly ledger: LedgerClient;
   readonly brain: OllamaBrain;
   readonly embeddingBrain: EmbeddingBrain;
+  private evictedSessions = 0;
+  private evictionTimer?: ReturnType<typeof setInterval>;
+  readonly sessionTtlMs: number;
 
   constructor(
     brainConfig: Partial<OllamaBrainConfig> = {},
@@ -66,6 +71,14 @@ export class SessionCoordinator {
     this.ledger = new LedgerClient(ledgerDlqPath);
     this.brain = new OllamaBrain(brainConfig);
     this.embeddingBrain = new EmbeddingBrain(embedConfig);
+    const parsedTtl = Number(process.env.CH1TTY_SESSION_TTL_MS);
+    this.sessionTtlMs = Number.isFinite(parsedTtl) && parsedTtl >= 0 ? parsedTtl : 3_600_000;
+    const parsedInterval = Number(process.env.CH1TTY_SESSION_EVICT_INTERVAL_MS);
+    const intervalMs = Number.isFinite(parsedInterval) && parsedInterval >= 0 ? parsedInterval : 300_000;
+    if (this.sessionTtlMs > 0 && intervalMs > 0) {
+      this.evictionTimer = setInterval(() => this.evictStaleSessions(), intervalMs);
+      this.evictionTimer.unref();
+    }
     // Warm the primary embedding brain so the first cast doesn't pay model-load latency.
     void this.embeddingBrain.warmup().catch(() => {/* best-effort */});
     if (USE_OLLAMA_BRAIN) {
@@ -118,6 +131,7 @@ export class SessionCoordinator {
       toolPatterns: new Map(),
       stagingComplete: false,
       serverAffinity: new Map(),
+      lastActiveAt: Date.now(),
     };
     this.contexts.set(sessionId, ctx);
 
@@ -134,6 +148,8 @@ export class SessionCoordinator {
   onToolCall(sessionId: string, namespacedTool: string): void {
     const ctx = this.contexts.get(sessionId);
     if (!ctx) return;
+
+    ctx.lastActiveAt = Date.now();
 
     // Extract server from namespaced tool name
     const sep = namespacedTool.indexOf('/');
@@ -196,6 +212,38 @@ export class SessionCoordinator {
     await this.ledger.flush().catch(() => {});
 
     this.contexts.delete(sessionId);
+  }
+
+  /**
+   * Evict sessions that have been inactive for longer than `ttlMs` (default:
+   * `this.sessionTtlMs`). Only staging-complete sessions are eligible.
+   *
+   * Pass a synthetic `now` value (e.g. `Date.now() + ttl + 1`) to trigger
+   * eviction in tests without real time passing.
+   *
+   * Returns the number of sessions evicted in this call.
+   */
+  evictStaleSessions(now = Date.now(), ttlMs = this.sessionTtlMs): number {
+    if (ttlMs <= 0) return 0;
+    const cutoff = now - ttlMs;
+    let count = 0;
+    for (const [id, ctx] of this.contexts.entries()) {
+      if (ctx.stagingComplete && ctx.lastActiveAt < cutoff) {
+        this.contexts.delete(id);
+        this.evictedSessions++;
+        count++;
+        log.debug(`Evicted stale session ${id} (inactive ${Math.round((now - ctx.lastActiveAt) / 1000)}s)`);
+      }
+    }
+    return count;
+  }
+
+  /** Stop the background eviction timer. Call on shutdown or in tests. */
+  close(): void {
+    if (this.evictionTimer) {
+      clearInterval(this.evictionTimer);
+      this.evictionTimer = undefined;
+    }
   }
 
   /** Get server affinity scores for a session (for search boosting). */
@@ -268,6 +316,8 @@ export class SessionCoordinator {
     ledger: ReturnType<LedgerClient['getStats']>;
     brain: ReturnType<OllamaBrain['getStats']>;
     embeddingBrain: ReturnType<EmbeddingBrain['getStats']>;
+    evictedSessions: number;
+    sessionTtlMs: number;
     sessions: Array<{
       sessionId: string;
       entity?: string;
@@ -307,6 +357,8 @@ export class SessionCoordinator {
       ledger: this.ledger.getStats(),
       brain: this.brain.getStats(),
       embeddingBrain: this.embeddingBrain.getStats(),
+      evictedSessions: this.evictedSessions,
+      sessionTtlMs: this.sessionTtlMs,
       sessions,
     };
   }
