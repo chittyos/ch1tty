@@ -52,14 +52,14 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **SS. `ch1tty/search` minScore in explain output** — When `explain: true` and `minScore > 0` are both set, `explanation.minScore` echoes the active threshold and `explanation.rationale` includes a note that tools below it were excluded. Completes the explain transparency story — full ranking picture (match mode, focus boost, minScore filter, top candidates) in one place. PR #440 ✅ MERGED (run 129, 2026-06-14). 7 new tests, 1231/0/2. DONE.
 - [x] **TT. `ch1tty/search` explain in no-query (server-summary) path** — `explain: true` was silently a no-op when no query was provided. Now the server-summary early-return includes `explanation: { method: 'server_summary', totalServers, totalTools, focus?, inFocusServers?, inFocusOnly?, rationale }` when explain is set. Completes explain coverage for ALL three search paths (AND/partial-keyword, query-less server-summary). PR #442 ✅ MERGED (run 131, 2026-06-14). 7 new tests, 1238/0/2. DONE.
 - [x] **UU. Branch coverage → 100%** — 5 remaining branch gaps closed. (a) aggregator.ts:560 ternary plural `'s'` branch (inFocusCount > 1 with inFocusOnly explain) — covered by 3 new tests. (b) child-manager.ts:237 `options?.timeoutMs ?? CALL_TIMEOUT_MS` right side — covered by 2 new tests using injected fake conn. (c) aggregator.ts:630, 1304, 1310 — structurally unreachable, suppressed with `/* c8 ignore next */`. Result: all src/ files at 100%/100%/100%/100%. PR #444 ✅ MERGED (9d28bb8, run 133). 7 new tests, 1245/0/2. DONE.
-- [ ] **VV. `ch1tty/search` explain `filterContext` for server/category-filter path** — When `explain:true` is set alongside `server` or `category` filter params, the explanation now includes `filterContext: { server?, category? }` and the rationale mentions "pre-filtered by server=...". Completes explain coverage for ALL three search paths: AND/partial-keyword (Q/SS), no-query server-summary (TT), server/category-filter (VV). PR open (run 134, 2026-06-14). 7 new tests, 1252/0/2.
+- [x] **VV. `ch1tty/search` explain `filterContext` for server/category-filter path** — When `explain:true` is set alongside `server` or `category` filter params, the explanation now includes `filterContext: { server?, category? }` and the rationale mentions "pre-filtered by server=...". Completes explain coverage for ALL three search paths: AND/partial-keyword (Q/SS), no-query server-summary (TT), server/category-filter (VV). PR #446 ✅ MERGED (3a805a7, run 134). 7 new tests, 1252/0/2. DONE.
 
-## Live Gateway State (as of 2026-06-14 run 134)
+## Live Gateway State (as of 2026-06-14 run 134 — post-merge)
 
 - Connected backends: not re-queried this run (prior stable state unchanged)
 - Not connected: chittyos, cloudflare, GitHub (needs GITHUB_MCP_AUTHORIZATION), linear, notion, stripe, neon (lazy, auth-gated)
 - System health: degraded (ledger DLQ has 6 entries — ledger.chitty.cc unreachable, unchanged)
-- VV PR open (CodeQL in_progress, expected green — data-logic only)
+- VV (#446) ✅ merged (3a805a7). KKKK commit (e41d0c1) also landed on main — coverage tests for suggestions cache, cast explain brain, single candidate, brain no_match.
 
 ## Live Gateway State (as of 2026-06-14 run 133)
 
