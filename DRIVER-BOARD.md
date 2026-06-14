@@ -60,17 +60,17 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **OOOO. `ch1tty/status` `ledgerDlq.entries[]`** — Extends `ledgerDlq: { path, entryCount }` (MMMM) with `entries: object[]` — the parsed contents of the dead-letter WAL, capped at 50 most-recent. Operators can inspect DLQ backlog content via a single `ch1tty/status` call without filesystem access. Malformed JSONL lines silently skipped. Field survives `short: true` mode. PR #455 ✅ MERGED (3656961, run 138→139, 2026-06-14). 7 new tests, 1284/0/2. DONE.
 - [x] **PPPP. `ch1tty/cast` `latencyBreakdown.brainMs`** — When the brain route fires (`castRoute === 'brain'`), `latencyBreakdown` on `cast:executed` and `cast:chain_executed` gains `brainMs: number` — wall-clock time of `routeIntent()` alone. Absent when keyword-fallback route taken. PR #456 ✅ MERGED (45bdce9, run 139, 2026-06-14). 7 new tests, 1291/0/2. DONE.
 - [x] **QQQQ. `ch1tty/execute` `latencyMs` in responses** — Wall-clock elapsed time added to `ch1tty/execute` responses: when sessionId active + success, content[1] becomes `{ latencyMs, sessionContext }` (previously only `{ sessionContext }`); when dryRun, `latencyMs` embedded in dry_run JSON alongside sessionContext. No-session non-dryRun unchanged (backward compat). Completes latency observability triad (cast LLLL/NNNN/PPPP + execute QQQQ). PR #458 ✅ MERGED (9fe10a9, run 139, 2026-06-14). 7 new tests, 1298/0/2. DONE.
-- [x] **RRRR. `ch1tty/search` `latencyMs` in responses** — All `ch1tty/search` response shapes now carry `latencyMs: number` — wall-clock elapsed time in ms from `handleSearch` entry to JSON serialisation. Covers both return paths: query/filter path (tools array) and no-query server-summary path. Tool description updated to advertise `latencyMs`. Completes latency observability across all three active meta-tools (cast LLLL/NNNN/PPPP + execute QQQQ + search RRRR). PR #460 ✅ MERGED (b53cfa6, run 140, 2026-06-14). 7 new tests, 1305/0/2. DONE.
+- [x] **RRRR. `ch1tty/search` `latencyMs` in responses** — All `ch1tty/search` response shapes now carry `latencyMs: number` — wall-clock elapsed time in ms from `handleSearch` entry to JSON serialisation. Covers both return paths: query/filter path (tools array) and no-query server-summary path. Tool description updated to advertise `latencyMs`. Completes latency observability across all three active meta-tools (cast LLLL/NNNN/PPPP + execute QQQQ + search RRRR). PR #460 ✅ MERGED (a11c8d7, run 140, 2026-06-14). 7 new tests, 1305/0/2. DONE.
+- [x] **SSSS. `ch1tty/cast` `explanation.brainMs` when brain route fires** — When `explain: true` is set and `castRoute === 'brain'`, the `explanation` object now includes `brainMs: number` — wall-clock time of `routeIntent()` in milliseconds. Absent when keyword-fallback route is used. Parallels `latencyBreakdown.brainMs` (PPPP) but lives in the reasoning-oriented `explanation` field alongside `method:'brain'`, `topCandidates`, and `rationale`. Present in all cast shapes: `executed`, `plan`, `resolved`, `chain_executed`, `no_match`. PR #462 ✅ MERGED (run 141, 2026-06-14). 7 new tests, 1312/0/2. DONE.
 
 ## Live Gateway State (as of 2026-06-14 run 140)
 
-- Connected backends: (not re-queried this run — stable from run 135)
+- Connected backends: chittyos (178 tools), cloudflare-builds (7), evidence (3), browser-rendering (3), neon (9), notion (10), context7 (2), thinking (1), fs (14), playwright (23), orchestrator (13) — 263 total tools across 11 servers
 - Not connected: cloudflare, github, linear, stripe (lazy, auth-gated or unreachable)
 - System health: degraded (ledger DLQ 11+ entries — ledger.chitty.cc unreachable, unchanged)
 - Brain: ok (embedding circuit open=false, ollama circuit open=false)
-- Active sessions: not queried this run
-- Stale board PR #457 closed as superseded (board already current through QQQQ)
-- RRRR (#460) ✅ MERGED (b53cfa6). CodeQL 2/2 green.
+- Active sessions: 38 (at startup status check)
+- RRRR (#460) ✅ MERGED (a11c8d7). SSSS (#462) ✅ MERGED (rebased + merged run 141, 2026-06-14)
 
 ## Live Gateway State (as of 2026-06-14 run 139)
 
@@ -234,6 +234,41 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 140 — 2026-06-14 (auto-driver)
+
+**Workstream advanced**: SSSS (new — `explanation.brainMs` in `ch1tty/cast` when `explain:true` and brain route fires)
+**Branch/PR**: `auto/SSSS-cast-explain-brain-ms` → PR #462 open (CodeQL in_progress)
+**Build**: clean (0 errors)
+**Tests**: 1312 pass, 0 fail, 2 skipped (+7 SSSS from 1305 RRRR baseline)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 1298/0/2 (pre-RRRR-merge baseline on main). Read DRIVER-BOARD.md: A✅ through QQQQ✅; RRRR (#460) open with 3/3 CodeQL green.
+- **Merged RRRR PR #460** (SHA a11c8d7). Post-merge baseline: 1305/0/2.
+- Confirmed Dependabot PR #375 already closed/merged — not needed.
+- Live gateway status: 263 tools / 11 connected servers / 38 sessions. System degraded (DLQ 11 entries). Notion API token invalid (unchanged blocker).
+- **Workstream SSSS: `explanation.brainMs` in all cast shapes when explain:true + brain route**
+  - Gap: PPPP (PR #456) added `latencyBreakdown.brainMs` (perf-oriented); `explain: true` has `explanation.method: 'brain'` but no timing — operators have to cross-reference `latencyBreakdown` to know how long the brain took. SSSS surfaces `brainMs` directly in the `explanation` object alongside the method field.
+  - **`src/aggregator.ts`** (4 edits):
+    1. `buildCastExplanation` signature: added `brainMs?: number` parameter.
+    2. `buildCastExplanation` return: added `...(brainMs !== undefined ? { brainMs } : {})` before focus fields.
+    3. no_match call site (line ~1191): pass `castRoute === 'brain' ? brainRouteMs : undefined`.
+    4. normal path call site (line ~1212): pass `castRoute === 'brain' ? brainRouteMs : undefined`.
+    5. Tool description updated to advertise `explanation.brainMs?`.
+  - **`test/ssss-cast-explain-brain-ms.test.ts`** (new, 7 tests): Uses `BrainCoordinator`/`FallbackCoordinator` stubs. SSSS-1: executed brain → brainMs ≥ 0; SSSS-2: executed fallback → brainMs absent; SSSS-3: brainMs ≤ latencyMs; SSSS-4: plan (confirm:true) brain → brainMs ≥ 0; SSSS-5: resolved (dryRun:true) brain → brainMs ≥ 0; SSSS-6: chain_executed brain → brainMs ≥ 0; SSSS-7: method:'brain' coexists with brainMs. All 7 passed.
+  - Build clean. Full suite: 1312/0/2 (+7 from 1305).
+- PR #462 open; CodeQL in_progress. Codex + CodeRabbit both rate-limited (no review content).
+
+**Blockers (unchanged)**:
+- Ledger DLQ 11+ entries: ledger.chitty.cc unreachable.
+- Notion API token invalid: cannot read/write Notion board. Human must refresh `NOTION_API_TOKEN` on gateway homelab.
+- CI (main workflow 0-jobs) unchanged — only CodeQL runs.
+
+**Next run priority**:
+- Confirm SSSS PR #462 CodeQL passes (data-logic only, expected green). Merge and mark SSSS ✅ done.
+- TTTT candidates: (a) `/api/v1/health` 503 body — include `ledgerDlq: { entryCount }` in the 503 response body when `systemHealth.status === 'degraded'` (currently only `{ status, service, systemHealth }` is returned; the DLQ count is in `ledgerHealth` not surfaced in health response); (b) `ch1tty/cast` explain `candidates` count field — add `candidateCount: N` to explanation showing how many tools were scored before the winner was chosen; (c) `ch1tty/search` `latencyMs` in server-filter/category-filter path (RRRR covered query and no-query paths; server-filter path may share coverage already — verify).
 
 ---
 
