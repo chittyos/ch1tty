@@ -60,6 +60,17 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **OOOO. `ch1tty/status` `ledgerDlq.entries[]`** — Extends `ledgerDlq: { path, entryCount }` (MMMM) with `entries: object[]` — the parsed contents of the dead-letter WAL, capped at 50 most-recent. Operators can inspect DLQ backlog content via a single `ch1tty/status` call without filesystem access. Malformed JSONL lines silently skipped. Field survives `short: true` mode. PR #455 ✅ MERGED (3656961, run 138→139, 2026-06-14). 7 new tests, 1284/0/2. DONE.
 - [x] **PPPP. `ch1tty/cast` `latencyBreakdown.brainMs`** — When the brain route fires (`castRoute === 'brain'`), `latencyBreakdown` on `cast:executed` and `cast:chain_executed` gains `brainMs: number` — wall-clock time of `routeIntent()` alone. Absent when keyword-fallback route taken. PR #456 ✅ MERGED (45bdce9, run 139, 2026-06-14). 7 new tests, 1291/0/2. DONE.
 - [x] **QQQQ. `ch1tty/execute` `latencyMs` in responses** — Wall-clock elapsed time added to `ch1tty/execute` responses: when sessionId active + success, content[1] becomes `{ latencyMs, sessionContext }` (previously only `{ sessionContext }`); when dryRun, `latencyMs` embedded in dry_run JSON alongside sessionContext. No-session non-dryRun unchanged (backward compat). Completes latency observability triad (cast LLLL/NNNN/PPPP + execute QQQQ). PR #458 ✅ MERGED (9fe10a9, run 139, 2026-06-14). 7 new tests, 1298/0/2. DONE.
+- [x] **RRRR. `ch1tty/search` `latencyMs` in responses** — All `ch1tty/search` response shapes now carry `latencyMs: number` — wall-clock elapsed time in ms from `handleSearch` entry to JSON serialisation. Covers both return paths: query/filter path (tools array) and no-query server-summary path. Tool description updated to advertise `latencyMs`. Completes latency observability across all three active meta-tools (cast LLLL/NNNN/PPPP + execute QQQQ + search RRRR). PR #460 open (CodeQL in_progress, run 140, 2026-06-14). 7 new tests, 1305/0/2. DONE.
+
+## Live Gateway State (as of 2026-06-14 run 140)
+
+- Connected backends: (not re-queried this run — stable from run 135)
+- Not connected: cloudflare, github, linear, stripe (lazy, auth-gated or unreachable)
+- System health: degraded (ledger DLQ 11+ entries — ledger.chitty.cc unreachable, unchanged)
+- Brain: ok (embedding circuit open=false, ollama circuit open=false)
+- Active sessions: not queried this run
+- Stale board PR #457 closed as superseded (board already current through QQQQ)
+- RRRR (#460) open (CodeQL in_progress; CodeRabbit + Codex rate-limited — no review content)
 
 ## Live Gateway State (as of 2026-06-14 run 139)
 
@@ -2105,3 +2116,27 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Continue catalog toward 133rd pass: identify remaining tools at <6/6 coverage and add verified combos (prioritize tools reachable via connected backends: playwright, orchestrator, cloudflare-builds, context7, thinking, fs, evidence, browser-rendering)
 - If Notion access is restored, migrate this board to a proper Notion page titled "ch1tty goal-driver board"
 - Consider bumping `cloudflare-builds/workers_builds_cancel` and `playwright/browser_close` from 1/6 to 6/6 (both have connected backends)
+
+### Run 140 — 2026-06-14 (auto-driver)
+
+**Workstream advanced**: RRRR (`ch1tty/search` latencyMs)
+**Branch**: `auto/RRRR-search-latencyms`
+**PR**: #460 (open, CodeQL in_progress)
+**Build**: clean (tsc, 0 errors)
+**Tests**: 1305 pass, 0 fail, 2 skipped (7 new tests in `test/search-latency.test.ts`)
+
+**What was done**:
+- Read CLAUDE.md + CHITTY.md; confirmed all workstreams A–E done; board current through QQQQ (run 139)
+- Build clean; 1298/0/2 on main at run start
+- Identified RRRR as next: `ch1tty/search` was the only active meta-tool without `latencyMs`, completing the observability triad (cast LLLL/NNNN/PPPP + execute QQQQ + search RRRR)
+- Added `searchStartMs = Date.now()` inside `handleSearch`; injected `latencyMs` into both return paths (query/filter path and no-query server-summary path)
+- Updated tool description to advertise `latencyMs`
+- 7 new tests cover: query path, non-negative value, server-summary path, server-filter, category-filter, sessionId path, explain path
+- Pushed branch; opened PR #460
+- Closed stale PR #457 (superseded board update)
+- CodeRabbit + Codex both hit rate limits — no review content to address
+- Updated DRIVER-BOARD.md with RRRR entry + run 140 log
+
+**Next run priority**:
+- Verify PR #460 CodeQL green; merge if clean
+- Next workstream: consider SSSS — `ch1tty/reload` latencyMs (natural 4th leg of observability), or `ch1tty/status` request latencyMs (5th), or branch/coverage sweep if all surfaces covered
