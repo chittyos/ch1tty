@@ -357,6 +357,7 @@ export class Aggregator {
           'When a sessionId is active, cast: executed and cast: chain_executed include sessionContext reflecting session state after execution; ' +
           'cast: plan, cast: resolved, cast: discovered, and cast: no_match include sessionContext reflecting pre-execution session state (recent tools, call count, sticky focus). ' +
           'All cast responses include latencyMs: the elapsed wall-clock time in milliseconds from intent submission to response (covers scoring + execution). ' +
+          'cast: executed and cast: chain_executed also include latencyBreakdown: { scoringMs, executionMs } — scoringMs is the time spent in registry fetch + intent routing/scoring before any backend call; executionMs is the time spent in the backend call(s). ' +
           'Sub-meta to master-meta — the gateway calling itself.',
         inputSchema: {
           type: 'object',
@@ -1260,9 +1261,11 @@ export class Aggregator {
 
     // Step 2a: Auto-chain execution — run all combo steps sequentially when chain: true
     if (!confirm && autoChain && catalogCombo && catalogCombo.chain.length > 1) {
+      const chainScoringMs = Date.now() - castStartMs;
       const steps: Array<{ step: number; tool: string; ok: boolean; content?: unknown[]; error?: string }> = [];
       let previousStepOutput: string | null = null;
       const allTexts: string[] = [];
+      const chainExecStartMs = Date.now();
 
       for (let i = 0; i < catalogCombo.chain.length; i++) {
         const stepTool = catalogCombo.chain[i];
@@ -1290,6 +1293,7 @@ export class Aggregator {
         }
       }
 
+      const chainExecutionMs = Date.now() - chainExecStartMs;
       const chainSummary = allTexts.length > 0 ? allTexts.join('\n\n') : undefined;
 
       let chainSessionContext: { recentTools: string[]; callCount: number; activeSessionFocus?: string } | null = null;
@@ -1311,6 +1315,7 @@ export class Aggregator {
             resolvedBy,
             intent,
             latencyMs: Date.now() - castStartMs,
+            latencyBreakdown: { scoringMs: chainScoringMs, executionMs: chainExecutionMs },
             // focusName is always truthy here (catalogCombo requires it — see line ~1238)
             /* c8 ignore next */
             ...(focusName ? { focus: focusName } : {}),
@@ -1403,10 +1408,13 @@ export class Aggregator {
     }
 
     // Step 3: Execute (Ch1tty executing through itself)
+    const execScoringMs = Date.now() - castStartMs;
+    const execStartMs = Date.now();
     const result = await this.handleExecute(
       { tool: best.namespacedName, args: toolArgs, ...(castTimeoutMs !== undefined ? { timeout: castTimeoutMs } : {}) },
       effectiveSessionId,
     );
+    const executionMs = Date.now() - execStartMs;
 
     let castSessionContext: { recentTools: string[]; callCount: number; activeSessionFocus?: string } | null = null;
     if (!result.isError && effectiveSessionId && this.coordinator.hasSession(effectiveSessionId)) {
@@ -1429,6 +1437,7 @@ export class Aggregator {
             resolvedBy,
             intent,
             latencyMs: Date.now() - castStartMs,
+            latencyBreakdown: { scoringMs: execScoringMs, executionMs },
             ...(focusName ? { focus: focusName } : {}),
             ...(scopeAnnotation ? { scope: scopeAnnotation } : {}),
             ...(explanation ? { explanation } : {}),
