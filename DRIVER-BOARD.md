@@ -43,6 +43,15 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **JJ. `ch1tty/cast` sessionContext response** — When effectiveSessionId is active and execution succeeds, `cast: executed` and `cast: chain_executed` include `sessionContext: { recentTools, callCount, activeSessionFocus? }` in the cast metadata JSON (content[0]). PR #423 ✅ MERGED (run 121+122, 2026-06-14). 9 new tests, 1169/0/2. DONE.
 - [x] **KK. `ch1tty/cast` sessionContext in cast: plan** — When effectiveSessionId is active and `confirm: true` is set, `cast: plan` now includes `sessionContext` reflecting pre-execution session state (prior tool calls, sticky focus). Completes sessionContext trio. PR #425 ✅ MERGED (run 122, 2026-06-14). 7 new tests (+1 updated JJ test), 1176/0/2. DONE.
 - [x] **LL. `ch1tty/cast` sessionContext in cast: discovered** — When effectiveSessionId is active, `cast: discovered` (prompts/resources match but no tools) now includes `sessionContext: { recentTools, callCount, activeSessionFocus? }` reflecting pre-execution session state. Completes sessionContext coverage for ALL cast response shapes. Also confirmed: the `!best` gate fires before `confirm`/`dryRun` checks — neither redirects to plan/resolved when no tools match. PR #427 ✅ MERGED (run 123, 2026-06-14). 7 new tests, 1183/0/2. DONE.
+- [ ] **MM. `ch1tty/cast` sessionContext in cast: no_match** — When effectiveSessionId is active, `cast: no_match` (nothing matched — no tools, prompts, or resources) now includes `sessionContext: { recentTools, callCount, activeSessionFocus? }` reflecting pre-execution session state. Completes sessionContext for the final remaining cast shape. PR #429 open (CodeQL in_progress, run 124, 2026-06-14). 7 new tests, 1183/0/2 → 1190/0/2 (+7).
+
+## Live Gateway State (as of 2026-06-14 run 124)
+
+- Connected backends: cloudflare-builds (7 tools), evidence (3), browser-rendering (3), context7 (2), thinking (1), fs (14), playwright (23), orchestrator (13) — 66 total tools
+- Not connected: chittyos, cloudflare, GitHub (needs GITHUB_MCP_AUTHORIZATION), linear, notion, stripe, neon (lazy, auth-gated)
+- System health: degraded (ledger DLQ has 6 entries — ledger.chitty.cc unreachable, unchanged)
+- Active sessions: 122 (at status check)
+- MM (#429) open (CodeQL in_progress)
 
 ## Live Gateway State (as of 2026-06-14 run 123)
 
@@ -96,6 +105,43 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 124 — 2026-06-14 (auto-driver)
+
+**Workstream advanced**: MM (new — `ch1tty/cast` sessionContext in `cast: no_match`)
+**Branch/PR**: `auto/MM-cast-no-match-session-context` → https://github.com/chittyos/ch1tty/pull/429 (open, CodeQL in_progress)
+**Build**: clean (0 errors)
+**Tests**: 1190 pass, 0 fail, 2 skipped (+7 new MM tests from 1183 baseline)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 1183/0/2 on main (commit 48795c0 — LL already merged). Board: A✅ through LL✅. No open PRs. Gateway status: 66 tools across 8 backends, 122 active sessions, system health degraded (ledger DLQ 6 entries, unchanged).
+- **Workstream MM: `ch1tty/cast` sessionContext in `cast: no_match`**
+  - Gap: After LL, only `cast: no_match` (and `cast: resolved`) lacked sessionContext across the six cast response shapes. `cast: no_match` fires when no tools, prompts, or resources score above the 0.1 threshold — callers still benefit from seeing session state (sticky focus, prior tool calls) in the same response for context on how to retry.
+  - **`src/aggregator.ts`** (2 edits):
+    1. Updated `ch1tty/cast` description to mention `cast: no_match` alongside plan and discovered as including pre-execution sessionContext.
+    2. In the `if (scoredTools.length === 0 && scoredPrompts.length === 0 && scoredResources.length === 0)` block: computed `noMatchSessionContext` using the identical pattern as discovered (LL) — `getToolPatterns` + `getSessionFocus` under `effectiveSessionId && hasSession` guard. Added `...(noMatchSessionContext ? { sessionContext: noMatchSessionContext } : {})` to the JSON.
+  - **`test/mm-cast-no-match-session-context.test.ts`** (new, 7 tests):
+    1. No sessionId → sessionContext absent
+    2. Fresh sessionId → present: `recentTools: []`, `callCount: 0`
+    3. `confirm:true` does not redirect to `cast: plan` when nothing matches; sessionContext present
+    4. `dryRun:true` does not redirect to `cast: resolved` when nothing matches; sessionContext present
+    5. Sticky focus set via search → `activeSessionFocus: "code"` present
+    6. No sticky focus → `activeSessionFocus` absent
+    7. Scope annotation + sessionContext co-exist in no_match response
+  - Build clean. 1190/0/2 (+7 from 1183).
+- Bot comments on PR #429: Codex usage-limit + CodeRabbit rate-limit — both informational, no action.
+- CI: 2 CodeQL checks in_progress at run end (known pattern — data-logic only, expected green).
+
+**Blockers (unchanged)**:
+- CI broken org-wide (main workflow 0-jobs). Human must investigate GitHub Actions settings for chittyos org.
+- Notion backend unreachable (auth/wrapper not configured). Human must set NOTION_API_TOKEN + wrapper script.
+- Ledger DLQ 6 entries: ledger.chitty.cc unreachable.
+
+**Next run priority**:
+- Confirm PR #429 (MM) CodeQL passes (data-logic only, expected green). Merge and mark MM ✅ done.
+- NN candidates: (a) `cast: no_match` sessionContext — DONE (this run); (b) `ch1tty/search` `minScore` filter — `minScore: number` param hard-filters results below a relevance threshold; (c) `ch1tty/status` `toolsByServer` breakdown — flat `{ [serverId]: count }` map for operator visibility; (d) `cast: resolved` sessionContext — only remaining cast shape without sessionContext (dryRun path — pre-execution, no tool call).
 
 ---
 
