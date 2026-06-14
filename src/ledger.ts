@@ -262,7 +262,10 @@ export class LedgerClient {
       const result: object[] = [];
       for (const line of tail) {
         try {
-          result.push(JSON.parse(line) as object);
+          const parsed: unknown = JSON.parse(line);
+          if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+            result.push(parsed as object);
+          }
         } catch {
           // skip malformed lines
         }

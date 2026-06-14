@@ -116,15 +116,18 @@ test('OOOO-5: ledgerDlq.entries is capped at 50 most-recent entries', async () =
   }
 });
 
-// OOOO-6: malformed JSON lines are silently skipped
-test('OOOO-6: malformed JSON lines in DLQ are silently skipped', async () => {
+// OOOO-6: malformed JSON and non-object valid JSON are silently skipped
+test('OOOO-6: malformed JSON and non-object valid JSON lines are silently skipped', async () => {
   const dir = tempDir();
   const dlqPath = join(dir, 'oooo6.dlq.jsonl');
   writeFileSync(
     dlqPath,
     [
       JSON.stringify({ event_type: 'ok', session_id: 'good1', metadata: {}, timestamp: new Date().toISOString(), retries: 0 }),
-      'NOT_VALID_JSON{{{',
+      'NOT_VALID_JSON{{{',            // malformed — skipped
+      'null',                         // valid JSON but not an object — skipped
+      '42',                           // valid JSON primitive — skipped
+      '["array"]',                    // valid JSON array — skipped
       JSON.stringify({ event_type: 'ok', session_id: 'good2', metadata: {}, timestamp: new Date().toISOString(), retries: 0 }),
     ].join('\n') + '\n',
     'utf8',
@@ -132,8 +135,8 @@ test('OOOO-6: malformed JSON lines in DLQ are silently skipped', async () => {
   const agg = isolatedAgg(dir, 'oooo6', dlqPath);
   try {
     const snap = agg.getStatusSnapshot();
-    // entryCount counts all non-empty lines (3), but entries skips the malformed one
-    assert.equal(snap.ledgerDlq.entryCount, 3);
+    // entryCount counts all non-empty lines (6); entries keeps only valid objects (2)
+    assert.equal(snap.ledgerDlq.entryCount, 6);
     assert.equal(snap.ledgerDlq.entries.length, 2);
     const ids = (snap.ledgerDlq.entries as Record<string, unknown>[]).map((e) => e['session_id']);
     assert.deepEqual(ids, ['good1', 'good2']);
