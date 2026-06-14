@@ -60,7 +60,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **OOOO. `ch1tty/status` `ledgerDlq.entries[]`** — Extends `ledgerDlq: { path, entryCount }` (MMMM) with `entries: object[]` — the parsed contents of the dead-letter WAL, capped at 50 most-recent. Operators can inspect DLQ backlog content via a single `ch1tty/status` call without filesystem access. Malformed JSONL lines silently skipped. Field survives `short: true` mode. PR #455 ✅ MERGED (3656961, run 138→139, 2026-06-14). 7 new tests, 1284/0/2. DONE.
 - [x] **PPPP. `ch1tty/cast` `latencyBreakdown.brainMs`** — When the brain route fires (`castRoute === 'brain'`), `latencyBreakdown` on `cast:executed` and `cast:chain_executed` gains `brainMs: number` — wall-clock time of `routeIntent()` alone. Absent when keyword-fallback route taken. PR #456 ✅ MERGED (45bdce9, run 139, 2026-06-14). 7 new tests, 1291/0/2. DONE.
 - [x] **QQQQ. `ch1tty/execute` `latencyMs` in responses** — Wall-clock elapsed time added to `ch1tty/execute` responses: when sessionId active + success, content[1] becomes `{ latencyMs, sessionContext }` (previously only `{ sessionContext }`); when dryRun, `latencyMs` embedded in dry_run JSON alongside sessionContext. No-session non-dryRun unchanged (backward compat). Completes latency observability triad (cast LLLL/NNNN/PPPP + execute QQQQ). PR #458 ✅ MERGED (9fe10a9, run 139, 2026-06-14). 7 new tests, 1298/0/2. DONE.
-- [x] **RRRR. `ch1tty/search` `latencyMs` in responses** — All `ch1tty/search` response shapes now carry `latencyMs: number` — wall-clock elapsed time in ms from `handleSearch` entry to JSON serialisation. Covers both return paths: query/filter path (tools array) and no-query server-summary path. Tool description updated to advertise `latencyMs`. Completes latency observability across all three active meta-tools (cast LLLL/NNNN/PPPP + execute QQQQ + search RRRR). PR #460 open (CodeQL in_progress, run 140, 2026-06-14). 7 new tests, 1305/0/2. DONE.
+- [x] **RRRR. `ch1tty/search` `latencyMs` in responses** — All `ch1tty/search` response shapes now carry `latencyMs: number` — wall-clock elapsed time in ms from `handleSearch` entry to JSON serialisation. Covers both return paths: query/filter path (tools array) and no-query server-summary path. Tool description updated to advertise `latencyMs`. Completes latency observability across all three active meta-tools (cast LLLL/NNNN/PPPP + execute QQQQ + search RRRR). PR #460 ✅ MERGED (b53cfa6, run 140, 2026-06-14). 7 new tests, 1305/0/2. DONE.
 
 ## Live Gateway State (as of 2026-06-14 run 140)
 
@@ -70,7 +70,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Brain: ok (embedding circuit open=false, ollama circuit open=false)
 - Active sessions: not queried this run
 - Stale board PR #457 closed as superseded (board already current through QQQQ)
-- RRRR (#460) open (CodeQL in_progress; CodeRabbit + Codex rate-limited — no review content)
+- RRRR (#460) ✅ MERGED (b53cfa6). CodeQL 2/2 green.
 
 ## Live Gateway State (as of 2026-06-14 run 139)
 
