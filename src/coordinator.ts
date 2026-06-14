@@ -313,6 +313,7 @@ export class SessionCoordinator {
     activeSessions: number;
     boundEntity: boolean;
     topTools: string[];
+    toolsByServer: Record<string, number>;
     ledger: ReturnType<LedgerClient['getStats']>;
     brain: ReturnType<OllamaBrain['getStats']>;
     embeddingBrain: ReturnType<EmbeddingBrain['getStats']>;
@@ -340,20 +341,28 @@ export class SessionCoordinator {
     }));
 
     const globalToolCounts = new Map<string, number>();
+    const globalServerCounts = new Map<string, number>();
     for (const ctx of this.contexts.values()) {
       for (const [tool, pattern] of ctx.toolPatterns) {
         globalToolCounts.set(tool, (globalToolCounts.get(tool) ?? 0) + pattern.count);
+        const slash = tool.indexOf('/');
+        const serverId = slash !== -1 ? tool.slice(0, slash) : tool;
+        globalServerCounts.set(serverId, (globalServerCounts.get(serverId) ?? 0) + pattern.count);
       }
     }
     const topTools = [...globalToolCounts.entries()]
       .sort((a, b) => b[1] - a[1])
       .slice(0, 10)
       .map(([tool]) => tool);
+    const toolsByServer = Object.fromEntries(
+      [...globalServerCounts.entries()].sort((a, b) => b[1] - a[1]),
+    );
 
     return {
       activeSessions: sessions.length,
       boundEntity: sessions.some((s) => s.entity !== undefined),
       topTools,
+      toolsByServer,
       ledger: this.ledger.getStats(),
       brain: this.brain.getStats(),
       embeddingBrain: this.embeddingBrain.getStats(),
