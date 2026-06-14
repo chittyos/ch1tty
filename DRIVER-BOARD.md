@@ -59,7 +59,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **NNNN. `ch1tty/cast` `latencyBreakdown` in `cast:executed` and `cast:chain_executed`** — Adds `latencyBreakdown: { scoringMs, executionMs }` to the two cast shapes that call backends. `scoringMs` = time from intent submission to before first backend call (registry fetch + brain routing + keyword scoring + focus bias). `executionMs` = time inside `handleExecute` (single step or chain total). Shapes without backend calls (plan, resolved, discovered, no_match) do not get `latencyBreakdown` — `latencyMs` is the complete story there. PR #453 ✅ MERGED (8a193775, run 137, 2026-06-14). 7 new tests, 1277/0/2. DONE.
 - [x] **OOOO. `ch1tty/status` `ledgerDlq.entries[]`** — Extends `ledgerDlq: { path, entryCount }` (MMMM) with `entries: object[]` — the parsed contents of the dead-letter WAL, capped at 50 most-recent. Operators can inspect DLQ backlog content via a single `ch1tty/status` call without filesystem access. Malformed JSONL lines silently skipped. Field survives `short: true` mode. PR #455 ✅ MERGED (3656961, run 138→139, 2026-06-14). 7 new tests, 1284/0/2. DONE.
 - [x] **PPPP. `ch1tty/cast` `latencyBreakdown.brainMs`** — When the brain route fires (`castRoute === 'brain'`), `latencyBreakdown` on `cast:executed` and `cast:chain_executed` gains `brainMs: number` — wall-clock time of `routeIntent()` alone. Absent when keyword-fallback route taken. PR #456 ✅ MERGED (45bdce9, run 139, 2026-06-14). 7 new tests, 1291/0/2. DONE.
-- [ ] **QQQQ. `ch1tty/execute` `latencyMs` in responses** — Wall-clock elapsed time added to `ch1tty/execute` responses: when sessionId active + success, `{ latencyMs, sessionContext }` in content[1]; when dryRun, `latencyMs` embedded in the dry_run JSON alongside sessionContext. No-session non-dryRun unchanged (backward compat). Completes latency observability triad (cast LLLL + execute QQQQ). PR #458 open (CodeQL in_progress, CodeRabbit reviewing, 2026-06-14). 7 new tests, 1298/0/2.
+- [x] **QQQQ. `ch1tty/execute` `latencyMs` in responses** — Wall-clock elapsed time added to `ch1tty/execute` responses: when sessionId active + success, content[1] becomes `{ latencyMs, sessionContext }` (previously only `{ sessionContext }`); when dryRun, `latencyMs` embedded in dry_run JSON alongside sessionContext. No-session non-dryRun unchanged (backward compat). Completes latency observability triad (cast LLLL/NNNN/PPPP + execute QQQQ). PR #458 ✅ MERGED (9fe10a9, run 139, 2026-06-14). 7 new tests, 1298/0/2. DONE.
 
 ## Live Gateway State (as of 2026-06-14 run 139)
 
@@ -68,7 +68,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - System health: degraded (ledger DLQ 11+ entries — ledger.chitty.cc unreachable, unchanged)
 - Brain: ok (embedding circuit open=false, ollama circuit open=false)
 - Active sessions: not queried this run
-- PPPP (#456) ✅ MERGED (45bdce9). QQQQ (#458) open (CodeQL in_progress, CodeRabbit reviewing).
+- PPPP (#456) ✅ MERGED (45bdce9). QQQQ (#458) ✅ MERGED (9fe10a9).
 
 ## Live Gateway State (as of 2026-06-14 run 138)
 
