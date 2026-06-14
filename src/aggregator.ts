@@ -548,6 +548,30 @@ export class Aggregator {
       }
 
       const entity = effectiveSessionId ? this.coordinator.getEntityContext(effectiveSessionId) : undefined;
+
+      let summaryExplanation: object | null = null;
+      if (explain) {
+        const inFocusCount = focus ? serverSummary.filter((s) => s.inFocus).length : 0;
+        const focusBoost = focus?.boost ?? 0.5;
+        const parts: string[] = ['No query provided — returning server summary'];
+        parts.push(`${serverSummary.length} server${serverSummary.length === 1 ? '' : 's'}, ${registry.length} total tools`);
+        if (focusName && focus) {
+          if (inFocusOnly) {
+            parts.push(`"${focusName}" focus active — inFocusOnly: showing only ${inFocusCount} in-focus server${inFocusCount === 1 ? '' : 's'}`);
+          } else {
+            parts.push(`"${focusName}" focus active — ${inFocusCount} of ${serverSummary.length} servers in focus (boost +${focusBoost})`);
+          }
+        }
+        summaryExplanation = {
+          method: 'server_summary' as const,
+          totalServers: serverSummary.length,
+          totalTools: registry.length,
+          ...(focusName ? { focus: focusName, inFocusServers: inFocusCount } : {}),
+          ...(inFocusOnly && focus ? { inFocusOnly: true } : {}),
+          rationale: parts.join('; ') + '.',
+        };
+      }
+
       return {
         content: [{
           type: 'text',
@@ -557,6 +581,7 @@ export class Aggregator {
             ...(focusName ? { focus: focusName } : {}),
             ...(inFocusOnly && focus ? { inFocusOnly: true } : {}),
             ...(sessionContext ? { sessionContext } : {}),
+            ...(summaryExplanation ? { explanation: summaryExplanation } : {}),
             servers: serverSummary,
             totalTools: registry.length,
           }, null, 2),
