@@ -40,15 +40,16 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **GG. `ch1tty/search` serverName field** — Each tool result now includes `serverName` (human-readable backend name, e.g. `"Neon Database"`) alongside the existing `server` id field. PR #419 ✅ MERGED (run 121, 2026-06-14). 7 new tests, 1140/0/2. DONE.
 - [x] **HH. Session TTL eviction** — `SessionContext.lastActiveAt` tracked on create + every tool call. Background sweep (default every 5 min) evicts staging-complete sessions inactive longer than `CH1TTY_SESSION_TTL_MS` (default 1h). `evictStaleSessions(now?, ttlMs?)` public for test injection. `close()` stops timer. `getSnapshot()` reports `evictedSessions` + `sessionTtlMs`. Wired into `Aggregator.shutdown()`. PR #420 ✅ MERGED (run 121, 2026-06-14). 12 new tests, 1145/0/2. DONE.
 - [x] **II. `ch1tty/execute` sessionContext response** — When effectiveSessionId is active and the tool call succeeds (not dryRun), a second content item with `sessionContext: { recentTools, callCount, activeSessionFocus? }` is appended to the execute response, mirroring FF. The first content item (raw tool output) is unchanged. PR #421 ✅ MERGED (run 121, 2026-06-14). 7 new tests, 1160/0/2. DONE.
-- [ ] **JJ. `ch1tty/cast` sessionContext response** — When effectiveSessionId is active and execution succeeds, `cast: executed` and `cast: chain_executed` include `sessionContext: { recentTools, callCount, activeSessionFocus? }` in the cast metadata JSON (content[0]). cast: plan/resolved/no_match/discovered unchanged. PR #423 OPEN (run 121, 2026-06-14). 9 new tests, 1169/0/2. Awaiting CI/merge.
+- [x] **JJ. `ch1tty/cast` sessionContext response** — When effectiveSessionId is active and execution succeeds, `cast: executed` and `cast: chain_executed` include `sessionContext: { recentTools, callCount, activeSessionFocus? }` in the cast metadata JSON (content[0]). PR #423 ✅ MERGED (run 121+122, 2026-06-14). 9 new tests, 1169/0/2. DONE.
+- [ ] **KK. `ch1tty/cast` sessionContext in cast: plan** — When effectiveSessionId is active and `confirm: true` is set, `cast: plan` now includes `sessionContext` reflecting pre-execution session state (prior tool calls, sticky focus). Completes sessionContext trio. PR #425 OPEN (run 122, 2026-06-14). 7 new tests (+1 updated JJ test), 1176/0/2. Awaiting CodeQL/merge.
 
-## Live Gateway State (as of 2026-06-14 run 121)
+## Live Gateway State (as of 2026-06-14 run 122)
 
 - Connected backends: cloudflare-builds (7 tools), evidence (3), browser-rendering (3), context7 (2), thinking (1), fs (14), playwright (23), orchestrator (13) — 66 total tools
 - Not connected: chittyos, cloudflare, GitHub (needs GITHUB_MCP_AUTHORIZATION), linear, notion, stripe, neon (lazy, auth-gated)
 - System health: degraded (ledger DLQ has 6 entries — ledger.chitty.cc unreachable)
 - Brain: ok (embedding circuit open=false; Ollama circuit cycling normally)
-- GG (#419) ✅ HH (#420) ✅ II (#421) ✅ all merged; JJ (#423) open (CodeQL in_progress)
+- JJ (#423) ✅ merged; KK (#425) open (CodeQL in_progress)
 
 ## Live Gateway State (as of 2026-06-13 run 117)
 
@@ -87,6 +88,31 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 122 — 2026-06-14 (auto-driver)
+
+**Workstream advanced**: KK (new — `ch1tty/cast` sessionContext in cast: plan)
+**Branch/PR**: `auto/KK-cast-plan-session-context` → https://github.com/chittyos/ch1tty/pull/425 (open, CodeQL in_progress)
+**Build**: clean (0 errors)
+**Tests**: 1176 pass, 0 fail, 2 skipped (+7 new KK tests + 1 updated JJ test from 1169 baseline)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 1169/0/2 on HEAD. Board: A✅ through JJ open (PR #423). Confirmed JJ (#423) already merged (state: closed, merged: true). No other open PRs. Marked JJ ✅ done.
+- **Workstream KK: `ch1tty/cast` sessionContext in cast: plan**
+  - Gap: JJ (PR #423) added sessionContext to `cast: executed` and `cast: chain_executed`. `cast: plan` (confirm mode) was explicitly left out in JJ because "no execution means no meaningful session state update." On reflection, plan mode IS a good candidate: clients deciding whether to confirm benefit from seeing the current session state (sticky focus, prior tool calls) in the same response without a separate `ch1tty/status` round-trip.
+  - **`src/aggregator.ts`** (2 edits): (1) Updated `ch1tty/cast` description to mention `cast: plan` now includes sessionContext. (2) Inside the `if (confirm)` block, computed `planSessionContext` (same pattern as `castSessionContext` post-execution: `getToolPatterns` + `getSessionFocus`) and added to the `cast: plan` JSON before `focusSuggestions`.
+  - **`test/kk-cast-plan-session-context.test.ts`** (new, 7 tests): no sessionId → absent; fresh session → present with `recentTools:[]` `callCount:0`; prior execute calls → recentTools includes them; callCount reflects prior calls; activeSessionFocus set before confirm → present; no focus → absent; dryRun path → unchanged (no sessionContext).
+  - **`test/jj-cast-session-context.test.ts`** (1 test updated): test 9 asserted `cast: plan` has no sessionContext — updated to assert it IS present with empty recentTools and callCount:0 for a fresh session.
+  - Build clean, 1176/0/2 (+7 from 1169).
+- Bot comments on PR #425: Codex usage-limit + CodeRabbit rate-limit — both informational, no action.
+- CI: 2 CodeQL checks in_progress at run end.
+
+**Next run priority**:
+- Merge KK (#425) once CodeQL completes (expected green — data-logic only). Mark KK ✅ done.
+- Workstream LL candidates: (a) `ch1tty/cast` sessionContext on `cast: discovered` — when the brain finds a prompt/resource match (not a tool), sessionContext could be added; (b) `ch1tty/search` `minScore` filter — add a `minScore: number` param to filter below a relevance threshold; (c) coverage sweep — run `npm run coverage` to find any remaining branch gaps and close them; (d) `ch1tty/status` `toolsByServer` field — flat count breakdown by server id.
+- Persistent blockers: CI broken org-wide (human must fix GitHub Actions), Notion unreachable, Ledger DLQ 6 entries.
 
 ---
 

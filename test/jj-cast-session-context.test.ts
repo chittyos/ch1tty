@@ -254,16 +254,19 @@ test('cast: executed — backend error → no sessionContext (isError response)'
   }
 });
 
-// ── 9. confirm: true (cast: plan) → no sessionContext ────────────────────────
+// ── 9. confirm: true (cast: plan) → sessionContext present (KK: plan now includes pre-execution state) ──
 
-test('cast: plan (confirm:true) → no sessionContext (no execution occurred)', async () => {
+test('cast: plan (confirm:true) → sessionContext present showing pre-execution session state', async () => {
   const agg = makeAgg('9-plan');
   try {
     const SESSION = 'jj-plan-session';
     const result = await agg.callTool('ch1tty/cast', { intent: 'list neon projects', confirm: true, sessionId: SESSION });
     const cast = parseCast(result);
     assert.equal(cast.cast, 'plan', 'should be cast: plan with confirm:true');
-    assert.equal('sessionContext' in cast, false, 'sessionContext must be absent in cast: plan (no execution)');
+    const sc = cast.sessionContext as { recentTools: string[]; callCount: number } | undefined;
+    assert.ok(sc, 'sessionContext should be present in cast: plan when sessionId is active (KK)');
+    assert.deepEqual(sc.recentTools, [], 'recentTools should be empty for a fresh session with no prior calls');
+    assert.equal(sc.callCount, 0, 'callCount should be 0 for a fresh session with no prior calls');
   } finally {
     await agg.shutdown();
   }
