@@ -55,6 +55,16 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **VV. `ch1tty/search` explain `filterContext` for server/category-filter path** — When `explain:true` is set alongside `server` or `category` filter params, the explanation now includes `filterContext: { server?, category? }` and the rationale mentions "pre-filtered by server=...". Completes explain coverage for ALL three search paths: AND/partial-keyword (Q/SS), no-query server-summary (TT), server/category-filter (VV). PR #446 ✅ MERGED (3a805a7, run 135, 2026-06-14). 7 new tests, 1252/0/2. DONE.
 - [x] **KKKK. Branch coverage gaps** — 4 previously uncovered branches in `suggestions.ts` and `aggregator.ts:buildCastExplanation`: (a) `loadSuggestionsCatalog` cache hit (same path × 2 → same object reference), (b) `buildCastExplanation` with `method: 'brain'`, (c) `buildCastExplanation` single-candidate (no runner-up), (d) `buildCastExplanation` no_match with `resolvedBy: 'brain'`. PR #447 ✅ MERGED (e41d0c1, run 135, 2026-06-14). 4 new tests, 1256/0/2. DONE.
 - [x] **LLLL. `latencyMs` in all `ch1tty/cast` response types** — All 6 cast response shapes (`executed`, `plan`, `resolved`, `discovered`, `no_match`, `chain_executed`) now carry `latencyMs: number` — wall-clock elapsed time in ms from intent submission to response. Timer starts after the empty-intent guard; covers scoring + brain routing + backend execution. PR #449 ✅ MERGED (bfd01847, run 135, 2026-06-14). 7 new tests, 1263/0/2. DONE.
+- [ ] **MMMM. `ch1tty/status` `ledgerDlq` shorthand at snapshot top level** — `getStatusSnapshot()` now includes `ledgerDlq: { path: string, entryCount: number }` at the top level alongside `systemHealth`/`brainHealth`/`ledgerHealth`. When `systemHealth.status === 'degraded'` (DLQ backlog), operators can immediately see the WAL file path and entry count without navigating into `ledgerHealth`. Values are identical to `ledgerHealth.dlqPath` + `ledgerHealth.dlqEntries` — convenience shorthand only. Survives `short: true` mode. PR #451 open (run 136, 2026-06-14). 7 new tests, 1270/0/2.
+
+## Live Gateway State (as of 2026-06-14 run 136)
+
+- Connected backends: (not re-queried this run — prior stable state from run 135 unchanged)
+- Not connected: cloudflare, github, linear, stripe (lazy, auth-gated or unreachable)
+- System health: degraded (ledger DLQ 11+ entries — ledger.chitty.cc unreachable, unchanged)
+- Brain: ok (embedding circuit open=false, ollama circuit open=false)
+- Active sessions: not queried this run
+- MMMM (#451) open (CodeQL in_progress)
 
 ## Live Gateway State (as of 2026-06-14 run 135)
 
@@ -184,6 +194,38 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 136 — 2026-06-14 (auto-driver)
+
+**Workstream advanced**: MMMM (new — `ch1tty/status` `ledgerDlq` shorthand at snapshot top level)
+**Branch/PR**: `auto/MMMM-status-ledger-dlq` → PR #451 open (CodeQL in_progress)
+**Build**: clean (0 errors)
+**Tests**: 1270 pass, 0 fail, 2 skipped (+7 MMMM from 1263 baseline)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, `git fetch --all`. Board read (DRIVER-BOARD.md): A✅ through LLLL✅. No open PRs (all PRs merged before this run). Baseline: 1263/0/2. Notion API token invalid (unchanged blocker). Ledger DLQ 11 entries (unchanged blocker).
+- GitHub MCP confirmed 0 open PRs. Last run (135) ended with LLLL merged (bfd01847) and next-run priority MMMM: `ledgerDlq` at status snapshot top level.
+- **Workstream MMMM: `ch1tty/status` `ledgerDlq` shorthand at top level**
+  - Gap: `getStatusSnapshot()` already had `ledgerHealth.dlqEntries` and `ledgerHealth.dlqPath`, but when `systemHealth.status === 'degraded'` the operator has to navigate into the nested `ledgerHealth` object to find the DLQ file path and entry count. The live gateway has been showing degraded for multiple runs (11 DLQ entries). A top-level `ledgerDlq: { path, entryCount }` field surfaces the actionable info immediately.
+  - **`src/aggregator.ts`** (3 edits):
+    1. `ch1tty/status` tool description updated to mention `ledgerDlq`.
+    2. `getStatusSnapshot()` return type: added `ledgerDlq: { path: string; entryCount: number }` after `ledgerHealth`.
+    3. Return object: added `ledgerDlq: { path: ledgerStats.dlqPath, entryCount: ledgerStats.dlqEntries }` after `ledgerHealth` block.
+  - **`test/mmmm-status-ledger-dlq.test.ts`** (new, 7 tests): MMMM-1 field present at top level; MMMM-2 path matches configured DLQ path; MMMM-3 entryCount=0 when no file; MMMM-4 entryCount=7 with 7-line seeded DLQ; MMMM-5 path matches ledgerHealth.dlqPath; MMMM-6 entryCount matches ledgerHealth.dlqEntries; MMMM-7 field survives short mode. All 7 passed.
+  - Build clean. Full suite: 1270/0/2 (+7 from 1263).
+- Bot comments on PR #451: Codex usage-limit + CodeRabbit rate-limit — both informational, no action needed.
+- PR #451 open; CodeQL in_progress at end of run. Subscribed to PR activity.
+
+**Blockers (unchanged)**:
+- Ledger DLQ 11 entries: ledger.chitty.cc unreachable. `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect.
+- Notion API token invalid: cannot read/write Notion board. Human must refresh `NOTION_API_TOKEN` on gateway homelab.
+- CI (main workflow 0-jobs) unchanged — only CodeQL runs.
+
+**Next run priority**:
+- Confirm MMMM PR #451 CodeQL passes (data-logic only, expected green). Merge and mark MMMM ✅ done.
+- NNNN candidates: (a) `ch1tty/cast` `latencyMs` breakdown by phase (scoring vs execution) — extends LLLL with per-phase timing; (b) `ch1tty/status` expose `ledgerDlq.entries[]` with the actual WAL records so operators can read DLQ content from a single status call without `cat ~/.ch1tty/ledger.dlq.jsonl`; (c) Dependabot PR #375 (esbuild dev-only bump — long overdue merge).
 
 ---
 
