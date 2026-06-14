@@ -16,7 +16,7 @@
  *   4. recentTools capped at 5 across multiple calls
  *   5. activeSessionFocus present when sticky focus is set
  *   6. activeSessionFocus absent when no focus is set
- *   7. dryRun: true → no sessionContext (dry run makes no tool call)
+ *   7. dryRun: true → sessionContext present (pre-execution state; dry_run call not recorded)
  */
 import assert from 'node:assert/strict';
 import { tmpdir } from 'node:os';
@@ -197,14 +197,19 @@ test('execute: sessionContext.activeSessionFocus absent when no focus has been s
   }
 });
 
-// ── 7. dryRun: true → no sessionContext ──────────────────────────────────────
+// ── 7. dryRun: true → sessionContext present (reflects pre-execution state) ───
+// QQ: dryRun now includes sessionContext embedded in the dry_run JSON.
+// The dry_run call itself is NOT recorded in the coordinator — callCount stays 0.
 
-test('execute: dryRun:true → no sessionContext appended (no tool call made)', async () => {
+test('execute: dryRun:true → sessionContext present; dry_run call not recorded in callCount', async () => {
   const agg = makeAgg('7-dryrun');
   try {
     const SESSION = 'ii-dryrun-session';
     const result = await agg.callTool('ch1tty/execute', { tool: 'neon/list_projects', args: {}, sessionId: SESSION, dryRun: true });
-    assert.equal(findSessionContext(result), undefined, 'sessionContext must be absent on dryRun (no tool call recorded)');
+    const sc = findSessionContext(result);
+    assert.ok(sc, 'sessionContext should be present in dry_run response when sessionId is active (QQ)');
+    assert.equal(sc.callCount, 0, 'dry_run call must NOT be recorded — callCount stays 0');
+    assert.deepEqual(sc.recentTools, [], 'recentTools should be empty for a fresh session');
   } finally {
     await agg.shutdown();
   }

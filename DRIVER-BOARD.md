@@ -47,6 +47,14 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **NN. `ch1tty/search` minScore filter** — `minScore: number` param on `ch1tty/search` hard-filters results to only tools with relevance score >= minScore. Requires a query (no-op without one). `total` reflects post-filter count. `minScore` echoed in response when > 0. Applied after sorting, before offset/limit pagination. PR #431 ✅ MERGED (run 125→126, 2026-06-14). 7 new tests, 1197/0/2. DONE.
 - [x] **OO. `ch1tty/cast` sessionContext in cast: resolved** — When effectiveSessionId is active, `cast: resolved` (dryRun:true path — resolves intent, returns tool+score without executing) now includes `sessionContext: { recentTools, callCount, activeSessionFocus? }` reflecting pre-execution session state. Completes sessionContext coverage for ALL six cast response shapes. Also updated: KK test 7 (previously asserted resolved had no sessionContext). PR #433 ✅ MERGED (run 126→127, 2026-06-14). 7 new tests (+1 updated), 1204/0/2. DONE.
 - [x] **PP. `ch1tty/status` coordinator `toolsByServer` breakdown** — `coordinator.getSnapshot()` now includes `toolsByServer: Record<string, number>` — a flat map of serverId → total call count aggregated across all active sessions. Server IDs extracted from namespaced `serverId/toolName` format; sorted by count descending; zero-count servers omitted. Present in both full and `short: true` mode. PR #434 ✅ MERGED (run 127, 2026-06-14). 7 new tests, 1211/0/2. DONE.
+- [ ] **QQ. `ch1tty/execute` dryRun sessionContext** — `dryRun: true` on `ch1tty/execute` now embeds `sessionContext: { recentTools, callCount, activeSessionFocus? }` directly in the `{ status:"dry_run", ... }` JSON when a sessionId is active. Pre-execution session state — no tool call is recorded. Completes sessionContext parity between normal execute (II) and dry-run execute (QQ). 1 existing test updated (execute-session-context.test.ts test 7). PR open (run 128, 2026-06-14). 7 new tests, 1218/0/2.
+
+## Live Gateway State (as of 2026-06-14 run 128)
+
+- Connected backends: not re-queried this run (prior stable state unchanged)
+- Not connected: chittyos, cloudflare, GitHub (needs GITHUB_MCP_AUTHORIZATION), linear, notion, stripe, neon (lazy, auth-gated)
+- System health: degraded (ledger DLQ has 6 entries — ledger.chitty.cc unreachable, unchanged)
+- PP (#434) ✅ merged (confirmed on main HEAD 9fc8277). QQ branch `auto/QQ-execute-dryrrun-sessioncontext` pushed; PR open.
 
 ## Live Gateway State (as of 2026-06-14 run 127)
 
@@ -123,6 +131,43 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 128 — 2026-06-14 (auto-driver)
+
+**Workstream advanced**: QQ (new — `ch1tty/execute` dryRun sessionContext)
+**Branch/PR**: `auto/QQ-execute-dryrrun-sessioncontext` → PR open
+**Build**: clean (0 errors)
+**Tests**: 1218 pass, 0 fail, 2 skipped (+7 new QQ tests, +1 updated II test, from 1211 baseline)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, `git fetch --all`. Board read (DRIVER-BOARD.md): A✅ through PP✅; no open PRs (PP #434 already merged per board). Confirmed no open PRs via GitHub MCP. Baseline: 1211/0/2. Gateway state: unchanged from run 127.
+- **Workstream QQ: `ch1tty/execute` dryRun sessionContext**
+  - Gap: `ch1tty/execute` with `dryRun: true` returned `{ status:"dry_run", server, tool, args }` without sessionContext. Normal execute (workstream II) appends a second content item with sessionContext when the call succeeds. The dryRun path short-circuits before any backend call — and before the caller's `args.dryRun !== true` guard in `handleMetaTool` could add sessionContext. This was the only execute path still missing it.
+  - **`src/aggregator.ts`** (2 edits):
+    1. Updated `ch1tty/execute` description to advertise sessionContext in dryRun responses.
+    2. In `handleExecute`, the `if (dryRun)` block (after backend is resolved): computes `dryRunSessionContext` using the same pattern as II — `coordinator.hasSession(effectiveSessionId)` guard, `getToolPatterns(id, 1000)` → top 5 = `recentTools`, sum = `callCount`, `getSessionFocus(id)` → `activeSessionFocus?`. Spreads into the JSON only when present. The dry_run call itself makes zero backend calls and is NOT recorded in the coordinator.
+  - **`test/qq-execute-dryrrun-sessioncontext.test.ts`** (new, 7 tests):
+    1. No sessionId → sessionContext absent
+    2. Fresh sessionId → sessionContext present: `recentTools: []`, `callCount: 0`
+    3. Prior execute calls → `recentTools` includes them in dry_run response
+    4. `callCount` reflects prior tool calls (not the dry_run itself — count stays at 2, not 3)
+    5. Sticky focus set via search → `activeSessionFocus: "code"` in sessionContext
+    6. No sticky focus → `activeSessionFocus` absent
+    7. dryRun makes zero backend calls even when sessionContext is populated (prior real call count verified)
+  - **`test/execute-session-context.test.ts`** (1 test updated): test 7 previously asserted sessionContext was absent on dryRun; updated to assert it IS present with `callCount: 0` (dryRun not recorded) and `recentTools: []` for a fresh session. Description updated.
+  - Build clean. 1218/0/2 (+7 new, +1 updated from 1211).
+- Board: PP already marked ✅; QQ entry added (open).
+
+**Blockers (unchanged)**:
+- CI broken org-wide (main workflow 0-jobs). Human must investigate GitHub Actions settings for chittyos org.
+- Notion backend unreachable (auth/wrapper not configured). Human must set NOTION_API_TOKEN + wrapper script.
+- Ledger DLQ 6 entries: ledger.chitty.cc unreachable.
+
+**Next run priority**:
+- Confirm QQ PR CodeQL passes (data-logic only, expected green). Merge and mark QQ ✅ done.
+- RR candidates: (a) `ch1tty/search` `minScore` surfaced in `explain` output — when minScore > 0, include it in `explanation.rationale` so callers see the active threshold alongside the ranking data; (b) `ch1tty/status` ledger DLQ path in snapshot — expose `ledgerDlq: { path, entryCount }` directly so operators can find the WAL path without inspecting logs; (c) coverage sweep — `npm run coverage` to find any remaining branch gaps.
 
 ---
 
