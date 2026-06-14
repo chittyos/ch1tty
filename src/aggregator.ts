@@ -299,7 +299,7 @@ export class Aggregator {
     return [
       {
         name: `${META_SERVER_ID}${SEPARATOR}search`,
-        description: 'Search the tool registry. Returns matching tool names, descriptions, and input schemas. When a sessionId is active, also returns sessionContext: { recentTools, callCount, activeSessionFocus? } for one-shot session awareness. Use before execute.',
+        description: 'Search the tool registry. Returns matching tool names, serverName, descriptions, and input schemas. When a sessionId is active, also returns sessionContext: { recentTools, callCount, activeSessionFocus? } for one-shot session awareness. Use before execute.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -594,6 +594,7 @@ export class Aggregator {
       return {
         tool: t.namespacedName,
         server: t.serverId,
+        serverName: t.serverName,
         category: t.category,
         description: t.description,
         inputSchema: t.inputSchema,
