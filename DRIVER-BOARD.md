@@ -43,7 +43,15 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **JJ. `ch1tty/cast` sessionContext response** — When effectiveSessionId is active and execution succeeds, `cast: executed` and `cast: chain_executed` include `sessionContext: { recentTools, callCount, activeSessionFocus? }` in the cast metadata JSON (content[0]). PR #423 ✅ MERGED (run 121+122, 2026-06-14). 9 new tests, 1169/0/2. DONE.
 - [x] **KK. `ch1tty/cast` sessionContext in cast: plan** — When effectiveSessionId is active and `confirm: true` is set, `cast: plan` now includes `sessionContext` reflecting pre-execution session state (prior tool calls, sticky focus). Completes sessionContext trio. PR #425 ✅ MERGED (run 122, 2026-06-14). 7 new tests (+1 updated JJ test), 1176/0/2. DONE.
 - [x] **LL. `ch1tty/cast` sessionContext in cast: discovered** — When effectiveSessionId is active, `cast: discovered` (prompts/resources match but no tools) now includes `sessionContext: { recentTools, callCount, activeSessionFocus? }` reflecting pre-execution session state. Completes sessionContext coverage for ALL cast response shapes. Also confirmed: the `!best` gate fires before `confirm`/`dryRun` checks — neither redirects to plan/resolved when no tools match. PR #427 ✅ MERGED (run 123, 2026-06-14). 7 new tests, 1183/0/2. DONE.
-- [ ] **MM. `ch1tty/cast` sessionContext in cast: no_match** — When effectiveSessionId is active, `cast: no_match` (nothing matched — no tools, prompts, or resources) now includes `sessionContext: { recentTools, callCount, activeSessionFocus? }` reflecting pre-execution session state. Completes sessionContext for the final remaining cast shape. PR #429 open (CodeQL in_progress, run 124, 2026-06-14). 7 new tests, 1183/0/2 → 1190/0/2 (+7).
+- [x] **MM. `ch1tty/cast` sessionContext in cast: no_match** — When effectiveSessionId is active, `cast: no_match` (nothing matched — no tools, prompts, or resources) now includes `sessionContext: { recentTools, callCount, activeSessionFocus? }` reflecting pre-execution session state. Completes sessionContext for ALL six cast response shapes. PR #429 ✅ MERGED (run 124→125, 2026-06-14). 7 new tests, 1190/0/2. DONE.
+- [ ] **NN. `ch1tty/search` minScore filter** — `minScore: number` param on `ch1tty/search` hard-filters results to only tools with relevance score >= minScore. Requires a query (no-op without one). `total` reflects post-filter count. `minScore` echoed in response when > 0. Applied after sorting, before offset/limit pagination. PR #431 open (CodeQL queued, run 125, 2026-06-14). 7 new tests, 1197/0/2.
+
+## Live Gateway State (as of 2026-06-14 run 125)
+
+- Connected backends: stable (not re-queried this run)
+- Not connected: chittyos, cloudflare, GitHub (needs GITHUB_MCP_AUTHORIZATION), linear, notion, stripe, neon (lazy, auth-gated)
+- System health: degraded (ledger DLQ has 6 entries — ledger.chitty.cc unreachable, unchanged)
+- LL (#427) ✅ merged. MM (#429) ✅ squash-merged this run. NN (#431) open (CodeQL queued).
 
 ## Live Gateway State (as of 2026-06-14 run 124)
 
@@ -142,6 +150,45 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 **Next run priority**:
 - Confirm PR #429 (MM) CodeQL passes (data-logic only, expected green). Merge and mark MM ✅ done.
 - NN candidates: (a) `cast: no_match` sessionContext — DONE (this run); (b) `ch1tty/search` `minScore` filter — `minScore: number` param hard-filters results below a relevance threshold; (c) `ch1tty/status` `toolsByServer` breakdown — flat `{ [serverId]: count }` map for operator visibility; (d) `cast: resolved` sessionContext — only remaining cast shape without sessionContext (dryRun path — pre-execution, no tool call).
+
+---
+
+### Run 125 — 2026-06-14 (auto-driver)
+
+**Workstream advanced**: NN (new — `ch1tty/search` minScore filter)
+**Branch/PR**: `auto/NN-search-minscore` → https://github.com/chittyos/ch1tty/pull/431 (open, CodeQL queued)
+**Build**: clean (0 errors)
+**Tests**: 1197 pass, 0 fail, 2 skipped (+7 new NN tests from 1190 baseline)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, 1183/0/2 on local HEAD (LL merged, MM open as PR #429). Board: A✅ through LL✅; MM open. Confirmed PR #429 (MM) all 3 CI checks green (CodeQL success, Analyze-actions success, Analyze-javascript-typescript success). Squash-merged MM → main `e4c1f40`. Pulled main. Baseline: 1190/0/2.
+- **Workstream NN: `ch1tty/search` minScore filter**
+  - Gap: `ch1tty/search` had no lower-bound relevance filter. In partial-match (OR) fallback mode, results include low-scoring tools that share only one term with a multi-word query. Callers wanting precision had to post-filter client-side or use exact multi-term AND queries.
+  - **`src/aggregator.ts`** (4 edits):
+    1. Added `minScore: number` property to `ch1tty/search` inputSchema (after `inFocusOnly`) with description explaining query-dependency and 0–1.3 score range.
+    2. Extracted `const minScore = typeof args.minScore === 'number' && args.minScore > 0 ? args.minScore : 0;` in `handleSearch`.
+    3. After sort (post-relevanceMap): `if (minScore > 0 && relevanceMap.size > 0) { matches = matches.filter((t) => (relevanceMap.get(t.namespacedName) ?? 0) >= minScore); }` — 4 lines, applied before offset/limit pagination.
+    4. Added `...(minScore > 0 ? { minScore } : {})` to response JSON (after `inFocusOnly` field).
+  - **`test/nn-search-minscore.test.ts`** (new, 7 tests):
+    1. `minScore: 0.5` + partial-match query "sql list execute" → run_sql (0.67) returned, list_tables (0.33) excluded
+    2. `minScore: 0` → no-op (all partial-match tools returned)
+    3. `minScore` omitted → no-op
+    4. `minScore` without query → no-op (server summary returned unchanged)
+    5. `total` reflects post-minScore count (1, not 2)
+    6. `minScore` field in response only when > 0
+    7. `minScore: 1.1` (above max achievable 1.0) → 0 results
+  - Build clean. 1197/0/2 (+7 from 1190).
+- Bot comments on PR #431: Codex usage-limit + CodeRabbit rate-limit — both informational, no action.
+- CI: 2 CodeQL checks queued at run end (expected green — data-logic only).
+
+**Blockers (unchanged)**:
+- CI broken org-wide (main workflow 0-jobs). Human must investigate GitHub Actions settings for chittyos org.
+- Notion backend unreachable (auth/wrapper not configured). Human must set NOTION_API_TOKEN + wrapper script.
+- Ledger DLQ 6 entries: ledger.chitty.cc unreachable.
+
+**Next run priority**:
+- Confirm PR #431 (NN) CodeQL passes. Merge and mark NN ✅ done.
+- OO candidates: (a) `ch1tty/status` `toolsByServer` breakdown — flat `{ [serverId]: count }` map in status snapshot for operator visibility; (b) `cast: resolved` sessionContext — the only remaining cast response shape without sessionContext (dryRun path — pre-execution, no backend call); (c) `ch1tty/search` `minScore` in `explain` output — surface the filter threshold in the explanation rationale.
 
 ---
 
