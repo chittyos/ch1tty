@@ -57,8 +57,16 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **LLLL. `latencyMs` in all `ch1tty/cast` response types** — All 6 cast response shapes (`executed`, `plan`, `resolved`, `discovered`, `no_match`, `chain_executed`) now carry `latencyMs: number` — wall-clock elapsed time in ms from intent submission to response. Timer starts after the empty-intent guard; covers scoring + brain routing + backend execution. PR #449 ✅ MERGED (bfd01847, run 135, 2026-06-14). 7 new tests, 1263/0/2. DONE.
 - [x] **MMMM. `ch1tty/status` `ledgerDlq` shorthand at snapshot top level** — `getStatusSnapshot()` now includes `ledgerDlq: { path: string, entryCount: number }` at the top level alongside `systemHealth`/`brainHealth`/`ledgerHealth`. When `systemHealth.status === 'degraded'` (DLQ backlog), operators can immediately see the WAL file path and entry count without navigating into `ledgerHealth`. Values are identical to `ledgerHealth.dlqPath` + `ledgerHealth.dlqEntries` — convenience shorthand only. Survives `short: true` mode. PR #451 ✅ MERGED (6bbbf585, run 136, 2026-06-14). 7 new tests, 1270/0/2. DONE.
 - [x] **NNNN. `ch1tty/cast` `latencyBreakdown` in `cast:executed` and `cast:chain_executed`** — Adds `latencyBreakdown: { scoringMs, executionMs }` to the two cast shapes that call backends. `scoringMs` = time from intent submission to before first backend call (registry fetch + brain routing + keyword scoring + focus bias). `executionMs` = time inside `handleExecute` (single step or chain total). Shapes without backend calls (plan, resolved, discovered, no_match) do not get `latencyBreakdown` — `latencyMs` is the complete story there. PR #453 ✅ MERGED (8a193775, run 137, 2026-06-14). 7 new tests, 1277/0/2. DONE.
+- [ ] **OOOO. `ch1tty/status` `ledgerDlq.entries[]`** — Extends `ledgerDlq: { path, entryCount }` (MMMM) with `entries: object[]` — the parsed contents of the dead-letter WAL, capped at 50 most-recent. Operators can inspect DLQ backlog content via a single `ch1tty/status` call without filesystem access. Malformed JSONL lines silently skipped. Field survives `short: true` mode. PR #455 open (CodeQL in_progress, 2026-06-14). 7 new tests, 1284/0/2.
 
-## Live Gateway State (as of 2026-06-14 run 137)
+## Live Gateway State (as of 2026-06-14 run 138)
+
+- Connected backends: (not re-queried this run)
+- Not connected: cloudflare, github, linear, stripe (lazy, auth-gated or unreachable)
+- System health: degraded (ledger DLQ 11+ entries — ledger.chitty.cc unreachable, unchanged)
+- Brain: ok (embedding circuit open=false, ollama circuit open=false)
+- Active sessions: not queried this run
+- OOOO (#455) open (CodeQL in_progress at end of run; CodeRabbit review starting)
 
 - Connected backends: (not re-queried this run — prior stable state from run 135 unchanged)
 - Not connected: cloudflare, github, linear, stripe (lazy, auth-gated or unreachable)
@@ -204,6 +212,37 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 138 — 2026-06-14 (auto-driver)
+
+**Workstream advanced**: OOOO (new — `ledgerDlq.entries[]` in `ch1tty/status` snapshot)
+**Branch/PR**: `auto/OOOO-status-dlq-entries` → PR #455 open (CodeQL in_progress)
+**Build**: clean (0 errors)
+**Tests**: 1284 pass, 0 fail, 2 skipped (+7 OOOO from 1277 baseline)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, `git fetch --all`. Read DRIVER-BOARD.md: A✅ through NNNN✅. 1277/0/2 baseline. No open PRs (NNNN #453 already merged). Notion API token invalid (unchanged blocker). Ledger DLQ 11+ entries (unchanged blocker).
+- **Workstream OOOO: `ledgerDlq.entries[]` in `ch1tty/status`**
+  - Gap: `MMMM` (PR #451) added `ledgerDlq: { path, entryCount }` at the status snapshot top level. Operators could see *how many* entries were backed up in the DLQ but not *what* they were — still required SSH + `cat ~/.ch1tty/ledger.dlq.jsonl`. Given the gateway has been in `degraded` state for multiple runs (11+ DLQ entries), surfacing the actual entry content in status is the most actionable next step.
+  - **`src/ledger.ts`** (1 addition): Added `dlqReadEntries(limit = 50): object[]` to `LedgerClient` — reads the JSONL WAL, takes the last `limit` non-empty lines (most-recent), parses each as JSON, silently skips malformed lines. Returns `[]` on any file error.
+  - **`src/aggregator.ts`** (3 edits):
+    1. `ch1tty/status` description updated to advertise `entries[]`.
+    2. `getStatusSnapshot()` return type: `ledgerDlq: { path: string; entryCount: number; entries: object[] }`.
+    3. Return value: `entries: this.coordinator.ledger.dlqReadEntries(50)`.
+  - **`test/oooo-status-dlq-entries.test.ts`** (new, 7 tests): OOOO-1 entries is array; OOOO-2 empty when no file; OOOO-3 parsed objects present; OOOO-4 length matches entryCount; OOOO-5 capped at 50 most-recent (60-entry file → 50 entries, first is `s10`); OOOO-6 malformed lines skipped; OOOO-7 survives short mode.
+  - Build clean. Full suite: 1284/0/2 (+7 from 1277).
+- PR #455 open; CodeQL in_progress at end of run. CodeRabbit review started.
+
+**Blockers (unchanged)**:
+- Ledger DLQ 11+ entries: ledger.chitty.cc unreachable. `ledgerDlq.entries[]` (OOOO) now surfaces these via status — no more `cat` needed.
+- Notion API token invalid: cannot read/write Notion board. Human must refresh `NOTION_API_TOKEN` on gateway homelab.
+- CI (main workflow 0-jobs) unchanged — only CodeQL runs.
+
+**Next run priority**:
+- Confirm OOOO PR #455 CodeQL passes (data-logic only, expected green). Merge and mark OOOO ✅ done.
+- PPPP candidates: (a) `ch1tty/cast` `latencyBreakdown.brainMs` — expose how long `routeIntent()` took when brain routing fires, completing the 3-way timing split (brainMs + keyword scoringMs + executionMs); (b) Dependabot PR #375 esbuild dev-only bump (long overdue); (c) `ch1tty/status` API/v1/health endpoint surface DLQ count — already in the health endpoint body but not the response code logic.
 
 ---
 

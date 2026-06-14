@@ -253,6 +253,29 @@ export class LedgerClient {
     }
   }
 
+  /** Read and parse up to `limit` most-recent entries from the dead-letter WAL. Returns [] if absent or unreadable. Malformed lines are silently skipped. */
+  dlqReadEntries(limit = 50): object[] {
+    try {
+      const text = readFileSync(this.dlqPath, 'utf8');
+      const lines = text.split('\n').filter((l) => l.trim().length > 0);
+      const tail = limit > 0 ? lines.slice(-limit) : lines;
+      const result: object[] = [];
+      for (const line of tail) {
+        try {
+          const parsed: unknown = JSON.parse(line);
+          if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+            result.push(parsed as object);
+          }
+        } catch {
+          // skip malformed lines
+        }
+      }
+      return result;
+    } catch {
+      return [];
+    }
+  }
+
   getStats(): LedgerStats {
     return {
       buffered: this.buffer.length,

@@ -333,7 +333,7 @@ export class Aggregator {
       },
       {
         name: `${META_SERVER_ID}${SEPARATOR}status`,
-        description: 'Gateway status — connected servers, tool counts, cache ages, system health, and ledgerDlq shorthand (path + entryCount at top level for quick DLQ inspection)',
+        description: 'Gateway status — connected servers, tool counts, cache ages, system health, and ledgerDlq shorthand (path + entryCount + entries[] at top level for quick DLQ inspection without filesystem access)',
         inputSchema: {
           type: 'object',
           properties: {
@@ -791,7 +791,7 @@ export class Aggregator {
     systemHealth: { status: 'ok' | 'warn' | 'degraded'; brainDegraded: boolean; ledgerStatus: 'ok' | 'warn' | 'degraded' };
     brainHealth: { status: 'ok' | 'degraded'; embeddingCircuitOpen: boolean; ollamaCircuitOpen: boolean };
     ledgerHealth: { status: 'ok' | 'warn' | 'degraded'; dropped: number; buffered: number; flushErrors: number; dlqEntries: number; dlqPath: string };
-    ledgerDlq: { path: string; entryCount: number };
+    ledgerDlq: { path: string; entryCount: number; entries: object[] };
     coordinator: ReturnType<SessionCoordinator['getSnapshot']>;
     servers: ServerStatus[];
   } {
@@ -871,7 +871,7 @@ export class Aggregator {
         dlqEntries: ledgerStats.dlqEntries,
         dlqPath: ledgerStats.dlqPath,
       },
-      ledgerDlq: { path: ledgerStats.dlqPath, entryCount: ledgerStats.dlqEntries },
+      ledgerDlq: { path: ledgerStats.dlqPath, entryCount: ledgerStats.dlqEntries, entries: this.coordinator.ledger.dlqReadEntries(50) },
       coordinator: coordinatorSnap,
       servers: statuses,
     };
