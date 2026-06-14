@@ -50,7 +50,14 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **QQ. `ch1tty/execute` dryRun sessionContext** — `dryRun: true` on `ch1tty/execute` now embeds `sessionContext: { recentTools, callCount, activeSessionFocus? }` directly in the `{ status:"dry_run", ... }` JSON when a sessionId is active. Pre-execution session state — no tool call is recorded. Completes sessionContext parity between normal execute (II) and dry-run execute (QQ). 1 existing test updated (execute-session-context.test.ts test 7). PR #436 ✅ MERGED (run 128, 2026-06-14). 7 new tests, 1218/0/2. DONE.
 - [x] **RR. Branch coverage sweep** — 6 branch gaps closed across `coordinator.ts`, `aggregator.ts`, `remote-proxy.ts`: `toolsByServer` slash=-1 fallback, `scopeCategories` truthy in ledger record, `chain_executed` non-text content fallback, `chain_executed` explanation truthy, `cast: discovered` scope+explain, `callTool` per-call timeoutMs left side. PR #438 ✅ MERGED (run 129, 2026-06-14). 6 new tests, 1224/0/2. DONE.
 - [x] **SS. `ch1tty/search` minScore in explain output** — When `explain: true` and `minScore > 0` are both set, `explanation.minScore` echoes the active threshold and `explanation.rationale` includes a note that tools below it were excluded. Completes the explain transparency story — full ranking picture (match mode, focus boost, minScore filter, top candidates) in one place. PR #440 ✅ MERGED (run 129, 2026-06-14). 7 new tests, 1231/0/2. DONE.
-- [ ] **TT. `ch1tty/search` explain in no-query (server-summary) path** — `explain: true` was silently a no-op when no query was provided. Now the server-summary early-return includes `explanation: { method: 'server_summary', totalServers, totalTools, focus?, inFocusServers?, inFocusOnly?, rationale }` when explain is set. Completes explain coverage for ALL three search paths (AND/partial-keyword, query-less server-summary). PR open (run 130, 2026-06-14). 7 new tests, 1238/0/2.
+- [x] **TT. `ch1tty/search` explain in no-query (server-summary) path** — `explain: true` was silently a no-op when no query was provided. Now the server-summary early-return includes `explanation: { method: 'server_summary', totalServers, totalTools, focus?, inFocusServers?, inFocusOnly?, rationale }` when explain is set. Completes explain coverage for ALL three search paths (AND/partial-keyword, query-less server-summary). PR #442 ✅ MERGED (run 131, 2026-06-14). 7 new tests, 1238/0/2. DONE.
+
+## Live Gateway State (as of 2026-06-14 run 131)
+
+- Connected backends: not re-queried this run (prior stable state unchanged)
+- Not connected: chittyos, cloudflare, GitHub (needs GITHUB_MCP_AUTHORIZATION), linear, notion, stripe, neon (lazy, auth-gated)
+- System health: degraded (ledger DLQ has 6 entries — ledger.chitty.cc unreachable, unchanged)
+- TT (#442) ✅ merged (b8cf99f). All 3 CodeQL checks green before merge.
 
 ## Live Gateway State (as of 2026-06-14 run 130)
 
@@ -142,6 +149,26 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 131 — 2026-06-14 (auto-driver)
+
+**Workstream completed**: TT ✅ — PR #442 merged (b8cf99f)
+**Build**: n/a (no new code — merge run)
+**Tests**: 1238 pass, 0 fail, 2 skipped (unchanged — TT tests already counted in run 130)
+
+**What was done**:
+- Continued from run 130 context window. Checked CI for PR #442 (`auto/TT-search-explain-noquery`): all 3 CodeQL checks green (CodeQL success 12:26:13, Analyze-actions success 12:26:21, Analyze-javascript-typescript success 12:26:57).
+- Squash-merged PR #442 to main (SHA b8cf99f). Marked TT ✅ done in board.
+
+**Blockers (unchanged)**:
+- CI broken org-wide (main workflow 0-jobs). Human must investigate GitHub Actions settings for chittyos org.
+- Notion backend unreachable (auth/wrapper not configured). Human must set NOTION_API_TOKEN + wrapper script.
+- Ledger DLQ 6 entries: ledger.chitty.cc unreachable.
+
+**Next run priority**:
+- UU: remaining branch coverage gaps — (a) aggregator.ts:1279 (chain_executed no-focus false branch), (b) aggregator.ts:1285 (chain_executed no-suggestions false branch), (c) child-manager.ts:237 (callTool without options), (d) aggregator.ts:605 (minScore ?? 0 right-side — defensively unreachable, may skip). Or: (e) `ch1tty/search` explain for server/category-filter path (currently falls through to query path but no filter-context in explanation).
 
 ---
 
