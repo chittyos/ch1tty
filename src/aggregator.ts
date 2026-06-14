@@ -309,7 +309,7 @@ export class Aggregator {
             focus: { type: 'string', description: 'Focus profile to bias results toward (e.g. "finance", "governance", "design"). A soft lens — out-of-focus tools still appear. Use "none" to override the env default. Overrides CH1TTY_FOCUS for this call.' },
             limit: { type: 'number', description: 'Max results to return (default 20)' },
             offset: { type: 'number', description: 'Number of results to skip before returning the first result (default 0). Pair with limit to page through large result sets: offset:20, limit:20 returns the second page of 20.' },
-            explain: { type: 'boolean', description: 'If true, include an explanation field in the response showing how results were ranked: match mode (and/partial), focus boost contributions, per-result relevance scores, recency signals, and a human-readable rationale. Useful for debugging ranking decisions (default: false).' },
+            explain: { type: 'boolean', description: 'If true, include an explanation field in the response showing how results were ranked: match mode (and/partial), filterContext (active server/category filter), focus boost contributions, per-result relevance scores, recency signals, and a human-readable rationale. Useful for debugging ranking decisions (default: false).' },
             inFocusOnly: { type: 'boolean', description: 'If true and a focus profile is active, return only tools that are within the active focus (hard filter). Out-of-focus tools are excluded. No-op when no focus is active. Overrides the default lens behavior for this call (default: false).' },
             minScore: { type: 'number', description: 'Minimum relevance score threshold (0–1.3). When set, only tools with a relevance score >= minScore are returned. Requires a query — no-op without one since scores are only computed for keyword searches. Use to cut noise from partial-match results (e.g. minScore: 0.5 for high-confidence matches only).' },
             sessionId: { type: 'string', description: 'Explicit session ID. When provided, always takes priority over the transport-derived session ID — enabling stateless HTTP server-to-server callers to participate in session tracking (sticky focus, affinity, topTools). A session context is created lazily on first use.' },
@@ -663,7 +663,7 @@ export class Aggregator {
       : null;
 
     const explanation = explain
-      ? buildSearchExplanation(matches, results, relevanceMap, partialFallback, focusName, focus, recentServerIds, minScore)
+      ? buildSearchExplanation(matches, results, relevanceMap, partialFallback, focusName, focus, recentServerIds, minScore, serverFilter, categoryFilter)
       : null;
 
     return {
@@ -1758,6 +1758,8 @@ function buildSearchExplanation(
   focus: FocusProfile | null | undefined,
   recentServerIds: Set<string>,
   minScore: number = 0,
+  serverFilter?: string,
+  categoryFilter?: string,
 ): object {
   const matchMode = partialFallback ? 'partial' : 'and';
   const focusBoost = focus?.boost ?? 0.5;
@@ -1770,8 +1772,18 @@ function buildSearchExplanation(
   }));
 
   const inFocusCount = topResults.filter((r) => r.inFocus).length;
+  const filterContext = (serverFilter || categoryFilter)
+    ? { ...(serverFilter ? { server: serverFilter } : {}), ...(categoryFilter ? { category: categoryFilter } : {}) }
+    : undefined;
+
   const parts: string[] = [];
   parts.push(`Keyword search (${matchMode === 'partial' ? 'OR/partial fallback — no tool matched all terms' : 'AND mode'})`);
+  if (filterContext) {
+    const filterParts: string[] = [];
+    if (serverFilter) filterParts.push(`server="${serverFilter}"`);
+    if (categoryFilter) filterParts.push(`category="${categoryFilter}"`);
+    parts.push(`pre-filtered by ${filterParts.join(' + ')}`);
+  }
   if (topCandidates.length > 0) {
     const top = topCandidates[0];
     parts.push(`top result: "${top.tool}" (relevance: ${top.relevanceScore.toFixed(2)})`);
@@ -1790,6 +1802,7 @@ function buildSearchExplanation(
   return {
     method: 'keyword' as const,
     matchMode,
+    ...(filterContext ? { filterContext } : {}),
     ...(focusName ? { focus: focusName, focusBoost } : {}),
     ...(minScore > 0 ? { minScore } : {}),
     topCandidates,
