@@ -354,7 +354,7 @@ export class Aggregator {
           'Describe what you want done in natural language. Ch1tty searches its full surface — tools, prompts, and resources — ' +
           'resolves intent, and executes the best tool match. Related prompts and resources are surfaced alongside. ' +
           'When a sessionId is active, cast: executed and cast: chain_executed include sessionContext reflecting session state after execution; ' +
-          'cast: plan and cast: discovered include sessionContext reflecting pre-execution session state (recent tools, call count, sticky focus). ' +
+          'cast: plan, cast: discovered, and cast: no_match include sessionContext reflecting pre-execution session state (recent tools, call count, sticky focus). ' +
           'Sub-meta to master-meta — the gateway calling itself.',
         inputSchema: {
           type: 'object',
@@ -1095,6 +1095,16 @@ export class Aggregator {
       : null;
 
     if (scoredTools.length === 0 && scoredPrompts.length === 0 && scoredResources.length === 0) {
+      let noMatchSessionContext: { recentTools: string[]; callCount: number; activeSessionFocus?: string } | null = null;
+      if (effectiveSessionId && this.coordinator.hasSession(effectiveSessionId)) {
+        const ctxPat = this.coordinator.getToolPatterns(effectiveSessionId, 1000);
+        const sfocus = this.coordinator.getSessionFocus(effectiveSessionId);
+        noMatchSessionContext = {
+          recentTools: ctxPat.slice(0, 5).map((p) => p.tool),
+          callCount: ctxPat.reduce((s, p) => s + p.count, 0),
+          ...(sfocus ? { activeSessionFocus: sfocus } : {}),
+        };
+      }
       return {
         content: [{
           type: 'text',
@@ -1105,6 +1115,7 @@ export class Aggregator {
             ...(scopeAnnotation ? { scope: scopeAnnotation } : {}),
             ...(explain ? { explanation: buildCastExplanation(resolvedBy, undefined, [], focusName, focus) } : {}),
             ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
+            ...(noMatchSessionContext ? { sessionContext: noMatchSessionContext } : {}),
             hint: 'No tools, prompts, or resources matched your intent. Try ch1tty/search with different keywords.',
           }, null, 2),
         }],
