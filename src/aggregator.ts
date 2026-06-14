@@ -353,7 +353,8 @@ export class Aggregator {
         description:
           'Describe what you want done in natural language. Ch1tty searches its full surface — tools, prompts, and resources — ' +
           'resolves intent, and executes the best tool match. Related prompts and resources are surfaced alongside. ' +
-          'Sub-meta to master-meta — the gateway calling itself.',
+          'When a sessionId is active, cast: executed and cast: chain_executed responses include sessionContext: { recentTools, callCount, activeSessionFocus? } ' +
+          'reflecting session state after execution. Sub-meta to master-meta — the gateway calling itself.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -1211,6 +1212,17 @@ export class Aggregator {
 
       const chainSummary = allTexts.length > 0 ? allTexts.join('\n\n') : undefined;
 
+      let chainSessionContext: { recentTools: string[]; callCount: number; activeSessionFocus?: string } | null = null;
+      if (effectiveSessionId && this.coordinator.hasSession(effectiveSessionId)) {
+        const ctxPat = this.coordinator.getToolPatterns(effectiveSessionId, 1000);
+        const sfocus = this.coordinator.getSessionFocus(effectiveSessionId);
+        chainSessionContext = {
+          recentTools: ctxPat.slice(0, 5).map((p) => p.tool),
+          callCount: ctxPat.reduce((s, p) => s + p.count, 0),
+          ...(sfocus ? { activeSessionFocus: sfocus } : {}),
+        };
+      }
+
       return {
         content: [{
           type: 'text',
@@ -1223,6 +1235,7 @@ export class Aggregator {
             catalog: { name: catalogCombo.name, chain: catalogCombo.chain, accomplishes: catalogCombo.accomplishes },
             steps,
             ...(chainSummary !== undefined ? { summary: chainSummary } : {}),
+            ...(chainSessionContext ? { sessionContext: chainSessionContext } : {}),
             ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
           }, null, 2),
         }],
@@ -1286,6 +1299,17 @@ export class Aggregator {
       effectiveSessionId,
     );
 
+    let castSessionContext: { recentTools: string[]; callCount: number; activeSessionFocus?: string } | null = null;
+    if (!result.isError && effectiveSessionId && this.coordinator.hasSession(effectiveSessionId)) {
+      const ctxPat = this.coordinator.getToolPatterns(effectiveSessionId, 1000);
+      const sfocus = this.coordinator.getSessionFocus(effectiveSessionId);
+      castSessionContext = {
+        recentTools: ctxPat.slice(0, 5).map((p) => p.tool),
+        callCount: ctxPat.reduce((s, p) => s + p.count, 0),
+        ...(sfocus ? { activeSessionFocus: sfocus } : {}),
+      };
+    }
+
     // Return cast metadata + related context + raw tool output
     return {
       content: [
@@ -1304,6 +1328,7 @@ export class Aggregator {
             ...(chainContinuation ? { chainContinuation } : {}),
             ...(alternatives.length > 0 ? { alternatives } : {}),
             ...related,
+            ...(castSessionContext ? { sessionContext: castSessionContext } : {}),
             ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
           }),
         },
