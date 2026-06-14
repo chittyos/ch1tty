@@ -333,7 +333,7 @@ export class Aggregator {
       },
       {
         name: `${META_SERVER_ID}${SEPARATOR}status`,
-        description: 'Gateway status — connected servers, tool counts, cache ages',
+        description: 'Gateway status — connected servers, tool counts, cache ages, system health, and ledgerDlq shorthand (path + entryCount at top level for quick DLQ inspection)',
         inputSchema: {
           type: 'object',
           properties: {
@@ -790,6 +790,7 @@ export class Aggregator {
     systemHealth: { status: 'ok' | 'warn' | 'degraded'; brainDegraded: boolean; ledgerStatus: 'ok' | 'warn' | 'degraded' };
     brainHealth: { status: 'ok' | 'degraded'; embeddingCircuitOpen: boolean; ollamaCircuitOpen: boolean };
     ledgerHealth: { status: 'ok' | 'warn' | 'degraded'; dropped: number; buffered: number; flushErrors: number; dlqEntries: number; dlqPath: string };
+    ledgerDlq: { path: string; entryCount: number };
     coordinator: ReturnType<SessionCoordinator['getSnapshot']>;
     servers: ServerStatus[];
   } {
@@ -869,6 +870,7 @@ export class Aggregator {
         dlqEntries: ledgerStats.dlqEntries,
         dlqPath: ledgerStats.dlqPath,
       },
+      ledgerDlq: { path: ledgerStats.dlqPath, entryCount: ledgerStats.dlqEntries },
       coordinator: coordinatorSnap,
       servers: statuses,
     };
