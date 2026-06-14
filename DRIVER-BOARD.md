@@ -57,7 +57,17 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **LLLL. `latencyMs` in all `ch1tty/cast` response types** — All 6 cast response shapes (`executed`, `plan`, `resolved`, `discovered`, `no_match`, `chain_executed`) now carry `latencyMs: number` — wall-clock elapsed time in ms from intent submission to response. Timer starts after the empty-intent guard; covers scoring + brain routing + backend execution. PR #449 ✅ MERGED (bfd01847, run 135, 2026-06-14). 7 new tests, 1263/0/2. DONE.
 - [x] **MMMM. `ch1tty/status` `ledgerDlq` shorthand at snapshot top level** — `getStatusSnapshot()` now includes `ledgerDlq: { path: string, entryCount: number }` at the top level alongside `systemHealth`/`brainHealth`/`ledgerHealth`. When `systemHealth.status === 'degraded'` (DLQ backlog), operators can immediately see the WAL file path and entry count without navigating into `ledgerHealth`. Values are identical to `ledgerHealth.dlqPath` + `ledgerHealth.dlqEntries` — convenience shorthand only. Survives `short: true` mode. PR #451 ✅ MERGED (6bbbf585, run 136, 2026-06-14). 7 new tests, 1270/0/2. DONE.
 - [x] **NNNN. `ch1tty/cast` `latencyBreakdown` in `cast:executed` and `cast:chain_executed`** — Adds `latencyBreakdown: { scoringMs, executionMs }` to the two cast shapes that call backends. `scoringMs` = time from intent submission to before first backend call (registry fetch + brain routing + keyword scoring + focus bias). `executionMs` = time inside `handleExecute` (single step or chain total). Shapes without backend calls (plan, resolved, discovered, no_match) do not get `latencyBreakdown` — `latencyMs` is the complete story there. PR #453 ✅ MERGED (8a193775, run 137, 2026-06-14). 7 new tests, 1277/0/2. DONE.
-- [ ] **OOOO. `ch1tty/status` `ledgerDlq.entries[]`** — Extends `ledgerDlq: { path, entryCount }` (MMMM) with `entries: object[]` — the parsed contents of the dead-letter WAL, capped at 50 most-recent. Operators can inspect DLQ backlog content via a single `ch1tty/status` call without filesystem access. Malformed JSONL lines silently skipped. Field survives `short: true` mode. PR #455 open (CodeQL in_progress, 2026-06-14). 7 new tests, 1284/0/2.
+- [x] **OOOO. `ch1tty/status` `ledgerDlq.entries[]`** — Extends `ledgerDlq: { path, entryCount }` (MMMM) with `entries: object[]` — the parsed contents of the dead-letter WAL, capped at 50 most-recent. Operators can inspect DLQ backlog content via a single `ch1tty/status` call without filesystem access. Malformed JSONL lines silently skipped. Field survives `short: true` mode. PR #455 ✅ MERGED (3656961, run 138→139, 2026-06-14). 7 new tests, 1284/0/2. DONE.
+- [ ] **PPPP. `ch1tty/cast` `latencyBreakdown.brainMs`** — When the brain route fires (`castRoute === 'brain'`), add `brainMs: number` to `latencyBreakdown` in `cast:executed` and `cast:chain_executed`. Completes the 3-way timing split: `brainMs` (routeIntent wall time) + `scoringMs` (total pre-execution including brain) + `executionMs` (backend). Absent when keyword-fallback route taken. Open.
+
+## Live Gateway State (as of 2026-06-14 run 139)
+
+- Connected backends: (not re-queried this run — stable from run 135)
+- Not connected: cloudflare, github, linear, stripe (lazy, auth-gated or unreachable)
+- System health: degraded (ledger DLQ 11+ entries — ledger.chitty.cc unreachable, unchanged)
+- Brain: ok (embedding circuit open=false, ollama circuit open=false)
+- Active sessions: not queried this run
+- OOOO (#455) ✅ MERGED (3656961). PPPP open (in progress this run).
 
 ## Live Gateway State (as of 2026-06-14 run 138)
 
