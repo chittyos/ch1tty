@@ -51,7 +51,14 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **RR. Branch coverage sweep** — 6 branch gaps closed across `coordinator.ts`, `aggregator.ts`, `remote-proxy.ts`: `toolsByServer` slash=-1 fallback, `scopeCategories` truthy in ledger record, `chain_executed` non-text content fallback, `chain_executed` explanation truthy, `cast: discovered` scope+explain, `callTool` per-call timeoutMs left side. PR #438 ✅ MERGED (run 129, 2026-06-14). 6 new tests, 1224/0/2. DONE.
 - [x] **SS. `ch1tty/search` minScore in explain output** — When `explain: true` and `minScore > 0` are both set, `explanation.minScore` echoes the active threshold and `explanation.rationale` includes a note that tools below it were excluded. Completes the explain transparency story — full ranking picture (match mode, focus boost, minScore filter, top candidates) in one place. PR #440 ✅ MERGED (run 129, 2026-06-14). 7 new tests, 1231/0/2. DONE.
 - [x] **TT. `ch1tty/search` explain in no-query (server-summary) path** — `explain: true` was silently a no-op when no query was provided. Now the server-summary early-return includes `explanation: { method: 'server_summary', totalServers, totalTools, focus?, inFocusServers?, inFocusOnly?, rationale }` when explain is set. Completes explain coverage for ALL three search paths (AND/partial-keyword, query-less server-summary). PR #442 ✅ MERGED (run 131, 2026-06-14). 7 new tests, 1238/0/2. DONE.
-- [ ] **UU. Branch coverage → 100%** — 5 remaining branch gaps closed. (a) aggregator.ts:560 ternary plural `'s'` branch (inFocusCount > 1 with inFocusOnly explain) — covered by 3 new tests. (b) child-manager.ts:237 `options?.timeoutMs ?? CALL_TIMEOUT_MS` right side — covered by 2 new tests using injected fake conn. (c) aggregator.ts:630, 1304, 1310 — structurally unreachable, suppressed with `/* c8 ignore next */`. Result: all src/ files at 100%/100%/100%/100%. PR #444 open (CodeQL in_progress). 7 new tests, 1245/0/2.
+- [x] **UU. Branch coverage → 100%** — 5 remaining branch gaps closed. (a) aggregator.ts:560 ternary plural `'s'` branch (inFocusCount > 1 with inFocusOnly explain) — covered by 3 new tests. (b) child-manager.ts:237 `options?.timeoutMs ?? CALL_TIMEOUT_MS` right side — covered by 2 new tests using injected fake conn. (c) aggregator.ts:630, 1304, 1310 — structurally unreachable, suppressed with `/* c8 ignore next */`. Result: all src/ files at 100%/100%/100%/100%. PR #444 ✅ MERGED (9d28bb8, run 133). 7 new tests, 1245/0/2. DONE.
+
+## Live Gateway State (as of 2026-06-14 run 133)
+
+- Connected backends: not re-queried this run (prior stable state unchanged)
+- Not connected: chittyos, cloudflare, GitHub (needs GITHUB_MCP_AUTHORIZATION), linear, notion, stripe, neon (lazy, auth-gated)
+- System health: degraded (ledger DLQ has 6 entries — ledger.chitty.cc unreachable, unchanged)
+- UU (#444) ✅ merged (9d28bb8). All 3 CodeQL checks green before merge.
 
 ## Live Gateway State (as of 2026-06-14 run 132)
 
@@ -157,6 +164,26 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 133 — 2026-06-14 (auto-driver)
+
+**Workstream completed**: UU ✅ — PR #444 merged (9d28bb8)
+**Build**: n/a (no new code — merge run)
+**Tests**: 1245 pass, 0 fail, 2 skipped (unchanged — UU tests already counted in run 132)
+
+**What was done**:
+- Continued from run 132 context window. Checked CI for PR #444 (`auto/UU-branch-coverage-gaps`): all 3 CodeQL checks green (CodeQL success 13:35:54, Analyze-actions success 13:36:01, Analyze-javascript-typescript success 13:36:34).
+- Squash-merged PR #444 to main (SHA 9d28bb8). Marked UU ✅ done in board.
+
+**Blockers (unchanged)**:
+- CI broken org-wide (main workflow 0-jobs). Human must investigate GitHub Actions settings for chittyos org.
+- Notion backend unreachable (auth/wrapper not configured). Human must set NOTION_API_TOKEN + wrapper script.
+- Ledger DLQ 6 entries: ledger.chitty.cc unreachable.
+
+**Next run priority**:
+- VV candidates: (a) `ch1tty/status` ledgerDlq field — expose DLQ path + entry count directly in the status snapshot (currently only in `ledgerHealth.dlqEntries`); (b) `ch1tty/search` explain for server-filter / category-filter path — currently the filter-context is not surfaced in explanation; (c) Dependabot PR #375 (esbuild dev-only bump — long overdue merge).
 
 ---
 
