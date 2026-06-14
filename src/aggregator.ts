@@ -311,6 +311,7 @@ export class Aggregator {
             offset: { type: 'number', description: 'Number of results to skip before returning the first result (default 0). Pair with limit to page through large result sets: offset:20, limit:20 returns the second page of 20.' },
             explain: { type: 'boolean', description: 'If true, include an explanation field in the response showing how results were ranked: match mode (and/partial), focus boost contributions, per-result relevance scores, recency signals, and a human-readable rationale. Useful for debugging ranking decisions (default: false).' },
             inFocusOnly: { type: 'boolean', description: 'If true and a focus profile is active, return only tools that are within the active focus (hard filter). Out-of-focus tools are excluded. No-op when no focus is active. Overrides the default lens behavior for this call (default: false).' },
+            minScore: { type: 'number', description: 'Minimum relevance score threshold (0–1.3). When set, only tools with a relevance score >= minScore are returned. Requires a query — no-op without one since scores are only computed for keyword searches. Use to cut noise from partial-match results (e.g. minScore: 0.5 for high-confidence matches only).' },
             sessionId: { type: 'string', description: 'Explicit session ID. When provided, always takes priority over the transport-derived session ID — enabling stateless HTTP server-to-server callers to participate in session tracking (sticky focus, affinity, topTools). A session context is created lazily on first use.' },
           },
         },
@@ -464,6 +465,7 @@ export class Aggregator {
     const offset = typeof args.offset === 'number' && args.offset > 0 ? Math.floor(args.offset) : 0;
     const explain = args.explain === true;
     const inFocusOnly = args.inFocusOnly === true;
+    const minScore = typeof args.minScore === 'number' && args.minScore > 0 ? args.minScore : 0;
     const effectiveSessionId = typeof args.sessionId === 'string' && args.sessionId ? args.sessionId : sessionId;
     const { name: focusName, profile: focus } = this.resolveActiveFocus(args.focus, effectiveSessionId);
 
@@ -597,6 +599,12 @@ export class Aggregator {
       });
     }
 
+    // minScore hard filter: drop tools with relevance below the threshold.
+    // Only meaningful when a query is present (scores are only computed then).
+    if (minScore > 0 && relevanceMap.size > 0) {
+      matches = matches.filter((t) => (relevanceMap.get(t.namespacedName) ?? 0) >= minScore);
+    }
+
     const results = matches.slice(offset, offset + limit).map((t) => {
       // Per-tool usage enrichment: prefer exact-tool pattern (callCount + lastUsedMs) over
       // server-level boolean. Falls back to `true` when the server was used but not this tool.
@@ -640,6 +648,7 @@ export class Aggregator {
           ...(partialFallback ? { mode: 'partial' } : {}),
           ...(focusName ? { focus: focusName } : {}),
           ...(inFocusOnly && focus ? { inFocusOnly: true } : {}),
+          ...(minScore > 0 ? { minScore } : {}),
           ...(effectiveSessionId ? { sessionId: effectiveSessionId } : {}),
           ...(sessionContext ? { sessionContext } : {}),
           ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
