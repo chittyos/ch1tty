@@ -39,12 +39,15 @@ class KeywordOnlyCoordinator extends SessionCoordinator {
 
 test('rrr: coordinator.getSnapshot toolsByServer uses full name as key when tool has no slash', async () => {
   const coordinator = new KeywordOnlyCoordinator({}, { enabled: false }, dlqPath('coord-noslash'));
-  await coordinator.onSessionStart('sid', 'http');
-  coordinator.onToolCall('sid', 'noslash'); // no '/' separator
-  const snap = coordinator.getSnapshot();
-  assert.deepEqual(snap.toolsByServer, { noslash: 1 },
-    'tool without slash: full name becomes the server key (slash === -1 branch)');
-  coordinator.close();
+  try {
+    await coordinator.onSessionStart('sid', 'http');
+    coordinator.onToolCall('sid', 'noslash'); // no '/' separator
+    const snap = coordinator.getSnapshot();
+    assert.deepEqual(snap.toolsByServer, { noslash: 1 },
+      'tool without slash: full name becomes the server key (slash === -1 branch)');
+  } finally {
+    coordinator.close();
+  }
 });
 
 // ── 2. aggregator.ts:1078 — scopeCategories truthy in ledger record (sessionId active) ──
@@ -77,20 +80,23 @@ test('rrr: cast scope.categories + explicit sessionId fires scopeCategories ledg
 
   // scope.categories + explicit sessionId → effectiveSessionId is active → ledger record at
   // line 1070-1079 is entered → scopeCategories truthy branch at line 1078 fires.
-  const result = await agg.callTool('ch1tty/cast', {
-    intent: 'list neon projects',
-    scope: { categories: ['ecosystem'] },
-    sessionId: 'sess-rrr-scope-cat',
-    dryRun: true,
-  });
-  const data = JSON.parse(result.content[0].text as string) as Record<string, unknown>;
-  // Scope annotation must reflect categories (confirms categories were parsed)
-  assert.deepEqual(
-    (data.scope as Record<string, unknown>)?.categories,
-    ['ecosystem'],
-    'scope.categories in response confirms scopeCategories was parsed and line 1078 fired',
-  );
-  await agg.shutdown();
+  try {
+    const result = await agg.callTool('ch1tty/cast', {
+      intent: 'list neon projects',
+      scope: { categories: ['ecosystem'] },
+      sessionId: 'sess-rrr-scope-cat',
+      dryRun: true,
+    });
+    const data = JSON.parse(result.content[0].text as string) as Record<string, unknown>;
+    // Scope annotation must reflect categories (confirms categories were parsed)
+    assert.deepEqual(
+      (data.scope as Record<string, unknown>)?.categories,
+      ['ecosystem'],
+      'scope.categories in response confirms scopeCategories was parsed and line 1078 fired',
+    );
+  } finally {
+    await agg.shutdown();
+  }
 });
 
 // ── 3. aggregator.ts:1246 — JSON.stringify fallback for non-text error content ──
@@ -147,21 +153,24 @@ test('rrr: chain step isError with non-text content uses JSON.stringify fallback
     focus: 'code',
   });
 
-  const result = await agg.callTool('ch1tty/cast', {
-    intent: 'list neon projects',
-    chain: true,
-  });
-  const data = JSON.parse(result.content[0].text as string) as Record<string, unknown>;
-  assert.equal(data.cast, 'chain_executed', 'chain_executed when at least step 0 runs');
-  const steps = data.steps as Array<{ step: number; tool: string; ok: boolean; error?: string }>;
-  const errStep = steps.find((s) => !s.ok);
-  assert.ok(errStep !== undefined, 'one step must fail');
-  // JSON.stringify of image content array — must contain "image" key from the content object
-  assert.ok(
-    typeof errStep.error === 'string' && errStep.error.includes('"type"'),
-    'error string is JSON.stringify of content array (not content[0].text which is undefined)',
-  );
-  await agg.shutdown();
+  try {
+    const result = await agg.callTool('ch1tty/cast', {
+      intent: 'list neon projects',
+      chain: true,
+    });
+    const data = JSON.parse(result.content[0].text as string) as Record<string, unknown>;
+    assert.equal(data.cast, 'chain_executed', 'chain_executed when at least step 0 runs');
+    const steps = data.steps as Array<{ step: number; tool: string; ok: boolean; error?: string }>;
+    const errStep = steps.find((s) => !s.ok);
+    assert.ok(errStep !== undefined, 'one step must fail');
+    // JSON.stringify of image content array — must contain "image" key from the content object
+    assert.ok(
+      typeof errStep.error === 'string' && errStep.error.includes('"type"'),
+      'error string is JSON.stringify of content array (not content[0].text which is undefined)',
+    );
+  } finally {
+    await agg.shutdown();
+  }
 });
 
 // ── 4. aggregator.ts:1280 — explanation truthy branch in chain_executed ──
@@ -214,17 +223,20 @@ test('rrr: chain_executed with explain:true includes explanation field (line 128
     focus: 'code',
   });
 
-  const result = await agg.callTool('ch1tty/cast', {
-    intent: 'list neon projects',
-    chain: true,
-    explain: true,   // <- triggers explanation truthy branch at line 1280
-  });
-  const data = JSON.parse(result.content[0].text as string) as Record<string, unknown>;
-  assert.equal(data.cast, 'chain_executed', 'must be chain_executed');
-  assert.ok(data.explanation !== undefined,
-    'explanation field present when explain:true in chain_executed (line 1280 truthy branch)');
-  assert.equal((data.explanation as Record<string, unknown>).method, 'keyword');
-  await agg.shutdown();
+  try {
+    const result = await agg.callTool('ch1tty/cast', {
+      intent: 'list neon projects',
+      chain: true,
+      explain: true,   // <- triggers explanation truthy branch at line 1280
+    });
+    const data = JSON.parse(result.content[0].text as string) as Record<string, unknown>;
+    assert.equal(data.cast, 'chain_executed', 'must be chain_executed');
+    assert.ok(data.explanation !== undefined,
+      'explanation field present when explain:true in chain_executed (line 1280 truthy branch)');
+    assert.equal((data.explanation as Record<string, unknown>).method, 'keyword');
+  } finally {
+    await agg.shutdown();
+  }
 });
 
 // ── 5. aggregator.ts:1201-1202 — scope annotation + explanation in cast:discovered ──
@@ -262,19 +274,22 @@ test('rrr: cast:discovered with scope and explain:true covers lines 1201-1202', 
   // Intent matches the prompt ("guide", "writing", "queries") but NOT the tool ("list", "projects")
   // scope.servers=['neon'] restricts tools to neon — none score above threshold
   // explain:true builds explanation — both branches at 1201 and 1202 fire
-  const result = await agg.callTool('ch1tty/cast', {
-    intent: 'guide writing queries',
-    scope: { servers: ['neon'] },
-    explain: true,
-  });
-  const data = JSON.parse(result.content[0].text as string) as Record<string, unknown>;
-  assert.equal(data.cast, 'discovered', 'prompt matches but no tools → cast:discovered');
-  assert.deepEqual(
-    (data.scope as Record<string, unknown>)?.servers,
-    ['neon'],
-    'scope annotation present in discovered response (line 1201 truthy branch)',
-  );
-  assert.ok(data.explanation !== undefined,
-    'explanation present in discovered response when explain:true (line 1202 truthy branch)');
-  await agg.shutdown();
+  try {
+    const result = await agg.callTool('ch1tty/cast', {
+      intent: 'guide writing queries',
+      scope: { servers: ['neon'] },
+      explain: true,
+    });
+    const data = JSON.parse(result.content[0].text as string) as Record<string, unknown>;
+    assert.equal(data.cast, 'discovered', 'prompt matches but no tools → cast:discovered');
+    assert.deepEqual(
+      (data.scope as Record<string, unknown>)?.servers,
+      ['neon'],
+      'scope annotation present in discovered response (line 1201 truthy branch)',
+    );
+    assert.ok(data.explanation !== undefined,
+      'explanation present in discovered response when explain:true (line 1202 truthy branch)');
+  } finally {
+    await agg.shutdown();
+  }
 });
