@@ -57,7 +57,17 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **LLLL. `latencyMs` in all `ch1tty/cast` response types** — All 6 cast response shapes (`executed`, `plan`, `resolved`, `discovered`, `no_match`, `chain_executed`) now carry `latencyMs: number` — wall-clock elapsed time in ms from intent submission to response. Timer starts after the empty-intent guard; covers scoring + brain routing + backend execution. PR #449 ✅ MERGED (bfd01847, run 135, 2026-06-14). 7 new tests, 1263/0/2. DONE.
 - [x] **MMMM. `ch1tty/status` `ledgerDlq` shorthand at snapshot top level** — `getStatusSnapshot()` now includes `ledgerDlq: { path: string, entryCount: number }` at the top level alongside `systemHealth`/`brainHealth`/`ledgerHealth`. When `systemHealth.status === 'degraded'` (DLQ backlog), operators can immediately see the WAL file path and entry count without navigating into `ledgerHealth`. Values are identical to `ledgerHealth.dlqPath` + `ledgerHealth.dlqEntries` — convenience shorthand only. Survives `short: true` mode. PR #451 ✅ MERGED (6bbbf585, run 136, 2026-06-14). 7 new tests, 1270/0/2. DONE.
 - [x] **NNNN. `ch1tty/cast` `latencyBreakdown` in `cast:executed` and `cast:chain_executed`** — Adds `latencyBreakdown: { scoringMs, executionMs }` to the two cast shapes that call backends. `scoringMs` = time from intent submission to before first backend call (registry fetch + brain routing + keyword scoring + focus bias). `executionMs` = time inside `handleExecute` (single step or chain total). Shapes without backend calls (plan, resolved, discovered, no_match) do not get `latencyBreakdown` — `latencyMs` is the complete story there. PR #453 ✅ MERGED (8a193775, run 137, 2026-06-14). 7 new tests, 1277/0/2. DONE.
-- [ ] **OOOO. `ch1tty/status` `ledgerDlq.entries[]`** — Extends `ledgerDlq: { path, entryCount }` (MMMM) with `entries: object[]` — the parsed contents of the dead-letter WAL, capped at 50 most-recent. Operators can inspect DLQ backlog content via a single `ch1tty/status` call without filesystem access. Malformed JSONL lines silently skipped. Field survives `short: true` mode. PR #455 open (CodeQL in_progress, 2026-06-14). 7 new tests, 1284/0/2.
+- [x] **OOOO. `ch1tty/status` `ledgerDlq.entries[]`** — Extends `ledgerDlq: { path, entryCount }` (MMMM) with `entries: object[]` — the parsed contents of the dead-letter WAL, capped at 50 most-recent. Operators can inspect DLQ backlog content via a single `ch1tty/status` call without filesystem access. Malformed JSONL lines silently skipped. Field survives `short: true` mode. PR #455 ✅ MERGED (3656961, run 138→139, 2026-06-14). 7 new tests, 1284/0/2. DONE.
+- [ ] **PPPP. `ch1tty/cast` `latencyBreakdown.brainMs`** — When the brain route fires (`castRoute === 'brain'`), add `brainMs: number` to `latencyBreakdown` in `cast:executed` and `cast:chain_executed`. Completes the 3-way timing split: `brainMs` (routeIntent wall time) + `scoringMs` (total pre-execution including brain) + `executionMs` (backend). Absent when keyword-fallback route taken. Open.
+
+## Live Gateway State (as of 2026-06-14 run 139)
+
+- Connected backends: (not re-queried this run — stable from run 135)
+- Not connected: cloudflare, github, linear, stripe (lazy, auth-gated or unreachable)
+- System health: degraded (ledger DLQ 11+ entries — ledger.chitty.cc unreachable, unchanged)
+- Brain: ok (embedding circuit open=false, ollama circuit open=false)
+- Active sessions: not queried this run
+- OOOO (#455) ✅ MERGED (3656961). PPPP open (in progress this run).
 
 ## Live Gateway State (as of 2026-06-14 run 138)
 
@@ -212,6 +222,40 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 139 — 2026-06-14 (auto-driver)
+
+**Workstream advanced**: PPPP (new — `latencyBreakdown.brainMs` in `cast:executed` and `cast:chain_executed`)
+**Branch/PR**: `auto/PPPP-cast-latency-breakdown-brain-ms` → PR #456 open (CodeQL in_progress)
+**Build**: clean (0 errors)
+**Tests**: 1291 pass, 0 fail, 2 skipped (+7 PPPP from 1284 baseline)
+
+**What was done**:
+- Startup: git reset --hard origin/main after PR #455 (OOOO) merge divergence. 1284/0/2 baseline confirmed. Read DRIVER-BOARD.md: A✅ through OOOO✅. PPPP open as new workstream.
+- **Confirmed OOOO PR #455 merged** (SHA 3656961). Marked OOOO ✅ done in board.
+- **Workstream PPPP: `latencyBreakdown.brainMs` when brain route fires**
+  - Gap: NNNN (PR #453) added `latencyBreakdown: { scoringMs, executionMs }` to `cast:executed` and `cast:chain_executed`. `scoringMs` covers the full pre-execution window (registry fetch + brain routing + keyword scoring + focus bias), so when the brain takes 400ms and keyword scoring takes 1ms, callers see only a single `scoringMs` number with no way to know how much was brain overhead. The natural completion is exposing `brainMs` when `castRoute === 'brain'`.
+  - **`src/aggregator.ts`** (4 edits):
+    1. Wrap `routeIntent()` call: `const brainRouteStartMs = Date.now()` before; `const brainRouteMs = Date.now() - brainRouteStartMs` after.
+    2. `cast:chain_executed` `latencyBreakdown`: `{ scoringMs: chainScoringMs, executionMs: chainExecutionMs, ...(castRoute === 'brain' ? { brainMs: brainRouteMs } : {}) }`.
+    3. `cast:executed` `latencyBreakdown`: `{ scoringMs: execScoringMs, executionMs, ...(castRoute === 'brain' ? { brainMs: brainRouteMs } : {}) }`.
+    4. Tool description updated to advertise `brainMs?` in `latencyBreakdown`.
+  - **`test/pppp-cast-latency-breakdown-brain-ms.test.ts`** (new, 7 tests): Uses `BrainCoordinator` (subclass stubs `routeIntent` to return a non-null result) and `FallbackCoordinator` (returns `null`) injected via `options.coordinator`. PPPP-1/3: brain route → `brainMs` present and ≥ 0. PPPP-2/4: keyword fallback → `brainMs` absent. PPPP-5: `brainMs ≤ scoringMs + 2ms`. PPPP-6/7: plan/no_match → no `latencyBreakdown` (unchanged from NNNN). All 7 passed.
+  - Build clean. Full suite: 1291/0/2 (+7 from 1284).
+- PR #456 open; CodeQL in_progress. Codex + CodeRabbit both rate-limited (informational).
+
+**Blockers (unchanged)**:
+- Ledger DLQ 11+ entries: ledger.chitty.cc unreachable. `ledgerDlq.entries[]` (OOOO) now surfaces these via status.
+- Notion API token invalid: cannot read/write Notion board. Human must refresh `NOTION_API_TOKEN` on gateway homelab.
+- CI (main workflow 0-jobs) unchanged — only CodeQL runs.
+
+**Next run priority**:
+- Confirm PPPP PR #456 CodeQL passes (data-logic only, expected green). Merge and mark PPPP ✅ done.
+- QQQQ candidates: (a) Dependabot PR #375 esbuild dev-only bump (long overdue — no logic change, just merge); (b) `ch1tty/cast` explain `brainMs` in `explanation` field — when `explain:true` and brain route fires, surface `brainMs` alongside the existing `method:'brain'` in the explanation; (c) `ch1tty/status` health endpoint `/api/v1/health` DLQ count in 503 response — currently 503 fires when `systemHealth.status === 'degraded'` but the body doesn't include the DLQ count.
+
+---
 
 ---
 

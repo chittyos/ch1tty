@@ -357,7 +357,7 @@ export class Aggregator {
           'When a sessionId is active, cast: executed and cast: chain_executed include sessionContext reflecting session state after execution; ' +
           'cast: plan, cast: resolved, cast: discovered, and cast: no_match include sessionContext reflecting pre-execution session state (recent tools, call count, sticky focus). ' +
           'All cast responses include latencyMs: the elapsed wall-clock time in milliseconds from intent submission to response (covers scoring + execution). ' +
-          'cast: executed and cast: chain_executed also include latencyBreakdown: { scoringMs, executionMs } — scoringMs is the time spent in registry fetch + intent routing/scoring before any backend call; executionMs is the time spent in the backend call(s). ' +
+          'cast: executed and cast: chain_executed also include latencyBreakdown: { scoringMs, executionMs, brainMs? } — scoringMs is the time spent in registry fetch + intent routing/scoring before any backend call; executionMs is the time spent in the backend call(s); brainMs is present when the brain route was taken and shows the routeIntent() wall time. ' +
           'Sub-meta to master-meta — the gateway calling itself.',
         inputSchema: {
           type: 'object',
@@ -1057,7 +1057,9 @@ export class Aggregator {
       category: t.category,
       serverName: t.serverName,
     }));
+    const brainRouteStartMs = Date.now();
     const routed = await this.coordinator.routeIntent(intent, candidates);
+    const brainRouteMs = Date.now() - brainRouteStartMs;
 
     let scoredTools: Array<NamespacedTool & { score: number }>;
     let castRoute: 'brain' | 'fallback';
@@ -1315,7 +1317,7 @@ export class Aggregator {
             resolvedBy,
             intent,
             latencyMs: Date.now() - castStartMs,
-            latencyBreakdown: { scoringMs: chainScoringMs, executionMs: chainExecutionMs },
+            latencyBreakdown: { scoringMs: chainScoringMs, executionMs: chainExecutionMs, ...(castRoute === 'brain' ? { brainMs: brainRouteMs } : {}) },
             // focusName is always truthy here (catalogCombo requires it — see line ~1238)
             /* c8 ignore next */
             ...(focusName ? { focus: focusName } : {}),
@@ -1437,7 +1439,7 @@ export class Aggregator {
             resolvedBy,
             intent,
             latencyMs: Date.now() - castStartMs,
-            latencyBreakdown: { scoringMs: execScoringMs, executionMs },
+            latencyBreakdown: { scoringMs: execScoringMs, executionMs, ...(castRoute === 'brain' ? { brainMs: brainRouteMs } : {}) },
             ...(focusName ? { focus: focusName } : {}),
             ...(scopeAnnotation ? { scope: scopeAnnotation } : {}),
             ...(explanation ? { explanation } : {}),
