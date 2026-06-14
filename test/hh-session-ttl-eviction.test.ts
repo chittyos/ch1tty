@@ -78,12 +78,9 @@ test('evictStaleSessions: onToolCall prevents eviction of otherwise-expired sess
   const coord = makeCoord();
   try {
     await coord.onSessionStart('sess-refresh', 'http');
-    await new Promise<void>((r) => setTimeout(r, 50));
-    // Refresh lastActiveAt via tool call (session is 50ms old, shortTtl=80ms — still alive)
     coord.onToolCall('sess-refresh', 'neon/list_projects');
-    await new Promise<void>((r) => setTimeout(r, 50));
-    // Now 100ms since session start (>shortTtl=80ms), but only 50ms since tool call (<80ms)
-    const evicted = coord.evictStaleSessions(Date.now(), shortTtl);
+    // Synthetic now = just under TTL past the tool call: cutoff = now - shortTtl < lastActiveAt → NOT evicted
+    const evicted = coord.evictStaleSessions(Date.now() + shortTtl - 1, shortTtl);
     assert.equal(evicted, 0, 'tool call should have kept session alive');
     assert.equal(coord.hasSession('sess-refresh'), true);
   } finally {
@@ -94,14 +91,24 @@ test('evictStaleSessions: onToolCall prevents eviction of otherwise-expired sess
 test('evictStaleSessions: staging-incomplete sessions are NOT evicted', async () => {
   const coord = makeCoord();
   try {
-    // onSessionStart sets stagingComplete=false until staging finishes.
-    // Without an ecosystem backend, staging completes immediately (synchronously in test).
-    // We need to test the guard directly — create a scenario where staging is incomplete.
-    // Since staging completes immediately when no ecosystem backend is bound, we verify
-    // the guard exists by checking that a completed session IS evicted (staging=true path).
+    await coord.onSessionStart('sess-incomplete', 'http');
+    // Force stagingComplete=false via test cast to exercise the guard directly
+    const ctx = (coord as unknown as { contexts: Map<string, { stagingComplete: boolean }> }).contexts.get('sess-incomplete');
+    assert.ok(ctx, 'session context should exist');
+    ctx.stagingComplete = false;
+    const evicted = coord.evictStaleSessions(Date.now() + TTL + 1, TTL);
+    assert.equal(evicted, 0, 'staging-incomplete session must not be evicted');
+    assert.equal(coord.hasSession('sess-incomplete'), true);
+  } finally {
+    coord.close();
+  }
+});
+
+test('evictStaleSessions: staging-complete expired session IS evicted', async () => {
+  const coord = makeCoord();
+  try {
     await coord.onSessionStart('sess-staged', 'http');
-    // staging completes synchronously (no ecosystem backend) → stagingComplete=true
-    assert.equal(coord.isStagingComplete('sess-staged'), true, 'staging should be complete');
+    assert.equal(coord.isStagingComplete('sess-staged'), true, 'staging should be complete without ecosystem backend');
     const evicted = coord.evictStaleSessions(Date.now() + TTL + 1, TTL);
     assert.equal(evicted, 1, 'staged+expired session should be evicted');
   } finally {

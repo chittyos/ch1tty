@@ -71,8 +71,10 @@ export class SessionCoordinator {
     this.ledger = new LedgerClient(ledgerDlqPath);
     this.brain = new OllamaBrain(brainConfig);
     this.embeddingBrain = new EmbeddingBrain(embedConfig);
-    this.sessionTtlMs = Number(process.env.CH1TTY_SESSION_TTL_MS ?? 3_600_000);
-    const intervalMs = Number(process.env.CH1TTY_SESSION_EVICT_INTERVAL_MS ?? 300_000);
+    const parsedTtl = Number(process.env.CH1TTY_SESSION_TTL_MS);
+    this.sessionTtlMs = Number.isFinite(parsedTtl) && parsedTtl >= 0 ? parsedTtl : 3_600_000;
+    const parsedInterval = Number(process.env.CH1TTY_SESSION_EVICT_INTERVAL_MS);
+    const intervalMs = Number.isFinite(parsedInterval) && parsedInterval >= 0 ? parsedInterval : 300_000;
     if (this.sessionTtlMs > 0 && intervalMs > 0) {
       this.evictionTimer = setInterval(() => this.evictStaleSessions(), intervalMs);
       this.evictionTimer.unref();
