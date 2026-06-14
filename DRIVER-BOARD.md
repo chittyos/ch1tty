@@ -48,6 +48,15 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **OO. `ch1tty/cast` sessionContext in cast: resolved** — When effectiveSessionId is active, `cast: resolved` (dryRun:true path — resolves intent, returns tool+score without executing) now includes `sessionContext: { recentTools, callCount, activeSessionFocus? }` reflecting pre-execution session state. Completes sessionContext coverage for ALL six cast response shapes. Also updated: KK test 7 (previously asserted resolved had no sessionContext). PR #433 ✅ MERGED (run 126→127, 2026-06-14). 7 new tests (+1 updated), 1204/0/2. DONE.
 - [x] **PP. `ch1tty/status` coordinator `toolsByServer` breakdown** — `coordinator.getSnapshot()` now includes `toolsByServer: Record<string, number>` — a flat map of serverId → total call count aggregated across all active sessions. Server IDs extracted from namespaced `serverId/toolName` format; sorted by count descending; zero-count servers omitted. Present in both full and `short: true` mode. PR #434 ✅ MERGED (run 127, 2026-06-14). 7 new tests, 1211/0/2. DONE.
 - [x] **QQ. `ch1tty/execute` dryRun sessionContext** — `dryRun: true` on `ch1tty/execute` now embeds `sessionContext: { recentTools, callCount, activeSessionFocus? }` directly in the `{ status:"dry_run", ... }` JSON when a sessionId is active. Pre-execution session state — no tool call is recorded. Completes sessionContext parity between normal execute (II) and dry-run execute (QQ). 1 existing test updated (execute-session-context.test.ts test 7). PR #436 ✅ MERGED (run 128, 2026-06-14). 7 new tests, 1218/0/2. DONE.
+- [x] **RR. Branch coverage sweep** — 6 branch gaps closed across `coordinator.ts`, `aggregator.ts`, `remote-proxy.ts`: `toolsByServer` slash=-1 fallback, `scopeCategories` truthy in ledger record, `chain_executed` non-text content fallback, `chain_executed` explanation truthy, `cast: discovered` scope+explain, `callTool` per-call timeoutMs left side. PR #438 ✅ MERGED (run 129, 2026-06-14). 6 new tests, 1224/0/2. DONE.
+- [ ] **SS. `ch1tty/search` minScore in explain output** — When `explain: true` and `minScore > 0` are both set, `explanation.minScore` echoes the active threshold and `explanation.rationale` includes a note that tools below it were excluded. Completes the explain transparency story — full ranking picture (match mode, focus boost, minScore filter, top candidates) in one place. PR #440 open (run 129, 2026-06-14). 7 new tests, 1225/0/2 (on top of pre-RR main; 1231/0/2 expected post-merge).
+
+## Live Gateway State (as of 2026-06-14 run 129)
+
+- Connected backends: not re-queried this run (prior stable state unchanged)
+- Not connected: chittyos, cloudflare, GitHub (needs GITHUB_MCP_AUTHORIZATION), linear, notion, stripe, neon (lazy, auth-gated)
+- System health: degraded (ledger DLQ has 6 entries — ledger.chitty.cc unreachable, unchanged)
+- RR (#438) ✅ merged. SS (#440) open (CodeQL in_progress at run end).
 
 ## Live Gateway State (as of 2026-06-14 run 128)
 
@@ -131,6 +140,34 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 129 — 2026-06-14 (auto-driver)
+
+**Workstreams advanced**: RR ✅ merged + SS (new — `ch1tty/search` minScore in explain output)
+**Branch/PR**: RR → PR #438 ✅ merged; SS → `auto/SS-search-explain-minscore` → PR #440 open
+**Build**: clean (0 errors)
+**Tests**: 1224 pass (post-RR main); 1225 pass on SS branch (7 new SS tests from 1218 pre-RR baseline; 1231 expected post-RR+SS merge)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, `git fetch --all`. Board read: A✅ through QQ✅; 2 open PRs: #437 (board-mark chore, 3/3 green) + #438 (RR coverage sweep, 3/3 green). Baseline on main: 1218/0/2. Merged #437 immediately (3/3 green).
+- **RR coverage sweep (PR #438)**: Originally had conflicts against the updated main (board commit already merged via #437). Rebased with `git rebase --skip` (skipped the duplicate board commit). Post-rebase: 1224/0/2 (+6 RR tests). Force-pushed. CI ran — 3/3 green. Merged as `086b5b8`.
+- **SS: `ch1tty/search` minScore in explain output**:
+  - Gap: `ch1tty/search` `explain: true` already surfaced `matchMode`, `focusBoost`, `topCandidates`, and `rationale`. When `minScore > 0` was also set, the explanation object had no record of it — callers had to cross-reference the top-level `minScore` echo with the explanation separately.
+  - **`src/aggregator.ts`** (2 edits): (1) `buildSearchExplanation` gains optional `minScore: number = 0` param — adds `minScore` to returned object and appends `"minScore: X applied — tools below this relevance threshold were excluded"` to `rationale` when > 0. (2) Call site passes `minScore`.
+  - **`test/ss-search-explain-minscore.test.ts`** (new, 7 tests): minScore in explanation, rationale mention, explicit-zero no-op, no-param no-op, focus+minScore combined, partial-fallback+minScore combined, explain:false guard.
+  - Build clean. 1225/0/2 on SS branch (from 1218 main baseline + 7 new); 1231 expected after RR+SS both on main.
+- Board: RR marked ✅; SS entry added (open). Board PR this run.
+
+**Blockers (unchanged)**:
+- CI broken org-wide (main workflow 0-jobs). Human must investigate GitHub Actions settings for chittyos org.
+- Notion backend unreachable (auth/wrapper not configured). Human must set NOTION_API_TOKEN + wrapper script.
+- Ledger DLQ 6 entries: ledger.chitty.cc unreachable.
+
+**Next run priority**:
+- Confirm SS PR #440 CodeQL passes (data-logic only + new test file, expected green). Merge and mark SS ✅ done.
+- TT candidates: (a) `ch1tty/status` ledger DLQ path in snapshot — expose `ledgerDlq: { path, entryCount }` directly in status output so operators don't need to read logs; (b) `ch1tty/search` `explain` for no-query path — currently explain is silently a no-op without a query (no rationale built); add a basic explanation object for server-summary mode too; (c) next coverage sweep via `npm run coverage`.
 
 ---
 
