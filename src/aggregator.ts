@@ -355,7 +355,7 @@ export class Aggregator {
           'Describe what you want done in natural language. Ch1tty searches its full surface — tools, prompts, and resources — ' +
           'resolves intent, and executes the best tool match. Related prompts and resources are surfaced alongside. ' +
           'When a sessionId is active, cast: executed and cast: chain_executed include sessionContext reflecting session state after execution; ' +
-          'cast: plan, cast: discovered, and cast: no_match include sessionContext reflecting pre-execution session state (recent tools, call count, sticky focus). ' +
+          'cast: plan, cast: resolved, cast: discovered, and cast: no_match include sessionContext reflecting pre-execution session state (recent tools, call count, sticky focus). ' +
           'Sub-meta to master-meta — the gateway calling itself.',
         inputSchema: {
           type: 'object',
@@ -1276,6 +1276,16 @@ export class Aggregator {
 
     // Step 2b: Dry-run mode — return only resolved tool + score + catalog match, no execution, no schema
     if (dryRun) {
+      let resolvedSessionContext: { recentTools: string[]; callCount: number; activeSessionFocus?: string } | null = null;
+      if (effectiveSessionId && this.coordinator.hasSession(effectiveSessionId)) {
+        const ctxPat = this.coordinator.getToolPatterns(effectiveSessionId, 1000);
+        const sfocus = this.coordinator.getSessionFocus(effectiveSessionId);
+        resolvedSessionContext = {
+          recentTools: ctxPat.slice(0, 5).map((p) => p.tool),
+          callCount: ctxPat.reduce((s, p) => s + p.count, 0),
+          ...(sfocus ? { activeSessionFocus: sfocus } : {}),
+        };
+      }
       return {
         content: [{
           type: 'text',
@@ -1288,6 +1298,7 @@ export class Aggregator {
             ...(explanation ? { explanation } : {}),
             resolved: { tool: best.namespacedName, score: best.score },
             ...(catalogCombo ? { catalogCombo: { name: catalogCombo.name, chain: catalogCombo.chain, accomplishes: catalogCombo.accomplishes } } : {}),
+            ...(resolvedSessionContext ? { sessionContext: resolvedSessionContext } : {}),
           }, null, 2),
         }],
       };
