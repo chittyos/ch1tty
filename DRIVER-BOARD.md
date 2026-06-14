@@ -225,6 +225,40 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 
 ---
 
+### Run 139 — 2026-06-14 (auto-driver)
+
+**Workstream advanced**: PPPP (new — `latencyBreakdown.brainMs` in `cast:executed` and `cast:chain_executed`)
+**Branch/PR**: `auto/PPPP-cast-latency-breakdown-brain-ms` → PR #456 open (CodeQL in_progress)
+**Build**: clean (0 errors)
+**Tests**: 1291 pass, 0 fail, 2 skipped (+7 PPPP from 1284 baseline)
+
+**What was done**:
+- Startup: git reset --hard origin/main after PR #455 (OOOO) merge divergence. 1284/0/2 baseline confirmed. Read DRIVER-BOARD.md: A✅ through OOOO✅. PPPP open as new workstream.
+- **Confirmed OOOO PR #455 merged** (SHA 3656961). Marked OOOO ✅ done in board.
+- **Workstream PPPP: `latencyBreakdown.brainMs` when brain route fires**
+  - Gap: NNNN (PR #453) added `latencyBreakdown: { scoringMs, executionMs }` to `cast:executed` and `cast:chain_executed`. `scoringMs` covers the full pre-execution window (registry fetch + brain routing + keyword scoring + focus bias), so when the brain takes 400ms and keyword scoring takes 1ms, callers see only a single `scoringMs` number with no way to know how much was brain overhead. The natural completion is exposing `brainMs` when `castRoute === 'brain'`.
+  - **`src/aggregator.ts`** (4 edits):
+    1. Wrap `routeIntent()` call: `const brainRouteStartMs = Date.now()` before; `const brainRouteMs = Date.now() - brainRouteStartMs` after.
+    2. `cast:chain_executed` `latencyBreakdown`: `{ scoringMs: chainScoringMs, executionMs: chainExecutionMs, ...(castRoute === 'brain' ? { brainMs: brainRouteMs } : {}) }`.
+    3. `cast:executed` `latencyBreakdown`: `{ scoringMs: execScoringMs, executionMs, ...(castRoute === 'brain' ? { brainMs: brainRouteMs } : {}) }`.
+    4. Tool description updated to advertise `brainMs?` in `latencyBreakdown`.
+  - **`test/pppp-cast-latency-breakdown-brain-ms.test.ts`** (new, 7 tests): Uses `BrainCoordinator` (subclass stubs `routeIntent` to return a non-null result) and `FallbackCoordinator` (returns `null`) injected via `options.coordinator`. PPPP-1/3: brain route → `brainMs` present and ≥ 0. PPPP-2/4: keyword fallback → `brainMs` absent. PPPP-5: `brainMs ≤ scoringMs + 2ms`. PPPP-6/7: plan/no_match → no `latencyBreakdown` (unchanged from NNNN). All 7 passed.
+  - Build clean. Full suite: 1291/0/2 (+7 from 1284).
+- PR #456 open; CodeQL in_progress. Codex + CodeRabbit both rate-limited (informational).
+
+**Blockers (unchanged)**:
+- Ledger DLQ 11+ entries: ledger.chitty.cc unreachable. `ledgerDlq.entries[]` (OOOO) now surfaces these via status.
+- Notion API token invalid: cannot read/write Notion board. Human must refresh `NOTION_API_TOKEN` on gateway homelab.
+- CI (main workflow 0-jobs) unchanged — only CodeQL runs.
+
+**Next run priority**:
+- Confirm PPPP PR #456 CodeQL passes (data-logic only, expected green). Merge and mark PPPP ✅ done.
+- QQQQ candidates: (a) Dependabot PR #375 esbuild dev-only bump (long overdue — no logic change, just merge); (b) `ch1tty/cast` explain `brainMs` in `explanation` field — when `explain:true` and brain route fires, surface `brainMs` alongside the existing `method:'brain'` in the explanation; (c) `ch1tty/status` health endpoint `/api/v1/health` DLQ count in 503 response — currently 503 fires when `systemHealth.status === 'degraded'` but the body doesn't include the DLQ count.
+
+---
+
+---
+
 ### Run 138 — 2026-06-14 (auto-driver)
 
 **Workstream advanced**: OOOO (new — `ledgerDlq.entries[]` in `ch1tty/status` snapshot)
