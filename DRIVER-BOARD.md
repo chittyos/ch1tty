@@ -39,7 +39,8 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **FF. `ch1tty/search` sessionContext field** — When a sessionId is active, `ch1tty/search` now returns `sessionContext: { recentTools: string[], callCount: number, activeSessionFocus?: string }` — one-shot session awareness alongside tool results, no separate `ch1tty/status` call needed. Included in both the query path and no-query server-summary path. PR #418 ✅ MERGED (run 119, 2026-06-13). 7 new tests, 1133/0/2. DONE.
 - [x] **GG. `ch1tty/search` serverName field** — Each tool result now includes `serverName` (human-readable backend name, e.g. `"Neon Database"`) alongside the existing `server` id field. PR #419 ✅ MERGED (run 121, 2026-06-14). 7 new tests, 1140/0/2. DONE.
 - [x] **HH. Session TTL eviction** — `SessionContext.lastActiveAt` tracked on create + every tool call. Background sweep (default every 5 min) evicts staging-complete sessions inactive longer than `CH1TTY_SESSION_TTL_MS` (default 1h). `evictStaleSessions(now?, ttlMs?)` public for test injection. `close()` stops timer. `getSnapshot()` reports `evictedSessions` + `sessionTtlMs`. Wired into `Aggregator.shutdown()`. PR #420 ✅ MERGED (run 121, 2026-06-14). 12 new tests, 1145/0/2. DONE.
-- [ ] **II. `ch1tty/execute` sessionContext response** — When effectiveSessionId is active and the tool call succeeds (not dryRun), a second content item with `sessionContext: { recentTools, callCount, activeSessionFocus? }` is appended to the execute response, mirroring FF. The first content item (raw tool output) is unchanged. PR #421 OPEN (run 121, 2026-06-14). 7 new tests, 1140/0/2. Awaiting merge.
+- [x] **II. `ch1tty/execute` sessionContext response** — When effectiveSessionId is active and the tool call succeeds (not dryRun), a second content item with `sessionContext: { recentTools, callCount, activeSessionFocus? }` is appended to the execute response, mirroring FF. The first content item (raw tool output) is unchanged. PR #421 ✅ MERGED (run 121, 2026-06-14). 7 new tests, 1160/0/2. DONE.
+- [ ] **JJ. `ch1tty/cast` sessionContext response** — When effectiveSessionId is active and execution succeeds, `cast: executed` and `cast: chain_executed` include `sessionContext: { recentTools, callCount, activeSessionFocus? }` in the cast metadata JSON (content[0]). cast: plan/resolved/no_match/discovered unchanged. PR #423 OPEN (run 121, 2026-06-14). 9 new tests, 1169/0/2. Awaiting CI/merge.
 
 ## Live Gateway State (as of 2026-06-14 run 121)
 
@@ -47,7 +48,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Not connected: chittyos, cloudflare, GitHub (needs GITHUB_MCP_AUTHORIZATION), linear, notion, stripe, neon (lazy, auth-gated)
 - System health: degraded (ledger DLQ has 6 entries — ledger.chitty.cc unreachable)
 - Brain: ok (embedding circuit open=false; Ollama circuit cycling normally)
-- GG (#419) + HH (#420) merged this run; II (#421) rebasing+merging this run
+- GG (#419) ✅ HH (#420) ✅ II (#421) ✅ all merged; JJ (#423) open (CodeQL in_progress)
 
 ## Live Gateway State (as of 2026-06-13 run 117)
 
@@ -97,15 +98,21 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 **Tests**: 1133 pass on main baseline; merged PRs add +7 (GG) +12 (HH) +7 (II) = 1159 expected after all merges
 
 **What was done**:
-- Startup: `npm ci` clean, `npm run build` clean, 1133/0/2 on HEAD. Board read: A✅ through FF✅; GG/HH/II open. Built from main sha 798600a.
-- Merged GG (#419) — squash — serverName in search results.
-- Merged HH (#420) — squash — session TTL eviction in coordinator.
-- PR #421 (II) had conflict in DRIVER-BOARD.md after GG/HH merged; rebased branch locally and resolving.
-- Advancing workstream JJ this run.
+- Startup: `npm ci` clean, `npm run build` clean, 1133/0/2 on main sha 798600a. Board: A✅ through FF✅; GG/HH/II all open (all mergeable_state: clean).
+- Merged HH (#420) squash → main 7be5939.
+- Merged GG (#419) squash → main f57ae3e.
+- PR #421 (II) had DRIVER-BOARD.md conflict after GG+HH landed; rebased locally (aggregator.ts merged clean — different functions), resolved board conflict, force-pushed, merged → main 013ce1b.
+- Full test suite on merged main: **1160/0/2** (1133 baseline + 7 GG + 12 HH + 7 II = 1159, +1 pre-existing).
+- **Workstream JJ: `ch1tty/cast` sessionContext in cast: executed + chain_executed**
+  - Gap: FF added sessionContext to search, II added it to execute. cast — the third execution meta-tool — had no equivalent; callers needed a separate `ch1tty/status` round-trip.
+  - **`src/aggregator.ts`** (3 edits): (1) Updated cast description; (2) `chain_executed` path: compute `chainSessionContext` after step loop, add to JSON; (3) `executed` path: compute `castSessionContext` after `handleExecute` returns (only when `!result.isError`), add to cast metadata JSON (content[0]).
+  - **9 new tests** in `test/jj-cast-session-context.test.ts`: no sessionId, sessionContext present + recentTools, callCount, recentTools cap-5, activeSessionFocus set, focus absent, chain_executed context, isError no-context, plan no-context.
+  - Build clean, 1169/0/2 (+9 from 1160).
+- PR #423 opened: https://github.com/chittyos/ch1tty/pull/423 — CodeQL in_progress. Codex usage-limit + CodeRabbit rate-limit — both informational, no action.
 
 **Next run priority**:
-- Confirm II (#421) merged (rebase in progress this run).
-- Workstream JJ: `ch1tty/cast` sessionContext in response — add sessionContext to cast: executed/chain_executed/plan responses when session active.
+- Merge JJ (#423) once CodeQL completes (expected green — data-logic only, no infra change). Mark JJ ✅ done.
+- Workstream KK candidates: (a) `ch1tty/status` ledgerDlq field — expose DLQ path + entry count in status snapshot; (b) `ch1tty/cast` sessionContext on cast: plan — include session state in confirm mode; (c) Dependabot #375 (esbuild dev-only bump — long overdue).
 - Persistent blockers: CI broken org-wide (human must fix GitHub Actions), Notion unreachable, Ledger DLQ 6 entries.
 
 ---
