@@ -45,7 +45,16 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **LL. `ch1tty/cast` sessionContext in cast: discovered** — When effectiveSessionId is active, `cast: discovered` (prompts/resources match but no tools) now includes `sessionContext: { recentTools, callCount, activeSessionFocus? }` reflecting pre-execution session state. Completes sessionContext coverage for ALL cast response shapes. Also confirmed: the `!best` gate fires before `confirm`/`dryRun` checks — neither redirects to plan/resolved when no tools match. PR #427 ✅ MERGED (run 123, 2026-06-14). 7 new tests, 1183/0/2. DONE.
 - [x] **MM. `ch1tty/cast` sessionContext in cast: no_match** — When effectiveSessionId is active, `cast: no_match` (nothing matched — no tools, prompts, or resources) now includes `sessionContext: { recentTools, callCount, activeSessionFocus? }` reflecting pre-execution session state. Completes sessionContext for ALL six cast response shapes. PR #429 ✅ MERGED (run 124→125, 2026-06-14). 7 new tests, 1190/0/2. DONE.
 - [x] **NN. `ch1tty/search` minScore filter** — `minScore: number` param on `ch1tty/search` hard-filters results to only tools with relevance score >= minScore. Requires a query (no-op without one). `total` reflects post-filter count. `minScore` echoed in response when > 0. Applied after sorting, before offset/limit pagination. PR #431 ✅ MERGED (run 125→126, 2026-06-14). 7 new tests, 1197/0/2. DONE.
-- [ ] **OO. `ch1tty/cast` sessionContext in cast: resolved** — When effectiveSessionId is active, `cast: resolved` (dryRun:true path — resolves intent, returns tool+score without executing) now includes `sessionContext: { recentTools, callCount, activeSessionFocus? }` reflecting pre-execution session state. Completes sessionContext coverage for ALL six cast response shapes. Also updated: KK test 7 (previously asserted resolved had no sessionContext). PR #433 open (CodeQL in_progress, run 126, 2026-06-14). 7 new tests (+1 updated), 1204/0/2.
+- [x] **OO. `ch1tty/cast` sessionContext in cast: resolved** — When effectiveSessionId is active, `cast: resolved` (dryRun:true path — resolves intent, returns tool+score without executing) now includes `sessionContext: { recentTools, callCount, activeSessionFocus? }` reflecting pre-execution session state. Completes sessionContext coverage for ALL six cast response shapes. Also updated: KK test 7 (previously asserted resolved had no sessionContext). PR #433 ✅ MERGED (run 126→127, 2026-06-14). 7 new tests (+1 updated), 1204/0/2. DONE.
+- [ ] **PP. `ch1tty/status` coordinator `toolsByServer` breakdown** — `coordinator.getSnapshot()` now includes `toolsByServer: Record<string, number>` — a flat map of serverId → total call count aggregated across all active sessions. Server IDs extracted from namespaced `serverId/toolName` format; sorted by count descending; zero-count servers omitted. Present in both full and `short: true` mode. PR open (run 127, 2026-06-14). 7 new tests, 1211/0/2.
+
+## Live Gateway State (as of 2026-06-14 run 127)
+
+- Connected backends: cloudflare-builds (7 tools), evidence (3), browser-rendering (3), context7 (2), thinking (1), fs (14), playwright (23), orchestrator (13) — 66 total tools
+- Not connected: chittyos, cloudflare, GitHub (needs GITHUB_MCP_AUTHORIZATION), linear, notion, stripe, neon (lazy, auth-gated)
+- System health: degraded (ledger DLQ has 6 entries — ledger.chitty.cc unreachable, unchanged)
+- Active sessions: 127 (at status check)
+- OO (#433) ✅ merged (confirmed on main HEAD 234bab3). PP branch `auto/PP-status-tools-by-server` pushed; PR open.
 
 ## Live Gateway State (as of 2026-06-14 run 126)
 
@@ -114,6 +123,42 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 127 — 2026-06-14 (auto-driver)
+
+**Workstream advanced**: PP (new — `ch1tty/status` coordinator `toolsByServer` breakdown)
+**Branch/PR**: `auto/PP-status-tools-by-server` → PR open
+**Build**: clean (0 errors)
+**Tests**: 1211 pass, 0 fail, 2 skipped (+7 new PP tests from 1204 baseline)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean. `git fetch --all`: OO branch present on origin. No open PRs. Confirmed OO (#433) merged (HEAD of main `234bab3 feat(cast): sessionContext in cast: resolved responses (OO)`). Baseline: 1204/0/2. Board: A✅ through NN✅; OO marked ✅ done this run. Gateway status: 8/15 connected, 66 tools, 127 active sessions, system health degraded (ledger DLQ 6 entries — unchanged).
+- **Workstream PP: `ch1tty/status` coordinator `toolsByServer` breakdown**
+  - Gap: `coordinator.getSnapshot()` exposed `topTools: string[]` (top 10 globally) but no per-server breakdown. Operators couldn't see which backends are actually being used vs. which are idle — critical for capacity planning and identifying dead registrations.
+  - **`src/coordinator.ts`** (2 edits):
+    1. Added `toolsByServer: Record<string, number>` to `getSnapshot()` return type annotation.
+    2. In the global-counts loop: alongside `globalToolCounts`, built `globalServerCounts` by extracting `serverId` from each namespaced `serverId/toolName` (via `indexOf('/')`) and accumulating counts. Converted to `toolsByServer` plain object sorted by count descending (highest-traffic servers first). Tools without a `/` use the full name as the key (defensive — shouldn't occur in practice).
+  - **`test/pp-status-tools-by-server.test.ts`** (new, 7 tests):
+    1. No sessions → `toolsByServer: {}`
+    2. Single call → `{ neon: 1 }`
+    3. Multiple calls same server → count accumulated (3 calls → `{ neon: 3 }`)
+    4. Two servers → both present with correct counts
+    5. Cross-session aggregation for same server (2 sessions → counts summed)
+    6. `short: true` preserves `coordinator.toolsByServer` (coordinator-level field, not sessions)
+    7. Ended session tools absent (`onSessionEnd` removes context → server count drops)
+  - Build clean, 1211/0/2 (+7 from 1204).
+- Board: OO marked ✅ done; PP entry added (open).
+
+**Blockers (unchanged)**:
+- CI broken org-wide (main workflow 0-jobs). Human must investigate GitHub Actions settings for chittyos org.
+- Notion backend unreachable (auth/wrapper not configured). Human must set NOTION_API_TOKEN + wrapper script.
+- Ledger DLQ 6 entries: ledger.chitty.cc unreachable.
+
+**Next run priority**:
+- Confirm PP PR CodeQL passes (data-logic only, expected green). Merge and mark PP ✅ done.
+- QQ candidates: (a) `ch1tty/execute` `sessionContext` on dry_run response — mirrors OO for execute (dryRun path returns `{ status:"dry_run", server, tool, args }` but no sessionContext); (b) `ch1tty/search` `minScore` surfaced in `explain` output — when minScore > 0, add `minScore` to `explanation.rationale` so callers see the active threshold; (c) `ch1tty/status` ledger DLQ count in snapshot — expose `ledgerDlq: { path, entryCount }` directly in the status snapshot (already visible in `ledgerHealth.dlqEntries` but not labelled with the path); (d) coverage sweep — `npm run coverage` to find remaining branch gaps.
 
 ---
 
