@@ -61,7 +61,16 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **PPPP. `ch1tty/cast` `latencyBreakdown.brainMs`** — When the brain route fires (`castRoute === 'brain'`), `latencyBreakdown` on `cast:executed` and `cast:chain_executed` gains `brainMs: number` — wall-clock time of `routeIntent()` alone. Absent when keyword-fallback route taken. PR #456 ✅ MERGED (45bdce9, run 139, 2026-06-14). 7 new tests, 1291/0/2. DONE.
 - [x] **QQQQ. `ch1tty/execute` `latencyMs` in responses** — Wall-clock elapsed time added to `ch1tty/execute` responses: when sessionId active + success, content[1] becomes `{ latencyMs, sessionContext }` (previously only `{ sessionContext }`); when dryRun, `latencyMs` embedded in dry_run JSON alongside sessionContext. No-session non-dryRun unchanged (backward compat). Completes latency observability triad (cast LLLL/NNNN/PPPP + execute QQQQ). PR #458 ✅ MERGED (9fe10a9, run 139, 2026-06-14). 7 new tests, 1298/0/2. DONE.
 - [x] **RRRR. `ch1tty/search` `latencyMs` in responses** — All `ch1tty/search` response shapes now carry `latencyMs: number` — wall-clock elapsed time in ms from `handleSearch` entry to JSON serialisation. Covers both return paths: query/filter path (tools array) and no-query server-summary path. Tool description updated to advertise `latencyMs`. Completes latency observability across all three active meta-tools (cast LLLL/NNNN/PPPP + execute QQQQ + search RRRR). PR #460 ✅ MERGED (a11c8d7, run 140, 2026-06-14). 7 new tests, 1305/0/2. DONE.
-- [x] **SSSS. `ch1tty/cast` `explanation.brainMs` when brain route fires** — When `explain: true` is set and `castRoute === 'brain'`, the `explanation` object now includes `brainMs: number` — wall-clock time of `routeIntent()` in milliseconds. Absent when keyword-fallback route is used. Parallels `latencyBreakdown.brainMs` (PPPP) but lives in the reasoning-oriented `explanation` field alongside `method:'brain'`, `topCandidates`, and `rationale`. Present in all cast shapes: `executed`, `plan`, `resolved`, `chain_executed`, `no_match`. PR #462 ✅ MERGED (run 141, 2026-06-14). 7 new tests, 1312/0/2. DONE.
+- [x] **SSSS. `ch1tty/cast` `explanation.brainMs` when brain route fires** — When `explain: true` is set and `castRoute === 'brain'`, the `explanation` object now includes `brainMs: number` — wall-clock time of `routeIntent()` in milliseconds. Absent when keyword-fallback route is used. Parallels `latencyBreakdown.brainMs` (PPPP) but lives in the reasoning-oriented `explanation` field alongside `method:'brain'`, `topCandidates`, and `rationale`. Present in all cast shapes: `executed`, `plan`, `resolved`, `chain_executed`, `no_match`. PR #462 ✅ MERGED (3fe81de, run 141, 2026-06-14). 7 new tests, 1312/0/2. DONE.
+- [ ] **TTTT. `ch1tty/cast` `explanation.candidateCount`** — Adds `candidateCount: number` to `explanation` when `explain: true` is set. Shows the total number of tools in the scoring pool before the top-5 `topCandidates` slice — lets operators see how competitive the resolution was (3 candidates is very different from 150). Always 0 on `cast:no_match`. PR #463 open (CodeQL in_progress, run 141, 2026-06-14). 7 new tests, 1319/0/2.
+
+## Live Gateway State (as of 2026-06-14 run 141)
+
+- Connected backends: (not re-queried this run — stable from run 140: 263 tools across 11 servers)
+- Not connected: cloudflare, github, linear, stripe (lazy, auth-gated or unreachable)
+- System health: degraded (ledger DLQ 11+ entries — ledger.chitty.cc unreachable, unchanged)
+- Brain: ok (embedding circuit open=false, ollama circuit open=false)
+- SSSS (#462) ✅ MERGED (3fe81de, rebased to resolve DRIVER-BOARD.md conflict). TTTT (#463) open (CodeQL in_progress)
 
 ## Live Gateway State (as of 2026-06-14 run 140)
 
@@ -70,7 +79,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - System health: degraded (ledger DLQ 11+ entries — ledger.chitty.cc unreachable, unchanged)
 - Brain: ok (embedding circuit open=false, ollama circuit open=false)
 - Active sessions: 38 (at startup status check)
-- RRRR (#460) ✅ MERGED (a11c8d7). SSSS (#462) ✅ MERGED (rebased + merged run 141, 2026-06-14)
+- RRRR (#460) ✅ MERGED (a11c8d7). SSSS (#462) ✅ MERGED (3fe81de, run 141, 2026-06-14)
 
 ## Live Gateway State (as of 2026-06-14 run 139)
 
@@ -234,6 +243,36 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 141 — 2026-06-14 (auto-driver)
+
+**Workstream advanced**: TTTT (new — `explanation.candidateCount` in `ch1tty/cast` when `explain:true`)
+**Branch/PR**: `auto/TTTT-cast-explain-candidate-count` → PR #463 open (CodeQL in_progress)
+**Build**: clean (0 errors)
+**Tests**: 1319 pass, 0 fail, 2 skipped (+7 TTTT from 1312 SSSS baseline)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 1305/0/2 (main was at RRRR; SSSS open PR #462).
+- Read DRIVER-BOARD.md: A✅ through RRRR✅; SSSS (#462) open — CI green, `mergeable_state: dirty` (DRIVER-BOARD.md conflict only).
+- **Rebased SSSS branch** (`auto/SSSS-cast-explain-brain-ms`) onto main, resolved DRIVER-BOARD.md conflict (both sides updated RRRR entry; kept SSSS version which adds SSSS entry + correct SHA). Force-pushed. Tests: 1312/0/2.
+- **Merged SSSS PR #462** (SHA 3fe81de). Post-merge baseline on main: 1312/0/2.
+- **Workstream TTTT: `explanation.candidateCount` in all cast explain shapes**
+  - Gap: `explanation.topCandidates` shows top-5 scoring tools, but the total pool size was invisible. Knowing candidateCount=150 vs candidateCount=3 tells operators how competitive the intent resolution was.
+  - **`src/aggregator.ts`** (2 edits): `candidateCount: scoredTools.length` added to `buildCastExplanation` return object; tool description updated.
+  - **`test/tttt-cast-explain-candidate-count.test.ts`** (new, 7 tests): TTTT-1..7 covering keyword/brain routes, exact count with 2-tool registry, no_match→0, plan/resolved/chain_executed shapes, candidateCount ≥ topCandidates.length invariant.
+  - Build clean. Full suite: 1319/0/2 (+7 from 1312).
+- Notion API token still invalid (blocker unchanged).
+
+**Blockers (unchanged)**:
+- Ledger DLQ 11+ entries: ledger.chitty.cc unreachable.
+- Notion API token invalid: cannot read/write Notion board. Human must refresh `NOTION_API_TOKEN`.
+- CI (main workflow 0-jobs) unchanged — only CodeQL runs.
+
+**Next run priority**:
+- Confirm TTTT PR #463 CodeQL passes. Merge and mark TTTT ✅ done.
+- UUUU candidates: (a) `/api/v1/health` 503 body include `ledgerDlq: { entryCount }` when degraded; (b) `explanation.winnerScore` shorthand (score of winning tool without having to parse topCandidates[0]); (c) `ch1tty/cast` `chain_executed` — verify latencyBreakdown covers chain total correctly with multi-step test.
 
 ---
 
