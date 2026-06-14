@@ -353,8 +353,9 @@ export class Aggregator {
         description:
           'Describe what you want done in natural language. Ch1tty searches its full surface — tools, prompts, and resources — ' +
           'resolves intent, and executes the best tool match. Related prompts and resources are surfaced alongside. ' +
-          'When a sessionId is active, cast: executed and cast: chain_executed responses include sessionContext: { recentTools, callCount, activeSessionFocus? } ' +
-          'reflecting session state after execution. Sub-meta to master-meta — the gateway calling itself.',
+          'When a sessionId is active, cast: executed and cast: chain_executed include sessionContext reflecting session state after execution; ' +
+          'cast: plan includes sessionContext reflecting pre-execution session state (recent tools, call count, sticky focus). ' +
+          'Sub-meta to master-meta — the gateway calling itself.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -1263,6 +1264,16 @@ export class Aggregator {
 
     // Step 2c: Confirm mode — return the plan without executing
     if (confirm) {
+      let planSessionContext: { recentTools: string[]; callCount: number; activeSessionFocus?: string } | null = null;
+      if (effectiveSessionId && this.coordinator.hasSession(effectiveSessionId)) {
+        const ctxPat = this.coordinator.getToolPatterns(effectiveSessionId, 1000);
+        const sfocus = this.coordinator.getSessionFocus(effectiveSessionId);
+        planSessionContext = {
+          recentTools: ctxPat.slice(0, 5).map((p) => p.tool),
+          callCount: ctxPat.reduce((s, p) => s + p.count, 0),
+          ...(sfocus ? { activeSessionFocus: sfocus } : {}),
+        };
+      }
       return {
         content: [{
           type: 'text',
@@ -1285,6 +1296,7 @@ export class Aggregator {
             ...(chainContinuation ? { chainContinuation } : {}),
             alternatives,
             ...related,
+            ...(planSessionContext ? { sessionContext: planSessionContext } : {}),
             ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
             args: toolArgs,
             hint: 'Call cast again without confirm to execute, or use ch1tty/execute directly.',
