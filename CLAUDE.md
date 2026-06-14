@@ -188,6 +188,8 @@ Endpoints on `{bindAddress}:{port}`:
 | `CH1TTY_REMOTE_TIMEOUT_MS` | Override all remote proxy timeouts (connect: 15s, list: 15s, call: 120s) to the given value in milliseconds. Lower it in test environments to avoid long waits when remote backends are slow or hanging. |
 | `CH1TTY_OLLAMA_CIRCUIT_THRESHOLD` | Consecutive failures before OllamaBrain circuit opens (default 3). |
 | `CH1TTY_OLLAMA_CIRCUIT_COOLDOWN_MS` | How long OllamaBrain circuit stays open before a half-open probe (default 60000ms). |
+| `CH1TTY_SESSION_TTL_MS` | Inactive session TTL in ms — sessions that have had no tool calls for this duration are auto-evicted from memory (default 3600000 = 1h). Set to 0 to disable eviction. |
+| `CH1TTY_SESSION_EVICT_INTERVAL_MS` | How often the eviction sweep runs (default 300000 = 5min). Ignored when TTL is 0. |
 
 ## Registration
 
