@@ -48,13 +48,14 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **OO. `ch1tty/cast` sessionContext in cast: resolved** — When effectiveSessionId is active, `cast: resolved` (dryRun:true path — resolves intent, returns tool+score without executing) now includes `sessionContext: { recentTools, callCount, activeSessionFocus? }` reflecting pre-execution session state. Completes sessionContext coverage for ALL six cast response shapes. Also updated: KK test 7 (previously asserted resolved had no sessionContext). PR #433 ✅ MERGED (run 126→127, 2026-06-14). 7 new tests (+1 updated), 1204/0/2. DONE.
 - [x] **PP. `ch1tty/status` coordinator `toolsByServer` breakdown** — `coordinator.getSnapshot()` now includes `toolsByServer: Record<string, number>` — a flat map of serverId → total call count aggregated across all active sessions. Server IDs extracted from namespaced `serverId/toolName` format; sorted by count descending; zero-count servers omitted. Present in both full and `short: true` mode. PR #434 ✅ MERGED (run 127, 2026-06-14). 7 new tests, 1211/0/2. DONE.
 - [x] **QQ. `ch1tty/execute` dryRun sessionContext** — `dryRun: true` on `ch1tty/execute` now embeds `sessionContext: { recentTools, callCount, activeSessionFocus? }` directly in the `{ status:"dry_run", ... }` JSON when a sessionId is active. Pre-execution session state — no tool call is recorded. Completes sessionContext parity between normal execute (II) and dry-run execute (QQ). 1 existing test updated (execute-session-context.test.ts test 7). PR #436 ✅ MERGED (run 128, 2026-06-14). 7 new tests, 1218/0/2. DONE.
+- [x] **RR. Branch coverage sweep** — 6 branch gaps closed across coordinator.ts, aggregator.ts, and remote-proxy.ts: coordinator:349 (slash===-1), aggregator:1078 (scopeCategories in ledger record with sessionId), aggregator:1246 (JSON.stringify fallback for non-text error content in chain step), aggregator:1280 (explanation truthy branch in chain_executed), aggregator:1201-1202 (scope + explanation in cast:discovered), remote-proxy:229 (options.timeoutMs left side of ??). coordinator.ts 100%, remote-proxy.ts 100%, aggregator.ts 99.62%. PR #438 ✅ MERGED (run 128, 2026-06-14). 6 new tests (5 new file + 1 appended), 1224/0/2. DONE.
 
 ## Live Gateway State (as of 2026-06-14 run 128)
 
 - Connected backends: not re-queried this run (prior stable state unchanged)
 - Not connected: chittyos, cloudflare, GitHub (needs GITHUB_MCP_AUTHORIZATION), linear, notion, stripe, neon (lazy, auth-gated)
 - System health: degraded (ledger DLQ has 6 entries — ledger.chitty.cc unreachable, unchanged)
-- PP (#434) ✅ merged (confirmed on main HEAD 9fc8277). QQ branch `auto/QQ-execute-dryrrun-sessioncontext` pushed; PR open.
+- QQ (#436) ✅ merged. RR (#438) ✅ merged (3/3 CodeQL green, squash-merged 2026-06-14T11:11Z). HEAD: 086b5b8.
 
 ## Live Gateway State (as of 2026-06-14 run 127)
 
