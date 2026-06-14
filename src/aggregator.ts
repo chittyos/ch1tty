@@ -356,6 +356,7 @@ export class Aggregator {
           'resolves intent, and executes the best tool match. Related prompts and resources are surfaced alongside. ' +
           'When a sessionId is active, cast: executed and cast: chain_executed include sessionContext reflecting session state after execution; ' +
           'cast: plan, cast: resolved, cast: discovered, and cast: no_match include sessionContext reflecting pre-execution session state (recent tools, call count, sticky focus). ' +
+          'All cast responses include latencyMs: the elapsed wall-clock time in milliseconds from intent submission to response (covers scoring + execution). ' +
           'Sub-meta to master-meta — the gateway calling itself.',
         inputSchema: {
           type: 'object',
@@ -996,6 +997,7 @@ export class Aggregator {
       };
     }
 
+    const castStartMs = Date.now();
     const terms = intent.toLowerCase().split(/\s+/).filter((t) => t.length > 2);
 
     // Parse scope — hard filter applied to the registry before intent scoring.
@@ -1163,6 +1165,7 @@ export class Aggregator {
             cast: 'no_match',
             resolvedBy,
             intent,
+            latencyMs: Date.now() - castStartMs,
             ...(scopeAnnotation ? { scope: scopeAnnotation } : {}),
             ...(explain ? { explanation: buildCastExplanation(resolvedBy, undefined, [], focusName, focus) } : {}),
             ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
@@ -1226,6 +1229,7 @@ export class Aggregator {
             cast: 'discovered',
             resolvedBy,
             intent,
+            latencyMs: Date.now() - castStartMs,
             ...(scopeAnnotation ? { scope: scopeAnnotation } : {}),
             ...(explanation ? { explanation } : {}),
             hint: 'No executable tools matched, but related prompts/resources found.',
@@ -1304,6 +1308,7 @@ export class Aggregator {
             cast: 'chain_executed',
             resolvedBy,
             intent,
+            latencyMs: Date.now() - castStartMs,
             // focusName is always truthy here (catalogCombo requires it — see line ~1238)
             /* c8 ignore next */
             ...(focusName ? { focus: focusName } : {}),
@@ -1339,6 +1344,7 @@ export class Aggregator {
             cast: 'resolved',
             resolvedBy,
             intent,
+            latencyMs: Date.now() - castStartMs,
             ...(focusName ? { focus: focusName } : {}),
             ...(scopeAnnotation ? { scope: scopeAnnotation } : {}),
             ...(explanation ? { explanation } : {}),
@@ -1369,6 +1375,7 @@ export class Aggregator {
             cast: 'plan',
             resolvedBy,
             intent,
+            latencyMs: Date.now() - castStartMs,
             ...(focusName ? { focus: focusName } : {}),
             ...(scopeAnnotation ? { scope: scopeAnnotation } : {}),
             ...(explanation ? { explanation } : {}),
@@ -1419,6 +1426,7 @@ export class Aggregator {
             cast: 'executed',
             resolvedBy,
             intent,
+            latencyMs: Date.now() - castStartMs,
             ...(focusName ? { focus: focusName } : {}),
             ...(scopeAnnotation ? { scope: scopeAnnotation } : {}),
             ...(explanation ? { explanation } : {}),
