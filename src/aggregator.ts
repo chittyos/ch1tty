@@ -318,7 +318,7 @@ export class Aggregator {
       },
       {
         name: `${META_SERVER_ID}${SEPARATOR}execute`,
-        description: 'Execute a tool by its namespaced name (serverId/toolName). Use search to discover available tools first. When a sessionId is active, sessionContext: { recentTools, callCount, activeSessionFocus? } is included in the response for one-shot session awareness — appended as a second content item on normal execution, embedded in the dry_run JSON when dryRun: true.',
+        description: 'Execute a tool by its namespaced name (serverId/toolName). Use search to discover available tools first. When a sessionId is active, a metadata JSON is appended as a second content item containing latencyMs (wall-clock backend call time in ms) + sessionContext: { recentTools, callCount, activeSessionFocus? } for one-shot session awareness. When dryRun: true, latencyMs and (if session active) sessionContext are embedded in the dry_run JSON instead.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -429,16 +429,29 @@ export class Aggregator {
       case 'search':
         return this.handleSearch(args, sessionId);
       case 'execute': {
+        const executeStartMs = Date.now();
         const execResult = await this.handleExecute(args, sessionId);
-        if (!execResult.isError && args.dryRun !== true) {
-          const execSessionId = typeof args.sessionId === 'string' && args.sessionId ? args.sessionId : sessionId;
-          if (execSessionId && this.coordinator.hasSession(execSessionId)) {
-            const patterns = this.coordinator.getToolPatterns(execSessionId, 1000);
-            const recentTools = patterns.slice(0, 5).map((p) => p.tool);
-            const callCount = patterns.reduce((sum, p) => sum + p.count, 0);
-            const activeSessionFocus = this.coordinator.getSessionFocus(execSessionId);
-            const sessionContext = { recentTools, callCount, ...(activeSessionFocus ? { activeSessionFocus } : {}) };
-            execResult.content.push({ type: 'text', text: JSON.stringify({ sessionContext }) });
+        const latencyMs = Date.now() - executeStartMs;
+        if (!execResult.isError) {
+          if (args.dryRun === true) {
+            const first = execResult.content[0] as { type?: string; text?: string } | undefined;
+            if (first?.type === 'text' && typeof first.text === 'string') {
+              try {
+                const dr = JSON.parse(first.text) as Record<string, unknown>;
+                dr.latencyMs = latencyMs;
+                first.text = JSON.stringify(dr);
+              } catch { /* ignore malformed JSON */ }
+            }
+          } else {
+            const execSessionId = typeof args.sessionId === 'string' && args.sessionId ? args.sessionId : sessionId;
+            if (execSessionId && this.coordinator.hasSession(execSessionId)) {
+              const patterns = this.coordinator.getToolPatterns(execSessionId, 1000);
+              const recentTools = patterns.slice(0, 5).map((p) => p.tool);
+              const callCount = patterns.reduce((sum, p) => sum + p.count, 0);
+              const activeSessionFocus = this.coordinator.getSessionFocus(execSessionId);
+              const sessionContext = { recentTools, callCount, ...(activeSessionFocus ? { activeSessionFocus } : {}) };
+              execResult.content.push({ type: 'text', text: JSON.stringify({ latencyMs, sessionContext }) });
+            }
           }
         }
         return execResult;
