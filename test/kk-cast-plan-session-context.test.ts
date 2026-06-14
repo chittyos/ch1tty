@@ -8,7 +8,7 @@
  * This lets clients deciding whether to confirm see current session context
  * (prior tool calls, sticky focus) without a separate ch1tty/status round-trip.
  *
- * cast: resolved (dryRun) and cast: no_match remain unchanged — no sessionContext.
+ * cast: resolved (dryRun) gained sessionContext in OO; cast: no_match gained it in MM.
  *
  * Covered:
  *   1. No sessionId → no sessionContext in cast: plan
@@ -17,7 +17,7 @@
  *   4. sessionContext.callCount reflects total prior calls
  *   5. activeSessionFocus present when sticky focus is set before confirm call
  *   6. activeSessionFocus absent when no focus set
- *   7. dryRun:true → no sessionContext (resolved path unchanged)
+ *   7. dryRun:true → sessionContext present (resolved path updated by OO)
  */
 import assert from 'node:assert/strict';
 import { tmpdir } from 'node:os';
@@ -190,16 +190,19 @@ test('cast: plan — activeSessionFocus absent when no focus has been set in thi
   }
 });
 
-// ── 7. dryRun:true → no sessionContext (resolved path unchanged) ──────────────
+// ── 7. dryRun:true → sessionContext present (resolved path updated by OO) ─────
 
-test('cast: resolved (dryRun:true) → no sessionContext (resolved path unchanged by KK)', async () => {
+test('cast: resolved (dryRun:true) → sessionContext present (resolved path updated by OO)', async () => {
   const agg = makeAgg('7-dryrun');
   try {
     const SESSION = 'kk-dryrun-session';
     const result = await agg.callTool('ch1tty/cast', { intent: 'list neon projects', dryRun: true, sessionId: SESSION });
     const cast = parseCast(result);
     assert.equal(cast.cast, 'resolved', 'should be cast: resolved with dryRun:true');
-    assert.equal('sessionContext' in cast, false, 'sessionContext must be absent in cast: resolved (dryRun path unchanged)');
+    const sc = cast.sessionContext as { recentTools: string[]; callCount: number } | undefined;
+    assert.ok(sc, 'sessionContext should be present in cast: resolved when sessionId is active (OO)');
+    assert.deepEqual(sc.recentTools, [], 'recentTools should be empty for a fresh session');
+    assert.equal(sc.callCount, 0, 'callCount should be 0 for a fresh session');
   } finally {
     await agg.shutdown();
   }
