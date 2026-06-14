@@ -299,7 +299,7 @@ export class Aggregator {
     return [
       {
         name: `${META_SERVER_ID}${SEPARATOR}search`,
-        description: 'Search the tool registry. Returns matching tool names, serverName, descriptions, and input schemas. When a sessionId is active, also returns sessionContext: { recentTools, callCount, activeSessionFocus? } for one-shot session awareness. Use before execute.',
+        description: 'Search the tool registry. Returns matching tool names, serverName, descriptions, and input schemas. All responses include latencyMs: wall-clock elapsed time in ms for the registry lookup + scoring. When a sessionId is active, also returns sessionContext: { recentTools, callCount, activeSessionFocus? } for one-shot session awareness. Use before execute.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -473,6 +473,7 @@ export class Aggregator {
   // ── Search ──────────────────────────────────────────────────
 
   private async handleSearch(args: Record<string, unknown>, sessionId?: string): Promise<ToolCallResult> {
+    const searchStartMs = Date.now();
     const query = typeof args.query === 'string' ? args.query.toLowerCase() : '';
     const serverFilter = typeof args.server === 'string' ? args.server : undefined;
     const categoryFilter = typeof args.category === 'string' ? args.category : undefined;
@@ -592,6 +593,7 @@ export class Aggregator {
           type: 'text',
           text: JSON.stringify({
             hint: 'Use query, server, or category to search for specific tools',
+            latencyMs: Date.now() - searchStartMs,
             ...(entity?.chittyId ? { entity: entity.chittyId, identityClass: entity.identityClass } : {}),
             ...(focusName ? { focus: focusName } : {}),
             ...(inFocusOnly && focus ? { inFocusOnly: true } : {}),
@@ -687,6 +689,7 @@ export class Aggregator {
         text: JSON.stringify({
           matches: results.length,
           total: matches.length,
+          latencyMs: Date.now() - searchStartMs,
           ...(offset > 0 ? { offset } : {}),
           ...(partialFallback ? { mode: 'partial' } : {}),
           ...(focusName ? { focus: focusName } : {}),
