@@ -52,7 +52,19 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **SS. `ch1tty/search` minScore in explain output** — When `explain: true` and `minScore > 0` are both set, `explanation.minScore` echoes the active threshold and `explanation.rationale` includes a note that tools below it were excluded. Completes the explain transparency story — full ranking picture (match mode, focus boost, minScore filter, top candidates) in one place. PR #440 ✅ MERGED (run 129, 2026-06-14). 7 new tests, 1231/0/2. DONE.
 - [x] **TT. `ch1tty/search` explain in no-query (server-summary) path** — `explain: true` was silently a no-op when no query was provided. Now the server-summary early-return includes `explanation: { method: 'server_summary', totalServers, totalTools, focus?, inFocusServers?, inFocusOnly?, rationale }` when explain is set. Completes explain coverage for ALL three search paths (AND/partial-keyword, query-less server-summary). PR #442 ✅ MERGED (run 131, 2026-06-14). 7 new tests, 1238/0/2. DONE.
 - [x] **UU. Branch coverage → 100%** — 5 remaining branch gaps closed. (a) aggregator.ts:560 ternary plural `'s'` branch (inFocusCount > 1 with inFocusOnly explain) — covered by 3 new tests. (b) child-manager.ts:237 `options?.timeoutMs ?? CALL_TIMEOUT_MS` right side — covered by 2 new tests using injected fake conn. (c) aggregator.ts:630, 1304, 1310 — structurally unreachable, suppressed with `/* c8 ignore next */`. Result: all src/ files at 100%/100%/100%/100%. PR #444 ✅ MERGED (9d28bb8, run 133). 7 new tests, 1245/0/2. DONE.
-- [x] **VV. `ch1tty/search` explain `filterContext` for server/category-filter path** — When `explain:true` is set alongside `server` or `category` filter params, the explanation now includes `filterContext: { server?, category? }` and the rationale mentions "pre-filtered by server=...". Completes explain coverage for ALL three search paths: AND/partial-keyword (Q/SS), no-query server-summary (TT), server/category-filter (VV). PR #446 ✅ MERGED (3a805a7, run 134). 7 new tests, 1252/0/2. DONE.
+- [x] **VV. `ch1tty/search` explain `filterContext` for server/category-filter path** — When `explain:true` is set alongside `server` or `category` filter params, the explanation now includes `filterContext: { server?, category? }` and the rationale mentions "pre-filtered by server=...". Completes explain coverage for ALL three search paths: AND/partial-keyword (Q/SS), no-query server-summary (TT), server/category-filter (VV). PR #446 ✅ MERGED (3a805a7, run 135, 2026-06-14). 7 new tests, 1252/0/2. DONE.
+- [x] **KKKK. Branch coverage gaps** — 4 previously uncovered branches in `suggestions.ts` and `aggregator.ts:buildCastExplanation`: (a) `loadSuggestionsCatalog` cache hit (same path × 2 → same object reference), (b) `buildCastExplanation` with `method: 'brain'`, (c) `buildCastExplanation` single-candidate (no runner-up), (d) `buildCastExplanation` no_match with `resolvedBy: 'brain'`. PR #447 ✅ MERGED (e41d0c1, run 135, 2026-06-14). 4 new tests, 1256/0/2. DONE.
+- [x] **LLLL. `latencyMs` in all `ch1tty/cast` response types** — All 6 cast response shapes (`executed`, `plan`, `resolved`, `discovered`, `no_match`, `chain_executed`) now carry `latencyMs: number` — wall-clock elapsed time in ms from intent submission to response. Timer starts after the empty-intent guard; covers scoring + brain routing + backend execution. PR #449 ✅ MERGED (bfd01847, run 135, 2026-06-14). 7 new tests, 1263/0/2. DONE.
+
+## Live Gateway State (as of 2026-06-14 run 135)
+
+- Connected backends: chittyos (178 tools), cloudflare-builds (7), evidence (3), browser-rendering (3), neon (9), notion (10), context7 (2), thinking (1), fs (14), playwright (23), orchestrator (13) — 263 total tools across 11 servers
+- Not connected: cloudflare, github, linear, stripe (lazy, auth-gated or unreachable)
+- System health: **degraded** — ledger DLQ now has **11 entries** (up from 6; ledger.chitty.cc unreachable)
+- Brain: ok (embedding circuit open=false, ollama circuit open=false; embedding has 3 timeouts)
+- Active sessions: 20; Notion API token invalid (cannot read/write Notion board)
+- cowork backend connected but not in tool count (0 tools listed)
+- VV (#446) ✅ merged (3a805a7), KKKK (#447) ✅ merged (e41d0c1), LLLL (#449) ✅ merged (bfd01847)
 
 ## Live Gateway State (as of 2026-06-14 run 134 — post-merge)
 
@@ -208,6 +220,35 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 **Next run priority**:
 - Confirm VV PR CodeQL passes (data-logic only, expected green). Merge and mark VV ✅ done.
 - WW candidates: (a) `ch1tty/status` ledgerDlq shorthand field — expose `ledgerDlq: { path, entryCount }` at the top level of the status snapshot (currently only inside `ledgerHealth.dlqEntries` + `ledgerHealth.dlqPath`); (b) `ch1tty/search` explain `minCandidates` note — when no tools match at all, topCandidates is empty but rationale doesn't say why; (c) Dependabot PR #375 (esbuild dev-only bump — long overdue).
+
+---
+
+### Run 135 — 2026-06-14 (auto-driver)
+
+**Workstream advanced**: LLLL (new — `latencyMs` in all `ch1tty/cast` response types)
+**Branch/PR**: `auto/LLLL-cast-latency-ms` → PR #449 ✅ MERGED (bfd01847)
+**Build**: clean (0 errors)
+**Tests**: 1263 pass, 0 fail, 2 skipped (+7 LLLL from 1256 baseline after VV+KKKK)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean (exit 0), `git fetch --all`. Checked DRIVER-BOARD.md (run 134, VV open PR). Confirmed baseline 1245/0/2 on main.
+- **Merged open PRs**: VV (#446, search explain filterContext, 7 new tests) → squash-merged SHA 3a805a7. KKKK (#447, 4 branch coverage gaps) → squash-merged SHA e41d0c1. Both were CodeQL-green. Updated local main to e41d0c1. Combined baseline now 1256/0/2.
+- **Live gateway status checked via Ch1tty MCP**: `systemHealth: degraded` (ledger DLQ 11 entries, up from 6). Notion API token invalid (cannot read board). 20 active sessions. 263 tools across 11 connected servers.
+- **Workstream LLLL: `latencyMs` in all `ch1tty/cast` response types**
+  - Observation: every other response shape in ch1tty carries timing hints or is short-circuit enough to not need one, but cast is the longest pipeline (intent scoring + brain routing + backend execution) and had no elapsed-time signal for callers.
+  - `src/aggregator.ts`: added `const castStartMs = Date.now()` right after the empty-intent guard in `handleCast`. Added `latencyMs: Date.now() - castStartMs` to all 6 response objects (no_match, discovered, chain_executed, resolved, plan, executed). Updated cast tool description to advertise `latencyMs`.
+  - `test/llll-cast-latency-ms.test.ts` (new, 7 tests): LLLL-1 executed, LLLL-2 plan, LLLL-3 resolved, LLLL-4 discovered, LLLL-5 no_match, LLLL-6 chain_executed, LLLL-7 error path (no latencyMs). All 7 passed.
+  - Build clean. Full suite: 1263/0/2 (+7 from 1256).
+- Pushed branch `auto/LLLL-cast-latency-ms`, opened PR #449. Both Codex and CodeRabbit rate-limited (no reviews). CI (CodeQL) in_progress at end of run.
+- PR #449 (LLLL) squash-merged → main bfd01847 (confirmed CodeQL-green). Board PR #450 created but had merge conflict with bfd01847 (DRIVER-BOARD.md touched by both); rebased and force-pushed to resolve (run 136 continuation).
+
+**Blockers (updated)**:
+- Ledger DLQ now 11 entries (was 6): ledger.chitty.cc unreachable. `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect.
+- **Notion API token invalid**: cannot read/write Notion board. Human must refresh `NOTION_API_TOKEN` on the gateway homelab.
+- CI (main workflow 0-jobs) unchanged — only CodeQL runs.
+
+**Next run priority**:
+- MMMM candidates: (a) `ch1tty/status` expose `ledgerDlq: { path, entries }` at snapshot top level — actionable for operators seeing degraded; (b) `ch1tty/cast` `latencyMs` breakdown by phase (scoring vs execution) for deeper perf insight; (c) refresh focus-suggestions.json catalog with updated fixture tools (last refreshed run ~91).
 
 ---
 
