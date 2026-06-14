@@ -317,7 +317,7 @@ export class Aggregator {
       },
       {
         name: `${META_SERVER_ID}${SEPARATOR}execute`,
-        description: 'Execute a tool by its namespaced name (serverId/toolName). Use search to discover available tools first.',
+        description: 'Execute a tool by its namespaced name (serverId/toolName). Use search to discover available tools first. When a sessionId is active, a second content item with sessionContext: { recentTools, callCount, activeSessionFocus? } is appended to the response for one-shot session awareness.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -423,8 +423,21 @@ export class Aggregator {
     switch (toolName) {
       case 'search':
         return this.handleSearch(args, sessionId);
-      case 'execute':
-        return this.handleExecute(args, sessionId);
+      case 'execute': {
+        const execResult = await this.handleExecute(args, sessionId);
+        if (!execResult.isError && args.dryRun !== true) {
+          const execSessionId = typeof args.sessionId === 'string' && args.sessionId ? args.sessionId : sessionId;
+          if (execSessionId && this.coordinator.hasSession(execSessionId)) {
+            const patterns = this.coordinator.getToolPatterns(execSessionId, 1000);
+            const recentTools = patterns.slice(0, 5).map((p) => p.tool);
+            const callCount = patterns.reduce((sum, p) => sum + p.count, 0);
+            const activeSessionFocus = this.coordinator.getSessionFocus(execSessionId);
+            const sessionContext = { recentTools, callCount, ...(activeSessionFocus ? { activeSessionFocus } : {}) };
+            execResult.content.push({ type: 'text', text: JSON.stringify({ sessionContext }) });
+          }
+        }
+        return execResult;
+      }
       case 'status':
         return this.handleStatus(args);
       case 'reload':
