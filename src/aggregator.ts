@@ -358,6 +358,7 @@ export class Aggregator {
           'cast: plan, cast: resolved, cast: discovered, and cast: no_match include sessionContext reflecting pre-execution session state (recent tools, call count, sticky focus). ' +
           'All cast responses include latencyMs: the elapsed wall-clock time in milliseconds from intent submission to response (covers scoring + execution). ' +
           'cast: executed and cast: chain_executed also include latencyBreakdown: { scoringMs, executionMs, brainMs? } — scoringMs is the time spent in registry fetch + intent routing/scoring before any backend call; executionMs is the time spent in the backend call(s); brainMs is present when the brain route was taken and shows the routeIntent() wall time. ' +
+          'When explain: true is set and the brain route was taken, explanation includes brainMs: the wall-clock time of the brain routeIntent() call in milliseconds (alongside method: "brain"). Absent when the keyword-fallback route was used. ' +
           'Sub-meta to master-meta — the gateway calling itself.',
         inputSchema: {
           type: 'object',
@@ -1188,7 +1189,7 @@ export class Aggregator {
             intent,
             latencyMs: Date.now() - castStartMs,
             ...(scopeAnnotation ? { scope: scopeAnnotation } : {}),
-            ...(explain ? { explanation: buildCastExplanation(resolvedBy, undefined, [], focusName, focus) } : {}),
+            ...(explain ? { explanation: buildCastExplanation(resolvedBy, undefined, [], focusName, focus, castRoute === 'brain' ? brainRouteMs : undefined) } : {}),
             ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
             ...(noMatchSessionContext ? { sessionContext: noMatchSessionContext } : {}),
             hint: 'No tools, prompts, or resources matched your intent. Try ch1tty/search with different keywords.',
@@ -1209,7 +1210,7 @@ export class Aggregator {
       score: t.score,
       description: t.description,
     }));
-    const explanation = explain ? buildCastExplanation(resolvedBy, best, scoredTools, focusName, focus) : null;
+    const explanation = explain ? buildCastExplanation(resolvedBy, best, scoredTools, focusName, focus, castRoute === 'brain' ? brainRouteMs : undefined) : null;
 
     // Build related prompts/resources context
     const related: Record<string, unknown> = {};
@@ -1756,6 +1757,7 @@ function buildCastExplanation(
   scoredTools: ScoredNamespacedTool[],
   focusName: string | undefined,
   focus: FocusProfile | null | undefined,
+  brainMs?: number,
 ): object {
   const topCandidates = scoredTools.slice(0, 5).map((t) => ({ tool: t.namespacedName, score: t.score }));
   const winnerInFocus = best && focus ? isInFocus(focus, best) : false;
@@ -1780,6 +1782,7 @@ function buildCastExplanation(
 
   return {
     method: resolvedBy,
+    ...(brainMs !== undefined ? { brainMs } : {}),
     ...(focusName ? { focus: focusName, focusBoost, winnerInFocus } : {}),
     topCandidates,
     rationale,
