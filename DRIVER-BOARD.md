@@ -71,7 +71,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **WWWW** — ch1tty/status and ch1tty/reload latencyMs (PR #468). DONE.
 - [x] **XXXX** — cast explanation topCandidates[n].inFocus (PR #470). DONE.
 - [x] **YYYY** — cast explanation runnerUpScore + runnerUpTool (PR #472). DONE.
-- [ ] **ZZZZ** — cast explanation.winnerFocusBoost: exact boost applied to winner (0 if out-of-focus, absent if no focus/no_match). PR TBD (run 146, 2026-06-15). IN PROGRESS.
+- [x] **ZZZZ** — cast explanation.winnerFocusBoost: exact boost applied to winner (0 if out-of-focus, absent if no focus/no_match). PR #473 ✅ MERGED (b16fed8, run 146, 2026-06-15). 7 new tests, 1361/0/2. DONE.
 
 ## Blockers
 
@@ -87,19 +87,17 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Build**: clean | **Tests**: 1354/0/2
 - **Next**: ZZZZ — `explanation.winnerFocusBoost`
 
-### 2026-06-15 (run 146 — this run)
+### 2026-06-15 (run 146)
 - **Workstream**: ZZZZ — `cast explanation.winnerFocusBoost`
-- **Branch/PR**: `auto/ZZZZ-cast-explain-winnerfocusboost` → PR TBD
-- **Build**: clean | **Tests**: 1361/0/2 (+7 ZZZZ)
+- **Branch/PR**: `auto/ZZZZ-cast-explain-winnerfocusboost` → PR #473 ✅ MERGED (b16fed8)
+- **Build**: clean | **Tests**: 1361/0/2 (+7 ZZZZ from 1354 baseline)
 - **What was done**:
-  - Startup: npm ci clean, build clean, 1354/0/2 (no open PRs). Board restored as plain text (was truncated base64).
-  - Notion 401 confirmed. DRIVER-BOARD.md reconstructed from git history (e3a090d + git log through YYYY).
+  - Startup: npm ci clean, build clean, 1354/0/2 (no open PRs). Board restored as plain text (was truncated base64 — recurring issue fixed).
+  - Notion 401 confirmed. DRIVER-BOARD.md reconstructed from git history and written as plain text.
   - ZZZZ: `explanation.winnerFocusBoost` in `ch1tty/cast` when `explain:true` and focus active.
-    - `src/aggregator.ts`: `buildCastExplanation` return — added `winnerFocusBoost: winnerInFocus ? focusBoost : 0` inside the focusName spread, only when `best !== undefined`. Tool description updated.
-    - `test/zzzz-cast-explain-winnerfocusboost.test.ts`: 7 new tests covering in-focus (=boost), out-of-focus (=0), no focus (absent), plan path, consistency with focusBoost, no_match (absent), description.
-    - All 7 ZZZZ tests pass. Full suite: 1361/0/2.
-  - Pushed branch, opened PR.
-- **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs.
+    - `src/aggregator.ts`: `buildCastExplanation` return — `winnerFocusBoost: winnerInFocus ? focusBoost : 0` inside focusName spread, only when `best !== undefined`. Tool description updated.
+    - `test/zzzz-cast-explain-winnerfocusboost.test.ts`: 7 new tests (in-focus=boost, out-of-focus=0, no focus absent, plan path, consistency, no_match absent, description).
+  - All 3 CodeQL checks green. PR #473 squash-merged. Board updated ZZZZ ✅.
+- **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**:
-  1. Check ZZZZ PR — if CodeQL green, merge it.
-  2. Plan AAAAA (or next letter): candidates include (a) `/api/v1/health` warn body — surface `brainCircuitOpen: true` in the 200 response when `systemHealth.status === 'warn'`; (b) `explanation.focusDecisive: boolean` computed from `winnerFocusBoost` + score gap (winnerScore - winnerFocusBoost < runnerUpScore → true); (c) cast `latencyBreakdown.registryMs` separate from scoringMs.
+  1. Plan AAAAA: candidates — (a) `/api/v1/health` warn body: surface `brainCircuitOpen: true` in 200 response when `systemHealth.status === 'warn'`; (b) `explanation.focusDecisive: boolean` — computed as `winnerScore - winnerFocusBoost < runnerUpScore`; (c) cast `latencyBreakdown.registryMs` — registry fetch time isolated from scoringMs.
