@@ -349,3 +349,8 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - CodeRabbit + Codex rate-limited (recurring — no action).
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**: QQQQQQ — `topCandidatesGiniCoefficient: number` (Gini coefficient of topCandidates scores — measures inequality/concentration within the top-5 pool; 0 = equal scores, 1 = one dominant tool).
+
+## ⚠️ BLOCKER (run 170): GitHub MCP token expired at ~23:00 UTC
+- GitHub MCP server returning "token expired" — all API calls (CI check, merge) failing.
+- PR #534 (PPPPPP candidateScoreEntropy) is open and awaiting merge.
+- Next run: check if token is restored, then merge PR #534 and continue with QQQQQQ.
