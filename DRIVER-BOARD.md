@@ -81,7 +81,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **GGGGG** — cast explanation.focusConfidence: number — focusBias clamped to [0,1]. Same presence conditions as focusBias. Unlike focusBias (can exceed 1), focusConfidence is always [0,1] — a clean percentage of focus attribution. PR #485 ✅ MERGED (1e9407a, run 152, 2026-06-15). 8 new tests, 1417/0/2. DONE.
 - [x] **HHHHH** — cast explanation.winnerServer: string — server ID of the winning tool (segment before "/" in namespaced name, e.g. "neon" from "neon/query_database"). Absent on no_match. Present regardless of focus. Lets operators identify which backend resolved the intent without parsing the tool name. PR #486 ✅ MERGED (1e07a00, run 153, 2026-06-15). 8 new tests, 1425/0/2. DONE.
 - [x] **IIIII** — cast explanation.focusRank: number — 1-based rank the winning tool would hold if focus boost were removed. focusRank===1 → winner led pre-focus; focusRank===2 → focus promoted from 2nd; etc. Absent when no focus or no_match. Consistent with focusDecisive. PR #488 ✅ MERGED (43d413f, run 154, 2026-06-15). 8 new tests, 1433/0/2. DONE.
-- [ ] **JJJJJ** — cast explanation.unfocusedWinner: string — namespaced tool that would have won without the active focus boost (pre-focus rank-1 tool). Present only when focus active, winner exists, and pre-focus leader differs from winner. Absent when no focus, no_match, or winner already led pre-focus (focusRank===1). PR #489 open (run 155, 2026-06-15). 8 new tests, 1441/0/2.
+- [x] **JJJJJ** — cast explanation.unfocusedWinner: string — namespaced tool that would have won without the active focus boost (pre-focus rank-1 tool). Present only when focus active, winner exists, and pre-focus leader differs from winner. Absent when no focus, no_match, or winner already led pre-focus (focusRank===1). PR #489 ✅ MERGED (0bed3cd, run 155, 2026-06-15). 8 new tests, 1441/0/2. DONE.
 
 ## Blockers
 
@@ -221,14 +221,14 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 ### 2026-06-15 (run 155)
 - **Workstream**: JJJJJ — `cast explanation.unfocusedWinner: string`
-- **Branch/PR**: `auto/JJJJJ-cast-explain-unfocused-winner` → PR #489 open (CI in_progress)
+- **Branch/PR**: `auto/JJJJJ-cast-explain-unfocused-winner` → PR #489 ✅ MERGED (0bed3cd)
 - **Build**: clean | **Tests**: 1441/0/2 (+8 JJJJJ from 1433 IIIII baseline)
 - **What was done**:
-  - Startup: npm ci clean, build clean, 1433/0/2 on main (d532fab). Board restored from base64 in git (recurring issue: GitHub API write stored base64 text — decoded on load).
+  - Startup: npm ci clean, build clean, 1433/0/2 on main (d532fab). Board restored from base64 in git (recurring issue: GitHub API write stored base64 text — decoded on load; push_files now used instead).
   - Board read: IIIII confirmed done, JJJJJ selected (unfocusedWinner candidate).
   - JJJJJ: `src/aggregator.ts` `buildCastExplanation` — refactored `focusRank` pre-focus sort into shared `preFocusSorted` array; derived `unfocusedWinner` from same sort (preFocusSorted[0].n when it differs from best.namespacedName). Added `...(unfocusedWinner !== undefined ? { unfocusedWinner } : {})` inside `best !== undefined` guard within `focusName` spread. Tool description updated.
   - `test/jjjjj-cast-explain-unfocused-winner.test.ts`: 8 new tests (absent-when-no-displacement, present-when-focus-promoted, no_match absent, no-focus absent, namespaced format, consistency-with-focusRank, out-of-focus-winner absent, description).
-  - Codex rate-limited (no action — recurring). CodeRabbit review in_progress. CI 2/2 CodeQL in_progress.
-- **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring); direct git push to main 403 (workaround: GitHub API write); board base64 recurring (decode on load).
+  - Codex rate-limited (no action — recurring). CodeRabbit review completed: 1 actionable comment — tests JJJJJ-1/-2/-5/-7 had conditional branches allowing vacuous passes. Fixed locally (unconditional assertions); all 1441 tests still pass. PR #489 merged before fix was pushed → strengthened tests will be included in KKKKK branch. CI 2/2 CodeQL green. PR #489 squash-merged (0bed3cd) at ~15:12 UTC.
+- **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring); direct git push to main 403 (workaround: push_files API stores plain text ✓).
 - **Next run priority**:
-  - Merge JJJJJ (PR #489) if CI green. Then KKKKK candidates: (a) cast explanation `focusRankDelta: number` — `focusRank - 1` (how many positions focus moved the winner up; 0 = no change); (b) `/api/v1/health` ok body `ledgerOk: true` when `systemHealth.ledgerStatus === 'ok'`; (c) cast explanation `candidatesBeforeFocus: number` — total candidates before focus boost re-sort.
+  - KKKKK candidates: (a) cast explanation `focusRankDelta: number` — `focusRank - 1` (how many positions focus moved the winner up; 0 = no change); (b) `/api/v1/health` ok body `ledgerOk: true` when `systemHealth.ledgerStatus === 'ok'`; (c) cast explanation `candidatesBeforeFocus: number` — total candidates before focus boost re-sort. Note: include strengthened JJJJJ test assertions (unconditional per CodeRabbit review) in the KKKKK branch.
