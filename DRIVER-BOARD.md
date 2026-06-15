@@ -267,7 +267,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 ### 2026-06-15 (run 158)
 - **Workstream**: MMMMM — `cast explanation.candidatesInFocusCount: number`
-- **Branch/PR**: `auto/MMMMM-cast-explain-candidates-in-focus-count` → PR TBD
+- **Branch/PR**: `auto/MMMMM-cast-explain-candidates-in-focus-count` → PR #494 🔄 CI queued
 - **Build**: clean | **Tests**: TBD
 - **What was done**:
   - Startup: pulled main (0426ef5 = LLLLL merge). Build clean, 1457/0/2.
@@ -275,4 +275,4 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - MMMMM: implementing `explanation.candidatesInFocusCount: number` — count of scored candidates whose server/category is in-focus. Present when focus active + winner exists (same conditions as winnerFocusBoost). Absent when no focus or no_match.
 - **Blockers (unchanged)**: Notion 401, ledger DLQ 11 entries, CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**:
-  - [ ] **MMMMM** — cast explanation.candidatesInFocusCount: number — count of in-focus candidates among scored candidates. PR TBD.
+  - Merge MMMMM (PR #494) if CI green. Then NNNNN candidates: (a) cast explanation `inFocusFraction: number` — candidatesInFocusCount / candidateCount as [0,1] density metric; (b) `/api/v1/health` ok body `ledgerOk: true` when `systemHealth.ledgerStatus === 'ok'` (symmetric to ledgerWarn).
