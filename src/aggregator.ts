@@ -360,6 +360,7 @@ export class Aggregator {
           'cast: executed and cast: chain_executed also include latencyBreakdown: { scoringMs, executionMs, brainMs? } — scoringMs is the time spent in registry fetch + intent routing/scoring before any backend call; executionMs is the time spent in the backend call(s); brainMs is present when the brain route was taken and shows the routeIntent() wall time. ' +
           'When explain: true is set and the brain route was taken, explanation includes brainMs: the wall-clock time of the brain routeIntent() call in milliseconds (alongside method: "brain"). Absent when the keyword-fallback route was used. ' +
           'explanation also includes candidateCount: the total number of tools in the scoring pool before the top-5 topCandidates slice. 0 on no_match. ' +
+          'explanation also includes winnerScore: the numeric relevance score of the winning tool (topCandidates[0].score). Absent on no_match (no winner). Lets operators read the winner\'s score directly without indexing into topCandidates. ' +
           'Sub-meta to master-meta — the gateway calling itself.',
         inputSchema: {
           type: 'object',
@@ -1785,6 +1786,7 @@ function buildCastExplanation(
     method: resolvedBy,
     ...(brainMs !== undefined ? { brainMs } : {}),
     candidateCount: scoredTools.length,
+    ...(best !== undefined ? { winnerScore: best.score } : {}),
     ...(focusName ? { focus: focusName, focusBoost, winnerInFocus } : {}),
     topCandidates,
     rationale,
