@@ -153,14 +153,14 @@ test('LLLLL-3: winnerScoreBase === winnerScore when winner is out-of-focus (no b
     const parsed = JSON.parse((r.content[0] as { text: string }).text);
     const { explanation } = parsed;
     assert.ok('winnerScoreBase' in explanation, 'winnerScoreBase should be present with active focus');
-    // If stripe (out-of-focus) won, no boost was applied
-    if (explanation.winnerServer === 'stripe' && explanation.winnerInFocus === false) {
-      assert.equal(explanation.winnerFocusBoost, 0, 'out-of-focus winner: winnerFocusBoost should be 0');
-      assert.ok(
-        Math.abs(explanation.winnerScoreBase - explanation.winnerScore) < 1e-9,
-        `out-of-focus winner: winnerScoreBase (${explanation.winnerScoreBase}) should equal winnerScore (${explanation.winnerScore})`,
-      );
-    }
+    // stripe dominates the intent — assert it actually won out-of-focus
+    assert.equal(explanation.winnerServer, 'stripe', 'expected stripe to win this scenario');
+    assert.equal(explanation.winnerInFocus, false, 'expected out-of-focus winner');
+    assert.equal(explanation.winnerFocusBoost, 0, 'out-of-focus winner: winnerFocusBoost should be 0');
+    assert.ok(
+      Math.abs(explanation.winnerScoreBase - explanation.winnerScore) < 1e-9,
+      `out-of-focus winner: winnerScoreBase (${explanation.winnerScoreBase}) should equal winnerScore (${explanation.winnerScore})`,
+    );
     // Identity always holds regardless of who won
     const expected = explanation.winnerScore - explanation.winnerFocusBoost;
     assert.ok(
@@ -254,13 +254,12 @@ test('LLLLL-7: winnerScoreBase < winnerScore when winner is in-focus (boost > 0 
     const parsed = JSON.parse((r.content[0] as { text: string }).text);
     const { explanation } = parsed;
     assert.ok('winnerScoreBase' in explanation, 'winnerScoreBase should be present');
-    // When the winner is in-focus, the boost is non-zero → base < final score
-    if (explanation.winnerInFocus === true) {
-      assert.ok(
-        explanation.winnerScoreBase < explanation.winnerScore,
-        `in-focus winner: winnerScoreBase (${explanation.winnerScoreBase}) should be < winnerScore (${explanation.winnerScore})`,
-      );
-    }
+    // finance focus → stripe in-focus; assert it actually won in-focus
+    assert.equal(explanation.winnerInFocus, true, 'expected in-focus winner for this scenario');
+    assert.ok(
+      explanation.winnerScoreBase < explanation.winnerScore,
+      `in-focus winner: winnerScoreBase (${explanation.winnerScoreBase}) should be < winnerScore (${explanation.winnerScore})`,
+    );
     // Identity always holds
     const expected = explanation.winnerScore - explanation.winnerFocusBoost;
     assert.ok(
