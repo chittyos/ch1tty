@@ -313,3 +313,15 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - CodeRabbit + Codex rate-limited (recurring — no action).
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**: NNNNNN — `rawFocusMarginRatio: number` (rawFocusMargin / winnerScoreBase when winnerScoreBase > 0 — relative unfocused margin normalised to winner's base; measures how much the focus boost mattered relative to the winner's organic strength).
+
+### 2026-06-15 (run 168 — NNNNNN) ✅ COMPLETE
+- **Workstream**: A (gateway observability) — NNNNNN: `cast explanation.rawFocusMarginRatio: number`
+- **Branch/PR**: `auto/NNNNNN-cast-explain-raw-focus-margin-ratio` → PR #532
+- **Build**: clean | **Tests**: 1634/0/2 (+8 NNNNNN from 1626 MMMMMM baseline)
+- **What was done**:
+  - Startup: main at 339430d7 (MMMMMM inFocusBottomScore merged). Added rawFocusMarginRatio: rawFocusMargin / winnerScoreBase (when winnerScoreBase > 0). Inline in the best+runner-up block alongside rawFocusMargin.
+  - Description line added after rawFocusMargin. 8 new tests (NNNNNN-1..8). All pass.
+  - PR #532 opened; CI 3/3 green; merged.
+  - CodeRabbit + Codex rate-limited (recurring — no action).
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
+- **Next run priority**: OOOOOO — `focusMarginRatio: number` (focusMargin / winnerScore — the post-focus gap as a fraction of winner's total score; symmetric to rawFocusMarginRatio but using the boosted scores).
