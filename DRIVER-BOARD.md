@@ -88,7 +88,8 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **NNNNN** — cast explanation.inFocusFraction: number — fraction of scored candidates that are in-focus (candidatesInFocusCount / candidateCount), [0,1]. Same presence conditions as candidatesInFocusCount; absent when candidateCount === 0. PR #495 ✅ MERGED (df640e0, 2026-06-15). 8 new tests, 1473/0/2. DONE.
 - [x] **OOOOO** — /api/v1/health ok body: ledgerOk: true when systemHealth.ledgerStatus === 'ok' — symmetric to ledgerWarn. PR #496 ✅ MERGED (a64d80c, 2026-06-15). 8 new tests, 1481/0/2. DONE.
 - [x] **PPPPP** — cast explanation.topOutOfFocusScore: number — highest relevance score among out-of-focus candidates. Present when focus active, winner exists, and at least one out-of-focus candidate exists. PR #497 ✅ MERGED (4ec2ee8, 2026-06-15). 8 new tests, 1489/0/2. DONE.
-- [ ] **QQQQQ** — cast explanation.focusRankPercentile: number — normalized pre-focus rank (focusRank / candidateCount), [0,1]. Identity: focusRankPercentile * candidateCount === focusRank. PR #501 🔄 CI in_progress (run 158, 2026-06-15). 8 new tests, 1497/0/2.
+- [x] **QQQQQ** — cast explanation.outOfFocusWinnerGap: number — score gap between winner and best out-of-focus candidate (winnerScore - topOutOfFocusScore). Present under same conditions as topOutOfFocusScore. PR #499 ✅ MERGED (ac28f50, 2026-06-15, parallel session). 8 new tests, 1497/0/2. DONE. (PR #501 closed run 158 — stale duplicate with different impl; parallel session's #499 merged first.)
+- [ ] **RRRRR** — cast explanation.focusRankPercentile: number — normalized pre-focus rank (focusRank / candidateCount), [0,1]. Identity: focusRankPercentile * candidateCount === focusRank. PR #502 🔄 CI in_progress (run 158, 2026-06-15). 8 new tests, 1505/0/2.
 
 ## Blockers
 
@@ -195,7 +196,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - Codex + CodeRabbit rate-limited (no action — recurring). CI 2/2 CodeQL green. PR #485 merged 13:13 UTC.
 - **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**:
-  - HHHHH candidates: (a) `/api/v1/health` ok body `ledgerOk: true` when `systemHealth.ledgerStatus === 'ok'` (symmetric completeness with ledgerWarn/brainCircuitOpen); (b) cast explanation `focusRank: number` — winner's 1-based rank in pre-focus scoring (1 = would have won anyway, >1 = focus promoted it); (c) cast explanation `unfocusedWinner: string` — namespaced tool that would have won without focus boost (absent when same as winner).
+  - HHHHH candidates: (a) `/api/v1/health` ok body `ledgerOk: true` when `systemHealth.ledgerStatus === 'ok'` (symmetric completeness with ledgerWarn/brainCircuitOpen); (b) cast explanation `focusRank: number` — winner's 1-based rank before focus boost re-sort (1 = would have won anyway, >1 = focus promoted it); (c) cast explanation `unfocusedWinner: string` — namespaced tool that would have won without focus boost (absent when same as winner).
 
 ### 2026-06-15 (run 153)
 - **Workstream**: HHHHH — `cast explanation.winnerServer: string`
@@ -280,5 +281,9 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - QQQQQ: `explanation.focusRankPercentile = focusRank / candidateCount`, [0,1] normalized pre-focus rank. Added to `buildCastExplanation` inside `focusRank !== undefined` guard alongside `focusRank` and `focusRankDelta`. Tool description updated. 8 new tests (present/absent/bounds/identity/edge cases/description).
   - CodeRabbit + Codex rate-limited (recurring — no action).
 - **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring); direct git push to main 403 (feature branches pushable via git).
+- **Additional discoveries (late run 158)**:
+  - QQQQQ: PR #499 (outOfFocusWinnerGap) merged by parallel session at ac28f50 before this run's PR #501 was created. PR #501 (focusRankPercentile) conflicted on aggregator.ts → closed as stale.
+  - RRRRR: Implemented focusRankPercentile (originally planned as QQQQQ) as RRRRR. Branch `auto/RRRRR-cast-explain-focus-rank-percentile`, PR #502, CI in_progress. 1505/0/2.
+  - Codex + CodeRabbit rate-limited on PR #502 (recurring — no action).
 - **Next run priority**:
-  - Merge QQQQQ (PR #501) if CI green. Then RRRRR candidates: (a) cast explanation `runnerUpServer: string` — server ID of the runner-up tool (parallel to `winnerServer`); (b) cast explanation `winnerCategory: string` — category of the winning server; (c) cast explanation `focusRankNormalized: number` — `(focusRank - 1) / max(candidateCount - 1, 1)` (0-indexed variant where 0 = already led, 1 = was last).
+  - Merge RRRRR (PR #502) if CI green. Then SSSSS candidates: (a) cast explanation `runnerUpServer: string` — server ID of the runner-up tool (parallel to `winnerServer`); (b) cast explanation `winnerCategory: string` — category of the winning server; (c) cast explanation `inFocusWinnerGap: number` — score gap between winner and best in-focus non-winner candidate.
