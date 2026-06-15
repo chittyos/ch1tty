@@ -105,7 +105,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 ### 2026-06-15 (run 147)
 - **Workstream**: AAAAA — `cast explanation.focusDecisive: boolean`
-- **Branch/PR**: `auto/AAAAA-cast-explain-focus-decisive` → PR #475 (open)
+- **Branch/PR**: `auto/AAAAA-cast-explain-focus-decisive` → PR #475 ✅ MERGED (db2f4fb)
 - **Build**: clean | **Tests**: 1369/0/2 (+8 AAAAA from 1361 baseline)
 - **What was done**:
   - Startup: npm ci clean, build clean, tests 1361/0/2 (baseline matches run 146). Board was plain text — no reconstruction needed.
