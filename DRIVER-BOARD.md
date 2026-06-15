@@ -64,6 +64,8 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **SSSS. `ch1tty/cast` `explanation.brainMs` when brain route fires** — When `explain: true` is set and `castRoute === 'brain'`, the `explanation` object now includes `brainMs: number` — wall-clock time of `routeIntent()` in milliseconds. Absent when keyword-fallback route is used. Parallels `latencyBreakdown.brainMs` (PPPP) but lives in the reasoning-oriented `explanation` field alongside `method:'brain'`, `topCandidates`, and `rationale`. Present in all cast shapes: `executed`, `plan`, `resolved`, `chain_executed`, `no_match`. PR #462 ✅ MERGED (3fe81de, run 141, 2026-06-14). 7 new tests, 1312/0/2. DONE.
 - [x] **TTTT. `ch1tty/cast` `explanation.candidateCount`** — Adds `candidateCount: number` to `explanation` when `explain: true` is set. Shows the total number of tools in the scoring pool before the top-5 `topCandidates` slice — lets operators see how competitive the resolution was (3 candidates is very different from 150). Always 0 on `cast:no_match`. PR #463 ✅ MERGED (dd2f1c3, run 141, 2026-06-14). 7 new tests, 1319/0/2. DONE.
 - [x] **UUUU. `ch1tty/cast` `explanation.winnerScore`** — Adds `winnerScore: number` to `explanation` when `explain: true` is set. Score of the winning (top-ranked) tool in the scoring pool — equals `topCandidates[0].score` but readable directly without indexing. Absent on `cast:no_match` (no winner). PR #465 ✅ MERGED (34ca3fc, run 142, 2026-06-15). 7 new tests, 1326/0/2. DONE.
+- [ ] **VVVV. `/api/v1/health` 503 body includes `ledgerDlq.entryCount`** — PR #467 open (run 143 predecessor, 2026-06-15). 7 new tests, 1333/0/2. Pending merge.
+- [ ] **WWWW. `ch1tty/status` and `ch1tty/reload` `latencyMs`** — Completes latency observability across all 5 meta-tools. `ch1tty/status` (full + short modes) and `ch1tty/reload` (success path) now include `latencyMs`. Tool descriptions updated. PR #468 open (run 143, 2026-06-15). 7 new tests, 1333/0/2. Pending merge.
 
 ## Live Gateway State (as of 2026-06-14 run 141)
 
@@ -2244,3 +2246,33 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 **Next run priority**:
 - Confirm UUUU PR #465 CodeQL passes. Merge and mark UUUU ✅ done.
 - VVVV candidates: (a) `/api/v1/health` 503 body include `ledgerDlq: { entryCount }` when degraded; (b) `ch1tty/cast` `chain_executed` latencyBreakdown multi-step test (verify scoringMs+executionMs cover chain total); (c) `explanation.focusBoostApplied: boolean` shorthand (true when focus is active AND winner is in-focus, false otherwise).
+
+---
+
+### Run 143 — 2026-06-15 (auto-driver)
+
+**Workstream advanced**: WWWW (new — `latencyMs` in `ch1tty/status` and `ch1tty/reload`)
+**Branch/PR**: `auto/WWWW-status-reload-latency-ms` → PR #468 open (run 143, 2026-06-15)
+**Build**: clean (0 errors)
+**Tests**: 1333 pass, 0 fail, 2 skipped (+7 WWWW from 1326/0/2 UUUU baseline)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 1326/0/2 on main (post-UUUU).
+- Read DRIVER-BOARD.md: A✅ through UUUU✅ all done. Open PR: #467 (VVVV — health 503 DLQ entrycount).
+- Identified WWWW: `latencyMs` was missing from `ch1tty/status` and `ch1tty/reload` — the only two meta-tools without it. search (RRRR), execute (QQQQ), cast (LLLL) already had it.
+- **Workstream WWWW: `latencyMs` in `ch1tty/status` and `ch1tty/reload`**
+  - `handleStatus`: `statusStartMs = Date.now()` before `getStatusSnapshot()`; `latencyMs` additive-spread into both full-mode and short-mode JSON outputs.
+  - `handleReload`: `reloadStartMs = Date.now()` before the try block; `latencyMs: Date.now() - reloadStartMs` added to the success `result` object.
+  - Tool descriptions for both updated to advertise `latencyMs`.
+  - **`test/wwww-status-reload-latency-ms.test.ts`** (new, 7 tests): WWWW-1..7 covering status full mode, status short mode, latencyMs at top-level (not nested), reload success, reload fields present, status description, reload description.
+  - Build clean. Full suite: 1333/0/2 (+7 from 1326).
+- PR #467 (VVVV) still open — did not merge or duplicate (independent change).
+- Board updated: VVVV and WWWW entries added. Subscribed to PR #468 activity.
+
+**Blockers (unchanged)**:
+- Ledger DLQ 11+ entries: ledger.chitty.cc unreachable.
+- Notion API token invalid: cannot read/write Notion board.
+
+**Next run priority**:
+- Merge VVVV (#467) and WWWW (#468) once CodeQL passes.
+- XXXX candidates: (a) `explanation.focusBoostApplied: boolean` in cast explain (true when focus active AND winner in-focus); (b) `ch1tty/cast` `chain_executed` latency multi-step coverage; (c) `/api/v1/health` 200 body include `uptime` field for operator convenience.
