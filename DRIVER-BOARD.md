@@ -72,7 +72,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **XXXX** — cast explanation topCandidates[n].inFocus (PR #470). DONE.
 - [x] **YYYY** — cast explanation runnerUpScore + runnerUpTool (PR #472). DONE.
 - [x] **ZZZZ** — cast explanation.winnerFocusBoost: exact boost applied to winner (0 if out-of-focus, absent if no focus/no_match). PR #473 ✅ MERGED (b16fed8, run 146, 2026-06-15). 7 new tests, 1361/0/2. DONE.
-- [ ] **AAAAA** — cast explanation.focusDecisive: boolean — true when winner would not have won without focus boost (winnerScore - winnerFocusBoost < runnerUpScore). PR #475 (open, run 147, 2026-06-15). 8 new tests, 1369/0/2.
+- [x] **AAAAA** — cast explanation.focusDecisive: boolean — true when winner would not have won without focus boost (winnerScore - winnerFocusBoost < runnerUpScore). PR #475 ✅ MERGED (db2f4fb, run 147, 2026-06-15). 8 new tests, 1369/0/2. DONE.
 
 ## Blockers
 
@@ -105,7 +105,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 ### 2026-06-15 (run 147)
 - **Workstream**: AAAAA — `cast explanation.focusDecisive: boolean`
-- **Branch/PR**: `auto/AAAAA-cast-explain-focus-decisive` → PR #475 (open)
+- **Branch/PR**: `auto/AAAAA-cast-explain-focus-decisive` → PR #475 ✅ MERGED (db2f4fb)
 - **Build**: clean | **Tests**: 1369/0/2 (+8 AAAAA from 1361 baseline)
 - **What was done**:
   - Startup: npm ci clean, build clean, tests 1361/0/2 (baseline matches run 146). Board was plain text — no reconstruction needed.
