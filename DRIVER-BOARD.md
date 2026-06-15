@@ -110,6 +110,20 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **IIIIII** — cast explanation.inFocusMeanScore: number — arithmetic mean score of in-focus candidates. Same presence conditions as inFocusTopScore. PR #523 ✅ MERGED (2026-06-15). 8 new tests, 1650/0/2. DONE.
 - [x] **JJJJJJ** — cast explanation.rawFocusMargin: number — winnerScoreBase - runnerUpScoreBase (unfocused score gap, strips focus boost from both sides). Present when focus active + runner-up exists. Can be negative when focus reversed ranking. PR #525 ✅ MERGED (3baf457, 2026-06-15). 8 new tests, 1658/0/2. DONE.
 - [x] **KKKKKK** — cast explanation.focusNetBoostDelta: number — net differential focus boost winner received vs runner-up (winnerFocusBoost - runnerUpFocusBoost). +focusBoost when winner in-focus/runner-up out; 0 when both same; -focusBoost when vice versa. Identity: focusMargin === rawFocusMargin + focusNetBoostDelta. Present when focus active + runner-up exists. PR #529 ✅ MERGED (2026-06-15). 8 new tests, 1668/0/2. DONE.
+- [x] **LLLLLL** — cast explanation.outOfFocusBottomScore: number — lowest score among out-of-focus candidates. Completes out-of-focus triple (top/mean/bottom). MERGED on main (run 166). DONE.
+- [x] **MMMMMM** — cast explanation.inFocusBottomScore: number — lowest score among in-focus candidates. Completes in-focus triple (top/mean/bottom). MERGED on main (run 167). DONE.
+- [x] **NNNNNN** — cast explanation.rawFocusMarginRatio: number — rawFocusMargin / winnerScoreBase when winnerScoreBase > 0. PR #532 ✅ MERGED (run 168). DONE.
+- [x] **OOOOOO** — cast explanation.focusMarginRatio: number — focusMargin / winnerScore when winnerScore > 0. Symmetric to rawFocusMarginRatio in boosted space. PR #533 ✅ MERGED (run 169). DONE.
+- [x] **PPPPPP** — cast explanation.candidateScoreEntropy: number — Shannon entropy of full candidate score distribution. PR #534 ✅ MERGED (0625d668, run 170). DONE.
+- [x] **QQQQQQ** — cast explanation.topCandidatesGiniCoefficient: number — Gini coefficient of topCandidates pool. PR #535 ✅ MERGED (a98ee7ab, run 171). DONE.
+- [x] **RRRRRR** — cast explanation.scoreDominanceIndex: number — winner's share of total candidate score mass. PR #536 ✅ MERGED (717b37c, run 172). DONE.
+- [x] **SSSSSS** — cast explanation.candidateGiniCoefficient: number — Gini coefficient of full candidate pool. PR #537 ✅ MERGED (43fd553, run 173). DONE.
+- [x] **TTTTTT** — cast explanation.topCandidatesScoreSkewness: number — skewness of topCandidates scores. PR #538 ✅ MERGED (ee3568f, run 174). DONE.
+- [x] **UUUUUU** — cast explanation.candidateScoreSkewness: number — skewness of full candidate pool. PR #539 ✅ MERGED (0ac9474, parallel session). DONE. (note: PR #541 closed — focusNetBoostDelta duplicate/letter conflict)
+- [x] **VVVVVV** — cast explanation.candidateScoreVariance: number — variance of full candidate pool. PR #540 ✅ MERGED (a741381). DONE.
+- [x] **WWWWWW** — cast explanation.candidateScoreStdDev: number — stddev of full candidate pool (sqrt of candidateScoreVariance). PR #542 ✅ MERGED (a2d0e11). DONE.
+- [x] **XXXXXX** — cast explanation.candidateScoreMean: number — arithmetic mean of full candidate pool. PR #543 ✅ MERGED (8e8ba93). DONE.
+- [ ] **YYYYYY** — cast explanation.candidateScoreKurtosis: number — excess kurtosis (fourth standardised moment) of full candidate pool. K = (1/n)*Σ((x_i−mean)^4)/stddev^4 − 3. Present when >= 2 candidates and stddev > 0. Completes four-moment suite. Branch: auto/YYYYYY-cast-explain-candidate-score-kurtosis. PR TBD.
 
 ## Blockers
 
@@ -407,3 +421,15 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Branch/PR**: `auto/XXXXXX-cast-explain-candidate-score-mean` → PR TBD
 - **Build**: clean | **Tests**: 1714/0/2 (+8 XXXXXX from 1706 WWWWWW baseline)
 - **What was done**: Added candidateScoreMean: totalCandidateScore / candidateCount. Reuses candidateScoreEntropyTotal (no extra loop). Full-pool parallel to topCandidatesMeanScore. Always <= winnerScore. Equals topCandidatesMeanScore when candidateCount <= 5. 8 new tests.
+
+### 2026-06-15 (run 179 — YYYYYY)
+- **Workstream**: A (gateway observability) — YYYYYY: `cast explanation.candidateScoreKurtosis: number`
+- **Branch/PR**: `auto/YYYYYY-cast-explain-candidate-score-kurtosis` → PR TBD
+- **Build**: clean | **Tests**: 1786/0/2 (+8 YYYYYY from 1778 XXXXXX baseline)
+- **What was done**:
+  - Startup: found PR #541 (UUUUUU focusNetBoostDelta) superseded — remote main advanced 5 commits (UUUUUU–XXXXXX / PRs #539–543) since branch was cut; focusNetBoostDelta already in main as b279c21/KKKKKK. Closed PR #541.
+  - Backfilled DRIVER-BOARD.md workstream entries for LLLLLL–XXXXXX (all merged on remote main while board was out of sync).
+  - YYYYYY: added `candidateScoreKurtosis` — excess kurtosis (fourth standardised moment, K = (1/n)*Σ((x_i−mean)^4)/stddev^4 − 3) of full candidate pool. IIFE reuses `candidateScoreEntropyTotal` for mean; guards on scoredTools.length < 2 and variance === 0. Wired after candidateScoreStdDev in output spread. Description line added after candidateScoreMean. Completes four-moment suite (mean/variance/stddev/skewness/kurtosis).
+  - 8 new tests (YYYYYY-1..8). Build clean. 1786/0/2.
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (11+ entries, ledger.chitty.cc unreachable). CI 0-jobs (non-CodeQL, recurring).
+- **Next run priority**: ZZZZZZ — `topCandidatesScoreKurtosis: number` (excess kurtosis of the top-5 pool; symmetric to candidateScoreKurtosis, completes the four-moment suite for the topCandidates window alongside topCandidatesScoreVariance/topCandidatesScoreStdDev/topCandidatesScoreSkewness).
