@@ -371,6 +371,7 @@ export class Aggregator {
           'explanation also includes winnerServer: string — the server ID of the winning tool (the segment before the "/" in its namespaced name, e.g. "neon" from "neon/query_database"). Absent on no_match (no winner). Lets operators identify which backend resolved the intent without parsing the tool name. ' +
           'explanation also includes focusRank: number — the 1-based rank the winning tool would hold if the focus boost were removed (i.e. its position in pre-focus descending score order). Present when a focus profile is active and a winner exists. A value of 1 means the winner was already the top candidate without focus (focus did not change the outcome); a value of 2 means focus promoted the winner from 2nd to 1st; and so on. Consistent with focusDecisive: when focusDecisive is false and a runner-up exists, focusRank is always 1. ' +
           'explanation also includes unfocusedWinner: string — the namespaced tool name that would have won if the active focus boost were removed (the tool at rank 1 in pre-focus descending score order). Present only when a focus profile is active, a winner exists, and the pre-focus leader differs from the actual winner (i.e. focus changed the top spot). Absent when no focus is active, on no_match, or when the winner was already the top candidate without focus (focusRank === 1). Lets operators see exactly which tool was displaced by the focus boost. ' +
+          'explanation also includes focusRankDelta: number — the number of positions the active focus boost promoted the winning tool in the pre-focus ranking (focusRank - 1). Present whenever focusRank is present (focus active and a winner exists). A value of 0 means the winner was already the top candidate before focus was applied (no promotion occurred); a value of 1 means focus moved the winner up one position (from 2nd to 1st); a value of 2 means two positions; and so on. Lets operators quantify how aggressively focus intervened in the selection without interpreting the raw rank. ' +
           'Sub-meta to master-meta — the gateway calling itself.',
         inputSchema: {
           type: 'object',
@@ -1829,7 +1830,7 @@ function buildCastExplanation(
       focus: focusName,
       focusBoost,
       winnerInFocus,
-      ...(best !== undefined ? { winnerFocusBoost: winnerInFocus ? focusBoost : 0, ...(focusRank !== undefined ? { focusRank } : {}), ...(unfocusedWinner !== undefined ? { unfocusedWinner } : {}) } : {}),
+      ...(best !== undefined ? { winnerFocusBoost: winnerInFocus ? focusBoost : 0, ...(focusRank !== undefined ? { focusRank, focusRankDelta: focusRank - 1 } : {}), ...(unfocusedWinner !== undefined ? { unfocusedWinner } : {}) } : {}),
       ...(best !== undefined && topCandidates.length > 1 ? {
         focusDecisive: (best.score - (winnerInFocus ? focusBoost : 0)) < topCandidates[1].score,
         focusMargin: best.score - topCandidates[1].score,
