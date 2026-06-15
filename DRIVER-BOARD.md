@@ -104,7 +104,8 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **DDDDDD** — cast explanation.topCandidatesScoreVariance: number — variance of topCandidates scores (sum of squared deviations from mean, divided by N). Present when >= 2 topCandidates. Absent on no_match or single candidate. PR #514 ✅ MERGED (4787dec, 2026-06-15). 8 new tests, 1602/0/2. DONE.
 - [x] **EEEEEE** — cast explanation.runnerUpInFocus: boolean — whether the runner-up tool's server or category matches the active focus profile. Present when focus active + runner-up exists (same conditions as focusDecisive/focusMargin). Absent when no focus, no_match, or < 2 candidates. Symmetric to winnerInFocus. PR #515 ✅ MERGED (444b18c, 2026-06-15). 8 new tests, 1610/0/2. DONE.
 - [x] **FFFFFF** — cast explanation.runnerUpFocusBoost: number — exact additive focus boost applied to runner-up (equals focusBoost when runnerUpInFocus; 0 otherwise). Present when focus active + runner-up exists. Absent when no focus, no_match, or < 2 candidates. Symmetric to winnerFocusBoost. MERGED directly to main (e98e910, 2026-06-15). 8 new tests, 1618/0/2. DONE.
-- [ ] **GGGGGG** — cast explanation.runnerUpScoreBase: number — runner-up's pre-focus relevance score (runnerUpScore - runnerUpFocusBoost). Identity: runnerUpScoreBase + runnerUpFocusBoost === runnerUpScore. Symmetric to winnerScoreBase. Present when focus active + runner-up exists. In progress (2026-06-15).
+- [x] **GGGGGG** — cast explanation.runnerUpScoreBase: number — runner-up's pre-focus relevance score (runnerUpScore - runnerUpFocusBoost). Identity: runnerUpScoreBase + runnerUpFocusBoost === runnerUpScore. Symmetric to winnerScoreBase. Present when focus active + runner-up exists. PR #518 ✅ MERGED (201303e, 2026-06-15). 8 new tests, 1626/0/2. DONE.
+- [ ] **HHHHHH** — cast explanation.runnerUpFocusBoostRatio: number — fraction of runner-up's total score from focus boost (runnerUpFocusBoost / runnerUpScore), [0,1]. Present when focus active + runner-up exists + runnerUpScore > 0. Absent when no focus, no_match, < 2 candidates, or runnerUpScore === 0. Symmetric to winnerFocusBoostRatio. In progress (2026-06-15).
 
 ## Blockers
 
@@ -239,3 +240,14 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - `test/ffffff-cast-explain-runner-up-focus-boost.test.ts`: 8 new tests. Build clean. 1618/0/2.
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**: Merge FFFFFF (PR to be opened). Then GGGGGG — `runnerUpScoreBase: number` (runner-up score before focus boost; runnerUpScore - runnerUpFocusBoost) to complete the runner-up score decomposition parallel to winnerScoreBase.
+
+### 2026-06-15 (run 163 — HHHHHH)
+- **Workstream**: A (gateway observability) — HHHHHH: `cast explanation.runnerUpFocusBoostRatio: number`
+- **Branch/PR**: `auto/HHHHHH-cast-explain-runner-up-focus-boost-ratio` → PR TBD
+- **Build**: clean | **Tests**: 1634/0/2 (+8 HHHHHH from 1626 GGGGGG baseline)
+- **What was done**:
+  - Startup: FFFFFF (PR #517 → e98e910) confirmed merged. GGGGGG (PR #518 → 201303e) opened by parallel session and merged. Board updated FFFFFF+GGGGGG to DONE.
+  - HHHHHH: `src/aggregator.ts` `buildCastExplanation` — added `runnerUpFocusBoostRatio: (isInFocus(focus!, scoredTools[1]) ? focusBoost : 0) / topCandidates[1].score` with runnerUpScore > 0 guard, alongside runnerUpScoreBase in focus+runner-up block. Tool description updated.
+  - `test/hhhhhh-cast-explain-runner-up-focus-boost-ratio.test.ts`: 8 new tests. Build clean. 1634/0/2.
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
+- **Next run priority**: Merge HHHHHH (PR to be opened). Then IIIIII — `rawFocusMargin: number` (winnerScoreBase - runnerUpScoreBase; unfocused score gap between winner and runner-up; compares to focusMargin to measure how much focus affected the margin).
