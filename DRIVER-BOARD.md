@@ -65,6 +65,14 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **TTTT. `ch1tty/cast` `explanation.candidateCount`** — Adds `candidateCount: number` to `explanation` when `explain: true` is set. Shows the total number of tools in the scoring pool before the top-5 `topCandidates` slice — lets operators see how competitive the resolution was (3 candidates is very different from 150). Always 0 on `cast:no_match`. PR #463 ✅ MERGED (dd2f1c3, run 141, 2026-06-14). 7 new tests, 1319/0/2. DONE.
 - [x] **UUUU. `ch1tty/cast` `explanation.winnerScore`** — Adds `winnerScore: number` to `explanation` when `explain: true` is set. Score of the winning (top-ranked) tool in the scoring pool — equals `topCandidates[0].score` but readable directly without indexing. Absent on `cast:no_match` (no winner). PR #465 ✅ MERGED (34ca3fc, run 142, 2026-06-15). 7 new tests, 1326/0/2. DONE.
 
+## Live Gateway State (as of 2026-06-15 run 143)
+
+- Connected backends: (not re-queried this run — stable from run 140: 263 tools across 11 servers)
+- Not connected: cloudflare, github, linear, stripe (lazy, auth-gated or unreachable)
+- System health: degraded (ledger DLQ 11+ entries — ledger.chitty.cc unreachable, unchanged)
+- Brain: ok (unchanged)
+- VVVV (#467) open — CodeQL queued (2 checks: Analyze javascript-typescript, Analyze actions)
+
 ## Live Gateway State (as of 2026-06-14 run 141)
 
 - Connected backends: (not re-queried this run — stable from run 140: 263 tools across 11 servers)
@@ -244,6 +252,35 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Ledger DLQ backlog (6 entries): ledger.chitty.cc unreachable. System health shows `degraded`. Run `cat ~/.ch1tty/ledger.dlq.jsonl` to inspect entries.
 
 ## Run Log
+
+---
+
+### Run 143 — 2026-06-15 (auto-driver)
+
+**Workstream advanced**: VVVV (new — `/api/v1/health` 503 body includes `ledgerDlq: { entryCount }`)
+**Branch/PR**: `auto/VVVV-health-dlq-entrycount` → PR #467 open (CodeQL queued)
+**Build**: clean (0 errors)
+**Tests**: 1333 pass, 0 fail, 2 skipped (+7 VVVV from 1326 UUUU baseline)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 1326/0/2 (UUUU baseline on main). `git fetch --all`. No open PRs.
+- Read DRIVER-BOARD.md: A✅ through UUUU✅ (run 142). Next-run candidates from run 141: (a) `/api/v1/health` 503 body with `ledgerDlq.entryCount`, (b) `explanation.winnerScore` → done as UUUU, (c) chain_executed latencyBreakdown verification.
+- **Workstream VVVV: `ledgerDlq.entryCount` in `/api/v1/health` 503 body**
+  - Gap: when the gateway is degraded, callers hitting the liveness endpoint learn `status: degraded` and get the full `systemHealth` blob, but must make a second call to `/api/v1/status` to find the DLQ backlog depth. Given the live gateway has been degraded for 10+ consecutive runs (11+ DLQ entries), surfacing `entryCount` directly in the 503 body closes the single-call observability gap.
+  - **`src/http-server.ts`**: destructure both `systemHealth` and `ledgerDlq` from `getStatusSnapshot()`; when `httpStatus === 503`, set `body.ledgerDlq = { entryCount: ledgerDlq.entryCount }` before `JSON.stringify`. 200 body unchanged. Internal-error path unchanged.
+  - **`CLAUDE.md`**: updated `/api/v1/health` endpoint description to document `ledgerDlq: { entryCount }` in the 503 body and clarify it is absent from internal-error 503s.
+  - **`test/vvvv-health-dlq-entrycount.test.ts`** (new, 7 tests): VVVV-1 field present in 503; VVVV-2 count matches DLQ (7 entries → 7); VVVV-3 absent in 200; VVVV-4 consistent with `getStatusSnapshot().ledgerDlq.entryCount`; VVVV-5 minimal surface (only `entryCount`, no `path`/`entries`); VVVV-6 existing 503 fields still present; VVVV-7 internal-error path has no `ledgerDlq`.
+  - Build clean. Full suite: 1333/0/2 (+7 from 1326).
+- Codex + CodeRabbit both rate-limited (informational).
+
+**Blockers (unchanged)**:
+- Ledger DLQ 11+ entries: ledger.chitty.cc unreachable.
+- Notion API token invalid: cannot read/write Notion board.
+- CI (main workflow 0-jobs) unchanged — only CodeQL runs.
+
+**Next run priority**:
+- Confirm VVVV PR #467 CodeQL passes (data-logic only, expected green). Merge and mark VVVV ✅ done.
+- WWWW candidates: (a) `explanation.runnerUpScore` — score of the second-place cast candidate (complements `winnerScore` with the margin); (b) `/api/v1/health` warn-state surface — brain circuit-open is currently `warn` (not `degraded`), but the health body doesn't distinguish `warn` from `ok` in the `systemHealth` detail — add `brainWarn: true` marker or similar when warn; (c) `ch1tty/cast` `chain_executed` test verifying `latencyBreakdown.executionMs` covers the full chain (multi-step, not just first step).
 
 ---
 

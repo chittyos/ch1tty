@@ -66,10 +66,12 @@ export class HttpMcpServer {
     if (req.method === 'GET' && path === '/api/v1/health') {
       res.setHeader('Content-Type', 'application/json');
       try {
-        const { systemHealth } = this.aggregator.getStatusSnapshot();
+        const { systemHealth, ledgerDlq } = this.aggregator.getStatusSnapshot();
         const httpStatus = systemHealth.status === 'degraded' ? 503 : 200;
         res.writeHead(httpStatus);
-        res.end(JSON.stringify({ status: systemHealth.status, service: 'ch1tty', systemHealth }));
+        const body: Record<string, unknown> = { status: systemHealth.status, service: 'ch1tty', systemHealth };
+        if (httpStatus === 503) body.ledgerDlq = { entryCount: ledgerDlq.entryCount };
+        res.end(JSON.stringify(body));
       } catch (err) {
         log.error(`Health check failed: ${err}`);
         res.writeHead(503);
