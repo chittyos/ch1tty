@@ -74,7 +74,8 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **ZZZZ** — cast explanation.winnerFocusBoost: exact boost applied to winner (0 if out-of-focus, absent if no focus/no_match). PR #473 ✅ MERGED (b16fed8, run 146, 2026-06-15). 7 new tests, 1361/0/2. DONE.
 - [x] **AAAAA** — cast explanation.focusDecisive: boolean — true when winner would not have won without focus boost. PR #475 ✅ MERGED (run 147, 2026-06-15). 8 new tests, 1369/0/2. DONE.
 - [x] **BBBBB** — cast latencyBreakdown.registryMs — registry fetch time isolated from scoringMs. PR #477 ✅ MERGED (4949c21, run 147, 2026-06-15). Codex P2 fix: times only getRegistry(), not allSettled wrapper. 8 new tests, 1377/0/2. DONE.
-- [x] **CCCCC** — cast explanation.focusMargin: number — raw score gap between winner and runner-up in focus-biased space (winnerScore - runnerUpScore). PR #478 ✅ MERGED (7d2d572, run 148, 2026-06-15). 8 new tests, 1377/0/2. DONE.
+- [x] **CCCCC** — cast explanation.focusMargin: number — raw score gap between winner and runner-up in focus-biased space (winnerScore - runnerUpScore). PR #478 ✅ MERGED (7d2d572, run 148, 2026-06-15). 8 new tests, 1385/0/2. DONE.
+- [ ] **DDDDD** — /api/v1/health warn body: brainCircuitOpen: true when systemHealth.brainDegraded — surfaces brain circuit state in the 200 warn response without a separate /api/v1/status call. PR open (run 150, 2026-06-15). 8 new tests, 1393/0/2.
 
 ## Blockers
 
@@ -129,3 +130,17 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**:
   - DDDDD: `/api/v1/health` warn body — when `systemHealth.status === 'warn'`, include `brainCircuitOpen: true` in the 200 response body.
+
+### 2026-06-15 (run 149)
+- **Workstream**: DDDDD — `/api/v1/health` warn body includes `brainCircuitOpen: true`
+- **Branch/PR**: `auto/DDDDD-health-warn-brainCircuitOpen` → PR open
+- **Build**: clean | **Tests**: 1393/0/2 (+8 DDDDD from 1385 baseline; BBBBB+CCCCC also merged this run)
+- **What was done**:
+  - Startup: npm ci clean, build clean, tests 1369/0/2 on main (AAAAA baseline). Found 3 open PRs: #476 (board), #477 (BBBBB), #478 (CCCCC). All 3/3 CI green.
+  - Merged #476 (board). Rebased and merged #477 (BBBBB ✅ 4949c21). Rebased and merged #478 (CCCCC ✅ 7d2d572).
+  - DDDDD: `src/http-server.ts` `/api/v1/health` handler — added `if (systemHealth.status === 'warn' && systemHealth.brainDegraded) body.brainCircuitOpen = true;` after the ledgerDlq guard.
+  - Updated `CLAUDE.md` `/api/v1/health` docs to document `brainCircuitOpen` in warn body.
+  - `test/ddddd-health-warn-braincircuitopen.test.ts`: 8 new tests (warn+brain→present, ok→absent, degraded→absent, warn+ledger-only→absent, internal-error→absent, exact boolean true, existing fields still present, HTTP 200 not 503).
+- **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring).
+- **Next run priority**:
+  - EEEEE candidates: (a) `/api/v1/health` warn body `ledgerWarn: true` when `systemHealth.ledgerStatus === 'warn'` (ledger-only warn surfacing, symmetric to brainCircuitOpen); (b) cast explanation `focusBias: number` — winnerFocusBoost / focusMargin ratio (portion of margin attributable to focus boost).
