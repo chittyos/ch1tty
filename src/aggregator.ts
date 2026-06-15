@@ -368,6 +368,7 @@ export class Aggregator {
           'explanation also includes focusMargin: number — the raw score gap between winner and runner-up in the focus-biased scoring space (winnerScore - runnerUpScore). Present when a focus profile is active and there is at least one runner-up. Lets operators see at a glance how large the winning margin was under the focus lens. ' +
           'explanation also includes focusBias: number — fraction of the winner-runner-up margin attributable to the active focus boost (winnerFocusBoost / focusMargin). Present when a focus profile is active, there is at least one runner-up, and focusMargin is non-zero. Absent when focusMargin is 0 (tied candidates), when there is no runner-up, when focus is inactive, or on no_match. A value of 0 means the boost did not contribute to the margin (winner was out-of-focus); a value of 1 means the boost exactly equals the margin; values >1 mean the boost exceeded the raw unfocused margin. ' +
           'explanation also includes focusConfidence: number — focusBias clamped to [0,1]. Same presence conditions as focusBias (active focus, runner-up exists, focusMargin non-zero, best tool exists). A value of 0 means focus contributed nothing to the margin (winner was out-of-focus); a value of 1 means focus was at least fully decisive (focusBias ≥ 1). Unlike focusBias which can exceed 1 when the boost outweighs the margin, focusConfidence is always in [0,1] and can be read directly as a percentage confidence that focus drove the decision. ' +
+          'explanation also includes winnerServer: string — the server ID of the winning tool (the segment before the "/" in its namespaced name, e.g. "neon" from "neon/query_database"). Absent on no_match (no winner). Lets operators identify which backend resolved the intent without parsing the tool name. ' +
           'Sub-meta to master-meta — the gateway calling itself.',
         inputSchema: {
           type: 'object',
@@ -1802,7 +1803,7 @@ function buildCastExplanation(
     method: resolvedBy,
     ...(brainMs !== undefined ? { brainMs } : {}),
     candidateCount: scoredTools.length,
-    ...(best !== undefined ? { winnerScore: best.score } : {}),
+    ...(best !== undefined ? { winnerScore: best.score, winnerServer: best.namespacedName.split('/')[0] } : {}),
     ...(topCandidates.length > 1 ? { runnerUpScore: topCandidates[1].score, runnerUpTool: topCandidates[1].tool } : {}),
     ...(focusName ? {
       focus: focusName,
