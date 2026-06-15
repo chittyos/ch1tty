@@ -407,6 +407,20 @@
       "authTokenKey": "chittymcp",
       "lazy": false,
       "enabled": true
+    },
+    {
+      "_comment": "ChittyConnect (ChicoKeys) — the credential/connection broker. Own MCP at connect.chitty.cc/api/mcp (streamable HTTP, auth-gated 401; /sse is the legacy transport). NOT proxied under mcp.chitty.cc/{connect}. Registered direct, mirroring the orchestrator direct-service pattern (authTokenKey chittymcp). This is the canonical remote broker the /chico skill targets — local Task subagents have no broker access."
+    },
+    {
+      "id": "connect",
+      "name": "ChittyConnect (ChicoKeys)",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "ecosystem",
+      "endpoint": "https://connect.chitty.cc/api/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": false,
+      "enabled": true
     }
   ]
 }
