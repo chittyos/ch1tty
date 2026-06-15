@@ -75,7 +75,8 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **AAAAA** — cast explanation.focusDecisive: boolean — true when winner would not have won without focus boost. PR #475 ✅ MERGED (run 147, 2026-06-15). 8 new tests, 1369/0/2. DONE.
 - [x] **BBBBB** — cast latencyBreakdown.registryMs — registry fetch time isolated from scoringMs. PR #477 ✅ MERGED (4949c21, run 147, 2026-06-15). Codex P2 fix: times only getRegistry(), not allSettled wrapper. 8 new tests, 1377/0/2. DONE.
 - [x] **CCCCC** — cast explanation.focusMargin: number — raw score gap between winner and runner-up in focus-biased space (winnerScore - runnerUpScore). PR #478 ✅ MERGED (7d2d572, run 148, 2026-06-15). 8 new tests, 1385/0/2. DONE.
-- [ ] **DDDDD** — /api/v1/health warn body: brainCircuitOpen: true when systemHealth.brainDegraded — surfaces brain circuit state in the 200 warn response without a separate /api/v1/status call. PR open (run 150, 2026-06-15). 8 new tests, 1393/0/2.
+- [x] **DDDDD** — /api/v1/health warn body: brainCircuitOpen: true when systemHealth.brainDegraded — surfaces brain circuit state in the 200 warn response without a separate /api/v1/status call. PR #480 ✅ MERGED (3f4e107, run 150, 2026-06-15). 8 new tests, 1393/0/2. DONE.
+- [ ] **EEEEE** — /api/v1/health warn body: ledgerWarn: true when systemHealth.ledgerStatus === 'warn' — symmetric to brainCircuitOpen; distinguishes ledger-drops/flushErrors warn from brain-circuit warn. PR open (run 150, 2026-06-15). 8 new tests, 1401/0/2.
 
 ## Blockers
 
@@ -144,3 +145,15 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**:
   - EEEEE candidates: (a) `/api/v1/health` warn body `ledgerWarn: true` when `systemHealth.ledgerStatus === 'warn'` (ledger-only warn surfacing, symmetric to brainCircuitOpen); (b) cast explanation `focusBias: number` — winnerFocusBoost / focusMargin ratio (portion of margin attributable to focus boost).
+
+### 2026-06-15 (run 150)
+- **Workstream**: DDDDD ✅ merged + EEEEE opened
+- **Branch/PR**: `auto/EEEEE-health-warn-ledgerwarn` → PR open
+- **Build**: clean | **Tests**: 1401/0/2 (+8 EEEEE from 1393 DDDDD baseline)
+- **What was done**:
+  - Startup: npm ci clean, build clean, 1385/0/2 on main. Found 2 open PRs: #479 (board mark CCCCC done), #480 (DDDDD brainCircuitOpen).
+  - Merged PR #479 (board). PR #480 (DDDDD) had conflict in DRIVER-BOARD.md after #479 merge — rebased, resolved conflict, force-pushed eec5f90. CI 3/3 green. Merged #480 ✅ (3f4e107).
+  - EEEEE: `src/http-server.ts` — added `if (systemHealth.status === 'warn' && systemHealth.ledgerStatus === 'warn') body.ledgerWarn = true;` after brainCircuitOpen guard. Updated CLAUDE.md /api/v1/health docs. 8 new tests in `test/eeeee-health-warn-ledgerwarn.test.ts`.
+- **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring).
+- **Next run priority**:
+  - Merge EEEEE (PR open) if CI green, then FFFFF: cast explanation `focusBias: number` (winnerFocusBoost / focusMargin — fraction of margin due to focus boost). Guard: absent when focusMargin === 0 (division by zero).
