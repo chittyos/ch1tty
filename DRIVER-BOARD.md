@@ -300,3 +300,16 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - CodeRabbit + Codex rate-limited (recurring — no action).
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**: MMMMMM — `inFocusBottomScore: number` (lowest score among in-focus candidates, symmetric bottom complement to inFocusTopScore; completes the in-focus triple: top/mean/bottom) or `rawFocusMarginRatio: number`.
+
+### 2026-06-15 (run 167 — MMMMMM) ✅ COMPLETE
+- **Workstream**: A (gateway observability) — MMMMMM: `cast explanation.inFocusBottomScore: number`
+- **Branch/PR**: `auto/MMMMMM-cast-explain-in-focus-bottom-score` → PR #531
+- **Build**: clean | **Tests**: 1626/0/2 (+8 MMMMMM from 1618 LLLLLL baseline)
+- **What was done**:
+  - Startup: main at 58e6413a (LLLLLL outOfFocusBottomScore merged). Added inFocusBottomScore: lowest score among in-focus candidates. Reuses inFocusScores array. Triple (bottom/mean/top) completes the in-focus score distribution.
+  - Description line added after inFocusMeanScore. Wired into output spread after inFocusMeanScore.
+  - 8 new tests (MMMMMM-1..8). All pass.
+  - PR #531 opened; CI 3/3 green; merged.
+  - CodeRabbit + Codex rate-limited (recurring — no action).
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
+- **Next run priority**: NNNNNN — `rawFocusMarginRatio: number` (rawFocusMargin / winnerScoreBase when winnerScoreBase > 0 — relative unfocused margin normalised to winner's base; measures how much the focus boost mattered relative to the winner's organic strength).
