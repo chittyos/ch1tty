@@ -1,24 +1,21 @@
 /**
  * KKKKK: explanation.focusRankDelta in ch1tty/cast when explain:true and focus is active.
  *
- * focusRankDelta: number — the number of positions the active focus boost promoted the winning
- * tool in the pre-focus ranking (focusRank - 1).
+ * focusRankDelta: number — the number of positions focus moved the winning tool up
+ * in the pre-focus ranking (focusRank - 1). A value of 0 means focus did not change
+ * the winner's rank; a value of 1 means focus promoted the winner from 2nd to 1st; etc.
  *
- * Present when: focus profile active + winner exists (same conditions as focusRank).
+ * Present when: focus profile active + winner exists (same as focusRank).
  * Absent when: no focus active, or no_match (no winner).
  *
- * Value: 0 = winner was already top candidate pre-focus (no promotion occurred).
- *        1 = focus promoted winner from 2nd to 1st.
- *        N = focus promoted winner N positions up.
- *
  * Covered:
- *   KKKKK-1: focusRankDelta === 0 when winner was already #1 pre-focus (focusRank === 1)
- *   KKKKK-2: focusRankDelta >= 1 when focus promoted winner from behind (focusRank >= 2)
+ *   KKKKK-1: focusRankDelta === 0 when winner already led pre-focus (no displacement)
+ *   KKKKK-2: focusRankDelta === 1 when focus promoted winner from 2nd to 1st
  *   KKKKK-3: absent on cast:no_match (no winner)
  *   KKKKK-4: absent when no focus profile is active
- *   KKKKK-5: always a non-negative integer (>= 0) when present
- *   KKKKK-6: focusRankDelta === focusRank - 1 (consistency invariant)
- *   KKKKK-7: out-of-focus winner → focusRankDelta === 0 (no boost applied, winner led pre-focus)
+ *   KKKKK-5: focusRankDelta is always a non-negative integer (>= 0)
+ *   KKKKK-6: focusRankDelta === focusRank - 1 (mathematical consistency)
+ *   KKKKK-7: focusRankDelta === 0 for out-of-focus winner (already led pre-focus)
  *   KKKKK-8: tool description documents focusRankDelta
  */
 import assert from 'node:assert/strict';
@@ -94,10 +91,9 @@ function buildAgg(
   });
 }
 
-test('KKKKK-1: focusRankDelta === 0 when winner was already #1 pre-focus (focusRank === 1)', async () => {
-  // stripe/create_invoice matches all 4 intent terms (score ~1.0); neon/run_sql matches ~0.25.
-  // With finance focus, stripe gets +0.5 → still #1. Without boost stripe was already #1.
-  // So focusRank === 1 → focusRankDelta === 0.
+test('KKKKK-1: focusRankDelta === 0 when winner already led pre-focus', async () => {
+  // stripe/create_invoice matches all 4 intent terms (raw 1.0); neon/run_sql matches 0 terms (raw 0).
+  // finance focus boosts stripe, but stripe was already #1 pre-focus → focusRank===1 → focusRankDelta===0.
   const stripeTools: ToolEntry[] = [
     { name: 'create_invoice', description: 'billing invoice payment charge', inputSchema: { type: 'object', properties: {} } },
   ];
@@ -112,17 +108,17 @@ test('KKKKK-1: focusRankDelta === 0 when winner was already #1 pre-focus (focusR
     assert.ok('explanation' in parsed, 'explanation absent');
     const { explanation } = parsed;
     assert.ok('focusRankDelta' in explanation, 'focusRankDelta should be present when focus active and winner exists');
-    assert.equal(explanation.focusRank, 1, `expected focusRank 1, got ${explanation.focusRank}`);
-    assert.equal(explanation.focusRankDelta, 0, `expected focusRankDelta 0 when focusRank===1, got ${explanation.focusRankDelta}`);
+    assert.equal(explanation.focusRankDelta, 0, `expected focusRankDelta 0 (no displacement), got ${explanation.focusRankDelta}`);
   } finally {
     await agg.shutdown();
   }
 });
 
-test('KKKKK-2: focusRankDelta >= 1 when focus promoted winner from behind (focusRank >= 2)', async () => {
-  // neon matches 3 intent terms (raw ~0.75); stripe matches 4 terms (raw ~1.0).
-  // code focus gives neon +0.5 → boosted score ~1.25 > stripe ~1.0 → neon wins.
-  // Without boost neon was #2 → focusRank === 2 → focusRankDelta === 1.
+test('KKKKK-2: focusRankDelta === 1 when focus promoted winner from 2nd to 1st', async () => {
+  // neon/run_sql: matches 3/4 intent terms "sql database schema" → raw score 0.75
+  // stripe/create_invoice: matches 4/4 terms "sql database schema query" → raw score 1.0
+  // code focus boost 0.5: neon=1.25, stripe=1.0 → neon wins. Pre-focus: stripe (1.0) led, neon (0.75) was 2nd.
+  // neon's focusRank=2 → focusRankDelta=1 (promoted by exactly 1 position).
   const neonTools: ToolEntry[] = [
     { name: 'run_sql', description: 'sql database schema', inputSchema: { type: 'object', properties: {} } },
   ];
@@ -136,22 +132,15 @@ test('KKKKK-2: focusRankDelta >= 1 when focus promoted winner from behind (focus
     const parsed = JSON.parse((r.content[0] as { text: string }).text);
     assert.ok('explanation' in parsed, 'explanation absent');
     const { explanation } = parsed;
-    assert.ok('focusRankDelta' in explanation, 'focusRankDelta should be present when focus active and winner exists');
-    assert.equal(typeof explanation.focusRankDelta, 'number', 'focusRankDelta should be a number');
-    // If focus was decisive (neon promoted from behind), delta >= 1
-    if (explanation.winnerServer === 'neon' && explanation.winnerInFocus === true && explanation.focusRank >= 2) {
-      assert.ok(explanation.focusRankDelta >= 1,
-        `expected focusRankDelta >= 1 when focus promoted winner, got ${explanation.focusRankDelta}`);
-    }
-    // Invariant: delta === rank - 1 regardless of scenario
-    assert.equal(explanation.focusRankDelta, explanation.focusRank - 1,
-      `focusRankDelta must equal focusRank - 1: delta=${explanation.focusRankDelta} rank=${explanation.focusRank}`);
+    assert.equal(explanation.winnerServer, 'neon', `expected neon to win with code focus, got "${explanation.winnerServer}"`);
+    assert.ok('focusRankDelta' in explanation, 'focusRankDelta should be present with active focus and a winner');
+    assert.ok(explanation.focusRankDelta >= 1, `expected focusRankDelta >= 1 (neon was promoted by focus), got ${explanation.focusRankDelta}`);
   } finally {
     await agg.shutdown();
   }
 });
 
-test('KKKKK-3: cast:no_match → focusRankDelta absent (no winner)', async () => {
+test('KKKKK-3: cast:no_match → focusRankDelta absent', async () => {
   const path = dlqPath('k3');
   const emptyAgg = new Aggregator([STRIPE_CFG], {
     backendFactory: () => makeBackend([]),
@@ -179,13 +168,16 @@ test('KKKKK-4: no focus active → focusRankDelta absent', async () => {
   const stripeTools: ToolEntry[] = [
     { name: 'create_invoice', description: 'billing invoice payment', inputSchema: { type: 'object', properties: {} } },
   ];
-  const agg = buildAgg('k4', [STRIPE_CFG], { stripe: stripeTools }); // no focus
+  const neonTools: ToolEntry[] = [
+    { name: 'run_sql', description: 'billing sql database', inputSchema: { type: 'object', properties: {} } },
+  ];
+  const agg = buildAgg('k4', [STRIPE_CFG, NEON_CFG], { stripe: stripeTools, neon: neonTools }); // no focus
   try {
     const r = await agg.callTool('ch1tty/cast', { intent: 'billing invoice', explain: true });
     const parsed = JSON.parse((r.content[0] as { text: string }).text);
     assert.ok('explanation' in parsed, 'explanation absent');
     const { explanation } = parsed;
-    assert.ok(!('focus' in explanation), 'focus should be absent when no focus active');
+    assert.ok(!('focus' in explanation), 'focus key should be absent when no focus active');
     assert.ok(
       !('focusRankDelta' in explanation),
       `focusRankDelta should be absent when no focus active, got ${explanation.focusRankDelta}`,
@@ -195,7 +187,7 @@ test('KKKKK-4: no focus active → focusRankDelta absent', async () => {
   }
 });
 
-test('KKKKK-5: focusRankDelta is always a non-negative integer (>= 0) when present', async () => {
+test('KKKKK-5: focusRankDelta is always a non-negative integer (>= 0)', async () => {
   const stripeTools: ToolEntry[] = [
     { name: 'create_invoice', description: 'billing invoice payment charge', inputSchema: { type: 'object', properties: {} } },
   ];
@@ -208,7 +200,7 @@ test('KKKKK-5: focusRankDelta is always a non-negative integer (>= 0) when prese
     const r = await agg.callTool('ch1tty/cast', { intent: 'billing invoice payment charge', explain: true });
     const parsed = JSON.parse((r.content[0] as { text: string }).text);
     const { explanation } = parsed;
-    assert.ok('focusRankDelta' in explanation, 'focusRankDelta should be present with active focus and winner');
+    assert.ok('focusRankDelta' in explanation, 'focusRankDelta should be present with active focus');
     assert.equal(typeof explanation.focusRankDelta, 'number', 'focusRankDelta should be a number');
     assert.ok(Number.isInteger(explanation.focusRankDelta), 'focusRankDelta should be an integer');
     assert.ok(explanation.focusRankDelta >= 0, `focusRankDelta should be >= 0, got ${explanation.focusRankDelta}`);
@@ -217,35 +209,34 @@ test('KKKKK-5: focusRankDelta is always a non-negative integer (>= 0) when prese
   }
 });
 
-test('KKKKK-6: focusRankDelta === focusRank - 1 (consistency invariant)', async () => {
-  // Verify the identity holds across both in-focus and out-of-focus winners.
+test('KKKKK-6: focusRankDelta === focusRank - 1 (mathematical consistency)', async () => {
   const stripeTools: ToolEntry[] = [
-    { name: 'create_invoice', description: 'billing invoice payment', inputSchema: { type: 'object', properties: {} } },
+    { name: 'create_invoice', description: 'billing invoice payment charge fee refund', inputSchema: { type: 'object', properties: {} } },
   ];
   const neonTools: ToolEntry[] = [
-    { name: 'run_sql', description: 'billing sql query data', inputSchema: { type: 'object', properties: {} } },
+    { name: 'run_sql', description: 'billing sql database', inputSchema: { type: 'object', properties: {} } },
   ];
   const agg = buildAgg('k6', [STRIPE_CFG, NEON_CFG], { stripe: stripeTools, neon: neonTools },
     { focus: 'finance', profiles: FINANCE_PROFILES });
   try {
-    const r = await agg.callTool('ch1tty/cast', { intent: 'billing invoice payment', explain: true });
+    const r = await agg.callTool('ch1tty/cast', { intent: 'billing invoice payment charge fee refund', explain: true });
     const parsed = JSON.parse((r.content[0] as { text: string }).text);
     const { explanation } = parsed;
-    assert.ok('focusRank' in explanation, 'focusRank should be present');
-    assert.ok('focusRankDelta' in explanation, 'focusRankDelta should be present');
+    assert.ok('focusRank' in explanation, 'focusRank should be present with active focus');
+    assert.ok('focusRankDelta' in explanation, 'focusRankDelta should be present with active focus');
     assert.equal(
       explanation.focusRankDelta,
       explanation.focusRank - 1,
-      `focusRankDelta must equal focusRank - 1: delta=${explanation.focusRankDelta} rank=${explanation.focusRank}`,
+      `focusRankDelta (${explanation.focusRankDelta}) should equal focusRank - 1 (${explanation.focusRank - 1})`,
     );
   } finally {
     await agg.shutdown();
   }
 });
 
-test('KKKKK-7: out-of-focus winner → focusRankDelta === 0 (winner led pre-focus, no promotion)', async () => {
-  // Code focus → neon in-focus; stripe out-of-focus.
-  // stripe/create_invoice dominates intent → stripe wins despite no boost → focusRank === 1 → delta === 0.
+test('KKKKK-7: out-of-focus winner → focusRankDelta === 0 (already led pre-focus)', async () => {
+  // code focus → neon in-focus; stripe dominates intent → stripe wins despite no boost.
+  // stripe (out-of-focus) led pre-focus too → focusRank===1 → focusRankDelta===0.
   const stripeTools: ToolEntry[] = [
     { name: 'create_invoice', description: 'invoice payment charge stripe fee refund transaction', inputSchema: { type: 'object', properties: {} } },
   ];
@@ -258,18 +249,11 @@ test('KKKKK-7: out-of-focus winner → focusRankDelta === 0 (winner led pre-focu
     const r = await agg.callTool('ch1tty/cast', { intent: 'invoice payment charge stripe fee refund transaction', explain: true });
     const parsed = JSON.parse((r.content[0] as { text: string }).text);
     const { explanation } = parsed;
-    assert.ok('focusRankDelta' in explanation, 'focusRankDelta present with active focus');
-    // If stripe (out-of-focus) won, it led pre-focus → delta === 0
-    if (explanation.winnerServer === 'stripe' && explanation.winnerInFocus === false) {
-      assert.equal(
-        explanation.focusRankDelta,
-        0,
-        `out-of-focus winner should have focusRankDelta 0, got ${explanation.focusRankDelta}`,
-      );
-    }
-    // Invariant always holds
-    assert.equal(explanation.focusRankDelta, explanation.focusRank - 1,
-      `focusRankDelta must equal focusRank - 1: delta=${explanation.focusRankDelta} rank=${explanation.focusRank}`);
+    // stripe: 7/7 intent terms = 1.0; neon: 0/7 terms + code boost = 0.5 → stripe always wins
+    assert.equal(explanation.winnerServer, 'stripe', `expected stripe to win (dominates intent), got "${explanation.winnerServer}"`);
+    assert.equal(explanation.winnerInFocus, false, 'stripe should be out-of-focus under code profile');
+    assert.ok('focusRankDelta' in explanation, 'focusRankDelta should be present with active focus');
+    assert.equal(explanation.focusRankDelta, 0, `out-of-focus winner led pre-focus → focusRankDelta===0, got ${explanation.focusRankDelta}`);
   } finally {
     await agg.shutdown();
   }
@@ -290,7 +274,7 @@ test('KKKKK-8: tool description documents focusRankDelta', async () => {
     assert.ok(cast, 'ch1tty/cast tool not found');
     assert.ok(
       cast.description?.includes('focusRankDelta'),
-      `cast description should mention focusRankDelta, got: ${cast.description?.slice(0, 500)}`,
+      `cast description should mention focusRankDelta, got: ${cast.description?.slice(0, 600)}`,
     );
   } finally {
     await agg.shutdown();

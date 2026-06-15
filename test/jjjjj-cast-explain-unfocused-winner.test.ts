@@ -106,14 +106,13 @@ test('JJJJJ-1: absent when winner already led pre-focus (no displacement)', asyn
     const parsed = JSON.parse((r.content[0] as { text: string }).text);
     assert.ok('explanation' in parsed, 'explanation absent');
     const { explanation } = parsed;
-    assert.ok('focusRank' in explanation, 'focusRank should be present with active focus');
-    // stripe already led pre-focus → focusRank===1 → unfocusedWinner must be absent
-    if (explanation.focusRank === 1) {
-      assert.ok(
-        !('unfocusedWinner' in explanation),
-        `unfocusedWinner should be absent when focusRank===1, got "${explanation.unfocusedWinner}"`,
-      );
-    }
+    // stripe matches 4/4 intent terms (raw 1.0), neon matches 0/4 (sql/database ≠ billing/invoice/payment/charge)
+    // finance focus boosts stripe further; stripe was #1 pre-focus too → focusRank===1, unfocusedWinner absent
+    assert.equal(explanation.focusRank, 1, `expected focusRank 1 (stripe led pre-focus), got ${explanation.focusRank}`);
+    assert.ok(
+      !('unfocusedWinner' in explanation),
+      `unfocusedWinner should be absent when focusRank===1, got "${explanation.unfocusedWinner}"`,
+    );
   } finally {
     await agg.shutdown();
   }
@@ -136,27 +135,22 @@ test('JJJJJ-2: present and correct when focus promoted winner from 2nd place', a
     const parsed = JSON.parse((r.content[0] as { text: string }).text);
     assert.ok('explanation' in parsed, 'explanation absent');
     const { explanation } = parsed;
+    // neon: 3/4 terms "sql database schema" from intent "sql database schema query" → raw 0.75
+    // stripe: 4/4 terms "sql database schema query" → raw 1.0
+    // code focus boost 0.5: neon=1.25, stripe=1.0 → neon wins; pre-focus stripe led (1.0 > 0.75) → focusRank>=2
+    assert.equal(explanation.winnerServer, 'neon', `expected neon to win with code focus, got "${explanation.winnerServer}"`);
     assert.ok('focusRank' in explanation, 'focusRank should be present with active focus');
-    assert.equal(typeof explanation.focusRank, 'number', 'focusRank should be a number');
-    // When neon wins due to focus boost (focusRank >= 2), unfocusedWinner should be the pre-focus leader
-    if (explanation.winnerServer === 'neon' && explanation.winnerInFocus === true && explanation.focusRank >= 2) {
-      assert.ok('unfocusedWinner' in explanation, 'unfocusedWinner should be present when focus changed top spot');
-      assert.equal(typeof explanation.unfocusedWinner, 'string', 'unfocusedWinner should be a string');
-      assert.ok(
-        explanation.unfocusedWinner.includes('/'),
-        `unfocusedWinner should be a namespaced tool name, got "${explanation.unfocusedWinner}"`,
-      );
-      assert.ok(
-        explanation.unfocusedWinner.startsWith('stripe/'),
-        `unfocusedWinner should be the stripe tool that was displaced, got "${explanation.unfocusedWinner}"`,
-      );
-    } else if (explanation.focusRank === 1) {
-      // stripe won outright or neon already led → unfocusedWinner absent
-      assert.ok(
-        !('unfocusedWinner' in explanation),
-        `unfocusedWinner should be absent when focusRank===1, got "${explanation.unfocusedWinner}"`,
-      );
-    }
+    assert.ok(explanation.focusRank >= 2, `expected focusRank >= 2 (neon was promoted by focus), got ${explanation.focusRank}`);
+    assert.ok('unfocusedWinner' in explanation, 'unfocusedWinner should be present when focus changed top spot');
+    assert.equal(typeof explanation.unfocusedWinner, 'string', 'unfocusedWinner should be a string');
+    assert.ok(
+      explanation.unfocusedWinner.includes('/'),
+      `unfocusedWinner should be a namespaced tool name, got "${explanation.unfocusedWinner}"`,
+    );
+    assert.ok(
+      explanation.unfocusedWinner.startsWith('stripe/'),
+      `unfocusedWinner should be the stripe tool displaced by neon, got "${explanation.unfocusedWinner}"`,
+    );
   } finally {
     await agg.shutdown();
   }
@@ -224,16 +218,14 @@ test('JJJJJ-5: unfocusedWinner is always a namespaced tool name (contains "/")',
     const r = await agg.callTool('ch1tty/cast', { intent: 'sql database schema query', explain: true });
     const parsed = JSON.parse((r.content[0] as { text: string }).text);
     const { explanation } = parsed;
-    // Only check format if unfocusedWinner is present
-    if ('unfocusedWinner' in explanation) {
-      assert.equal(typeof explanation.unfocusedWinner, 'string', 'unfocusedWinner should be a string');
-      assert.ok(
-        explanation.unfocusedWinner.includes('/'),
-        `unfocusedWinner should contain "/" (namespaced), got "${explanation.unfocusedWinner}"`,
-      );
-    }
-    // Either absent (focusRank===1) or a namespaced string — both are valid
-    assert.ok('focusRank' in explanation, 'focusRank should always be present with active focus and a winner');
+    // neon: 3/4 terms (raw 0.75) + code focus 0.5 = 1.25; stripe: 4/4 terms = 1.0 → neon wins, displacing stripe
+    assert.ok('focusRank' in explanation, 'focusRank should be present with active focus and a winner');
+    assert.ok('unfocusedWinner' in explanation, 'unfocusedWinner should be present (neon won due to focus, displacing stripe)');
+    assert.equal(typeof explanation.unfocusedWinner, 'string', 'unfocusedWinner should be a string');
+    assert.ok(
+      explanation.unfocusedWinner.includes('/'),
+      `unfocusedWinner should contain "/" (namespaced), got "${explanation.unfocusedWinner}"`,
+    );
   } finally {
     await agg.shutdown();
   }
@@ -282,14 +274,15 @@ test('JJJJJ-7: out-of-focus winner → unfocusedWinner absent (winner already le
     const r = await agg.callTool('ch1tty/cast', { intent: 'invoice payment charge stripe fee refund transaction', explain: true });
     const parsed = JSON.parse((r.content[0] as { text: string }).text);
     const { explanation } = parsed;
-    // If stripe (out-of-focus) won, it was already #1 pre-focus → unfocusedWinner absent
-    if (explanation.winnerServer === 'stripe' && explanation.winnerInFocus === false) {
-      assert.ok(
-        !('unfocusedWinner' in explanation),
-        `out-of-focus winner should have no unfocusedWinner, got "${explanation.unfocusedWinner}"`,
-      );
-      assert.equal(explanation.focusRank, 1, `out-of-focus winner should have focusRank===1, got ${explanation.focusRank}`);
-    }
+    // stripe: 7/7 intent terms = 1.0 raw; neon: 0/7 terms = 0 raw + code boost 0.5 = 0.5
+    // stripe wins (1.0 > 0.5) despite being out-of-focus; it also led pre-focus → focusRank===1, unfocusedWinner absent
+    assert.equal(explanation.winnerServer, 'stripe', `expected stripe to win (dominates intent), got "${explanation.winnerServer}"`);
+    assert.equal(explanation.winnerInFocus, false, 'stripe should be out-of-focus under code profile');
+    assert.equal(explanation.focusRank, 1, `out-of-focus winner led pre-focus too → focusRank===1, got ${explanation.focusRank}`);
+    assert.ok(
+      !('unfocusedWinner' in explanation),
+      `out-of-focus winner should have no unfocusedWinner, got "${explanation.unfocusedWinner}"`,
+    );
   } finally {
     await agg.shutdown();
   }
