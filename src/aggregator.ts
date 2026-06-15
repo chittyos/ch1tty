@@ -361,7 +361,7 @@ export class Aggregator {
           'When explain: true is set and the brain route was taken, explanation includes brainMs: the wall-clock time of the brain routeIntent() call in milliseconds (alongside method: "brain"). Absent when the keyword-fallback route was used. ' +
           'explanation also includes candidateCount: the total number of tools in the scoring pool before the top-5 topCandidates slice. 0 on no_match. ' +
           'explanation also includes winnerScore: the numeric relevance score of the winning tool (topCandidates[0].score). Absent on no_match (no winner). Lets operators read the winner\'s score directly without indexing into topCandidates. ' +
-          'explanation also includes runnerUpScore: the score of the second-place candidate (topCandidates[1].score), and runnerUpTool: its namespaced tool name. Both absent when there is 0 or 1 candidate (no_match, single-tool registries). The margin winnerScore-runnerUpScore indicates how decisive the resolution was. ' +
+          'explanation also includes runnerUpScore: the score of the second-place candidate (topCandidates[1].score), runnerUpTool: its namespaced tool name, and runnerUpServer: the server ID of the runner-up tool (segment before "/" in the namespaced name, e.g. "neon" from "neon/query_database"). All three absent when there is 0 or 1 candidate (no_match, single-tool registries). runnerUpServer parallels winnerServer and lets operators see which backend produced the closest competing tool without parsing runnerUpTool. The margin winnerScore-runnerUpScore indicates how decisive the resolution was. ' +
           'When a focus profile is active, each entry in topCandidates also carries inFocus: boolean — true if that candidate is within the active focus profile (and therefore received a boost). Absent when no focus is active. ' +
           'explanation also includes winnerFocusBoost: the exact additive boost applied to the winning tool by the active focus profile. Equals focusBoost when winnerInFocus is true; 0 when winnerInFocus is false (winner was not in-focus). Absent when no focus is active or on no_match (no winner). ' +
           'explanation also includes focusDecisive: boolean — true when the winning tool would not have won without the focus boost (computed as winnerScore - winnerFocusBoost < runnerUpScore). Absent when no focus is active, on no_match, or when there is only one candidate (no runner-up to compare). ' +
@@ -1850,7 +1850,7 @@ function buildCastExplanation(
     ...(brainMs !== undefined ? { brainMs } : {}),
     candidateCount: scoredTools.length,
     ...(best !== undefined ? { winnerScore: best.score, winnerServer: best.namespacedName.split('/')[0] } : {}),
-    ...(topCandidates.length > 1 ? { runnerUpScore: topCandidates[1].score, runnerUpTool: topCandidates[1].tool } : {}),
+    ...(topCandidates.length > 1 ? { runnerUpScore: topCandidates[1].score, runnerUpTool: topCandidates[1].tool, runnerUpServer: topCandidates[1].tool.split('/')[0] } : {}),
     ...(focusName && focus ? {
       focus: focusName,
       focusBoost,
