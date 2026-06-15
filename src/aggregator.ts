@@ -363,6 +363,7 @@ export class Aggregator {
           'explanation also includes winnerScore: the numeric relevance score of the winning tool (topCandidates[0].score). Absent on no_match (no winner). Lets operators read the winner\'s score directly without indexing into topCandidates. ' +
           'explanation also includes runnerUpScore: the score of the second-place candidate (topCandidates[1].score), and runnerUpTool: its namespaced tool name. Both absent when there is 0 or 1 candidate (no_match, single-tool registries). The margin winnerScore-runnerUpScore indicates how decisive the resolution was. ' +
           'When a focus profile is active, each entry in topCandidates also carries inFocus: boolean — true if that candidate is within the active focus profile (and therefore received a boost). Absent when no focus is active. ' +
+          'explanation also includes winnerFocusBoost: the exact additive boost applied to the winning tool by the active focus profile. Equals focusBoost when winnerInFocus is true; 0 when winnerInFocus is false (winner was not in-focus). Absent when no focus is active or on no_match (no winner). Callers can compute focus-decisiveness: if winnerScore - winnerFocusBoost < runnerUpScore, the winner would not have prevailed without the focus boost. ' +
           'Sub-meta to master-meta — the gateway calling itself.',
         inputSchema: {
           type: 'object',
@@ -1798,7 +1799,7 @@ function buildCastExplanation(
     candidateCount: scoredTools.length,
     ...(best !== undefined ? { winnerScore: best.score } : {}),
     ...(topCandidates.length > 1 ? { runnerUpScore: topCandidates[1].score, runnerUpTool: topCandidates[1].tool } : {}),
-    ...(focusName ? { focus: focusName, focusBoost, winnerInFocus } : {}),
+    ...(focusName ? { focus: focusName, focusBoost, winnerInFocus, ...(best !== undefined ? { winnerFocusBoost: winnerInFocus ? focusBoost : 0 } : {}) } : {}),
     topCandidates,
     rationale,
   };

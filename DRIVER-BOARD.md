@@ -1,1 +1,105 @@
-IyBjaDF0dHkgZ29hbC1kcml2ZXIgYm9hcmQKCkZhbGxiYWNrIGJvYXJkIOKAlCBOb3Rpb24gKG5vdGlvbiBiYWNrZW5kKSB3YXMgdW5yZWFjaGFibGUgYXQgYm9hcmQgY3JlYXRpb24gdGltZS4gVGhpcyBmaWxlIHNlcnZlcyBhcyB0aGUgY3Jvc3MtcnVuIGR1cmFibGUgc3RhdGUgdW50aWwgTm90aW9uIGFjY2VzcyBpcyByZXN0b3JlZC4KCiMjIFdvcmtzdHJlYW0gU3RhdHVzCgotIFt4XSAqKkEuIEdhdGV3YXkgdXAvcmVmcmVzaGVkL3Rlc3RlZCoqIOKAlCBCdWlsZCBjbGVhbiwgOTM4IHRlc3RzIHBhc3MsIDUgbWV0YS10b29scyBjb25maXJtZWQgKGBjaDF0dHkvc2VhcmNoYCwgYGNoMXR0eS9leGVjdXRlYCwgYGNoMXR0eS9zdGF0dXNgLCBgY2gxdHR5L3JlbG9hZGAsIGBjaDF0dHkvY2FzdGApLCBkb2NzIHByZXNlbnQuIERPTkUuCi0gW3hdICoqQi4gR2l0SHViIE1DUCBtaWdyYXRpb24qKiDigJQgYHNlcnZlcnMuanNvbmAgZ2l0aHViIGVudHJ5IGFscmVhZHkgbWlncmF0ZWQgdG8gYGh0dHBzOi8vYXBpLmdpdGh1YmNvcGlsb3QuY29tL21jcC9gIHdpdGggYGVudkhlYWRlcnNgIGZvciBgR0lUSFVCX01DUF9BVVRIT1JJWkFUSU9OYC4gTm8gYEBtb2RlbGNvbnRleHRwcm90b2NvbC9zZXJ2ZXItZ2l0aHViYCBhbnl3aGVyZS4gRE9ORS4KLSBbeF0gKipDLiBGb2N1cy1wcm9maWxlIGxheWVyKiog4oCUIGBmb2N1cy1wcm9maWxlcy5qc29uYCB3aXRoIDYgcHJvZmlsZXMgKGZpbmFuY2UsIGdvdmVybmFuY2UsIGRlc2lnbiwgY29kZSwgY29tbXVuaWNhdGlvbiwgb3BzKSwgYENIMVRUWV9GT0NVU2AgZW52IHZhciwgcGVyLWNhbGwgYGZvY3VzYCBwYXJhbSBvbiBzZWFyY2gvY2FzdCwgYGNoMXR0eS9zdGF0dXNgIHJlcG9ydHMgYGF2YWlsYWJsZUZvY3VzUHJvZmlsZXNgLCByZWFsIHRlc3RzIGluIGB0ZXN0L2ZvY3VzLnRlc3QudHNgLiBET05FLgotIFt4XSAqKkQuIFNjZW5hcmlvIHRlc3RpbmcgKyBzaW11bGF0aW9uKiog4oCUIGB0ZXN0L3NjZW5hcmlvLnRlc3QudHNgICgxMTU3IGxpbmVzKSwgYHRlc3Qvc2ltdWxhdGlvbi50ZXN0LnRzYCAoMjI5IGxpbmVzKSwgYHNpbS9zY2VuYXJpb3MudHNgIGhhcm5lc3MgZHJpdmluZyByZWFsIEFnZ3JlZ2F0b3Igb3ZlciBGaXh0dXJlQmFja2VuZHMuIEFsbCA2IGZvY3VzIHByb2ZpbGVzIGNvdmVyZWQuIEFsbCB0ZXN0cyBwYXNzLiBET05FLgotIFt4XSAqKkUuIEFsY2hlbWlzdCBicmFpbnN0b3JtKiog4oCUIGBmb2N1cy1zdWdnZXN0aW9ucy5qc29uYCBzdWdnZXN0aW9ucyBjYXRhbG9nIENPTVBMRVRFLiAxNzUwIGNvbWJvcywgMTc1OSBwcm9tcHRzIGFjcm9zcyA2IHByb2ZpbGVzICgxNTR0aCBwYXNzKTsgKiozNzIvMzcyIHRvb2xzIGF0IDYvNiDigJQgMTAwJSBjb21wbGV0ZSBjb3ZlcmFnZSoqLiBET05FIChydW4gOTEsIDIwMjYtMDYtMTIpLgotIFt4XSAqKkYuIENhc3QgbWlzcy1wYXRoIGZvY3VzIHN1Z2dlc3Rpb25zKiog4oCUIGBjYXN0OiBub19tYXRjaGAgYW5kIGBjYXN0OiBkaXNjb3Zl
+# ch1tty goal-driver board
+
+Fallback board — Notion API token invalid (401). This file is the cross-run durable state.
+Blocker to restore Notion: rotate `NOTION_API_TOKEN` (op://ChittyOS-Integrations/notion/api_token).
+
+NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Restored as plain text (run 146).
+
+## Workstream Status (A–E: original; F+: ongoing observability improvements)
+
+- [x] **A** — Gateway up/refreshed/tested. Build clean, 5 meta-tools confirmed. DONE.
+- [x] **B** — GitHub MCP migration: `servers.json` github → `https://api.githubcopilot.com/mcp/` with envHeaders. DONE.
+- [x] **C** — Focus-profile layer: `focus-profiles.json` (6 profiles), CH1TTY_FOCUS, per-call focus param, status reporting, tests. DONE.
+- [x] **D** — Scenario testing + simulation: `test/scenario.test.ts`, `test/simulation.test.ts`, `sim/scenarios.ts` harness. DONE.
+- [x] **E** — Alchemist catalog: `focus-suggestions.json` — 372/372 tools at 6/6, 100% coverage (run 91). DONE.
+- [x] **F** — Cast miss-path focus suggestions (PR #365). DONE.
+- [x] **G** — Search focus suggestions (PR #368). DONE.
+- [x] **H** — `resolvedFromCatalog` on cast:executed/plan (PR #370). DONE.
+- [x] **I** — `chainContinuation` hint on cast:executed/plan (PR #372). DONE.
+- [x] **J** — Catalog stats in ch1tty/status (PR #374). DONE.
+- [x] **K** — cast `chain: true` auto-chain execution (PR #376). DONE.
+- [x] **L** — ch1tty/reload catalog freshness check (PR #378). DONE.
+- [x] **M** — cast chain step-output forwarding / previousResult (PR #380). DONE.
+- [x] **N** — cast chain_executed summary field (PR #382). DONE.
+- [x] **O** — cast dryRun mode (PR #384). DONE.
+- [x] **P** — cast explain mode: explanation object (PR #386). DONE.
+- [x] **Q** — search explain mode (PR #388). DONE.
+- [x] **R** — search inFocusOnly hard filter (PR #390). DONE.
+- [x] **S** — Session-sticky focus (PR #392). DONE.
+- [x] **T** — ch1tty/status session focus reporting (PR #394). DONE.
+- [x] **U** — ch1tty/status per-session topTools (PR #397). DONE.
+- [x] **V** — ch1tty/status coordinator-level global topTools (PR #399). DONE.
+- [x] **W** — ch1tty/status catalog stats + activeFocusSuggestions (PR #401). DONE.
+- [x] **X** — ch1tty/execute dryRun mode (PR #404). DONE.
+- [x] **Y** — ch1tty/cast scope parameter (PR #406). DONE.
+- [x] **Z** — ch1tty/status short mode (PR #409). DONE.
+- [x] **AA** — ch1tty/search offset pagination (PR #411). DONE.
+- [x] **BB** — ch1tty/execute per-call timeout (PR #413). DONE.
+- [x] **CC** — ch1tty/cast per-call timeout (PR #414). DONE.
+- [x] **DD** — Explicit sessionId param on search/execute/cast (PR #415). DONE.
+- [x] **EE** — ch1tty/search recentlyUsed enrichment (PR #416). DONE.
+- [x] **FF** — ch1tty/search sessionContext field (PR #418). DONE.
+- [x] **GG** — ch1tty/search serverName field (PR #419). DONE.
+- [x] **HH** — Session TTL eviction (PR #420). DONE.
+- [x] **II** — ch1tty/execute sessionContext response (PR #421). DONE.
+- [x] **JJ** — ch1tty/cast sessionContext in cast:executed/chain_executed (PR #423). DONE.
+- [x] **KK** — ch1tty/cast sessionContext in cast:plan (PR #425). DONE.
+- [x] **LL** — ch1tty/cast sessionContext in cast:discovered (PR #427). DONE.
+- [x] **MM** — ch1tty/cast sessionContext in cast:no_match (PR #429). DONE.
+- [x] **NN** — ch1tty/search minScore filter (PR #431). DONE.
+- [x] **OO** — ch1tty/cast sessionContext in cast:resolved (PR #433). DONE.
+- [x] **PP** — ch1tty/status coordinator toolsByServer breakdown (PR #434). DONE.
+- [x] **QQ** — ch1tty/execute dryRun sessionContext (PR #436). DONE.
+- [x] **RR** — Branch coverage sweep (PR #438). DONE.
+- [x] **SS** — ch1tty/search minScore in explain output (PR #440). DONE.
+- [x] **TT** — ch1tty/search explain in no-query path (PR #442). DONE.
+- [x] **UU** — Branch coverage 100% (PR #444). DONE.
+- [x] **VV** — ch1tty/search explain filterContext (PR #446). DONE.
+- [x] **IIII** — Branch coverage gaps in aggregator/suggestions (PR #407). DONE.
+- [x] **KKKK** — Branch coverage gaps in buildCastExplanation (PR #447). DONE.
+- [x] **LLLL** — latencyMs in all cast response types (PR #449). DONE.
+- [x] **MMMM** — ch1tty/status ledgerDlq shorthand (PR #451). DONE.
+- [x] **NNNN** — cast latencyBreakdown scoringMs/executionMs (PR #453). DONE.
+- [x] **OOOO** — ch1tty/status ledgerDlq.entries[] (PR #455). DONE.
+- [x] **PPPP** — cast latencyBreakdown.brainMs (PR #456). DONE.
+- [x] **QQQQ** — ch1tty/execute latencyMs (PR #458). DONE.
+- [x] **RRRR** — ch1tty/search latencyMs (PR #460). DONE.
+- [x] **SSSS** — cast explanation.brainMs when explain:true (PR #462). DONE.
+- [x] **TTTT** — cast explanation.candidateCount (PR #463). DONE.
+- [x] **UUUU** — cast explanation.winnerScore (PR #465). DONE.
+- [x] **VVVV** — /api/v1/health 503 body ledgerDlq.entryCount (PR #467). DONE.
+- [x] **WWWW** — ch1tty/status and ch1tty/reload latencyMs (PR #468). DONE.
+- [x] **XXXX** — cast explanation topCandidates[n].inFocus (PR #470). DONE.
+- [x] **YYYY** — cast explanation runnerUpScore + runnerUpTool (PR #472). DONE.
+- [ ] **ZZZZ** — cast explanation.winnerFocusBoost: exact boost applied to winner (0 if out-of-focus, absent if no focus/no_match). PR TBD (run 146, 2026-06-15). IN PROGRESS.
+
+## Blockers
+
+- **Notion API token** — Invalid (401). Human action: `chitty-mcp-token notion` or rotate token in 1Password.
+- **Ledger DLQ** — 11+ entries: `ledger.chitty.cc` unreachable from remote container.
+- **CI (main ci.yml)** — 0-jobs queue failure (non-CodeQL). Only CodeQL runs on PRs. Recurring pattern, non-blocking.
+
+## Run Log
+
+### 2026-06-14 (run 145 — last before this run)
+- **Workstream**: YYYY — `cast explanation.runnerUpScore + runnerUpTool`
+- **Branch/PR**: `auto/YYYY-cast-explain-runner-up` → PR #472 ✅ MERGED
+- **Build**: clean | **Tests**: 1354/0/2
+- **Next**: ZZZZ — `explanation.winnerFocusBoost`
+
+### 2026-06-15 (run 146 — this run)
+- **Workstream**: ZZZZ — `cast explanation.winnerFocusBoost`
+- **Branch/PR**: `auto/ZZZZ-cast-explain-winnerfocusboost` → PR TBD
+- **Build**: clean | **Tests**: 1361/0/2 (+7 ZZZZ)
+- **What was done**:
+  - Startup: npm ci clean, build clean, 1354/0/2 (no open PRs). Board restored as plain text (was truncated base64).
+  - Notion 401 confirmed. DRIVER-BOARD.md reconstructed from git history (e3a090d + git log through YYYY).
+  - ZZZZ: `explanation.winnerFocusBoost` in `ch1tty/cast` when `explain:true` and focus active.
+    - `src/aggregator.ts`: `buildCastExplanation` return — added `winnerFocusBoost: winnerInFocus ? focusBoost : 0` inside the focusName spread, only when `best !== undefined`. Tool description updated.
+    - `test/zzzz-cast-explain-winnerfocusboost.test.ts`: 7 new tests covering in-focus (=boost), out-of-focus (=0), no focus (absent), plan path, consistency with focusBoost, no_match (absent), description.
+    - All 7 ZZZZ tests pass. Full suite: 1361/0/2.
+  - Pushed branch, opened PR.
+- **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs.
+- **Next run priority**:
+  1. Check ZZZZ PR — if CodeQL green, merge it.
+  2. Plan AAAAA (or next letter): candidates include (a) `/api/v1/health` warn body — surface `brainCircuitOpen: true` in the 200 response when `systemHealth.status === 'warn'`; (b) `explanation.focusDecisive: boolean` computed from `winnerFocusBoost` + score gap (winnerScore - winnerFocusBoost < runnerUpScore → true); (c) cast `latencyBreakdown.registryMs` separate from scoringMs.
