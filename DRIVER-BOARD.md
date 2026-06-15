@@ -83,7 +83,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **IIIII** — cast explanation.focusRank: number — 1-based rank the winning tool would hold if focus boost were removed. focusRank===1 → winner led pre-focus; focusRank===2 → focus promoted from 2nd; etc. Absent when no focus or no_match. Consistent with focusDecisive. PR #488 ✅ MERGED (43d413f, run 154, 2026-06-15). 8 new tests, 1433/0/2. DONE.
 - [x] **JJJJJ** — cast explanation.unfocusedWinner: string — namespaced tool that would have won without the active focus boost (pre-focus rank-1 tool). Present only when focus active, winner exists, and pre-focus leader differs from winner. Absent when no focus, no_match, or winner already led pre-focus (focusRank===1). PR #489 ✅ MERGED (0bed3cd, run 155, 2026-06-15). 8 new tests, 1441/0/2. DONE.
 - [x] **KKKKK** — cast explanation.focusRankDelta: number — number of positions focus promoted the winning tool in pre-focus ranking (focusRank - 1). Present whenever focusRank is present (focus active + winner exists). 0 = winner already led pre-focus; N = promoted N positions. PR #490 ✅ MERGED (2a92665, run 156, 2026-06-15). 8 new tests, 1449/0/2. DONE.
-- [x] **LLLLL** — cast explanation.winnerScoreBase: number — winner's pre-focus base score (winnerScore - winnerFocusBoost). Completes the decomposition: winnerScoreBase + winnerFocusBoost = winnerScore. PR #493 ✅ MERGED (run 158, 2026-06-15). 8 new tests, 1457/0/2. DONE.
+- [x] **LLLLL** — cast explanation.winnerScoreBase: number — winner's pre-focus base score (winnerScore - winnerFocusBoost). Completes the decomposition: winnerScoreBase + winnerFocusBoost = winnerScore. PR #493 ✅ MERGED (0426ef5, run 158, 2026-06-15). 8 new tests, 1457/0/2. DONE.
 
 ## Blockers
 
@@ -252,7 +252,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 ### 2026-06-15 (run 157)
 - **Workstream**: LLLLL — `cast explanation.winnerScoreBase: number`
-- **Branch/PR**: `auto/LLLLL-cast-explain-winner-score-base` → PR #493 🔄 CI in_progress
+- **Branch/PR**: `auto/LLLLL-cast-explain-winner-score-base` → PR #493 ✅ MERGED (0426ef5)
 - **Build**: clean | **Tests**: 1457/0/2 (+8 LLLLL from 1449 KKKKK baseline)
 - **What was done**:
   - Startup: git pull --rebase origin main (synced). npm ci clean, build clean, 1449/0/2 on main.
@@ -264,3 +264,15 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Blockers (unchanged)**: Notion 401, ledger DLQ 11 entries, CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**:
   - Merge LLLLL (PR #493) if CI green. Then MMMMM candidates: (a) cast explanation `candidatesInFocusCount: number` — how many of the scored candidates were in-focus; (b) `/api/v1/health` ok body `ledgerOk: true` when `systemHealth.ledgerStatus === 'ok'` (symmetric to ledgerWarn).
+
+### 2026-06-15 (run 158)
+- **Workstream**: MMMMM — `cast explanation.candidatesInFocusCount: number`
+- **Branch/PR**: `auto/MMMMM-cast-explain-candidates-in-focus-count` → PR TBD
+- **Build**: clean | **Tests**: TBD
+- **What was done**:
+  - Startup: pulled main (0426ef5 = LLLLL merge). Build clean, 1457/0/2.
+  - Board: LLLLL confirmed DONE (0426ef5). SHA placeholder updated; run-157 PR status updated to MERGED.
+  - MMMMM: implementing `explanation.candidatesInFocusCount: number` — count of scored candidates whose server/category is in-focus. Present when focus active + winner exists (same conditions as winnerFocusBoost). Absent when no focus or no_match.
+- **Blockers (unchanged)**: Notion 401, ledger DLQ 11 entries, CI 0-jobs (non-CodeQL, recurring).
+- **Next run priority**:
+  - [ ] **MMMMM** — cast explanation.candidatesInFocusCount: number — count of in-focus candidates among scored candidates. PR TBD.
