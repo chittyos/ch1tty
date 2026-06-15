@@ -370,6 +370,7 @@ export class Aggregator {
           'explanation also includes focusConfidence: number — focusBias clamped to [0,1]. Same presence conditions as focusBias (active focus, runner-up exists, focusMargin non-zero, best tool exists). A value of 0 means focus contributed nothing to the margin (winner was out-of-focus); a value of 1 means focus was at least fully decisive (focusBias ≥ 1). Unlike focusBias which can exceed 1 when the boost outweighs the margin, focusConfidence is always in [0,1] and can be read directly as a percentage confidence that focus drove the decision. ' +
           'explanation also includes winnerServer: string — the server ID of the winning tool (the segment before the "/" in its namespaced name, e.g. "neon" from "neon/query_database"). Absent on no_match (no winner). Lets operators identify which backend resolved the intent without parsing the tool name. ' +
           'explanation also includes focusRank: number — the 1-based rank the winning tool would hold if the focus boost were removed (i.e. its position in pre-focus descending score order). Present when a focus profile is active and a winner exists. A value of 1 means the winner was already the top candidate without focus (focus did not change the outcome); a value of 2 means focus promoted the winner from 2nd to 1st; and so on. Consistent with focusDecisive: when focusDecisive is false and a runner-up exists, focusRank is always 1. ' +
+          'explanation also includes unfocusedWinner: string — the namespaced tool name that would have won if the active focus boost were removed (the tool at rank 1 in pre-focus descending score order). Present only when a focus profile is active, a winner exists, and the pre-focus leader differs from the actual winner (i.e. focus changed the top spot). Absent when no focus is active, on no_match, or when the winner was already the top candidate without focus (focusRank === 1). Lets operators see exactly which tool was displaced by the focus boost. ' +
           'Sub-meta to master-meta — the gateway calling itself.',
         inputSchema: {
           type: 'object',
@@ -1783,13 +1784,22 @@ function buildCastExplanation(
   const winnerInFocus = best && focus ? isInFocus(focus, best) : false;
   const focusBoost = focus?.boost ?? 0.5;
 
-  // 1-based rank of the winner in the pre-focus scoring order.
-  const focusRank: number | undefined =
+  // Pre-focus sorted list: scores with focus boost stripped, descending. Shared by focusRank + unfocusedWinner.
+  const preFocusSorted: { n: string; s: number }[] | undefined =
     focusName && best !== undefined
       ? scoredTools
           .map((t) => ({ n: t.namespacedName, s: t.score - (focus && isInFocus(focus, t) ? focusBoost : 0) }))
           .sort((a, b) => b.s - a.s)
-          .findIndex((t) => t.n === best.namespacedName) + 1
+      : undefined;
+
+  // 1-based rank of the winner in the pre-focus scoring order.
+  const focusRank: number | undefined =
+    preFocusSorted !== undefined ? preFocusSorted.findIndex((t) => t.n === best!.namespacedName) + 1 : undefined;
+
+  // Tool that would have won without the focus boost; absent when same as winner (focus didn't change top spot).
+  const unfocusedWinner: string | undefined =
+    preFocusSorted !== undefined && preFocusSorted.length > 0 && preFocusSorted[0].n !== best!.namespacedName
+      ? preFocusSorted[0].n
       : undefined;
 
   let rationale: string;
@@ -1819,7 +1829,7 @@ function buildCastExplanation(
       focus: focusName,
       focusBoost,
       winnerInFocus,
-      ...(best !== undefined ? { winnerFocusBoost: winnerInFocus ? focusBoost : 0, ...(focusRank !== undefined ? { focusRank } : {}) } : {}),
+      ...(best !== undefined ? { winnerFocusBoost: winnerInFocus ? focusBoost : 0, ...(focusRank !== undefined ? { focusRank } : {}), ...(unfocusedWinner !== undefined ? { unfocusedWinner } : {}) } : {}),
       ...(best !== undefined && topCandidates.length > 1 ? {
         focusDecisive: (best.score - (winnerInFocus ? focusBoost : 0)) < topCandidates[1].score,
         focusMargin: best.score - topCandidates[1].score,
