@@ -77,7 +77,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **CCCCC** — cast explanation.focusMargin: number — raw score gap between winner and runner-up in focus-biased space (winnerScore - runnerUpScore). PR #478 ✅ MERGED (7d2d572, run 148, 2026-06-15). 8 new tests, 1385/0/2. DONE.
 - [x] **DDDDD** — /api/v1/health warn body: brainCircuitOpen: true when systemHealth.brainDegraded — surfaces brain circuit state in the 200 warn response without a separate /api/v1/status call. PR #480 ✅ MERGED (3f4e107, run 150, 2026-06-15). 8 new tests, 1393/0/2. DONE.
 - [x] **EEEEE** — /api/v1/health warn body: ledgerWarn: true when systemHealth.ledgerStatus === 'warn' — symmetric to brainCircuitOpen; distinguishes ledger-drops/flushErrors warn from brain-circuit warn. PR #481 ✅ MERGED (c04f708, run 150, 2026-06-15). 8 new tests, 1401/0/2. DONE.
-- [ ] **FFFFF** — cast explanation.focusBias: number — fraction of winner-runner-up margin attributable to focus boost (winnerFocusBoost / focusMargin). Absent when focusMargin === 0 (division-by-zero guard), no runner-up, focus inactive, or no_match. PR #483 open (run 151, 2026-06-15). 8 new tests, 1409/0/2.
+- [x] **FFFFF** — cast explanation.focusBias: number — fraction of winner-runner-up margin attributable to focus boost (winnerFocusBoost / focusMargin). Absent when focusMargin === 0 (division-by-zero guard), no runner-up, focus inactive, or no_match. PR #483 ✅ MERGED (b697884, run 151, 2026-06-15). 8 new tests, 1409/0/2. DONE.
 
 ## Blockers
 
