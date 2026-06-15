@@ -79,6 +79,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **EEEEE** — /api/v1/health warn body: ledgerWarn: true when systemHealth.ledgerStatus === 'warn' — symmetric to brainCircuitOpen; distinguishes ledger-drops/flushErrors warn from brain-circuit warn. PR #481 ✅ MERGED (c04f708, run 150, 2026-06-15). 8 new tests, 1401/0/2. DONE.
 - [x] **FFFFF** — cast explanation.focusBias: number — fraction of winner-runner-up margin attributable to focus boost (winnerFocusBoost / focusMargin). Absent when focusMargin === 0 (division-by-zero guard), no runner-up, focus inactive, or no_match. PR #483 ✅ MERGED (b697884, run 151, 2026-06-15). 8 new tests, 1409/0/2. DONE.
 - [x] **GGGGG** — cast explanation.focusConfidence: number — focusBias clamped to [0,1]. Same presence conditions as focusBias. Unlike focusBias (can exceed 1), focusConfidence is always [0,1] — a clean percentage of focus attribution. PR #485 ✅ MERGED (1e9407a, run 152, 2026-06-15). 8 new tests, 1417/0/2. DONE.
+- [ ] **HHHHH** — cast explanation.winnerServer: string — server ID of the winning tool (segment before "/" in namespaced name, e.g. "neon" from "neon/query_database"). Absent on no_match. Present regardless of focus. Lets operators identify which backend resolved the intent without parsing the tool name. PR #486 (open, CI in_progress, run 153, 2026-06-15). 8 new tests, 1425/0/2.
 
 ## Blockers
 
@@ -186,3 +187,18 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**:
   - HHHHH candidates: (a) `/api/v1/health` ok body `ledgerOk: true` when `systemHealth.ledgerStatus === 'ok'` (symmetric completeness with ledgerWarn/brainCircuitOpen); (b) cast explanation `focusRank: number` — winner's 1-based rank in pre-focus scoring (1 = would have won anyway, >1 = focus promoted it); (c) cast explanation `unfocusedWinner: string` — namespaced tool that would have won without focus boost (absent when same as winner).
+
+### 2026-06-15 (run 153)
+- **Workstream**: HHHHH — `cast explanation.winnerServer: string`
+- **Branch/PR**: `auto/HHHHH-cast-explain-winner-server` → PR #486 (open, CI in_progress at run end)
+- **Build**: clean | **Tests**: 1425/0/2 (+8 HHHHH from 1417 GGGGG baseline)
+- **What was done**:
+  - Startup: npm ci clean, build clean, 1409/0/2 on main. PR #485 (GGGGG) was open with 3/3 CI green (CodeQL). Merged it via squash → 1e9407a.
+  - Board read from DRIVER-BOARD.md (Notion 401 — recurring). GGGGG confirmed done, HHHHH selected.
+  - HHHHH: `src/aggregator.ts` `buildCastExplanation` — added `winnerServer: best.namespacedName.split('/')[0]` alongside `winnerScore` (same `best !== undefined` guard). Tool description updated to document `winnerServer`.
+  - `test/hhhhh-cast-explain-winner-server.test.ts`: 8 new tests (winner=server ID, prefix consistency, no_match absent, in-focus winner present, out-of-focus winner present, no-focus present, single-candidate present — no runner-up needed, description).
+  - HHHHH-7 confirms the key distinction vs focusMargin/focusBias: `winnerServer` needs only a winner, not a runner-up.
+  - CodeRabbit review in_progress at run end. Codex usage-limit bot comment (no action). CI 2/2 CodeQL in_progress.
+- **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring).
+- **Next run priority**:
+  - Merge HHHHH (PR #486) if CI green. Then IIIII candidates: (a) cast explanation `focusRank: number` — winner's 1-based rank before focus boost re-sort; (b) cast explanation `unfocusedWinner: string` — the tool that would have won without focus (absent when same as winner); (c) `/api/v1/health` ok body `ledgerOk: true` for symmetric completeness.
