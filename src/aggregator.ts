@@ -378,6 +378,7 @@ export class Aggregator {
           'explanation also includes topOutOfFocusScore: number — the highest relevance score among all out-of-focus candidates (candidates whose server and category do not match the active focus profile). Present when a focus profile is active, a winner exists, and at least one out-of-focus candidate exists. Absent when no focus is active, on no_match, or when all candidates are in-focus (none are out-of-focus). Combined with winnerScore, shows the winner\'s advantage over the non-focus field; combined with winnerScoreBase, reveals whether the winner would have beaten the best out-of-focus candidate even without the boost (winnerScoreBase > topOutOfFocusScore means focus was not decisive for beating the out-of-focus field). ' +
           'explanation also includes outOfFocusWinnerGap: number — the score gap between the winning tool and the best out-of-focus candidate (winnerScore - topOutOfFocusScore). Present under the same conditions as topOutOfFocusScore (focus active, winner exists, at least one out-of-focus candidate). Always >= 0 since the winner holds the maximum post-boost score. A large gap means the winner is well clear of the non-focus field; a gap near 0 means an out-of-focus tool nearly matched the winner. Lets operators assess whether the winning tool dominated both the focus and non-focus fields without computing winnerScore - topOutOfFocusScore manually. ' +
           'explanation also includes focusRankPercentile: number — the winning tool\'s pre-focus rank expressed as a fraction of the total candidate pool (focusRank / candidateCount), giving a normalized [0,1] measure of how deeply buried the winner was before the active focus boost was applied. Present when a focus profile is active and a winner exists (same conditions as focusRank). Absent when no focus is active or on no_match (no winner). A low value (e.g. 1/candidateCount when focusRank === 1) means the winner was near the top of the pre-focus ranking; a high value (approaching 1 when focusRank equals candidateCount) means the winner was at the very bottom before focus promotion. The identity focusRankPercentile * candidateCount === focusRank always holds. ' +
+          'explanation also includes inFocusTopScore: number — the highest relevance score among all in-focus candidates (candidates whose server or category matches the active focus profile). Present when a focus profile is active, a winner exists, and at least one in-focus candidate exists. Absent when no focus is active, on no_match, or when all candidates are out-of-focus (none are in-focus). When the winner is in-focus, inFocusTopScore equals winnerScore (the winner is the top in-focus candidate). When the winner is out-of-focus (the focus profile did not produce the winner), inFocusTopScore shows the best score the focus field achieved, enabling operators to see how close the focus candidates came to winning. ' +
           'Sub-meta to master-meta — the gateway calling itself.',
         inputSchema: {
           type: 'object',
@@ -1818,6 +1819,15 @@ function buildCastExplanation(
         })()
       : undefined;
 
+  // Highest score among in-focus candidates; absent when no focus, no winner, or all candidates are out-of-focus.
+  const inFocusTopScore: number | undefined =
+    focusName && focus && best !== undefined
+      ? (() => {
+          const scores = scoredTools.filter((t) => isInFocus(focus, t)).map((t) => t.score);
+          return scores.length > 0 ? Math.max(...scores) : undefined;
+        })()
+      : undefined;
+
   let rationale: string;
   if (!best) {
     rationale = `No tool candidates found via ${resolvedBy} routing.`;
@@ -1845,7 +1855,7 @@ function buildCastExplanation(
       focus: focusName,
       focusBoost,
       winnerInFocus,
-      ...(best !== undefined ? { winnerFocusBoost: winnerInFocus ? focusBoost : 0, winnerScoreBase: best.score - (winnerInFocus ? focusBoost : 0), candidatesInFocusCount: scoredTools.filter((t) => isInFocus(focus, t)).length, ...(scoredTools.length > 0 ? { inFocusFraction: scoredTools.filter((t) => isInFocus(focus, t)).length / scoredTools.length } : {}), ...(focusRank !== undefined ? { focusRank, focusRankDelta: focusRank - 1, focusRankPercentile: focusRank / scoredTools.length } : {}), ...(unfocusedWinner !== undefined ? { unfocusedWinner } : {}), ...(topOutOfFocusScore !== undefined ? { topOutOfFocusScore, outOfFocusWinnerGap: best!.score - topOutOfFocusScore } : {}) } : {}),
+      ...(best !== undefined ? { winnerFocusBoost: winnerInFocus ? focusBoost : 0, winnerScoreBase: best.score - (winnerInFocus ? focusBoost : 0), candidatesInFocusCount: scoredTools.filter((t) => isInFocus(focus, t)).length, ...(scoredTools.length > 0 ? { inFocusFraction: scoredTools.filter((t) => isInFocus(focus, t)).length / scoredTools.length } : {}), ...(focusRank !== undefined ? { focusRank, focusRankDelta: focusRank - 1, focusRankPercentile: focusRank / scoredTools.length } : {}), ...(unfocusedWinner !== undefined ? { unfocusedWinner } : {}), ...(topOutOfFocusScore !== undefined ? { topOutOfFocusScore, outOfFocusWinnerGap: best!.score - topOutOfFocusScore } : {}), ...(inFocusTopScore !== undefined ? { inFocusTopScore } : {}) } : {}),
       ...(best !== undefined && topCandidates.length > 1 ? {
         focusDecisive: (best.score - (winnerInFocus ? focusBoost : 0)) < topCandidates[1].score,
         focusMargin: best.score - topCandidates[1].score,
