@@ -94,7 +94,8 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **TTTTT** — cast explanation.runnerUpServer: string — server ID of runner-up tool (segment before "/" in namespaced name). Present when winner + runner-up exist. Absent on no_match or single candidate. PR #503 ✅ MERGED (de9f281, run 160, 2026-06-15). 8 new tests, 1521/0/2. DONE.
 - [x] **UUUUU** — cast explanation.winnerCategory: string — server category of winning tool (e.g. "ecosystem", "code", "communication"). Parallels winnerServer. Present when winner exists. Absent on no_match. PR #505 ✅ MERGED (542a151, run 159d/160, 2026-06-15). 8 new tests, 1529/0/2. DONE.
 - [x] **VVVVV** — cast explanation.inFocusWinnerGap: number — score margin by which the out-of-focus winner beat the best in-focus candidate (winnerScore - inFocusTopScore). Present when focus active, winner out-of-focus, at least one in-focus candidate. PR #506 ✅ MERGED (7da94b4, run 159d, 2026-06-15). 8 new tests, 1537/0/2. DONE.
-- [ ] **WWWWW** — cast explanation.runnerUpCategory: string — category of the runner-up tool's server. Present when runner-up exists. Absent on no_match or single candidate. PR TBD (run 159d, 2026-06-15).
+- [x] **WWWWW** — cast explanation.runnerUpCategory: string — category of the runner-up tool's server. Present when runner-up exists. Absent on no_match or single candidate. PR #507 ✅ MERGED (5aa83b9, run 159d, 2026-06-15). 8 new tests, 1545/0/2. DONE.
+- [ ] **XXXXX** — cast explanation.candidateScoreSpread: number — score range across all candidates (winnerScore - lowestCandidateScore). Present when >= 2 candidates. PR TBD (run 159d, 2026-06-15).
 
 ## Blockers
 
