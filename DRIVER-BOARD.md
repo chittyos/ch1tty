@@ -92,7 +92,8 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **RRRRR** — cast explanation.focusRankPercentile: number — normalized pre-focus rank (focusRank / candidateCount), [0,1]. Identity: focusRankPercentile * candidateCount === focusRank. PR #502 ✅ MERGED (a8381be, run 158, 2026-06-15). 8 new tests, 1505/0/2. DONE.
 - [x] **SSSSS** — cast explanation.inFocusTopScore: number — highest relevance score among in-focus candidates. Present when focus active, winner exists, at least one in-focus candidate scored > 0.1. PR #500 ✅ MERGED (9a4f42c, run 159b, 2026-06-15). 8 new tests, 1513/0/2. DONE.
 - [x] **TTTTT** — cast explanation.runnerUpServer: string — server ID of runner-up tool (segment before "/" in namespaced name). Present when winner + runner-up exist. Absent on no_match or single candidate. PR #503 ✅ MERGED (de9f281, run 160, 2026-06-15). 8 new tests, 1521/0/2. DONE.
-- [ ] **UUUUU** — cast explanation.winnerCategory: string — server category of winning tool (e.g. "ecosystem", "code", "communication"). Parallels winnerServer. Present when winner exists. Absent on no_match. PR #505 🔄 CI running (run 160, 2026-06-15).
+- [x] **UUUUU** — cast explanation.winnerCategory: string — server category of winning tool (e.g. "ecosystem", "code", "communication"). Parallels winnerServer. Present when winner exists. Absent on no_match. PR #505 ✅ MERGED (542a151, run 159d/160, 2026-06-15). 8 new tests, 1529/0/2. DONE.
+- [ ] **VVVVV** — cast explanation.inFocusWinnerGap: number — score margin by which the out-of-focus winner beat the best in-focus candidate (winnerScore - inFocusTopScore). Present when focus active, winner out-of-focus, at least one in-focus candidate. PR TBD (run 159d, 2026-06-15).
 
 ## Blockers
 
@@ -181,16 +182,26 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Branch/PR**: PR #503 ✅ MERGED (de9f281)
 - **Build**: clean | **Tests**: 1521/0/2
 
-### 2026-06-15 (run 160 — this session)
+### 2026-06-15 (run 160 — parallel session)
 - **Workstream**: UUUUU — `cast explanation.winnerCategory: string`
-- **Branch/PR**: `auto/UUUUU-cast-explain-winner-category` → PR #505 🔄 CI running
+- **Branch/PR**: `auto/UUUUU-cast-explain-winner-category` → PR #505 ✅ MERGED (542a151)
 - **Build**: clean | **Tests**: 1529/0/2 (+8 UUUUU from 1521 TTTTT baseline)
 - **What was done**:
   - Startup: npm ci clean, build clean, 1513/0/2 on main (SSSSS=9a4f42c). Board read from DRIVER-BOARD.md (Notion 401 — recurring). SSSSS confirmed done. TTTTT (PR #503) open with clean mergeable state.
   - Merged PR #503 (TTTTT runnerUpServer) squash → de9f281. Pulled main.
   - UUUUU: `src/aggregator.ts` `buildCastExplanation` — added `winnerCategory: best.category` alongside `winnerServer` and `winnerScore` inside `best !== undefined` guard. Tool description updated to document `winnerCategory`.
   - `test/uuuuu-cast-explain-winner-category.test.ts`: 8 new tests (present, non-empty string, reflects server config category, absent on no_match, present single candidate, present without focus, present with focus, description).
-  - PR #505 opened. CodeRabbit + Codex rate-limited (recurring — no action).
+  - PR #505 merged (542a151). CodeRabbit + Codex rate-limited (recurring — no action).
+- **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring).
+
+### 2026-06-15 (run 159d — this session, VVVVV)
+- **Workstream**: VVVVV — `cast explanation.inFocusWinnerGap: number`
+- **Branch/PR**: `auto/VVVVV-cast-explain-in-focus-winner-gap` → PR TBD
+- **Build**: clean | **Tests**: 1537/0/2 (+8 VVVVV from 1529 UUUUU baseline)
+- **What was done**:
+  - UUUUU (PR #505) confirmed merged at 542a151. TTTTT (#503) also confirmed merged.
+  - VVVVV: `src/aggregator.ts` `buildCastExplanation` — added `inFocusWinnerGap: best!.score - inFocusTopScore` inside `!winnerInFocus && inFocusTopScore !== undefined` guard. Tool description updated to document inFocusWinnerGap.
+  - `test/vvvvv-cast-explain-in-focus-winner-gap.test.ts`: 8 new tests (present/>=0/identity/absent-in-focus-winner/absent-no_match/absent-no-focus/absent-no-in-focus-candidates/description).
 - **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**:
-  - Merge UUUUU (PR #505) if CI green. Then VVVVV candidates: (a) cast explanation `runnerUpCategory: string` — category of the runner-up tool's server (symmetric to winnerCategory); (b) cast explanation `inFocusWinnerGap: number` — score gap between winner and best in-focus non-winner candidate.
+  - Merge VVVVV (PR open) if CI green. Then WWWWW candidates: (a) cast explanation `runnerUpCategory: string` — category of the runner-up tool's server (symmetric to winnerCategory/runnerUpServer); (b) cast explanation `candidateScoreSpread: number` — range of candidate scores (max - min) when >= 2 candidates.
