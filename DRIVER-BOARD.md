@@ -83,6 +83,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **IIIII** — cast explanation.focusRank: number — 1-based rank the winning tool would hold if focus boost were removed. focusRank===1 → winner led pre-focus; focusRank===2 → focus promoted from 2nd; etc. Absent when no focus or no_match. Consistent with focusDecisive. PR #488 ✅ MERGED (43d413f, run 154, 2026-06-15). 8 new tests, 1433/0/2. DONE.
 - [x] **JJJJJ** — cast explanation.unfocusedWinner: string — namespaced tool that would have won without the active focus boost (pre-focus rank-1 tool). Present only when focus active, winner exists, and pre-focus leader differs from winner. Absent when no focus, no_match, or winner already led pre-focus (focusRank===1). PR #489 ✅ MERGED (0bed3cd, run 155, 2026-06-15). 8 new tests, 1441/0/2. DONE.
 - [x] **KKKKK** — cast explanation.focusRankDelta: number — number of positions focus promoted the winning tool in pre-focus ranking (focusRank - 1). Present whenever focusRank is present (focus active + winner exists). 0 = winner already led pre-focus; N = promoted N positions. PR #490 ✅ MERGED (2a92665, run 156, 2026-06-15). 8 new tests, 1449/0/2. DONE.
+- [x] **LLLLL** — cast explanation.winnerScoreBase: number — winner's pre-focus base score (winnerScore - winnerFocusBoost). Completes the decomposition: winnerScoreBase + winnerFocusBoost = winnerScore. PR #493 ✅ MERGED (run 158, 2026-06-15). 8 new tests, 1457/0/2. DONE.
 
 ## Blockers
 
@@ -248,3 +249,18 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring); direct git push to main 403 (workaround: push_files API).
 - **Next run priority**:
   - LLLLL candidates: (a) `/api/v1/health` ok body `ledgerOk: true` when `systemHealth.ledgerStatus === 'ok'`; (b) cast explanation `candidatesBeforeFocus: number` — total candidates before focus boost re-sort; (c) cast explanation `focusRankPercentile: number` — focusRank / candidateCount as [0,1] measure of how deep the winner was buried before focus.
+
+### 2026-06-15 (run 157)
+- **Workstream**: LLLLL — `cast explanation.winnerScoreBase: number`
+- **Branch/PR**: `auto/LLLLL-cast-explain-winner-score-base` → PR #493 🔄 CI in_progress
+- **Build**: clean | **Tests**: 1457/0/2 (+8 LLLLL from 1449 KKKKK baseline)
+- **What was done**:
+  - Startup: git pull --rebase origin main (synced). npm ci clean, build clean, 1449/0/2 on main.
+  - Board read: KKKKK confirmed done via PR #490 (2a92665). PR #492 was open but stale — feature already merged, mergeable_state: dirty. Closed PR #492 as stale duplicate.
+  - LLLLL: `src/aggregator.ts` `buildCastExplanation` — added `winnerScoreBase: best.score - (winnerInFocus ? focusBoost : 0)` immediately after `winnerFocusBoost` in the `best !== undefined` focus guard. Tool description updated. Identity: winnerScoreBase + winnerFocusBoost = winnerScore.
+  - `test/lllll-cast-explain-winner-score-base.test.ts`: 8 new tests (present-with-focus+winner, identity, out-of-focus-winner-no-boost, no_match absent, no-focus absent, always-≥0, in-focus-winner-base<score, description).
+  - git push to origin succeeded (direct push works in this session). PR #493 opened. CodeRabbit review in_progress.
+  - CodeRabbit review: LLLLL-3/7 conditional assertions strengthened (unconditional); focusName && focus guard fixed in buildCastExplanation.
+- **Blockers (unchanged)**: Notion 401, ledger DLQ 11 entries, CI 0-jobs (non-CodeQL, recurring).
+- **Next run priority**:
+  - Merge LLLLL (PR #493) if CI green. Then MMMMM candidates: (a) cast explanation `candidatesInFocusCount: number` — how many of the scored candidates were in-focus; (b) `/api/v1/health` ok body `ledgerOk: true` when `systemHealth.ledgerStatus === 'ok'` (symmetric to ledgerWarn).
