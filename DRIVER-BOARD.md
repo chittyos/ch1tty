@@ -73,6 +73,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **YYYY** — cast explanation runnerUpScore + runnerUpTool (PR #472). DONE.
 - [x] **ZZZZ** — cast explanation.winnerFocusBoost: exact boost applied to winner (0 if out-of-focus, absent if no focus/no_match). PR #473 ✅ MERGED (b16fed8, run 146, 2026-06-15). 7 new tests, 1361/0/2. DONE.
 - [x] **AAAAA** — cast explanation.focusDecisive: boolean — true when winner would not have won without focus boost (winnerScore - winnerFocusBoost < runnerUpScore). PR #475 ✅ MERGED (db2f4fb, run 147, 2026-06-15). 8 new tests, 1369/0/2. DONE.
+- [ ] **BBBBB** — cast latencyBreakdown.registryMs: wall-clock time of registry/prompts/resources fetch (sub-component of scoringMs; 0 if cache warm). PR #477 (open, run 147, 2026-06-15). 8 new tests, 1377/0/2.
 
 ## Blockers
 
@@ -104,15 +105,13 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   1. Plan AAAAA: candidates — (a) `/api/v1/health` warn body: surface `brainCircuitOpen: true` in 200 response when `systemHealth.status === 'warn'`; (b) `explanation.focusDecisive: boolean` — computed as `winnerScore - winnerFocusBoost < runnerUpScore`; (c) cast `latencyBreakdown.registryMs` — registry fetch time isolated from scoringMs.
 
 ### 2026-06-15 (run 147)
-- **Workstream**: AAAAA — `cast explanation.focusDecisive: boolean`
-- **Branch/PR**: `auto/AAAAA-cast-explain-focus-decisive` → PR #475 ✅ MERGED (db2f4fb)
-- **Build**: clean | **Tests**: 1369/0/2 (+8 AAAAA from 1361 baseline)
+- **Workstream**: AAAAA (merged) + BBBBB (opened)
+- **Branch/PR**: `auto/AAAAA-cast-explain-focus-decisive` → PR #475 ✅ MERGED (db2f4fb) / `auto/BBBBB-cast-latency-registry-ms` → PR #477 (open)
+- **Build**: clean | **Tests**: 1377/0/2 (+8 AAAAA, +8 BBBBB from 1361 baseline)
 - **What was done**:
-  - Startup: npm ci clean, build clean, tests 1361/0/2 (baseline matches run 146). Board was plain text — no reconstruction needed.
-  - AAAAA (b): `explanation.focusDecisive: boolean` in `ch1tty/cast` when `explain:true`, focus active, winner exists, runner-up exists.
-    - `src/aggregator.ts`: `buildCastExplanation` — `focusDecisive: (best.score - (winnerInFocus ? focusBoost : 0)) < topCandidates[1].score` inside focusName spread, conditioned on `best !== undefined && topCandidates.length > 1`. Tool description updated.
-    - `test/aaaaa-cast-explain-focus-decisive.test.ts`: 8 new tests (decisive, non-decisive, out-of-focus winner, no focus, no_match, single candidate, plan path, description).
-  - Bot comments on PR: Codex usage limit + CodeRabbit rate limit — both non-actionable.
+  - Startup: npm ci clean, build clean, tests 1361/0/2. Board plain text — no reconstruction needed.
+  - AAAAA: `explanation.focusDecisive: boolean` merged (PR #475 → db2f4fb).
+  - BBBBB: `latencyBreakdown.registryMs` in `ch1tty/cast` — isolates `Promise.allSettled([getRegistry(), ...])` wall time from total `scoringMs`. 8 new tests.
 - **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**:
-  - BBBBB candidates: (a) `/api/v1/health` warn body `brainCircuitOpen: true` in 200 when `systemHealth.status === 'warn'`; (b) cast `latencyBreakdown.registryMs` — registry fetch time isolated from scoringMs; (c) cast explanation `focusMargin: number` = winnerScore - runnerUpScore (raw margin for operators).
+  - CCCCC candidates: (a) `/api/v1/health` warn body `brainCircuitOpen: true` when `systemHealth.status === 'warn'`; (b) cast explanation `focusMargin: number` = winnerScore - runnerUpScore.

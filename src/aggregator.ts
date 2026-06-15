@@ -357,7 +357,7 @@ export class Aggregator {
           'When a sessionId is active, cast: executed and cast: chain_executed include sessionContext reflecting session state after execution; ' +
           'cast: plan, cast: resolved, cast: discovered, and cast: no_match include sessionContext reflecting pre-execution session state (recent tools, call count, sticky focus). ' +
           'All cast responses include latencyMs: the elapsed wall-clock time in milliseconds from intent submission to response (covers scoring + execution). ' +
-          'cast: executed and cast: chain_executed also include latencyBreakdown: { scoringMs, executionMs, brainMs? } — scoringMs is the time spent in registry fetch + intent routing/scoring before any backend call; executionMs is the time spent in the backend call(s); brainMs is present when the brain route was taken and shows the routeIntent() wall time. ' +
+          'cast: executed and cast: chain_executed also include latencyBreakdown: { scoringMs, executionMs, registryMs, brainMs? } — scoringMs is the time spent in registry fetch + intent routing/scoring before any backend call; executionMs is the time spent in the backend call(s); registryMs is the wall-clock time of the registry fetch only (getRegistry() call; a sub-component of scoringMs; near-zero if the registry was already cached; excludes prompts/resources fetch time); brainMs is present when the brain route was taken and shows the routeIntent() wall time. ' +
           'When explain: true is set and the brain route was taken, explanation includes brainMs: the wall-clock time of the brain routeIntent() call in milliseconds (alongside method: "brain"). Absent when the keyword-fallback route was used. ' +
           'explanation also includes candidateCount: the total number of tools in the scoring pool before the top-5 topCandidates slice. 0 on no_match. ' +
           'explanation also includes winnerScore: the numeric relevance score of the winning tool (topCandidates[0].score). Absent on no_match (no winner). Lets operators read the winner\'s score directly without indexing into topCandidates. ' +
@@ -1042,8 +1042,9 @@ export class Aggregator {
       : null;
 
     // Step 1: Score tools, prompts, and resources in parallel (Ch1tty searching itself)
+    let registryMs = 0;
     const [registryResult, promptsResult, resourcesResult] = await Promise.allSettled([
-      this.getRegistry(),
+      (async () => { const t = Date.now(); const r = await this.getRegistry(); registryMs = Date.now() - t; return r; })(),
       this.listAllPrompts(),
       this.listAllResources(),
     ]);
@@ -1344,7 +1345,7 @@ export class Aggregator {
             resolvedBy,
             intent,
             latencyMs: Date.now() - castStartMs,
-            latencyBreakdown: { scoringMs: chainScoringMs, executionMs: chainExecutionMs, ...(castRoute === 'brain' ? { brainMs: brainRouteMs } : {}) },
+            latencyBreakdown: { scoringMs: chainScoringMs, executionMs: chainExecutionMs, registryMs, ...(castRoute === 'brain' ? { brainMs: brainRouteMs } : {}) },
             // focusName is always truthy here (catalogCombo requires it — see line ~1238)
             /* c8 ignore next */
             ...(focusName ? { focus: focusName } : {}),
@@ -1466,7 +1467,7 @@ export class Aggregator {
             resolvedBy,
             intent,
             latencyMs: Date.now() - castStartMs,
-            latencyBreakdown: { scoringMs: execScoringMs, executionMs, ...(castRoute === 'brain' ? { brainMs: brainRouteMs } : {}) },
+            latencyBreakdown: { scoringMs: execScoringMs, executionMs, registryMs, ...(castRoute === 'brain' ? { brainMs: brainRouteMs } : {}) },
             ...(focusName ? { focus: focusName } : {}),
             ...(scopeAnnotation ? { scope: scopeAnnotation } : {}),
             ...(explanation ? { explanation } : {}),
