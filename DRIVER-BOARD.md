@@ -100,7 +100,8 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **ZZZZZ** — cast explanation.outOfFocusCandidatesCount: number — complement of candidatesInFocusCount; identity: candidatesInFocusCount + outOfFocusCandidatesCount === candidateCount. PR #510 ✅ MERGED (295f920, 2026-06-15). 8 new tests, 1569/0/2. DONE.
 - [x] **AAAAAA** — cast explanation.winnerScoreRatio: number — winnerScore / runnerUpScore. Multiplicative complement to focusMargin. Present when runner-up exists and runnerUpScore > 0. PR #511 ✅ MERGED (217dc63, 2026-06-15). 8 new tests, 1577/0/2. DONE.
 - [x] **BBBBBB** — cast explanation.lowestCandidateScore: number — score of the weakest candidate in the full pool. Identity: winnerScore - lowestCandidateScore === candidateScoreSpread. Present when >= 2 candidates. PR #512 ✅ MERGED (5749f4f, 2026-06-15). 9 new tests, 1586/0/2. DONE.
-- [ ] **CCCCCC** — cast explanation.winnerFocusBoostRatio: number — fraction of winner's total score from focus boost (winnerFocusBoost / winnerScore), [0,1]. Present when focus active + winner exists + winnerScore > 0. PR #513 CI running (2026-06-15).
+- [x] **CCCCCC** — cast explanation.winnerFocusBoostRatio: number — fraction of winner's total score from focus boost (winnerFocusBoost / winnerScore), [0,1]. Present when focus active + winner exists + winnerScore > 0. PR #513 ✅ MERGED (4eae278, 2026-06-15). 8 new tests, 1594/0/2. DONE.
+- [ ] **DDDDDD** — cast explanation.topCandidatesScoreVariance: number — variance of topCandidates scores (sum of squared deviations from mean, divided by N). Present when >= 2 topCandidates. Absent on no_match or single candidate. In progress (2026-06-15).
 
 ## Blockers
 
