@@ -354,3 +354,28 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - CodeRabbit + Codex rate-limited (recurring — no action).
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**: RRRRRR — `scoreDominanceIndex: number` (winner's share of total candidate score mass: winnerScore / totalCandidateScore; present when winner exists and totalScore > 0).
+
+### 2026-06-15 (run 172 — RRRRRR) ✅ COMPLETE
+- **Workstream**: A (gateway observability) — RRRRRR: `cast explanation.scoreDominanceIndex: number`
+- **Branch/PR**: `auto/RRRRRR-cast-explain-score-dominance-index` → PR #536 ✅ MERGED
+- **Build**: clean | **Tests**: 1666/0/2 (+8 RRRRRR from 1658 QQQQQQ baseline)
+
+### 2026-06-15 (run 173 — SSSSSS) ✅ COMPLETE
+- **Workstream**: A (gateway observability) — SSSSSS: `cast explanation.candidateGiniCoefficient: number`
+- **Branch/PR**: `auto/SSSSSS-cast-explain-candidate-gini-coefficient` → PR #537 ✅ MERGED
+- **Build**: clean | **Tests**: 1674/0/2 (+8 SSSSSS from 1666 RRRRRR baseline)
+
+### 2026-06-15 (run 174 — TTTTTT) ✅ COMPLETE
+- **Workstream**: A (gateway observability) — TTTTTT: `cast explanation.topCandidatesScoreSkewness: number`
+- **Branch/PR**: `auto/TTTTTT-cast-explain-top-candidates-score-skewness` → PR #538 ✅ MERGED
+- **Build**: clean | **Tests**: 1682/0/2 (+8 TTTTTT from 1674 SSSSSS baseline)
+
+### 2026-06-15 (run 175 — UUUUUU) ✅ COMPLETE
+- **Workstream**: A (gateway observability) — UUUUUU: `cast explanation.candidateScoreSkewness: number`
+- **Branch/PR**: `auto/UUUUUU-cast-explain-candidate-score-skewness` → PR #539 ✅ MERGED (0ac9474)
+- **Build**: clean | **Tests**: 1690/0/2 (+8 UUUUUU from 1682 TTTTTT baseline)
+- **What was done**:
+  - Added candidateScoreSkewness: IIFE computing 3rd standardised moment of full candidate pool. Reuses candidateScoreEntropyTotal for mean. Absent when < 2 candidates or stddev === 0.
+  - Test fix: neon tool description changed to 'billing sql query database' to share keyword 'billing' with intent (scorer filters 0-score tools, so both tools must match at least one keyword).
+  - 8 new tests (UUUUUU-1..8). All pass. PR #539 merged.
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
