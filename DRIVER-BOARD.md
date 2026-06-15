@@ -389,3 +389,15 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - Test fix: neon tool description changed to 'billing sql query database' to share keyword 'billing' with intent (scorer filters 0-score tools, so both tools must match at least one keyword).
   - 8 new tests (UUUUUU-1..8). All pass. PR #539 merged.
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
+
+### 2026-06-15 (run 176 — VVVVVV) ✅ COMPLETE
+- **Workstream**: A (gateway observability) — VVVVVV: `cast explanation.candidateScoreVariance: number`
+- **Branch/PR**: `auto/VVVVVV-cast-explain-candidate-score-variance` → PR #540 ✅ MERGED (a741381)
+- **Build**: clean | **Tests**: 1698/0/2 (+8 VVVVVV from 1690 UUUUUU baseline)
+- **What was done**: Added candidateScoreVariance: (1/n)*Σ(x_i-mean)² over full pool. Reuses candidateScoreEntropyTotal for mean. Full-pool parallel to topCandidatesScoreVariance. Equals topCandidatesScoreVariance when candidateCount <= 5. 8 new tests.
+
+### 2026-06-15 (run 177 — WWWWWW) ✅ COMPLETE
+- **Workstream**: A (gateway observability) — WWWWWW: `cast explanation.candidateScoreStdDev: number`
+- **Branch/PR**: `auto/WWWWWW-cast-explain-candidate-score-std-dev` → PR TBD
+- **Build**: clean | **Tests**: 1706/0/2 (+8 WWWWWW from 1698 VVVVVV baseline)
+- **What was done**: Added candidateScoreStdDev: sqrt(candidateScoreVariance). Derived directly from the precomputed candidateScoreVariance — no extra loop. Full-pool parallel to topCandidatesScoreStdDev. Identity: candidateScoreStdDev^2 === candidateScoreVariance. Equals topCandidatesScoreStdDev when candidateCount <= 5. 8 new tests.
