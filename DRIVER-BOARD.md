@@ -91,7 +91,8 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **QQQQQ** — cast explanation.outOfFocusWinnerGap: number — score gap between winner and best out-of-focus candidate (winnerScore - topOutOfFocusScore). Present under same conditions as topOutOfFocusScore. PR #499 ✅ MERGED (ac28f50, 2026-06-15, parallel session). 8 new tests, 1497/0/2. DONE. (PR #501 closed run 158 — stale duplicate with different impl; parallel session's #499 merged first.)
 - [x] **RRRRR** — cast explanation.focusRankPercentile: number — normalized pre-focus rank (focusRank / candidateCount), [0,1]. Identity: focusRankPercentile * candidateCount === focusRank. PR #502 ✅ MERGED (a8381be, run 158, 2026-06-15). 8 new tests, 1505/0/2. DONE.
 - [x] **SSSSS** — cast explanation.inFocusTopScore: number — highest relevance score among in-focus candidates. Present when focus active, winner exists, at least one in-focus candidate scored > 0.1. PR #500 ✅ MERGED (9a4f42c, run 159b, 2026-06-15). 8 new tests, 1513/0/2. DONE.
-- [ ] **TTTTT** — cast explanation.runnerUpServer: string — server ID of runner-up tool (segment before "/" in namespaced name). Present when winner + runner-up exist. Absent on no_match or single candidate. PR #503 🔄 CI running (run 159c, 2026-06-15).
+- [x] **TTTTT** — cast explanation.runnerUpServer: string — server ID of runner-up tool (segment before "/" in namespaced name). Present when winner + runner-up exist. Absent on no_match or single candidate. PR #503 ✅ MERGED (de9f281, run 160, 2026-06-15). 8 new tests, 1521/0/2. DONE.
+- [ ] **UUUUU** — cast explanation.winnerCategory: string — server category of winning tool (e.g. "ecosystem", "code", "communication"). Parallels winnerServer. Present when winner exists. Absent on no_match. PR #505 🔄 CI running (run 160, 2026-06-15).
 
 ## Blockers
 
@@ -111,232 +112,85 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Workstream**: ZZZZ — `cast explanation.winnerFocusBoost`
 - **Branch/PR**: `auto/ZZZZ-cast-explain-winnerfocusboost` → PR #473 ✅ MERGED (b16fed8)
 - **Build**: clean | **Tests**: 1361/0/2 (+7 ZZZZ from 1354 baseline)
-- **What was done**:
-  - Startup: npm ci clean, build clean, 1354/0/2 (no open PRs). Board restored as plain text (was truncated base64 — recurring issue fixed).
-  - Notion 401 confirmed. DRIVER-BOARD.md reconstructed from git history and written as plain text.
-  - ZZZZ: `explanation.winnerFocusBoost` in `ch1tty/cast` when `explain:true` and focus active.
-    - `src/aggregator.ts`: `buildCastExplanation` return — `winnerFocusBoost: winnerInFocus ? focusBoost : 0` inside focusName spread, only when `best !== undefined`. Tool description updated.
-    - `test/zzzz-cast-explain-winnerfocusboost.test.ts`: 7 new tests (in-focus=boost, out-of-focus=0, no focus absent, plan path, consistency, no_match absent, description).
-  - All 3 CodeQL checks green. PR #473 squash-merged. Board updated ZZZZ ✅.
-- **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**:
-  1. Plan AAAAA: candidates —  (a) `/api/v1/health` warn body: surface `brainCircuitOpen: true` in 200 response when `systemHealth.status === 'warn'`; (b) `explanation.focusDecisive: boolean` — computed as `winnerScore - winnerFocusBoost < runnerUpScore`; (c) cast `latencyBreakdown.registryMs` — registry fetch time isolated from scoringMs.
+  1. Plan AAAAA: candidates — (a) `/api/v1/health` warn body: surface `brainCircuitOpen: true` in 200 response when `systemHealth.status === 'warn'`; (b) `explanation.focusDecisive: boolean`; (c) cast `latencyBreakdown.registryMs`.
 
 ### 2026-06-15 (run 147)
-- **Workstream**: AAAAA merged) + BBBBB (opened then merged after Codex P2 fix)
+- **Workstream**: AAAAA merged + BBBBB opened then merged
 - **Branch/PR**: `auto/BBBBB-cast-latency-registry-ms` → PR #477 ✅ MERGED
-- **Build**: clean | **Tests**: 1377/0/2 (+8 BBBBB from 1369 post-AAAAA)
-- **What was done**:
-  - Merged AAAAA (PR #475, db2f4fb) at run start — CI was green.
-  - BBBBB: `latencyBreakdown.registryMs` — wall-clock time of `getRegistry()` only (not allSettled wrapper). Codex P2 review flagged that wrapping all three parallel fetches inflated registryMs when prompts/resources are slow; fixed by timing only getRegistry() via inline async wrapper.
-  - PR #477 merged (runs 148+149 also ran while watching; CCCCC opened as PR #478 by run 148).
-  - Board push to main 403'd repeatedly; used GitHub API (create_or_update_file) to write board update.
-- **Blockers**: Notion 401, ledger DLQ, CI 0-jobs, direct git push to main 403 (workaround: use GitHub API).
-- **Next run priority**:
-  - Merge CCCCC (PR #478) if CI green, then plan DDDDD: `/api/v1/health` warn body `brainCircuitOpen: true` when `systemHealth.status === 'warn'`.
+- **Build**: clean | **Tests**: 1377/0/2
 
 ### 2026-06-15 (run 148)
 - **Workstream**: CCCCC — `cast explanation.focusMargin: number`
-- **Branch/PR**: `auto/CCCCC-cast-explain-focus-margin` → PR #478 (open)
-- **Build**: clean | **Tests**: 1377/0/2 (+8 CCCCC from 1369 baseline)
-- **What was done**:
-  - CCCCC: `explanation.focusMargin: number` in `ch1tty/cast` when `explain:true`, focus active, winner + runner-up exist.
-    - `src/aggregator.ts`: `buildCastExplanation` — `focusMargin: best.score - topCandidates[1].score` inside `best !== undefined && topCandidates.length > 1` guard alongside `focusDecisive`. Tool description updated.
-    - 8 new tests.
-- **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring).
-- **Next run priority**:
-  - DDDDD: `/api/v1/health` warn body — when `systemHealth.status === 'warn'`, include `brainCircuitOpen: true` in the 200 response body.
+- **Branch/PR**: `auto/CCCCC-cast-explain-focus-margin` → PR #478 ✅ MERGED (7d2d572)
+- **Build**: clean | **Tests**: 1385/0/2
 
 ### 2026-06-15 (run 149)
-- **Workstream**: DDDDD — `/api/v1/health` warn body includes `brainCircuitOpen: true`
-- **Branch/PR**: `auto/DDDDD-health-warn-brainCircuitOpen` → PR open
-- **Build**: clean | **Tests**: 1393/0/2 (+8 DDDDD from 1385 baseline; BBBBB+CCCCC also merged this run)
-- **What was done**:
-  - Startup: npm ci clean, build clean, tests 1369/0/2 on main (AAAAA baseline). Found 3 open PRs: #476 (board), #477 (BBBBB), #478 (CCCCC). All 3/3 CI green.
-  - Merged #476 (board). Rebased and merged #477 (BBBBB ✅ 4949c21). Rebased and merged #478 (CCCCC ✅ 7d2d572).
-  - DDDDD: `src/http-server.ts` `/api/v1/health` handler — added `if (systemHealth.status === 'warn' && systemHealth.brainDegraded) body.brainCircuitOpen = true;` after the ledgerDlq guard.
-  - Updated `CLAUDE.md` `/api/v1/health` docs to document `brainCircuitOpen` in warn body.
-  - `test/ddddd-health-warn-braincircuitopen.test.ts`: 8 new tests (warn+brain→present, ok→absent, degraded→absent, warn+ledger-only→absent, internal-error→absent, exact boolean true, existing fields still present, HTTP 200 not 503).
-- **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring).
-- **Next run priority**:
-  - EEEEE candidates: (a) `/api/v1/health` warn body `ledgerWarn: true` when `systemHealth.ledgerStatus === 'warn'` (ledger-only warn surfacing, symmetric to brainCircuitOpen); (b) cast explanation `focusBias: number` — winnerFocusBoost / focusMargin ratio (portion of margin attributable to focus boost).
+- **Workstream**: DDDDD — `/api/v1/health` warn body brainCircuitOpen
+- **Branch/PR**: PR #480 ✅ MERGED (3f4e107)
+- **Build**: clean | **Tests**: 1393/0/2
 
 ### 2026-06-15 (run 150)
-- **Workstream**: DDDDD ✅ merged + EEEEE opened
-- **Branch/PR**: `auto/EEEEE-health-warn-ledgerwarn` → PR open
-- **Build**: clean | **Tests**: 1401/0/2 (+8 EEEEE from 1393 DDDDD baseline)
-- **What was done**:
-  - Startup: npm ci clean, build clean, 1385/0/2 on main. Found 2 open PRs: #479 (board mark CCCCC done), #480 (DDDDD brainCircuitOpen).
-  - Merged PR #479 (board). PR #480 (DDDDD) had conflict in DRIVER-BOARD.md after #479 merge — rebased, resolved conflict, force-pushed eec5f90. CI 3/3 green. Merged #480 ✅ (3f4e107).
-  - EEEEE: `src/http-server.ts` — added `if (systemHealth.status === 'warn' && systemHealth.ledgerStatus === 'warn') body.ledgerWarn = true;` after brainCircuitOpen guard. Updated CLAUDE.md /api/v1/health docs. 8 new tests in `test/eeeee-health-warn-ledgerwarn.test.ts`.
-- **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring).
-- **Next run priority**:
-  - Merge EEEEE (PR open) if CI green, then FFFFF: cast explanation `focusBias: number` (winnerFocusBoost / focusMargin — fraction of margin due to focus boost). Guard: absent when focusMargin === 0 (division by zero).
+- **Workstream**: EEEEE — `/api/v1/health` warn body ledgerWarn
+- **Branch/PR**: PR #481 ✅ MERGED (c04f708)
+- **Build**: clean | **Tests**: 1401/0/2
 
 ### 2026-06-15 (run 151)
 - **Workstream**: FFFFF — `cast explanation.focusBias: number`
-- **Branch/PR**: `auto/FFFFF-cast-explain-focus-bias` → PR #483 (open, CI in_progress)
-- **Build**: clean | **Tests**: 1409/0/2 (+8 FFFFF from 1401 EEEEE baseline)
-- **What was done**:
-  - Startup: npm ci clean, build clean, 1401/0/2 on main. No open PRs (EEEEE #481 already merged per board).
-  - FFFFF: `src/aggregator.ts` `buildCastExplanation` — added `focusBias: (winnerInFocus ? focusBoost : 0) / (best.score - topCandidates[1].score)` inside `best !== undefined && topCandidates.length > 1` guard, with inner `focusMargin !== 0` guard. Tool description updated to document `focusBias`.
-  - `test/fffff-cast-explain-focus-bias.test.ts`: 8 new tests (present&≥0, consistency, out-of-focus=0, tied=absent, no-focus=absent, no_match=absent, single-candidate=absent, description).
-  - PR #483 opened. CodeRabbit + Codex rate-limited (no action). CI 2/2 CodeQL in_progress at run end.
-- **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring).
-- **Next run priority**:
-  - Merge FFFFF (PR #483) if CI green, then GGGGG candidates: (a) cast explanation `focusConfidence: number` — `focusBias` clamped to [0,1] for display (since focusBias can exceed 1); (b) `/api/v1/health` ok body add `ledgerOk: true` field for symmetric completeness; (c) cast explanation `candidatesBeforeFocus: number` — total candidates before focus boost re-sort.
+- **Branch/PR**: PR #483 ✅ MERGED (b697884)
+- **Build**: clean | **Tests**: 1409/0/2
 
 ### 2026-06-15 (run 152)
 - **Workstream**: GGGGG — `cast explanation.focusConfidence: number`
-- **Branch/PR**: `auto/GGGGG-cast-explain-focus-confidence` → PR #485 ✅ MERGED (1e9407a, ~13:13 UTC)
-- **Build**: clean | **Tests**: 1417/0/2 (+8 GGGGG from 1409 FFFFF baseline)
-- **What was done**:
-  - Startup: npm ci clean, build clean, 1409/0/2 on main. No open PRs (FFFFF #483 already merged).
-  - GGGGG: `src/aggregator.ts` `buildCastExplanation` — added `focusConfidence: Math.min(1, (winnerInFocus ? focusBoost : 0) / (best.score - topCandidates[1].score))` alongside `focusBias`, inside same `focusMargin !== 0` guard. Tool description updated.
-  - Key clamping verified live: intent `alpha beta gamma delta`, in-focus stripe (3/4 terms, score 0.75) vs neon (4/4, score 1.0); after boost focusBias=2.0, focusConfidence=1.0 (clamped) ✓
-  - `test/ggggg-cast-explain-focus-confidence.test.ts`: 8 new tests ([0,1] range, min(1,focusBias) consistency, clamping, out-of-focus=0, no-focus absent, no_match absent, single-candidate absent, description).
-  - Codex + CodeRabbit rate-limited (no action — recurring). CI 2/2 CodeQL green. PR #485 merged 13:13 UTC.
-- **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring).
-- **Next run priority**:
-  - HHHHH candidates: (a) `/api/v1/health` ok body `ledgerOk: true` when `systemHealth.ledgerStatus === 'ok'` (symmetric completeness with ledgerWarn/brainCircuitOpen); (b) cast explanation `focusRank: number` — winner's 1-based rank in pre-focus scoring (1 = would have won anyway, >1 = focus promoted it); (c) cast explanation `unfocusedWinner: string` — namespaced tool that would have won without focus boost (absent when same as winner).
+- **Branch/PR**: PR #485 ✅ MERGED (1e9407a)
+- **Build**: clean | **Tests**: 1417/0/2
 
 ### 2026-06-15 (run 153)
 - **Workstream**: HHHHH — `cast explanation.winnerServer: string`
-- **Branch/PR**: `auto/HHHHH-cast-explain-winner-server` → PR #486 ✅ MERGED (1e07a00, ~13:24 UTC)
-- **Build**: clean | **Tests**: 1425/0/2 (+8 HHHHH from 1417 GGGGG baseline)
-- **What was done**:
-  - Startup: npm ci clean, build clean, 1409/0/2 on main. PR #485 (GGGGG) was open with 3/3 CI green (CodeQL). Merged it via squash → 1e9407a.
-  - Board read from DRIVER-BOARD.md (Notion 401 — recurring). GGGGG confirmed done, HHHHH selected.
-  - HHHHH: `src/aggregator.ts` `buildCastExplanation` — added `winnerServer: best.namespacedName.split('/')[0]` alongside `winnerScore` (same `best !== undefined` guard). Tool description updated to document `winnerServer`.
-  - `test/hhhhh-cast-explain-winner-server.test.ts`: 8 new tests (winner=server ID, prefix consistency, no_match absent, in-focus winner present, out-of-focus winner present, no-focus present, single-candidate present — no runner-up needed, description).
-  - HHHHH-7 confirms the key distinction vs focusMargin/focusBias: `winnerServer` needs only a winner, not a runner-up.
-  - CodeRabbit review in_progress at run end. Codex usage-limit bot comment (no action). CI 2/2 CodeQL in_progress.
-- **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring).
-- **Next run priority**:
-  - Merge HHHHH (PR #486) if CI green. Then IIIII candidates: (a) cast explanation `focusRank: number` — winner's 1-based rank before focus boost re-sort; (b) cast explanation `unfocusedWinner: string` — the tool that would have won without focus (absent when same as winner); (c) `/api/v1/health` ok body `ledgerOk: true` for symmetric completeness.
+- **Branch/PR**: PR #486 ✅ MERGED (1e07a00)
+- **Build**: clean | **Tests**: 1425/0/2
 
 ### 2026-06-15 (run 154)
 - **Workstream**: IIIII — `cast explanation.focusRank: number`
-- **Branch/PR**: `auto/IIIII-cast-explain-focus-rank` → PR #488 ✅ MERGED (43d413f)
-- **Build**: clean | **Tests**: 1433/0/2 (+8 IIIII from 1425 HHHHH baseline)
-- **What was done**:
-  - Startup: npm ci clean, build clean, 1425/0/2 on main. No open PRs (HHHHH #486 + board #487 already merged).
-  - Board read from DRIVER-BOARD.md (Notion 401 — recurring). HHHHH confirmed done, IIIII selected.
-  - IIIII: `src/aggregator.ts` `buildCastExplanation` — computed `focusRank` pre-return by mapping scoredTools to pre-focus scores (subtracting focusBoost from in-focus tools), sorting descending, finding winner's 1-based index. Added `...(focusRank !== undefined ? { focusRank } : {})` inside `best !== undefined` guard within `focusName` spread. Tool description updated.
-  - `test/iiiii-cast-explain-focus-rank.test.ts`: 8 new tests (rank-1 already-led, rank-2 focus-promoted, no_match absent, no-focus absent, always-int>:1, consistent-with-focusDecisive, out-of-focus-winner→rank-1, description).
-  - CodeRabbit rate-limited (no action — recurring). CI 3/3 CodeQL green. PR #488 merged |14:48 UTC|.
-- **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring); direct git push to main 403 (workaround: GitHub API write).
-- **Next run priority**:
-  - JJJJJ candidates: (a) cast explanation `unfocusedWinner: string` — namespaced tool that would have won without focus boost (absent when same as winner or no focus); (b) `/api/v1/health` ok body `ledgerOk: true` when `systemHealth.ledgerStatus === 'ok'`; (c) cast explanation `focusRankDelta: number` — `focusRank - 1` (how many positions focus moved the winner up; 0 = no change).
+- **Branch/PR**: PR #488 ✅ MERGED (43d413f)
+- **Build**: clean | **Tests**: 1433/0/2
 
 ### 2026-06-15 (run 155)
 - **Workstream**: JJJJJ — `cast explanation.unfocusedWinner: string`
-- **Branch/PR**: `auto/JJJJJ-cast-explain-unfocused-winner` → PR #489 ✅ MERGED (0bed3cd)
-- **Build**: clean | **Tests**: 1441/0/2 (+8 JJJJJ from 1433 IIIII baseline)
-- **What was done**:
-  - Startup: npm ci clean, build clean, 1433/0/2 on main (d532fab). Board restored from base64 in git (recurring issue: GitHub API write stored base64 text — decoded on load; push_files now used instead).
-  - Board read: IIIII confirmed done, JJJJJ selected (unfocusedWinner candidate).
-  - JJJJJ: `src/aggregator.ts` `buildCastExplanation` — refactored `focusRank` pre-focus sort into shared `preFocusSorted` array; derived `unfocusedWinner` from same sort (preFocusSorted[0].n when it differs from best.namespacedName). Added `...(unfocusedWinner !== undefined ? { unfocusedWinner } : {})` inside `best !== undefined` guard within `focusName` spread. Tool description updated.
-  - `test/jjjjj-cast-explain-unfocused-winner.test.ts`: 8 new tests (absent-when-no-displacement, present-when-focus-promoted, no_match absent, no-focus absent, namespaced format, consistency-with-focusRank, out-of-focus-winner absent, description).
-  - Codex rate-limited (no action — recurring). CodeRabbit review completed: 1 actionable comment — tests JJJJJ-1/-2/-5/-7 had conditional branches allowing vacuous passes. Fixed locally (unconditional assertions); all 1441 tests still pass. PR #489 merged before fix was pushed → strengthened tests will be included in KKKKK branch. CI 2/2 CodeQL green. PR #489 squash-merged (0bed3cd) at ~15:12 UTC.
-- **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring); direct git push to main 403 (workaround: push_files API stores plain text ✓).
-- **Next run priority**:
-  - KKKKK candidates: (a) cast explanation `focusRankDelta: number` — `focusRank - 1` (how many positions focus moved the winner up; 0 = no change); (b) `/api/v1/health` ok body `ledgerOk: true` when `systemHealth.ledgerStatus === 'ok'`; (c) cast explanation `candidatesBeforeFocus: number` — total candidates before focus boost re-sort. Note: include strengthened JJJJJ test assertions (unconditional per CodeRabbit review) in the KKKKK branch.
+- **Branch/PR**: PR #489 ✅ MERGED (0bed3cd)
+- **Build**: clean | **Tests**: 1441/0/2
 
 ### 2026-06-15 (run 156)
-- **Workstream**: JJJJJ ✅ merged + KKKKK implemented and merged
-- **Branch/PR**: `auto/KKKKK-cast-explain-focus-rank-delta` → PR #490 ✅ MERGED (2a92665)
-- **Build**: clean | **Tests**: 1449/0/2 (+8 KKKKK from 1441 JJJJJ baseline)
+- **Workstream**: KKKKK — `cast explanation.focusRankDelta: number`
+- **Branch/PR**: PR #490 ✅ MERGED (2a92665)
+- **Build**: clean | **Tests**: 1449/0/2
+
+### 2026-06-15 (runs 157–158b — parallel sessions)
+- LLLLL PR #493 ✅ (0426ef5), MMMMM PR #494 ✅ (75155c5), NNNNN PR #495 ✅ (df640e0)
+- OOOOO PR #496 ✅ (a64d80c), PPPPP PR #497 ✅ (4ec2ee8)
+- QQQQQ PR #499 ✅ (ac28f50), RRRRR PR #502 ✅ (a8381be)
+- Tests: 1457→1505/0/2 across these merges
+
+### 2026-06-15 (run 159b)
+- **Workstream**: SSSSS — `cast explanation.inFocusTopScore: number`
+- **Branch/PR**: PR #500 ✅ MERGED (9a4f42c)
+- **Build**: clean | **Tests**: 1513/0/2
+
+### 2026-06-15 (run 159c)
+- **Workstream**: TTTTT — `cast explanation.runnerUpServer: string`
+- **Branch/PR**: PR #503 ✅ MERGED (de9f281)
+- **Build**: clean | **Tests**: 1521/0/2
+
+### 2026-06-15 (run 160 — this session)
+- **Workstream**: UUUUU — `cast explanation.winnerCategory: string`
+- **Branch/PR**: `auto/UUUUU-cast-explain-winner-category` → PR #505 🔄 CI running
+- **Build**: clean | **Tests**: 1529/0/2 (+8 UUUUU from 1521 TTTTT baseline)
 - **What was done**:
-  - Startup: npm ci clean, build clean, 1433/0/2 on main (d532fab — detached HEAD). Fetched + reset to origin/main post-JJJJJ merge.
-  - PR #489 (JJJJJ): 3/3 CI green. Merged via squash → 0bed3cd.
-  - KKKKK: `explanation.focusRankDelta: number` = `focusRank - 1`. `src/aggregator.ts` `buildCastExplanation` — added `focusRankDelta: focusRank - 1` alongside `focusRank` inside `focusRank !== undefined` spread. Tool description updated.
-  - `test/kkkkk-cast-explain-focus-rank-delta.test.ts`: 8 new tests (delta-0-when-already-led, delta≥1-when-promoted, no_match-absent, no-focus-absent, non-negative-int, consistency-invariant delta===rank-1, out-of-focus-winner→0, description).
-  - PR #490 opened; 3/3 CodeQL green; merged (2a92665). CodeRabbit + Codex rate-limited (recurring).
-  - Note (run 156b/this session): parallel duplicate session also implemented KKKKK on same branch and opened PR #492 — closed as stale since PR #490 was already merged. Board corrected.
-- **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring); direct git push to main 403 (workaround: push_files API).
+  - Startup: npm ci clean, build clean, 1513/0/2 on main (SSSSS=9a4f42c). Board read from DRIVER-BOARD.md (Notion 401 — recurring). SSSSS confirmed done. TTTTT (PR #503) open with clean mergeable state.
+  - Merged PR #503 (TTTTT runnerUpServer) squash → de9f281. Pulled main.
+  - UUUUU: `src/aggregator.ts` `buildCastExplanation` — added `winnerCategory: best.category` alongside `winnerServer` and `winnerScore` inside `best !== undefined` guard. Tool description updated to document `winnerCategory`.
+  - `test/uuuuu-cast-explain-winner-category.test.ts`: 8 new tests (present, non-empty string, reflects server config category, absent on no_match, present single candidate, present without focus, present with focus, description).
+  - PR #505 opened. CodeRabbit + Codex rate-limited (recurring — no action).
+- **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**:
-  - Merge LLLLL (PR #498) if CI green. Then MMMMM candidates: (a) `/api/v1/health` ok body `ledgerOk: true` when `systemHealth.ledgerStatus === 'ok'`; (b) cast explanation `candidatesBeforeFocus: number` — total candidates before focus boost re-sort; (c) cast explanation `focusRankPercentile: number` — focusRank / candidateCount as [0,1] measure of how deep the winner was buried before focus.
-
-### 2026-06-15 (run 157)
-- **Workstream**: LLLLL — `cast explanation.winnerScoreBase: number`
-- **Branch/PR**: PR #493 ✅ MERGED (0426ef5) — parallel session; PR #498 ❌ closed (stale duplicate detected in run 158)
-- **Build**: clean | **Tests**: 1457/0/2 (+8 LLLLL from 1449 KKKKK baseline)
-- **What was done**:
-  - Startup: git fetch + reset to origin/main (3be2575). npm ci clean, build clean, 1449/0/2. Board confirmed KKKKK DONE.
-  - Found PR #493 (parallel session) open with LLLLL `winnerScoreBase` — 3/3 CI green but merge conflict in DRIVER-BOARD.md (genuine 3-way conflict: both PR branch and main modified KKKKK line from older common ancestor 53e984a).
-  - Applied PR #493 code changes locally (2 edits to aggregator.ts, new test file). Built clean. 1457/0/2.
-  - Attempted to fix conflict by pushing board to PR branch — failed (mergeable_state stayed dirty). Agent to push all 3 files to main failed with 32K output token limit on 91KB aggregator.ts.
-  - Resolution: created new clean branch `auto/LLLLL-cast-explain-winner-score-base-v2` from current main (3be2575). Committed (c60f1dd). `git push` to feature branch succeeded (403 only blocks main). Opened PR #498. Closed PR #493 as superseded. Board updated on main via push_files.
-  - Key lesson: git push to feature branches works; 403 only applies to main. Use git push for branches, push_files API only for main.
-  - Post-session: A parallel session later merged PR #493 (0426ef5), then continued with MMMMM (#494), NNNNN (#495), OOOOO (#496), PPPPP (#497) — all merged before run 158 started.
-- **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring); direct git push to main 403 (feature branches pushable via git).
-- **Next run priority**:
-  - Merge LLLLL (PR #498) if CI green. Then MMMMM candidates: (a) cast explanation `candidatesInFocusCount: number` — how many of the scored candidates were in-focus; (b) `/api/v1/health` ok body `ledgerOk: true` when `systemHealth.ledgerStatus === 'ok'` (symmetric to ledgerWarn).
-
-### 2026-06-15 (run 158a — parallel)
-- **Workstream**: QQQQQ — `cast explanation.focusRankPercentile: number`
-- **Branch/PR**: `auto/QQQQQ-cast-explain-focus-rank-percentile` → PR #501 🔄 CI in_progress
-- **Build**: clean | **Tests**: 1497/0/2 (+8 QQQQQ from 1489 PPPPP baseline)
-- **What was done**:
-  - Startup: git fetch + reset to origin/main (999e600). npm ci clean, build clean, 1489/0/2 (PPPPP merged).
-  - Discovered: main had advanced past board's LLLLL-in-progress note — parallel sessions had merged LLLLL (#493 0426ef5), MMMMM (#494 75155c5), NNNNN (#495 df640e0), OOOOO (#496 a64d80c), PPPPP (#497 4ec2ee8). Board corrected (LLLLL–PPPPP all DONE).
-  - PR #498 closed as stale duplicate (LLLLL already done via #493).
-  - QQQQQ: `explanation.focusRankPercentile = focusRank / candidateCount`, [0,1] normalized pre-focus rank. Added to `buildCastExplanation` inside `focusRank !== undefined` guard alongside `focusRank` and `focusRankDelta`. Tool description updated. 8 new tests (present/absent/bounds/identity/edge cases/description).
-  - CodeRabbit + Codex rate-limited (recurring — no action).
-- **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring); direct git push to main 403 (feature branches pushable via git).
-- **Additional discoveries (late run 158)**:
-  - QQQQQ: PR #499 (outOfFocusWinnerGap) merged by parallel session at ac28f50 before this run's PR #501 was created. PR #501 (focusRankPercentile) conflicted on aggregator.ts → closed as stale.
-  - RRRRR: Implemented focusRankPercentile as RRRRR. PR #502 ✅ MERGED (a8381be). 1505/0/2.
-  - Codex + CodeRabbit rate-limited on PR #502 (recurring — no action).
-- **Final tests**: 1505/0/2
-- **Next run priority**:
-  - SSSSS candidates: (a) cast explanation `runnerUpServer: string` — server ID of the runner-up tool (parallel to `winnerServer`, present when runner-up exists); (b) cast explanation `winnerCategory: string` — category of the winning server; (c) cast explanation `inFocusWinnerGap: number` — score gap between winner and best in-focus non-winner candidate.
-
-### 2026-06-15 (run 158b — parallel)
-- **Workstream**: MMMMM — `cast explanation.candidatesInFocusCount: number`
-- **Branch/PR**: `auto/MMMMM-cast-explain-candidates-in-focus-count` → PR #494 ✅ MERGED (75155c5)
-- **Build**: clean | **Tests**: 1465/0/2 (+8 MMMMM from 1457 LLLLL baseline)
-- **What was done**:
-  - Startup: pulled main (0426ef5 = LLLLL merge). Build clean, 1457/0/2.
-  - Board: LLLLL confirmed DONE (0426ef5). SHA placeholder updated; run-157 PR status updated to MERGED.
-  - MMMMM: `src/aggregator.ts` `buildCastExplanation` — added `candidatesInFocusCount: scoredTools.filter((t) => isInFocus(focus, t)).length` in the `best !== undefined` focus guard. Tool description updated.
-  - `test/mmmmm-cast-explain-candidates-in-focus-count.test.ts`: 8 new tests (present, ≥0, ≤candidateCount, all-out-of-focus=0, all-in-focus=candidateCount, no_match absent, no-focus absent, description).
-  - PR #494 opened; 3/3 CI green; merged (75155c5). CodeRabbit rate-limited (recurring).
-  - NNNNN: `src/aggregator.ts` `buildCastExplanation` — added `inFocusFraction: scoredTools.filter(...).length / scoredTools.length` inside `scoredTools.length > 0` guard. Tool description updated.
-  - `test/nnnnn-cast-explain-in-focus-fraction.test.ts`: 8 new tests (present, [0,1] range, identity, all-out=0, all-in=1, no_match absent, no-focus absent, description).
-  - PR #495 opened; 3/3 CI green; merged (df640e0). CodeRabbit rate-limited (recurring).
-  - OOOOO: `/api/v1/health` ok body `ledgerOk: true` — added to http-server.ts + CLAUDE.md updated. PR #496 ✅ MERGED (a64d80c).
-  - PPPPP: `cast explanation.topOutOfFocusScore: number` — PR #497 ✅ MERGED (4ec2ee8).
-- **Blockers (unchanged)**: Notion 401, ledger DLQ 11 entries, CI 0-jobs (non-CodeQL, recurring).
-- **Next run priority**:
-  - Merge QQQQQ (PR #499 outOfFocusWinnerGap + PR #500 inFocusTopScore) if CI green. Then RRRRR candidates: (a) cast explanation `focusScoreSpread: number` — range of in-focus candidate scores (max - min); (b) cast explanation `inFocusWinnerGap: number` — score gap between winner and best in-focus non-winner.
-
-### 2026-06-15 (run 159a — parallel)
-- **Workstream**: PPPPP ✅ merged + QQQQQ `outOfFocusWinnerGap` → PR #499 ✅ MERGED (ac28f50)
-- **Build**: clean | **Tests**: 1497/0/2 (+8 from 1489 PPPPP baseline)
-- **What was done**:
-  - Merged PR #497 (PPPPP — topOutOfFocusScore) via squash → 4ec2ee8. Pulled main (1489/0/2).
-  - QQQQQ: `buildCastExplanation` — added `outOfFocusWinnerGap: best!.score - topOutOfFocusScore` alongside `topOutOfFocusScore`. `test/qqqqq-cast-explain-out-of-focus-winner-gap.test.ts`: 8 new tests.
-  - PR #499 opened + merged → ac28f50. CodeRabbit/Codex rate-limited (recurring).
-
-### 2026-06-15 (run 159b — this session)
-- **Workstream**: SSSSS `inFocusTopScore` → PR #500 ✅ MERGED (9a4f42c)
-- **Build**: clean | **Tests**: 1515/0/2 (after rebase onto main with RRRRR=focusRankPercentile + board commits)
-- **What was done**:
-  - Startup: DRIVER-BOARD.md restored from compacted summary. OOOOO (PR #496, a64d80c), PPPPP (PR #497, 4ec2ee8) both confirmed merged.
-  - QQQQQ→SSSSS: QQQQQ (outOfFocusWinnerGap, PR #499) and RRRRR (focusRankPercentile, PR #502) both already merged by parallel sessions. Our addition is `inFocusTopScore` — labeled SSSSS going forward.
-  - `src/aggregator.ts` `buildCastExplanation` — added `inFocusTopScore` computed as max score among in-focus scoredTools; `...(inFocusTopScore !== undefined ? { inFocusTopScore } : {})` in focus guard. Tool description updated.
-  - `test/qqqqq-cast-explain-in-focus-top-score.test.ts`: 8 new tests. QQQQQ-4 fix: shared keyword "billing" ensures neon scores > 0.1 threshold.
-  - Rebased 3× onto advancing main; resolved conflicts each time. PR #500 merged → 9a4f42c.
-
-### 2026-06-15 (run 159c — this session, TTTTT)
-- **Workstream**: TTTTT `runnerUpServer` → PR #503 🔄 CI running
-- **Build**: clean | **Tests**: 1513/0/2 (+8 TTTTT from 1505 RRRRR baseline)
-- **What was done**:
-  - SSSSS (PR #500) confirmed merged at 9a4f42c.
-  - TTTTT: `src/aggregator.ts` line 1843 — added `runnerUpServer: topCandidates[1].tool.split('/')[0]` alongside `runnerUpScore` and `runnerUpTool` in the runner-up spread. Tool description updated to document runnerUpServer.
-  - `test/ttttt-cast-explain-runner-up-server.test.ts`: 8 new tests (present, non-empty string, equals runnerUpTool.split('/')[0], absent on no_match, absent single candidate, present without focus, present with focus, description).
-  - PR #503 opened; CI in_progress.
-- **Next run priority**:
-  - Merge TTTTT (PR #503) if CI green. Then UUUUU candidates: (a) cast explanation `winnerCategory: string`; (b) cast explanation `inFocusWinnerGap: number`.
+  - Merge UUUUU (PR #505) if CI green. Then VVVVV candidates: (a) cast explanation `runnerUpCategory: string` — category of the runner-up tool's server (symmetric to winnerCategory); (b) cast explanation `inFocusWinnerGap: number` — score gap between winner and best in-focus non-winner candidate.
