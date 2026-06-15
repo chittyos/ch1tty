@@ -102,7 +102,8 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **BBBBBB** — cast explanation.lowestCandidateScore: number — score of the weakest candidate in the full pool. Identity: winnerScore - lowestCandidateScore === candidateScoreSpread. Present when >= 2 candidates. PR #512 ✅ MERGED (5749f4f, 2026-06-15). 9 new tests, 1586/0/2. DONE.
 - [x] **CCCCCC** — cast explanation.winnerFocusBoostRatio: number — fraction of winner's total score from focus boost (winnerFocusBoost / winnerScore), [0,1]. Present when focus active + winner exists + winnerScore > 0. PR #513 ✅ MERGED (4eae278, 2026-06-15). 8 new tests, 1594/0/2. DONE.
 - [x] **DDDDDD** — cast explanation.topCandidatesScoreVariance: number — variance of topCandidates scores (sum of squared deviations from mean, divided by N). Present when >= 2 topCandidates. Absent on no_match or single candidate. PR #514 ✅ MERGED (4787dec, 2026-06-15). 8 new tests, 1602/0/2. DONE.
-- [ ] **EEEEEE** — cast explanation.runnerUpInFocus: boolean — whether the runner-up tool's server or category matches the active focus profile. Present when focus active + runner-up exists (same conditions as focusDecisive/focusMargin). Absent when no focus, no_match, or < 2 candidates. Symmetric to winnerInFocus. PR #515 (2026-06-15).
+- [x] **EEEEEE** — cast explanation.runnerUpInFocus: boolean — whether the runner-up tool's server or category matches the active focus profile. Present when focus active + runner-up exists (same conditions as focusDecisive/focusMargin). Absent when no focus, no_match, or < 2 candidates. Symmetric to winnerInFocus. PR #515 ✅ MERGED (444b18c, 2026-06-15). 8 new tests, 1610/0/2. DONE.
+- [ ] **FFFFFF** — cast explanation.runnerUpFocusBoost: number — exact additive focus boost applied to runner-up (equals focusBoost when runnerUpInFocus; 0 otherwise). Present when focus active + runner-up exists. Absent when no focus, no_match, or < 2 candidates. Symmetric to winnerFocusBoost. In progress (2026-06-15).
 
 ## Blockers
 
@@ -226,3 +227,14 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - `test/eeeeee-cast-explain-runner-up-in-focus.test.ts`: 8 new tests. Build clean. 1602/0/2.
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**: Merge DDDDDD (#514) then EEEEEE (#515). Then FFFFFF — `runnerUpFocusBoost: number`.
+
+### 2026-06-15 (run 162 — FFFFFF)
+- **Workstream**: A (gateway observability) — FFFFFF: `cast explanation.runnerUpFocusBoost: number`
+- **Branch/PR**: `auto/FFFFFF-cast-explain-runner-up-focus-boost` → PR TBD
+- **Build**: clean | **Tests**: 1618/0/2 (+8 FFFFFF from 1610 EEEEEE baseline)
+- **What was done**:
+  - Startup: merged DDDDDD (#514 → 4787dec) then EEEEEE (#515 → 444b18c). Conflict resolution: rebased PR #515 branch onto main after #514 squash, resolved aggregator.ts (keep both description strings) and DRIVER-BOARD.md (DDDDDD DONE + EEEEEE entry).
+  - FFFFFF: `src/aggregator.ts` `buildCastExplanation` — added `runnerUpFocusBoost: isInFocus(focus!, scoredTools[1]) ? focusBoost : 0` alongside `runnerUpInFocus` in the `best !== undefined && topCandidates.length > 1` focus block. Tool description updated.
+  - `test/ffffff-cast-explain-runner-up-focus-boost.test.ts`: 8 new tests. Build clean. 1618/0/2.
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
+- **Next run priority**: Merge FFFFFF (PR to be opened). Then GGGGGG — `runnerUpScoreBase: number` (runner-up score before focus boost; runnerUpScore - runnerUpFocusBoost) to complete the runner-up score decomposition parallel to winnerScoreBase.
