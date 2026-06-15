@@ -107,6 +107,8 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **GGGGGG** — cast explanation.runnerUpScoreBase: number — runner-up's relevance score before active focus boost was applied (runnerUpScore - runnerUpFocusBoost). Identity: runnerUpScoreBase + runnerUpFocusBoost = runnerUpScore. Symmetric to winnerScoreBase. PR merged via parallel session (201303e, 2026-06-15). 8 new tests, 1626/0/2. DONE.
 - [x] **HHHHHH** — cast explanation.topCandidatesScoreStdDev: number — standard deviation of topCandidates scores (sqrt of topCandidatesScoreVariance). Same units as scores, same presence conditions as topCandidatesScoreVariance. PR #521 ✅ MERGED (2026-06-15). 8 new tests, 1634/0/2. DONE.
 - [x] **HHHHHH** (b) — cast explanation.runnerUpFocusBoostRatio: number — fraction of runner-up's total score from focus boost (runnerUpFocusBoost / runnerUpScore), [0,1]. Present when focus active + runner-up exists + runnerUpScore > 0. Absent when no focus, no_match, < 2 candidates, or runnerUpScore === 0. PR #522 ✅ MERGED (2026-06-15). 8 new tests, 1642/0/2. DONE.
+- [x] **IIIIII** — cast explanation.inFocusMeanScore: number — arithmetic mean score of in-focus candidates. Same presence conditions as inFocusTopScore. PR #523 ✅ MERGED (2026-06-15). 8 new tests, 1650/0/2. DONE.
+- [ ] **JJJJJJ** — cast explanation.rawFocusMargin: number — winnerScoreBase - runnerUpScoreBase (unfocused score gap, strips focus boost from both sides). Present when focus active + runner-up exists. Can be negative when focus reversed ranking. In progress (2026-06-15).
 
 ## Blockers
 
@@ -261,3 +263,17 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Build**: clean | **Tests**: 1634/0/2 (+8 from 1626 GGGGGG baseline)
 - **What was done**: Parallel session with #521; both labeled HHHHHH. Added runnerUpFocusBoostRatio in focus+runner-up block.
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
+
+### 2026-06-15 (run 164 — JJJJJJ)
+- **Workstream**: A (gateway observability) — merged HHHHHH (#521, #522) + IIIIII (#523); created JJJJJJ: `cast explanation.rawFocusMargin: number`
+- **Branch/PR**: `auto/JJJJJJ-cast-explain-raw-focus-margin` → PR TBD
+- **Build**: clean | **Tests**: 1658/0/2 (+8 JJJJJJ from 1650 IIIIII baseline)
+- **What was done**:
+  - Startup: npm ci clean, build clean, 1626/0/2 on main (GGGGGG HEAD 9d02bc2). Board read from DRIVER-BOARD.md (Notion 401 — recurring).
+  - Merged HHHHHH topCandidatesScoreStdDev (PR #521) via local squash + conflict resolution in DRIVER-BOARD.md. Tests: 1634/0/2.
+  - Merged HHHHHH(b) runnerUpFocusBoostRatio (PR #522) via local squash + conflict resolution in DRIVER-BOARD.md + aggregator.ts (kept both description lines). Tests: 1642/0/2.
+  - Merged IIIIII inFocusMeanScore (PR #523) via local squash (no conflicts — clean auto-merge). Tests: 1650/0/2.
+  - JJJJJJ: `src/aggregator.ts` `buildCastExplanation` — added `rawFocusMargin: (best.score - winnerFocusBoost) - (runnerUpScore - runnerUpFocusBoost)` alongside `runnerUpScoreBase` in the focus+runner-up block. Tool description documents presence, identity, and negative-when-focus-reversed semantics.
+  - `test/jjjjjj-cast-explain-raw-focus-margin.test.ts`: 8 new tests covering presence, value equality, identity, negative-when-decisive, absent-no-focus, absent-no_match, absent-single-candidate, description.
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
+- **Next run priority**: Merge JJJJJJ (PR to be opened). Then KKKKKK — candidate `rawFocusMarginRatio: number` (rawFocusMargin / winnerScoreBase when winnerScoreBase > 0 — relative unfocused margin; or `inFocusStdDev` for the in-focus pool score distribution).
