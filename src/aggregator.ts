@@ -370,8 +370,8 @@ export class Aggregator {
           'explanation also includes focusConfidence: number — focusBias clamped to [0,1]. Same presence conditions as focusBias (active focus, runner-up exists, focusMargin non-zero, best tool exists). A value of 0 means focus contributed nothing to the margin (winner was out-of-focus); a value of 1 means focus was at least fully decisive (focusBias ≥ 1). Unlike focusBias which can exceed 1 when the boost outweighs the margin, focusConfidence is always in [0,1] and can be read directly as a percentage confidence that focus drove the decision. ' +
           'explanation also includes winnerServer: string — the server ID of the winning tool (the segment before the "/" in its namespaced name, e.g. "neon" from "neon/query_database"). Absent on no_match (no winner). Lets operators identify which backend resolved the intent without parsing the tool name. ' +
           'explanation also includes focusRank: number — the 1-based rank the winning tool would hold if the focus boost were removed (i.e. its position in pre-focus descending score order). Present when a focus profile is active and a winner exists. A value of 1 means the winner was already the top candidate without focus (focus did not change the outcome); a value of 2 means focus promoted the winner from 2nd to 1st; and so on. Consistent with focusDecisive: when focusDecisive is false and a runner-up exists, focusRank is always 1. ' +
+          'explanation also includes focusRankDelta: number — the number of positions focus moved the winning tool up in the pre-focus ranking (focusRank - 1). Present under the same conditions as focusRank (focus active, winner exists). A value of 0 means focus did not change the winner\'s rank (it was already the top candidate); a value of 1 means focus promoted the winner by one position (from 2nd to 1st); and so on. Convenient shorthand for focusRank - 1 so callers need not subtract. ' +
           'explanation also includes unfocusedWinner: string — the namespaced tool name that would have won if the active focus boost were removed (the tool at rank 1 in pre-focus descending score order). Present only when a focus profile is active, a winner exists, and the pre-focus leader differs from the actual winner (i.e. focus changed the top spot). Absent when no focus is active, on no_match, or when the winner was already the top candidate without focus (focusRank === 1). Lets operators see exactly which tool was displaced by the focus boost. ' +
-          'explanation also includes focusRankDelta: number — the number of positions the active focus boost promoted the winning tool in the pre-focus ranking (focusRank - 1). Present whenever focusRank is present (focus active and a winner exists). A value of 0 means the winner was already the top candidate before focus was applied (no promotion occurred); a value of 1 means focus moved the winner up one position (from 2nd to 1st); a value of 2 means two positions; and so on. Lets operators quantify how aggressively focus intervened in the selection without interpreting the raw rank. ' +
           'Sub-meta to master-meta — the gateway calling itself.',
         inputSchema: {
           type: 'object',
@@ -1797,6 +1797,9 @@ function buildCastExplanation(
   const focusRank: number | undefined =
     preFocusSorted !== undefined ? preFocusSorted.findIndex((t) => t.n === best!.namespacedName) + 1 : undefined;
 
+  // Number of positions focus moved the winner up (focusRank - 1); 0 means no change in rank.
+  const focusRankDelta: number | undefined = focusRank !== undefined ? focusRank - 1 : undefined;
+
   // Tool that would have won without the focus boost; absent when same as winner (focus didn't change top spot).
   const unfocusedWinner: string | undefined =
     preFocusSorted !== undefined && preFocusSorted.length > 0 && preFocusSorted[0].n !== best!.namespacedName
@@ -1830,7 +1833,7 @@ function buildCastExplanation(
       focus: focusName,
       focusBoost,
       winnerInFocus,
-      ...(best !== undefined ? { winnerFocusBoost: winnerInFocus ? focusBoost : 0, ...(focusRank !== undefined ? { focusRank, focusRankDelta: focusRank - 1 } : {}), ...(unfocusedWinner !== undefined ? { unfocusedWinner } : {}) } : {}),
+      ...(best !== undefined ? { winnerFocusBoost: winnerInFocus ? focusBoost : 0, ...(focusRank !== undefined ? { focusRank, focusRankDelta } : {}), ...(unfocusedWinner !== undefined ? { unfocusedWinner } : {}) } : {}),
       ...(best !== undefined && topCandidates.length > 1 ? {
         focusDecisive: (best.score - (winnerInFocus ? focusBoost : 0)) < topCandidates[1].score,
         focusMargin: best.score - topCandidates[1].score,
