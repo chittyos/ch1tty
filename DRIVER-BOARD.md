@@ -340,17 +340,17 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 ### 2026-06-15 (run 170 — PPPPPP) ✅ COMPLETE
 - **Workstream**: A (gateway observability) — PPPPPP: `cast explanation.candidateScoreEntropy: number`
-- **Branch/PR**: `auto/PPPPPP-cast-explain-candidate-score-entropy` → PR #534
+- **Branch/PR**: `auto/PPPPPP-cast-explain-candidate-score-entropy` → PR #534 ✅ MERGED (0625d668)
 - **Build**: clean | **Tests**: 1650/0/2 (+8 PPPPPP from 1642 OOOOOO baseline)
+
+### 2026-06-15 (run 171 — QQQQQQ) ✅ COMPLETE
+- **Workstream**: A (gateway observability) — QQQQQQ: `cast explanation.topCandidatesGiniCoefficient: number`
+- **Branch/PR**: `auto/QQQQQQ-cast-explain-top-candidates-gini-coefficient` → PR #535 ✅ MERGED (a98ee7ab)
+- **Build**: clean | **Tests**: 1658/0/2 (+8 QQQQQQ from 1650 PPPPPP baseline)
 - **What was done**:
-  - Startup: main at 0d4c4be2 (OOOOOO focusMarginRatio merged). Added candidateScoreEntropy: Shannon entropy H = -sum(p_i*log2(p_i)) over all scoredTools. Precomputed variable; wired into topCandidates.length > 1 block.
-  - Description line added after topCandidatesMeanScore. 8 new tests (PPPPPP-1..8). All pass.
-  - PR #534 opened; CI 3/3 green; merged.
+  - Startup: main at 0625d668 (PPPPPP candidateScoreEntropy merged). GitHub MCP token recovered (was expired ~23:00 UTC run 170 — now resolved).
+  - QQQQQQ: added topCandidatesGiniCoefficient: Gini of topCandidates pool. Precomputed IIFE variable (sort ascending, G = (2·Σ(i+1)·s[i] / (n·total)) - (n+1)/n). Wired into topCandidates.length > 1 block alongside topCandidatesScoreStdDev. Description added after topCandidatesScoreStdDev.
+  - 8 new tests (QQQQQQ-1..8). All pass. PR #535 merged.
   - CodeRabbit + Codex rate-limited (recurring — no action).
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
-- **Next run priority**: QQQQQQ — `topCandidatesGiniCoefficient: number` (Gini coefficient of topCandidates scores — measures inequality/concentration within the top-5 pool; 0 = equal scores, 1 = one dominant tool).
-
-## ⚠️ BLOCKER (run 170): GitHub MCP token expired at ~23:00 UTC
-- GitHub MCP server returning "token expired" — all API calls (CI check, merge) failing.
-- PR #534 (PPPPPP candidateScoreEntropy) is open and awaiting merge.
-- Next run: check if token is restored, then merge PR #534 and continue with QQQQQQ.
+- **Next run priority**: RRRRRR — `scoreDominanceIndex: number` (winner's share of total candidate score mass: winnerScore / totalCandidateScore; present when winner exists and totalScore > 0).
