@@ -90,7 +90,8 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **PPPPP** — cast explanation.topOutOfFocusScore: number — highest relevance score among out-of-focus candidates. Present when focus active, winner exists, and at least one out-of-focus candidate exists. PR #497 ✅ MERGED (4ec2ee8, 2026-06-15). 8 new tests, 1489/0/2. DONE.
 - [x] **QQQQQ** — cast explanation.outOfFocusWinnerGap: number — score gap between winner and best out-of-focus candidate (winnerScore - topOutOfFocusScore). Present under same conditions as topOutOfFocusScore. PR #499 ✅ MERGED (ac28f50, 2026-06-15, parallel session). 8 new tests, 1497/0/2. DONE. (PR #501 closed run 158 — stale duplicate with different impl; parallel session's #499 merged first.)
 - [x] **RRRRR** — cast explanation.focusRankPercentile: number — normalized pre-focus rank (focusRank / candidateCount), [0,1]. Identity: focusRankPercentile * candidateCount === focusRank. PR #502 ✅ MERGED (a8381be, run 158, 2026-06-15). 8 new tests, 1505/0/2. DONE.
-- [ ] **SSSSS** — cast explanation.inFocusTopScore: number — highest relevance score among in-focus candidates. Present when focus active, winner exists, at least one in-focus candidate scored > 0.1. PR #500 🔄 CI awaiting (run 159b, 2026-06-15).
+- [x] **SSSSS** — cast explanation.inFocusTopScore: number — highest relevance score among in-focus candidates. Present when focus active, winner exists, at least one in-focus candidate scored > 0.1. PR #500 ✅ MERGED (9a4f42c, run 159b, 2026-06-15). 8 new tests, 1513/0/2. DONE.
+- [ ] **TTTTT** — cast explanation.runnerUpServer: string — server ID of runner-up tool (segment before "/" in namespaced name). Present when winner + runner-up exist. Absent on no_match or single candidate. PR #503 🔄 CI running (run 159c, 2026-06-15).
 
 ## Blockers
 
@@ -320,14 +321,22 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - PR #499 opened + merged → ac28f50. CodeRabbit/Codex rate-limited (recurring).
 
 ### 2026-06-15 (run 159b — this session)
-- **Workstream**: SSSSS `inFocusTopScore` → PR #500 🔄 CI awaiting (rebased onto 3d113b3)
+- **Workstream**: SSSSS `inFocusTopScore` → PR #500 ✅ MERGED (9a4f42c)
 - **Build**: clean | **Tests**: 1515/0/2 (after rebase onto main with RRRRR=focusRankPercentile + board commits)
 - **What was done**:
   - Startup: DRIVER-BOARD.md restored from compacted summary. OOOOO (PR #496, a64d80c), PPPPP (PR #497, 4ec2ee8) both confirmed merged.
   - QQQQQ→SSSSS: QQQQQ (outOfFocusWinnerGap, PR #499) and RRRRR (focusRankPercentile, PR #502) both already merged by parallel sessions. Our addition is `inFocusTopScore` — labeled SSSSS going forward.
   - `src/aggregator.ts` `buildCastExplanation` — added `inFocusTopScore` computed as max score among in-focus scoredTools; `...(inFocusTopScore !== undefined ? { inFocusTopScore } : {})` in focus guard. Tool description updated.
   - `test/qqqqq-cast-explain-in-focus-top-score.test.ts`: 8 new tests. QQQQQ-4 fix: shared keyword "billing" ensures neon scores > 0.1 threshold.
-  - Rebased 3× onto advancing main; resolved conflicts each time preserving outOfFocusWinnerGap + focusRankPercentile from merged PRs alongside inFocusTopScore.
-  - Force-pushed to origin; CI started on 98ce9dd → rebased again onto 3d113b3; force-pushed 98ce9dd.
+  - Rebased 3× onto advancing main; resolved conflicts each time. PR #500 merged → 9a4f42c.
+
+### 2026-06-15 (run 159c — this session, TTTTT)
+- **Workstream**: TTTTT `runnerUpServer` → PR #503 🔄 CI running
+- **Build**: clean | **Tests**: 1513/0/2 (+8 TTTTT from 1505 RRRRR baseline)
+- **What was done**:
+  - SSSSS (PR #500) confirmed merged at 9a4f42c.
+  - TTTTT: `src/aggregator.ts` line 1843 — added `runnerUpServer: topCandidates[1].tool.split('/')[0]` alongside `runnerUpScore` and `runnerUpTool` in the runner-up spread. Tool description updated to document runnerUpServer.
+  - `test/ttttt-cast-explain-runner-up-server.test.ts`: 8 new tests (present, non-empty string, equals runnerUpTool.split('/')[0], absent on no_match, absent single candidate, present without focus, present with focus, description).
+  - PR #503 opened; CI in_progress.
 - **Next run priority**:
-  - Merge PR #500 (inFocusTopScore) if CI green. Then TTTTT candidates: (a) cast explanation `runnerUpServer: string`; (b) cast explanation `winnerCategory: string`; (c) cast explanation `inFocusWinnerGap: number`.
+  - Merge TTTTT (PR #503) if CI green. Then UUUUU candidates: (a) cast explanation `winnerCategory: string`; (b) cast explanation `inFocusWinnerGap: number`.
