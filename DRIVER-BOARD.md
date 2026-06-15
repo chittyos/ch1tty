@@ -354,3 +354,23 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - CodeRabbit + Codex rate-limited (recurring — no action).
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**: RRRRRR — `scoreDominanceIndex: number` (winner's share of total candidate score mass: winnerScore / totalCandidateScore; present when winner exists and totalScore > 0).
+
+### 2026-06-15 (runs 172–174 — RRRRRR/SSSSSS/TTTTTT) ✅ COMPLETE (board not updated at run time)
+- **Workstream**: A (gateway observability) — RRRRRR: `scoreDominanceIndex`, SSSSSS: `candidateGiniCoefficient`, TTTTTT: `topCandidatesScoreSkewness`
+- **Branch/PR**: PR #536 ✅ MERGED (717b37c) | PR #537 ✅ MERGED (43fd553) | PR #538 ✅ MERGED (ee3568f)
+- **Build**: clean | **Tests**: 1666/0/2 → 1674/0/2 → 1682/0/2 (actual main at TTTTTT: 1740/0/2 — apps tests included)
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
+- **Next run priority**: UUUUUU — `focusNetBoostDelta: number` (winnerFocusBoost - runnerUpFocusBoost; closes focus margin triangle: focusMargin = rawFocusMargin + focusNetBoostDelta). PR #529 (KKKKKK label, stale base) is superseded by UUUUUU.
+
+### 2026-06-15 (run 175 — UUUUUU) ✅ COMPLETE
+- **Workstream**: A (gateway observability) — UUUUUU: `cast explanation.focusNetBoostDelta: number`
+- **Branch/PR**: `auto/UUUUUU-cast-explain-focus-net-boost-delta` → PR TBD
+- **Build**: clean | **Tests**: 1748/0/2 (+8 UUUUUU from 1740 TTTTTT baseline)
+- **What was done**:
+  - Startup: main at ee3568f (TTTTTT topCandidatesScoreSkewness merged). Found divergence: local main at 5570c53 (unpushed test-coverage commits), remote main at ee3568f. Worked from origin/main.
+  - Discovered PR #529 (focusNetBoostDelta, KKKKKK label, stale base a98ee7ab) open but superseded. Created fresh UUUUUU branch from TTTTTT.
+  - Added focusNetBoostDelta: winnerFocusBoost − runnerUpFocusBoost. Wired after rawFocusMarginRatio in focus+runner-up block. Description added after rawFocusMarginRatio. Identity: focusMargin = rawFocusMargin + focusNetBoostDelta.
+  - 8 new tests (UUUUUU-1..8) in test/uuuuuu-cast-explain-focus-net-boost-delta.test.ts. All pass.
+  - Gateway status: ledger DLQ 11 entries (degraded — upstream ledger.chitty.cc unreachable; not a code bug).
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (11 entries, upstream). CI 0-jobs (non-CodeQL, recurring). PR #529 to be closed (superseded by UUUUUU).
+- **Next run priority**: VVVVVV — `focusNetBoostRatio: number` (focusNetBoostDelta / focusBoost: +1 when winner in-focus and runner-up out, 0 when same state, −1 when runner-up in-focus and winner out; normalised sign indicator of the boost differential direction).
