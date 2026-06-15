@@ -107,6 +107,8 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **GGGGGG** — cast explanation.runnerUpScoreBase: number — runner-up's relevance score before active focus boost was applied (runnerUpScore - runnerUpFocusBoost). Identity: runnerUpScoreBase + runnerUpFocusBoost = runnerUpScore. Symmetric to winnerScoreBase. PR merged via parallel session (201303e, 2026-06-15). 8 new tests, 1626/0/2. DONE.
 - [x] **HHHHHH** — cast explanation.topCandidatesScoreStdDev: number — standard deviation of topCandidates scores (sqrt of topCandidatesScoreVariance). Same units as scores, same presence conditions as topCandidatesScoreVariance. PR #521 ✅ MERGED (2026-06-15). 8 new tests, 1634/0/2. DONE.
 - [x] **HHHHHH** (b) — cast explanation.runnerUpFocusBoostRatio: number — fraction of runner-up's total score from focus boost (runnerUpFocusBoost / runnerUpScore), [0,1]. Present when focus active + runner-up exists + runnerUpScore > 0. Absent when no focus, no_match, < 2 candidates, or runnerUpScore === 0. PR #522 ✅ MERGED (2026-06-15). 8 new tests, 1642/0/2. DONE.
+- [x] **IIIIII** — cast explanation.inFocusMeanScore: number — arithmetic mean relevance score of all in-focus candidates. Present when focus active + winner exists + at least one in-focus candidate. Identity: inFocusMeanScore <= inFocusTopScore. Batch-merged to main (919fc4b, 2026-06-15). 8 new tests, 1650/0/2. DONE.
+- [ ] **JJJJJJ** — cast explanation.outOfFocusMeanScore: number — arithmetic mean relevance score of all out-of-focus candidates. Symmetric to inFocusMeanScore. Present when focus active + winner exists + at least one out-of-focus candidate. Identity: outOfFocusMeanScore <= topOutOfFocusScore. In progress (2026-06-15).
 
 ## Blockers
 
