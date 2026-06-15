@@ -401,3 +401,9 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Branch/PR**: `auto/WWWWWW-cast-explain-candidate-score-std-dev` → PR TBD
 - **Build**: clean | **Tests**: 1706/0/2 (+8 WWWWWW from 1698 VVVVVV baseline)
 - **What was done**: Added candidateScoreStdDev: sqrt(candidateScoreVariance). Derived directly from the precomputed candidateScoreVariance — no extra loop. Full-pool parallel to topCandidatesScoreStdDev. Identity: candidateScoreStdDev^2 === candidateScoreVariance. Equals topCandidatesScoreStdDev when candidateCount <= 5. 8 new tests.
+
+### 2026-06-15 (run 178 — XXXXXX) ✅ COMPLETE
+- **Workstream**: A (gateway observability) — XXXXXX: `cast explanation.candidateScoreMean: number`
+- **Branch/PR**: `auto/XXXXXX-cast-explain-candidate-score-mean` → PR TBD
+- **Build**: clean | **Tests**: 1714/0/2 (+8 XXXXXX from 1706 WWWWWW baseline)
+- **What was done**: Added candidateScoreMean: totalCandidateScore / candidateCount. Reuses candidateScoreEntropyTotal (no extra loop). Full-pool parallel to topCandidatesMeanScore. Always <= winnerScore. Equals topCandidatesMeanScore when candidateCount <= 5. 8 new tests.
