@@ -80,6 +80,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **FFFFF** — cast explanation.focusBias: number — fraction of winner-runner-up margin attributable to focus boost (winnerFocusBoost / focusMargin). Absent when focusMargin === 0 (division-by-zero guard), no runner-up, focus inactive, or no_match. PR #483 ✅ MERGED (b697884, run 151, 2026-06-15). 8 new tests, 1409/0/2. DONE.
 - [x] **GGGGG** — cast explanation.focusConfidence: number — focusBias clamped to [0,1]. Same presence conditions as focusBias. Unlike focusBias (can exceed 1), focusConfidence is always [0,1] — a clean percentage of focus attribution. PR #485 ✅ MERGED (1e9407a, run 152, 2026-06-15). 8 new tests, 1417/0/2. DONE.
 - [x] **HHHHH** — cast explanation.winnerServer: string — server ID of the winning tool (segment before "/" in namespaced name, e.g. "neon" from "neon/query_database"). Absent on no_match. Present regardless of focus. Lets operators identify which backend resolved the intent without parsing the tool name. PR #486 ✅ MERGED (1e07a00, run 153, 2026-06-15). 8 new tests, 1425/0/2. DONE.
+- [ ] **IIIII** — cast explanation.focusRank: number — 1-based rank the winning tool would hold if focus boost were removed. focusRank===1 → winner led pre-focus; focusRank===2 → focus promoted from 2nd; etc. Absent when no focus or no_match. Consistent with focusDecisive. PR #488 (open, CI in_progress, run 154, 2026-06-15). 8 new tests, 1433/0/2.
 
 ## Blockers
 
@@ -202,3 +203,17 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**:
   - Merge HHHHH (PR #486) if CI green. Then IIIII candidates: (a) cast explanation `focusRank: number` — winner's 1-based rank before focus boost re-sort; (b) cast explanation `unfocusedWinner: string` — the tool that would have won without focus (absent when same as winner); (c) `/api/v1/health` ok body `ledgerOk: true` for symmetric completeness.
+
+### 2026-06-15 (run 154)
+- **Workstream**: IIIII — `cast explanation.focusRank: number`
+- **Branch/PR**: `auto/IIIII-cast-explain-focus-rank` → PR #488 (open, CI in_progress)
+- **Build**: clean | **Tests**: 1433/0/2 (+8 IIIII from 1425 HHHHH baseline)
+- **What was done**:
+  - Startup: npm ci clean, build clean, 1425/0/2 on main. No open PRs (HHHHH #486 + board #487 already merged).
+  - Board read from DRIVER-BOARD.md (Notion 401 — recurring). HHHHH confirmed done, IIIII selected.
+  - IIIII: `src/aggregator.ts` `buildCastExplanation` — computed `focusRank` pre-return by mapping scoredTools to pre-focus scores (subtracting focusBoost from in-focus tools), sorting descending, finding winner's 1-based index. Added `...(focusRank !== undefined ? { focusRank } : {})` inside `best !== undefined` guard within `focusName` spread. Tool description updated.
+  - `test/iiiii-cast-explain-focus-rank.test.ts`: 8 new tests (rank-1 already-led, rank-2 focus-promoted, no_match absent, no-focus absent, always-int≥1, consistent-with-focusDecisive, out-of-focus-winner→rank-1, description).
+  - CodeRabbit rate-limited (no action — recurring). CI 2/2 CodeQL queued at run end.
+- **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring).
+- **Next run priority**:
+  - Merge IIIII (PR #488) if CI green. Then JJJJJ candidates: (a) cast explanation `unfocusedWinner: string` — namespaced tool that would have won without focus boost (absent when same as winner or no focus); (b) `/api/v1/health` ok body `ledgerOk: true` when `systemHealth.ledgerStatus === 'ok'`; (c) cast explanation `focusRankDelta: number` — `focusRank - 1` (how many positions focus moved the winner up; 0 = no change).
