@@ -240,15 +240,15 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**: Merge FFFFFF (PR to be opened). Then GGGGGG — `runnerUpScoreBase: number` (runner-up score before focus boost; runnerUpScore - runnerUpFocusBoost) to complete the runner-up score decomposition parallel to winnerScoreBase.
 
-### 2026-06-15 (run 163 — FFFFFF merged + GGGGGGG)
-- **Workstream**: A (gateway observability) — FFFFFF merged, GGGGGGG opened
-- **Branch/PR**: `auto/GGGGGGG-cast-explain-runner-up-score-base` → PR #519 open
-- **Build**: clean | **Tests**: 1626/0/2 (+8 GGGGGGG from 1618 FFFFFF baseline)
+### 2026-06-15 (run 163 — FFFFFF merged + collision on GGGGGG)
+- **Workstream**: A (gateway observability) — FFFFFF merged; GGGGGG landed via parallel session
+- **Branch/PR**: PR #519 `auto/GGGGGGG-cast-explain-runner-up-score-base` → closed (duplicate; parallel session 201303e won the race with GGGGGG)
+- **Build**: clean | **Tests**: 1626/0/2 on main after GGGGGG
 - **What was done**:
-  - Startup: npm ci clean, build clean, 1610/0/2 on main (EEEEEE HEAD 444b18c). Board read from DRIVER-BOARD.md (Notion 401 — recurring). PR #517 (FFFFFF) confirmed open with all 3 CodeQL checks green. PR #516 (EEEEEE stale) confirmed: EEEEEE already squash-merged to main; closed PR #516.
-  - Merged PR #517 (FFFFFF runnerUpFocusBoost) squash → e98e910. Reset main to origin/main.
-  - GGGGGGG: `src/aggregator.ts` `buildCastExplanation` — added `runnerUpScoreBase: topCandidates[1].score - (isInFocus(focus!, scoredTools[1]) ? focusBoost : 0)` after `runnerUpFocusBoost` in the `best !== undefined && topCandidates.length > 1` focus block. Tool description updated to document runnerUpScoreBase with identity decomposition and symmetric-to-winnerScoreBase note.
-  - `test/ggggggg-cast-explain-runner-up-score-base.test.ts`: 8 new tests (present, in-focus value, out-of-focus value, absent-1-candidate, absent-no-focus, number-type, identity, description). All pass.
-  - PR #519 opened. CodeQL queued. CodeRabbit + Codex rate-limited (recurring — no action).
+  - Startup: npm ci clean, build clean, 1610/0/2 on main (EEEEEE HEAD 444b18c). Board read from DRIVER-BOARD.md (Notion 401 — recurring). PR #517 (FFFFFF) confirmed open with all 3 CodeQL checks green. PR #516 (EEEEEE stale) closed.
+  - Merged PR #517 (FFFFFF runnerUpFocusBoost) squash → e98e910. Reset main.
+  - Implemented GGGGGGG (7 G's): `runnerUpScoreBase` in aggregator.ts + 8 tests. PR #519 opened. All 3 CodeQL checks passed.
+  - Parallel session collision: origin/main advanced to 201303e (GGGGGG, 6 G's) — same feature (runnerUpScoreBase). PR #519 had merge conflicts. Closed #519 as superseded.
+  - CodeRabbit + Codex rate-limited (recurring — no action).
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
-- **Next run priority**: Merge GGGGGGG (PR #519) when CodeQL green. Then HHHHHHH — candidate: `runnerUpScoreRatio: number` (runnerUpScore / runnerUpFocusBoost complement, or winner/runnerUp base ratio).
+- **Next run priority**: main is at GGGGGG (201303e, 1626/0/2). Next: HHHHHH — candidate `runnerUpFocusBoostRatio: number` (runnerUpFocusBoost / runnerUpScore — the fraction of runner-up's total score from focus boost; symmetric to winnerFocusBoostRatio).
