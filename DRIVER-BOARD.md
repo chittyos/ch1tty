@@ -287,3 +287,16 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - CodeRabbit + Codex rate-limited on #527 (recurring — no action).
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**: LLLLLL — `outOfFocusBottomScore: number` (lowest relevance score among out-of-focus candidates, complement to topOutOfFocusScore; symmetric to inFocusBottomScore if that lands first) or `rawFocusMarginRatio: number` (rawFocusMargin / winnerScoreBase).
+
+### 2026-06-15 (run 166 — LLLLLL) ✅ COMPLETE
+- **Workstream**: A (gateway observability) — LLLLLL: `cast explanation.outOfFocusBottomScore: number`
+- **Branch/PR**: `auto/LLLLLL-cast-explain-out-of-focus-bottom-score` → PR #529
+- **Build**: clean | **Tests**: 1618/0/2 (+8 LLLLLL from 1610 KKKKKK baseline)
+- **What was done**:
+  - Startup: main at 640fc2ee (KKKKKK outOfFocusMeanScore merged). Added outOfFocusBottomScore: lowest score among out-of-focus candidates. Reuses outOfFocusScores array. Triple (bottom/mean/top) completes the out-of-focus score distribution.
+  - Description line added after outOfFocusMeanScore. Wired into output spread after outOfFocusMeanScore.
+  - 8 new tests (LLLLLL-1..8). All pass.
+  - PR #529 opened; CI 3/3 green; merged.
+  - CodeRabbit + Codex rate-limited (recurring — no action).
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
+- **Next run priority**: MMMMMM — `inFocusBottomScore: number` (lowest score among in-focus candidates, symmetric bottom complement to inFocusTopScore; completes the in-focus triple: top/mean/bottom) or `rawFocusMarginRatio: number`.
