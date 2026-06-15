@@ -105,6 +105,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **EEEEEE** — cast explanation.runnerUpInFocus: boolean — whether the runner-up tool's server or category matches the active focus profile. Present when focus active + runner-up exists (same conditions as focusDecisive/focusMargin). Absent when no focus, no_match, or < 2 candidates. Symmetric to winnerInFocus. PR #515 ✅ MERGED (444b18c, 2026-06-15). 8 new tests, 1610/0/2. DONE.
 - [x] **FFFFFF** — cast explanation.runnerUpFocusBoost: number — exact additive focus boost applied to runner-up (equals focusBoost when runnerUpInFocus; 0 otherwise). Present when focus active + runner-up exists. Absent when no focus, no_match, or < 2 candidates. Symmetric to winnerFocusBoost. PR #517 ✅ MERGED (e98e910, 2026-06-15). 8 new tests, 1618/0/2. DONE.
 - [x] **GGGGGG** — cast explanation.runnerUpScoreBase: number — runner-up's relevance score before active focus boost was applied (runnerUpScore - runnerUpFocusBoost). Identity: runnerUpScoreBase + runnerUpFocusBoost = runnerUpScore. Symmetric to winnerScoreBase. PR merged via parallel session (201303e, 2026-06-15). 8 new tests, 1626/0/2. DONE.
+- [x] **HHHHHH** — cast explanation.topCandidatesScoreStdDev: number — standard deviation of topCandidates scores (sqrt of topCandidatesScoreVariance). Same units as scores, same presence conditions as topCandidatesScoreVariance. PR #521 ✅ MERGED (2026-06-15). 8 new tests, 1634/0/2. DONE.
 
 ## Blockers
 
