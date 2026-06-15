@@ -96,7 +96,8 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **VVVVV** — cast explanation.inFocusWinnerGap: number — score margin by which the out-of-focus winner beat the best in-focus candidate (winnerScore - inFocusTopScore). Present when focus active, winner out-of-focus, at least one in-focus candidate. PR #506 ✅ MERGED (7da94b4, run 159d, 2026-06-15). 8 new tests, 1537/0/2. DONE.
 - [x] **WWWWW** — cast explanation.runnerUpCategory: string — category of the runner-up tool's server. Present when runner-up exists. Absent on no_match or single candidate. PR #507 ✅ MERGED (5aa83b9, run 159d, 2026-06-15). 8 new tests, 1545/0/2. DONE.
 - [x] **XXXXX** — cast explanation.candidateScoreSpread: number — score range across all candidates (winnerScore - lowestCandidateScore). Present when >= 2 candidates. PR #508 ✅ MERGED (f6292a5, run 159d, 2026-06-15). 8 new tests, 1553/0/2. DONE.
-- [ ] **YYYYY** — cast explanation.topCandidatesMeanScore: number — mean score of topCandidates pool. Present when winner exists. PR TBD (run 159d, 2026-06-15).
+- [x] **YYYYY** — cast explanation.topCandidatesMeanScore: number — mean score of topCandidates pool. Present when winner exists. PR #509 ✅ MERGED (bb2ccc0, 2026-06-15). 8 new tests, 1561/0/2. DONE.
+- [ ] **ZZZZZ** — cast explanation.outOfFocusCandidatesCount: number — count of scored candidates whose server and category do not match the active focus profile. Complement of candidatesInFocusCount; identity: candidatesInFocusCount + outOfFocusCandidatesCount === candidateCount. PR #510 CI running (2026-06-15).
 
 ## Blockers
 
