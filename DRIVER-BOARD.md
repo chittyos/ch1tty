@@ -64,8 +64,9 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **SSSS. `ch1tty/cast` `explanation.brainMs` when brain route fires** — When `explain: true` is set and `castRoute === 'brain'`, the `explanation` object now includes `brainMs: number` — wall-clock time of `routeIntent()` in milliseconds. Absent when keyword-fallback route is used. Parallels `latencyBreakdown.brainMs` (PPPP) but lives in the reasoning-oriented `explanation` field alongside `method:'brain'`, `topCandidates`, and `rationale`. Present in all cast shapes: `executed`, `plan`, `resolved`, `chain_executed`, `no_match`. PR #462 ✅ MERGED (3fe81de, run 141, 2026-06-14). 7 new tests, 1312/0/2. DONE.
 - [x] **TTTT. `ch1tty/cast` `explanation.candidateCount`** — Adds `candidateCount: number` to `explanation` when `explain: true` is set. Shows the total number of tools in the scoring pool before the top-5 `topCandidates` slice — lets operators see how competitive the resolution was (3 candidates is very different from 150). Always 0 on `cast:no_match`. PR #463 ✅ MERGED (dd2f1c3, run 141, 2026-06-14). 7 new tests, 1319/0/2. DONE.
 - [x] **UUUU. `ch1tty/cast` `explanation.winnerScore`** — Adds `winnerScore: number` to `explanation` when `explain: true` is set. Score of the winning (top-ranked) tool in the scoring pool — equals `topCandidates[0].score` but readable directly without indexing. Absent on `cast:no_match` (no winner). PR #465 ✅ MERGED (34ca3fc, run 142, 2026-06-15). 7 new tests, 1326/0/2. DONE.
-- [ ] **VVVV. `/api/v1/health` 503 body includes `ledgerDlq.entryCount`** — PR #467 open (run 143 predecessor, 2026-06-15). 7 new tests, 1333/0/2. Pending merge.
-- [ ] **WWWW. `ch1tty/status` and `ch1tty/reload` `latencyMs`** — Completes latency observability across all 5 meta-tools. `ch1tty/status` (full + short modes) and `ch1tty/reload` (success path) now include `latencyMs`. Tool descriptions updated. PR #468 open (run 143, 2026-06-15). 7 new tests, 1333/0/2. Pending merge.
+- [x] **VVVV. `/api/v1/health` 503 body includes `ledgerDlq.entryCount`** — PR #467 ✅ MERGED (run 144, 2026-06-15). 7 new tests, 1333/0/2. DONE.
+- [x] **WWWW. `ch1tty/status` and `ch1tty/reload` `latencyMs`** — Completes latency observability across all 5 meta-tools. PR #468 ✅ MERGED (run 144, 2026-06-15). 7 new tests, 1340/0/2. DONE.
+- [ ] **XXXX. `topCandidates[n].inFocus` in `ch1tty/cast` explanation** — When `explain:true` and focus active, each `topCandidates` entry carries `inFocus: boolean` (true if in-focus/boosted, false otherwise; absent without focus). Tool description updated. PR #470 open (run 144, 2026-06-15). 7 new tests, 1347/0/2. Pending merge.
 
 ## Live Gateway State (as of 2026-06-15 run 143)
 
@@ -73,7 +74,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - Not connected: cloudflare, github, linear, stripe (lazy, auth-gated or unreachable)
 - System health: degraded (ledger DLQ 11+ entries — ledger.chitty.cc unreachable, unchanged)
 - Brain: ok (unchanged)
-- VVVV (#467) open — CodeQL queued (2 checks: Analyze javascript-typescript, Analyze actions)
+- VVVV (#467) ✅ MERGED (run 144), WWWW (#468) ✅ MERGED (run 144), XXXX (#470) open — CodeQL in_progress
 
 ## Live Gateway State (as of 2026-06-14 run 141)
 
@@ -2313,3 +2314,34 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 **Next run priority**:
 - Merge VVVV (#467) and WWWW (#468) once CodeQL passes.
 - XXXX candidates: (a) `explanation.focusBoostApplied: boolean` in cast explain (true when focus active AND winner in-focus); (b) `ch1tty/cast` `chain_executed` latency multi-step coverage; (c) `/api/v1/health` 200 body include `uptime` field for operator convenience.
+
+---
+
+### Run 144 — 2026-06-15 (auto-driver)
+
+**Workstream advanced**: XXXX (new — `topCandidates[n].inFocus` in `ch1tty/cast` explanation)
+**Branch/PR**: `auto/XXXX-cast-explain-topcandidates-infocus` → PR #470 open (run 144, 2026-06-15)
+**Build**: clean (0 errors)
+**Tests**: 1347 pass, 0 fail, 2 skipped (+7 XXXX from 1340/0/2 WWWW+VVVV baseline)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 1326/0/2 on main (post-UUUU tip). CLAUDE.md + CHITTY.md read. DRIVER-BOARD.md read — confirmed A✅ through UUUU✅. Open PRs: #467 (VVVV) and #468 (WWWW), both with CodeQL success but ci.yml 0-jobs queue failure.
+- **Merged PR #467 (VVVV)** — CodeQL green, ci.yml 0-jobs queue issue (recurring pattern). `sha: 8bdc9bf`.
+- **Merged PR #468 (WWWW)** — CodeQL green, same ci.yml pattern. `sha: 966aa8d`.
+- Pulled main → 1340/0/2 (VVVV +7 + WWWW +7 from 1326 baseline).
+- **Workstream XXXX: `topCandidates[n].inFocus` in `ch1tty/cast` explanation**
+  - Gap: `explanation.winnerInFocus` (top-level) existed but topCandidates entries had only `tool` + `score`. Operators couldn't see which runner-ups were boosted or suppressed without cross-referencing the focus profile.
+  - **`src/aggregator.ts`** (2 edits): `buildCastExplanation` line 1768: map spreads `...(focus ? { inFocus: isInFocus(focus, t) } : {})` into each candidate; tool description updated to document `inFocus: boolean` per-entry and its absence without focus.
+  - **`test/xxxx-cast-explain-topcandidates-infocus.test.ts`** (new, 7 tests): XXXX-1 all entries have inFocus when focus active; XXXX-2 winner inFocus:true; XXXX-3 out-of-focus entry inFocus:false; XXXX-4 no inFocus when no focus; XXXX-5 no_match empty topCandidates no error; XXXX-6 cast:plan carries inFocus; XXXX-7 tool description mentions inFocus.
+  - Build clean. Full suite: 1347/0/2 (+7 from 1340).
+- Pushed branch, opened PR #470. CodeQL in_progress at run end.
+- DRIVER-BOARD.md updated: VVVV✅ WWWW✅ marked done, XXXX entry added, run 144 log appended.
+
+**Blockers (unchanged)**:
+- Ledger DLQ 11+ entries: ledger.chitty.cc unreachable.
+- Notion API token invalid: cannot read/write Notion board. Human must refresh `NOTION_API_TOKEN`.
+- CI (main ci.yml workflow 0-jobs) persistent — only CodeQL runs on PRs.
+
+**Next run priority**:
+- Confirm XXXX PR #470 CodeQL passes; merge and mark XXXX ✅ done.
+- YYYY candidates: (a) `explanation.runnerUpScore` — numeric score of topCandidates[1] surfaced directly (complements winnerScore with the margin gap); (b) `explanation.focusBoostAmount` — the exact boost delta applied to the winner (winnerScore - pre-boost score, 0 if winner was already top without focus); (c) `/api/v1/health` warn body variant — when `systemHealth.status === 'warn'`, surface `brainCircuitOpen: true` in the 200 body so callers see the degraded-brain signal without a separate status call.
