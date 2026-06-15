@@ -103,8 +103,8 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **CCCCCC** — cast explanation.winnerFocusBoostRatio: number — fraction of winner's total score from focus boost (winnerFocusBoost / winnerScore), [0,1]. Present when focus active + winner exists + winnerScore > 0. PR #513 ✅ MERGED (4eae278, 2026-06-15). 8 new tests, 1594/0/2. DONE.
 - [x] **DDDDDD** — cast explanation.topCandidatesScoreVariance: number — variance of topCandidates scores (sum of squared deviations from mean, divided by N). Present when >= 2 topCandidates. Absent on no_match or single candidate. PR #514 ✅ MERGED (4787dec, 2026-06-15). 8 new tests, 1602/0/2. DONE.
 - [x] **EEEEEE** — cast explanation.runnerUpInFocus: boolean — whether the runner-up tool's server or category matches the active focus profile. Present when focus active + runner-up exists (same conditions as focusDecisive/focusMargin). Absent when no focus, no_match, or < 2 candidates. Symmetric to winnerInFocus. PR #515 ✅ MERGED (444b18c, 2026-06-15). 8 new tests, 1610/0/2. DONE.
-- [x] **FFFFFF** — cast explanation.runnerUpFocusBoost: number — exact additive focus boost applied to runner-up (equals focusBoost when runnerUpInFocus; 0 otherwise). Present when focus active + runner-up exists. Absent when no focus, no_match, or < 2 candidates. Symmetric to winnerFocusBoost. MERGED directly to main (e98e910, 2026-06-15). 8 new tests, 1618/0/2. DONE.
-- [ ] **GGGGGG** — cast explanation.runnerUpScoreBase: number — runner-up's pre-focus relevance score (runnerUpScore - runnerUpFocusBoost). Identity: runnerUpScoreBase + runnerUpFocusBoost === runnerUpScore. Symmetric to winnerScoreBase. Present when focus active + runner-up exists. In progress (2026-06-15).
+- [x] **FFFFFF** — cast explanation.runnerUpFocusBoost: number — exact additive focus boost applied to runner-up (equals focusBoost when runnerUpInFocus; 0 otherwise). Present when focus active + runner-up exists. Absent when no focus, no_match, or < 2 candidates. Symmetric to winnerFocusBoost. PR #517 ✅ MERGED (e98e910, 2026-06-15). 8 new tests, 1618/0/2. DONE.
+- [x] **GGGGGG** — cast explanation.runnerUpScoreBase: number — runner-up's relevance score before active focus boost was applied (runnerUpScore - runnerUpFocusBoost). Identity: runnerUpScoreBase + runnerUpFocusBoost = runnerUpScore. Symmetric to winnerScoreBase. PR merged via parallel session (201303e, 2026-06-15). 8 new tests, 1626/0/2. DONE.
 
 ## Blockers
 
@@ -239,3 +239,16 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - `test/ffffff-cast-explain-runner-up-focus-boost.test.ts`: 8 new tests. Build clean. 1618/0/2.
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**: Merge FFFFFF (PR to be opened). Then GGGGGG — `runnerUpScoreBase: number` (runner-up score before focus boost; runnerUpScore - runnerUpFocusBoost) to complete the runner-up score decomposition parallel to winnerScoreBase.
+
+### 2026-06-15 (run 163 — FFFFFF merged + collision on GGGGGG)
+- **Workstream**: A (gateway observability) — FFFFFF merged; GGGGGG landed via parallel session
+- **Branch/PR**: PR #519 `auto/GGGGGGG-cast-explain-runner-up-score-base` → closed (duplicate; parallel session 201303e won the race with GGGGGG)
+- **Build**: clean | **Tests**: 1626/0/2 on main after GGGGGG
+- **What was done**:
+  - Startup: npm ci clean, build clean, 1610/0/2 on main (EEEEEE HEAD 444b18c). Board read from DRIVER-BOARD.md (Notion 401 — recurring). PR #517 (FFFFFF) confirmed open with all 3 CodeQL checks green. PR #516 (EEEEEE stale) closed.
+  - Merged PR #517 (FFFFFF runnerUpFocusBoost) squash → e98e910. Reset main.
+  - Implemented GGGGGGG (7 G's): `runnerUpScoreBase` in aggregator.ts + 8 tests. PR #519 opened. All 3 CodeQL checks passed.
+  - Parallel session collision: origin/main advanced to 201303e (GGGGGG, 6 G's) — same feature (runnerUpScoreBase). PR #519 had merge conflicts. Closed #519 as superseded.
+  - CodeRabbit + Codex rate-limited (recurring — no action).
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
+- **Next run priority**: main is at GGGGGG (201303e, 1626/0/2). Next: HHHHHH — candidate `runnerUpFocusBoostRatio: number` (runnerUpFocusBoost / runnerUpScore — the fraction of runner-up's total score from focus boost; symmetric to winnerFocusBoostRatio).
