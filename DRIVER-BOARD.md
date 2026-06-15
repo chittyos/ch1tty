@@ -77,6 +77,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **CCCCC** — cast explanation.focusMargin: number — raw score gap between winner and runner-up in focus-biased space (winnerScore - runnerUpScore). PR #478 ✅ MERGED (7d2d572, run 148, 2026-06-15). 8 new tests, 1385/0/2. DONE.
 - [x] **DDDDD** — /api/v1/health warn body: brainCircuitOpen: true when systemHealth.brainDegraded — surfaces brain circuit state in the 200 warn response without a separate /api/v1/status call. PR #480 ✅ MERGED (3f4e107, run 150, 2026-06-15). 8 new tests, 1393/0/2. DONE.
 - [x] **EEEEE** — /api/v1/health warn body: ledgerWarn: true when systemHealth.ledgerStatus === 'warn' — symmetric to brainCircuitOpen; distinguishes ledger-drops/flushErrors warn from brain-circuit warn. PR #481 ✅ MERGED (c04f708, run 150, 2026-06-15). 8 new tests, 1401/0/2. DONE.
+- [ ] **FFFFF** — cast explanation.focusBias: number — fraction of winner-runner-up margin attributable to focus boost (winnerFocusBoost / focusMargin). Absent when focusMargin === 0 (division-by-zero guard), no runner-up, focus inactive, or no_match. PR #483 open (run 151, 2026-06-15). 8 new tests, 1409/0/2.
 
 ## Blockers
 
@@ -157,3 +158,16 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**:
   - Merge EEEEE (PR open) if CI green, then FFFFF: cast explanation `focusBias: number` (winnerFocusBoost / focusMargin — fraction of margin due to focus boost). Guard: absent when focusMargin === 0 (division by zero).
+
+### 2026-06-15 (run 151)
+- **Workstream**: FFFFF — `cast explanation.focusBias: number`
+- **Branch/PR**: `auto/FFFFF-cast-explain-focus-bias` → PR #483 (open, CI in_progress)
+- **Build**: clean | **Tests**: 1409/0/2 (+8 FFFFF from 1401 EEEEE baseline)
+- **What was done**:
+  - Startup: npm ci clean, build clean, 1401/0/2 on main. No open PRs (EEEEE #481 already merged per board).
+  - FFFFF: `src/aggregator.ts` `buildCastExplanation` — added `focusBias: (winnerInFocus ? focusBoost : 0) / (best.score - topCandidates[1].score)` inside `best !== undefined && topCandidates.length > 1` guard, with inner `focusMargin !== 0` guard. Tool description updated to document `focusBias`.
+  - `test/fffff-cast-explain-focus-bias.test.ts`: 8 new tests (present+≥0, consistency, out-of-focus=0, tied=absent, no-focus=absent, no_match=absent, single-candidate=absent, description).
+  - PR #483 opened. CodeRabbit + Codex rate-limited (no action). CI 2/2 CodeQL in_progress at run end.
+- **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring).
+- **Next run priority**:
+  - Merge FFFFF (PR #483) if CI green, then GGGGG candidates: (a) cast explanation `focusConfidence: number` — `focusBias` clamped to [0,1] for display (since focusBias can exceed 1); (b) `/api/v1/health` ok body add `ledgerOk: true` field for symmetric completeness; (c) cast explanation `candidatesBeforeFocus: number` — total candidates before focus boost re-sort.
