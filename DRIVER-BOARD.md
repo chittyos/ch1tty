@@ -79,7 +79,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **EEEEE** — /api/v1/health warn body: ledgerWarn: true when systemHealth.ledgerStatus === 'warn' — symmetric to brainCircuitOpen; distinguishes ledger-drops/flushErrors warn from brain-circuit warn. PR #481 ✅ MERGED (c04f708, run 150, 2026-06-15). 8 new tests, 1401/0/2. DONE.
 - [x] **FFFFF** — cast explanation.focusBias: number — fraction of winner-runner-up margin attributable to focus boost (winnerFocusBoost / focusMargin). Absent when focusMargin === 0 (division-by-zero guard), no runner-up, focus inactive, or no_match. PR #483 ✅ MERGED (b697884, run 151, 2026-06-15). 8 new tests, 1409/0/2. DONE.
 - [x] **GGGGG** — cast explanation.focusConfidence: number — focusBias clamped to [0,1]. Same presence conditions as focusBias. Unlike focusBias (can exceed 1), focusConfidence is always [0,1] — a clean percentage of focus attribution. PR #485 ✅ MERGED (1e9407a, run 152, 2026-06-15). 8 new tests, 1417/0/2. DONE.
-- [ ] **HHHHH** — cast explanation.winnerServer: string — server ID of the winning tool (segment before "/" in namespaced name, e.g. "neon" from "neon/query_database"). Absent on no_match. Present regardless of focus. Lets operators identify which backend resolved the intent without parsing the tool name. PR #486 (open, CI in_progress, run 153, 2026-06-15). 8 new tests, 1425/0/2.
+- [x] **HHHHH** — cast explanation.winnerServer: string — server ID of the winning tool (segment before "/" in namespaced name, e.g. "neon" from "neon/query_database"). Absent on no_match. Present regardless of focus. Lets operators identify which backend resolved the intent without parsing the tool name. PR #486 ✅ MERGED (1e07a00, run 153, 2026-06-15). 8 new tests, 1425/0/2. DONE.
 
 ## Blockers
 
@@ -190,7 +190,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 ### 2026-06-15 (run 153)
 - **Workstream**: HHHHH — `cast explanation.winnerServer: string`
-- **Branch/PR**: `auto/HHHHH-cast-explain-winner-server` → PR #486 (open, CI in_progress at run end)
+- **Branch/PR**: `auto/HHHHH-cast-explain-winner-server` → PR #486 ✅ MERGED (1e07a00, ~13:24 UTC)
 - **Build**: clean | **Tests**: 1425/0/2 (+8 HHHHH from 1417 GGGGG baseline)
 - **What was done**:
   - Startup: npm ci clean, build clean, 1409/0/2 on main. PR #485 (GGGGG) was open with 3/3 CI green (CodeQL). Merged it via squash → 1e9407a.
