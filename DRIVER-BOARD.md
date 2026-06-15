@@ -109,6 +109,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **HHHHHH** (b) — cast explanation.runnerUpFocusBoostRatio: number — fraction of runner-up's total score from focus boost (runnerUpFocusBoost / runnerUpScore), [0,1]. Present when focus active + runner-up exists + runnerUpScore > 0. Absent when no focus, no_match, < 2 candidates, or runnerUpScore === 0. PR #522 ✅ MERGED (2026-06-15). 8 new tests, 1642/0/2. DONE.
 - [x] **IIIIII** — cast explanation.inFocusMeanScore: number — arithmetic mean score of in-focus candidates. Same presence conditions as inFocusTopScore. PR #523 ✅ MERGED (2026-06-15). 8 new tests, 1650/0/2. DONE.
 - [x] **JJJJJJ** — cast explanation.rawFocusMargin: number — winnerScoreBase - runnerUpScoreBase (unfocused score gap, strips focus boost from both sides). Present when focus active + runner-up exists. Can be negative when focus reversed ranking. PR #525 ✅ MERGED (3baf457, 2026-06-15). 8 new tests, 1658/0/2. DONE.
+- [x] **KKKKKK** — cast explanation.focusNetBoostDelta: number — net differential focus boost winner received vs runner-up (winnerFocusBoost - runnerUpFocusBoost). +focusBoost when winner in-focus/runner-up out; 0 when both same; -focusBoost when vice versa. Identity: focusMargin === rawFocusMargin + focusNetBoostDelta. Present when focus active + runner-up exists. PR #529 ✅ MERGED (2026-06-15). 8 new tests, 1668/0/2. DONE.
 
 ## Blockers
 
@@ -287,6 +288,15 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - CodeRabbit + Codex rate-limited on #527 (recurring — no action).
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**: LLLLLL — `outOfFocusBottomScore: number` (lowest relevance score among out-of-focus candidates, complement to topOutOfFocusScore; symmetric to inFocusBottomScore if that lands first) or `rawFocusMarginRatio: number` (rawFocusMargin / winnerScoreBase).
+
+### 2026-06-15 (run 165 — KKKKKK)
+- **Workstream**: A (gateway observability) — JJJJJJ confirmed DONE; KKKKKK: `cast explanation.focusNetBoostDelta: number`
+- **Branch/PR**: `auto/KKKKKK-cast-explain-focus-net-boost-delta` → PR #529 ✅ MERGED (2026-06-15)
+- **Build**: clean | **Tests**: 1668/0/2 (+8 KKKKKK from 1658 JJJJJJ baseline; 0 fail)
+- **What was done**:
+  - Fixed KKKKKK-4 test: STRIPE_TOOLS had 0 keyword overlap → filtered before focus boost. Added STRIPE_TOOLS_WEAK (query+database = 2/5=0.4 base, 0.9 after boost) so stripe is in-focus runner-up but neon (1.0) wins.
+  - Rebased onto main after parallel sessions added NNNNNN/OOOOOO/PPPPPP; resolved conflicts keeping both rawFocusMarginRatio (HEAD) and focusNetBoostDelta (branch).
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
 
 ### 2026-06-15 (run 166 — LLLLLL) ✅ COMPLETE
 - **Workstream**: A (gateway observability) — LLLLLL: `cast explanation.outOfFocusBottomScore: number`
