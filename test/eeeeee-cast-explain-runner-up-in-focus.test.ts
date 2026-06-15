@@ -1,5 +1,5 @@
 /**
- * DDDDDD: explanation.runnerUpInFocus in ch1tty/cast when explain:true and focus active.
+ * EEEEEE: explanation.runnerUpInFocus in ch1tty/cast when explain:true and focus active.
  *
  * runnerUpInFocus: boolean — whether the runner-up tool's server or category matches
  * the active focus profile (i.e. the runner-up received an additive boost).
@@ -9,14 +9,14 @@
  * Symmetric to winnerInFocus.
  *
  * Covered:
- *   DDDDDD-1: present when focus active + runner-up exists
- *   DDDDDD-2: true when runner-up is in-focus
- *   DDDDDD-3: false when runner-up is out-of-focus
- *   DDDDDD-4: absent when only 1 candidate (no runner-up)
- *   DDDDDD-5: absent when no focus active
- *   DDDDDD-6: boolean type
- *   DDDDDD-7: symmetric to winnerInFocus (both present when focus + runner-up)
- *   DDDDDD-8: tool description documents runnerUpInFocus
+ *   EEEEEE-1: present when focus active + runner-up exists
+ *   EEEEEE-2: true when runner-up is in-focus
+ *   EEEEEE-3: false when runner-up is out-of-focus
+ *   EEEEEE-4: absent when only 1 candidate (no runner-up)
+ *   EEEEEE-5: absent when no focus active
+ *   EEEEEE-6: boolean type
+ *   EEEEEE-7: symmetric to winnerInFocus (both present when focus + runner-up)
+ *   EEEEEE-8: tool description documents runnerUpInFocus
  */
 import assert from 'node:assert/strict';
 import { tmpdir } from 'node:os';
@@ -28,7 +28,7 @@ import type { Backend, BackendStatus, ServerConfig, ToolCallResult, ToolEntry } 
 import type { FocusProfiles } from '../src/focus.js';
 
 function dlqPath(label: string): string {
-  return join(tmpdir(), `ch1tty-dddddd-${label}-${Date.now()}.jsonl`);
+  return join(tmpdir(), `ch1tty-eeeeee-${label}-${Date.now()}.jsonl`);
 }
 
 // Stripe: ecosystem → in-focus under finance
@@ -105,7 +105,7 @@ function buildAgg(
   });
 }
 
-test('DDDDDD-1: present when focus active + runner-up exists', async () => {
+test('EEEEEE-1: present when focus active + runner-up exists', async () => {
   const agg = buildAgg(
     'd1',
     [STRIPE_CFG, TASKS_CFG],
@@ -123,7 +123,7 @@ test('DDDDDD-1: present when focus active + runner-up exists', async () => {
   }
 });
 
-test('DDDDDD-2: true when runner-up is in-focus', async () => {
+test('EEEEEE-2: true when runner-up is in-focus', async () => {
   // Both stripe (winner) and tasks (runner-up) are ecosystem → both in-focus under finance.
   const agg = buildAgg(
     'd2',
@@ -146,7 +146,7 @@ test('DDDDDD-2: true when runner-up is in-focus', async () => {
   }
 });
 
-test('DDDDDD-3: false when runner-up is out-of-focus', async () => {
+test('EEEEEE-3: false when runner-up is out-of-focus', async () => {
   // stripe (winner, ecosystem/in-focus) beats neon (runner-up, code/out-of-focus).
   // NEON_TOOLS_BILLING ensures neon scores as runner-up against billing/invoice intent.
   const agg = buildAgg(
@@ -170,7 +170,7 @@ test('DDDDDD-3: false when runner-up is out-of-focus', async () => {
   }
 });
 
-test('DDDDDD-4: absent when only 1 candidate (no runner-up)', async () => {
+test('EEEEEE-4: absent when only 1 candidate (no runner-up)', async () => {
   // Only stripe in registry → winner exists but no runner-up → runnerUpInFocus absent.
   const agg = buildAgg(
     'd4',
@@ -192,7 +192,7 @@ test('DDDDDD-4: absent when only 1 candidate (no runner-up)', async () => {
   }
 });
 
-test('DDDDDD-5: absent when no focus active', async () => {
+test('EEEEEE-5: absent when no focus active', async () => {
   // 2 tools, no focus → runner-up exists but focus is off → runnerUpInFocus absent.
   const agg = buildAgg(
     'd5',
@@ -214,7 +214,7 @@ test('DDDDDD-5: absent when no focus active', async () => {
   }
 });
 
-test('DDDDDD-6: boolean type', async () => {
+test('EEEEEE-6: boolean type', async () => {
   const agg = buildAgg(
     'd6',
     [STRIPE_CFG, NEON_CFG],
@@ -236,7 +236,7 @@ test('DDDDDD-6: boolean type', async () => {
   }
 });
 
-test('DDDDDD-7: symmetric to winnerInFocus — both present under same focus+runner-up conditions', async () => {
+test('EEEEEE-7: symmetric to winnerInFocus — both present under same focus+runner-up conditions', async () => {
   const agg = buildAgg(
     'd7',
     [STRIPE_CFG, NEON_CFG],
@@ -256,7 +256,7 @@ test('DDDDDD-7: symmetric to winnerInFocus — both present under same focus+run
   }
 });
 
-test('DDDDDD-8: tool description documents runnerUpInFocus', async () => {
+test('EEEEEE-8: tool description documents runnerUpInFocus', async () => {
   const path = dlqPath('d8');
   const agg = new Aggregator([STRIPE_CFG], {
     backendFactory: () => makeBackend([]),

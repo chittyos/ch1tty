@@ -225,4 +225,4 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - EEEEEE: `src/aggregator.ts` `buildCastExplanation` — added `runnerUpInFocus: isInFocus(focus!, scoredTools[1])` inside `best !== undefined && topCandidates.length > 1` focus block. Tool description updated.
   - `test/eeeeee-cast-explain-runner-up-in-focus.test.ts`: 8 new tests. Build clean. 1602/0/2.
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
-- **Next run priority**: Merge DDDDDD (PR #514) then EEEEEE (PR #515). Then FFFFFF — `runnerUpFocusBoost: number` (focus boost applied to runner-up; equals focusBoost when runnerUpInFocus is true, else 0).
+- **Next run priority**: Merge DDDDDD (#514) then EEEEEE (#515). Then FFFFFF — `runnerUpFocusBoost: number`.
