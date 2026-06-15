@@ -76,7 +76,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **BBBBB** — cast latencyBreakdown.registryMs — registry fetch time isolated from scoringMs. PR #477 ✅ MERGED (4949c21, run 147, 2026-06-15). Codex P2 fix: times only getRegistry(), not allSettled wrapper. 8 new tests, 1377/0/2. DONE.
 - [x] **CCCCC** — cast explanation.focusMargin: number — raw score gap between winner and runner-up in focus-biased space (winnerScore - runnerUpScore). PR #478 ✅ MERGED (7d2d572, run 148, 2026-06-15). 8 new tests, 1385/0/2. DONE.
 - [x] **DDDDD** — /api/v1/health warn body: brainCircuitOpen: true when systemHealth.brainDegraded — surfaces brain circuit state in the 200 warn response without a separate /api/v1/status call. PR #480 ✅ MERGED (3f4e107, run 150, 2026-06-15). 8 new tests, 1393/0/2. DONE.
-- [ ] **EEEEE** — /api/v1/health warn body: ledgerWarn: true when systemHealth.ledgerStatus === 'warn' — symmetric to brainCircuitOpen; distinguishes ledger-drops/flushErrors warn from brain-circuit warn. PR open (run 150, 2026-06-15). 8 new tests, 1401/0/2.
+- [x] **EEEEE** — /api/v1/health warn body: ledgerWarn: true when systemHealth.ledgerStatus === 'warn' — symmetric to brainCircuitOpen; distinguishes ledger-drops/flushErrors warn from brain-circuit warn. PR #481 ✅ MERGED (c04f708, run 150, 2026-06-15). 8 new tests, 1401/0/2. DONE.
 
 ## Blockers
 
