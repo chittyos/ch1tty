@@ -67,6 +67,15 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **VVVV. `/api/v1/health` 503 body includes `ledgerDlq.entryCount`** — PR #467 ✅ MERGED (run 143/144, 2026-06-15). 7 new tests, 1333/0/2. DONE.
 - [x] **WWWW. `ch1tty/status` and `ch1tty/reload` `latencyMs`** — Completes latency observability across all 5 meta-tools. `ch1tty/status` (full + short modes) and `ch1tty/reload` (success path) now include `latencyMs`. Tool descriptions updated. PR #468 ✅ MERGED (run 143/144, 2026-06-15). 7 new tests, 1340/0/2. DONE.
 - [x] **XXXX. `topCandidates[n].inFocus` in `ch1tty/cast` explanation** — When `explain:true` and focus active, each `topCandidates` entry carries `inFocus: boolean` (true if in-focus/boosted, false otherwise; absent without focus). Tool description updated. PR #470 ✅ MERGED (a3a99b3, run 144, 2026-06-15). 7 new tests, 1347/0/2. DONE.
+- [ ] **YYYY. `explanation.runnerUpScore` + `explanation.runnerUpTool` in `ch1tty/cast`** — When `explain:true` and ≥2 candidates, explanation includes `runnerUpScore` (topCandidates[1].score) and `runnerUpTool` (topCandidates[1].tool). Both absent on no_match or single-tool registries. Margin = winnerScore - runnerUpScore. PR #472 open (CodeQL in_progress, run 145, 2026-06-15). 7 new tests, 1354/0/2.
+
+## Live Gateway State (as of 2026-06-15 run 145)
+
+- Connected backends: (not re-queried this run — stable from run 140: 263 tools across 11 servers)
+- Not connected: cloudflare, github, linear, stripe (lazy, auth-gated or unreachable)
+- System health: degraded (ledger DLQ 11+ entries — ledger.chitty.cc unreachable, unchanged)
+- Brain: ok (unchanged)
+- YYYY (#472) open — CodeQL in_progress
 
 ## Live Gateway State (as of 2026-06-15 run 143)
 

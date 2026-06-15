@@ -361,6 +361,7 @@ export class Aggregator {
           'When explain: true is set and the brain route was taken, explanation includes brainMs: the wall-clock time of the brain routeIntent() call in milliseconds (alongside method: "brain"). Absent when the keyword-fallback route was used. ' +
           'explanation also includes candidateCount: the total number of tools in the scoring pool before the top-5 topCandidates slice. 0 on no_match. ' +
           'explanation also includes winnerScore: the numeric relevance score of the winning tool (topCandidates[0].score). Absent on no_match (no winner). Lets operators read the winner\'s score directly without indexing into topCandidates. ' +
+          'explanation also includes runnerUpScore: the score of the second-place candidate (topCandidates[1].score), and runnerUpTool: its namespaced tool name. Both absent when there is 0 or 1 candidate (no_match, single-tool registries). The margin winnerScore-runnerUpScore indicates how decisive the resolution was. ' +
           'When a focus profile is active, each entry in topCandidates also carries inFocus: boolean — true if that candidate is within the active focus profile (and therefore received a boost). Absent when no focus is active. ' +
           'Sub-meta to master-meta — the gateway calling itself.',
         inputSchema: {
@@ -1796,6 +1797,7 @@ function buildCastExplanation(
     ...(brainMs !== undefined ? { brainMs } : {}),
     candidateCount: scoredTools.length,
     ...(best !== undefined ? { winnerScore: best.score } : {}),
+    ...(topCandidates.length > 1 ? { runnerUpScore: topCandidates[1].score, runnerUpTool: topCandidates[1].tool } : {}),
     ...(focusName ? { focus: focusName, focusBoost, winnerInFocus } : {}),
     topCandidates,
     rationale,
