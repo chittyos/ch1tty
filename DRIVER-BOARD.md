@@ -90,6 +90,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **PPPPP** — cast explanation.topOutOfFocusScore: number — highest relevance score among out-of-focus candidates. Present when focus active, winner exists, and at least one out-of-focus candidate exists. PR #497 ✅ MERGED (4ec2ee8, 2026-06-15). 8 new tests, 1489/0/2. DONE.
 - [x] **QQQQQ** — cast explanation.outOfFocusWinnerGap: number — score gap between winner and best out-of-focus candidate (winnerScore - topOutOfFocusScore). Present under same conditions as topOutOfFocusScore. PR #499 ✅ MERGED (ac28f50, 2026-06-15, parallel session). 8 new tests, 1497/0/2. DONE. (PR #501 closed run 158 — stale duplicate with different impl; parallel session's #499 merged first.)
 - [x] **RRRRR** — cast explanation.focusRankPercentile: number — normalized pre-focus rank (focusRank / candidateCount), [0,1]. Identity: focusRankPercentile * candidateCount === focusRank. PR #502 ✅ MERGED (a8381be, run 158, 2026-06-15). 8 new tests, 1505/0/2. DONE.
+- [ ] **SSSSS** — cast explanation.inFocusTopScore: number — highest relevance score among in-focus candidates. Present when focus active, winner exists, at least one in-focus candidate scored > 0.1. PR #500 🔄 CI awaiting (run 159b, 2026-06-15).
 
 ## Blockers
 
@@ -269,8 +270,10 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - Key lesson: git push to feature branches works; 403 only applies to main. Use git push for branches, push_files API only for main.
   - Post-session: A parallel session later merged PR #493 (0426ef5), then continued with MMMMM (#494), NNNNN (#495), OOOOO (#496), PPPPP (#497) — all merged before run 158 started.
 - **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring); direct git push to main 403 (feature branches pushable via git).
+- **Next run priority**:
+  - Merge LLLLL (PR #498) if CI green. Then MMMMM candidates: (a) cast explanation `candidatesInFocusCount: number` — how many of the scored candidates were in-focus; (b) `/api/v1/health` ok body `ledgerOk: true` when `systemHealth.ledgerStatus === 'ok'` (symmetric to ledgerWarn).
 
-### 2026-06-15 (run 158)
+### 2026-06-15 (run 158a — parallel)
 - **Workstream**: QQQQQ — `cast explanation.focusRankPercentile: number`
 - **Branch/PR**: `auto/QQQQQ-cast-explain-focus-rank-percentile` → PR #501 🔄 CI in_progress
 - **Build**: clean | **Tests**: 1497/0/2 (+8 QQQQQ from 1489 PPPPP baseline)
@@ -288,3 +291,43 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Final tests**: 1505/0/2
 - **Next run priority**:
   - SSSSS candidates: (a) cast explanation `runnerUpServer: string` — server ID of the runner-up tool (parallel to `winnerServer`, present when runner-up exists); (b) cast explanation `winnerCategory: string` — category of the winning server; (c) cast explanation `inFocusWinnerGap: number` — score gap between winner and best in-focus non-winner candidate.
+
+### 2026-06-15 (run 158b — parallel)
+- **Workstream**: MMMMM — `cast explanation.candidatesInFocusCount: number`
+- **Branch/PR**: `auto/MMMMM-cast-explain-candidates-in-focus-count` → PR #494 ✅ MERGED (75155c5)
+- **Build**: clean | **Tests**: 1465/0/2 (+8 MMMMM from 1457 LLLLL baseline)
+- **What was done**:
+  - Startup: pulled main (0426ef5 = LLLLL merge). Build clean, 1457/0/2.
+  - Board: LLLLL confirmed DONE (0426ef5). SHA placeholder updated; run-157 PR status updated to MERGED.
+  - MMMMM: `src/aggregator.ts` `buildCastExplanation` — added `candidatesInFocusCount: scoredTools.filter((t) => isInFocus(focus, t)).length` in the `best !== undefined` focus guard. Tool description updated.
+  - `test/mmmmm-cast-explain-candidates-in-focus-count.test.ts`: 8 new tests (present, ≥0, ≤candidateCount, all-out-of-focus=0, all-in-focus=candidateCount, no_match absent, no-focus absent, description).
+  - PR #494 opened; 3/3 CI green; merged (75155c5). CodeRabbit rate-limited (recurring).
+  - NNNNN: `src/aggregator.ts` `buildCastExplanation` — added `inFocusFraction: scoredTools.filter(...).length / scoredTools.length` inside `scoredTools.length > 0` guard. Tool description updated.
+  - `test/nnnnn-cast-explain-in-focus-fraction.test.ts`: 8 new tests (present, [0,1] range, identity, all-out=0, all-in=1, no_match absent, no-focus absent, description).
+  - PR #495 opened; 3/3 CI green; merged (df640e0). CodeRabbit rate-limited (recurring).
+  - OOOOO: `/api/v1/health` ok body `ledgerOk: true` — added to http-server.ts + CLAUDE.md updated. PR #496 ✅ MERGED (a64d80c).
+  - PPPPP: `cast explanation.topOutOfFocusScore: number` — PR #497 ✅ MERGED (4ec2ee8).
+- **Blockers (unchanged)**: Notion 401, ledger DLQ 11 entries, CI 0-jobs (non-CodeQL, recurring).
+- **Next run priority**:
+  - Merge QQQQQ (PR #499 outOfFocusWinnerGap + PR #500 inFocusTopScore) if CI green. Then RRRRR candidates: (a) cast explanation `focusScoreSpread: number` — range of in-focus candidate scores (max - min); (b) cast explanation `inFocusWinnerGap: number` — score gap between winner and best in-focus non-winner.
+
+### 2026-06-15 (run 159a — parallel)
+- **Workstream**: PPPPP ✅ merged + QQQQQ `outOfFocusWinnerGap` → PR #499 ✅ MERGED (ac28f50)
+- **Build**: clean | **Tests**: 1497/0/2 (+8 from 1489 PPPPP baseline)
+- **What was done**:
+  - Merged PR #497 (PPPPP — topOutOfFocusScore) via squash → 4ec2ee8. Pulled main (1489/0/2).
+  - QQQQQ: `buildCastExplanation` — added `outOfFocusWinnerGap: best!.score - topOutOfFocusScore` alongside `topOutOfFocusScore`. `test/qqqqq-cast-explain-out-of-focus-winner-gap.test.ts`: 8 new tests.
+  - PR #499 opened + merged → ac28f50. CodeRabbit/Codex rate-limited (recurring).
+
+### 2026-06-15 (run 159b — this session)
+- **Workstream**: SSSSS `inFocusTopScore` → PR #500 🔄 CI awaiting (rebased onto 3d113b3)
+- **Build**: clean | **Tests**: 1515/0/2 (after rebase onto main with RRRRR=focusRankPercentile + board commits)
+- **What was done**:
+  - Startup: DRIVER-BOARD.md restored from compacted summary. OOOOO (PR #496, a64d80c), PPPPP (PR #497, 4ec2ee8) both confirmed merged.
+  - QQQQQ→SSSSS: QQQQQ (outOfFocusWinnerGap, PR #499) and RRRRR (focusRankPercentile, PR #502) both already merged by parallel sessions. Our addition is `inFocusTopScore` — labeled SSSSS going forward.
+  - `src/aggregator.ts` `buildCastExplanation` — added `inFocusTopScore` computed as max score among in-focus scoredTools; `...(inFocusTopScore !== undefined ? { inFocusTopScore } : {})` in focus guard. Tool description updated.
+  - `test/qqqqq-cast-explain-in-focus-top-score.test.ts`: 8 new tests. QQQQQ-4 fix: shared keyword "billing" ensures neon scores > 0.1 threshold.
+  - Rebased 3× onto advancing main; resolved conflicts each time preserving outOfFocusWinnerGap + focusRankPercentile from merged PRs alongside inFocusTopScore.
+  - Force-pushed to origin; CI started on 98ce9dd → rebased again onto 3d113b3; force-pushed 98ce9dd.
+- **Next run priority**:
+  - Merge PR #500 (inFocusTopScore) if CI green. Then TTTTT candidates: (a) cast explanation `runnerUpServer: string`; (b) cast explanation `winnerCategory: string`; (c) cast explanation `inFocusWinnerGap: number`.
