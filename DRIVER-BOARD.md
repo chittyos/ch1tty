@@ -325,3 +325,15 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - CodeRabbit + Codex rate-limited (recurring — no action).
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**: OOOOOO — `focusMarginRatio: number` (focusMargin / winnerScore — the post-focus gap as a fraction of winner's total score; symmetric to rawFocusMarginRatio but using the boosted scores).
+
+### 2026-06-15 (run 169 — OOOOOO) ✅ COMPLETE
+- **Workstream**: A (gateway observability) — OOOOOO: `cast explanation.focusMarginRatio: number`
+- **Branch/PR**: `auto/OOOOOO-cast-explain-focus-margin-ratio` → PR #533
+- **Build**: clean | **Tests**: 1642/0/2 (+8 OOOOOO from 1634 NNNNNN baseline)
+- **What was done**:
+  - Startup: main at 5021ed7b (NNNNNN rawFocusMarginRatio merged). Added focusMarginRatio: focusMargin / winnerScore (when winnerScore > 0). Inline in best+runner-up block alongside focusMargin. Symmetric to rawFocusMarginRatio in boosted score space.
+  - Description line added after focusMargin. 8 new tests (OOOOOO-1..8). All pass.
+  - PR #533 opened; CI 3/3 green; merged.
+  - CodeRabbit + Codex rate-limited (recurring — no action).
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
+- **Next run priority**: PPPPPP — `candidateScoreEntropy: number` (Shannon entropy of normalised candidate score distribution — measures how spread-out or concentrated scores are; low entropy = one dominant tool, high entropy = scores evenly spread).
