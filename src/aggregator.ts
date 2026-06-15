@@ -333,7 +333,7 @@ export class Aggregator {
       },
       {
         name: `${META_SERVER_ID}${SEPARATOR}status`,
-        description: 'Gateway status — connected servers, tool counts, cache ages, system health, and ledgerDlq shorthand (path + entryCount + entries[] at top level for quick DLQ inspection without filesystem access)',
+        description: 'Gateway status — connected servers, tool counts, cache ages, system health, and ledgerDlq shorthand (path + entryCount + entries[] at top level for quick DLQ inspection without filesystem access). All responses include latencyMs: wall-clock elapsed time in ms for the snapshot operation.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -346,7 +346,7 @@ export class Aggregator {
       },
       {
         name: `${META_SERVER_ID}${SEPARATOR}reload`,
-        description: 'Hot-reload servers.json without restarting the gateway',
+        description: 'Hot-reload servers.json without restarting the gateway. Success responses include latencyMs: wall-clock elapsed time in ms for the full reload operation.',
         inputSchema: { type: 'object' },
       },
       {
@@ -897,17 +897,19 @@ export class Aggregator {
   }
 
   private async handleStatus(args: Record<string, unknown> = {}): Promise<ToolCallResult> {
+    const statusStartMs = Date.now();
     const snapshot = this.getStatusSnapshot();
+    const latencyMs = Date.now() - statusStartMs;
     const short = args.short === true;
     if (short) {
       const { servers: _servers, coordinator, ...rest } = snapshot;
       const { sessions: _sessions, ...coordinatorShort } = coordinator;
       return {
-        content: [{ type: 'text', text: JSON.stringify({ ...rest, coordinator: coordinatorShort }, null, 2) }],
+        content: [{ type: 'text', text: JSON.stringify({ ...rest, coordinator: coordinatorShort, latencyMs }, null, 2) }],
       };
     }
     return {
-      content: [{ type: 'text', text: JSON.stringify(snapshot, null, 2) }],
+      content: [{ type: 'text', text: JSON.stringify({ ...snapshot, latencyMs }, null, 2) }],
     };
   }
 
@@ -919,6 +921,7 @@ export class Aggregator {
       };
     }
 
+    const reloadStartMs = Date.now();
     try {
       const newConfig = loadConfigFromPath(this.configPath);
       if (this.suggestionsCatalogPath) {
@@ -959,6 +962,7 @@ export class Aggregator {
         removed: removed.map((c) => c.id),
         totalServers: this.activeConfigs().length,
         catalog: freshness,
+        latencyMs: Date.now() - reloadStartMs,
       };
 
       log.info(`Config reloaded: +${added.length} -${removed.length} servers`);
