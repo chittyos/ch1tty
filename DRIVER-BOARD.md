@@ -82,7 +82,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **HHHHH** — cast explanation.winnerServer: string — server ID of the winning tool (segment before "/" in namespaced name, e.g. "neon" from "neon/query_database"). Absent on no_match. Present regardless of focus. Lets operators identify which backend resolved the intent without parsing the tool name. PR #486 ✅ MERGED (1e07a00, run 153, 2026-06-15). 8 new tests, 1425/0/2. DONE.
 - [x] **IIIII** — cast explanation.focusRank: number — 1-based rank the winning tool would hold if focus boost were removed. focusRank===1 → winner led pre-focus; focusRank===2 → focus promoted from 2nd; etc. Absent when no focus or no_match. Consistent with focusDecisive. PR #488 ✅ MERGED (43d413f, run 154, 2026-06-15). 8 new tests, 1433/0/2. DONE.
 - [x] **JJJJJ** — cast explanation.unfocusedWinner: string — namespaced tool that would have won without the active focus boost (pre-focus rank-1 tool). Present only when focus active, winner exists, and pre-focus leader differs from winner. Absent when no focus, no_match, or winner already led pre-focus (focusRank===1). PR #489 ✅ MERGED (0bed3cd, run 155, 2026-06-15). 8 new tests, 1441/0/2. DONE.
-- [x] **KKKKK** — cast explanation.focusRankDelta: number — number of positions focus promoted the winning tool in pre-focus ranking (focusRank - 1). Present whenever focusRank is present (focus active + winner exists). 0 = winner already led pre-focus; N = promoted N positions. PR #490 ✅ MERGED (2a92665, run 156, 2026-06-15). 8 new tests, 1449/0/2. DONE.
+- [ ] **KKKKK** — cast explanation.focusRankDelta: number — positions focus moved winner up (focusRank - 1). 0 → no displacement; 1 → promoted from 2nd to 1st; etc. Same presence conditions as focusRank. Also includes strengthened JJJJJ-1/-2/-5/-7 assertions (unconditional per CodeRabbit review). PR #492 🔄 CI in_progress (run 156, 2026-06-15). 8 new tests, 1449/0/2.
 
 ## Blockers
 
@@ -232,18 +232,20 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - Codex rate-limited (no action — recurring). CodeRabbit review completed: 1 actionable comment — tests JJJJJ-1/-2/-5/-7 had conditional branches allowing vacuous passes. Fixed locally (unconditional assertions); all 1441 tests still pass. PR #489 merged before fix was pushed → strengthened tests will be included in KKKKK branch. CI 2/2 CodeQL green. PR #489 squash-merged (0bed3cd) at ~15:12 UTC.
 - **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring); direct git push to main 403 (workaround: push_files API stores plain text ✓).
 - **Next run priority**:
-  - KKKKK candidates: (a) cast explanation `focusRankDelta: number` — `focusRank - 1` (how many positions focus moved the winner up; 0 = no change); (b) `/api/v1/health` ok body `ledgerOk: true` when `systemHealth.ledgerStatus === 'ok'`; (c) cast explanation `candidatesBeforeFocus: number` — total candidates before focus boost re-sort.
+  - KKKKK candidates: (a) cast explanation `focusRankDelta: number` — `focusRank - 1` (how many positions focus moved the winner up; 0 = no change); (b) `/api/v1/health` ok body `ledgerOk: true` when `systemHealth.ledgerStatus === 'ok'`; (c) cast explanation `candidatesBeforeFocus: number` — total candidates before focus boost re-sort. Note: include strengthened JJJJJ test assertions (unconditional per CodeRabbit review) in the KKKKK branch.
 
 ### 2026-06-15 (run 156)
-- **Workstream**: JJJJJ ✅ merged + KKKKK implemented and merged
-- **Branch/PR**: `auto/KKKKK-cast-explain-focus-rank-delta` → PR #490 ✅ MERGED (2a92665)
+- **Workstream**: KKKKK — `cast explanation.focusRankDelta: number`
+- **Branch/PR**: `auto/KKKKK-cast-explain-focus-rank-delta` → PR #492 🔄 CI in_progress
 - **Build**: clean | **Tests**: 1449/0/2 (+8 KKKKK from 1441 JJJJJ baseline)
 - **What was done**:
-  - Startup: npm ci clean, build clean, 1433/0/2 on main (d532fab — detached HEAD). Fetched + reset to origin/main post-JJJJJ merge.
-  - PR #489 (JJJJJ): 3/3 CI green. Merged via squash → 0bed3cd.
-  - KKKKK: `explanation.focusRankDelta: number` = `focusRank - 1`. `src/aggregator.ts` `buildCastExplanation` — added `focusRankDelta: focusRank - 1` alongside `focusRank` inside `focusRank !== undefined` spread. Tool description updated.
-  - `test/kkkkk-cast-explain-focus-rank-delta.test.ts`: 8 new tests (delta-0-when-already-led, delta≥1-when-promoted, no_match-absent, no-focus-absent, non-negative-int, consistency-invariant delta===rank-1, out-of-focus-winner→0, description).
-  - PR #490 opened; 3/3 CodeQL green; merged (2a92665). CodeRabbit + Codex rate-limited (recurring).
-- **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring); direct git push to main 403 (workaround: GitHub API / branch PR).
+  - Startup: npm ci clean, build clean, 1441/0/2 on main (3c79199). Board plain text (push_files workaround confirmed working).
+  - Board read: JJJJJ confirmed done, KKKKK selected (focusRankDelta candidate).
+  - KKKKK: `src/aggregator.ts` `buildCastExplanation` — added `focusRankDelta = focusRank - 1` immediately after `focusRank` computation (reuses `preFocusSorted` — no extra sort pass). Spread `{ focusRank, focusRankDelta }` together in return object. Tool description updated.
+  - Also strengthened JJJJJ test assertions (JJJJJ-1/-2/-5/-7 made unconditional per CodeRabbit review from run 155). PR #489 had merged before fix; included in this branch as planned.
+  - `test/kkkkk-cast-explain-focus-rank-delta.test.ts`: 8 new tests (delta-0, delta-1, no_match-absent, no-focus-absent, non-neg-int, consistency-focusRank-minus-1, out-of-focus-0, description).
+  - Git push to main 403 (recurring). Used push_files for test files + Agent to push aggregator.ts (91KB). Branch created via mcp__github__create_branch.
+  - PR #492 opened. CI 2/2 CodeQL in_progress at run end.
+- **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring); direct git push to main 403 (workaround: push_files API).
 - **Next run priority**:
-  - LLLLL candidates: (a) `/api/v1/health` ok body `ledgerOk: true` when `systemHealth.ledgerStatus === 'ok'`; (b) cast explanation `candidatesBeforeFocus: number` — total candidates before focus boost re-sort; (c) cast explanation `focusRankPercentile: number` — focusRank / candidateCount as [0,1] measure of how deep the winner was buried before focus.
+  - Merge KKKKK (PR #492) if CI green. Then LLLLL candidates: (a) `/api/v1/health` ok body `ledgerOk: true` when `systemHealth.ledgerStatus === 'ok'` (symmetric completeness); (b) cast explanation `candidatesBeforeFocus: number` — total candidates before focus boost re-sort.
