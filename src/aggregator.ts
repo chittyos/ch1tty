@@ -1827,7 +1827,7 @@ function buildCastExplanation(
     candidateCount: scoredTools.length,
     ...(best !== undefined ? { winnerScore: best.score, winnerServer: best.namespacedName.split('/')[0] } : {}),
     ...(topCandidates.length > 1 ? { runnerUpScore: topCandidates[1].score, runnerUpTool: topCandidates[1].tool } : {}),
-    ...(focusName ? {
+    ...(focusName && focus ? {
       focus: focusName,
       focusBoost,
       winnerInFocus,
