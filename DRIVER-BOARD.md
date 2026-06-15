@@ -66,7 +66,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **UUUU. `ch1tty/cast` `explanation.winnerScore`** — Adds `winnerScore: number` to `explanation` when `explain: true` is set. Score of the winning (top-ranked) tool in the scoring pool — equals `topCandidates[0].score` but readable directly without indexing. Absent on `cast:no_match` (no winner). PR #465 ✅ MERGED (34ca3fc, run 142, 2026-06-15). 7 new tests, 1326/0/2. DONE.
 - [x] **VVVV. `/api/v1/health` 503 body includes `ledgerDlq.entryCount`** — PR #467 ✅ MERGED (run 143/144, 2026-06-15). 7 new tests, 1333/0/2. DONE.
 - [x] **WWWW. `ch1tty/status` and `ch1tty/reload` `latencyMs`** — Completes latency observability across all 5 meta-tools. `ch1tty/status` (full + short modes) and `ch1tty/reload` (success path) now include `latencyMs`. Tool descriptions updated. PR #468 ✅ MERGED (run 143/144, 2026-06-15). 7 new tests, 1340/0/2. DONE.
-- [ ] **XXXX. `topCandidates[n].inFocus` in `ch1tty/cast` explanation** — When `explain:true` and focus active, each `topCandidates` entry carries `inFocus: boolean` (true if in-focus/boosted, false otherwise; absent without focus). Tool description updated. PR #470 open (run 144, 2026-06-15). 7 new tests, 1347/0/2. Pending merge.
+- [x] **XXXX. `topCandidates[n].inFocus` in `ch1tty/cast` explanation** — When `explain:true` and focus active, each `topCandidates` entry carries `inFocus: boolean` (true if in-focus/boosted, false otherwise; absent without focus). Tool description updated. PR #470 ✅ MERGED (a3a99b3, run 144, 2026-06-15). 7 new tests, 1347/0/2. DONE.
 
 ## Live Gateway State (as of 2026-06-15 run 143)
 
