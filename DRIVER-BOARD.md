@@ -63,6 +63,7 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 - [x] **RRRR. `ch1tty/search` `latencyMs` in responses** — All `ch1tty/search` response shapes now carry `latencyMs: number` — wall-clock elapsed time in ms from `handleSearch` entry to JSON serialisation. Covers both return paths: query/filter path (tools array) and no-query server-summary path. Tool description updated to advertise `latencyMs`. Completes latency observability across all three active meta-tools (cast LLLL/NNNN/PPPP + execute QQQQ + search RRRR). PR #460 ✅ MERGED (a11c8d7, run 140, 2026-06-14). 7 new tests, 1305/0/2. DONE.
 - [x] **SSSS. `ch1tty/cast` `explanation.brainMs` when brain route fires** — When `explain: true` is set and `castRoute === 'brain'`, the `explanation` object now includes `brainMs: number` — wall-clock time of `routeIntent()` in milliseconds. Absent when keyword-fallback route is used. Parallels `latencyBreakdown.brainMs` (PPPP) but lives in the reasoning-oriented `explanation` field alongside `method:'brain'`, `topCandidates`, and `rationale`. Present in all cast shapes: `executed`, `plan`, `resolved`, `chain_executed`, `no_match`. PR #462 ✅ MERGED (3fe81de, run 141, 2026-06-14). 7 new tests, 1312/0/2. DONE.
 - [x] **TTTT. `ch1tty/cast` `explanation.candidateCount`** — Adds `candidateCount: number` to `explanation` when `explain: true` is set. Shows the total number of tools in the scoring pool before the top-5 `topCandidates` slice — lets operators see how competitive the resolution was (3 candidates is very different from 150). Always 0 on `cast:no_match`. PR #463 ✅ MERGED (dd2f1c3, run 141, 2026-06-14). 7 new tests, 1319/0/2. DONE.
+- [ ] **UUUU. `ch1tty/cast` `explanation.winnerScore`** — Adds `winnerScore: number` to `explanation` when `explain: true` is set. Score of the winning (top-ranked) tool in the scoring pool — equals `topCandidates[0].score` but readable directly without indexing. Absent on `cast:no_match` (no winner). PR #465 open (run 142, 2026-06-15).
 
 ## Live Gateway State (as of 2026-06-14 run 141)
 
@@ -2214,3 +2215,32 @@ Fallback board — Notion (notion backend) was unreachable at board creation tim
 **Next run priority**:
 - Verify PR #460 CodeQL green; merge if clean
 - Next workstream: consider SSSS — `ch1tty/reload` latencyMs (natural 4th leg of observability), or `ch1tty/status` request latencyMs (5th), or branch/coverage sweep if all surfaces covered
+
+---
+
+### Run 142 — 2026-06-15 (auto-driver)
+
+**Workstream advanced**: UUUU (new — `explanation.winnerScore` in `ch1tty/cast` when `explain:true`)
+**Branch/PR**: `auto/UUUU-cast-explain-winner-score` → PR #465 open (run 142, 2026-06-15)
+**Build**: clean (0 errors)
+**Tests**: 1326 pass, 0 fail, 2 skipped (+7 UUUU from 1319 TTTT baseline)
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 1319/0/2 on main (post-TTTT merge).
+- Read DRIVER-BOARD.md: A✅ through TTTT✅. Only open PR was #464 (board restore — accidentally truncated).
+- **Merged PR #464** (board restore) — full DRIVER-BOARD.md restored from local commit.
+- Identified UUUU candidates from board: (a) health 503 with DLQ, (b) `explanation.winnerScore`, (c) `chain_executed` latency multi-step test. Selected (b) as the tightest focused change following the SSSS/TTTT explain-enrichment pattern.
+- **Workstream UUUU: `explanation.winnerScore` in all cast explain shapes**
+  - Gap: `explanation.topCandidates[0].score` holds the winner's score but requires array indexing. `winnerScore` surfaces it directly in the explanation object alongside `candidateCount` and `brainMs`.
+  - **`src/aggregator.ts`** (2 edits): `buildCastExplanation` return object: added `...(best !== undefined ? { winnerScore: best.score } : {})` after `candidateCount`; tool description updated to advertise `winnerScore` and its absence on `no_match`.
+  - **`test/uuuu-cast-explain-winner-score.test.ts`** (new, 7 tests): UUUU-1..7 covering keyword route, winnerScore==topCandidates[0].score invariant, no_match absent, plan/resolved/chain_executed shapes, brain route.
+  - Build clean. Full suite: 1326/0/2 (+7 from 1319).
+
+**Blockers (unchanged)**:
+- Ledger DLQ 11+ entries: ledger.chitty.cc unreachable.
+- Notion API token invalid: cannot read/write Notion board. Human must refresh `NOTION_API_TOKEN`.
+- CI (main workflow 0-jobs) unchanged — only CodeQL runs.
+
+**Next run priority**:
+- Confirm UUUU PR #465 CodeQL passes. Merge and mark UUUU ✅ done.
+- VVVV candidates: (a) `/api/v1/health` 503 body include `ledgerDlq: { entryCount }` when degraded; (b) `ch1tty/cast` `chain_executed` latencyBreakdown multi-step test (verify scoringMs+executionMs cover chain total); (c) `explanation.focusBoostApplied: boolean` shorthand (true when focus is active AND winner is in-focus, false otherwise).
