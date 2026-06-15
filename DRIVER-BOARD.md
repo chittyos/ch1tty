@@ -78,7 +78,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **DDDDD** — /api/v1/health warn body: brainCircuitOpen: true when systemHealth.brainDegraded — surfaces brain circuit state in the 200 warn response without a separate /api/v1/status call. PR #480 ✅ MERGED (3f4e107, run 150, 2026-06-15). 8 new tests, 1393/0/2. DONE.
 - [x] **EEEEE** — /api/v1/health warn body: ledgerWarn: true when systemHealth.ledgerStatus === 'warn' — symmetric to brainCircuitOpen; distinguishes ledger-drops/flushErrors warn from brain-circuit warn. PR #481 ✅ MERGED (c04f708, run 150, 2026-06-15). 8 new tests, 1401/0/2. DONE.
 - [x] **FFFFF** — cast explanation.focusBias: number — fraction of winner-runner-up margin attributable to focus boost (winnerFocusBoost / focusMargin). Absent when focusMargin === 0 (division-by-zero guard), no runner-up, focus inactive, or no_match. PR #483 ✅ MERGED (b697884, run 151, 2026-06-15). 8 new tests, 1409/0/2. DONE.
-- [ ] **GGGGG** — cast explanation.focusConfidence: number — focusBias clamped to [0,1]. Same presence conditions as focusBias. Unlike focusBias (can exceed 1), focusConfidence is always [0,1] — a clean percentage of focus attribution. PR #485 (open, CI in_progress, run 152, 2026-06-15). 8 new tests, 1417/0/2.
+- [x] **GGGGG** — cast explanation.focusConfidence: number — focusBias clamped to [0,1]. Same presence conditions as focusBias. Unlike focusBias (can exceed 1), focusConfidence is always [0,1] — a clean percentage of focus attribution. PR #485 ✅ MERGED (1e9407a, run 152, 2026-06-15). 8 new tests, 1417/0/2. DONE.
 
 ## Blockers
 
@@ -175,15 +175,14 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 ### 2026-06-15 (run 152)
 - **Workstream**: GGGGG — `cast explanation.focusConfidence: number`
-- **Branch/PR**: `auto/GGGGG-cast-explain-focus-confidence` → PR #485 (open, CI in_progress)
+- **Branch/PR**: `auto/GGGGG-cast-explain-focus-confidence` → PR #485 ✅ MERGED (1e9407a, ~13:13 UTC)
 - **Build**: clean | **Tests**: 1417/0/2 (+8 GGGGG from 1409 FFFFF baseline)
 - **What was done**:
-  - Startup: npm ci clean, build clean, 1409/0/2 on main. No open PRs (FFFFF #483 already merged per board commit).
-  - DRIVER-BOARD.md read from DRIVER-BOARD.md (Notion 401, using file fallback). All workstreams A–FFFFF confirmed done.
-  - GGGGG: `src/aggregator.ts` `buildCastExplanation` — added `focusConfidence: Math.min(1, (winnerInFocus ? focusBoost : 0) / (best.score - topCandidates[1].score))` alongside `focusBias`, inside same `focusMargin !== 0` guard. Tool description updated to document `focusConfidence`.
-  - Key clamping property verified live: with intent `alpha beta gamma delta`, in-focus stripe tool matches 3/4 terms (score 0.75) vs out-of-focus neon 4/4 (score 1.0); after boost focusBias=2.0, focusConfidence=1.0 (clamped) ✓
-  - `test/ggggg-cast-explain-focus-confidence.test.ts`: 8 new tests covering: [0,1] range, min(1,focusBias) consistency, clamping (focusBias>1 → focusConfidence=1), out-of-focus=0, no-focus absent, no_match absent, single-candidate absent, description.
-  - PR #485 opened. Codex + CodeRabbit rate-limited (no action needed — recurring). CI 2/2 CodeQL in_progress at run end.
+  - Startup: npm ci clean, build clean, 1409/0/2 on main. No open PRs (FFFFF #483 already merged).
+  - GGGGG: `src/aggregator.ts` `buildCastExplanation` — added `focusConfidence: Math.min(1, (winnerInFocus ? focusBoost : 0) / (best.score - topCandidates[1].score))` alongside `focusBias`, inside same `focusMargin !== 0` guard. Tool description updated.
+  - Key clamping verified live: intent `alpha beta gamma delta`, in-focus stripe (3/4 terms, score 0.75) vs neon (4/4, score 1.0); after boost focusBias=2.0, focusConfidence=1.0 (clamped) ✓
+  - `test/ggggg-cast-explain-focus-confidence.test.ts`: 8 new tests ([0,1] range, min(1,focusBias) consistency, clamping, out-of-focus=0, no-focus absent, no_match absent, single-candidate absent, description).
+  - Codex + CodeRabbit rate-limited (no action — recurring). CI 2/2 CodeQL green. PR #485 merged 13:13 UTC.
 - **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**:
-  - Merge GGGGG (PR #485) if CI green, then HHHHH candidates: (a) `/api/v1/health` ok body `ledgerOk: true` when `systemHealth.ledgerStatus === 'ok'` (symmetric completeness with ledgerWarn/brainCircuitOpen); (b) cast explanation `focusRank: number` — winner's rank in the pre-focus scoring (1-based; 1 means it would have won anyway, >1 means focus promoted it); (c) cast explanation `unfocusedWinner: string` — namespaced tool name that would have won without focus boost (absent when same as winner).
+  - HHHHH candidates: (a) `/api/v1/health` ok body `ledgerOk: true` when `systemHealth.ledgerStatus === 'ok'` (symmetric completeness with ledgerWarn/brainCircuitOpen); (b) cast explanation `focusRank: number` — winner's 1-based rank in pre-focus scoring (1 = would have won anyway, >1 = focus promoted it); (c) cast explanation `unfocusedWinner: string` — namespaced tool that would have won without focus boost (absent when same as winner).
