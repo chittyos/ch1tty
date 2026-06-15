@@ -86,7 +86,8 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **LLLLL** — cast explanation.winnerScoreBase: number — winner's pre-focus base score (winnerScore - winnerFocusBoost). Completes the decomposition: winnerScoreBase + winnerFocusBoost = winnerScore. PR #493 ✅ MERGED (0426ef5, run 158, 2026-06-15). 8 new tests, 1457/0/2. DONE.
 - [x] **MMMMM** — cast explanation.candidatesInFocusCount: number — count of scored candidates whose server or category matches the active focus profile (out of candidateCount). Present when focus active + winner exists. Absent on no_match or no focus. Combined with candidateCount gives in-focus density. PR #494 ✅ MERGED (75155c5, run 158, 2026-06-15). 8 new tests, 1465/0/2. DONE.
 - [x] **NNNNN** — cast explanation.inFocusFraction: number — candidatesInFocusCount / candidateCount as [0,1] density metric. Present when focus active + winner exists + candidateCount > 0. Absent when no focus, no_match, or candidateCount === 0 (division guard). PR #495 ✅ MERGED (df640e0, run 158, 2026-06-15). 8 new tests, 1473/0/2. DONE.
-- [ ] **OOOOO** — /api/v1/health ok body ledgerOk: true when systemHealth.ledgerStatus === 'ok'. Symmetric to ledgerWarn. Explicit positive signal that ledger is clean. PR TBD.
+- [x] **OOOOO** — /api/v1/health ok body ledgerOk: true when systemHealth.ledgerStatus === 'ok'. Symmetric to ledgerWarn. Explicit positive signal that ledger is clean. PR #496 ✅ MERGED (a64d80c, run 158, 2026-06-15). 8 new tests, 1481/0/2. DONE.
+- [ ] **PPPPP** — cast explanation.topOutOfFocusScore: number — highest score among out-of-focus candidates. Present when focus active + winner exists + at least one out-of-focus candidate. Absent when all candidates are in-focus, no focus, or no_match. PR TBD.
 
 ## Blockers
 
