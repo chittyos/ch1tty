@@ -274,3 +274,16 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - JJJJJJ: added rawFocusMargin (winnerScoreBase - runnerUpScoreBase) in focus+runner-up block. 8 new tests. PR #525 → merged (3baf457). Tests: 1658/0/2.
   - Blockers: direct `git push main` 403 (recurring — use PR path); CodeRabbit rate-limited on #525 (recurring); Notion 401.
 - **Next run priority**: KKKKKK — `rawFocusMarginRatio: number` (rawFocusMargin / winnerScoreBase when winnerScoreBase > 0 — relative unfocused margin normalised to winner's base). Or alternatively `inFocusBottomScore: number` (lowest score among in-focus candidates, complement to inFocusTopScore).
+
+### 2026-06-15 (run 165 — KKKKKK) ✅ COMPLETE
+- **Workstream**: A (gateway observability) — KKKKKK: `cast explanation.outOfFocusMeanScore: number`
+- **Branch/PR**: `auto/KKKKKK-cast-explain-out-of-focus-mean-score` → PR #527 (renamed from JJJJJJ — collision with run 164 rawFocusMargin)
+- **Build**: clean | **Tests**: 1610/0/2 (+8 KKKKKK from 1602 baseline)
+- **What was done**:
+  - Startup: main at 966ba68 (run 164 JJJJJJ=rawFocusMargin). JJJJJJ was already taken; renamed workstream to KKKKKK.
+  - Added outOfFocusMeanScore: precomputed outOfFocusScores array + outOfFocusMeanScore mean; wired into focus+best block alongside topOutOfFocusScore. Description line added after inFocusMeanScore. Symmetric to inFocusMeanScore.
+  - 8 new tests (KKKKKK-1..8). All pass.
+  - PR #527 opened; CI 3/3 green; merged.
+  - CodeRabbit + Codex rate-limited on #527 (recurring — no action).
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
+- **Next run priority**: LLLLLL — `outOfFocusBottomScore: number` (lowest relevance score among out-of-focus candidates, complement to topOutOfFocusScore; symmetric to inFocusBottomScore if that lands first) or `rawFocusMarginRatio: number` (rawFocusMargin / winnerScoreBase).
