@@ -85,7 +85,8 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **KKKKK** — cast explanation.focusRankDelta: number — number of positions focus promoted the winning tool in pre-focus ranking (focusRank - 1). Present whenever focusRank is present (focus active + winner exists). 0 = winner already led pre-focus; N = promoted N positions. PR #490 ✅ MERGED (2a92665, run 156, 2026-06-15). 8 new tests, 1449/0/2. DONE.
 - [x] **LLLLL** — cast explanation.winnerScoreBase: number — winner's pre-focus base score (winnerScore - winnerFocusBoost). Completes the decomposition: winnerScoreBase + winnerFocusBoost = winnerScore. PR #493 ✅ MERGED (0426ef5, run 158, 2026-06-15). 8 new tests, 1457/0/2. DONE.
 - [x] **MMMMM** — cast explanation.candidatesInFocusCount: number — count of scored candidates whose server or category matches the active focus profile (out of candidateCount). Present when focus active + winner exists. Absent on no_match or no focus. Combined with candidateCount gives in-focus density. PR #494 ✅ MERGED (75155c5, run 158, 2026-06-15). 8 new tests, 1465/0/2. DONE.
-- [ ] **NNNNN** — cast explanation.inFocusFraction: number — candidatesInFocusCount / candidateCount as [0,1] density metric. Present when focus active + winner exists + candidateCount > 0. Absent when no focus, no_match, or candidateCount === 0 (division guard). PR TBD.
+- [x] **NNNNN** — cast explanation.inFocusFraction: number — candidatesInFocusCount / candidateCount as [0,1] density metric. Present when focus active + winner exists + candidateCount > 0. Absent when no focus, no_match, or candidateCount === 0 (division guard). PR #495 ✅ MERGED (df640e0, run 158, 2026-06-15). 8 new tests, 1473/0/2. DONE.
+- [ ] **OOOOO** — /api/v1/health ok body ledgerOk: true when systemHealth.ledgerStatus === 'ok'. Symmetric to ledgerWarn. Explicit positive signal that ledger is clean. PR TBD.
 
 ## Blockers
 
@@ -277,7 +278,10 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - MMMMM: `src/aggregator.ts` `buildCastExplanation` — added `candidatesInFocusCount: scoredTools.filter((t) => isInFocus(focus, t)).length` in the `best !== undefined` focus guard. Tool description updated.
   - `test/mmmmm-cast-explain-candidates-in-focus-count.test.ts`: 8 new tests (present, ≥0, ≤candidateCount, all-out-of-focus=0, all-in-focus=candidateCount, no_match absent, no-focus absent, description).
   - PR #494 opened; 3/3 CI green; merged (75155c5). CodeRabbit rate-limited (recurring).
-  - NNNNN: `inFocusFraction: number` = candidatesInFocusCount / candidateCount — started this run.
+  - NNNNN: `src/aggregator.ts` `buildCastExplanation` — added `inFocusFraction: scoredTools.filter(...).length / scoredTools.length` inside `scoredTools.length > 0` guard. Tool description updated.
+  - `test/nnnnn-cast-explain-in-focus-fraction.test.ts`: 8 new tests (present, [0,1] range, identity, all-out=0, all-in=1, no_match absent, no-focus absent, description).
+  - PR #495 opened; 3/3 CI green; merged (df640e0). CodeRabbit rate-limited (recurring).
+  - OOOOO: `/api/v1/health` ok body `ledgerOk: true` — added to http-server.ts + CLAUDE.md updated. PR TBD.
 - **Blockers (unchanged)**: Notion 401, ledger DLQ 11 entries, CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**:
-  - Merge NNNNN (PR TBD) if CI green. Then OOOOO candidates: (a) `/api/v1/health` ok body `ledgerOk: true`; (b) cast explanation `focusScoreSpread: number` — stddev or range of in-focus candidate scores.
+  - Merge OOOOO (PR TBD) if CI green. Then PPPPP candidates: (a) cast explanation `focusScoreSpread: number` — range of in-focus candidate scores (max - min); (b) cast explanation `outOfFocusWinnerGap: number` — score gap between winner and highest out-of-focus candidate.
