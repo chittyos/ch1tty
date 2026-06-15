@@ -72,8 +72,9 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **XXXX** — cast explanation topCandidates[n].inFocus (PR #470). DONE.
 - [x] **YYYY** — cast explanation runnerUpScore + runnerUpTool (PR #472). DONE.
 - [x] **ZZZZ** — cast explanation.winnerFocusBoost: exact boost applied to winner (0 if out-of-focus, absent if no focus/no_match). PR #473 ✅ MERGED (b16fed8, run 146, 2026-06-15). 7 new tests, 1361/0/2. DONE.
-- [x] **AAAAA** — cast explanation.focusDecisive: boolean — true when winner would not have won without focus boost (winnerScore - winnerFocusBoost < runnerUpScore). PR #475 ✅ MERGED (db2f4fb, run 147, 2026-06-15). 8 new tests, 1369/0/2. DONE.
-- [ ] **BBBBB** — cast latencyBreakdown.registryMs: wall-clock time of registry/prompts/resources fetch (sub-component of scoringMs; 0 if cache warm). PR #477 (open, run 147, 2026-06-15). 8 new tests, 1377/0/2.
+- [x] **AAAAA** — cast explanation.focusDecisive: boolean — true when winner would not have won without focus boost. PR #475 ✅ MERGED (run 147, 2026-06-15). 8 new tests, 1369/0/2. DONE.
+- [x] **BBBBB** — cast latencyBreakdown.registryMs — registry fetch time isolated from scoringMs. PR #477 ✅ MERGED (4949c21, run 149, 2026-06-15). 8 new tests, 1377/0/2. DONE.
+- [ ] **CCCCC** — cast explanation.focusMargin: number — raw score gap between winner and runner-up in focus-biased space (winnerScore - runnerUpScore). PR #478 (open, run 148, 2026-06-15). 8 new tests, 1377/0/2.
 
 ## Blockers
 
@@ -105,13 +106,23 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   1. Plan AAAAA: candidates — (a) `/api/v1/health` warn body: surface `brainCircuitOpen: true` in 200 response when `systemHealth.status === 'warn'`; (b) `explanation.focusDecisive: boolean` — computed as `winnerScore - winnerFocusBoost < runnerUpScore`; (c) cast `latencyBreakdown.registryMs` — registry fetch time isolated from scoringMs.
 
 ### 2026-06-15 (run 147)
-- **Workstream**: AAAAA (merged) + BBBBB (opened)
-- **Branch/PR**: `auto/AAAAA-cast-explain-focus-decisive` → PR #475 ✅ MERGED (db2f4fb) / `auto/BBBBB-cast-latency-registry-ms` → PR #477 (open)
-- **Build**: clean | **Tests**: 1377/0/2 (+8 AAAAA, +8 BBBBB from 1361 baseline)
+- **Workstream**: AAAAA — `cast explanation.focusDecisive: boolean`
+- **Branch/PR**: `auto/AAAAA-cast-explain-focus-decisive` → PR #475 ✅ MERGED (db2f4fb)
+- **Build**: clean | **Tests**: 1369/0/2 (+8 AAAAA from 1361 baseline)
 - **What was done**:
-  - Startup: npm ci clean, build clean, tests 1361/0/2. Board plain text — no reconstruction needed.
-  - AAAAA: `explanation.focusDecisive: boolean` merged (PR #475 → db2f4fb).
-  - BBBBB: `latencyBreakdown.registryMs` in `ch1tty/cast` — isolates `Promise.allSettled([getRegistry(), ...])` wall time from total `scoringMs`. 8 new tests.
+  - AAAAA: `explanation.focusDecisive: boolean` in `ch1tty/cast` when `explain:true`, focus active, winner + runner-up exist.
+    - `src/aggregator.ts`: `buildCastExplanation` — `focusDecisive: (best.score - (winnerInFocus ? focusBoost : 0)) < topCandidates[1].score`. Tool description updated.
+    - 8 new tests.
+- **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring).
+
+### 2026-06-15 (run 148)
+- **Workstream**: CCCCC — `cast explanation.focusMargin: number`
+- **Branch/PR**: `auto/CCCCC-cast-explain-focus-margin` → PR #478 (open)
+- **Build**: clean | **Tests**: 1377/0/2 (+8 CCCCC from 1369 baseline)
+- **What was done**:
+  - CCCCC: `explanation.focusMargin: number` in `ch1tty/cast` when `explain:true`, focus active, winner + runner-up exist.
+    - `src/aggregator.ts`: `buildCastExplanation` — `focusMargin: best.score - topCandidates[1].score` inside `best !== undefined && topCandidates.length > 1` guard alongside `focusDecisive`. Tool description updated.
+    - 8 new tests.
 - **Blockers (unchanged)**: Notion 401, ledger DLQ, CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**:
-  - CCCCC candidates: (a) `/api/v1/health` warn body `brainCircuitOpen: true` when `systemHealth.status === 'warn'`; (b) cast explanation `focusMargin: number` = winnerScore - runnerUpScore.
+  - DDDDD: `/api/v1/health` warn body — when `systemHealth.status === 'warn'`, include `brainCircuitOpen: true` in the 200 response body.
