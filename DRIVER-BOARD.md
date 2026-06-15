@@ -337,3 +337,15 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - CodeRabbit + Codex rate-limited (recurring — no action).
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**: PPPPPP — `candidateScoreEntropy: number` (Shannon entropy of normalised candidate score distribution — measures how spread-out or concentrated scores are; low entropy = one dominant tool, high entropy = scores evenly spread).
+
+### 2026-06-15 (run 170 — PPPPPP) ✅ COMPLETE
+- **Workstream**: A (gateway observability) — PPPPPP: `cast explanation.candidateScoreEntropy: number`
+- **Branch/PR**: `auto/PPPPPP-cast-explain-candidate-score-entropy` → PR #534
+- **Build**: clean | **Tests**: 1650/0/2 (+8 PPPPPP from 1642 OOOOOO baseline)
+- **What was done**:
+  - Startup: main at 0d4c4be2 (OOOOOO focusMarginRatio merged). Added candidateScoreEntropy: Shannon entropy H = -sum(p_i*log2(p_i)) over all scoredTools. Precomputed variable; wired into topCandidates.length > 1 block.
+  - Description line added after topCandidatesMeanScore. 8 new tests (PPPPPP-1..8). All pass.
+  - PR #534 opened; CI 3/3 green; merged.
+  - CodeRabbit + Codex rate-limited (recurring — no action).
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
+- **Next run priority**: QQQQQQ — `topCandidatesGiniCoefficient: number` (Gini coefficient of topCandidates scores — measures inequality/concentration within the top-5 pool; 0 = equal scores, 1 = one dominant tool).
