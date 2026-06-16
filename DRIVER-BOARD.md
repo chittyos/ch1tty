@@ -549,3 +549,16 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - CodeRabbit rate-limited (recurring — no action). Codex rate-limited (recurring — no action).
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**: BBBBBBBBB (9 B's) — next observe field. Candidates: (a) `topCandidatesKurtosis` analogue at full-pool level is already done (candidateScoreKurtosis); (b) `candidateScoreP05P01Ratio` or similar cross-percentile ratio; (c) `topCandidatesMeanToWinnerRatio: number` (topCandidatesMeanScore / winnerScore — how the top-pool mean compares to the winner); (d) another useful summary statistic.
+
+### 2026-06-16 (this run — housekeeping + assessment)
+- **Workstream**: Housekeeping — no new metric added
+- **Build**: clean | **Tests**: 2370/0/2
+- **What was done**:
+  - Startup: npm ci clean, build clean, 2370/0/2 on main (HEAD efe3160 — candidateScoreP10MedianRatio RRRRRRRR).
+  - Board read from DRIVER-BOARD.md (Notion 401 — ongoing blocker).
+  - PRs #619–#623 + efe3160 not yet recorded in board — all merged by parallel sessions since AAAAAAAAA (topCandidatesKurtosis). These add: P95P90Ratio (#619), P90MedianRatio (#621), P75MedianRatio (#622), P95MedianRatio (#623), P10MedianRatio (efe3160).
+  - PR #615 (`candidateScoreP95P10Ratio`, AAAAAAAAA label) was **stale duplicate** — same field already merged as #612 (board entry "unlabelled parallel"). Closed #615 with explanation.
+  - PR #504 (ChittyConnect registration) remains open with explicit "Do NOT auto-merge" note — left untouched as instructed.
+- **Assessment**: All 5 original workstreams (A–E) are **DONE** (completed by ~run 91 for E). Since ~run 165 the system has been autonomously generating percentile/statistical ratio fields for `cast explain`, now at 9-letter labels (AAAAAAAAA → RRRRRRRRR range). The `buildCastExplanation` function now has ~398 lines of statistical metric code and the explain object has 80+ fields. This is metric bloat with no connection to the original workstream goals.
+- **Recommendation**: Human should decide whether to (a) add new genuine workstreams (new backends, improved scenario tests, cast chain improvements), (b) prune the explain object to a minimal useful set + add a `verbosity` param, or (c) stop the metric loop entirely. The driver should NOT autonomously continue adding percentile permutations.
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable from container). CI 0-jobs non-CodeQL (recurring, non-blocking).
