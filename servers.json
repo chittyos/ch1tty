@@ -153,7 +153,7 @@
       "category": "desktop",
       "endpoint": "http://127.0.0.1:8850/mcp",
       "lazy": true,
-      "enabled": true
+      "enabled": false
     },
     {
       "_comment": "github: official GitHub hosted MCP server (replaces deprecated @modelcontextprotocol/server-github). Auth via GITHUB_MCP_AUTHORIZATION env var holding 'Bearer <PAT>'; populate from op://ChittyOS-Integrations/github/personal_access_token (e.g. export GITHUB_MCP_AUTHORIZATION=\"Bearer $(op read op://ChittyOS-Integrations/github/personal_access_token)\"). The chitty-mcp-token broker has no 'github' key, so authTokenKey is not used here."
@@ -188,15 +188,15 @@
     {
       "id": "notion",
       "name": "Notion",
-      "type": "local",
+      "type": "remote",
       "access": "readwrite",
       "category": "documents",
-      "command": "/home/ubuntu/.local/bin/notion-mcp-wrapper.sh",
-      "args": [
-        "-y",
-        "@notionhq/notion-mcp-server"
-      ],
-      "env": {},
+      "endpoint": "https://mcp.chitty.cc/notion/mcp",
+      "envHeaders": {
+        "CF-Access-Client-Id": "CHITTY_CF_ACCESS_CLIENT_ID",
+        "CF-Access-Client-Secret": "CHITTY_CF_ACCESS_CLIENT_SECRET"
+      },
+      "authTokenKey": "chittymcp",
       "lazy": true,
       "enabled": true
     },
@@ -220,18 +220,15 @@
     {
       "id": "neon",
       "name": "Neon Database",
-      "type": "local",
+      "type": "remote",
       "access": "readwrite",
       "category": "ecosystem",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@neondatabase/mcp-server-neon",
-        "start"
-      ],
-      "env": {
-        "NEON_API_KEY": "op://ChittyOS-Integrations/neon/api_key"
+      "endpoint": "https://mcp.chitty.cc/neon/mcp",
+      "envHeaders": {
+        "CF-Access-Client-Id": "CHITTY_CF_ACCESS_CLIENT_ID",
+        "CF-Access-Client-Secret": "CHITTY_CF_ACCESS_CLIENT_SECRET"
       },
+      "authTokenKey": "chittymcp",
       "lazy": true,
       "enabled": true
     },
@@ -407,6 +404,20 @@
       "access": "readwrite",
       "category": "ecosystem",
       "endpoint": "https://orchestrator.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": false,
+      "enabled": true
+    },
+    {
+      "_comment": "ChittyConnect (ChicoKeys) — the credential/connection broker. Own MCP at connect.chitty.cc/api/mcp (streamable HTTP, auth-gated 401; /sse is the legacy transport). NOT proxied under mcp.chitty.cc/{connect}. Registered direct, mirroring the orchestrator direct-service pattern (authTokenKey chittymcp). This is the canonical remote broker the /chico skill targets — local Task subagents have no broker access."
+    },
+    {
+      "id": "connect",
+      "name": "ChittyConnect (ChicoKeys)",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "ecosystem",
+      "endpoint": "https://connect.chitty.cc/api/mcp",
       "authTokenKey": "chittymcp",
       "lazy": false,
       "enabled": true
