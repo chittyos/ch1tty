@@ -110,6 +110,45 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **IIIIII** — cast explanation.inFocusMeanScore: number — arithmetic mean score of in-focus candidates. Same presence conditions as inFocusTopScore. PR #523 ✅ MERGED (2026-06-15). 8 new tests, 1650/0/2. DONE.
 - [x] **JJJJJJ** — cast explanation.rawFocusMargin: number — winnerScoreBase - runnerUpScoreBase (unfocused score gap, strips focus boost from both sides). Present when focus active + runner-up exists. Can be negative when focus reversed ranking. PR #525 ✅ MERGED (3baf457, 2026-06-15). 8 new tests, 1658/0/2. DONE.
 - [x] **KKKKKK** — cast explanation.focusNetBoostDelta: number — net differential focus boost winner received vs runner-up (winnerFocusBoost - runnerUpFocusBoost). +focusBoost when winner in-focus/runner-up out; 0 when both same; -focusBoost when vice versa. Identity: focusMargin === rawFocusMargin + focusNetBoostDelta. Present when focus active + runner-up exists. PR #529 ✅ MERGED (2026-06-15). 8 new tests, 1668/0/2. DONE.
+- [x] **LLLLLL** — cast explanation.outOfFocusBottomScore: number. PR #529 (2nd) ✅ MERGED. DONE.
+- [x] **MMMMMM** — cast explanation.inFocusBottomScore: number. PR #531 ✅ MERGED. DONE.
+- [x] **NNNNNN** — cast explanation.rawFocusMarginRatio: number. PR #532 ✅ MERGED. DONE.
+- [x] **OOOOOO** — cast explanation.focusMarginRatio: number. PR #533 ✅ MERGED. DONE.
+- [x] **PPPPPP** — cast explanation.candidateScoreEntropy: number. PR #534 ✅ MERGED. DONE.
+- [x] **QQQQQQ** — cast explanation.topCandidatesGiniCoefficient: number. PR #535 ✅ MERGED. DONE.
+- [x] **RRRRRR** — cast explanation.scoreDominanceIndex: number. PR #536 ✅ MERGED. DONE.
+- [x] **SSSSSS** — cast explanation.candidateGiniCoefficient: number. PR #537 ✅ MERGED. DONE.
+- [x] **TTTTTT** — cast explanation.topCandidatesScoreSkewness: number. PR #538 ✅ MERGED. DONE.
+- [x] **UUUUUU** — cast explanation.candidateScoreSkewness: number (3rd moment). PR #539 ✅ MERGED. DONE.
+- [x] **VVVVVV** — cast explanation.candidateScoreVariance: number (2nd moment). PR #540 ✅ MERGED. DONE.
+- [x] **WWWWWW** — cast explanation.candidateScoreStdDev: number. PR #542 ✅ MERGED. DONE.
+- [x] **XXXXXX** — cast explanation.candidateScoreMean: number (1st moment). PR #543 ✅ MERGED. DONE.
+- [x] **YYYYYY** — cast explanation.medianCandidateScore: number. PR #544 ✅ MERGED. DONE.
+- [x] **ZZZZZZ** — cast explanation.candidateScoreMeanRatio: number. PR #545 ✅ MERGED. DONE.
+- [x] **AAAAAAA** — cast explanation.candidateScoreCoefficientOfVariation: number (CV). PR #546 ✅ MERGED. DONE.
+- [x] **BBBBBBB** — cast explanation.medianToMeanRatio: number. PR #548 ✅ MERGED. DONE.
+- [x] **CCCCCCC** — cast explanation.winnerToMedianRatio: number. PR #549 ✅ MERGED. DONE.
+- [x] **DDDDDDD** — cast explanation.winnerScoreZScore: number. PR #550 ✅ MERGED. DONE.
+- [x] **EEEEEEE** — cast explanation.runnerUpScoreZScore: number. PR #551 ✅ MERGED. DONE.
+- [x] **FFFFFFF** — cast explanation.zScoreGap: number (winner-runnerUp gap in stddev units). PR #552 ✅ MERGED. DONE.
+- [x] **GGGGGGG** — cast explanation.candidateScoreNormalizedRange: number (spread / mean). PR #553 ✅ MERGED. DONE.
+- [x] **HHHHHHH** — cast explanation.lowestCandidateScoreRatio: number. PR #554 ✅ MERGED. DONE.
+- [x] **IIIIIII** — cast explanation.nonZeroCandidateFraction: number. PR #555 ✅ MERGED. DONE.
+- [x] **JJJJJJJ** — cast explanation.topHeavinessRatio: number (top-5 share of total score mass). PR #556 ✅ MERGED. DONE.
+- [x] **KKKKKKK** — cast explanation.candidateScoreHerfindahlIndex: number (HHI concentration). PR #557 ✅ MERGED (7295780, 2026-06-16, this run). 8 new tests. DONE.
+- [x] **LLLLLLL** — cast explanation.effectiveN: number (1/HHI — effective candidate count). PR #558 ✅ MERGED (parallel session). DONE.
+- [x] **MMMMMMM** — cast explanation.scoreEntropyNormalized: number (entropy / log2(nonZeroCount)). PR #559 ✅ MERGED (parallel session). DONE.
+- [x] **NNNNNNN** — cast explanation.candidateScoreIQR: number (interquartile range, robust spread measure). PR #560 ✅ MERGED (parallel session). DONE.
+- [x] **OOOOOOO** — cast explanation.candidateScoreIQRRatio: number (IQR / mean). PR #561 ✅ MERGED (parallel session). DONE.
+- [x] **PPPPPPP** — cast explanation.top2HeavinessRatio: number (top-2 share of total score mass). PR #563 ✅ MERGED (parallel session). DONE.
+- [x] **QQQQQQQ** — cast explanation.candidateScoreKurtosis: number (4th moment, excess kurtosis — completes 4-moment characterisation). PR #562 ✅ MERGED (this run). DONE.
+- [x] **RRRRRRR** — cast explanation.winnerRunnerUpGap: number. PR #566 ✅ MERGED (parallel session). DONE.
+- [x] **SSSSSSS** — cast explanation.runnerUpMeanGap: number. PR #567 ✅ MERGED (parallel session). DONE.
+- [x] **TTTTTTT** — cast explanation.candidateScoreGeometricMean: number. PR #568 ✅ MERGED (parallel session). DONE.
+- [x] **UUUUUUU** — cast explanation.candidateScoreHarmonicMean: number. PR #569 ✅ MERGED (parallel session). DONE.
+- [x] **VVVVVVV** — cast explanation.candidateScoreP90: number. PR #570 ✅ MERGED (parallel session). DONE.
+- [x] **WWWWWWW** — cast explanation.candidateScoreP10: number. PR #571 ✅ MERGED (parallel session). DONE.
+- [x] **XXXXXXX** — cast explanation.candidateScoreP80Range: number. PR #572 ✅ MERGED (parallel session). DONE.
 
 ## Blockers
 
@@ -407,3 +446,17 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Branch/PR**: `auto/XXXXXX-cast-explain-candidate-score-mean` → PR TBD
 - **Build**: clean | **Tests**: 1714/0/2 (+8 XXXXXX from 1706 WWWWWW baseline)
 - **What was done**: Added candidateScoreMean: totalCandidateScore / candidateCount. Reuses candidateScoreEntropyTotal (no extra loop). Full-pool parallel to topCandidatesMeanScore. Always <= winnerScore. Equals topCandidatesMeanScore when candidateCount <= 5. 8 new tests.
+
+### 2026-06-16 (run 179 — QQQQQQQ) ✅ COMPLETE
+- **Workstream**: A (gateway observability) — QQQQQQQ: `cast explanation.candidateScoreKurtosis: number`
+- **Branch/PR**: `auto/NNNNNNN-cast-explain-candidate-score-kurtosis` → PR #562
+- **Build**: clean | **Tests**: TBD (+8 QQQQQQQ)
+- **What was done**:
+  - Startup: npm ci clean, build clean, 1874/0/2 on main (MMMMMMM HEAD aa73bb8). Board read from DRIVER-BOARD.md (Notion 401 — recurring).
+  - Merged PR #557 (KKKKKKK candidateScoreHerfindahlIndex → 7295780). Closed stale PR #547 (YYYYYY kurtosis targeting old SHA — YYYYYY slot already taken by medianCandidateScore #544).
+  - Parallel sessions had also merged LLLLLLL (#558 effectiveN), MMMMMMM (#559 scoreEntropyNormalized), NNNNNNN (#560 candidateScoreIQR), OOOOOOO (#561 candidateScoreIQRRatio), PPPPPPP (#563 top2HeavinessRatio) — pulled main twice mid-rebase.
+  - QQQQQQQ (renamed twice from NNNNNNN→PPPPPPP→QQQQQQQ due to race losses): 4th standardised moment (excess kurtosis) — `(1/n)*Σ((x_i-mean)^4/stddev^4) - 3`. Computed via IIFE after candidateScoreSkewness. Same presence guard (>= 2 candidates, stddev > 0). Description line added. Wired into output spread after candidateScoreSkewness.
+  - 8 new tests (QQQQQQQ-1..8): present/finite/absent-single/absent-identical-scores/absent-no_match/2-candidate-identity(-2)/present-no-focus/description. All pass.
+  - Board backfilled: added LLLLLL through PPPPPPP (parallel sessions, 6-letter and 7-letter sequences).
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
+- **Next run priority**: RRRRRRR (7 R's) — `topCandidatesKurtosis: number` (4th moment of topCandidates pool, symmetric to topCandidatesScoreSkewness; completes 4-moment characterisation for top pool).
