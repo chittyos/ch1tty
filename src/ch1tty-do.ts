@@ -32,6 +32,8 @@ const META_TOOL_VERBS: ReadonlySet<string> = new Set([
   'search', 'execute', 'status', 'reload', 'cast', 'code', 'provision',
 ]);
 const REGISTRY_TTL = 5 * 60 * 1000;
+/** Idle window after which alarm() runs onSessionEnd for a session. */
+const SESSION_IDLE_MS = 15 * 60 * 1000;
 
 interface NamespacedTool {
   serverId: string;
@@ -94,9 +96,11 @@ export class Ch1ttyDO extends DurableObject<Env> {
     }
 
     const sessionId = req.headers.get('mcp-session-id') ?? `do-${crypto.randomUUID().slice(0, 8)}`;
+    // SessionTracker.getOrCreate is idempotent. Coordinator session start is
+    // started exactly once (in the initialize handler) so per-request calls do
+    // not wipe affinity/patterns or re-stage the entity — see handleJsonRpc.
     this.sessions.getOrCreate(sessionId, 'http');
-    void this.coordinator.onSessionStart(sessionId, 'http');
-    // Ensure the alarm is scheduled so buffered events flush.
+    // Ensure the alarm is scheduled so buffered events flush + idle sessions close.
     await this.ensureAlarm();
 
     let body: { jsonrpc?: string; id?: unknown; method?: string; params?: Record<string, unknown> };
@@ -122,6 +126,11 @@ export class Ch1ttyDO extends DurableObject<Env> {
 
     switch (body.method) {
       case 'initialize':
+        // Start the coordinator session exactly once per session (begins entity
+        // staging + emits session_start). hasSession guards re-initialize.
+        if (!this.coordinator.hasSession(sessionId)) {
+          void this.coordinator.onSessionStart(sessionId, 'http');
+        }
         return ok({
           protocolVersion: '2025-06-18',
           capabilities: { tools: {}, resources: {}, prompts: {} },
@@ -132,6 +141,11 @@ export class Ch1ttyDO extends DurableObject<Env> {
       case 'tools/list':
         return ok(await this.listAllTools());
       case 'tools/call': {
+        // Lazily start the session for clients that skip initialize. hasSession
+        // makes this a no-op once started, so affinity/patterns still accumulate.
+        if (!this.coordinator.hasSession(sessionId)) {
+          void this.coordinator.onSessionStart(sessionId, 'http');
+        }
         const name = String(body.params?.name ?? '');
         const args = (body.params?.arguments && typeof body.params.arguments === 'object')
           ? (body.params.arguments as Record<string, unknown>) : {};
@@ -898,13 +912,24 @@ export class Ch1ttyDO extends DurableObject<Env> {
   }
 
   async alarm(): Promise<void> {
+    // A per-session DO (idFromName) has no transport-close event, so onSessionEnd
+    // (context_checkpoint to ContextConsciousness + session_end ledger summary)
+    // is driven here: close sessions idle longer than SESSION_IDLE_MS. This is
+    // the real lifecycle-end path the stdio gateway ran on transport.onclose.
+    for (const sid of this.coordinator.idleSessions(SESSION_IDLE_MS)) {
+      await this.coordinator.onSessionEnd(sid).catch((e) => log.warn(`onSessionEnd(${sid}) failed: ${e}`));
+      this.sessions.remove(sid);
+    }
+
     const ledgerN = await this.ledger.flush();
     const evalN = await this.evaluator.flush();
     log.debug(`Alarm flush: ledger=${ledgerN} eval=${evalN}`);
-    // Reschedule while there's anything still buffered; otherwise let it lapse.
+
+    // Reschedule while there's anything still buffered OR any session is still
+    // active (so it can be idle-closed later); otherwise let the alarm lapse.
     const lStats = this.ledger.getStats();
     const eStats = this.evaluator.getStats();
-    if (lStats.buffered > 0 || eStats.buffered > 0) {
+    if (lStats.buffered > 0 || eStats.buffered > 0 || this.sessions.count > 0) {
       await this.ctx.storage.setAlarm(Date.now() + LEDGER_FLUSH_INTERVAL_MS);
     }
   }

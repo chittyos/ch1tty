@@ -38,6 +38,7 @@ export interface SessionContext {
   toolPatterns: Map<string, ToolPattern>;
   stagingComplete: boolean;
   serverAffinity: Map<string, number>;
+  lastActivityAt: number;
 }
 
 export class SessionCoordinator {
@@ -73,12 +74,27 @@ export class SessionCoordinator {
     log.info(`Coordinator bound to ecosystem backend: ${serverId}`);
   }
 
+  /** Whether a session context already exists (start-once guard in the DO). */
+  hasSession(sessionId: string): boolean {
+    return this.contexts.has(sessionId);
+  }
+
+  /** Session ids whose last activity is older than `idleMs`. */
+  idleSessions(idleMs: number): string[] {
+    const cutoff = Date.now() - idleMs;
+    return [...this.contexts.values()].filter((c) => c.lastActivityAt < cutoff).map((c) => c.sessionId);
+  }
+
   async onSessionStart(sessionId: string, transport: 'stdio' | 'http'): Promise<void> {
+    // Idempotent: re-starting an existing session would wipe affinity/patterns
+    // and re-stage. The DO calls this once (on initialize); guard defensively.
+    if (this.contexts.has(sessionId)) return;
     const ctx: SessionContext = {
       sessionId,
       toolPatterns: new Map(),
       stagingComplete: false,
       serverAffinity: new Map(),
+      lastActivityAt: Date.now(),
     };
     this.contexts.set(sessionId, ctx);
     this.recordToLedger(sessionId, 'session_start', { transport });
@@ -93,6 +109,7 @@ export class SessionCoordinator {
   onToolCall(sessionId: string, namespacedTool: string): void {
     const ctx = this.contexts.get(sessionId);
     if (!ctx) return;
+    ctx.lastActivityAt = Date.now();
 
     const sep = namespacedTool.indexOf('/');
     if (sep > 0) {
