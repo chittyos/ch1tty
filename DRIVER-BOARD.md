@@ -149,6 +149,13 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **VVVVVVV** — cast explanation.candidateScoreP90: number. PR #570 ✅ MERGED (parallel session). DONE.
 - [x] **WWWWWWW** — cast explanation.candidateScoreP10: number. PR #571 ✅ MERGED (parallel session). DONE.
 - [x] **XXXXXXX** — cast explanation.candidateScoreP80Range: number. PR #572 ✅ MERGED (parallel session). DONE.
+- [x] **YYYYYYY** — cast explanation.candidateScoreMAD: number (median absolute deviation). PR #573 ✅ MERGED (parallel session). DONE.
+- [x] **ZZZZZZZ** — cast explanation.candidateScoreMADRatio: number (MAD / median). PR #575 ✅ MERGED (parallel session). DONE.
+- [x] **AAAAAAAA** — cast explanation.candidateScoreRobustSkewness: number. PR #576 ✅ MERGED (parallel session). DONE.
+- [x] **BBBBBBBB** — cast explanation.candidateScoreQuantileSkewness: number. PR #577 ✅ MERGED (parallel session). DONE.
+- [x] **CCCCCCCC** — cast explanation.candidateScoreWinsorizedMean: number. PR #578 ✅ MERGED (parallel session). DONE.
+- [x] **DDDDDDDD** — cast explanation.candidateScoreJainFairnessIndex: number (Jain's fairness index = (Σx)²/(n·Σx²)). PR #579 ✅ MERGED (parallel session). DONE.
+- [ ] **EEEEEEEE** — cast explanation.topCandidatesKurtosis: number (4th moment excess kurtosis of top-5 pool — completes 4-moment characterisation of top pool alongside variance/stddev/skewness). PR #583 🔄 OPEN. 8 new tests, 2050/0/2. THIS RUN.
 
 ## Blockers
 
@@ -446,6 +453,20 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Branch/PR**: `auto/XXXXXX-cast-explain-candidate-score-mean` → PR TBD
 - **Build**: clean | **Tests**: 1714/0/2 (+8 XXXXXX from 1706 WWWWWW baseline)
 - **What was done**: Added candidateScoreMean: totalCandidateScore / candidateCount. Reuses candidateScoreEntropyTotal (no extra loop). Full-pool parallel to topCandidatesMeanScore. Always <= winnerScore. Equals topCandidatesMeanScore when candidateCount <= 5. 8 new tests.
+
+### 2026-06-16 (run 180 — EEEEEEEE) 🔄 PR #583 OPEN
+- **Workstream**: A (gateway observability) — EEEEEEEE: `cast explanation.topCandidatesKurtosis: number`
+- **Branch/PR**: `auto/EEEEEEEE-cast-explain-top-candidates-kurtosis` → PR #583 (open, CI in progress)
+- **Build**: clean | **Tests**: 2050/0/2 (+8 EEEEEEEE from 2042 DDDDDDDD baseline)
+- **What was done**:
+  - Startup: npm ci clean, build clean, 2042/0/2 on main (DDDDDDDD HEAD 0ed511f). Board read from DRIVER-BOARD.md (Notion 401 — recurring).
+  - Closed stale PR #565 (PPPPPPP targeting old SHA — candidateScoreKurtosis already merged as QQQQQQQ at 9f7dcf09).
+  - Backfilled DRIVER-BOARD: YYYYYYY through DDDDDDDD (parallel sessions since run 179). Tests: 1994→2042.
+  - EEEEEEEE: `src/aggregator.ts` — added `topCandidatesKurtosis` IIFE after `topCandidatesScoreSkewness`: `(1/n)*Σ((x_i−mean)⁴/stddev⁴) − 3`. Same presence guard (>= 2 topCandidates, stddev > 0). Description line added after `topCandidatesScoreSkewness`. Wired into output spread after `topCandidatesScoreSkewness`.
+  - `test/eeeeeeee-cast-explain-top-candidates-kurtosis.test.ts`: 8 new tests. All pass.
+  - PR #583 opened. CodeQL in progress. CodeRabbit rate-limited (recurring — no action).
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
+- **Next run priority**: FFFFFFFF — `topCandidatesP90: number` (90th-percentile score of the top-5 pool) or `topCandidatesMedian: number` (median of top pool, complement to topCandidatesMeanScore). Check if PR #583 merged first; if so continue from FFFFFFFF.
 
 ### 2026-06-16 (run 179 — QQQQQQQ) ✅ COMPLETE
 - **Workstream**: A (gateway observability) — QQQQQQQ: `cast explanation.candidateScoreKurtosis: number`
