@@ -155,7 +155,8 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **BBBBBBBB** — cast explanation.candidateScoreQuantileSkewness: number. PR #577 ✅ MERGED (parallel session). DONE.
 - [x] **CCCCCCCC** — cast explanation.candidateScoreWinsorizedMean: number. PR #578 ✅ MERGED (parallel session). DONE.
 - [x] **DDDDDDDD** — cast explanation.candidateScoreJainFairnessIndex: number (Jain's fairness index = (Σx)²/(n·Σx²)). PR #579 ✅ MERGED (parallel session). DONE.
-- [ ] **EEEEEEEE** — cast explanation.topCandidatesKurtosis: number (4th moment excess kurtosis of top-5 pool — completes 4-moment characterisation of top pool alongside variance/stddev/skewness). PR #583 🔄 OPEN. 8 new tests, 2050/0/2. THIS RUN.
+- [x] **EEEEEEEE** — cast explanation.topCandidatesKurtosis: number. PR #583 ❌ CLOSED (parallel race — main advanced EEEEEEEE→YYYYYYYY while #583 sat open; same feature now carried by PR #611 ZZZZZZZZ). Feature not yet merged; continue via PR #611.
+- [ ] **ZZZZZZZZ** — cast explanation.topCandidatesKurtosis: number. PR #611 🔄 OPEN (parallel session, 2218/0/2). Feature to merge here.
 
 ## Blockers
 
