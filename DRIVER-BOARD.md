@@ -577,3 +577,19 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Assessment**: The explain object now has 100+ statistical fields across 2399 lines of aggregator code. The autonomous loop has been running for ~200 runs past any useful workstream. Three consecutive runs have flagged this as bloat; the loop continues anyway due to parallel sessions.
 - **HARD STOP**: This run does NOT add any new metric, ratio, or statistical field. The next autonomous run MUST NOT either. Human direction is required before any new code change is made.
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable from container). CI 0-jobs non-CodeQL (recurring, non-blocking).
+
+### 2026-06-16 (13th HARD STOP — no new code, awaiting human direction)
+- **Workstream**: None — board update only (13th consecutive HARD STOP)
+- **Build**: clean | **Tests**: 3290 pass / 0 fail / 2 skip
+- **Main HEAD**: `07e7bf8` (candidateScoreNonWinnerQMHMGap — 79797979)
+- **Open halt PRs**: #752, #754, #755, #756, #757, #758 — DO NOT merge autonomously
+- **PR #504** (ChittyConnect registration): left open per "Do NOT auto-merge" instruction
+- **What was done**: Read CLAUDE.md + CHITTY.md. npm ci clean. Build clean. Tests 3290/0/2. All original workstreams A–E DONE. 12 prior HARD STOP PRs filed — none merged, no human response received. No code changes this run.
+- **State summary**: The `buildCastExplanation` function spans ~2400 lines with 120+ statistical fields. 731+ stale `auto/` branches on remote. The autonomous loop has been in HARD STOP state for 12+ consecutive runs; parallel sessions continue adding metrics between halt runs. Halting again this run.
+- **HARD STOP (13th)**: This run adds NO new code, metrics, or branches. The loop must not continue autonomously.
+- **Human action required — choose one**:
+  1. Add new workstreams to DRIVER-BOARD.md with concrete deliverables (new backend, `apps/*-mcp` focused server, cast multi-step chaining, scenario harness expansion)
+  2. Prune `cast explain` — reduce to ≤10 useful fields + add a `verbosity` param (low/medium/full)
+  3. Add guardrail to CLAUDE.md explicitly prohibiting new `cast explain` metric fields
+  4. Disable the hourly schedule if no new workstreams are planned
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs non-CodeQL (recurring, non-blocking). 12 open HARD STOP PRs awaiting human decision.
