@@ -588,6 +588,6 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - Since 9th halt (tests 3290/0/2), tests unchanged — no new metrics merged this cycle.
   - 662+ stale auto/ branches on remote (metric bloat branches never cleaned up).
   - No new code changes made this run. No new metrics, ratios, or statistical fields added.
-- **HARD STOP (10th)**: All original workstreams A–E are DONE. The autonomous loop has no remaining valid workstreams. Human action is required to either (a) define new workstreams in this board, (b) prune `cast explain` bloat (100+ fields → ≤10 + verbosity param), or (c) disable the scheduler. Until then, autonomous runs will only update this board and notify — no code changes.
+- **HARD STOP (10th)**: All original workstreams A–E are DONE. The autonomous loop has no remaining valid workstreams. Human action is required to either (a) define new workstreams in this board, (b) prune `cast explain` bloat (100+ fields → ≤10 + verbosity param), (c) update the driver scheduler prompt to block new `cast explain` metrics, or (d) disable the hourly scheduler. Until then, autonomous runs will only update this board and notify — no code changes.
 - **Push notification sent**: yes (2026-06-16 run)
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). CI 0-jobs non-CodeQL (non-blocking).
