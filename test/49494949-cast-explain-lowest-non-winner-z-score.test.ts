@@ -1,0 +1,253 @@
+/**
+ * 49494949: explanation.lowestNonWinnerZScore in ch1tty/cast when explain:true.
+ *
+ * lowestNonWinnerZScore: number — z-score of the lowest candidate within the non-winner pool:
+ * (lowestCandidateScore - candidateScoreNonWinnerMean) / candidateScoreNonWinnerStdDev.
+ *
+ * Present when: >= 3 candidates and candidateScoreNonWinnerStdDev >= 1e-10.
+ * Absent when: no_match, < 3 candidates, or nonWinnerStdDev near-zero.
+ * Always <= 0: lowest scorer is always <= the non-winner mean.
+ * For n=3: always equals -1 (mirror of runnerUpNonWinnerZScore = +1).
+ * Identity: lowestNonWinnerZScore * nonWinnerStdDev === lowestCandidateScore - nonWinnerMean.
+ * Always <= runnerUpNonWinnerZScore (lowest below runner-up).
+ *
+ * Covered:
+ *   49494949-1: present when >= 3 candidates and nonWinnerStdDev >= 1e-10
+ *   49494949-2: always finite and <= 0 when present
+ *   49494949-3: identity — lowestNonWinnerZScore * nonWinnerStdDev === lowestCandidateScore - nonWinnerMean
+ *   49494949-4: for n=3 with distinct non-winner scores equals -1
+ *   49494949-5: absent on cast:no_match
+ *   49494949-6: absent when fewer than 3 candidates
+ *   49494949-7: always <= runnerUpNonWinnerZScore when both present
+ *   49494949-8: tool description documents lowestNonWinnerZScore
+ */
+import assert from 'node:assert/strict';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import test from 'node:test';
+import { Aggregator } from '../src/aggregator.js';
+import { SessionCoordinator } from '../src/coordinator.js';
+import type { Backend, BackendStatus, ServerConfig, ToolCallResult, ToolEntry } from '../src/types.js';
+
+function dlqPath(label: string): string {
+  return join(tmpdir(), `ch1tty-49494949-${label}-${Date.now()}.jsonl`);
+}
+
+const STRIPE_CFG: ServerConfig = {
+  id: 'stripe', name: 'Stripe Payments', type: 'remote', access: 'readwrite',
+  category: 'ecosystem', endpoint: 'https://stripe.test/mcp',
+};
+const NEON_CFG: ServerConfig = {
+  id: 'neon', name: 'Neon Database', type: 'remote', access: 'readwrite',
+  category: 'code', endpoint: 'https://neon.test/mcp',
+};
+const LINEAR_CFG: ServerConfig = {
+  id: 'linear', name: 'Linear', type: 'remote', access: 'readwrite',
+  category: 'ecosystem', endpoint: 'https://linear.test/mcp',
+};
+
+function makeBackend(tools: ToolEntry[]): Backend {
+  return {
+    registerServer: () => {},
+    isRegistered: () => true,
+    getStatus: (): BackendStatus => ({ connected: true, toolCount: tools.length, toolCacheAge: 0 }),
+    listTools: async () => tools,
+    callTool: async (): Promise<ToolCallResult> => ({ content: [{ type: 'text', text: 'ok' }] }),
+    listResources: async () => ({ resources: [], templates: [] }),
+    readResource: async () => ({ contents: [] }),
+    listPrompts: async () => [],
+    getPrompt: async () => ({ messages: [] }),
+    shutdown: async () => {},
+  };
+}
+
+class FallbackCoordinator extends SessionCoordinator {
+  constructor(dlq?: string) { super({}, { enabled: false }, dlq); }
+  override async routeIntent(): Promise<null> { return null; }
+}
+
+function buildAgg(label: string, configs: ServerConfig[], toolMap: Record<string, ToolEntry[]>): Aggregator {
+  const path = dlqPath(label);
+  return new Aggregator(configs, {
+    backendFactory: (cfg) => makeBackend(toolMap[cfg.id] ?? []),
+    focusProfiles: { profiles: {} },
+    suggestionsCatalog: {},
+    ledgerDlqPath: path,
+    coordinator: new FallbackCoordinator(path),
+  });
+}
+
+const stripeTools: ToolEntry[] = [
+  { name: 'create_invoice', description: 'billing invoice payment charge', inputSchema: { type: 'object', properties: {} } },
+];
+const neonTools: ToolEntry[] = [
+  { name: 'run_sql', description: 'billing sql query database', inputSchema: { type: 'object', properties: {} } },
+];
+const linearTools: ToolEntry[] = [
+  { name: 'create_issue', description: 'billing issue tracking project', inputSchema: { type: 'object', properties: {} } },
+];
+
+test('49494949-1: present when >= 3 candidates and nonWinnerStdDev >= 1e-10', async () => {
+  const agg = buildAgg('xxx1', [STRIPE_CFG, NEON_CFG, LINEAR_CFG], { stripe: stripeTools, neon: neonTools, linear: linearTools });
+  try {
+    const r = await agg.callTool('ch1tty/cast', { intent: 'billing invoice payment', explain: true });
+    const parsed = JSON.parse((r.content[0] as { text: string }).text);
+    assert.ok('explanation' in parsed, 'explanation absent');
+    const { explanation } = parsed;
+    if (explanation.candidateCount >= 3 && explanation.candidateScoreNonWinnerStdDev >= 1e-10) {
+      assert.ok('lowestNonWinnerZScore' in explanation,
+        `lowestNonWinnerZScore should be present; keys: ${Object.keys(explanation).join(', ')}`);
+      assert.equal(typeof explanation.lowestNonWinnerZScore, 'number', 'should be a number');
+    }
+  } finally {
+    await agg.shutdown();
+  }
+});
+
+test('49494949-2: always finite and <= 0 when present', async () => {
+  const agg = buildAgg('xxx2', [STRIPE_CFG, NEON_CFG, LINEAR_CFG], { stripe: stripeTools, neon: neonTools, linear: linearTools });
+  try {
+    const r = await agg.callTool('ch1tty/cast', { intent: 'billing invoice payment', explain: true });
+    const parsed = JSON.parse((r.content[0] as { text: string }).text);
+    const { explanation } = parsed;
+    if ('lowestNonWinnerZScore' in explanation) {
+      assert.ok(
+        Number.isFinite(explanation.lowestNonWinnerZScore),
+        `should be finite, got ${explanation.lowestNonWinnerZScore}`,
+      );
+      assert.ok(
+        explanation.lowestNonWinnerZScore <= 1e-9,
+        `should be <= 0, got ${explanation.lowestNonWinnerZScore}`,
+      );
+    }
+  } finally {
+    await agg.shutdown();
+  }
+});
+
+test('49494949-3: identity — lowestNonWinnerZScore * nonWinnerStdDev === lowestCandidateScore - nonWinnerMean', async () => {
+  const agg = buildAgg('xxx3', [STRIPE_CFG, NEON_CFG, LINEAR_CFG], { stripe: stripeTools, neon: neonTools, linear: linearTools });
+  try {
+    const r = await agg.callTool('ch1tty/cast', { intent: 'billing invoice payment', explain: true });
+    const parsed = JSON.parse((r.content[0] as { text: string }).text);
+    const { explanation } = parsed;
+    if ('lowestNonWinnerZScore' in explanation &&
+        'candidateScoreNonWinnerStdDev' in explanation &&
+        'lowestCandidateScore' in explanation &&
+        'candidateScoreNonWinnerMean' in explanation) {
+      const product = explanation.lowestNonWinnerZScore * explanation.candidateScoreNonWinnerStdDev;
+      const expected = explanation.lowestCandidateScore - explanation.candidateScoreNonWinnerMean;
+      assert.ok(
+        Math.abs(product - expected) < 1e-9,
+        `lowestNonWinnerZScore * nonWinnerStdDev (${product}) should equal lowestCandidateScore - nonWinnerMean (${expected})`,
+      );
+    }
+  } finally {
+    await agg.shutdown();
+  }
+});
+
+test('49494949-4: for n=3 with distinct non-winner scores equals -1', async () => {
+  const agg = buildAgg('xxx4', [STRIPE_CFG, NEON_CFG, LINEAR_CFG], { stripe: stripeTools, neon: neonTools, linear: linearTools });
+  try {
+    const r = await agg.callTool('ch1tty/cast', { intent: 'billing invoice payment', explain: true });
+    const parsed = JSON.parse((r.content[0] as { text: string }).text);
+    const { explanation } = parsed;
+    if ('lowestNonWinnerZScore' in explanation &&
+        'runnerUpThirdGap' in explanation &&
+        explanation.candidateCount === 3 &&
+        explanation.runnerUpThirdGap > 0) {
+      assert.ok(
+        Math.abs(explanation.lowestNonWinnerZScore + 1) < 1e-9,
+        `for n=3 with distinct scores, lowestNonWinnerZScore (${explanation.lowestNonWinnerZScore}) should equal -1`,
+      );
+    }
+  } finally {
+    await agg.shutdown();
+  }
+});
+
+test('49494949-5: absent on cast:no_match', async () => {
+  const path = dlqPath('xxx5');
+  const emptyAgg = new Aggregator([STRIPE_CFG], {
+    backendFactory: () => makeBackend([]),
+    focusProfiles: { profiles: {} },
+    suggestionsCatalog: {},
+    ledgerDlqPath: path,
+    coordinator: new FallbackCoordinator(path),
+  });
+  try {
+    const r = await emptyAgg.callTool('ch1tty/cast', { intent: 'xyzzy-nonexistent', explain: true });
+    const parsed = JSON.parse((r.content[0] as { text: string }).text);
+    assert.equal(parsed.cast, 'no_match', `expected no_match, got ${parsed.cast}`);
+    assert.ok(
+      !('lowestNonWinnerZScore' in parsed.explanation),
+      `should be absent on no_match, found: ${parsed.explanation.lowestNonWinnerZScore}`,
+    );
+  } finally {
+    await emptyAgg.shutdown();
+  }
+});
+
+test('49494949-6: absent when fewer than 3 candidates', async () => {
+  const path = dlqPath('xxx6');
+  const twoAgg = new Aggregator([STRIPE_CFG, NEON_CFG], {
+    backendFactory: (cfg) => makeBackend(cfg.id === 'stripe' ? stripeTools : neonTools),
+    focusProfiles: { profiles: {} },
+    suggestionsCatalog: {},
+    ledgerDlqPath: path,
+    coordinator: new FallbackCoordinator(path),
+  });
+  try {
+    const r = await twoAgg.callTool('ch1tty/cast', { intent: 'billing invoice payment', explain: true });
+    const parsed = JSON.parse((r.content[0] as { text: string }).text);
+    const { explanation } = parsed;
+    if (explanation.candidateCount < 3) {
+      assert.ok(
+        !('lowestNonWinnerZScore' in explanation),
+        `should be absent with < 3 candidates, found: ${explanation.lowestNonWinnerZScore}`,
+      );
+    }
+  } finally {
+    await twoAgg.shutdown();
+  }
+});
+
+test('49494949-7: always <= runnerUpNonWinnerZScore when both present', async () => {
+  const agg = buildAgg('xxx7', [STRIPE_CFG, NEON_CFG, LINEAR_CFG], { stripe: stripeTools, neon: neonTools, linear: linearTools });
+  try {
+    const r = await agg.callTool('ch1tty/cast', { intent: 'billing invoice payment', explain: true });
+    const parsed = JSON.parse((r.content[0] as { text: string }).text);
+    const { explanation } = parsed;
+    if ('lowestNonWinnerZScore' in explanation && 'runnerUpNonWinnerZScore' in explanation) {
+      assert.ok(
+        explanation.lowestNonWinnerZScore <= explanation.runnerUpNonWinnerZScore + 1e-9,
+        `lowestNonWinnerZScore (${explanation.lowestNonWinnerZScore}) should be <= runnerUpNonWinnerZScore (${explanation.runnerUpNonWinnerZScore})`,
+      );
+    }
+  } finally {
+    await agg.shutdown();
+  }
+});
+
+test('49494949-8: tool description documents lowestNonWinnerZScore', async () => {
+  const path = dlqPath('xxx8');
+  const agg = new Aggregator([STRIPE_CFG], {
+    backendFactory: () => makeBackend([]),
+    focusProfiles: { profiles: {} },
+    suggestionsCatalog: {},
+    ledgerDlqPath: path,
+    coordinator: new FallbackCoordinator(path),
+  });
+  try {
+    const { tools } = await agg.listAllTools();
+    const cast = tools.find((t) => t.name === 'ch1tty/cast');
+    assert.ok(cast, 'ch1tty/cast tool not found');
+    assert.ok(
+      cast.description?.includes('lowestNonWinnerZScore'),
+      `cast description should mention lowestNonWinnerZScore, got: ${cast.description?.slice(0, 600)}`,
+    );
+  } finally {
+    await agg.shutdown();
+  }
+});
