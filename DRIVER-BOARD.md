@@ -577,3 +577,23 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Assessment**: The explain object now has 100+ statistical fields across 2399 lines of aggregator code. The autonomous loop has been running for ~200 runs past any useful workstream. Three consecutive runs have flagged this as bloat; the loop continues anyway due to parallel sessions.
 - **HARD STOP**: This run does NOT add any new metric, ratio, or statistical field. The next autonomous run MUST NOT either. Human direction is required before any new code change is made.
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable from container). CI 0-jobs non-CodeQL (recurring, non-blocking).
+
+### 2026-06-16 (11th HARD STOP — this run)
+- **Workstream**: None — HARD STOP; no new production code added
+- **Build**: clean | **Tests**: 3290 pass / 0 fail / 2 skip
+- **Main HEAD**: `07e7bf8` (candidateScoreNonWinnerQMHMGap — 79797979)
+- **Stale auto/ branches on remote**: 731
+- **Open halt PRs**: #752 (7th), #754 (8th), #755 (9th), #756 (10th) — all DO NOT merge autonomously
+- **What was done**:
+  - Startup: npm ci clean, build clean, 3290/0/2 confirmed.
+  - Board read from DRIVER-BOARD.md (Notion 401 — recurring blocker).
+  - Assessed 10 prior HARD STOP entries (PRs #752, #754, #755, #756 open; board entries runs 179, final-halt, 7th–10th enforcement). Loop continued via parallel sessions between halt runs, adding 120+ statistical ratio/percentile fields since ~run 165. Test count grew: 1994 → 2316 → 2962 → 3290 across halt intervals.
+  - No new code changes. No new metrics, ratios, or statistical fields added.
+  - Push notification sent to human owner (nick@nevershitty.com).
+- **State assessment**: `buildCastExplanation` in `src/aggregator.ts` now spans ~2400 lines with 120+ fields. The explain object includes mean, median, variance, std dev, skewness, kurtosis, entropy, Gini, HHI, IQR, MAD, Winsorized mean, Jain fairness index, 9 percentile levels (P05/P10/P25/P75/P80/P90/P95), and dozens of cross-percentile ratio permutations. This is metric bloat that creates no value and was never a specified workstream.
+- **HARD STOP — HUMAN ACTION REQUIRED**:
+  1. **Add new workstreams** with concrete deliverables (new backend in `servers.json`, new `apps/*-mcp` focused server, cast multi-step chaining, scenario harness expansion for new backends)
+  2. **Prune `cast explain`** — keep ≤10 useful fields (winnerScore, winnerTool, winnerServer, runnerUpScore, candidateCount, focusDecisive, focusMargin, latencyMs) + add `verbosity: low|medium|full` param
+  3. **Update the driver prompt** in the scheduler to explicitly prohibit new `cast explain` metric fields (add guardrail to CLAUDE.md)
+  4. **Disable the hourly schedule** if no new workstreams are planned
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable from container). CI 0-jobs non-CodeQL (recurring, non-blocking).
