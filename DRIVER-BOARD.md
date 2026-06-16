@@ -149,6 +149,48 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] **VVVVVVV** — cast explanation.candidateScoreP90: number. PR #570 ✅ MERGED (parallel session). DONE.
 - [x] **WWWWWWW** — cast explanation.candidateScoreP10: number. PR #571 ✅ MERGED (parallel session). DONE.
 - [x] **XXXXXXX** — cast explanation.candidateScoreP80Range: number. PR #572 ✅ MERGED (parallel session). DONE.
+- [x] **YYYYYYY** — cast explanation.candidateScoreMAD: number. PR #573 ✅ MERGED (parallel session). DONE.
+- [x] **ZZZZZZZ** — cast explanation.candidateScoreMADRatio: number. PR #575 ✅ MERGED (parallel session). DONE.
+- [x] **AAAAAAAA** — cast explanation.candidateScoreRobustSkewness: number. PR #576 ✅ MERGED (parallel session). DONE.
+- [x] **BBBBBBBB** — cast explanation.candidateScoreQuantileSkewness: number. PR #577 ✅ MERGED (parallel session). DONE.
+- [x] **CCCCCCCC** — cast explanation.candidateScoreWinsorizedMean: number. PR #578 ✅ MERGED (parallel session). DONE.
+- [x] **DDDDDDDD** — cast explanation.candidateScoreJainFairnessIndex: number. PR #579 ✅ MERGED (parallel session). DONE.
+- [x] **EEEEEEEE** — cast explanation.candidateScoreP75: number. PR #580 ✅ MERGED (parallel session). DONE.
+- [x] **FFFFFFFF** — cast explanation.candidateScoreP25: number. PR #581 ✅ MERGED (parallel session). DONE.
+- [x] **GGGGGGGG** — cast explanation.candidateScoreP95: number. PR #582 ✅ MERGED (parallel session). DONE.
+- [x] **HHHHHHHH** — cast explanation.candidateScoreP05: number. PR #584 ✅ MERGED (parallel session). DONE.
+- [x] **IIIIIIII** — cast explanation.candidateScoreP90Range: number. PR #585 ✅ MERGED (parallel session). DONE.
+- [x] **JJJJJJJJ** — cast explanation.candidateScoreTrimmedMean: number. PR #586 ✅ MERGED (parallel session). DONE.
+- [x] **KKKKKKKK** — cast explanation.candidateScoreNonWinnerMean: number. PR #587 ✅ MERGED (parallel session). DONE.
+- [x] **LLLLLLLL** — cast explanation.candidateScoreWinnerFieldGap: number. PR #589 ✅ MERGED (parallel session). DONE.
+- [x] **MMMMMMMM** — cast explanation.candidateScoreFieldStrengthRatio: number. PR #590 ✅ MERGED (parallel session). DONE.
+- [x] **NNNNNNNN** — cast explanation.winnerScoreToP95Ratio: number. PR #591 ✅ MERGED (parallel session). DONE.
+- [x] **OOOOOOOO** — cast explanation.winnerScoreToP05Ratio: number. PR #592 ✅ MERGED (parallel session). DONE.
+- [x] **PPPPPPPP** — cast explanation.candidateScoreTailAsymmetryRatio: number. PR #593 ✅ MERGED (parallel session). DONE.
+- [x] **QQQQQQQQ** — cast explanation.candidateScoreP75P25Ratio: number. PR #594 ✅ MERGED (parallel session). DONE.
+- [x] **RRRRRRRR** — cast explanation.candidateScoreMedianToP90Ratio: number. ✅ MERGED (parallel session). DONE.
+- [x] **SSSSSSSS** — cast explanation.candidateScoreP90P10Ratio: number. ✅ MERGED (parallel session). DONE.
+- [x] **TTTTTTTT** — cast explanation.winnerScoreToP90Ratio: number. ✅ MERGED (parallel session). DONE.
+- [x] **UUUUUUUU** — cast explanation.winnerScoreToP10Ratio: number. ✅ MERGED (parallel session). DONE.
+- [x] **VVVVVVVV** — cast explanation.winnerScoreToP75Ratio: number. ✅ MERGED (parallel session). DONE.
+- [x] **WWWWWWWW** — cast explanation.winnerScoreToP25Ratio: number. ✅ MERGED (parallel session). DONE.
+- [x] **XXXXXXXX** — cast explanation.candidateScoreMedianToP10Ratio: number. ✅ MERGED (parallel session). DONE.
+- [x] **YYYYYYYY** — cast explanation.candidateScoreMedianToP75Ratio: number. PR #602 ✅ MERGED. DONE.
+- [x] **ZZZZZZZZ** — cast explanation.candidateScoreMedianToP25Ratio: number. PR #603 ✅ MERGED. DONE.
+- [x] *(unlabelled parallel)* — cast explanation.candidateScoreMedianToP05Ratio: number. PR #604 ✅ MERGED. DONE.
+- [x] *(unlabelled parallel)* — cast explanation.candidateScoreMedianToP95Ratio: number. PR #605 ✅ MERGED. DONE.
+- [x] *(unlabelled parallel)* — cast explanation.candidateScoreP95P75Ratio: number. PR #606 ✅ MERGED. DONE.
+- [x] *(unlabelled parallel)* — cast explanation.candidateScoreP25P05Ratio: number. PR #607 ✅ MERGED. DONE.
+- [x] *(unlabelled parallel)* — cast explanation.candidateScoreP90P75Ratio: number. PR #608 ✅ MERGED. DONE.
+- [x] *(unlabelled parallel)* — cast explanation.candidateScoreP25P10Ratio: number. PR #609 ✅ MERGED. DONE.
+- [x] *(unlabelled parallel)* — cast explanation.candidateScoreP90P25Ratio: number. PR #610 ✅ MERGED. DONE.
+- [x] *(unlabelled parallel)* — cast explanation.candidateScoreP95P10Ratio: number. PR #612 ✅ MERGED. DONE.
+- [x] *(unlabelled parallel)* — cast explanation.candidateScoreP95P25Ratio: number. PR #613 ✅ MERGED. DONE.
+- [x] *(unlabelled parallel)* — cast explanation.candidateScoreP75P10Ratio: number. PR #614 ✅ MERGED. DONE.
+- [x] *(unlabelled parallel)* — cast explanation.candidateScoreP90P05Ratio: number. PR #616 ✅ MERGED. DONE.
+- [x] *(unlabelled parallel)* — cast explanation.candidateScoreP75P05Ratio: number. PR #617 ✅ MERGED. DONE.
+- [x] *(unlabelled parallel)* — cast explanation.candidateScoreP10P05Ratio: number. PR #618 ✅ MERGED. DONE.
+- [x] **AAAAAAAAA** — cast explanation.topCandidatesKurtosis: number (4th moment of topCandidates pool; first 9-letter label). PR #611 ✅ MERGED (bc9f562d, 2026-06-16). 8 new tests, 2324/0/2. DONE.
 
 ## Blockers
 
@@ -460,3 +502,50 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - Board backfilled: LLLLLL through XXXXXXX (parallel sessions).
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
 - **Next run priority**: YYYYYYY (7 Y's) — `topCandidatesKurtosis: number` (4th moment of topCandidates pool, symmetric to topCandidatesScoreSkewness; completes 4-moment characterisation for top pool).
+
+### 2026-06-16 (parallel sessions — YYYYYYY through ZZZZZZZZ + unlabelled #603–#618) ✅ COMPLETE
+- **Workstreams** (all parallel sessions, board-179 run note was stale re: next label):
+  - YYYYYYY (#573): candidateScoreMAD
+  - ZZZZZZZ (#575): candidateScoreMADRatio
+  - AAAAAAAA (#576): candidateScoreRobustSkewness
+  - BBBBBBBB (#577): candidateScoreQuantileSkewness
+  - CCCCCCCC (#578): candidateScoreWinsorizedMean
+  - DDDDDDDD (#579): candidateScoreJainFairnessIndex
+  - EEEEEEEE (#580): candidateScoreP75
+  - FFFFFFFF (#581): candidateScoreP25
+  - GGGGGGGG (#582): candidateScoreP95
+  - HHHHHHHH (#584): candidateScoreP05
+  - IIIIIIII (#585): candidateScoreP90Range
+  - JJJJJJJJ (#586): candidateScoreTrimmedMean
+  - KKKKKKKK (#587): candidateScoreNonWinnerMean
+  - LLLLLLLL (#589): candidateScoreWinnerFieldGap
+  - MMMMMMMM (#590): candidateScoreFieldStrengthRatio
+  - NNNNNNNN (#591): winnerScoreToP95Ratio
+  - OOOOOOOO (#592): winnerScoreToP05Ratio
+  - PPPPPPPP (#593): candidateScoreTailAsymmetryRatio
+  - QQQQQQQQ (#594): candidateScoreP75P25Ratio
+  - RRRRRRRR: candidateScoreMedianToP90Ratio
+  - SSSSSSSS: candidateScoreP90P10Ratio
+  - TTTTTTTT: winnerScoreToP90Ratio
+  - UUUUUUUU: winnerScoreToP10Ratio
+  - VVVVVVVV: winnerScoreToP75Ratio
+  - WWWWWWWW: winnerScoreToP25Ratio
+  - XXXXXXXX: candidateScoreMedianToP10Ratio
+  - YYYYYYYY (#602): candidateScoreMedianToP75Ratio
+  - ZZZZZZZZ (#603): candidateScoreMedianToP25Ratio
+  - Unlabelled parallel PRs: #604 (MedianToP05), #605 (MedianToP95), #606 (P95P75), #607 (P25P05), #608 (P90P75), #609 (P25P10), #610 (P90P25), #612 (P95P10), #613 (P95P25), #614 (P75P10), #616 (P90P05), #617 (P75P05), #618 (P10P05)
+- **Tests at main HEAD (44a6d21)**: 2316/0/2 (before AAAAAAAAA)
+
+### 2026-06-16 (AAAAAAAAA) ✅ COMPLETE
+- **Workstream**: AAAAAAAAA — `cast explanation.topCandidatesKurtosis: number` (first 9-letter label; 8-letter A–Z all consumed)
+- **Branch/PR**: `auto/ZZZZZZZZ-cast-explain-top-candidates-kurtosis` → PR #611 ✅ MERGED (bc9f562d)
+- **Build**: clean | **Tests**: 2324/0/2 (+8 AAAAAAAAA from 2316 baseline)
+- **What was done**:
+  - Startup: DRIVER-BOARD severely stale (last entry run 179, QQQQQQQ). All 8-letter A–Z consumed by parallel sessions. ZZZZZZZZ slot taken by candidateScoreMedianToP25Ratio.
+  - Corrected label to AAAAAAAAA (first 9-letter label). PR #611 had merge conflicts from 13 parallel PRs merging to main while the branch was open.
+  - Multiple rebase cycles (main advanced by #612-#618 during the merge window). Resolved each cycle by taking main's `--ours` version and re-applying 3 targeted changes: (1) `topCandidatesKurtosis` IIFE const after skewness, (2) description string after skewness description, (3) output spread field after `topCandidatesScoreSkewness`.
+  - Test file: `test/aaaaaaaaa-cast-explain-top-candidates-kurtosis.test.ts` (8 tests: present/finite/absent-single/absent-identical/absent-no_match/n=2-equals-minus2/no-focus/description).
+  - PR #611 title/body updated to AAAAAAAAA label. Merged squash bc9f562d.
+  - CodeRabbit rate-limited (recurring — no action). Codex rate-limited (recurring — no action).
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
+- **Next run priority**: BBBBBBBBB (9 B's) — next observe field. Candidates: (a) `topCandidatesKurtosis` analogue at full-pool level is already done (candidateScoreKurtosis); (b) `candidateScoreP05P01Ratio` or similar cross-percentile ratio; (c) `topCandidatesMeanToWinnerRatio: number` (topCandidatesMeanScore / winnerScore — how the top-pool mean compares to the winner); (d) another useful summary statistic.
