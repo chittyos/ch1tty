@@ -1,8 +1,6 @@
-// Ported verbatim from src/utils.ts (no Node coupling). VERSION bumped channel
-// to mark the Worker/DO port.
 import type { ContentItem, ToolCallResult } from './types.js';
 
-export const VERSION = '5.0.0-do';
+export const VERSION = '4.1.0';
 
 export function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
   return new Promise((resolve, reject) => {
@@ -21,6 +19,8 @@ export function normalizeToolResult(result: Record<string, unknown>): ToolCallRe
       isError: (result.isError as boolean | undefined) ?? false,
     };
   }
+
+  // Legacy toolResult format
   return {
     content: [{ type: 'text', text: JSON.stringify((result as { toolResult: unknown }).toolResult) }],
     isError: false,
@@ -39,19 +39,4 @@ function normalizeContentItem(item: Record<string, unknown>): ContentItem {
     default:
       return { type: 'text', text: (item.text as string) ?? '' };
   }
-}
-
-/** Resolve a Secrets Store secret or plain string env value to a string. */
-export async function resolveSecret(v: unknown): Promise<string | undefined> {
-  if (v == null) return undefined;
-  if (typeof v === 'string') return v;
-  // SecretsStoreSecret has an async get(). Duck-type it.
-  if (typeof (v as { get?: unknown }).get === 'function') {
-    try {
-      return await (v as { get(): Promise<string> }).get();
-    } catch {
-      return undefined;
-    }
-  }
-  return undefined;
 }

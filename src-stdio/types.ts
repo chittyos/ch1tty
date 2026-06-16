@@ -1,6 +1,3 @@
-// Ported verbatim from the stdio gateway (src/types.ts). Transport-agnostic —
-// no Node coupling. The Backend interface is implemented by RemoteProxy (the
-// only backend in the Worker; the stdio ChildManager is dropped — see worker.ts).
 export type ServerAccess = 'read' | 'write' | 'readwrite';
 export type ServerCategory =
   | 'ecosystem'
@@ -30,15 +27,8 @@ export interface LocalServerConfig extends BaseServerConfig {
 export interface RemoteServerConfig extends BaseServerConfig {
   type: 'remote';
   endpoint: string;
-  /**
-   * Secret name resolved from the Worker env (Secrets Store binding or var).
-   * Replaces the stdio gateway's `chitty-mcp-token <key>` subprocess: in a
-   * Worker there is no process to spawn, so the bearer token is delivered as a
-   * binding and looked up by this key. See remote-proxy.ts resolveAuthToken().
-   */
   authTokenKey?: string;
   headers?: Record<string, string>;
-  /** header name -> env var name. Resolved from Worker env at connect time. */
   envHeaders?: Record<string, string>;
 }
 
@@ -109,8 +99,8 @@ export interface ToolEntry {
 }
 
 /**
- * Common interface for MCP backends. In the Worker only RemoteProxy implements
- * this (HTTP/streamable-MCP transport). The stdio ChildManager is gone.
+ * Common interface for MCP backends.
+ * ChildManager uses stdio transport, RemoteProxy uses HTTP transport.
  */
 export interface Backend {
   registerServer(config: ServerConfig): void;
@@ -129,29 +119,3 @@ export interface Backend {
   shutdown(): Promise<void>;
 }
 
-/** Worker environment bindings. */
-export interface Env {
-  /** Workers AI binding (embedding brain). */
-  AI: Ai;
-  /** Worker Loader binding for codemode DynamicWorkerExecutor. */
-  LOADER: unknown;
-  /** Per-session Durable Object namespace. */
-  CH1TTY: DurableObjectNamespace;
-  /** Vectorize index for tool-embedding search (768-dim, cosine). */
-  VECTORIZE?: VectorizeIndex;
-  /** Optional bearer token guarding the /mcp endpoint. */
-  CH1TTY_MCP_TOKEN?: string;
-  /** Secrets Store secret: ChittyMCP broker token (servers.json authTokenKey "chittymcp"). */
-  CHITTY_MCP_TOKEN?: SecretsStoreSecret | string;
-  CLOUDFLARE_MCP_TOKEN?: SecretsStoreSecret | string;
-  CLOUDFLARE_BUILDS_MCP_TOKEN?: SecretsStoreSecret | string;
-  CHITTYEVIDENCE_SEARCH_TOKEN?: SecretsStoreSecret | string;
-  CLOUDFLARE_BROWSER_RENDERING_TOKEN?: SecretsStoreSecret | string;
-  LINEAR_MCP_TOKEN?: SecretsStoreSecret | string;
-  /** "Bearer <PAT>" for github upstream (servers.json envHeaders Authorization). */
-  GITHUB_MCP_AUTHORIZATION?: SecretsStoreSecret | string;
-  /** CF Access service-token pair for mcp.chitty.cc-proxied upstreams. */
-  CHITTY_CF_ACCESS_CLIENT_ID?: SecretsStoreSecret | string;
-  CHITTY_CF_ACCESS_CLIENT_SECRET?: SecretsStoreSecret | string;
-  [key: string]: unknown;
-}

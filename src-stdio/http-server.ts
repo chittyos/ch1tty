@@ -160,7 +160,7 @@ export class HttpMcpServer {
       const mcpServer = this.createMcpServer(() => mcpSessionId);
 
       // Clean up on close
-      transport.onclose = () => {
+      let isClosing = false; transport.onclose = () => { if (isClosing) return; isClosing = true;
         const sid = [...this.sessions.entries()].find(([, s]) => s.transport === transport)?.[0];
         if (sid) {
           this.sessions.delete(sid);

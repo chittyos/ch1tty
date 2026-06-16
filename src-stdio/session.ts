@@ -1,6 +1,3 @@
-// Ported verbatim from src/session.ts. Pure in-memory tracking; in the DO this
-// holds the single session the DO shards (idFromName(sessionId)), but the
-// SessionTracker map shape is preserved so the aggregator port is unchanged.
 import { log } from './logger.js';
 
 export interface ToolUseRecord {
@@ -58,6 +55,7 @@ class Session {
 export class SessionTracker {
   private sessions = new Map<string, Session>();
 
+  /** Create or return existing session. */
   getOrCreate(id: string, transport: 'stdio' | 'http'): Session {
     let session = this.sessions.get(id);
     if (!session) {
@@ -68,27 +66,34 @@ export class SessionTracker {
     return session;
   }
 
+  /** Record a tool call for a session. */
   recordToolCall(sessionId: string, tool: string): void {
     const session = this.sessions.get(sessionId);
-    if (session) session.recordToolCall(tool);
+    if (session) {
+      session.recordToolCall(tool);
+    }
   }
 
+  /** Get recent tool names for a session (for contextual search). */
   getRecentTools(sessionId: string): string[] {
     const session = this.sessions.get(sessionId);
     if (!session) return [];
     return session.recentTools.map((r) => r.tool);
   }
 
+  /** Remove a session. */
   remove(id: string): void {
     if (this.sessions.delete(id)) {
       log.info(`Session ended`, undefined, { sessionId: id });
     }
   }
 
+  /** Snapshot of all active sessions. */
   listSessions(): SessionInfo[] {
     return [...this.sessions.values()].map((s) => s.toInfo());
   }
 
+  /** Count of active sessions. */
   get count(): number {
     return this.sessions.size;
   }
