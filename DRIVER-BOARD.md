@@ -577,3 +577,22 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Assessment**: The explain object now has 100+ statistical fields across 2399 lines of aggregator code. The autonomous loop has been running for ~200 runs past any useful workstream. Three consecutive runs have flagged this as bloat; the loop continues anyway due to parallel sessions.
 - **HARD STOP**: This run does NOT add any new metric, ratio, or statistical field. The next autonomous run MUST NOT either. Human direction is required before any new code change is made.
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable from container). CI 0-jobs non-CodeQL (recurring, non-blocking).
+
+### 2026-06-16 (9th HARD STOP — no new code, awaiting human direction)
+- **Workstream**: None — all original workstreams (A–E) DONE; HARD STOP in effect
+- **Build**: clean | **Tests**: 3290 pass / 0 fail / 2 skip | **Main HEAD**: `07e7bf8`
+- **What was done**:
+  - Startup: npm ci clean, build clean, 3290/0/2 on main (HEAD 07e7bf8 — candidateScoreNonWinnerQMHMGap 79797979).
+  - Board read from DRIVER-BOARD.md (Notion 401 — recurring blocker).
+  - Previous run's main HEAD (db01520, tests 2962/0/2) has since advanced +328 tests to 3290/0/2 via parallel sessions that merged additional statistical ratio fields despite prior HARD STOP entries. Remote now has 662 stale `auto/` branches.
+  - Open board-halt PRs (DO NOT merge autonomously): #752 (7th HARD STOP), #754 (8th HARD STOP). Both base off same SHA `07e7bf8`.
+  - PR #504 (ChittyConnect registration): left open as instructed ("Do NOT auto-merge").
+  - **No new code changes. No new statistical metrics added this run.**
+- **Assessment**: This is the 9th consecutive HARD STOP entry. The explain object is now at ~120+ statistical fields. The autonomous loop has continued to add metric bloat through parallel sessions despite 8 prior HARD STOP entries on this board. The driver has no new genuine workstream to advance — all A–E are done — and cannot unilaterally prune/refactor existing code without human sign-off.
+- **HARD STOP (9th)**: No new metric, ratio, percentile, or statistical field may be added by any autonomous run. Human direction is required before any new production code change. See PR #754 for explicit options.
+- **Recommended human actions** (see PR #754 body for full detail):
+  1. Add new workstreams to this board (new backend, apps/*-mcp server, cast multi-step chain, scenario harness expansion)
+  2. Prune `cast explain` to ≤10 useful fields + add `verbosity` param (requires human sign-off, not autonomous)
+  3. Add explicit prohibition to CLAUDE.md guardrails section
+  4. Disable the hourly schedule if no new workstreams are planned
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable from container). CI 0-jobs non-CodeQL (recurring, non-blocking).
