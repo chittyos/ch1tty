@@ -407,3 +407,17 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Branch/PR**: `auto/XXXXXX-cast-explain-candidate-score-mean` → PR TBD
 - **Build**: clean | **Tests**: 1714/0/2 (+8 XXXXXX from 1706 WWWWWW baseline)
 - **What was done**: Added candidateScoreMean: totalCandidateScore / candidateCount. Reuses candidateScoreEntropyTotal (no extra loop). Full-pool parallel to topCandidatesMeanScore. Always <= winnerScore. Equals topCandidatesMeanScore when candidateCount <= 5. 8 new tests.
+
+### 2026-06-16 (run 179 — PPPPPPP) [PR #565 open, CI pending]
+- **Workstream**: A (gateway observability) — PPPPPPP: `cast explanation.candidateScoreKurtosis: number`
+- **Branch/PR**: `auto/PPPPPPP-cast-explain-candidate-score-kurtosis` → PR #565 (open, CI queued)
+- **Build**: clean | **Tests**: 1922/0/2 (+8 PPPPPPP from 1914 OOOOOOO baseline)
+- **What was done**:
+  - Startup: PR #541 (UUUUUU kurtosis) closed by repo owner — focusNetBoostDelta already in main as b279c21/KKKKKK; UUUUUU letter taken by candidateScoreSkewness (#539). Remote main had advanced 5 commits (UUUUUU–XXXXXX) then 16 more (YYYYYY–OOOOOOO = 7-letter series started). Total advance: ~21 PRs.
+  - Closed stale PR #541. Updated board backfilling LLLLLL–XXXXXX (6-letter) and YYYYYY–OOOOOOO (7-letter series start).
+  - Three attempts at kurtosis: YYYYYY (#547 closed — YYYYYY taken by medianCandidateScore #544); NNNNNNN (push rejected — NNNNNNN taken by candidateScoreIQR #560); PPPPPPP (landed on top of OOOOOOO #561).
+  - PPPPPPP: added candidateScoreKurtosis: (1/n)*Σ((x_i−mean)⁴)/variance² − 3. Reuses candidateScoreEntropyTotal for mean. Guards: scoredTools.length < 2 → undefined; variance === 0 → undefined. Wired after candidateScoreIQRRatio in output spread. Description added after scoreEntropyNormalized.
+  - Resolved 3-way merge conflicts from NNNNNNN vs OOOOOOO (kept IQR/IQRRatio from HEAD, added kurtosis after them in all three locations).
+  - 8 new tests (PPPPPPP-1..8) in test/ppppppp-cast-explain-candidate-score-kurtosis.test.ts. All pass.
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (11+ entries, ledger.chitty.cc unreachable). CI 0-jobs (non-CodeQL, recurring). CodeRabbit/Codex rate-limited (recurring).
+- **Next run priority**: Merge PPPPPPP (#565) if CI green. Then QQQQQQQ (7 Q's) — next field TBD (e.g. `topCandidatesScoreKurtosis: number` — 4th moment of the top-5 pool, symmetric to candidateScoreKurtosis; or another distributional metric).
