@@ -584,10 +584,10 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **What was done**:
   - Startup: npm ci clean, build clean, 3290/0/2 on main (HEAD 07e7bf8).
   - Board read from DRIVER-BOARD.md (Notion 401 — ongoing blocker).
-  - Verified all original workstreams A–E done: B confirmed (servers.json github → `https://api.githubcopilot.com/mcp/` via envHeaders.Authorization), C confirmed (focus-profiles.json with 6 profiles), D confirmed (test/scenario.test.ts + sim/), E confirmed (focus-suggestions.json).
+  - Verified all original workstreams A–E done: B confirmed (servers.json GitHub → `https://api.githubcopilot.com/mcp/` via envHeaders.Authorization), C confirmed (focus-profiles.json with 6 profiles), D confirmed (test/scenario.test.ts + sim/), E confirmed (focus-suggestions.json).
   - **Closed PR #753** (lowestToThirdRatio v2 — metric bloat; this was the 3rd attempt to land the same field after #745 was already closed as bloat). Cast explain object has 120+ fields.
   - Left PR #752 open per its "DO NOT merge autonomously" flag — requires human review.
   - Left PR #504 open (ChittyConnect registration — explicit "Do NOT auto-merge").
   - NO new production code. NO new metrics added.
-- **HARD STOP — 8th enforcement**: All defined workstreams are complete. The driver has no productive autonomous work remaining. The cast explain object has grown to 120+ statistical fields with no utility improvement since ~run 91. This loop cannot self-terminate. Human must either: (1) add new workstreams to DRIVER-BOARD.md, (2) prune `buildCastExplanation` to ≤10 useful fields and add a `verbosity` param, or (3) disable the hourly schedule. The driver will only perform board maintenance until directed.
+- **HARD STOP — 8th enforcement**: All defined workstreams are complete. The driver has no productive autonomous work remaining. The cast explain object has grown to 120+ statistical fields with no utility improvement since ~run 91. This loop cannot self-terminate. Human must either: (1) add new workstreams to DRIVER-BOARD.md, (2) prune `buildCastExplanation` to ≤10 useful fields and add a `verbosity` param, (3) update the driver prompt to prohibit new metrics, or (4) disable the hourly schedule. The driver will only perform board maintenance until directed.
 - **Blockers (unchanged)**: Notion API 401 (rotate op://ChittyOS-Integrations/notion/api_token). Ledger DLQ (unreachable from container). CI 0-jobs non-CodeQL (recurring non-blocking).
