@@ -599,6 +599,7 @@ export class Aggregator {
           'explanation also includes rawFocusMargin: number — the score gap between the winner and the runner-up computed from their pre-focus base scores (winnerScoreBase - runnerUpScoreBase), stripping the focus boost from both sides. Present when a focus profile is active and a runner-up exists (same conditions as runnerUpScoreBase). Absent when no focus is active, on no_match, or fewer than 2 candidates. Can be negative when the runner-up\'s base score exceeded the winner\'s base score — meaning focus reversed the natural ranking (the winner would have lost without the boost). Compare to focusMargin (winnerScore - runnerUpScore, the gap after focus): if rawFocusMargin < focusMargin, the focus boost widened the gap; if rawFocusMargin > focusMargin, focus narrowed it; if rawFocusMargin < 0 and focusMargin > 0, focus reversed the outcome (focusDecisive is true in this case). The identity rawFocusMargin = focusMargin - (winnerFocusBoost - runnerUpFocusBoost) always holds. ' +
           'explanation also includes rawFocusMarginRatio: number — the rawFocusMargin normalised by the winner\'s pre-focus base score (rawFocusMargin / winnerScoreBase), expressing the unfocused gap as a fraction of the winner\'s organic relevance. Present when a focus profile is active, a runner-up exists, and winnerScoreBase > 0 (same conditions as rawFocusMargin, plus the division guard). Absent when no focus is active, on no_match, fewer than 2 candidates, or winnerScoreBase === 0. Can be negative (same sign as rawFocusMargin) when focus reversed the natural ranking. A value > 1 means the winner led by more than its full base score; a value of 0 means the two tools were tied pre-focus; a value near −1 means the runner-up nearly had twice the base score of the winner. Complements rawFocusMargin (the absolute gap) by normalising it to the winner\'s own scale, making the margin comparable across queries and score magnitudes. ' +
           'explanation also includes focusNetBoostDelta: number — the net differential focus boost the winner received compared to the runner-up (winnerFocusBoost - runnerUpFocusBoost). Present when a focus profile is active and a runner-up exists (same conditions as rawFocusMargin). Absent when no focus is active, on no_match, or fewer than 2 candidates. Possible values: +focusBoost when winner in-focus and runner-up out-of-focus (focus gave winner an unmatched advantage); 0 when both in-focus or both out-of-focus (focus shifted both equally, no net differential); -focusBoost when winner out-of-focus and runner-up in-focus (focus actually helped the runner-up more than the winner). The identity focusMargin = rawFocusMargin + focusNetBoostDelta always holds, triangulating the three margin views: post-focus gap, pre-focus gap, and the net boost differential. ' +
+          'When explain: true, pass verbosity: "low" for 9-10 essential fields only (method, candidateCount, winnerScore, winnerServer, runnerUpScore, runnerUpTool, topCandidates, rationale, plus focus fields when a focus is active); verbosity: "medium" adds focus analysis and basic distribution stats (candidateScoreMean, medianCandidateScore, candidateScoreStdDev, candidateScoreSpread, focusMargin, focusConfidence, etc.); verbosity: "full" (default, for backward compatibility) returns all 100+ statistical fields. New callers should use verbosity: "low". ' +
           'Sub-meta to master-meta — the gateway calling itself.',
         inputSchema: {
           type: 'object',
@@ -630,6 +631,11 @@ export class Aggregator {
             explain: {
               type: 'boolean',
               description: 'If true, include an explanation field in the response showing how the tool was selected: resolution method (brain or keyword), whether focus boosted the winner, top-scored candidates with scores, and a human-readable rationale. Works with all modes — executed, plan, dryRun, chain_executed, discovered, no_match (default: false).',
+            },
+            verbosity: {
+              type: 'string',
+              enum: ['low', 'medium', 'full'],
+              description: 'Controls how many fields appear in the explanation object when explain: true. "low" (recommended): 9-10 essential fields — method, candidateCount, winnerScore, winnerServer, runnerUpScore, runnerUpTool, focus, focusDecisive, topCandidates, rationale. "medium": adds focus analysis (focusMargin, focusRank, winnerFocusBoost, focusConfidence, etc.) and basic distribution stats (candidateScoreMean, medianCandidateScore, candidateScoreStdDev, candidateScoreSpread). "full": all fields including the complete statistical breakdown (100+ ratio/percentile/moment fields). Default: "full" for backward compatibility. New callers should use "low" unless the extra stats are needed.',
             },
             scope: {
               type: 'object',
@@ -1250,6 +1256,7 @@ export class Aggregator {
     const confirm = !dryRun && args.confirm === true;
     const autoChain = args.chain === true;
     const explain = args.explain === true;
+    const verbosity: 'low' | 'medium' | 'full' = (args.verbosity === 'low' || args.verbosity === 'medium') ? args.verbosity : 'full';
     const castTimeoutMs = typeof args.timeout === 'number' && args.timeout > 0 ? Math.floor(args.timeout) : undefined;
     const effectiveSessionId = typeof args.sessionId === 'string' && args.sessionId ? args.sessionId : sessionId;
     const { name: focusName, profile: focus } = this.resolveActiveFocus(args.focus, effectiveSessionId);
@@ -1434,7 +1441,7 @@ export class Aggregator {
             intent,
             latencyMs: Date.now() - castStartMs,
             ...(scopeAnnotation ? { scope: scopeAnnotation } : {}),
-            ...(explain ? { explanation: buildCastExplanation(resolvedBy, undefined, [], focusName, focus, castRoute === 'brain' ? brainRouteMs : undefined) } : {}),
+            ...(explain ? { explanation: buildCastExplanation(resolvedBy, undefined, [], focusName, focus, castRoute === 'brain' ? brainRouteMs : undefined, verbosity) } : {}),
             ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
             ...(noMatchSessionContext ? { sessionContext: noMatchSessionContext } : {}),
             hint: 'No tools, prompts, or resources matched your intent. Try ch1tty/search with different keywords.',
@@ -1455,7 +1462,7 @@ export class Aggregator {
       score: t.score,
       description: t.description,
     }));
-    const explanation = explain ? buildCastExplanation(resolvedBy, best, scoredTools, focusName, focus, castRoute === 'brain' ? brainRouteMs : undefined) : null;
+    const explanation = explain ? buildCastExplanation(resolvedBy, best, scoredTools, focusName, focus, castRoute === 'brain' ? brainRouteMs : undefined, verbosity) : null;
 
     // Build related prompts/resources context
     const related: Record<string, unknown> = {};
@@ -2003,6 +2010,7 @@ function buildCastExplanation(
   focusName: string | undefined,
   focus: FocusProfile | null | undefined,
   brainMs?: number,
+  verbosity: 'low' | 'medium' | 'full' = 'full',
 ): object {
   const topCandidates = scoredTools.slice(0, 5).map((t) => ({
     tool: t.namespacedName,
@@ -2341,6 +2349,85 @@ function buildCastExplanation(
       parts.push(`over runner-up "${runner.tool}" (${runner.score.toFixed(3)})`);
     }
     rationale = parts.join(' ');
+  }
+
+  if (verbosity === 'low') {
+    const r: Record<string, unknown> = {
+      method: resolvedBy,
+      candidateCount: scoredTools.length,
+      topCandidates,
+      rationale,
+    };
+    if (brainMs !== undefined) r.brainMs = brainMs;
+    if (best !== undefined) {
+      r.winnerScore = best.score;
+      r.winnerServer = best.namespacedName.split('/')[0];
+    }
+    if (topCandidates.length > 1) {
+      r.runnerUpScore = topCandidates[1].score;
+      r.runnerUpTool = topCandidates[1].tool;
+    }
+    if (focusName && focus && best !== undefined) {
+      r.focus = focusName;
+      r.focusBoost = focusBoost;
+      r.winnerInFocus = winnerInFocus;
+      if (topCandidates.length > 1) {
+        r.focusDecisive = (best.score - (winnerInFocus ? focusBoost : 0)) < topCandidates[1].score;
+      }
+    }
+    return r;
+  }
+
+  if (verbosity === 'medium') {
+    const r: Record<string, unknown> = {
+      method: resolvedBy,
+      candidateCount: scoredTools.length,
+      topCandidates,
+      rationale,
+    };
+    if (brainMs !== undefined) r.brainMs = brainMs;
+    if (best !== undefined) {
+      r.winnerScore = best.score;
+      r.winnerServer = best.namespacedName.split('/')[0];
+      r.winnerCategory = best.category;
+    }
+    if (topCandidates.length > 1) {
+      r.runnerUpScore = topCandidates[1].score;
+      r.runnerUpTool = topCandidates[1].tool;
+      r.runnerUpServer = topCandidates[1].tool.split('/')[0];
+      r.runnerUpCategory = scoredTools[1].category;
+    }
+    if (scoredTools.length >= 2) {
+      r.candidateScoreSpread = scoredTools[0].score - scoredTools[scoredTools.length - 1].score;
+      r.candidateScoreMean = scoredTools.reduce((s, t) => s + t.score, 0) / scoredTools.length;
+      if (medianCandidateScore !== undefined) r.medianCandidateScore = medianCandidateScore;
+      if (candidateScoreStdDev !== undefined) r.candidateScoreStdDev = candidateScoreStdDev;
+    }
+    if (focusName && focus && best !== undefined) {
+      r.focus = focusName;
+      r.focusBoost = focusBoost;
+      r.winnerInFocus = winnerInFocus;
+      r.winnerFocusBoost = winnerInFocus ? focusBoost : 0;
+      r.winnerScoreBase = best.score - (winnerInFocus ? focusBoost : 0);
+      r.candidatesInFocusCount = scoredTools.filter((t) => isInFocus(focus, t)).length;
+      if (scoredTools.length > 0) {
+        r.inFocusFraction = scoredTools.filter((t) => isInFocus(focus, t)).length / scoredTools.length;
+      }
+      if (focusRank !== undefined) {
+        r.focusRank = focusRank;
+        r.focusRankDelta = focusRank - 1;
+      }
+      if (unfocusedWinner !== undefined) r.unfocusedWinner = unfocusedWinner;
+      if (topCandidates.length > 1) {
+        r.focusDecisive = (best.score - (winnerInFocus ? focusBoost : 0)) < topCandidates[1].score;
+        r.focusMargin = best.score - topCandidates[1].score;
+        const margin = best.score - topCandidates[1].score;
+        if (margin !== 0) {
+          r.focusConfidence = Math.min(1, (winnerInFocus ? focusBoost : 0) / margin);
+        }
+      }
+    }
+    return r;
   }
 
   return {
