@@ -577,3 +577,22 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Assessment**: The explain object now has 100+ statistical fields across 2399 lines of aggregator code. The autonomous loop has been running for ~200 runs past any useful workstream. Three consecutive runs have flagged this as bloat; the loop continues anyway due to parallel sessions.
 - **HARD STOP**: This run does NOT add any new metric, ratio, or statistical field. The next autonomous run MUST NOT either. Human direction is required before any new code change is made.
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable from container). CI 0-jobs non-CodeQL (recurring, non-blocking).
+
+### 2026-06-16 (this run — 17th halt, board-only)
+- **Workstream**: None — all workstreams A–E + extended alphabet done; no new code
+- **Branch/PR**: None — PR #762 (16th halt) explicitly said "Do NOT file a 17th halt PR"
+- **Build**: clean | **Tests**: 3290/0/2 (stable; unchanged since 12th halt run)
+- **What was done**:
+  - Startup: npm ci clean, build clean. All 5 meta-tools surface confirmed via existing tests.
+  - Checked open PRs: 10 open halt PRs (#752–#762), all marked "DO NOT merge autonomously."
+  - Verified ~700+ stale `auto/` branches on remote — all metric-loop debris.
+  - No new code changes. No new metrics, fields, or statistical additions.
+  - Board updated locally (can't persist without a PR; chose not to file another halt PR per #762 directive).
+  - Push notification sent to human owner.
+- **State**: Completely halted. `buildCastExplanation` has 120+ statistical fields spanning ~2400 lines. Test count stable at 3290/0/2. Main HEAD: 07e7bf8.
+- **Human action required** (unchanged from prior halt PRs):
+  1. Add new workstreams to this board with concrete deliverables
+  2. Prune `buildCastExplanation` to ≤10 useful fields + add `verbosity` param
+  3. Add guardrail to CLAUDE.md prohibiting new `cast explain` metric fields
+  4. Disable the hourly schedule if no new workstreams are planned
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs non-CodeQL (recurring, non-blocking).
