@@ -449,14 +449,14 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 ### 2026-06-16 (run 179 — QQQQQQQ) ✅ COMPLETE
 - **Workstream**: A (gateway observability) — QQQQQQQ: `cast explanation.candidateScoreKurtosis: number`
-- **Branch/PR**: `auto/NNNNNNN-cast-explain-candidate-score-kurtosis` → PR #562
-- **Build**: clean | **Tests**: TBD (+8 QQQQQQQ)
+- **Branch/PR**: `auto/NNNNNNN-cast-explain-candidate-score-kurtosis` → PR #562 ✅ MERGED (9f7dcf09)
+- **Build**: clean | **Tests**: 1994/0/2 (+8 QQQQQQQ from baseline)
 - **What was done**:
-  - Startup: npm ci clean, build clean, 1874/0/2 on main (MMMMMMM HEAD aa73bb8). Board read from DRIVER-BOARD.md (Notion 401 — recurring).
+  - Startup: npm ci clean, build clean. Board read from DRIVER-BOARD.md (Notion 401 — recurring).
   - Merged PR #557 (KKKKKKK candidateScoreHerfindahlIndex → 7295780). Closed stale PR #547 (YYYYYY kurtosis targeting old SHA — YYYYYY slot already taken by medianCandidateScore #544).
-  - Parallel sessions had also merged LLLLLLL (#558 effectiveN), MMMMMMM (#559 scoreEntropyNormalized), NNNNNNN (#560 candidateScoreIQR), OOOOOOO (#561 candidateScoreIQRRatio), PPPPPPP (#563 top2HeavinessRatio) — pulled main twice mid-rebase.
-  - QQQQQQQ (renamed twice from NNNNNNN→PPPPPPP→QQQQQQQ due to race losses): 4th standardised moment (excess kurtosis) — `(1/n)*Σ((x_i-mean)^4/stddev^4) - 3`. Computed via IIFE after candidateScoreSkewness. Same presence guard (>= 2 candidates, stddev > 0). Description line added. Wired into output spread after candidateScoreSkewness.
+  - Parallel sessions merged LLLLLLL (#558), MMMMMMM (#559), NNNNNNN (#560), OOOOOOO (#561), PPPPPPP (#563), RRRRRRR (#566), SSSSSSS (#567), TTTTTTT (#568), UUUUUUU (#569), VVVVVVV (#570), WWWWWWW (#571), XXXXXXX (#572) — 3 consecutive rebase cycles required.
+  - QQQQQQQ (renamed NNNNNNN→PPPPPPP→QQQQQQQ due to 2 race losses): 4th standardised moment (excess kurtosis) — `(1/n)*Σ((x_i-mean)^4/stddev^4) - 3`. Computed via IIFE after candidateScoreSkewness. Same presence guard (>= 2 candidates, stddev > 0). Description line added. Wired into output spread after candidateScoreSkewness.
   - 8 new tests (QQQQQQQ-1..8): present/finite/absent-single/absent-identical-scores/absent-no_match/2-candidate-identity(-2)/present-no-focus/description. All pass.
-  - Board backfilled: added LLLLLL through PPPPPPP (parallel sessions, 6-letter and 7-letter sequences).
+  - Board backfilled: LLLLLL through XXXXXXX (parallel sessions).
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs (non-CodeQL, recurring).
-- **Next run priority**: RRRRRRR (7 R's) — `topCandidatesKurtosis: number` (4th moment of topCandidates pool, symmetric to topCandidatesScoreSkewness; completes 4-moment characterisation for top pool).
+- **Next run priority**: YYYYYYY (7 Y's) — `topCandidatesKurtosis: number` (4th moment of topCandidates pool, symmetric to topCandidatesScoreSkewness; completes 4-moment characterisation for top pool).
