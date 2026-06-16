@@ -562,3 +562,21 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Assessment**: All 5 original workstreams (A–E) are **DONE** (completed by ~run 91 for E). Since ~run 165 the system has been autonomously generating percentile/statistical ratio fields for `cast explain`, now at 9-letter labels (AAAAAAAAA → RRRRRRRRR range). The `buildCastExplanation` function now has ~398 lines of statistical metric code and the explain object has 80+ fields. This is metric bloat with no connection to the original workstream goals.
 - **Recommendation**: Human should decide whether to (a) add new genuine workstreams (new backends, improved scenario tests, cast chain improvements), (b) prune the explain object to a minimal useful set + add a `verbosity` param, or (c) stop the metric loop entirely. The driver should NOT autonomously continue adding percentile permutations.
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable from container). CI 0-jobs non-CodeQL (recurring, non-blocking).
+
+### 2026-06-16 (this run — metric-loop halt + housekeeping)
+- **Workstream**: Housekeeping only — no new metric added. Parallel sessions continued the metric loop after the previous housekeeping assessment, adding 16 more ratio fields (01010101–16161616). This run does NOT continue that loop.
+- **Build**: clean | **Tests**: 2778/0/2 (up from 2370 in last housekeeping run — 408 tests added by parallel sessions)
+- **Main HEAD**: `de9f2c1` — candidateScoreGeometricMeanToMedianRatio (16161616)
+- **What was done**:
+  - Startup: npm ci clean, build clean, 2778/0/2 on current main.
+  - Board read: previous housekeeping run assessed metric bloat and recommended stopping. Despite that, parallel sessions added 16 more fields (01010101 through 16161616 — geometric/harmonic mean ratios). aggregator.ts is now 2376 lines.
+  - Closed PR #657 (stale BBBBBBBBB-rebase, older base SHA 43dd3b6, superseded by #660 v2).
+  - Did NOT merge PR #660 (BBBBBBBBB candidateScoreIQRCoverage) or PR #680 (17171717 candidateScoreHarmonicMeanToMedianRatio) — both are metric additions; left open for human review.
+  - PR #504 (ChittyConnect registration) unchanged — explicit "Do NOT auto-merge" note.
+- **Open PRs awaiting human decision**:
+  - #660 — candidateScoreIQRCoverage (BBBBBBBBB v2)
+  - #680 — candidateScoreHarmonicMeanToMedianRatio (17171717)
+  - #504 — ChittyConnect registration (explicit hold)
+- **Assessment reinforced**: All original workstreams A–E done. The explain object now has 100+ statistical fields. The `buildCastExplanation` function is ~2376-line aggregator. Metric loop continues to generate permutations with no user-facing value.
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs non-CodeQL.
+- **Next run priority**: HUMAN DIRECTION NEEDED. Options: (a) prune explain to a `verbosity` param (minimal/standard/full); (b) close PRs #660 and #680 and define a new workstream; (c) stop the scheduler. Driver should NOT autonomously advance the metric loop next run either.
