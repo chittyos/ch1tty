@@ -577,3 +577,16 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Assessment**: The explain object now has 100+ statistical fields across 2399 lines of aggregator code. The autonomous loop has been running for ~200 runs past any useful workstream. Three consecutive runs have flagged this as bloat; the loop continues anyway due to parallel sessions.
 - **HARD STOP**: This run does NOT add any new metric, ratio, or statistical field. The next autonomous run MUST NOT either. Human direction is required before any new code change is made.
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable from container). CI 0-jobs non-CodeQL (recurring, non-blocking).
+
+### 2026-06-16T18:xx UTC — 16th halt run (no PR filed)
+- **Workstream**: No new work — all A–E and extended workstreams done; HARD STOP enforced
+- **Build**: clean | **Tests**: 3290 pass / 0 fail / 2 skip (3292 test entries, unchanged since 15th halt)
+- **What was done**:
+  - Startup: npm ci clean, build clean, tests 3290/0/2 on main (HEAD 07e7bf8 — candidateScoreNonWinnerQMHMGap).
+  - Board read from DRIVER-BOARD.md (Notion 401 — ongoing blocker).
+  - Found 669 stale auto/ branches on remote. Open halt PRs: #752, #754–#761 (15 HARD STOP PRs, none merged).
+  - **No new code, no new PR filed** — 15 prior HARD STOP PRs are sufficient signal. Filing a 16th PR would be noise.
+  - Push notification sent to human owner (nick@nevershitty.com) with full situation summary and 4 action options.
+- **Assessment**: System has been autonomously filing halt PRs for hours with no human response. Creating yet another PR is counterproductive. The notification is the only useful action.
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs non-CodeQL. No new workstreams defined by human.
+- **Next run**: If human has not responded, do NOT file a 17th halt PR. The situation is documented. Await direction or disable schedule.
