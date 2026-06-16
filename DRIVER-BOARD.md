@@ -577,3 +577,21 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Assessment**: The explain object now has 100+ statistical fields across 2399 lines of aggregator code. The autonomous loop has been running for ~200 runs past any useful workstream. Three consecutive runs have flagged this as bloat; the loop continues anyway due to parallel sessions.
 - **HARD STOP**: This run does NOT add any new metric, ratio, or statistical field. The next autonomous run MUST NOT either. Human direction is required before any new code change is made.
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable from container). CI 0-jobs non-CodeQL (recurring, non-blocking).
+
+### 2026-06-16T14:XX UTC (12th HARD STOP — no new code)
+- **Workstream**: Housekeeping only — no new metric, ratio, or statistical field added
+- **Build**: clean | **Tests**: 3290/0/2 (identical to 11th HARD STOP — main HEAD still 07e7bf8, no merges since)
+- **What was done**:
+  - Startup: npm ci clean, build clean, 3290/0/2 on main (HEAD 07e7bf8 — candidateScoreNonWinnerQMHMGap, 79797979).
+  - Board read from DRIVER-BOARD.md (Notion 401 — recurring blocker).
+  - Open HARD STOP PRs: #752 (7th), #754 (8th), #755 (9th), #756 (10th), #757 (11th) — all open, none merged, none actioned by human yet.
+  - Stale auto/ branches on remote: 731+. No cleanup performed (would require destructive batch git ops).
+  - PR #504 (ChittyConnect registration): left open per "Do NOT auto-merge" instruction.
+  - No new code changes. No new statistical metrics added.
+- **HARD STOP — 12th**: All 5 original workstreams (A–E) remain DONE. The `buildCastExplanation` function has 120+ statistical fields across ~2400 lines. Eleven prior HARD STOP entries have been filed across separate PRs (#752, #754, #755, #756, #757 currently open). The loop has continued running hourly between halt runs via parallel sessions. Tests have grown from 3290 → 3290 (no change this run — the halt is holding for now, but parallel sessions will reopen the loop).
+- **Human direction required** — choose one before the next run:
+  1. **Add new workstreams** to DRIVER-BOARD.md (new backend in servers.json, new apps/*-mcp focused server, cast multi-step chain improvements, scenario harness expansion for real backends)
+  2. **Prune cast explain** — reduce buildCastExplanation to ≤10 useful fields + add a verbosity param (low/medium/full)
+  3. **Add guardrail to CLAUDE.md** — explicitly prohibit new cast explain metric fields in the driver prompt
+  4. **Disable the hourly schedule** if no new workstreams are planned
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable from container). CI 0-jobs non-CodeQL (recurring, non-blocking).
