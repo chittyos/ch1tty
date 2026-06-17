@@ -603,3 +603,23 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   3. **Add CLAUDE.md guardrail** explicitly prohibiting new `cast explain` metric fields
   4. **Disable the hourly schedule** if no new workstreams are planned
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable from container). CI 0-jobs non-CodeQL (recurring, non-blocking).
+
+### 2026-06-17 (this run — halt enforcement + board update)
+- **Workstream**: Housekeeping — HARD STOP enforced; no new code, metrics, or statistical fields added
+- **Build**: clean | **Tests**: 3290/0/2 (main HEAD `acbd87b`, unchanged code)
+- **What was done**:
+  - Startup: npm ci clean, npm run build clean, npm test: 3290/0/2. Board read from DRIVER-BOARD.md (Notion 401 — ongoing blocker).
+  - Merged PR #768 (board-only 21st-halt cleanup, 3/3 CI green, squash → acbd87b). No code change.
+  - **PR #766** (`auto/verbosity-prune-cast-explain`) remains open and actionable:
+    - Adds `verbosity: 'low' | 'medium' | 'full'` to `ch1tty/cast` when `explain: true`
+    - `low`: 9-10 essential fields; `medium`: + focus + distribution; `full` (default): all 120+ fields — backward compatible
+    - CI: 3/3 CodeQL ✅ | Tests: 3304/0 (+14)
+    - Does NOT add any new metric. Directly addresses the explain-object bloat.
+  - **PR #504** (ChittyConnect registration) — left open, "Do NOT auto-merge" as noted.
+  - **No new branches, no new code, no new metrics created.**
+- **Human action required** (same as prior runs):
+  1. **Merge PR #766** — the only pending code improvement; backward compat; CI green
+  2. **Add new workstreams** to this board for the next genuine deliverable
+  3. **Add CLAUDE.md guardrail** prohibiting new `cast explain` metric/ratio fields
+  4. **Disable or redirect the hourly schedule** if no new workstreams are planned
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). CI 0-jobs non-CodeQL (non-blocking, recurring).
