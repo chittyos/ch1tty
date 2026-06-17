@@ -603,3 +603,22 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   3. **Add CLAUDE.md guardrail** explicitly prohibiting new `cast explain` metric fields
   4. **Disable the hourly schedule** if no new workstreams are planned
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable from container). CI 0-jobs non-CodeQL (recurring, non-blocking).
+
+### 2026-06-17 (this run — verbosity prune merged + guardrail added)
+- **Workstream**: Housekeeping — merge PR #766 (verbosity prune); add CLAUDE.md guardrail
+- **Build**: clean | **Tests**: 3304/0/2 (+14 verbosity tests from 3290 baseline)
+- **What was done**:
+  - Startup: npm ci clean, build clean. Board read from DRIVER-BOARD.md (Notion 401 — recurring).
+  - PR #769 (stale board-only halt-noise PR): CLOSED.
+  - PR #766 (`auto/verbosity-prune-cast-explain`): rebased onto `acbd87b` (skipped stale board commit, kept verbosity code commit → rebased as `59c1d50`). 3304/0/2. Pushed and merged.
+  - Added CLAUDE.md guardrail: `buildCastExplanation` metric freeze — no new statistical fields permitted.
+  - No new metrics added.
+- **State summary**:
+  - All workstreams A–E: DONE
+  - PR #766 ✅ MERGED — `verbosity: 'low'|'medium'|'full'` on `ch1tty/cast explain`
+  - CLAUDE.md: guardrail against new explain metrics now in place
+  - Open PRs: **1** (#504 ChittyConnect reg — "Do NOT auto-merge")
+- **Human action required**:
+  1. **Add new workstreams** to DRIVER-BOARD.md (new backend, `apps/*-mcp`, cast chaining, scenario expansion)
+  2. **Disable or redirect hourly schedule** if no new workstreams are planned
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs non-CodeQL (recurring).
