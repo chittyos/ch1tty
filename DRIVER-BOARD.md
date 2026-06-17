@@ -577,3 +577,21 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Assessment**: The explain object now has 100+ statistical fields across 2399 lines of aggregator code. The autonomous loop has been running for ~200 runs past any useful workstream. Three consecutive runs have flagged this as bloat; the loop continues anyway due to parallel sessions.
 - **HARD STOP**: This run does NOT add any new metric, ratio, or statistical field. The next autonomous run MUST NOT either. Human direction is required before any new code change is made.
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable from container). CI 0-jobs non-CodeQL (recurring, non-blocking).
+
+### 2026-06-17 (this run — 20th halt, board log only)
+- **Workstream**: No new code — board log only. All workstreams A–E remain DONE.
+- **Build**: clean | **Tests**: 3290 pass / 0 fail / 2 skip (main HEAD `07e7bf8` — unchanged)
+- **What was done**:
+  - Startup: npm ci clean, build clean, 3290/0/2 on main (HEAD `07e7bf8` — unchanged since 12th halt).
+  - Board read from DRIVER-BOARD.md (Notion 401 — recurring).
+  - Open PRs surveyed: 15 board-halt PRs (#752–#765) all open, none merged. **PR #766** (`auto/verbosity-prune-cast-explain`) is the ONLY substantive code PR — adds `verbosity: 'low' | 'medium' | 'full'` param to `ch1tty/cast explain`. CI green (CodeQL + Analyze: success). 3304 tests on PR branch (+14 new verbosity tests). This is the verbosity prune the human requested across 14 halt PRs.
+  - 674 stale `auto/` branches on remote.
+  - No new code changes made this run.
+- **Status of each workstream**:
+  - A: ✅ DONE — build clean, 5 meta-tools register, tests green
+  - B: ✅ DONE — github entry migrated to `https://api.githubcopilot.com/mcp/` with envHeaders
+  - C: ✅ DONE — focus-profiles.json with 6 profiles, CH1TTY_FOCUS, per-call focus param
+  - D: ✅ DONE — scenario/simulation test harness in test/
+  - E: ✅ DONE — focus-suggestions.json catalog
+- **Action required from human**: Merge PR #766 (`auto/verbosity-prune-cast-explain`) — it is the verbosity prune you asked for, CI green, +14 tests. Then add new workstreams to DRIVER-BOARD.md or disable the schedule.
+- **Blockers**: Notion API 401 (token invalid). Ledger DLQ (unreachable from container). 15 open halt PRs awaiting human triage.
