@@ -36,6 +36,7 @@ Treat Ch1tty as an orchestrator viewport, not a backend catalog.
   - `ch1tty/cast`
 - Session/fractal behavior is handled by SessionCoordinator + SessionTracker behind the meta-tools.
 - Backend namespace sprawl is controlled by config profiles; never expand public surface to include backend tools directly.
+- **`buildCastExplanation` metric freeze**: Do NOT add new statistical fields, ratios, percentile cross-comparisons, or observability metrics to `cast explain`. The `verbosity` param (`low`/`medium`/`full`) was added to manage the existing 120+ fields. Every field that belongs in `explain` is already there. Any PR adding a new metric/ratio/statistical measure to `buildCastExplanation` MUST be rejected.
 
 ## Commands
 
