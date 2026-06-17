@@ -577,3 +577,29 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Assessment**: The explain object now has 100+ statistical fields across 2399 lines of aggregator code. The autonomous loop has been running for ~200 runs past any useful workstream. Three consecutive runs have flagged this as bloat; the loop continues anyway due to parallel sessions.
 - **HARD STOP**: This run does NOT add any new metric, ratio, or statistical field. The next autonomous run MUST NOT either. Human direction is required before any new code change is made.
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable from container). CI 0-jobs non-CodeQL (recurring, non-blocking).
+
+### 2026-06-17 (run 21st-halt — cleanup sweep)
+- **Workstream**: Housekeeping — no new code; stale PRs closed; board consolidated
+- **Build**: clean | **Tests**: 3290/0/2 (unchanged since 12th halt at main HEAD `07e7bf8`)
+- **What was done**:
+  - Startup: npm ci clean, npm run build clean, npm test: 3290/0/2.
+  - Board read from DRIVER-BOARD.md (Notion 401 — ongoing blocker). Last main entry was the "final halt enforcement" (tests 2962/0/2). Since that entry, 20 board-halt PRs (#752–#767) were filed by parallel halt runs — all board-only, none merged, all now CLOSED as noise:
+    - Closed #752, #754–#765, #767 (15 board-only stale PRs) — superseded by this entry.
+  - **PR #766** (`auto/verbosity-prune-cast-explain`) remains OPEN — this is the ONE actionable code change:
+    - Adds `verbosity: 'low' | 'medium' | 'full'` param to `ch1tty/cast` (when `explain: true`)
+    - `low`: 9-10 essential fields; `medium`: + focus analysis + distribution stats; `full` (default): all 100+ fields — backward compatible
+    - CI: CodeQL ✅; Tests: 3304/0 (+14 verbosity tests)
+    - Directly implements option #2 from every halt PR's "human action required" list
+  - **No new code changes made this run.**
+- **State summary**:
+  - All workstreams A–E: DONE
+  - `cast explain` object: 120+ statistical fields across ~2400 aggregator lines
+  - Main HEAD: `07e7bf8` (unchanged for ~24h)
+  - Stale `auto/` branches on remote: 700+
+  - Open PRs: **2** (#766 verbosity prune, #504 ChittyConnect reg — "Do NOT auto-merge")
+- **Human action required** (unchanged from every prior halt):
+  1. **Merge PR #766** — verbosity prune, backward compatible, CI green, directly answers the ask
+  2. **Add new workstreams** to DRIVER-BOARD.md (new backend, `apps/*-mcp` server, cast chaining, scenario harness expansion)
+  3. **Add CLAUDE.md guardrail** explicitly prohibiting new `cast explain` metric fields
+  4. **Disable the hourly schedule** if no new workstreams are planned
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable from container). CI 0-jobs non-CodeQL (recurring, non-blocking).
