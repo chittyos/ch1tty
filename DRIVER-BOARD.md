@@ -622,3 +622,25 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   1. **Add new workstreams** to DRIVER-BOARD.md (new backend, `apps/*-mcp`, cast chaining, scenario expansion)
   2. **Disable or redirect hourly schedule** if no new workstreams are planned
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs non-CodeQL (recurring).
+
+### 2026-06-17 (hourly driver — stable/no-op)
+- **Workstream**: None — all A–E done; no new workstreams defined; guardrail blocks metric additions
+- **Build**: clean | **Tests**: 3304/0/2 (unchanged — same as PR #766 merge)
+- **What was done**:
+  - Startup: git reset --hard origin/main (local branch had diverged 50/50). npm ci clean, npm run build clean, npm test: 3304/0/2.
+  - Board read from DRIVER-BOARD.md (Notion 401 — recurring). Last entry confirmed: PR #766 (verbosity prune + guardrail) merged at 4757b04 on 2026-06-16.
+  - Open PRs: 0 actionable (PR #504 ChittyConnect reg still has "Do NOT auto-merge" note — left untouched).
+  - CLAUDE.md guardrail confirmed in place: buildCastExplanation metric freeze is active.
+  - No code changes made this run.
+- **State summary**:
+  - All workstreams A–E: DONE ✓
+  - `buildCastExplanation` metric freeze: ACTIVE (CLAUDE.md guardrail)
+  - `cast explain` verbosity param (`low`/`medium`/`full`): MERGED (#766)
+  - GitHub MCP: `https://api.githubcopilot.com/mcp/` with envHeaders ✓
+  - Focus profiles: 6 profiles in focus-profiles.json ✓
+  - Scenario harness: test/scenario.test.ts, test/simulation.test.ts ✓
+  - Suggestions catalog: focus-suggestions.json (372 tools, 6 focuses) ✓
+- **Human action required**:
+  1. **Add new workstreams** to DRIVER-BOARD.md before next run (candidates: new `apps/*-mcp` server, cast chain improvements, MCP registration PR #504 decision, scenario harness expansion with new backends)
+  2. **Disable or redirect hourly schedule** if no new workstreams are planned — this run found nothing to do
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable from container). CI 0-jobs non-CodeQL (recurring, non-blocking).
