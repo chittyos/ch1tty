@@ -30,9 +30,7 @@ import { log } from './logger.js';
 
 const SEPARATOR = '/';
 const META_SERVER_ID = 'ch1tty';
-const META_TOOL_VERBS: ReadonlySet<string> = new Set([
-  'search', 'execute', 'status', 'reload', 'cast', 'code', 'provision',
-]);
+const META_TOOL_VERBS: ReadonlySet<string> = new Set(['search', 'execute', 'status', 'reload', 'cast']);
 const REGISTRY_TTL = 5 * 60 * 1000;
 /** Idle window after which alarm() runs onSessionEnd for a session. */
 const SESSION_IDLE_MS = 15 * 60 * 1000;
@@ -438,21 +436,6 @@ export class Ch1ttyDO extends DurableObject<Env> {
       },
     ];
 
-    if (this.browserRuntime && this.browserRuntime.tools.browser_execute) {
-      const btool = this.browserRuntime.tools.browser_execute;
-      tools.push({
-        name: `${META_SERVER_ID}${SEPARATOR}browser_execute`,
-        description: btool.description || 'TypeScript async arrow function that uses the cdp connector',
-        inputSchema: {
-          type: 'object',
-          properties: {
-            code: { type: 'string', description: 'TypeScript async arrow function that uses the cdp connector' }
-          },
-          required: ['code']
-        }
-      });
-    }
-
     return tools;
   }
 
@@ -462,13 +445,13 @@ export class Ch1ttyDO extends DurableObject<Env> {
     switch (toolName) {
       case 'search': result = await this.handleSearch(args, sessionId); break;
       case 'execute': result = await this.handleExecute(args, sessionId); break;
-      case 'code': result = await this.handleCode(args, sessionId); break;
-      case 'browser_execute': result = await this.handleBrowserExecute(args); break;
-      case 'memory_recall': result = await this.handleMemoryRecall(args); break;
-      case 'memory_ingest': result = await this.handleMemoryIngest(args); break;
-      case 'memory_summary': result = await this.handleMemorySummary(args); break;
+      
+      
+      
+      
+      
       case 'cast': result = await this.handleCast(args, sessionId); break;
-      case 'provision': result = await this.handleProvision(args, sessionId); break;
+      
       case 'status': result = await this.handleStatus(); break;
       case 'reload': result = await this.handleReload(); break;
       default:
