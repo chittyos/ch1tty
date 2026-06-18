@@ -712,3 +712,25 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   3. **Worker dev-toolchain vulns** (wrangler/miniflare advisories) — require Cloudflare dep downgrade decision
   4. **Verify ChittyConnect** (`connect.chitty.cc/api/mcp`) auth token works from deployed gateway
 - **Blockers**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). CI 0-jobs non-CodeQL (recurring). CodeRabbit quota recovering from metric bloat.
+
+### 2026-06-18 (this run — SEC-FIX-2 merged; steady state)
+- **Workstream**: SEC-FIX-2 — merged ws HIGH DoS CVE fix (PR #777); no new workstreams defined
+- **Build**: clean | **Tests**: 3304/0/2 (confirmed on main c0dc5c1)
+- **What was done**:
+  - Startup: npm ci clean, build clean, npm test: 3304/0/2.
+  - Board read from DRIVER-BOARD.md (Notion 401 — recurring). `git fetch --all`.
+  - PR #777 (`fix(deps): pin ws >=8.21.0 in worker`): all 3 CodeQL checks ✅ green → squash-merged → c0dc5c1.
+  - PR #778 (stale board log from prior run): closed as superseded.
+  - No new code changes — system at steady state.
+- **State summary**:
+  - All workstreams A–E + F–WWWWWWW + SEC-FIX + SEC-FIX-2: DONE
+  - `buildCastExplanation` metric freeze: ACTIVE
+  - 0 vulnerabilities across all install roots (root + 5 sub-packages)
+  - Remaining LOW vulns: 3 × esbuild in `workers/chittyagent-ch1tty` (Windows dev-server only; require wrangler upgrade — separate concern)
+  - Open PRs: none
+- **Human action required** (unchanged):
+  1. **Add new workstreams** to DRIVER-BOARD.md — candidates: new `apps/*-mcp` server, cast chain improvements, new backends, scenario harness expansion
+  2. **Disable or redirect hourly schedule** if no new workstreams are planned
+  3. **Worker dev-toolchain vulns** (wrangler/miniflare/esbuild LOW advisories) — require Cloudflare dep upgrade decision
+  4. **Verify ChittyConnect** (`connect.chitty.cc/api/mcp`) auth token works from deployed gateway
+- **Blockers**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). CI 0-jobs non-CodeQL (recurring, non-blocking).
