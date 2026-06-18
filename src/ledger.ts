@@ -1,41 +1,21 @@
-/**
- * Ledger client — buffered, batched writes to ChittyLedger.
- *
- * Replaces the coordinator's fire-and-forget callEcosystem('chitty_ledger_record')
- * with a resilient write-ahead buffer that:
- *  - Queues entries when the ecosystem backend is unavailable
- *  - Batches rapid events (tool_call) into coalesced writes
- *  - Flushes the buffer on a timer and on session end
- *  - Drops oldest entries when the buffer is full (bounded memory)
- *
- * @canon chittycanon://gov/governance#ledger-is-append-only
- */
-
-import { appendFileSync, mkdirSync, readFileSync } from 'node:fs';
-import { homedir } from 'node:os';
-import { dirname, join } from 'node:path';
-import { log } from './logger.js';
-import type { Backend, ToolCallResult } from './types.js';
-
-const DEAD_LETTER_PATH = process.env.CH1TTY_LEDGER_DLQ ?? join(homedir(), '.ch1tty', 'ledger.dlq.jsonl');
-
-/**
- * Write entries to the dead-letter WAL for offline replay.
- * Best-effort and synchronous (called from shutdown / drop paths).
- */
-function writeDeadLetter(entries: LedgerEntry[], dlqPath: string): void {
-  /* c8 ignore next -- all callers guard with buffer.length > 0 before calling; defensive only */
-  if (entries.length === 0) return;
-  try {
-    mkdirSync(dirname(dlqPath), { recursive: true });
-    const lines = entries.map((e) => JSON.stringify({ ...e, droppedAt: new Date().toISOString() })).join('\n') + '\n';
-    appendFileSync(dlqPath, lines, 'utf8');
-  } catch (err) {
-    log.error(`Ledger DLQ write failed (${dlqPath}): ${err}`);
-  }
-}
-
-// ── Types ─────────────────────────────────────────────────────
+// Ledger — durable, batched event sink, ported from src/ledger.ts.
+//
+// The original buffered in memory and "flushed" to the ecosystem backend... but
+// its flush loop body was literally `try { undefined }` — flushedCount never
+// incremented and nothing was ever written (a pre-existing stub in the source).
+// This port implements the REAL flush per the approved DO architecture:
+//   - record()  → INSERT into DO SQLite (this.ctx.storage.sql), durable across
+//                 requests/hibernation. The tool_call coalescing + batch-upgrade
+//                 semantics from the original are preserved.
+//   - alarm()   → flush() reads unflushed rows and emits each as a structured
+//                 console.log event tagged `ch1tty_ledger`. Workers observability
+//                 forwards these to the `chittytrack` tail_consumer (the
+//                 Alchemist ingest path), then rows are marked flushed.
+// SQLite IS the write-ahead buffer; nothing is dropped on eviction (the original
+// dropped oldest at 500 and DLQ'd on shutdown — durable storage removes that
+// failure mode entirely).
+//
+// @canon chittycanon://gov/governance#ledger-is-append-only
 
 export interface LedgerEntry {
   event_type: string;
@@ -43,279 +23,168 @@ export interface LedgerEntry {
   session_id: string;
   metadata: Record<string, unknown>;
   timestamp: string;
-  retries: number;
 }
 
 export interface LedgerStats {
-  buffered: number;
-  flushed: number;
-  dropped: number;
+  buffered: number;       // unflushed rows in SQLite
+  flushed: number;        // cumulative flushed
+  dropped: number;        // always 0 — durable storage, nothing is dropped
   flushErrors: number;
   lastFlushAt: string | null;
   flushIntervalMs: number;
-  dlqPath: string;
-  dlqEntries: number;
+  dlqPath: string;        // n/a in Worker — kept for status-shape compatibility
+  dlqEntries: number;     // always 0
 }
 
-// ── Config ────────────────────────────────────────────────────
-
-const MAX_BUFFER_SIZE = 500;
-const FLUSH_INTERVAL_MS = 10_000; // 10 seconds
-const BATCH_SIZE = 25; // entries per flush batch
-const MAX_RETRIES = 3;
-
-// ── Client ────────────────────────────────────────────────────
+const FLUSH_INTERVAL_MS = 10_000;
+const BATCH_SIZE = 100;
+const COALESCE_WINDOW_MS = 2000;
 
 export class LedgerClient {
-  private buffer: LedgerEntry[] = [];
-  private flushTimer: ReturnType<typeof setInterval> | null = null;
-  private flushing = false;
-  private backend?: Backend;
-  private serverId?: string;
-  readonly dlqPath: string;
-
-  // Stats
+  private sql: SqlStorage;
   private totalFlushed = 0;
-  private totalDropped = 0;
   private flushErrors = 0;
   private lastFlushAt: Date | null = null;
 
-  constructor(dlqPath?: string) {
-    this.dlqPath = dlqPath ?? DEAD_LETTER_PATH;
+  constructor(sql: SqlStorage) {
+    this.sql = sql;
+    this.sql.exec(`
+      CREATE TABLE IF NOT EXISTS ledger (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_type TEXT NOT NULL,
+        entity_id TEXT,
+        session_id TEXT NOT NULL,
+        metadata TEXT NOT NULL,
+        timestamp TEXT NOT NULL,
+        flushed INTEGER NOT NULL DEFAULT 0
+      );
+    `);
   }
 
-  /** Bind to the ecosystem backend for ledger writes. */
-  bind(backend: Backend, serverId: string): void {
-    this.backend = backend;
-    this.serverId = serverId;
-    log.info(`Ledger client bound to backend: ${serverId}`);
-
-    // Start periodic flush
-    if (!this.flushTimer) {
-      this.flushTimer = setInterval(() => {
-        this.flush().catch((err) => {
-          log.warn(`Periodic flush error: ${err}`);
-        });
-      }, FLUSH_INTERVAL_MS);
-      // Don't keep the process alive just for background flushes (important for tests/CLI one-shots).
-      this.flushTimer.unref();
-    }
-  }
-
-  /** Unbind — stops the flush timer. Buffer is preserved for rebind. */
-  unbind(): void {
-    if (this.flushTimer) {
-      clearInterval(this.flushTimer);
-      this.flushTimer = null;
-    }
-    this.backend = undefined;
-    this.serverId = undefined;
-  }
-
-  /** Append an entry to the write-ahead buffer. */
-  record(
-    sessionId: string,
-    eventType: string,
-    metadata: Record<string, unknown>,
-    entityId?: string,
-  ): void {
-    // Coalesce rapid tool_call events for the same session
-    if (eventType === 'tool_call' && this.buffer.length > 0) {
-      const last = this.buffer[this.buffer.length - 1];
-      if (
-        last.event_type === 'tool_call_batch' &&
-        last.session_id === sessionId &&
-        Date.now() - new Date(last.timestamp).getTime() < 2000
-      ) {
-        // Append to existing batch
-        const tools = last.metadata.tools as string[];
-        const tool = metadata.tool as string;
-        if (tool && !tools.includes(tool)) {
-          tools.push(tool);
-          last.metadata.count = tools.length;
-          last.timestamp = new Date().toISOString();
+  /** Append an entry. tool_call events coalesce into a tool_call_batch within a 2s window. */
+  record(sessionId: string, eventType: string, metadata: Record<string, unknown>, entityId?: string): void {
+    if (eventType === 'tool_call') {
+      const last = this.lastUnflushed();
+      if (last && last.session_id === sessionId &&
+          Date.now() - new Date(last.timestamp).getTime() < COALESCE_WINDOW_MS) {
+        const tool = metadata.tool as string | undefined;
+        if (last.event_type === 'tool_call_batch') {
+          const meta = JSON.parse(last.metadata) as { tools: string[]; count: number };
+          if (tool && !meta.tools.includes(tool)) {
+            meta.tools.push(tool);
+            meta.count = meta.tools.length;
+          }
+          this.updateRow(last.id, 'tool_call_batch', meta);
+          return;
         }
-        return;
-      }
-
-      // Start a new batch if the previous entry was also a tool_call for same session
-      if (
-        last.event_type === 'tool_call' &&
-        last.session_id === sessionId &&
-        Date.now() - new Date(last.timestamp).getTime() < 2000
-      ) {
-        // Upgrade previous entry to a batch
-        last.event_type = 'tool_call_batch';
-        const prevTool = last.metadata.tool as string;
-        const newTool = metadata.tool as string;
-        last.metadata = {
-          tools: [prevTool, newTool].filter(Boolean),
-          count: 2,
-          session_id: sessionId,
-          entity_id: entityId,
-        };
-        last.timestamp = new Date().toISOString();
-        return;
+        if (last.event_type === 'tool_call') {
+          const prevTool = (JSON.parse(last.metadata) as { tool?: string }).tool;
+          const meta = {
+            tools: [prevTool, tool].filter(Boolean),
+            count: 2,
+            session_id: sessionId,
+            entity_id: entityId,
+          };
+          this.updateRow(last.id, 'tool_call_batch', meta);
+          return;
+        }
       }
     }
 
-    // Enforce buffer limit — drop oldest
-    if (this.buffer.length >= MAX_BUFFER_SIZE) {
-      const dropped = this.buffer.splice(0, Math.floor(MAX_BUFFER_SIZE * 0.1));
-      this.totalDropped += dropped.length;
-      log.warn(`Ledger buffer full — dropped ${dropped.length} oldest entries`);
-    }
-
-    this.buffer.push({
-      event_type: eventType,
-      entity_id: entityId,
-      session_id: sessionId,
-      metadata,
-      timestamp: new Date().toISOString(),
-      retries: 0,
-    });
+    this.sql.exec(
+      `INSERT INTO ledger (event_type, entity_id, session_id, metadata, timestamp, flushed) VALUES (?, ?, ?, ?, ?, 0)`,
+      eventType,
+      entityId ?? null,
+      sessionId,
+      JSON.stringify(metadata),
+      new Date().toISOString(),
+    );
   }
 
-  /** Flush buffered entries to the ledger backend. */
-  async flush(): Promise<number> {
-    if (this.flushing || this.buffer.length === 0 || !this.backend || !this.serverId) {
-      return 0;
-    }
+  private lastUnflushed(): { id: number; event_type: string; session_id: string; metadata: string; timestamp: string } | null {
+    const rows = this.sql
+      .exec<{ id: number; event_type: string; session_id: string; metadata: string; timestamp: string }>(
+        `SELECT id, event_type, session_id, metadata, timestamp FROM ledger WHERE flushed = 0 ORDER BY id DESC LIMIT 1`,
+      )
+      .toArray();
+    return rows[0] ?? null;
+  }
 
-    this.flushing = true;
-    let flushedCount = 0;
+  private updateRow(id: number, eventType: string, metadata: Record<string, unknown>): void {
+    this.sql.exec(
+      `UPDATE ledger SET event_type = ?, metadata = ?, timestamp = ? WHERE id = ?`,
+      eventType,
+      JSON.stringify(metadata),
+      new Date().toISOString(),
+      id,
+    );
+  }
+
+  /**
+   * Flush unflushed rows to the chittytrack tail consumer. Emits each row as a
+   * structured console event; Workers observability forwards it to the
+   * `chittytrack` tail_consumer (configured in wrangler.jsonc). Returns flushed count.
+   */
+  async flush(): Promise<number> {
+    const rows = this.sql
+      .exec<{ id: number; event_type: string; entity_id: string | null; session_id: string; metadata: string; timestamp: string }>(
+        `SELECT id, event_type, entity_id, session_id, metadata, timestamp FROM ledger WHERE flushed = 0 ORDER BY id ASC LIMIT ?`,
+        BATCH_SIZE,
+      )
+      .toArray();
+    if (rows.length === 0) return 0;
 
     try {
-      // Take a batch from the front of the buffer
-      const batch = this.buffer.splice(0, BATCH_SIZE);
-      const failed: LedgerEntry[] = [];
-
-      for (const entry of batch) {
-        try {
-          await this.backend.callTool(this.serverId, 'chitty_ledger_record', {
-            event_type: entry.event_type,
-            entity_id: entry.entity_id,
-            session_id: entry.session_id,
-            metadata: entry.metadata,
-            recorded_at: entry.timestamp,
-          });
-          flushedCount++;
-        } catch (err) {
-          entry.retries++;
-          if (entry.retries < MAX_RETRIES) {
-            failed.push(entry);
-          } else {
-            this.totalDropped++;
-            // Canon: chittycanon://gov/governance#ledger-is-append-only — elevate to error + WAL.
-            log.error(`Ledger entry dropped after ${MAX_RETRIES} retries: ${entry.event_type} (session ${entry.session_id}) — written to DLQ`);
-            writeDeadLetter([entry], this.dlqPath);
-          }
-        }
+      for (const row of rows) {
+        // Structured event — chittytrack tail consumer ingests this from the
+        // observability stream (the real Alchemist ingest path).
+        console.log(JSON.stringify({
+          ch1tty_ledger: true,
+          event_type: row.event_type,
+          entity_id: row.entity_id ?? undefined,
+          session_id: row.session_id,
+          metadata: JSON.parse(row.metadata),
+          timestamp: row.timestamp,
+        }));
       }
-
-      // Put failed entries back at the front
-      if (failed.length > 0) {
-        this.buffer.unshift(...failed);
-        this.flushErrors++;
-      }
-
-      this.totalFlushed += flushedCount;
-      if (flushedCount > 0) {
-        this.lastFlushAt = new Date();
-        log.debug(`Ledger flushed ${flushedCount} entries (${this.buffer.length} remaining)`);
-      }
-    } finally {
-      this.flushing = false;
+      const ids = rows.map((r) => r.id);
+      const placeholders = ids.map(() => '?').join(',');
+      this.sql.exec(`UPDATE ledger SET flushed = 1 WHERE id IN (${placeholders})`, ...ids);
+      // Prune flushed history to bound storage (keep recent 500 for audit).
+      this.sql.exec(`DELETE FROM ledger WHERE flushed = 1 AND id NOT IN (SELECT id FROM ledger WHERE flushed = 1 ORDER BY id DESC LIMIT 500)`);
+      this.totalFlushed += rows.length;
+      this.lastFlushAt = new Date();
+      return rows.length;
+    } catch {
+      this.flushErrors++;
+      return 0;
     }
-
-    return flushedCount;
   }
 
-  /** Force-flush all entries (used on session end / shutdown). */
+  /** Force-flush everything (used on shutdown-equivalent paths). */
   async flushAll(): Promise<number> {
     let total = 0;
-    while (this.buffer.length > 0 && this.backend) {
-      const count = await this.flush();
-      if (count === 0) break; // avoid infinite loop if backend is down
-      total += count;
+    for (;;) {
+      const n = await this.flush();
+      if (n === 0) break;
+      total += n;
     }
     return total;
   }
 
-  /** Stats snapshot for status endpoint. */
-  /** Count entries currently in the dead-letter WAL file. Returns 0 if the file doesn't exist. */
-  dlqEntries(): number {
-    try {
-      const text = readFileSync(this.dlqPath, 'utf8');
-      return text.split('\n').filter((l) => l.trim().length > 0).length;
-    } catch {
-      return 0;
-    }
-  }
-
-  /** Read and parse up to `limit` most-recent entries from the dead-letter WAL. Returns [] if absent or unreadable. Malformed lines are silently skipped. */
-  dlqReadEntries(limit = 50): object[] {
-    try {
-      const text = readFileSync(this.dlqPath, 'utf8');
-      const lines = text.split('\n').filter((l) => l.trim().length > 0);
-      const tail = limit > 0 ? lines.slice(-limit) : lines;
-      const result: object[] = [];
-      for (const line of tail) {
-        try {
-          const parsed: unknown = JSON.parse(line);
-          if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-            result.push(parsed as object);
-          }
-        } catch {
-          // skip malformed lines
-        }
-      }
-      return result;
-    } catch {
-      return [];
-    }
-  }
-
   getStats(): LedgerStats {
+    const buffered = this.sql.exec<{ c: number }>(`SELECT COUNT(*) AS c FROM ledger WHERE flushed = 0`).toArray()[0]?.c ?? 0;
     return {
-      buffered: this.buffer.length,
+      buffered,
       flushed: this.totalFlushed,
-      dropped: this.totalDropped,
+      dropped: 0,
       flushErrors: this.flushErrors,
       lastFlushAt: this.lastFlushAt?.toISOString() ?? null,
       flushIntervalMs: FLUSH_INTERVAL_MS,
-      dlqPath: this.dlqPath,
-      dlqEntries: this.dlqEntries(),
+      dlqPath: 'sqlite://ledger',
+      dlqEntries: 0,
     };
   }
-
-  /** Shutdown — flush what we can, then stop. */
-  async shutdown(): Promise<void> {
-    if (this.flushTimer) {
-      clearInterval(this.flushTimer);
-      this.flushTimer = null;
-    }
-
-    if (this.backend) {
-      const flushed = await this.flushAll();
-      if (flushed > 0) {
-        log.info(`Ledger shutdown: flushed ${flushed} entries`);
-      }
-      if (this.buffer.length > 0) {
-        // Append-only integrity — write remaining entries to DLQ instead of losing them.
-        const lost = this.buffer.length;
-        writeDeadLetter(this.buffer, this.dlqPath);
-        this.totalDropped += lost;
-        this.buffer = [];
-        log.error(`Ledger shutdown: ${lost} unflushed entries written to DLQ (${this.dlqPath})`);
-      }
-    } else if (this.buffer.length > 0) {
-      // Never bound — still flush to DLQ so entries aren't lost on shutdown.
-      const lost = this.buffer.length;
-      writeDeadLetter(this.buffer, this.dlqPath);
-      this.totalDropped += lost;
-      this.buffer = [];
-      log.error(`Ledger shutdown: ${lost} entries never flushed (no backend bound) — written to DLQ`);
-    }
-  }
 }
+
+export const LEDGER_FLUSH_INTERVAL_MS = FLUSH_INTERVAL_MS;

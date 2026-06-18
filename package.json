@@ -1,26 +1,25 @@
 {
   "name": "ch1tty",
-  "version": "4.1.0",
-  "description": "ChittyOS Universal MCP Gateway — one stdio server, all backends",
+  "version": "5.0.0-do",
+  "description": "ChittyOS Universal MCP Gateway \u2014 Cloudflare Worker + per-session Durable Object, slim MCP (search/execute/code), code mode, Workers AI brain",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "src/index.ts",
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "tsc --watch",
-    "sim": "CH1TTY_EMBED_ENABLED=false node --import tsx sim/run.ts",
-    "test": "node --import tsx --test test/**/*.test.ts apps/*/test/*.test.ts",
-    "test:watch": "node --import tsx --test --watch test/**/*.test.ts apps/*/test/*.test.ts",
-    "coverage": "c8 --all --include=src/**/*.ts --exclude=src/index.ts --exclude=src/types.ts --lines 99 --branches 95 --functions 100 --statements 99 node --import tsx --test test/**/*.test.ts apps/*/test/*.test.ts"
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --noEmit",
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.22.0"
+    "@chittyos/schema-client": "file:../../CHITTYFOUNDATION/chittyschema/clients/schema-client",
+    "@cloudflare/codemode": "^0.4.1",
+    "@modelcontextprotocol/sdk": "^1.25.0",
+    "agents": "^0.16.2"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
-    "c8": "^11.0.0",
-    "tsx": "^4.22.4",
-    "typescript": "^5.7.0"
+    "@cloudflare/workers-types": "^4.20250620.0",
+    "typescript": "^5.7.0",
+    "wrangler": "^4.0.0"
   },
   "engines": {
     "node": ">=20"

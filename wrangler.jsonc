@@ -1,5 +1,8 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
+  // Resolved the ch1tty vs ch1tty-viewport duplicate worker-name: there is NO
+  // ch1tty-viewport entry in this repo (grep found none), so nothing to rename.
+  // The single Worker keeps the canonical name "ch1tty".
   "name": "ch1tty",
   "main": "src/index.ts",
   "compatibility_date": "2026-03-16",
@@ -11,32 +14,53 @@
     "binding": "ASSETS",
     "directory": "./public"
   },
+  "ai": {
+    "binding": "AI"
+  },
+  "browser": {
+    "binding": "BROWSER"
+  },
+  "durable_objects": {
+    "bindings": [
+      { "name": "CH1TTY", "class_name": "Ch1ttyDO" }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["Ch1ttyDO"]
+    }
+  ],
+  // Worker Loader binding for codemode DynamicWorkerExecutor sandbox.
+  "worker_loaders": [
+    { "binding": "LOADER" }
+  ],
+  // Vectorize tool-embedding index (NEW RESOURCE — must be created before deploy):
+  //   wrangler vectorize create ch1tty-tool-index --dimensions=768 --metric=cosine
+  // 768-dim matches @cf/baai/bge-base-en-v1.5 (and the prior nomic-embed-text 768-dim).
+  // "agent_memory": [
+  //   { "binding": "MEMORY", "namespace": "ch1tty-memory" }
+  // ],
+  "vectorize": [
+    { "binding": "VECTORIZE", "index_name": "ch1tty-tool-index" }
+  ],
   "observability": {
     "enabled": true,
     "logs": {
       "enabled": true,
       "head_sampling_rate": 1,
       "invocation_logs": true,
-      "destinations": [
-        "chittytrack-logs"
-      ]
+      "destinations": ["chittytrack-logs"]
     },
     "traces": {
       "enabled": true,
       "head_sampling_rate": 1,
-      "destinations": [
-        "chittytrack-traces"
-      ],
+      "destinations": ["chittytrack-traces"],
       "persist": false
     }
   },
-  "ai": {
-    "binding": "AI"
-  },
   "upload_source_maps": true,
   "tail_consumers": [
-    {
-      "service": "chittytrack"
-    }
+    { "service": "chittytrack" }
   ]
 }
