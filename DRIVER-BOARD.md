@@ -712,3 +712,22 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   3. **Worker dev-toolchain vulns** (wrangler/miniflare advisories) — require Cloudflare dep downgrade decision
   4. **Verify ChittyConnect** (`connect.chitty.cc/api/mcp`) auth token works from deployed gateway
 - **Blockers**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). CI 0-jobs non-CodeQL (recurring). CodeRabbit quota recovering from metric bloat.
+
+### 2026-06-18 (this run — SEC-FIX-2: ws HIGH DoS CVE in worker)
+- **Workstream**: SEC-FIX-2 — pin `ws >=8.21.0` in `workers/chittyagent-ch1tty` (GHSA-96hv-2xvq-fx4p, CVSS 7.5 HIGH)
+- **Branch**: `auto/sec-ws-fix-2` | **PR**: #777 https://github.com/chittyos/ch1tty/pull/777 (CodeQL in progress)
+- **Build**: clean | **Tests**: 3304/0/2 (root, unchanged)
+- **What was done**:
+  - Startup: npm ci clean, build clean, 3304/0/2. Board read from DRIVER-BOARD.md (Notion 401 — recurring).
+  - Root `npm audit`: 0 vulnerabilities. Audited `workers/chittyagent-ch1tty`: 5 vulns (1 low + 4 high). The 4 HIGH = ws memory-exhaustion DoS (GHSA-96hv-2xvq-fx4p, CVSS 7.5) via wrangler/miniflare/@cloudflare/vitest-pool-workers; ws was at 8.20.1, fix is >=8.21.0.
+  - Fix: added `"overrides": {"ws": ">=8.21.0"}` to `workers/chittyagent-ch1tty/package.json`. Bumped ws 8.20.1→8.21.0.
+  - After fix: 0 HIGH + 3 LOW (remaining LOW = esbuild GHSA-g7r4-m6w7-qqqr, Windows dev-server only, unfixable without wrangler upgrade — separate concern).
+  - Root tests: 3304/0/2 (no regressions). PR #777 opened; CodeQL checks running.
+- **State summary**:
+  - All workstreams A–E + F–WWWWWWW + SEC-FIX: DONE
+  - SEC-FIX-2 (ws HIGH GHSA-96hv-2xvq-fx4p): PR #777 open, CodeQL in progress
+  - `buildCastExplanation` metric freeze: ACTIVE
+  - 0 HIGH/CRITICAL vulns across all install roots
+  - 3 LOW esbuild (Windows dev-server only, wrangler upgrade needed — known, separate concern)
+- **Next run priority**: Check if PR #777 merged (CodeQL + review needed). Then add new workstreams — human direction required.
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). CI 0-jobs non-CodeQL (recurring).
