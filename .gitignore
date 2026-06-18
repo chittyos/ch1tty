@@ -5,3 +5,6 @@ pnpm-lock.yaml
 sim/results/
 sim/results.latest.json
 coverage/
+
+# local deploy/secret-shaped artifacts — never commit
+.deploy/
