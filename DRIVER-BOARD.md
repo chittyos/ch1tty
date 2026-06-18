@@ -737,6 +737,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   4. **Verify ChittyConnect** (`connect.chitty.cc/api/mcp`) auth token works from deployed gateway
 - **Blockers**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). CI 0-jobs non-CodeQL (recurring, non-blocking).
 
+
 ### 2026-06-18 (this run — steady-state verification; merged PR #779)
 - **Workstream**: None — all workstreams A–E + SEC-FIX + SEC-FIX-2 done; no new workstreams defined
 - **Build**: clean | **Tests**: 3304/0/2 (confirmed on main 37fe604)
@@ -758,6 +759,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   3. **Worker dev-toolchain vulns** (wrangler/miniflare/esbuild LOW) — require Cloudflare dep upgrade decision
   4. **Verify ChittyConnect** (`connect.chitty.cc/api/mcp`) auth token from deployed gateway
 - **Blockers**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). CI 0-jobs non-CodeQL (recurring, non-blocking).
+
 
 ### 2026-06-18 (this run — steady-state health check)
 - **Workstream**: None — all workstreams A–E + SEC-FIX + SEC-FIX-2 done; no new workstreams defined
@@ -839,4 +841,28 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   4. **Stale branch cleanup** — ~759 stale `auto/` branches (enable auto-delete in repo settings or run bulk `git push origin --delete`)
   5. **Worker dev-toolchain vulns** (wrangler/miniflare/esbuild LOW) — require Cloudflare dep upgrade decision
   6. **Verify ChittyConnect** (`connect.chitty.cc/api/mcp`) auth token from deployed gateway
+- **Blockers**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). CI 0-jobs non-CodeQL (recurring, non-blocking).
+
+### 2026-06-18 (this run — steady-state; PR #784 still awaiting direction)
+- **Workstream**: None — all workstreams A–E + SEC-FIX done; no human direction received for PR #784
+- **Build**: clean | **Tests**: 3304/0/2 (confirmed on main HEAD c64c004)
+- **What was done**:
+  - Startup: npm ci clean, build clean, npm test: 3304/0/2. Board read from DRIVER-BOARD.md (Notion 401 — recurring).
+  - `git fetch --all`; reset local main to origin/main (HEAD c64c004 — board log PR #785 merged by prior run).
+  - `npm audit` (root): 0 vulnerabilities — hono/undici/esbuild fixes all confirmed effective.
+  - PR #784 (`feat/ch1tty-do-codemode`): still OPEN, `mergeable_state: dirty`, no new comments since CodeRabbit rate-limit note at 17:03 UTC. No human direction received. No new commits on branch (last commit bfa4a76, 2026-06-18 17:03 UTC). This is the 2nd consecutive run with no progress on #784 — a human decision is required before this can proceed.
+  - `buildCastExplanation` metric freeze guardrail confirmed active in CLAUDE.md — no new metrics added or pending.
+  - No code changes made this run.
+- **State summary**:
+  - All workstreams A–E + F–WWWWWWW + SEC-FIX + SEC-FIX-2 + SEC-FIX-3: DONE
+  - PR #784 (`feat/ch1tty-do-codemode`): OPEN — CF Worker + DO migration; 2nd run with no direction; still needs test strategy decision (options a/b/c from prior run entry)
+  - `buildCastExplanation` metric freeze: ACTIVE (CLAUDE.md guardrail)
+  - 0 vulnerabilities across all install roots
+  - Tests: 3304/0/2 on main
+- **Human action required** (same as prior run — no new items):
+  1. **PR #784 test strategy** — pick (a) Worker code to `workers/gateway-do/` separate package, (b) port test suite to Worker runtime, or (c) keep as long-lived branch; add choice to DRIVER-BOARD.md
+  2. **Add new workstreams** to DRIVER-BOARD.md if any planned beyond the DO migration
+  3. **Disable or redirect hourly schedule** if no new workstreams planned
+  4. **Stale branch cleanup** — ~759 remote `auto/` branches (enable auto-delete in repo settings)
+  5. **Verify ChittyConnect** (`connect.chitty.cc/api/mcp`) auth token from deployed gateway
 - **Blockers**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). CI 0-jobs non-CodeQL (recurring, non-blocking).
