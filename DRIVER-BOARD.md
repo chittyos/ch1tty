@@ -5,8 +5,10 @@ Blocker to restore Notion: rotate `NOTION_API_TOKEN` (op://ChittyOS-Integrations
 
 NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Restored as plain text (run 146).
 
-## Workstream Status (A–E: original; F+: ongoing observability improvements)
+## Workstream Status (A–E: original; F+: ongoing observability improvements; SEC-FIX: security)
 
+
+- [ ] **SEC-FIX** — Fix Dependabot high-severity `hono` vulnerability: `"overrides": {"hono": ">=4.12.25"}` in package.json. PR #773 `auto/sec-hono-override` — open for review (2026-06-18).
 - [x] **A** — Gateway up/refreshed/tested. Build clean, 5 meta-tools confirmed. DONE.
 - [x] **B** — GitHub MCP migration: `servers.json` github → `https://api.githubcopilot.com/mcp/` with envHeaders. DONE.
 - [x] **C** — Focus-profile layer: `focus-profiles.json` (6 profiles), CH1TTY_FOCUS, per-call focus param, status reporting, tests. DONE.
@@ -622,3 +624,26 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   1. **Add new workstreams** to DRIVER-BOARD.md (new backend, `apps/*-mcp`, cast chaining, scenario expansion)
   2. **Disable or redirect hourly schedule** if no new workstreams are planned
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs non-CodeQL (recurring).
+
+### 2026-06-18 (this run — Dependabot security fix)
+- **Workstream**: SEC-FIX — fix high-severity Dependabot `hono` vulnerability (GHSA-wwfh-h76j-fc44 + 4 co-advisories)
+- **Branch**: `auto/sec-hono-override` | **PR**: #773 https://github.com/chittyos/ch1tty/pull/773
+- **Build**: clean | **Tests**: 3304/0/2 (confirmed pre-fix; post-fix run in progress)
+- **What was done**:
+  - Startup: npm ci clean, build clean, 3304/0/2 on main HEAD 4757b04.
+  - Board read from DRIVER-BOARD.md (Notion 401 — recurring blocker).
+  - Confirmed single open PR: #772 (board log holding-pattern). PR #504 ChittyConnect reg: untouched ("Do NOT auto-merge").
+  - Identified 1 high severity vulnerability: `hono <=4.12.24` (5 CVEs) — transitive dep via `@modelcontextprotocol/sdk@1.27.1`.
+  - Fix: added `"overrides": {"hono": ">=4.12.25"}` to `package.json` — pins hono to 4.12.26 (fixed). `npm audit`: `found 0 vulnerabilities`. Build clean.
+  - `npm audit fix` alternative rejected: would have added 26 unrelated esbuild platform packages to lock file.
+  - Only 2 files changed: `package.json` (+3 lines) and `package-lock.json` (hono version update).
+  - Codex P1 review: root override didn't cover 5 sub-packages with their own lock files. Extended fix to all: added `overrides.hono >=4.12.25` to 4 `apps/*-mcp` packages; bumped direct dep `hono ^4.12.23→^4.12.25` in `workers/chittyagent-ch1tty`. All 5 show `found 0 [hono] vulnerabilities`.
+  - Worker retains 5 pre-existing dev-toolchain advisories (wrangler/miniflare/vitest-pool-workers) — separate concern, require breaking Cloudflare dep downgrade.
+- **State summary**:
+  - All workstreams A–E + F–WWWWWWW: DONE
+  - `buildCastExplanation` metric freeze: ACTIVE (CLAUDE.md guardrail)
+  - 0 hono-related vulnerabilities across all 6 install roots (root + 5 sub-packages)
+  - Open PRs: #504 (do-not-merge), #772 (board log — stale), #773 SEC-FIX (CodeQL in-progress, Codex ✅)
+  - CodeRabbit rate-limited (~1h reset) — direct consequence of ~700 metric-bloat PRs from prior runaway sessions
+- **Next run priority**: Check if PR #773 merged (CodeQL + human approval needed). If yes, mark SEC-FIX done and close stale #772. Add new workstreams — human direction required.
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CodeRabbit quota exhausted. Worker dev-toolchain vulns need separate attention.
