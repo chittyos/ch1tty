@@ -39,8 +39,10 @@ export interface FixtureServerDef {
 export interface CallRecord {
   serverId: string;
   tool: string;
+  args: Record<string, unknown>;
   durationMs: number;
   isError: boolean;
+  timeoutMs?: number;
 }
 
 function sleep(ms: number): Promise<void> {
@@ -97,7 +99,8 @@ export class FixtureBackend implements Backend {
   async callTool(
     serverId: string,
     toolName: string,
-    _args?: Record<string, unknown>,
+    args?: Record<string, unknown>,
+    options?: { timeoutMs?: number },
   ): Promise<ToolCallResult> {
     const def = this.servers.get(serverId);
     if (!def) {
@@ -117,14 +120,14 @@ export class FixtureBackend implements Backend {
     if (def.latencyMs) await sleep(def.latencyMs);
     if (tool.response === 'error') {
       const durationMs = Date.now() - start;
-      this.callLog.push({ serverId, tool: toolName, durationMs, isError: true });
+      this.callLog.push({ serverId, tool: toolName, args: args ?? {}, durationMs, isError: true, timeoutMs: options?.timeoutMs });
       return {
         content: [{ type: 'text', text: `Simulated error in ${serverId}/${toolName}` }],
         isError: true,
       };
     }
     const durationMs = Date.now() - start;
-    this.callLog.push({ serverId, tool: toolName, durationMs, isError: false });
+    this.callLog.push({ serverId, tool: toolName, args: args ?? {}, durationMs, isError: false, timeoutMs: options?.timeoutMs });
     return tool.response;
   }
 

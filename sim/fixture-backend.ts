@@ -128,6 +128,9 @@ export const FIXTURE_TOOLS: Record<string, FixtureTool[]> = {
     { name: 'workers_builds_get_build', description: 'Get details of a specific Cloudflare Workers Builds build run including configuration, status, and deployment outcome' },
     { name: 'workers_builds_get_build_logs', description: 'Get build logs from a specific Cloudflare Workers Builds run for debugging failed builds and deployment errors' },
     { name: 'workers_builds_set_active_worker', description: 'Set the active Worker ID for subsequent Workers Builds API calls in this session' },
+    { name: 'workers_list', description: 'List all Workers in the Cloudflare account, returning worker IDs for use with the builds pipeline' },
+    { name: 'workers_get_worker', description: 'Get configuration details of a Cloudflare Worker script by name' },
+    { name: 'workers_get_worker_code', description: 'Get the full source code of a Cloudflare Worker script for code review or audit' },
   ],
   fs: [
     { name: 'read_file', description: 'Read the contents of a file from the filesystem by path' },
@@ -137,15 +140,16 @@ export const FIXTURE_TOOLS: Record<string, FixtureTool[]> = {
 
   // ── design / desktop ─────────────────────────────────────────
   'browser-rendering': [
-    { name: 'render_page', description: 'Render a web page to HTML or PDF via headless browser' },
-    { name: 'capture_screenshot', description: 'Capture a screenshot of a rendered web page or URL' },
+    { name: 'get_url_html_content', description: 'Get page HTML content' },
+    { name: 'get_url_markdown', description: 'Get page converted into Markdown' },
+    { name: 'get_url_screenshot', description: 'Get page screenshot' },
   ],
   playwright: [
-    { name: 'navigate', description: 'Navigate a Playwright browser session to a URL' },
-    { name: 'screenshot', description: 'Take a screenshot of the current Playwright page and save it' },
-    { name: 'click', description: 'Click an element on the current Playwright page by selector' },
-    // near-miss: a playwright "render"-shaped tool to compete with browser-rendering/render_page
-    { name: 'render_to_pdf', description: 'Render the current Playwright page to a PDF file' },
+    { name: 'browser_navigate', description: 'Navigate to a URL' },
+    { name: 'browser_take_screenshot', description: 'Take a screenshot of the current page' },
+    { name: 'browser_click', description: 'Perform click on a web page' },
+    // near-miss: browser_snapshot captures page content like browser-rendering tools
+    { name: 'browser_snapshot', description: 'Capture accessibility snapshot of the current page, this is better than screenshot' },
   ],
   cowork: [
     { name: 'start_session', description: 'Start a Claude Co-Work desktop collaboration session' },

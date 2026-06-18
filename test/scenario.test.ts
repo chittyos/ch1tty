@@ -511,13 +511,13 @@ test('scenario: latency — slow backend completes without timeout', async () =>
   const elapsed = Date.now() - start;
 
   assert.equal(result.isError, undefined);
-  // Verify the call actually took the simulated latency
-  assert.ok(elapsed >= 50, `expected ≥50ms latency, got ${elapsed}ms`);
+  // Verify the call actually took the simulated latency (±5ms OS timer tolerance)
+  assert.ok(elapsed >= 45, `expected ≥45ms latency, got ${elapsed}ms`);
 
-  // Call log should show the duration
+  // Call log should show the duration (±5ms OS timer tolerance)
   const calls = fixture.getCallLog();
   assert.ok(calls.length > 0);
-  assert.ok(calls[0].durationMs >= 50, `call log duration should reflect latency, got ${calls[0].durationMs}ms`);
+  assert.ok(calls[0].durationMs >= 45, `call log duration should reflect latency, got ${calls[0].durationMs}ms`);
 });
 
 test('scenario: latency — parallel registry refresh handles multiple slow backends', async () => {

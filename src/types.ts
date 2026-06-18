@@ -118,7 +118,7 @@ export interface Backend {
   getStatus(serverId: string): BackendStatus;
 
   listTools(serverId: string): Promise<ToolEntry[]>;
-  callTool(serverId: string, toolName: string, args?: Record<string, unknown>): Promise<ToolCallResult>;
+  callTool(serverId: string, toolName: string, args?: Record<string, unknown>, options?: { timeoutMs?: number }): Promise<ToolCallResult>;
 
   listResources(serverId: string): Promise<{ resources: ResourceEntry[]; templates: ResourceTemplateEntry[] }>;
   readResource(serverId: string, uri: string): Promise<{ contents: Array<{ uri: string; mimeType?: string; text?: string; blob?: string }> }>;

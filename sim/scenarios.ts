@@ -179,39 +179,41 @@ export const SCENARIOS: Scenario[] = [
   {
     id: 'design.render',
     focus: 'design',
-    intent: 'render this web page to pdf via headless browser',
-    expect: 'browser-rendering/render_page',
-    note: 'near-miss: playwright/render_to_pdf',
+    intent: 'get the html content of a web page via headless browser',
+    expect: 'browser-rendering/get_url_html_content',
+    note: 'near-miss: browser-rendering/get_url_markdown (same server, "page" term shared; "html" uniquely scores get_url_html_content)',
   },
   {
     id: 'design.screenshot',
     focus: 'design',
-    intent: 'capture a screenshot of the rendered web page',
-    expect: 'browser-rendering/capture_screenshot',
-    note: 'near-miss: playwright/screenshot',
+    intent: 'get a screenshot of a web page url via headless browser rendering',
+    expect: 'browser-rendering/get_url_screenshot',
+    note: 'near-miss: playwright/browser_take_screenshot (screenshot keyword); url+browser+rendering discriminate toward get_url_screenshot',
   },
   {
     id: 'design.click-action',
     focus: 'design',
-    intent: 'click an element on the page by css selector',
-    expect: 'playwright/click',
-    note: 'near-misses: playwright/screenshot (page keyword), browser-rendering/render_page (page keyword); click+selector uniquely scores playwright/click',
+    intent: 'click on page element by css selector',
+    expect: 'playwright/browser_click',
+    note: 'near-misses: playwright/browser_take_screenshot (page keyword), browser-rendering/get_url_html_content (page keyword); click uniquely scores playwright/browser_click',
   },
   {
     id: 'design.navigate',
     focus: 'design',
     intent: 'navigate the browser to a url',
-    expect: 'playwright/navigate',
-    note: 'near-miss: browser-rendering/render_page (url keyword); navigate+browser uniquely matches playwright/navigate',
+    expect: 'playwright/browser_navigate',
+    note: 'near-miss: browser-rendering/get_url_html_content (url keyword); navigate+browser uniquely matches playwright/browser_navigate',
   },
   {
     // REORDER probe: cross-focus near-miss. Without focus, pdf/render_pdf (documents,
     // out of the design lens) is a strong literal match. With the design focus, the
     // +0.5 boost must lift the in-focus browser-rendering tool above it.
+    // Score trace (11 terms): pdf/render_pdf=5/11=0.455, get_url_html_content=4/11=0.364;
+    // with design boost: 0.364+0.5=0.864 > 0.455.
     id: 'design.render-document-reorder',
     focus: 'design',
-    intent: 'render a web page document to a pdf file',
-    expect: 'browser-rendering/render_page',
+    intent: 'render a web page document to html content and save as file with layout',
+    expect: 'browser-rendering/get_url_html_content',
     note: 'cross-focus near-miss: pdf/render_pdf (documents) should win WITHOUT focus, lose WITH design focus',
   },
 
@@ -356,6 +358,20 @@ export const SCENARIOS: Scenario[] = [
     intent: 'get the build logs for the failed cloudflare workers builds run to diagnose the deployment error',
     expect: 'cloudflare-builds/workers_builds_get_build_logs',
     note: 'near-misses: cloudflare/get_worker_logs (logs+worker+cloudflare but "build logs" not "worker logs"), cloudflare-builds/workers_builds_get_build (get+build but not logs+failed+diagnose+errors).',
+  },
+  {
+    id: 'ops.list-account-workers',
+    focus: 'ops',
+    intent: 'list all workers in the cloudflare account to find the worker id for the builds pipeline',
+    expect: 'cloudflare-builds/workers_list',
+    note: 'near-miss: cloudflare/list_workers (list+workers but "account"+"builds"+"pipeline" discriminate toward cloudflare-builds/workers_list)',
+  },
+  {
+    id: 'ops.get-worker-source-code',
+    focus: 'ops',
+    intent: 'get the source code of the worker script for code review and audit',
+    expect: 'cloudflare-builds/workers_get_worker_code',
+    note: 'near-miss: cloudflare-builds/workers_get_worker (same server; "source code"+"review"+"audit" uniquely scores workers_get_worker_code)',
   },
 
   // ── governance follow-up scenarios ───────────────────────────

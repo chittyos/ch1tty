@@ -245,3 +245,22 @@ test('getPrompt: withTimeout fires → re-throws error with "timed out" + connec
     await fixture.stop();
   }
 });
+
+test('callTool: explicit options.timeoutMs is used (covers remote-proxy.ts:229 left side)', async () => {
+  // Existing callTool test calls without options → getCallTimeoutMs() right side of ??.
+  // This test passes options: { timeoutMs } → exercises the options?.timeoutMs left side.
+  const fixture = await startHangFixture();
+  const proxy = new RemoteProxy();
+  try {
+    proxy.registerServer({
+      id: 'ct-opts', name: 'CT Options', type: 'remote', access: 'read', category: 'storage',
+      endpoint: `http://127.0.0.1:${fixture.port}/mcp`,
+    });
+    const result = await proxy.callTool('ct-opts', 'run', { q: 1 }, { timeoutMs: 50 });
+    assert.equal(result.isError, true, 'must be isError:true on timeout');
+    assert.match(result.content[0].text as string, /timed out after 50ms/, 'error must reference the per-call timeout (50ms, not the env 100ms fallback)');
+  } finally {
+    await proxy.shutdown();
+    await fixture.stop();
+  }
+});

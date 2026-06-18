@@ -193,6 +193,8 @@ export class SessionCoordinator {
   getSnapshot(): {
     activeSessions: number;
     boundEntity: boolean;
+    topTools: string[];
+    toolsByServer: Record<string, number>;
     ledger: ReturnType<LedgerClient['getStats']>;
     brain: ReturnType<WorkersAiBrain['getStats']>;
     sessions: Array<{ sessionId: string; entity?: string; toolPatterns: number; stagingComplete: boolean }>;
@@ -201,11 +203,18 @@ export class SessionCoordinator {
       sessionId: id,
       entity: ctx.entity?.chittyId,
       toolPatterns: ctx.toolPatterns.size,
+      topTools: [...ctx.toolPatterns.values()]
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5)
+        .map((p) => p.tool),
       stagingComplete: ctx.stagingComplete,
+      ...(ctx.sessionFocus ? { sessionFocus: ctx.sessionFocus } : {}),
     }));
     return {
       activeSessions: sessions.length,
       boundEntity: sessions.some((s) => s.entity !== undefined),
+      topTools,
+      toolsByServer,
       ledger: this.ledger.getStats(),
       brain: this.brain.getStats(),
       sessions,

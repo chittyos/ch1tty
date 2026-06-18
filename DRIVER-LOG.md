@@ -2430,4 +2430,169 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 **Next run priority**:
 1. Merge PR #304 when CI green (CodeQL + Analyze checks)
 2. 108th catalog pass: tools still needing profiles — `neon/fetch` (needs design+communication), `notion/API-get-self` (needs design+communication), `orchestrator/chittyagent-resolve` (needs design+communication), `cloudflare-builds/workers_builds_get` (needs finance+governance+communication), `notion/API-retrieve-a-data-source` (needs governance+design+communication), `cloudflare-builds/workers_builds_get_build_config` (needs only communication for 6/6)
+
+### 2026-06-10 — Session 019ziRVQGBFDN3Ape1VbXLpV
+
+**Workstream advanced**: E (Alchemist catalog — 111th pass, continued from prior compacted session)
+
+**What happened**:
+- Continued from compacted prior context. Branch `auto/E-catalog-111th-pass` already created from main (`d0e2d0f`, 1212 combos from merged 109th+110th combined pass)
+- Startup state: A ✅ B ✅ C ✅ D ✅ E in-progress. Prior session merged PRs #306 (109th pass) and #308 (110th pass merged) → main at 1212 combos / 517 verified
+- Coverage analysis identified 4 tools to complete to 6/6: `connectors:discord` (5/6), `chittyos-devops:chitty-register` (5/6), `cloudflare-builds/workers_builds_get_build_config` (5/6), `notion/API-update-a-data-source` (5/6)
+- Added 12 combos (2 per profile) targeting those + additional depth combos:
+  - **finance**: `discord-finance-broadcast`, `ship-agent-finance-release`
+  - **governance**: `notion-update-datasource-governance`, `notion-delete-block-governance-cleanup`
+  - **design**: `discord-design-share` (completes connectors:discord ✅), `notion-search-design-resources`
+  - **code**: `notion-delete-stale-code-docs`, `notion-search-code-context`
+  - **communication**: `chitty-register-broadcast-cloudflare-build` (completes chitty-register ✅ + workers_builds_get_build_config ✅), `notion-update-comms-record` (completes notion/API-update-a-data-source ✅)
+  - **ops**: `notion-search-ops-runbook`, `notion-patch-block-ops-update`
+- Fixed comm combo: initial chain lacked comm-relevant server; added `tasks/create` to satisfy test constraint
+- Tests: 938 pass / 0 fail / 2 skipped ✓
+- Catalog: 1212 → **1224 combos**
+- Pushed `auto/E-catalog-111th-pass`, opened PR #309
+
+**Branch / PR**: `auto/E-catalog-111th-pass` → PR #309 (https://github.com/chittyos/ch1tty/pull/309)
+
+**Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
+
+**Board state**: 1224 combos / 517 verified. `connectors:discord` ✅ 6/6. `chittyos-devops:chitty-register` ✅ 6/6. `cloudflare-builds/workers_builds_get_build_config` ✅ 6/6. `notion/API-update-a-data-source` ✅ 6/6.
+
+**Blockers**:
+- Notion auth 401: run `chitty-mcp-token notion` or rotate integration token in workspace settings
+
+**Next run priority**:
+1. Merge PR #309 (CI infrastructure issue expected — `total_jobs: 0` is pre-existing, not a test failure)
+2. 112th catalog pass: identify next tools below 6/6 coverage; prioritize tools with 4-5/6 that need only 1-2 more profiles
 3. Fix Notion auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` to verify the 668 unverified combos
+
+### 2026-06-10 — Session 016NSwXK7scaCGyfzJfeE2up (run 59 — 115th pass)
+
+**Workstream advanced**: E (Alchemist brainstorm — catalog 115th pass)
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass / 0 fail / 2 skipped
+- Found 3 open stacked PRs: #310 (112th, base=main, 3/3 CI green), #311 (113th, stacked on #310), #312 (114th, stacked on #311)
+- Merged #310 (squash) → main at d8c10a6 (1238 combos)
+- Rebased #311 onto new main (skipped already-upstream commits), force-pushed, updated base to main, merged → main at a31f46b (1250 combos)
+- Rebased #312 onto new main (skipped 112th+113th commits), force-pushed, updated base to main, merged → main at 350bb4a (1262 combos)
+- Coverage analysis: 175/380 tools at 6/6; top targets: github/get_pull_request (3/6, missing finance+governance+ops), chittyevidence/search_documents (2/6, missing finance+design+comm+ops)
+- Created branch `auto/E-catalog-115th-pass`; added 12 combos + 12 prompts (2 per profile):
+  - **finance**: finance-github-pr-billing-audit (github/get_pull_request+ledger), finance-evidence-search-billing-docs (chittyevidence/search_documents+notion)
+  - **governance**: governance-github-pr-compliance-evidence (github/get_pull_request+evidence), governance-fs-allowed-dirs-audit-scope (fs/list_allowed_directories+evidence)
+  - **design**: design-evidence-search-component-audit (chittyevidence/search_documents+playwright), design-token-ops-auth-gate-check (token-ops agent+notion)
+  - **code**: code-list-allowed-dirs-context7-ref (fs/list_allowed_directories+context7), code-resize-viewport-write-visual-diff (playwright/browser_resize+fs/write_file)
+  - **communication**: comm-evidence-search-task-brief (chittyevidence/search_documents+tasks), comm-list-allowed-dirs-notion-share (fs/list_allowed_directories+notion)
+  - **ops**: ops-pr-merge-trigger-build (github/get_pull_request+cloudflare-builds), ops-evidence-search-incident-triage (chittyevidence/search_documents+chittyos-devops:chitty-health)
+- 0 test failures. Tests: 938 pass / 0 fail / 2 skipped ✓
+- Catalog: 1262 → **1274 combos / 1271 prompts**. 6/6 tool count: **175 → 177**
+- Pushed branch, opened PR #313 (https://github.com/chittyos/ch1tty/pull/313)
+
+**Branch / PR**: `auto/E-catalog-115th-pass` → PR #313 (https://github.com/chittyos/ch1tty/pull/313)
+
+**Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
+
+**Board state**: 1274 combos / 517 verified / 1271 prompts. `github/get_pull_request` ✅ 6/6. `chittyevidence/search_documents` ✅ 6/6. `fs/list_allowed_directories` 5/6 (needs only +finance). `orchestrator/agent_execute(token-ops)` 3/6. `playwright/browser_resize` 3/6.
+
+**Blockers**:
+- Notion auth 401: run `chitty-mcp-token notion` or rotate integration token in workspace settings
+
+**Next run priority**:
+1. Merge PR #313 when CI green (CodeQL in progress at run end)
+2. 116th catalog pass: `fs/list_allowed_directories` (5/6, needs only finance → 1 combo finishes it); `orchestrator/agent_execute(token-ops)` (3/6, needs +governance+code+communication); `playwright/browser_resize` (3/6, needs +finance+governance+ops); `orchestrator/agent_execute(cleaner)` (2/6, needs 4 more profiles)
+3. Fix Notion auth: `chitty-mcp-token notion` or rotate token in workspace settings
+
+---
+
+### 2026-06-11 — Session 01LBG3w4NyTpVNSCTykZpCNB (128th pass)
+
+**Workstream advanced**: E (Alchemist brainstorm — catalog 128th pass)
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass / 0 fail / 2 skipped
+- No open PRs at start. main HEAD: `52f25a2` (127th pass — 1418 combos / 518 verified / 1415 prompts)
+- Workstream states: A ✅ B ✅ C ✅ D ✅ E in-progress (confirmed via DRIVER-LOG + repo scan)
+- Notion board still 401 — DRIVER-LOG.md remains cross-run fallback
+- Coverage gap analysis (post 127th-pass):
+  - 374 distinct tools; 234 at 6/6; 0 at 3-5/6; 7 at 2/6; 133 at 1/6
+  - **7 tools at 2/6** (the primary target this pass):
+    - `orchestrator/chittyagent-finance` (finance, governance)
+    - `orchestrator/agent_execute(helper)` (finance, communication)
+    - `orchestrator/skill_execute(chittycommand-alpha:cashflow-planner)` (finance, ops)
+    - `orchestrator/agent_execute(ledger)` (finance, governance)
+    - `orchestrator/agent_execute(stripe)` (finance, code)
+    - `orchestrator/skill_search(evidence-collect)` (finance, governance)
+    - `orchestrator/skill_execute(pipeline-submit)` (governance, design)
+  - 24 combos from prior passes had no matching prompt (orphan combos) → fixed
+- Created branch `auto/E-catalog-128th-pass`; added 12 combos + 12 prompts + fixed 24 missing prompts:
+  - **finance**: `finance-pipeline-submit-billing-gate` (pipeline-submit first in finance), `finance-agent-execute-notion-records-update` (notion agent in finance)
+  - **governance**: `governance-helper-agent-compliance-triage` (helper first in governance), `governance-cashflow-stripe-fiscal-compliance` (cashflow-planner + stripe first in governance)
+  - **design**: `design-chittyagent-finance-ledger-helper-ux-cost` (chittyagent-finance + ledger + helper first in design), `design-cashflow-stripe-evidence-cost-audit` (cashflow-planner + stripe + evidence-collect first in design)
+  - **code**: `code-pipeline-submit-helper-evidence-build-gate` (pipeline-submit + helper + evidence-collect first in code), `code-chittyagent-finance-stripe-ledger-cashflow-billing` (chittyagent-finance + stripe + ledger + cashflow-planner first in code)
+  - **communication**: `comm-pipeline-submit-cashflow-stripe-notify` (pipeline-submit + cashflow-planner + stripe first in comm), `comm-chittyagent-finance-ledger-evidence-broadcast` (chittyagent-finance + ledger + evidence-collect first in comm)
+  - **ops**: `ops-pipeline-submit-helper-evidence-deploy-gate` (pipeline-submit + helper + evidence-collect first in ops), `ops-chittyagent-finance-ledger-stripe-billing-health` (chittyagent-finance + ledger + stripe first in ops)
+- Coverage verification: all 7 target tools → 6/6 ✓; 0 orphan combos ✓
+- 0 test failures. Tests: 938 pass / 0 fail / 2 skipped ✓
+- Catalog: 1418 → **1430 combos / 518 verified (unchanged) / 1415 → 1451 prompts** (fixed 24 + added 12)
+- Pushed branch, opened PR #327; CI in_progress (2 CodeQL Analyze checks); CodeRabbit reviewing; Codex rate-limited (no action)
+
+**Branch / PR**: `auto/E-catalog-128th-pass` → PR #327 (https://github.com/chittyos/ch1tty/pull/327)
+
+**Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
+
+**Board state**: 1430 combos / 518 verified / 1451 prompts. MILESTONES: All 7 tools at 2/6 completed to 6/6. 0 orphan combos. 234 tools at 6/6 coverage (was 234 before — the 7 completions were previously at 2/6 not counted in 6/6 total). 386 distinct tools in catalog (374 + 12 new via new combos).
+
+**Blockers**:
+- Notion auth 401: run `chitty-mcp-token notion` or rotate integration token in workspace settings
+
+**Next run priority**:
+1. Merge PR #327 if CI green and no blocking CodeRabbit findings
+2. 129th catalog pass: scan for remaining tools at 1/6 that are naturally cross-profile (e.g. `orchestrator/agent_execute(notion)`, `notion/API-delete-a-page`, `neon/list_shared_projects`); check if `orchestrator/agent_execute(cleaner)` can be spread from its current profile(s); deepen any tool clusters where coverage is thin
+3. Fix Notion auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` to unblock cross-run board writes
+
+---
+
+### 2026-06-11 — Session 01DDT2fwS69bHfYoi4h1XqYv (run 70 — 129th pass)
+
+**Workstream advanced**: E (Alchemist brainstorm — catalog 129th pass)
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 938 pass / 0 fail / 2 skipped
+- Found PR #327 open (`auto/E-catalog-128th-pass`), CI green (CodeQL + Analyze all success, CodeRabbit reviewed)
+- Merged PR #327 → main now at 1430 combos / 1451 prompts / 241 tools at 6/6
+- Workstream states: A ✅ B ✅ C ✅ D ✅ E in-progress (confirmed via DRIVER-LOG + repo scan)
+- Notion board still 401 — DRIVER-LOG.md remains cross-run fallback
+- Coverage gap analysis (post 128th-pass):
+  - 374 distinct tools; 241 at 6/6; 0 at 3-5/6; 1 at 2/6; 132 at 1/6
+  - **1 tool at 2/6**: `orchestrator/agent_execute(notion)` (finance+governance → needs code+design+comm+ops)
+  - **132 tools at 1/6**: primarily profile-specific orchestrator skills; cross-profile candidates identified
+- Created branch `auto/E-catalog-129th-pass`; added 12 combos + 12 prompts:
+  - **finance**: `finance-neon-shared-projects-notion-cleanup` (neon/list_shared_projects+notion/API-delete-a-page into finance), `finance-workers-scripts-billing-audit` (workers_scripts_get+upload into finance)
+  - **governance**: `governance-obligation-tracker-evidence-docket` (obligation-tracker from finance into governance), `governance-pr-review-checkpoint-registry-tasks` (pr-review+checkpoint+tasks/create into governance)
+  - **design**: `design-notion-agent-frontend-skill-creator` (notion-agent into design → 3/6), `design-workers-build-alchemist-neon-create` (workers_builds_get_build into design)
+  - **code**: `code-notion-agent-workers-upload-pr-review` (notion-agent into code → 4/6), `code-build-mcp-alchemist-autobot-neon-delete` (build-mcp-server+alchemist from design into code)
+  - **communication**: `comm-notion-agent-broadcast-tasks` (notion-agent into communication → 5/6), `comm-workers-scripts-domain-knowledge-imessage` (workers_scripts_get into comm → 3/6)
+  - **ops**: `ops-notion-agent-checkpoint-pipelines-build-cancel` (notion-agent into ops → 6/6 ✅), `ops-alchemist-market-ship-workers-build` (ops depth)
+- Coverage verification: orchestrator/agent_execute(notion) → 6/6 ✓; 11 tools 1→2/6 ✓; 0 test failures
+- 0 test failures. Tests: 938 pass / 0 fail / 2 skipped ✓
+- Catalog: 1430 → **1442 combos / 1451 → 1463 prompts**
+- Pushed branch, opened PR #328
+
+**Branch / PR**: `auto/E-catalog-129th-pass` → PR #328 (https://github.com/chittyos/ch1tty/pull/328)
+
+**Build + test counts**: build clean, 938 pass / 0 fail / 2 skipped
+
+**Board state**: 1442 combos / 518 verified (unchanged) / 1463 prompts. orchestrator/agent_execute(notion) ✅ 6/6. Tools at 6/6: 242. Tools at 3/6: 1 (cloudflare/workers_scripts_get). Tools at 2/6: 10. Tools at 1/6: 121.
+
+**Blockers**:
+- Notion auth 401: run `chitty-mcp-token notion` or rotate integration token in workspace settings
+
+**Next run priority**:
+1. Merge PR #328 when CI green
+2. 130th catalog pass: advance tools toward 6/6 by adding cross-profile combos:
+   - `cloudflare/workers_scripts_get` (3/6, needs design+governance+ops)
+   - `cloudflare/workers_scripts_upload` (2/6, needs design+governance+communication+ops)
+   - `neon/list_shared_projects` (2/6, needs code+design+communication+ops)
+   - `notion/API-delete-a-page` (2/6, needs code+design+communication+ops)
+   - `orchestrator/skill_execute(pr-review)` (2/6, needs design+finance+communication+ops)
+   - Pick 2 per profile: tools that can naturally cross into that profile
+3. Fix Notion auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`

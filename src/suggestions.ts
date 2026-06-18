@@ -67,3 +67,20 @@ export function getSuggestionsForFocus(
     prompts: prompts.slice(0, maxPrompts),
   };
 }
+
+/**
+ * Find the first catalog combo whose chain starts with the given tool name.
+ * Returns null when no match or the focus has no catalog entry.
+ *
+ * Used by cast: executed / cast: plan to annotate the response when the
+ * resolved tool is the entry-point of a curated workflow in the active focus.
+ */
+export function findCatalogCombo(
+  toolName: string,
+  focusName: string,
+  catalog: Record<string, FocusSuggestions>,
+): SuggestedCombo | null {
+  const profile = catalog[focusName];
+  if (!profile) return null;
+  return profile.combos.find((c) => c.chain[0] === toolName) ?? null;
+}

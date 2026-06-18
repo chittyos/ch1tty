@@ -36,6 +36,7 @@ Treat Ch1tty as an orchestrator viewport, not a backend catalog.
   - `ch1tty/cast`
 - Session/fractal behavior is handled by SessionCoordinator + SessionTracker behind the meta-tools.
 - Backend namespace sprawl is controlled by config profiles; never expand public surface to include backend tools directly.
+- **`buildCastExplanation` metric freeze**: Do NOT add new statistical fields, ratios, percentile cross-comparisons, or observability metrics to `cast explain`. The `verbosity` param (`low`/`medium`/`full`) was added to manage the existing 120+ fields. Every field that belongs in `explain` is already there. Any PR adding a new metric/ratio/statistical measure to `buildCastExplanation` MUST be rejected.
 
 ## Commands
 
@@ -166,7 +167,7 @@ CH1TTY_PORT=9099 CH1TTY_MCP_TOKEN=secret123 npm start
 
 Endpoints on `{bindAddress}:{port}`:
 - `GET /health` — `{"status":"ok","service":"ch1tty","version":"<VERSION>"}` (always 200; process-level ping only)
-- `GET /api/v1/health` — Liveness probe (no auth required). Returns **200** if `systemHealth.status` is `ok` or `warn`; **503** if `degraded` (ledger DLQ backlog; brain circuit open is `warn` not `degraded`). Normal body: `{"status":"ok|warn|degraded","service":"ch1tty","systemHealth":{...}}`. On internal snapshot failure: **503** with `{"status":"degraded","service":"ch1tty","error":"internal"}` (no `systemHealth` field).
+- `GET /api/v1/health` — Liveness probe (no auth required). Returns **200** if `systemHealth.status` is `ok` or `warn`; **503** if `degraded` (ledger DLQ backlog; brain circuit open is `warn` not `degraded`). Normal body: `{"status":"ok|warn|degraded","service":"ch1tty","systemHealth":{...}}`. **ok body** additionally includes `ledgerOk: true` when `systemHealth.ledgerStatus === 'ok'` (ledger fully clean; symmetric to `ledgerWarn`). **warn body** additionally includes `brainCircuitOpen: true` when `systemHealth.brainDegraded === true` (Ollama/embedding circuit open) and `ledgerWarn: true` when `systemHealth.ledgerStatus === 'warn'` (drops/flushErrors present but no DLQ backlog); either or both may appear together. **503 body** additionally includes `ledgerDlq: { entryCount: N }` so callers can see the backlog depth without a separate `/api/v1/status` call. On internal snapshot failure: **503** with `{"status":"degraded","service":"ch1tty","error":"internal"}` (no `systemHealth` or `ledgerDlq` fields).
 - `GET /api/v1/status` — Full gateway status snapshot. Returns 500 + `{"error":"internal"}` on server-side failure (never a fake-ok envelope).
 - `GET /api/v1/sessions` — Active MCP session list (bearer-auth if configured)
 - `* /mcp` — **Streamable HTTP MCP endpoint** (bearer token required if `CH1TTY_MCP_TOKEN` is set)
@@ -188,6 +189,8 @@ Endpoints on `{bindAddress}:{port}`:
 | `CH1TTY_REMOTE_TIMEOUT_MS` | Override all remote proxy timeouts (connect: 15s, list: 15s, call: 120s) to the given value in milliseconds. Lower it in test environments to avoid long waits when remote backends are slow or hanging. |
 | `CH1TTY_OLLAMA_CIRCUIT_THRESHOLD` | Consecutive failures before OllamaBrain circuit opens (default 3). |
 | `CH1TTY_OLLAMA_CIRCUIT_COOLDOWN_MS` | How long OllamaBrain circuit stays open before a half-open probe (default 60000ms). |
+| `CH1TTY_SESSION_TTL_MS` | Inactive session TTL in ms — sessions that have had no tool calls for this duration are auto-evicted from memory (default 3600000 = 1h). Set to 0 to disable eviction. |
+| `CH1TTY_SESSION_EVICT_INTERVAL_MS` | How often the eviction sweep runs (default 300000 = 5min). Ignored when TTL is 0. |
 
 ## Registration
 

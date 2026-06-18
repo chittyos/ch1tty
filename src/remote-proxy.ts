@@ -234,7 +234,7 @@ export class RemoteProxy implements Backend {
     }
   }
 
-  async callTool(serverId: string, toolName: string, args: Record<string, unknown> = {}): Promise<ToolCallResult> {
+  async callTool(serverId: string, toolName: string, args: Record<string, unknown> = {}, options?: { timeoutMs?: number }): Promise<ToolCallResult> {
     const config = this.configs.get(serverId);
     if (!config) {
       return { content: [{ type: 'text', text: `Unknown remote server: ${serverId}` }], isError: true };
