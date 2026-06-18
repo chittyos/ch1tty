@@ -10,6 +10,8 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 - [ ] **SEC-FIX** — Fix Dependabot high-severity `hono` vulnerability: `"overrides": {"hono": ">=4.12.25"}` in package.json. PR #773 `auto/sec-hono-override` — open for review (2026-06-18).
 - [x] **SEC-FIX** — Fix Dependabot high-severity `hono` vulnerability: `"overrides": {"hono": ">=4.12.25"}` across root + 5 sub-packages. PR #773 ✅ MERGED (b55b9f7, 2026-06-18). DONE.
+- [x] **SEC-FIX-2** — Pin ws >=8.21.0 in worker: HIGH DoS CVE (GHSA-3h5q-q39x-f9gh) via wrangler→miniflare chain. PR #777 ✅ MERGED (c0dc5c1, 2026-06-18). DONE.
+- [x] **SEC-FIX-3** — Pin undici >=7.28.0 + esbuild >=0.28.1 in worker: 2 HIGH undici CVEs (GHSA-vmh5-mc38-953g TLS bypass, GHSA-pr7r-676h-xcf6 cache disclosure) + LOW esbuild CVE (GHSA-g7r4-m6w7-qqqr). PR #781 ✅ MERGED (abc56ee, 2026-06-18). DONE.
 - [x] **A** — Gateway up/refreshed/tested. Build clean, 5 meta-tools confirmed. DONE.
 - [x] **B** — GitHub MCP migration: `servers.json` github → `https://api.githubcopilot.com/mcp/` with envHeaders. DONE.
 - [x] **C** — Focus-profile layer: `focus-profiles.json` (6 profiles), CH1TTY_FOCUS, per-call focus param, status reporting, tests. DONE.
@@ -780,4 +782,30 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   3. **Worker dev-toolchain vulns** (wrangler/miniflare/esbuild LOW) — require Cloudflare dep upgrade decision
   4. **Verify ChittyConnect** (`connect.chitty.cc/api/mcp`) auth token from deployed gateway
   5. **Stale branch cleanup** — `git push origin --delete` for the 688 stale `auto/` branches (or enable branch auto-delete on merged PRs in repo settings)
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). CI 0-jobs non-CodeQL (recurring, non-blocking).
+
+### 2026-06-18 (this run — SEC-FIX-3 merged; steady state)
+- **Workstream**: SEC-FIX-3 — pin undici >=7.28.0 + esbuild >=0.28.1 in worker (2 HIGH + 1 LOW CVEs)
+- **Branch**: `auto/sec-fix-3-undici-esbuild` | **PR**: #781 ✅ MERGED (abc56ee, 2026-06-18)
+- **Build**: clean | **Tests**: 3304/0/2 (unchanged)
+- **What was done**:
+  - Startup: npm ci clean, build clean, npm test: 3304/0/2. Board read (Notion 401 — recurring).
+  - Ran `npm audit --prefix workers/chittyagent-ch1tty`: 5 vulns (1 LOW esbuild, 4 HIGH from undici 7.24.8 via wrangler→miniflare chain).
+  - HIGH: GHSA-vmh5-mc38-953g (undici TLS cert validation bypass via SOCKS5 ProxyAgent), GHSA-pr7r-676h-xcf6 (undici cross-user info disclosure via shared cache whitespace bypass). Fixed by undici >=7.28.0.
+  - LOW: GHSA-g7r4-m6w7-qqqr (esbuild arbitrary file read on Windows dev server). Fixed by esbuild >=0.28.1.
+  - Fix: added `"undici": ">=7.28.0"` and `"esbuild": ">=0.28.1"` to `overrides` in `workers/chittyagent-ch1tty/package.json`. Post-fix: `found 0 vulnerabilities`.
+  - Lock file: undici 7.24.8 → 7.28.0, esbuild 0.27.3 → 0.28.1.
+  - PR #781 CI: CodeQL ✅, Analyze actions ✅, Analyze javascript-typescript ✅. Squash-merged → abc56ee.
+  - Stale PR #782 (board log from prior session): closed after merge conflicts. Board update committed on fresh branch `auto/board-sec-fix-3-done`.
+- **State summary**:
+  - All workstreams A–E + F–WWWWWWW + SEC-FIX + SEC-FIX-2 + SEC-FIX-3: DONE
+  - `buildCastExplanation` metric freeze: ACTIVE (CLAUDE.md guardrail)
+  - 0 vulnerabilities across all install roots (including workers/chittyagent-ch1tty)
+  - Open PRs: none (PR #504 ChittyConnect confirmed merged 2026-06-16)
+  - Stale branches: 688 remote `auto/` branches (no open PRs; cleanup requires human auth)
+- **Human action required** (unchanged):
+  1. **Add new workstreams** to DRIVER-BOARD.md — candidates: new `apps/*-mcp` server, cast chain improvements, new backends, scenario harness expansion
+  2. **Disable or redirect hourly schedule** if no new workstreams are planned
+  3. **Stale branch cleanup** — 688 stale `auto/` branches on remote (or enable auto-delete in repo settings)
+  4. **Verify ChittyConnect** (`connect.chitty.cc/api/mcp`) auth token from deployed gateway
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). CI 0-jobs non-CodeQL (recurring, non-blocking).
