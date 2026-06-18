@@ -892,3 +892,27 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   4. **Stale branch cleanup** — 693 remote `auto/` branches (enable auto-delete in repo settings)
   5. **Verify ChittyConnect** (`connect.chitty.cc/api/mcp`) auth token from deployed gateway
 - **Blockers**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). PR #784 no common merge base (human direction required). CI 0-jobs non-CodeQL (recurring, non-blocking).
+
+### 2026-06-18 (this run — 4th run; PR #784 guardrail review posted)
+- **Workstream**: None new — all A–E done; active work: PR #784 guardrail review
+- **Build**: clean | **Tests**: 3304/0/2 (main HEAD ed70457)
+- **What was done**:
+  - Startup: npm ci clean, build clean, npm test 3304 pass / 0 fail / 2 skip.
+  - Reset local main to origin/main (was diverged 50/50 commits).
+  - Confirmed workstreams A–E all complete: build green, GitHub remote endpoint in servers.json, focus-profiles.json + src/focus.ts present, test/scenario.test.ts + test/simulation.test.ts present, focus-suggestions.json (1750 combos, 6 profiles) present.
+  - PR #784 (`feat/ch1tty-do-codemode`): deep-reviewed the 47-file diff. **New finding this run**: beyond the "no common merge base" issue, the PR adds **6 new tools** to the public MCP surface (`ch1tty/code`, `ch1tty/provision`, `ch1tty/memory_recall`, `ch1tty/memory_ingest`, `ch1tty/memory_summary`, `ch1tty/browser_execute`) — hard violation of CLAUDE.md binding guardrail (surface must be exactly 5). Posted a COMMENT review on GitHub documenting the violation and the specific changes required.
+  - Ch1tty gateway live status: 8/15 backends connected, 66 tools, 114 active sessions. Ledger DLQ: 11 entries (degraded — ledger.chitty.cc unreachable). Notion backend: not connected (401).
+  - Noted: test/ directory contains 135 `cast-explain-*-ratio` test files (rogue prior runs adding metrics in violation of the metric freeze). These tests pass but represent guardrail violations already merged to main. Human cleanup/revert decision needed.
+- **State summary**:
+  - All workstreams A–E: DONE
+  - PR #784: OPEN — **4th run**; COMMENT review posted documenting 6-tool surface violation; surface fix required before merge
+  - `buildCastExplanation` metric freeze: ACTIVE (CLAUDE.md guardrail); 135 rogue ratio tests already merged to main
+  - Ledger DLQ: 11 entries (degraded)
+  - Tests: 3304/0/2 on main
+- **Human action required**:
+  1. **PR #784 surface fix** — reduce `META_TOOL_VERBS` to exactly 5 tools; move memory/code/browser capabilities to `apps/*-mcp` focused servers. See review comment on PR #784 for full list.
+  2. **Rogue ratio test cleanup** — 135 `test/*ratio*.test.ts` files + corresponding source metrics violate the `buildCastExplanation` metric freeze. Decide: (a) revert the rogue commits off main, or (b) accept as historical debt and just enforce the freeze going forward.
+  3. **Stale branch cleanup** — ~759 remote `auto/` branches on remote.
+  4. **Ledger DLQ** — 11 entries; resolve ledger.chitty.cc connectivity.
+  5. **Disable or redirect hourly schedule** if no new workstreams planned.
+- **Blockers**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). PR #784 surface violation requires human fix or explicit human decision to relax the 5-tool guardrail.
