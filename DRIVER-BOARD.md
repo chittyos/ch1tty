@@ -866,3 +866,29 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   4. **Stale branch cleanup** — ~759 remote `auto/` branches (enable auto-delete in repo settings)
   5. **Verify ChittyConnect** (`connect.chitty.cc/api/mcp`) auth token from deployed gateway
 - **Blockers**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). CI 0-jobs non-CodeQL (recurring, non-blocking).
+
+### 2026-06-18 (this run — 3rd idle run; PR #784 confirmed as complete rewrite)
+- **Workstream**: None — all workstreams A–E + SEC-FIX done; PR #784 confirmed blocked
+- **Build**: clean | **Tests**: 3304/0/2 (confirmed on main HEAD 5f7f4af)
+- **What was done**:
+  - Startup: npm ci clean, build clean, npm test: 3304 pass / 0 fail / 2 skip. npm audit: 0 vulnerabilities.
+  - Board read from DRIVER-BOARD.md (Notion 401 — recurring). Fetched and inspected PR #784 branch.
+  - PR #784 (`feat/ch1tty-do-codemode`): OPEN — **no common merge base** with current main (built on pre-squash history). `package.json` has no `test` script (`build: "tsc --noEmit"`, `deploy: "wrangler deploy"`, `dev: "wrangler dev"`). `src/` contains only CF Workers+DO files; original stdio code archived to `src-stdio/`. This is a complete rewrite — the existing 3304-test suite tests code (`src/aggregator.ts` etc.) that no longer exists in this branch's `src/`. Option (a) restructuring is feasible but non-trivial; requires explicit human direction.
+  - `buildCastExplanation` metric freeze guardrail confirmed active — no new metrics added.
+  - No code changes made.
+- **State summary**:
+  - All workstreams A–E + F–WWWWWWW + SEC-FIX + SEC-FIX-2 + SEC-FIX-3: DONE
+  - PR #784: OPEN — **3rd consecutive idle run**; human decision required
+  - `buildCastExplanation` metric freeze: ACTIVE (CLAUDE.md guardrail)
+  - 0 vulnerabilities across all install roots; Tests: 3304/0/2 on main
+  - 693 stale auto/ branches on remote
+- **Human action required — URGENT (3rd run no direction)**:
+  1. **PR #784 test strategy** — add your choice to DRIVER-BOARD.md:
+     - **(a) Recommended**: Extract DO code to `workers/gateway-do/` (own `package.json`); keep `src/` + tests intact. Matches `workers/chittyagent-ch1tty/` pattern.
+     - **(b)** Port 3304-test suite to test `src/ch1tty-do.ts` under CF Workers runtime (significant effort)
+     - **(c)** Close PR #784; reopen as long-lived branch with Worker tests added first
+  2. **Add new workstreams** to DRIVER-BOARD.md if desired (new `apps/*-mcp`, scenario expansion, etc.)
+  3. **Disable or redirect hourly schedule** if no new workstreams are planned
+  4. **Stale branch cleanup** — 693 remote `auto/` branches (enable auto-delete in repo settings)
+  5. **Verify ChittyConnect** (`connect.chitty.cc/api/mcp`) auth token from deployed gateway
+- **Blockers**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). PR #784 no common merge base (human direction required). CI 0-jobs non-CodeQL (recurring, non-blocking).
