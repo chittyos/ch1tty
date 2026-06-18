@@ -691,3 +691,24 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   2. **Disable or redirect hourly schedule** if no new workstreams are planned
   3. **Worker dev-toolchain vulns** (wrangler/miniflare advisories) — require Cloudflare dep downgrade decision
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable from container). CI 0-jobs non-CodeQL (recurring, non-blocking).
+
+### 2026-06-18 (this run — idle; board correction re: PR #504)
+- **Workstream**: None — all workstreams A–E + SEC-FIX done; no new workstreams defined
+- **Build**: clean | **Tests**: 3304/0/2 (confirmed on main 651c267)
+- **What was done**:
+  - Startup: npm ci clean, build clean, npm test: 3304/0/2.
+  - Board read from DRIVER-BOARD.md (Notion 401 — recurring). `git fetch --all`.
+  - **Board correction**: PR #504 (ChittyConnect registration) was merged 2026-06-16 by chitcommit — not open as previously recorded. No open PRs.
+  - `servers.json` includes `connect` entry (`https://connect.chitty.cc/api/mcp`, lazy:false). Auth via `chittymcp` token key; reachability from remote container unverified (same constraint as ledger DLQ).
+  - No code changes made — system at steady state.
+- **State summary**:
+  - All workstreams A–E + F–WWWWWWW + SEC-FIX: DONE
+  - PR #504 (ChittyConnect): MERGED (2026-06-16)
+  - `buildCastExplanation` metric freeze: ACTIVE
+  - 0 vulnerabilities; open PRs: none
+- **Human action required** (unchanged):
+  1. **Add new workstreams** to DRIVER-BOARD.md — candidates: new `apps/*-mcp` server, cast chain improvements, new backends, scenario harness expansion
+  2. **Disable or redirect hourly schedule** if no new workstreams are planned
+  3. **Worker dev-toolchain vulns** (wrangler/miniflare advisories) — require Cloudflare dep downgrade decision
+  4. **Verify ChittyConnect** (`connect.chitty.cc/api/mcp`) auth token works from deployed gateway
+- **Blockers**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). CI 0-jobs non-CodeQL (recurring). CodeRabbit quota recovering from metric bloat.
