@@ -622,3 +622,25 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   1. **Add new workstreams** to DRIVER-BOARD.md (new backend, `apps/*-mcp`, cast chaining, scenario expansion)
   2. **Disable or redirect hourly schedule** if no new workstreams are planned
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs non-CodeQL (recurring).
+
+### 2026-06-18 (this run — holding pattern; no new workstreams)
+- **Workstream**: Housekeeping — no new code; confirmed guardrail active; closed stale PR #771
+- **Build**: clean | **Tests**: 3304/0/2 (unchanged from 2026-06-17 baseline; main HEAD `4757b04`)
+- **What was done**:
+  - Startup: npm ci clean, build clean, 3304/0/2 confirmed. Board read from DRIVER-BOARD.md (Notion 401 — recurring).
+  - Fixed detached HEAD: reset local `main` to `origin/main` (4757b04 — verbosity prune + metric freeze guardrail).
+  - PR #771 (stale board-only log from prior run): CLOSED as superseded.
+  - No open cast-explain metric PRs (searched: 0 results). Guardrail in CLAUDE.md is holding at the PR level.
+  - 107 new numeric-named metric branches on remote (auto/01010101 … auto/16161616 etc.) — all lack open PRs; appear to be parallel session artifacts that failed to open PRs against the guardrail. No action needed; they are unreferenced branches.
+  - No new code changes made this run.
+- **State summary**:
+  - All workstreams A–E: DONE
+  - `cast explain` verbosity (`low`/`medium`/`full`): DONE (PR #766, merged 2026-06-17)
+  - CLAUDE.md metric freeze guardrail: ACTIVE
+  - Open PRs: **1** (#504 ChittyConnect reg — "Do NOT auto-merge")
+  - Stale metric branches on remote: ~107 (no open PRs; safe to delete via `git push origin --delete <branch>` in bulk if desired)
+- **Human action required**:
+  1. **Add new workstreams** to DRIVER-BOARD.md — candidates: new `apps/*-mcp` server, cast chain improvements, scenario expansion, new backends (e.g. Linear, Stripe focused surfaces)
+  2. **Disable or redirect hourly schedule** if no new workstreams are planned — the driver has nothing productive to advance
+  3. **Delete stale numeric metric branches** (optional cleanup): `git push origin --delete $(git branch -r | grep 'origin/auto/[0-9]' | sed 's|origin/||' | tr '\n' ' ')`
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable from container). CI 0-jobs non-CodeQL (recurring, non-blocking).
