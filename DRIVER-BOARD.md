@@ -938,3 +938,28 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - All workstreams A–E: DONE
   - Tests: 3304/0/2 on branch (0 vulns)
 - **Blockers**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). CI 0-jobs non-CodeQL (recurring, non-blocking).
+
+### 2026-06-18 (this run — verify PR #790; close PR #789)
+- **Workstream**: SEC-FIX-4 continued — independent local verification of PR #790; close wrong-approach PR #789
+- **Branch/PR**: `auto/board-pr790-verified` → PR TBD (board log only)
+- **Build**: clean | **Tests**: 3304/0/2 (verified on `auto/sec-fix-4-root-wrangler-undici-ws`)
+- **What was done**:
+  - Startup: main is BROKEN — `npm run build` fails with 6 TypeScript errors; `npm ci` fails. Root cause: PR #784 merged to main, replacing `src/` with CF Worker/DO code (`5.0.0-do`).
+  - Fetched all branches; found 2 open PRs: #790 (restore stdio stack) and #789 (wrong approach: fix CF Worker TS errors).
+  - Checked out PR #790 branch (`auto/sec-fix-4-root-wrangler-undici-ws`): `npm ci` → 0 vulns; `npm run build` → clean tsc (v4.1.0); `npm test` → **3304 pass / 0 fail / 2 skip** (119 807 ms).
+  - Confirmed `src/` on PR #790 branch has NO forbidden ratio metrics (grep: 0 matches). The 135 `*-ratio*.test.ts` test files are vestiges of prior forbidden branches but pass permissively (skip when field absent).
+  - Posted verification comment on PR #790 (#issuecomment-4746888834): independent confirmation build+tests pass, recommendation to merge.
+  - Closed PR #789 (`auto/A-do-build-fix`): wrong approach — patched CF Worker TS errors instead of restoring Node.js. Retitled as `[SUPERSEDED BY #790]`.
+- **State summary**:
+  - **CRITICAL**: main is broken (CF Worker `5.0.0-do`, 6 TS errors, all tests fail). PR #790 is the fix — verified green locally; awaiting human merge.
+  - PR #790: OPEN — verification comment added; CI CodeQL ✅; NO automated build/test CI (ongoing gap). **Ready to merge.**
+  - PR #789: CLOSED (superseded by #790)
+  - All workstreams A–E: DONE; `buildCastExplanation` metric freeze: ACTIVE; src/ is clean
+  - 0 vulnerabilities on PR #790 branch
+- **Human action required — URGENT**:
+  1. **Merge PR #790** — main is broken; PR #790 restores Node.js stdio stack; build+tests verified green (3304/0/2)
+  2. **Add CI build+test job** — CodeQL-only CI allowed PR #784 to break main undetected; `npm ci && npm run build && npm test` CI step would catch this
+  3. **Stale branch cleanup** — ~759+ remote `auto/` branches (bulk delete or enable auto-delete in repo settings)
+  4. **Add new workstreams** to DRIVER-BOARD.md if any planned
+  5. **Disable or redirect hourly schedule** if no new workstreams planned post-merge
+- **Blockers**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). Main broken until PR #790 merges.
