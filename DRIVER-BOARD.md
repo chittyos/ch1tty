@@ -8,6 +8,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 ## Workstream Status (A–E: original; F+: ongoing observability improvements; SEC-FIX: security)
 
 
+- [x] **SEC-FIX-3** — Pin undici >=7.28.0 + esbuild >=0.28.1 in worker: 2 HIGH undici CVEs (GHSA-vmh5-mc38-953g, GHSA-pr7r-676h-xcf6) + LOW esbuild CVE (GHSA-g7r4-m6w7-qqqr). PR #781 ✅ MERGED (abc56ee, 2026-06-18). DONE.
 - [ ] **SEC-FIX** — Fix Dependabot high-severity `hono` vulnerability: `"overrides": {"hono": ">=4.12.25"}` in package.json. PR #773 `auto/sec-hono-override` — open for review (2026-06-18).
 - [x] **SEC-FIX** — Fix Dependabot high-severity `hono` vulnerability: `"overrides": {"hono": ">=4.12.25"}` across root + 5 sub-packages. PR #773 ✅ MERGED (b55b9f7, 2026-06-18). DONE.
 - [x] **A** — Gateway up/refreshed/tested. Build clean, 5 meta-tools confirmed. DONE.
@@ -775,11 +776,10 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - All workstreams A–E + F–WWWWWWW + SEC-FIX + SEC-FIX-2: DONE; SEC-FIX-3 open (PR #781)
   - `buildCastExplanation` metric freeze: ACTIVE
   - Worker: 0 vulnerabilities (was 5: 1 low + 4 high)
-  - Open PRs: #781 SEC-FIX-3 (CodeQL in progress)
-- **Next run priority**: Confirm PR #781 CodeQL green → merge. Then steady state unless human adds workstreams.
+  - Open PRs: none (PR #781 SEC-FIX-3 ✅ MERGED abc56ee)
+- **Next run priority**: Steady state — all workstreams + SEC-FIX-3 done. Human action required to add new workstreams or disable schedule.
 - **Human action required**:
-  1. **Merge PR #781** (SEC-FIX-3) once CodeQL passes
-  2. **Add new workstreams** to DRIVER-BOARD.md — candidates: new `apps/*-mcp` server, cast chain improvements, new backends, scenario expansion
+  1. **Add new workstreams** to DRIVER-BOARD.md — candidates: new `apps/*-mcp` server, cast chain improvements, new backends, scenario expansion
   3. **Disable or redirect hourly schedule** if no new workstreams are planned
   4. **Stale branch cleanup** — 688 stale `auto/` branches (or enable branch auto-delete in repo settings)
   5. **Verify ChittyConnect** (`connect.chitty.cc/api/mcp`) auth token from deployed gateway
