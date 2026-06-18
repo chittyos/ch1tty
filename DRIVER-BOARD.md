@@ -637,10 +637,13 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - Fix: added `"overrides": {"hono": ">=4.12.25"}` to `package.json` — pins hono to 4.12.26 (fixed). `npm audit`: `found 0 vulnerabilities`. Build clean.
   - `npm audit fix` alternative rejected: would have added 26 unrelated esbuild platform packages to lock file.
   - Only 2 files changed: `package.json` (+3 lines) and `package-lock.json` (hono version update).
+  - Codex P1 review: root override didn't cover 5 sub-packages with their own lock files. Extended fix to all: added `overrides.hono >=4.12.25` to 4 `apps/*-mcp` packages; bumped direct dep `hono ^4.12.23→^4.12.25` in `workers/chittyagent-ch1tty`. All 5 show `found 0 [hono] vulnerabilities`.
+  - Worker retains 5 pre-existing dev-toolchain advisories (wrangler/miniflare/vitest-pool-workers) — separate concern, require breaking Cloudflare dep downgrade.
 - **State summary**:
   - All workstreams A–E + F–WWWWWWW: DONE
   - `buildCastExplanation` metric freeze: ACTIVE (CLAUDE.md guardrail)
-  - 0 npm vulnerabilities after fix
-  - Open PRs: #504 (do-not-merge), #772 (board log — stale), + SEC-FIX PR (this run)
-- **Next run priority**: Close stale PR #772 if SEC-FIX PR merges, or advance a new genuine workstream — human should add one to this board.
-- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CI 0-jobs non-CodeQL (recurring).
+  - 0 hono-related vulnerabilities across all 6 install roots (root + 5 sub-packages)
+  - Open PRs: #504 (do-not-merge), #772 (board log — stale), #773 SEC-FIX (CodeQL in-progress, Codex ✅)
+  - CodeRabbit rate-limited (~1h reset) — direct consequence of ~700 metric-bloat PRs from prior runaway sessions
+- **Next run priority**: Check if PR #773 merged (CodeQL + human approval needed). If yes, mark SEC-FIX done and close stale #772. Add new workstreams — human direction required.
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CodeRabbit quota exhausted. Worker dev-toolchain vulns need separate attention.
