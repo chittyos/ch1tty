@@ -9,6 +9,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 
 - [ ] **SEC-FIX** — Fix Dependabot high-severity `hono` vulnerability: `"overrides": {"hono": ">=4.12.25"}` in package.json. PR #773 `auto/sec-hono-override` — open for review (2026-06-18).
+- [x] **SEC-FIX** — Fix Dependabot high-severity `hono` vulnerability: `"overrides": {"hono": ">=4.12.25"}` across root + 5 sub-packages. PR #773 ✅ MERGED (b55b9f7, 2026-06-18). DONE.
 - [x] **A** — Gateway up/refreshed/tested. Build clean, 5 meta-tools confirmed. DONE.
 - [x] **B** — GitHub MCP migration: `servers.json` github → `https://api.githubcopilot.com/mcp/` with envHeaders. DONE.
 - [x] **C** — Focus-profile layer: `focus-profiles.json` (6 profiles), CH1TTY_FOCUS, per-call focus param, status reporting, tests. DONE.
@@ -647,3 +648,24 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - CodeRabbit rate-limited (~1h reset) — direct consequence of ~700 metric-bloat PRs from prior runaway sessions
 - **Next run priority**: Check if PR #773 merged (CodeQL + human approval needed). If yes, mark SEC-FIX done and close stale #772. Add new workstreams — human direction required.
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ. CodeRabbit quota exhausted. Worker dev-toolchain vulns need separate attention.
+
+### 2026-06-18 (this run — SEC-FIX merged + board update)
+- **Workstream**: SEC-FIX housekeeping — confirmed PR #773 CI green, merged it, closed stale PR #772
+- **Branch**: `auto/board-log-run-jun18-v2` | **PR**: TBD
+- **Build**: clean | **Tests**: 3304/0/2 (confirmed on main b55b9f7)
+- **What was done**:
+  - Startup: npm ci clean, build clean, npm test: 3304/0/2. Board read from DRIVER-BOARD.md (Notion 401 — recurring).
+  - Confirmed open PRs: #773 (hono SEC-FIX, all 3 CodeQL ✅), #772 (stale board log).
+  - PR #773 CI all green (CodeQL + Analyze actions + Analyze javascript-typescript). Diff verified: only hono version bumps (4.12.23→4.12.26) across package.json/lock files — no logic changes. Squash-merged → b55b9f7.
+  - PR #772 closed as stale (superseded by this entry).
+  - SEC-FIX marked DONE in workstream checklist.
+- **State summary**:
+  - All workstreams A–E + F–WWWWWWW + SEC-FIX: DONE
+  - `buildCastExplanation` metric freeze: ACTIVE (CLAUDE.md guardrail)
+  - 0 hono CVEs across all install roots
+  - Open PRs: #504 (do-not-merge ChittyConnect reg)
+- **Human action required**:
+  1. **Add new workstreams** to DRIVER-BOARD.md — candidates: new `apps/*-mcp` server, cast chain improvements, new backends, scenario harness expansion
+  2. **Disable or redirect hourly schedule** if no new workstreams are planned
+  3. **Worker dev-toolchain vulns** (wrangler/miniflare advisories) — separate from hono fix; require Cloudflare dep downgrade decision
+- **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable from container). CI 0-jobs non-CodeQL (recurring, non-blocking).
