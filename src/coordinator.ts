@@ -198,13 +198,17 @@ export class SessionCoordinator {
     toolsByServer: Record<string, number>;
     ledger: ReturnType<LedgerClient['getStats']>;
     brain: ReturnType<WorkersAiBrain['getStats']>;
-    sessions: Array<{ sessionId: string; entity?: string; toolPatterns: number; stagingComplete: boolean }>;
+    sessions: Array<{ sessionId: string; entity?: string; toolPatterns: number; stagingComplete: boolean; sessionFocus?: string }>;
   } {
     const allPatterns = [...this.contexts.values()].flatMap((ctx) => [...ctx.toolPatterns.values()]);
-    const topTools = allPatterns
-      .sort((a, b) => b.count - a.count)
+    const toolTotals = new Map<string, number>();
+    for (const p of allPatterns) {
+      toolTotals.set(p.tool, (toolTotals.get(p.tool) ?? 0) + p.count);
+    }
+    const topTools = [...toolTotals.entries()]
+      .sort((a, b) => b[1] - a[1])
       .slice(0, 5)
-      .map((p) => p.tool);
+      .map(([tool]) => tool);
     const toolsByServer: Record<string, number> = {};
     for (const p of allPatterns) {
       const server = p.tool.includes('/') ? (p.tool.split('/')[0] ?? 'unknown') : 'unknown';
