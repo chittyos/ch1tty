@@ -22,7 +22,7 @@ import { VERSION, withTimeout, normalizeToolResult, resolveSecret } from './util
 import { log } from './logger.js';
 import { CircuitBreaker } from './circuit-breaker.js';
 import { AUTH_TOKEN_ENV } from './config-data.js';
-import { ToolsClient, normalizeToolSchema } from './vendor/schema-client/index.js';
+import { ToolsClient, normalizeToolSchema } from '@chittyos/schema-client';
 
 interface RemoteConnection {
   client: Client;

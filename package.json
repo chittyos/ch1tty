@@ -1,7 +1,7 @@
 {
   "name": "ch1tty",
   "version": "5.0.0-do",
-  "description": "ChittyOS Universal MCP Gateway — Cloudflare Worker + per-session Durable Object, slim MCP (search/execute/code), code mode, Workers AI brain",
+  "description": "ChittyOS Universal MCP Gateway \u2014 Cloudflare Worker + per-session Durable Object, slim MCP (search/execute/code), code mode, Workers AI brain",
   "type": "module",
   "main": "src/index.ts",
   "scripts": {
@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@chittyos/schema-client": "file:../../CHITTYFOUNDATION/chittyschema/clients/schema-client",
+    "@cloudflare/codemode": "^0.4.1",
     "@modelcontextprotocol/sdk": "^1.25.0",
     "agents": "^0.16.2"
   },
