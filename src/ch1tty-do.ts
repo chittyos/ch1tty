@@ -23,7 +23,7 @@ import { validateFocusProfiles, resolveFocus, isInFocus, applyFocusBias, type Fo
 import { getSuggestionsForFocus, type FocusSuggestions } from './suggestions.js';
 import { FOCUS_PROFILES_RAW, REMOTE_SERVERS } from './config-data.js';
 import { CodemodeBridge } from './codemode-bridge.js';
-import { OntologyClient } from './vendor/schema-client/index.js';
+import { OntologyClient } from '@chittyos/schema-client';
 import { createBrowserRuntime, type BrowserRuntime } from 'agents/browser/ai';
 import { VERSION } from './utils.js';
 import { log } from './logger.js';
@@ -223,6 +223,46 @@ export class Ch1ttyDO extends DurableObject<Env> {
   private async refreshRegistry(): Promise<void> {
     if (this.registryRefreshing) return this.registryRefreshing;
     this.registryRefreshing = (async () => {
+      // Ingest dynamically from aggregator
+      try {
+        const res = await fetch('https://mcp.chitty.cc/v0.1/servers');
+        if (res.ok) {
+          const data = await res.json() as { servers: any[] };
+          const dynamicConfigs = data.servers.map((s: any) => {
+            const existingBase = this.configs.find(c => c.id === s.id);
+            const existing = existingBase?.type === 'remote' ? existingBase as import('./types.js').RemoteServerConfig : undefined;
+            return {
+              id: s.id,
+              name: s.label || s.name,
+              type: 'remote' as const,
+              access: existingBase?.access || 'readwrite',
+              category: s.category || 'ecosystem',
+              endpoint: existing?.endpoint || s.endpoints.aggregated,
+              authTokenKey: existing?.authTokenKey || 'chittymcp',
+              envHeaders: existing?.envHeaders || {
+                'CF-Access-Client-Id': 'CHITTY_CF_ACCESS_CLIENT_ID',
+                'CF-Access-Client-Secret': 'CHITTY_CF_ACCESS_CLIENT_SECRET',
+              },
+              lazy: existingBase?.lazy ?? true,
+              enabled: existingBase?.enabled ?? true
+            };
+          });
+          
+          const configMap = new Map();
+          for (const c of this.configs) configMap.set(c.id, c);
+          for (const c of dynamicConfigs) {
+            configMap.set(c.id, c);
+            this.proxy.registerServer(c);
+          }
+          this.configs = Array.from(configMap.values());
+          log.info(`Ingested ${dynamicConfigs.length} servers from registry`);
+        } else {
+          log.warn(`Registry ingest failed: HTTP ${res.status}`);
+        }
+      } catch (err) {
+        log.error(`Registry ingest error: ${err}`);
+      }
+
       const toolPromises = this.activeConfigs().map(async (config) => {
         try {
           const tools = await this.proxy.listTools(config.id);

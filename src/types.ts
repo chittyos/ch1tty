@@ -135,6 +135,10 @@ export interface Env {
   AI: Ai;
   /** Worker Loader binding for codemode DynamicWorkerExecutor. */
   LOADER: unknown;
+  /** Browser Rendering binding */
+  BROWSER?: unknown;
+  /** Agent Memory binding */
+  MEMORY?: any;
   /** Per-session Durable Object namespace. */
   CH1TTY: DurableObjectNamespace;
   /** Vectorize index for tool-embedding search (768-dim, cosine). */
