@@ -42,14 +42,18 @@ function getCallTimeoutMs(): number {
 
 function isConnectionError(err: unknown): boolean {
   if (err instanceof Error) {
-    if (err.message.includes('timed out after')) {
-      return true;
-    }
-    if ('code' in err && typeof (err as any).code === 'number') {
-      const code = (err as any).code;
-      // -32000 is ErrorCode.ConnectionClosed. Any other JSON-RPC/MCP error code
-      // (like MethodNotFound -32601, InvalidParams -32602) is a valid response from the backend.
-      return code === -32000;
+    if (err.message.includes('timed out after')) return true;
+    // Node.js fetch throws TypeError with message 'fetch failed' for ECONNREFUSED etc.
+    if (err.message.includes('fetch failed')) return true;
+    // Auth token retrieval failure — treat as connection error so circuit breaker advances.
+    if (err.message.startsWith('auth_token_unavailable')) return true;
+    // MCP SDK StreamableHTTP transport wraps HTTP 4xx/5xx errors with this prefix.
+    if (err.message.includes('Streamable HTTP error:')) return true;
+    if ('code' in err && typeof (err as { code?: unknown }).code === 'number') {
+      const code = (err as { code: number }).code;
+      // -32000 = ConnectionClosed; -32603 = InternalError (e.g. HTTP 500 from backend).
+      // -32601 (MethodNotFound) and -32602 (InvalidParams) are valid backend responses, not transport errors.
+      return code === -32000 || code === -32603;
     }
   }
   return false;
@@ -240,7 +244,7 @@ export class RemoteProxy implements Backend {
     }
   }
 
-  async callTool(serverId: string, toolName: string, args: Record<string, unknown> = {}): Promise<ToolCallResult> {
+  async callTool(serverId: string, toolName: string, args: Record<string, unknown> = {}, options?: { timeoutMs?: number }): Promise<ToolCallResult> {
     const config = this.configs.get(serverId);
     if (!config) {
       return {
@@ -260,7 +264,7 @@ export class RemoteProxy implements Backend {
       const conn = await this.connectWithReconnect(serverId);
       const result = await withTimeout(
         conn.client.callTool({ name: toolName, arguments: args }),
-        getCallTimeoutMs(),
+        options?.timeoutMs ?? getCallTimeoutMs(),
         `callTool ${serverId}/${toolName}`,
       );
       this.breaker.recordSuccess(serverId);

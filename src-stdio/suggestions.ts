@@ -64,6 +64,20 @@ export function clearSuggestionsCache(): void {
   _catalogPath = null;
 }
 
+/**
+ * Find the first catalog combo whose chain starts with the given tool name.
+ * Returns null when no match or the focus has no catalog entry.
+ */
+export function findCatalogCombo(
+  toolName: string,
+  focusName: string,
+  catalog: Record<string, FocusSuggestions>,
+): SuggestedCombo | null {
+  const profile = catalog[focusName];
+  if (!profile) return null;
+  return profile.combos.find((c) => c.chain[0] === toolName) ?? null;
+}
+
 /** Score a combo against non-empty intent terms. Fraction of terms found in name+accomplishes+chain. */
 function scoreCombo(combo: SuggestedCombo, terms: string[]): number {
   const haystack = `${combo.name} ${combo.accomplishes} ${combo.chain.join(' ')}`.toLowerCase();

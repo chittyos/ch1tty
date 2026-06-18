@@ -192,7 +192,14 @@ export class LedgerClient {
 
       for (const entry of batch) {
         try {
-          undefined
+          await this.backend!.callTool(this.serverId!, 'chitty_ledger_record', {
+            event_type: entry.event_type,
+            entity_id: entry.entity_id,
+            session_id: entry.session_id,
+            metadata: entry.metadata,
+            timestamp: entry.timestamp,
+          });
+          flushedCount++;
         } catch (err) {
           entry.retries++;
           if (entry.retries < MAX_RETRIES) {
@@ -233,6 +240,24 @@ export class LedgerClient {
       total += count;
     }
     return total;
+  }
+
+  /** Read up to `limit` most-recent entries from the dead-letter WAL file (chronological order). Skips malformed JSON and non-object lines. */
+  dlqReadEntries(limit = 50): object[] {
+    try {
+      const text = readFileSync(this.dlqPath, 'utf8');
+      const lines = text.split('\n').filter((l) => l.trim().length > 0);
+      const parsed: object[] = [];
+      for (const l of lines) {
+        try {
+          const v = JSON.parse(l) as unknown;
+          if (v !== null && typeof v === 'object' && !Array.isArray(v)) parsed.push(v as object);
+        } catch { /* skip malformed */ }
+      }
+      return parsed.slice(-limit);
+    } catch {
+      return [];
+    }
   }
 
   /** Stats snapshot for status endpoint. */

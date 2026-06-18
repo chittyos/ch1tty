@@ -44,6 +44,8 @@ export interface SessionContext {
   toolPatterns: Map<string, ToolPattern>;
   stagingComplete: boolean;
   serverAffinity: Map<string, number>; // serverId → recency score
+  focus?: string; // sticky focus profile name for this session
+  lastActiveAt: number; // ms timestamp — updated by onToolCall, used by evictStaleSessions
 }
 
 // ── Coordinator ───────────────────────────────────────────────
@@ -52,9 +54,12 @@ export class SessionCoordinator {
   private contexts = new Map<string, SessionContext>();
   private ecosystemBackend?: Backend;
   private ecosystemServerId?: string;
+  private evictTimer: ReturnType<typeof setInterval> | null = null;
+  private _evictedSessions = 0;
   readonly ledger: LedgerClient;
   readonly brain: OllamaBrain;
   readonly embeddingBrain: EmbeddingBrain;
+  readonly sessionTtlMs: number;
 
   constructor(
     brainConfig: Partial<OllamaBrainConfig> = {},
@@ -64,6 +69,14 @@ export class SessionCoordinator {
     this.ledger = new LedgerClient(ledgerDlqPath);
     this.brain = new OllamaBrain(brainConfig);
     this.embeddingBrain = new EmbeddingBrain(embedConfig);
+    this.sessionTtlMs = Number(process.env.CH1TTY_SESSION_TTL_MS ?? 3_600_000);
+    const evictIntervalMs = Number(process.env.CH1TTY_SESSION_EVICT_INTERVAL_MS ?? 300_000);
+    if (evictIntervalMs > 0 && this.sessionTtlMs > 0) {
+      this.evictTimer = setInterval(() => {
+        this.evictStaleSessions(Date.now(), this.sessionTtlMs);
+      }, evictIntervalMs);
+      this.evictTimer.unref();
+    }
     // Warm the primary embedding brain so the first cast doesn't pay model-load latency.
     void this.embeddingBrain.warmup().catch(() => {/* best-effort */});
     if (USE_OLLAMA_BRAIN) {
@@ -116,6 +129,7 @@ export class SessionCoordinator {
       toolPatterns: new Map(),
       stagingComplete: false,
       serverAffinity: new Map(),
+      lastActiveAt: Date.now(),
     };
     this.contexts.set(sessionId, ctx);
 
@@ -132,6 +146,8 @@ export class SessionCoordinator {
   onToolCall(sessionId: string, namespacedTool: string): void {
     const ctx = this.contexts.get(sessionId);
     if (!ctx) return;
+
+    ctx.lastActiveAt = Date.now();
 
     // Extract server from namespaced tool name
     const sep = namespacedTool.indexOf('/');
@@ -206,6 +222,11 @@ export class SessionCoordinator {
     return this.contexts.get(sessionId)?.entity;
   }
 
+  /** Get a single tool pattern by exact namespaced tool name for a session. */
+  getToolPattern(sessionId: string, toolName: string): ToolPattern | undefined {
+    return this.contexts.get(sessionId)?.toolPatterns.get(toolName);
+  }
+
   /** Get top tool patterns for a session. */
   getToolPatterns(sessionId: string, limit = 10): ToolPattern[] {
     const ctx = this.contexts.get(sessionId);
@@ -237,10 +258,58 @@ export class SessionCoordinator {
     return this.contexts.get(sessionId)?.stagingComplete ?? false;
   }
 
+  /** Whether a session context currently exists for this ID. */
+  hasSession(sessionId: string): boolean {
+    return this.contexts.has(sessionId);
+  }
+
+  /** Get the sticky focus profile name for a session (set via setSessionFocus). */
+  getSessionFocus(sessionId: string): string | undefined {
+    return this.contexts.get(sessionId)?.focus;
+  }
+
+  /** Persist a focus profile name as the sticky focus for a session. Pass undefined to clear. */
+  setSessionFocus(sessionId: string, focus: string | undefined): void {
+    const ctx = this.contexts.get(sessionId);
+    if (ctx) ctx.focus = focus;
+  }
+
+  /**
+   * Evict sessions that have been inactive longer than ttlMs.
+   * Only evicts staging-complete sessions. ttlMs=0 disables eviction.
+   * Returns the number of sessions evicted.
+   */
+  evictStaleSessions(now: number, ttlMs: number): number {
+    if (ttlMs <= 0) return 0;
+    const cutoff = now - ttlMs;
+    let count = 0;
+    for (const [id, ctx] of this.contexts) {
+      if (!ctx.stagingComplete) continue;
+      if (ctx.lastActiveAt > cutoff) continue;
+      this.contexts.delete(id);
+      count++;
+    }
+    this._evictedSessions += count;
+    return count;
+  }
+
+  /** Release in-flight context and stop the background eviction timer. */
+  close(): void {
+    if (this.evictTimer) {
+      clearInterval(this.evictTimer);
+      this.evictTimer = null;
+    }
+    this.contexts.clear();
+  }
+
   /** Snapshot for status endpoint. */
   getSnapshot(): {
     activeSessions: number;
     boundEntity: boolean;
+    evictedSessions: number;
+    sessionTtlMs: number;
+    topTools: string[];
+    toolsByServer: Record<string, number>;
     ledger: ReturnType<LedgerClient['getStats']>;
     brain: ReturnType<OllamaBrain['getStats']>;
     embeddingBrain: ReturnType<EmbeddingBrain['getStats']>;
@@ -249,18 +318,61 @@ export class SessionCoordinator {
       entity?: string;
       toolPatterns: number;
       stagingComplete: boolean;
+      topTools: string[];
+      sessionFocus?: string;
     }>;
   } {
-    const sessions = [...this.contexts.entries()].map(([id, ctx]) => ({
-      sessionId: id,
-      entity: ctx.entity?.chittyId,
-      toolPatterns: ctx.toolPatterns.size,
-      stagingComplete: ctx.stagingComplete,
-    }));
+    // Aggregate tool counts across all active sessions
+    const globalCounts = new Map<string, number>();
+    const serverCounts: Record<string, number> = {};
+
+    for (const ctx of this.contexts.values()) {
+      for (const [tool, pattern] of ctx.toolPatterns) {
+        globalCounts.set(tool, (globalCounts.get(tool) ?? 0) + pattern.count);
+        const sep = tool.indexOf('/');
+        if (sep > 0) {
+          const srvId = tool.slice(0, sep);
+          serverCounts[srvId] = (serverCounts[srvId] ?? 0) + pattern.count;
+        } else {
+          serverCounts[tool] = (serverCounts[tool] ?? 0) + pattern.count;
+        }
+      }
+    }
+
+    const topTools = [...globalCounts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([tool]) => tool);
+
+    const sessions = [...this.contexts.entries()].map(([id, ctx]) => {
+      const entry: {
+        sessionId: string;
+        entity?: string;
+        toolPatterns: number;
+        stagingComplete: boolean;
+        topTools: string[];
+        sessionFocus?: string;
+      } = {
+        sessionId: id,
+        entity: ctx.entity?.chittyId,
+        toolPatterns: ctx.toolPatterns.size,
+        stagingComplete: ctx.stagingComplete,
+        topTools: [...ctx.toolPatterns.values()]
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 5)
+          .map((p) => p.tool),
+      };
+      if (ctx.focus !== undefined) entry.sessionFocus = ctx.focus;
+      return entry;
+    });
 
     return {
       activeSessions: sessions.length,
       boundEntity: sessions.some((s) => s.entity !== undefined),
+      evictedSessions: this._evictedSessions,
+      sessionTtlMs: this.sessionTtlMs,
+      topTools,
+      toolsByServer: serverCounts,
       ledger: this.ledger.getStats(),
       brain: this.brain.getStats(),
       embeddingBrain: this.embeddingBrain.getStats(),
@@ -282,7 +394,7 @@ export class SessionCoordinator {
 
     // Step 1: Resolve entity via ContextConsciousness
     try {
-      const resolveResult = await this.callEcosystem('viewport_resolve_context', {
+      const resolveResult = await this.callEcosystem('context_resolve', {
         session_id: sessionId,
       });
       const resolved = this.parseResult(resolveResult);
@@ -303,7 +415,7 @@ export class SessionCoordinator {
     // Step 2: Load recent memories
     if (ctx.entity?.chittyId) {
       try {
-        const memResult = await this.callEcosystem('viewport_memory_recall', {
+        const memResult = await this.callEcosystem('chitty_memory_recall', {
           query: 'recent session context',
           limit: 5,
         });
@@ -322,7 +434,7 @@ export class SessionCoordinator {
     // Step 3: Load active workstreams
     if (ctx.entity?.chittyId) {
       try {
-        const wsResult = await this.callEcosystem('viewport_memory_recall', {
+        const wsResult = await this.callEcosystem('chitty_memory_recall', {
           query: 'active workstreams',
           limit: 10,
         });
