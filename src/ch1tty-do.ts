@@ -23,7 +23,7 @@ import { validateFocusProfiles, resolveFocus, isInFocus, applyFocusBias, type Fo
 import { getSuggestionsForFocus, type FocusSuggestions } from './suggestions.js';
 import { FOCUS_PROFILES_RAW, REMOTE_SERVERS } from './config-data.js';
 import { CodemodeBridge } from './codemode-bridge.js';
-import { OntologyClient } from '@chittyos/schema-client';
+import { OntologyClient } from './vendor/schema-client/index.js';
 import { createBrowserRuntime, type BrowserRuntime } from 'agents/browser/ai';
 import { VERSION } from './utils.js';
 import { log } from './logger.js';
