@@ -186,6 +186,25 @@ export class RemoteProxy implements Backend {
         cursor = result.nextCursor;
       } while (cursor);
 
+      // Wire up ChittySchema canonical tool schemas (Half 2)
+      // Normalizes the "Russian doll" nested schemas from upstream.
+      try {
+        const canonicalRes = await fetch(`https://schema.chitty.cc/api/tools/${serverId}`);
+        if (canonicalRes.ok) {
+          const canonicalData = await canonicalRes.json() as { tools: Array<{ name: string; canonicalSchema: Record<string, unknown> }> };
+          if (canonicalData.tools && Array.isArray(canonicalData.tools)) {
+            const canonicalMap = new Map(canonicalData.tools.map(t => [t.name, t.canonicalSchema]));
+            for (const tool of tools) {
+              if (canonicalMap.has(tool.name) && canonicalMap.get(tool.name)) {
+                tool.inputSchema = canonicalMap.get(tool.name)!;
+              }
+            }
+          }
+        }
+      } catch (err) {
+        log.error(`Failed to fetch canonical tools for ${serverId}: ${String(err)}`, serverId);
+      }
+
       conn.toolCache = { tools, expiresAt: Date.now() + TOOL_CACHE_TTL };
       this.breaker.recordSuccess(serverId);
       return tools;
