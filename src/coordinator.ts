@@ -39,6 +39,7 @@ export interface SessionContext {
   stagingComplete: boolean;
   serverAffinity: Map<string, number>;
   lastActivityAt: number;
+  sessionFocus?: string;
 }
 
 export class SessionCoordinator {
@@ -199,14 +200,21 @@ export class SessionCoordinator {
     brain: ReturnType<WorkersAiBrain['getStats']>;
     sessions: Array<{ sessionId: string; entity?: string; toolPatterns: number; stagingComplete: boolean }>;
   } {
+    const allPatterns = [...this.contexts.values()].flatMap((ctx) => [...ctx.toolPatterns.values()]);
+    const topTools = allPatterns
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5)
+      .map((p) => p.tool);
+    const toolsByServer: Record<string, number> = {};
+    for (const p of allPatterns) {
+      const server = p.tool.includes('/') ? (p.tool.split('/')[0] ?? 'unknown') : 'unknown';
+      toolsByServer[server] = (toolsByServer[server] ?? 0) + p.count;
+    }
+
     const sessions = [...this.contexts.entries()].map(([id, ctx]) => ({
       sessionId: id,
       entity: ctx.entity?.chittyId,
       toolPatterns: ctx.toolPatterns.size,
-      topTools: [...ctx.toolPatterns.values()]
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 5)
-        .map((p) => p.tool),
       stagingComplete: ctx.stagingComplete,
       ...(ctx.sessionFocus ? { sessionFocus: ctx.sessionFocus } : {}),
     }));

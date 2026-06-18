@@ -1,0 +1,14 @@
+{
+  "name": "@chittyos/schema-client",
+  "version": "0.0.1-stub",
+  "description": "Stub — real package lives in CHITTYFOUNDATION/chittyschema",
+  "type": "module",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "types": "./index.d.ts"
+    }
+  }
+}

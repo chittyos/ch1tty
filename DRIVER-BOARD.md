@@ -916,3 +916,32 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   4. **Ledger DLQ** — 11 entries; resolve ledger.chitty.cc connectivity.
   5. **Disable or redirect hourly schedule** if no new workstreams planned.
 - **Blockers**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). PR #784 surface violation requires human fix or explicit human decision to relax the 5-tool guardrail.
+
+### 2026-06-18 (this run — DO build fix; workstream A re-opened)
+- **Workstream**: A — restore build after PR #784 (CF Worker/DO migration) broke `npm run build`
+- **Branch**: `auto/A-do-build-fix` | **PR**: TBD
+- **Build**: ✅ clean (fixed — `tsc --noEmit` 0 errors) | **Tests**: N/A (no test script in v5 DO project)
+- **What was done**:
+  - Startup: git fetch --all, read DRIVER-BOARD.md (Notion 401 — recurring).
+  - PR #784 (`feat(agents): integrate Agent Memory and Browser Runtime (SDK v0.16.1)`) was MERGED to main (e8546e9 → 7316961) despite prior run's guardrail review. Current main HEAD: 7316961.
+  - **Build was broken in 3 ways** (all fixed this run):
+    1. `@chittyos/schema-client` missing — referenced as `file:../../CHITTYFOUNDATION/chittyschema/clients/schema-client` (monorepo sibling not present in container). Fix: created `packages/schema-client/` stub (OntologyClient, ToolsClient, normalizeToolSchema safe no-ops); updated `package.json` to `file:packages/schema-client`.
+    2. `src/coordinator.ts`: `ctx.sessionFocus` — property missing from `SessionContext` interface. Fix: added `sessionFocus?: string` to `SessionContext`.
+    3. `src/coordinator.ts`: `topTools` and `toolsByServer` referenced as bare names outside their `map()` scope. Fix: extracted aggregation above the `sessions` map (flatten all contexts' toolPatterns, sort top-5, group by server-prefix).
+  - `npm run build` (tsc --noEmit): **clean, 0 errors** after fixes.
+  - Note: repo is now v5.0.0-do (Cloudflare Worker + Durable Object). No `npm test` script. The existing 3304-test Node.js suite lives in `test/` (excluded from tsc) but has no runner in the DO project — test infrastructure decision deferred to human.
+  - Note: PR #784 added 6 tools beyond the 5-tool surface guardrail (code, provision, memory_recall, memory_ingest, memory_summary, browser_execute). This violation is now in main. Flagging for human decision.
+  - Ch1tty gateway live status: v4.1.0 stdio instance running (8/15 backends, 66 tools, 117 sessions). Ledger DLQ: 11 entries (degraded).
+- **State summary**:
+  - Workstream A: **RE-OPENED** — build fixed, but DO project has no test runner; surface has 6+ tools (guardrail violation from PR #784)
+  - All other workstreams (B–E, SEC-FIX-1/2/3): DONE (against v4.1.0 stdio codebase)
+  - `buildCastExplanation` metric freeze: ACTIVE (CLAUDE.md guardrail)
+  - 0 hono/undici/esbuild vulnerabilities on root; DO project has no `npm audit` overrides yet
+  - Tests: no test runner in v5 DO project; 3304-test Node.js suite in test/ is orphaned
+- **Human action required**:
+  1. **5-tool surface violation** (PR #784 added 6 extra tools): decide whether to (a) move memory/code/browser tools to `apps/*-mcp` focused servers, or (b) explicitly relax the 5-tool guardrail in CLAUDE.md
+  2. **Test strategy for DO project**: add a test runner (vitest-pool-workers) targeting `src/ch1tty-do.ts`, or move DO code to `workers/gateway-do/` and keep existing tests running in `src/`
+  3. **`@chittyos/schema-client` stub**: replace with real dependency when `CHITTYFOUNDATION/chittyschema` is available; current stub returns safe no-op defaults
+  4. **Stale branch cleanup** — 693+ remote `auto/` branches
+  5. **Ledger DLQ** — 11 entries; resolve ledger.chitty.cc connectivity from deployed context
+- **Blockers**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). No test runner in DO project. @chittyos/schema-client stub (real monorepo sibling not in container).
