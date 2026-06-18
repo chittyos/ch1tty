@@ -22,6 +22,7 @@ import { VERSION, withTimeout, normalizeToolResult, resolveSecret } from './util
 import { log } from './logger.js';
 import { CircuitBreaker } from './circuit-breaker.js';
 import { AUTH_TOKEN_ENV } from './config-data.js';
+import { ToolsClient, normalizeToolSchema } from '@chittyos/schema-client';
 
 interface RemoteConnection {
   client: Client;
@@ -53,6 +54,10 @@ export class RemoteProxy implements Backend {
   private connections = new Map<string, RemoteConnection>();
   private connecting = new Map<string, Promise<RemoteConnection>>();
   private breaker = new CircuitBreaker();
+  // ChittySchema canonical tool-schema client. Resolves the FLAT canonical
+  // schema per tool; when ChittySchema has none, the upstream self-report is
+  // normalized locally via the SAME de-nester (one shared implementation).
+  private toolsClient = new ToolsClient();
 
   constructor(private env: Env) {}
 
@@ -186,23 +191,32 @@ export class RemoteProxy implements Backend {
         cursor = result.nextCursor;
       } while (cursor);
 
-      // Wire up ChittySchema canonical tool schemas (Half 2)
-      // Normalizes the "Russian doll" nested schemas from upstream.
+      // Resolve each tool's schema through ChittySchema's canonical tool-schema
+      // surface via @chittyos/schema-client. When ChittySchema holds a canonical
+      // (de-nested) schema we use it; otherwise we run the upstream self-report
+      // through the SAME normalizer locally so a 'Russian doll' schema is never
+      // federated raw. Failure is non-fatal (live/cache/local-fallback discipline
+      // mirroring the ontology client) — a ChittySchema outage degrades to local
+      // normalization, never to broken tool listing.
       try {
-        const canonicalRes = await fetch(`https://schema.chitty.cc/api/tools/${serverId}`);
-        if (canonicalRes.ok) {
-          const canonicalData = await canonicalRes.json() as { tools: Array<{ name: string; canonicalSchema: Record<string, unknown> }> };
-          if (canonicalData.tools && Array.isArray(canonicalData.tools)) {
-            const canonicalMap = new Map(canonicalData.tools.map(t => [t.name, t.canonicalSchema]));
-            for (const tool of tools) {
-              if (canonicalMap.has(tool.name) && canonicalMap.get(tool.name)) {
-                tool.inputSchema = canonicalMap.get(tool.name)!;
-              }
-            }
+        const canonical = await this.toolsClient.fetchCanonicalTools(serverId);
+        for (const tool of tools) {
+          const hit = canonical.get(tool.name);
+          if (hit?.canonicalSchema) {
+            tool.inputSchema = hit.canonicalSchema as Record<string, unknown>;
+          } else {
+            const flat = normalizeToolSchema(tool.inputSchema);
+            if (flat) tool.inputSchema = flat as Record<string, unknown>;
           }
         }
       } catch (err) {
-        log.error(`Failed to fetch canonical tools for ${serverId}: ${String(err)}`, serverId);
+        // ChittySchema unreachable: fall back to local normalization for every
+        // tool so the surface is still de-nested.
+        log.error(`Canonical tool resolve failed for ${serverId}, normalizing locally: ${String(err)}`, serverId);
+        for (const tool of tools) {
+          const flat = normalizeToolSchema(tool.inputSchema);
+          if (flat) tool.inputSchema = flat as Record<string, unknown>;
+        }
       }
 
       conn.toolCache = { tools, expiresAt: Date.now() + TOOL_CACHE_TTL };

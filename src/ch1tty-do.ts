@@ -21,8 +21,10 @@ import { WorkersAiBrain, type ToolCandidate } from './workers-ai-brain.js';
 import { validateServersConfig } from './config.js';
 import { validateFocusProfiles, resolveFocus, isInFocus, applyFocusBias, type FocusProfile, type FocusProfiles } from './focus.js';
 import { getSuggestionsForFocus, type FocusSuggestions } from './suggestions.js';
-import { REMOTE_SERVERS, FOCUS_PROFILES_RAW } from './config-data.js';
+import { FOCUS_PROFILES_RAW, REMOTE_SERVERS } from './config-data.js';
 import { CodemodeBridge } from './codemode-bridge.js';
+import { OntologyClient } from '@chittyos/schema-client';
+import { createBrowserRuntime, type BrowserRuntime } from 'agents/browser/ai';
 import { VERSION } from './utils.js';
 import { log } from './logger.js';
 
@@ -34,6 +36,19 @@ const META_TOOL_VERBS: ReadonlySet<string> = new Set([
 const REGISTRY_TTL = 5 * 60 * 1000;
 /** Idle window after which alarm() runs onSessionEnd for a session. */
 const SESSION_IDLE_MS = 15 * 60 * 1000;
+
+/**
+ * Extract the canonical entity-type code (T position) from a ChittyID of the
+ * form VV-G-LLL-SSSS-T-YM-C-X. Returns the single-letter code (e.g. 'P') when
+ * the id matches that shape, else null (callers skip type validation rather
+ * than guess). @canon chittycanon://gov/governance#core-types
+ */
+function extractEntityTypeCode(entityId: string): string | null {
+  const parts = entityId.split('-');
+  // VV-G-LLL-SSSS-T-YM-C-X => 8 segments, type code is index 4.
+  if (parts.length >= 5 && /^[A-Z]$/.test(parts[4]!)) return parts[4]!;
+  return null;
+}
 
 interface NamespacedTool {
   serverId: string;
@@ -54,6 +69,11 @@ export class Ch1ttyDO extends DurableObject<Env> {
   private evaluator: Evaluator;
   private brain: WorkersAiBrain;
   private codemode: CodemodeBridge;
+  // Canonical entity-type ontology (P/L/T/E/A) via @chittyos/schema-client.
+  // Used to type-check the entity a provision_bind attaches to.
+  private ontology: OntologyClient;
+  private browserRuntime?: BrowserRuntime;
+  private memoryNs?: any;
 
   private configs: ServerConfig[];
   private focusProfiles: FocusProfiles;
@@ -80,6 +100,18 @@ export class Ch1ttyDO extends DurableObject<Env> {
     this.configs = validateServersConfig({ servers: REMOTE_SERVERS }).servers;
     this.focusProfiles = validateFocusProfiles(FOCUS_PROFILES_RAW);
     this.codemode = new CodemodeBridge(env.LOADER);
+    this.ontology = new OntologyClient();
+    if (env.BROWSER) {
+      this.browserRuntime = createBrowserRuntime({
+        ctx,
+        browser: env.BROWSER as any,
+        loader: env.LOADER as any,
+        session: { mode: 'dynamic' }
+      });
+    }
+    if (env.MEMORY) {
+      this.memoryNs = env.MEMORY;
+    }
 
     this.rebuildBackends();
   }
@@ -240,7 +272,7 @@ export class Ch1ttyDO extends DurableObject<Env> {
 
   private metaTools() {
     const remoteIds = this.activeConfigs().filter((c) => c.type === 'remote').map((c) => c.id);
-    return [
+    const tools = [
       {
         name: `${META_SERVER_ID}${SEPARATOR}search`,
         description: 'Search the tool registry. Returns matching tool names, descriptions, and input schemas. Use before execute.',
@@ -313,15 +345,75 @@ export class Ch1ttyDO extends DurableObject<Env> {
       },
       {
         name: `${META_SERVER_ID}${SEPARATOR}status`,
-        description: 'Gateway status — connected servers, tool counts, cache ages, brain/ledger health',
+        description: 'Get the status of all configured backend MCP servers',
         inputSchema: { type: 'object' as const },
       },
       {
-        name: `${META_SERVER_ID}${SEPARATOR}reload`,
-        description: 'Rebuild the backend registry from the bundled config',
-        inputSchema: { type: 'object' as const },
+        name: `${META_SERVER_ID}${SEPARATOR}memory_recall`,
+        description: 'Search stored memories in a profile. Returns a synthesized answer grounded in the stored content.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            profile: { type: 'string', description: 'Name of the memory profile (e.g. user ID, team name, case ID).' },
+            query: { type: 'string', description: 'Natural language question or search query.' },
+          },
+          required: ['profile', 'query']
+        }
+      },
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}memory_ingest`,
+        description: 'Extract structured memories from a conversation. Identifies facts, events, instructions, and tasks automatically.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            profile: { type: 'string' },
+            sessionId: { type: 'string', description: 'Optional session identifier to scope extraction.' },
+            messages: {
+              type: 'array',
+              description: 'Conversation messages to process',
+              items: {
+                type: 'object',
+                properties: {
+                  role: { type: 'string', enum: ['system', 'user', 'assistant'] },
+                  content: { type: 'string' }
+                },
+                required: ['role', 'content']
+              }
+            }
+          },
+          required: ['profile', 'messages']
+        }
+      },
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}memory_summary`,
+        description: 'Generate a structured Markdown summary of everything stored in a memory profile.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            profile: { type: 'string' },
+            sessionId: { type: 'string' }
+          },
+          required: ['profile']
+        }
       },
     ];
+
+    if (this.browserRuntime && this.browserRuntime.tools.browser_execute) {
+      const btool = this.browserRuntime.tools.browser_execute;
+      tools.push({
+        name: `${META_SERVER_ID}${SEPARATOR}browser_execute`,
+        description: btool.description || 'TypeScript async arrow function that uses the cdp connector',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            code: { type: 'string', description: 'TypeScript async arrow function that uses the cdp connector' }
+          },
+          required: ['code']
+        }
+      });
+    }
+
+    return tools;
   }
 
   private async handleMetaTool(toolName: string, args: Record<string, unknown>, sessionId?: string): Promise<ToolCallResult> {
@@ -331,6 +423,10 @@ export class Ch1ttyDO extends DurableObject<Env> {
       case 'search': result = await this.handleSearch(args, sessionId); break;
       case 'execute': result = await this.handleExecute(args, sessionId); break;
       case 'code': result = await this.handleCode(args, sessionId); break;
+      case 'browser_execute': result = await this.handleBrowserExecute(args); break;
+      case 'memory_recall': result = await this.handleMemoryRecall(args); break;
+      case 'memory_ingest': result = await this.handleMemoryIngest(args); break;
+      case 'memory_summary': result = await this.handleMemorySummary(args); break;
       case 'cast': result = await this.handleCast(args, sessionId); break;
       case 'provision': result = await this.handleProvision(args, sessionId); break;
       case 'status': result = await this.handleStatus(); break;
@@ -556,6 +652,71 @@ export class Ch1ttyDO extends DurableObject<Env> {
     };
   }
 
+  // ── Browser Code mode ───────────────────────────────────────
+
+  private async handleBrowserExecute(args: Record<string, unknown>): Promise<ToolCallResult> {
+    if (!this.browserRuntime || !this.browserRuntime.tools.browser_execute) {
+      return { content: [{ type: 'text', text: 'Browser Run not configured (missing BROWSER binding).' }], isError: true };
+    }
+    const btool = this.browserRuntime.tools.browser_execute;
+    if (!btool.execute) {
+      return { content: [{ type: 'text', text: 'Browser tool is not executable.' }], isError: true };
+    }
+    try {
+      const res = await btool.execute(args, { toolCallId: crypto.randomUUID(), messages: [] });
+      return {
+        content: [{
+          type: 'text',
+          text: typeof res === 'string' ? res : JSON.stringify(res, null, 2)
+        }]
+      };
+    } catch (err) {
+      return { content: [{ type: 'text', text: String(err) }], isError: true };
+    }
+  }
+
+  // ── Agent Memory ─────────────────────────────────────────────
+
+  private async handleMemoryRecall(args: Record<string, unknown>): Promise<ToolCallResult> {
+    if (!this.memoryNs) return { content: [{ type: 'text', text: 'Agent Memory not configured.' }], isError: true };
+    try {
+      const profileName = args.profile as string;
+      const query = args.query as string;
+      const profile = await this.memoryNs.getProfile(profileName);
+      const res = await profile.recall(query);
+      return { content: [{ type: 'text', text: JSON.stringify(res, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text', text: String(err) }], isError: true };
+    }
+  }
+
+  private async handleMemoryIngest(args: Record<string, unknown>): Promise<ToolCallResult> {
+    if (!this.memoryNs) return { content: [{ type: 'text', text: 'Agent Memory not configured.' }], isError: true };
+    try {
+      const profileName = args.profile as string;
+      const messages = args.messages as any[];
+      const opts = args.sessionId ? { sessionId: args.sessionId as string } : undefined;
+      const profile = await this.memoryNs.getProfile(profileName);
+      await profile.ingest(messages, opts);
+      return { content: [{ type: 'text', text: `Successfully ingested ${messages.length} messages into profile '${profileName}'.` }] };
+    } catch (err) {
+      return { content: [{ type: 'text', text: String(err) }], isError: true };
+    }
+  }
+
+  private async handleMemorySummary(args: Record<string, unknown>): Promise<ToolCallResult> {
+    if (!this.memoryNs) return { content: [{ type: 'text', text: 'Agent Memory not configured.' }], isError: true };
+    try {
+      const profileName = args.profile as string;
+      const opts = args.sessionId ? { sessionId: args.sessionId as string } : undefined;
+      const profile = await this.memoryNs.getProfile(profileName);
+      const res = await profile.getSummary(opts);
+      return { content: [{ type: 'text', text: res.summary }] };
+    } catch (err) {
+      return { content: [{ type: 'text', text: String(err) }], isError: true };
+    }
+  }
+
   // ── Provision (orchestrator provision_fork + provision_bind) ─
 
   private async handleProvision(args: Record<string, unknown>, sessionId?: string): Promise<ToolCallResult> {
@@ -563,6 +724,22 @@ export class Ch1ttyDO extends DurableObject<Env> {
     const entityId = typeof args.entityId === 'string' ? args.entityId.trim() : '';
     if (!intent || !entityId) {
       return { content: [{ type: 'text', text: 'Missing required "intent" and/or "entityId".' }], isError: true };
+    }
+
+    // Entity typing: a ChittyID's type segment (VV-G-LLL-SSSS-T-YM-C-X) is the
+    // T position. Validate it against the canonical ontology (P/L/T/E/A) before
+    // binding. canon down => OntologyClient falls back to the five core types,
+    // so a recognized type still passes; an unrecognized type is rejected up
+    // front rather than binding a malformed entity.
+    const typeCode = extractEntityTypeCode(entityId);
+    if (typeCode) {
+      const known = await this.ontology.isValidType(typeCode).catch(() => true);
+      if (!known) {
+        return {
+          content: [{ type: 'text', text: `Entity "${entityId}" has non-canonical type "${typeCode}" (expected one of P/L/T/E/A). Refusing to provision.` }],
+          isError: true,
+        };
+      }
     }
     if (!this.proxy.isRegistered('orchestrator')) {
       return { content: [{ type: 'text', text: 'Orchestrator upstream not registered — cannot provision.' }], isError: true };
