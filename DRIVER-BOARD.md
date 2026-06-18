@@ -809,3 +809,34 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   3. **Stale branch cleanup** — 688 stale `auto/` branches on remote (or enable auto-delete in repo settings)
   4. **Verify ChittyConnect** (`connect.chitty.cc/api/mcp`) auth token from deployed gateway
 - **Blockers (unchanged)**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). CI 0-jobs non-CodeQL (recurring, non-blocking).
+
+### 2026-06-18 (this run — PR #784 CF Worker/DO assessment; PR #783 merged)
+- **Workstream**: Housekeeping — assess new PR #784 (CF Worker + DO migration); merge PR #783 board log
+- **Branch**: `auto/board-pr784-assessment` | **PR**: TBD
+- **Build**: clean | **Tests**: 3304/0/2 (confirmed on main HEAD 84ca710)
+- **What was done**:
+  - Startup: npm ci clean, build clean, npm test: 3304/0/2. Board read from DRIVER-BOARD.md (Notion 401 — recurring).
+  - `git fetch --all`: 759 remote branches (700+ stale metric/catalog auto/ branches, no new open PRs besides #783 and #784).
+  - **PR #783** (`auto/board-sec-fix-3-done`): board-only update, all 3 CodeQL ✅, `mergeable_state: clean`. Squash-merged → 84ca710.
+  - **PR #784** (`feat/ch1tty-do-codemode`): 8 commits from June 10–18, 47 files changed, 13,532 additions, 2,325 deletions. All 3 CodeQL checks ✅ but `mergeable_state: dirty` (git history divergence — branch built atop catalog commits not in squash-merged main; first 2 commits already upstream).
+    - Core content: ports the ch1tty gateway from Node.js stdio/HTTP to **Cloudflare Workers + Durable Objects** per CHITTY.md split-architecture. DO holds session/coordinator/ledger/evaluator per-session in SQLite; alarm() closes idle sessions; Workers AI replaces Ollama; remote-proxy no longer shells to chitty-mcp-token (tokens from env Secrets Store). Old stdio sources archived to `src-stdio/`.
+    - **Blocker for merge**: root `package.json` scripts changed to `wrangler deploy`/`wrangler dev`; `test` script removed entirely. Existing 3304-test Node.js suite tests `src/aggregator.ts` etc. which no longer exist in DO version. `npm test` would fail.
+    - **Resolution options** (human decision required):
+      a. Move Worker code to `workers/gateway-do/` (separate package.json), keep `src/` Node.js stdio intact — tests continue passing; Worker deployed separately
+      b. Port the test suite to test `src/ch1tty-do.ts` and the Worker runtime — significant work
+      c. Keep as long-lived feature branch; add tests for the DO implementation before landing
+  - No code changes to the gateway source this run.
+- **State summary**:
+  - All workstreams A–E + F–WWWWWWW + SEC-FIX + SEC-FIX-2 + SEC-FIX-3: DONE
+  - PR #784 (`feat/ch1tty-do-codemode`): OPEN — in-flight CF Worker + DO migration, needs test strategy decision before landing
+  - `buildCastExplanation` metric freeze: ACTIVE (CLAUDE.md guardrail)
+  - 0 vulnerabilities; 3304/0/2 tests on main
+  - Stale branches: ~759 remote `auto/` branches
+- **Human action required**:
+  1. **PR #784 test strategy** — decide (a), (b), or (c) above for the CF Worker migration; add direction to DRIVER-BOARD.md so next run can advance it
+  2. **Add new workstreams** if any beyond the DO migration are planned
+  3. **Disable or redirect hourly schedule** if no new workstreams are planned
+  4. **Stale branch cleanup** — ~759 stale `auto/` branches (enable auto-delete in repo settings or run bulk `git push origin --delete`)
+  5. **Worker dev-toolchain vulns** (wrangler/miniflare/esbuild LOW) — require Cloudflare dep upgrade decision
+  6. **Verify ChittyConnect** (`connect.chitty.cc/api/mcp`) auth token from deployed gateway
+- **Blockers**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). CI 0-jobs non-CodeQL (recurring, non-blocking).
