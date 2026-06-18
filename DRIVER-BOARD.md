@@ -8,7 +8,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 ## Workstream Status (A–E: original; F+: ongoing observability improvements; SEC-FIX: security)
 
 
-- [ ] **SEC-FIX** — Fix Dependabot high-severity `hono` vulnerability: `"overrides": {"hono": ">=4.12.25"}` in package.json. PR `auto/sec-hono-override` — in progress (2026-06-18).
+- [ ] **SEC-FIX** — Fix Dependabot high-severity `hono` vulnerability: `"overrides": {"hono": ">=4.12.25"}` in package.json. PR #773 `auto/sec-hono-override` — open for review (2026-06-18).
 - [x] **A** — Gateway up/refreshed/tested. Build clean, 5 meta-tools confirmed. DONE.
 - [x] **B** — GitHub MCP migration: `servers.json` github → `https://api.githubcopilot.com/mcp/` with envHeaders. DONE.
 - [x] **C** — Focus-profile layer: `focus-profiles.json` (6 profiles), CH1TTY_FOCUS, per-call focus param, status reporting, tests. DONE.
@@ -627,7 +627,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 ### 2026-06-18 (this run — Dependabot security fix)
 - **Workstream**: SEC-FIX — fix high-severity Dependabot `hono` vulnerability (GHSA-wwfh-h76j-fc44 + 4 co-advisories)
-- **Branch**: `auto/sec-hono-override` | **PR**: pending
+- **Branch**: `auto/sec-hono-override` | **PR**: #773 https://github.com/chittyos/ch1tty/pull/773
 - **Build**: clean | **Tests**: 3304/0/2 (confirmed pre-fix; post-fix run in progress)
 - **What was done**:
   - Startup: npm ci clean, build clean, 3304/0/2 on main HEAD 4757b04.
