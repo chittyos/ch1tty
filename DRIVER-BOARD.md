@@ -916,3 +916,25 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   4. **Ledger DLQ** — 11 entries; resolve ledger.chitty.cc connectivity.
   5. **Disable or redirect hourly schedule** if no new workstreams planned.
 - **Blockers**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). PR #784 surface violation requires human fix or explicit human decision to relax the 5-tool guardrail.
+
+### 2026-06-18 (this run — SEC-FIX-4: restore stdio stack after PR #784 regression)
+- **Workstream**: SEC-FIX-4 — fix critical regression introduced by PR #784 merge
+- **Branch/PR**: `auto/sec-fix-4-root-wrangler-undici-ws` → PR #790 (open, CI in progress)
+- **Build**: clean | **Tests**: 3304/0/2 (0 fail; was 0 passing before fix)
+- **npm audit**: 0 vulnerabilities (package-lock.json regenerated; wrangler/miniflare/undici/ws removed)
+- **What was done**:
+  - PR #784 had been merged to main. It replaced `src/` wholesale with CF Worker/DO code, causing all 3304 tests to fail (imports from `../src/` resolved to Worker stubs with no stdio logic).
+  - Restored `package.json` / `tsconfig.json` to Node.js stdio config.
+  - Regenerated `package-lock.json` — removed stale wrangler/miniflare/undici/ws entries (was 4 high vulns → 0).
+  - Created 9 shim files in `src/` (each: `export * from '../src-stdio/foo.js'`) so test imports resolve without touching 3300+ test files.
+  - Fixed `src-stdio/coordinator.ts`: added `hasSession`, `getSessionFocus`, `setSessionFocus`, `evictStaleSessions`, session TTL eviction timer; corrected tool names; extended `getSnapshot` with `topTools`, `toolsByServer`, `evictedSessions`, `sessionTtlMs`, per-session `sessionFocus`.
+  - Fixed `src-stdio/ledger.ts`: implemented `flush()` callTool body (was `try { undefined }`); added `dlqReadEntries()`.
+  - Fixed `src-stdio/suggestions.ts`: added `findCatalogCombo()` missing from stdio version.
+  - Fixed `src-stdio/types.ts`: added `options?: { timeoutMs?: number }` to `Backend.callTool`.
+  - Fixed `src-stdio/remote-proxy.ts`: accept `timeoutMs` option; broadened `isConnectionError` to catch `'Streamable HTTP error:'` (MCP SDK StreamableHTTP wraps HTTP 4xx/5xx) and `'fetch failed'` (ECONNREFUSED).
+  - PR #790 opened; subscribed to activity; CI CodeQL in progress.
+- **State summary**:
+  - PR #790: OPEN — CI CodeQL in progress; no review comments
+  - All workstreams A–E: DONE
+  - Tests: 3304/0/2 on branch (0 vulns)
+- **Blockers**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). CI 0-jobs non-CodeQL (recurring, non-blocking).
