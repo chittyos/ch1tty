@@ -51,9 +51,12 @@ function isConnectionError(err: unknown): boolean {
     if (err.message.includes('Streamable HTTP error:')) return true;
     if ('code' in err && typeof (err as { code?: unknown }).code === 'number') {
       const code = (err as { code: number }).code;
-      // -32000 = ConnectionClosed; -32603 = InternalError (e.g. HTTP 500 from backend).
-      // -32601 (MethodNotFound) and -32602 (InvalidParams) are valid backend responses, not transport errors.
-      return code === -32000 || code === -32603;
+      // -32000 = ConnectionClosed — unambiguously a transport error.
+      // -32603 (InternalError) is intentionally excluded: 'Streamable HTTP error:' already
+      // catches HTTP 500 responses, and -32603 at the McpError level may be an
+      // application-level tool error on a healthy connection — evicting for it would
+      // incorrectly open the circuit breaker for unrelated tools on the same backend.
+      return code === -32000;
     }
   }
   return false;

@@ -192,13 +192,15 @@ export class LedgerClient {
 
       for (const entry of batch) {
         try {
-          await this.backend!.callTool(this.serverId!, 'chitty_ledger_record', {
+          const result = await this.backend!.callTool(this.serverId!, 'chitty_ledger_record', {
             event_type: entry.event_type,
             entity_id: entry.entity_id,
             session_id: entry.session_id,
             metadata: entry.metadata,
             timestamp: entry.timestamp,
           });
+          // RemoteProxy returns isError:true without throwing for circuit-open / unknown server.
+          if (result.isError) throw new Error(`ledger write rejected: ${JSON.stringify(result.content)}`);
           flushedCount++;
         } catch (err) {
           entry.retries++;
