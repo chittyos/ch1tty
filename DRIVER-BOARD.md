@@ -919,7 +919,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 ### 2026-06-18 (this run — SEC-FIX-4: restore stdio stack after PR #784 regression)
 - **Workstream**: SEC-FIX-4 — fix critical regression introduced by PR #784 merge
-- **Branch/PR**: `auto/sec-fix-4-root-wrangler-undici-ws` → PR #790 (open, CI in progress)
+- **Branch/PR**: `auto/sec-fix-4-root-wrangler-undici-ws` → PR #790 ✅ MERGED
 - **Build**: clean | **Tests**: 3304/0/2 (0 fail; was 0 passing before fix)
 - **npm audit**: 0 vulnerabilities (package-lock.json regenerated; wrangler/miniflare/undici/ws removed)
 - **What was done**:
