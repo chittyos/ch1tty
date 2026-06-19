@@ -205,6 +205,31 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 ## Run Log
 
+### 2026-06-19 (this run — idle; 16th+ consecutive idle run)
+- **Workstream**: None — all workstreams A–AAAAAAAAA + SEC-FIX 1–4 done; no new workstreams defined
+- **Build**: clean (ch1tty@4.1.0) | **Tests**: 1337/0/2 (down from 3304 after PR #802 purged 246 prohibited metric test files) | **Audit**: 0 vulnerabilities
+- **What was done**:
+  - `npm ci` clean, `npm run build` clean, `npm test`: 1337/0/2. `npm audit`: 0 vulnerabilities.
+  - Board read from DRIVER-BOARD.md (Notion 401 — recurring). `git fetch --all`.
+  - No open PRs. HEAD: 786c917 (PR #803 — prior run board log).
+  - Prior run (PR #802, dc13955) purged 246 prohibited `buildCastExplanation` metric test files. Test count dropped from 3304 to 1337. 163 test files remain, 45 suites, all green. PR #802 commit explicitly notes: "source metrics remain in src-stdio/aggregator.ts and require a separate human decision to revert."
+  - No code changes made this run — system at steady state.
+- **State summary**:
+  - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4: DONE
+  - `buildCastExplanation` metric freeze: ACTIVE. 246 rogue test files PURGED (PR #802, 2026-06-19). Source metrics still in `src-stdio/aggregator.ts` — pending human decision (a) revert or (b) accept as permanent debt.
+  - `verbosity` param: SHIPPED (src-stdio/aggregator.ts, tested in test/cast-explain-verbosity.test.ts).
+  - Tests: 1337/0/2. Audit: 0. No open PRs. ~760+ stale remote `auto/` branches.
+- **Human action required** (16th+ consecutive idle run):
+  1. **Disable or redirect hourly schedule** — no incomplete workstreams; every run is idle
+  2. **Add new workstreams** to DRIVER-BOARD.md if any planned (e.g. new `apps/*-mcp` server, new backends, scenario expansion)
+  3. **Stale branch cleanup** — ~760+ remote `auto/` branches; enable auto-delete in repo settings or bulk-delete
+  4. **Source metric decision** — rogue `buildCastExplanation` metrics still in `src-stdio/aggregator.ts` (PR #802 deferred this to human); decide: (a) revert, (b) accept as permanent debt. Test files already purged (PR #802).
+  5. **`register-chittyconnect-mcp` merge decision** — PR #504 closed/deferred; merge to add ChittyConnect backend when surgery owner clears it
+  6. **Ledger DLQ** — 11+ entries; `ledger.chitty.cc` unreachable from remote container
+  7. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token` to restore Notion board
+- **Next run**: Same idle state expected unless new workstreams added or source-metric decision made.
+- **Blockers**: Notion 401. Ledger DLQ. PushNotification unavailable. CI 0-jobs non-CodeQL (recurring, non-blocking).
+
 ### 2026-06-19 (this run — idle; 15th+ consecutive idle run)
 - **Workstream**: None — all workstreams A–AAAAAAAAA + SEC-FIX 1–4 done; no new workstreams defined
 - **Build**: clean (ch1tty@4.1.0) | **Tests**: 3304/0/2 | **Audit**: 0 vulnerabilities
