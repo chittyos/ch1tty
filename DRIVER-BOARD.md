@@ -205,6 +205,33 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 ## Run Log
 
+### 2026-06-19 (this run — idle; 15th+ consecutive idle run)
+- **Workstream**: None — all workstreams A–AAAAAAAAA + SEC-FIX 1–4 done; no new workstreams defined
+- **Build**: clean (ch1tty@4.1.0) | **Tests**: 3304/0/2 | **Audit**: 0 vulnerabilities
+- **What was done**:
+  - `npm ci` clean, `npm run build` clean, `npm test`: 3304/0/2. `npm audit (root)`: 0 vulnerabilities.
+  - Board read from DRIVER-BOARD.md (Notion 401 — recurring). `git fetch --all`.
+  - 1 open PR found: PR #800 (`auto/board-run-log-14th-idle-run`). CI: 3/3 ✅ green. Squash-merged → 7e43513.
+  - Confirmed workstreams A–E all complete: build green, GitHub remote endpoint (https://api.githubcopilot.com/mcp/) in servers.json, focus-profiles.json + src/focus.ts, test/scenario.test.ts + test/simulation.test.ts, focus-suggestions.json — all present.
+  - `buildCastExplanation` metric freeze guardrail confirmed active — no new metrics added.
+  - No code changes made — system at steady state.
+  - Codex review on PR #801 flagged 3 board issues (ordering, completion range, dropped human actions) — corrected in this commit.
+- **State summary**:
+  - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4: DONE
+  - `buildCastExplanation` metric freeze: ACTIVE (CLAUDE.md guardrail). 246 ratio test files as historical debt on main.
+  - `verbosity` param: SHIPPED (src-stdio/aggregator.ts, tested in test/cast-explain-verbosity.test.ts).
+  - Tests: 3304/0/2. Audit: 0. PR #801 open (this run's log, CI in progress). ~760+ stale remote `auto/` branches.
+- **Human action required** (15th+ consecutive idle run — same as all prior idle runs):
+  1. **Disable or redirect hourly schedule** — no incomplete workstreams; every run is idle; new auto/ ratio-branch batches keep appearing
+  2. **Add new workstreams** to DRIVER-BOARD.md if any planned (e.g. new `apps/*-mcp` server, new backends, scenario expansion)
+  3. **Stale branch cleanup** — ~760+ remote `auto/` branches; enable auto-delete in repo settings or bulk-delete
+  4. **`register-chittyconnect-mcp` merge decision** — PR #504 closed/deferred; merge to add ChittyConnect backend when surgery owner clears it
+  5. **Rogue cast-explain metrics** — 246 test files + source metrics violate CLAUDE.md freeze; decide: (a) revert, (b) accept as debt
+  6. **Ledger DLQ** — 11+ entries; `ledger.chitty.cc` unreachable from remote container
+  7. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token` to restore Notion board
+- **Next run**: Same idle state expected unless new workstreams added.
+- **Blockers**: Notion 401. Ledger DLQ. PushNotification unavailable. CI 0-jobs non-CodeQL (recurring, non-blocking).
+
 ### 2026-06-19 (this run — idle; 14th+ consecutive idle run)
 - **Workstream**: None — all workstreams A–AAAAAAAAA + SEC-FIX 1–4 done; no new workstreams defined
 - **Build**: clean (ch1tty@4.1.0) | **Tests**: 3304/0/2 | **Audit**: 0 vulnerabilities
@@ -1157,3 +1184,4 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - All workstreams A–E: DONE
   - Tests: 3304/0/2 on branch (0 vulns)
 - **Blockers**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). CI 0-jobs non-CodeQL (recurring, non-blocking).
+
