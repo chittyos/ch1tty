@@ -230,7 +230,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Next run**: Same idle state expected unless new workstreams added or source-metric decision made.
 - **Blockers**: Notion 401. Ledger DLQ. PushNotification unavailable. CI 0-jobs non-CodeQL (recurring, non-blocking).
 
-### 2026-06-19 (this run — idle; 15th+ consecutive idle run)
+### 2026-06-19 (prior run — idle; 15th+ consecutive idle run)
 - **Workstream**: None — all workstreams A–AAAAAAAAA + SEC-FIX 1–4 done; no new workstreams defined
 - **Build**: clean (ch1tty@4.1.0) | **Tests**: 3304/0/2 | **Audit**: 0 vulnerabilities
 - **What was done**:
@@ -1213,7 +1213,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 ### 2026-06-19 (this run — guardrail enforcement: purge 246 prohibited metric tests)
 - **Workstream**: Guardrail cleanup — enforce `buildCastExplanation` metric freeze (CLAUDE.md binding)
-- **Branch/PR**: `auto/purge-prohibited-metric-tests` → PR #802 (open; CodeQL in progress)
+- **Branch/PR**: `auto/purge-prohibited-metric-tests` → PR #802 ✅ MERGED (dc13955)
 - **Build**: clean (ch1tty@4.1.0) | **Tests**: 1337/0/2 (was 3304/0/2; 1967 rogue tests removed)
 - **What was done**:
   - Startup: npm ci clean, build clean, npm test: 3304/0/2. Board read from DRIVER-BOARD.md. `git fetch --all`.
@@ -1223,7 +1223,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - No open PRs before this run; 259 stale `auto/*-cast-explain-*-ratio` branches on remote (unchanged).
 - **State summary**:
   - All workstreams A–E: DONE
-  - PR #802: OPEN — guardrail test purge, CodeQL in progress, 0 review comments
+  - PR #802: ✅ MERGED (dc13955) — guardrail test purge complete
   - `buildCastExplanation` metric freeze: ACTIVE (CLAUDE.md guardrail)
   - Tests: 1337/0/2 on PR branch (main still shows 3304 until merge)
   - Source metrics in `src-stdio/aggregator.ts`: rogue computation variables (geometric/harmonic mean, P05–P95, trimmed/Winsorized mean, etc.) still present; serve no tests after this PR — removal requires human decision
