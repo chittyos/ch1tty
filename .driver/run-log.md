@@ -830,3 +830,16 @@
   3. `playwright/browser_select_option` (2/6) — 4 missing profiles
   4. `context7/resolve-library-id(playwright)` (1/6, in code) — 5 missing profiles
   - Human auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)` to unblock ~39 Notion combos
+
+---
+
+### 2026-06-19T18:00Z — 23rd idle run
+
+- **Workstream advanced**: None (all done — idle run)
+- **Startup checks**: `npm ci` clean, `npm run build` clean (0 errors), `npm test` → **1337 pass / 0 fail / 2 skip** ✓
+- **State inspection**: No open PRs. main at `5bc021d` (22nd run board log). All workstreams A–E confirmed done. Focus-suggestions catalog at 1750 combos / 596 verified (154th pass — COMPLETE COVERAGE per file comment). Focus-profiles.json: 6 profiles. GitHub entry in servers.json: `https://api.githubcopilot.com/mcp/` ✓. build compiles from `src-stdio/` (tsconfig rootDir confirmed) with `src/` as shim re-export layer (intentional, from PR #790 stdio restore).
+- **Guardrail audit**: Verified that PR #802 purged 246 prohibited buildCastExplanation metric test files (1337 tests = post-purge baseline) and PR #811 removed 15 rogue variable declarations + 100 stale description entries from `src-stdio/aggregator.ts`. Remaining 112 grep hits for ratio/percentile keywords in aggregator are legitimate pre-freeze fields (winnerScoreRatio, focusRankPercentile, runnerUpScore, etc.) that were present before the metric freeze. Source is clean.
+- **Rogue remote branches**: 718 remote `auto/` branches found (259 named `auto/NNNNNNNN-cast-explain-*-ratio` — all prohibited metric additions from earlier rogue runs; 459 other). No open PRs for any of them. All source violations already purged via PR #802 + #811. The 259 branches are harmless remote clutter. Human cleanup: `git push origin --delete <branch>` for each, or ask GitHub admin to bulk-delete branches matching `auto/[0-9]*-cast-explain-*`.
+- **Notion board**: Still unavailable (API 401). Using `.driver/run-log.md` + `DRIVER-BOARD.md` as substitute. Human fix: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`.
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E ✓ (all done)
+- **Next run**: Steady state — nothing to advance. If anything new is needed: (1) clean up 259 prohibited metric remote branches (human action); (2) restore Notion API token; (3) catalog verification of 1154 unverified combos requires auth tokens for Notion/GitHub/Stripe/Linear/Cloudflare/Neon.
