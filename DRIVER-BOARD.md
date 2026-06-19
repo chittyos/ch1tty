@@ -1236,3 +1236,29 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   5. **Disable or redirect hourly schedule** if no new workstreams planned
 - **Next run**: Check PR #802 CI; if green and no review blocks, merge. Then do source-metric cleanup if directed, else log idle.
 - **Blockers**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). Source metric cleanup requires human decision.
+
+### 2026-06-19 (this run — 17th idle run; merged PR #804; source metrics still pending)
+- **Workstream**: None — all workstreams A–E + SEC-FIX 1–4 done; no new workstreams defined
+- **Branch/PR**: `auto/board-run-log-17th-idle-run` → PR #805
+- **Build**: clean (ch1tty@4.1.0) | **Tests**: 1337/0/2 (confirmed on main HEAD f4777a9)
+- **What was done**:
+  - Startup: `npm ci` clean, `npm run build` clean, `npm test` 1337/0/2. Board read from DRIVER-BOARD.md (Notion 401 — recurring). `git fetch --all`.
+  - Found 1 open PR: #804 (idle board log, 3/3 CI green). Merged it → f4777a9. No code changes.
+  - Inspected `src-stdio/aggregator.ts` lines 2224–2465: confirmed ~30 rogue variable declarations (geometric/harmonic mean, P05/P10/P25/P75/P90/P95, MAD, robust skewness, quantile skewness, winsorized mean, Jain fairness index, trimmed mean) + hundreds of rogue output fields in the `full`-verbosity return object, all introduced by prior automated runs violating the `buildCastExplanation` metric freeze. Tests were deleted by PR #802; source code still computes and emits them. Deferred cleanup: source + output object are interleaved with legitimate fields; risk of removing legitimate fields without explicit direction from human.
+  - `buildCastExplanation` metric freeze guardrail confirmed active in CLAUDE.md — no new metrics added this run.
+  - 779 stale remote `auto/` branches (unchanged; bulk-delete requires human auth).
+- **State summary**:
+  - All workstreams A–E + F–RRRRRRR + SEC-FIX 1–4: DONE
+  - `buildCastExplanation` metric freeze: ACTIVE; source has ~30 rogue variables + hundreds of rogue output fields (dead code — no tests since PR #802)
+  - Tests: 1337/0/2 on main | Build: clean | 0 vulnerabilities
+  - No open PRs (besides this board log PR)
+  - 779 stale `auto/` branches on remote
+- **Human action required** (17th consecutive idle run):
+  1. **Source metric cleanup** (URGENT, 3rd+ run noting): rogue computation variables + output fields in `src-stdio/aggregator.ts` `buildCastExplanation` (~2224–2465). No tests. Violated CLAUDE.md guardrail. Human must confirm: (a) delete these dead-code blocks, or (b) accept as permanent debt. If (a), next run will execute the cleanup.
+  2. **Add new workstreams** — no incomplete workstreams; every run is idle. Candidates: new `apps/*-mcp`, backends, scenario expansion.
+  3. **Disable or redirect hourly schedule** if no new workstreams planned.
+  4. **Stale branch cleanup** — 779 remote `auto/` branches (enable auto-delete on merge in repo settings, or bulk-delete).
+  5. **Ledger DLQ** — resolve `ledger.chitty.cc` connectivity from deployed gateway.
+  6. **ChittyConnect auth** — verify `connect.chitty.cc/api/mcp` token from deployed gateway.
+- **Next run**: If human has confirmed source cleanup (a), delete rogue metrics from `src-stdio/aggregator.ts`. Otherwise log idle again.
+- **Blockers**: Notion API token invalid (401). Ledger DLQ (unreachable). Source metric decision pending. No new workstreams defined.
