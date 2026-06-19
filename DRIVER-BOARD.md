@@ -205,6 +205,32 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 ## Run Log
 
+### 2026-06-19 (this run — idle; 14th+ consecutive idle run)
+- **Workstream**: None — all workstreams A–AAAAAAAAA + SEC-FIX 1–4 done; no new workstreams defined
+- **Build**: clean (ch1tty@4.1.0) | **Tests**: 3304/0/2 | **Audit**: 0 vulnerabilities
+- **What was done**:
+  - npm ci clean, npm run build clean, npm test: 3306 total (3304 pass / 0 fail / 2 skip). npm audit: 0 vulnerabilities.
+  - Board read from DRIVER-BOARD.md (Notion 401 — recurring blocker). `git fetch --all`.
+  - HEAD: 6db978f (PR #799 — prior run: 13th+ idle run log). No open PRs (confirmed via GitHub MCP).
+  - `git fetch --all` pulled 16 new `auto/01010101–16161616-cast-explain-*-ratio` branches — same guardrail-violating pattern as prior batches; no PRs created from them.
+  - PushNotification tool unavailable (claude-code-remote MCP not connected — recurring).
+  - No code changes made — system at steady state.
+- **State summary**:
+  - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4: DONE
+  - `buildCastExplanation` metric freeze: ACTIVE (CLAUDE.md guardrail). 246 ratio test files as historical debt on main.
+  - `verbosity` param: SHIPPED (src-stdio/aggregator.ts, tested in test/cast-explain-verbosity.test.ts).
+  - Tests: 3304/0/2. Audit: 0. No open PRs. 706+ stale remote auto/ branches (batch of 16 new ratio branches since last run).
+- **Human action required** (14th+ consecutive idle run — same as all prior idle runs):
+  1. **Disable or redirect hourly schedule** — no incomplete workstreams; every run is idle; new auto/ ratio-branch batches keep appearing
+  2. **Add new workstreams** to DRIVER-BOARD.md if any planned (e.g. new `apps/*-mcp` server, new backends, scenario expansion)
+  3. **Stale branch cleanup** — 706+ remote `auto/` branches; enable auto-delete in repo settings or bulk-delete
+  4. **`register-chittyconnect-mcp` merge decision** — PR #504 closed/deferred; merge to add ChittyConnect backend when surgery owner clears it
+  5. **Rogue cast-explain metrics** — 246 test files + source metrics violate CLAUDE.md freeze; decide: (a) revert, (b) accept as debt
+  6. **Ledger DLQ** — 11+ entries; `ledger.chitty.cc` unreachable from remote container
+  7. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token` to restore Notion board
+- **Next run**: Same idle state expected unless new workstreams added. New batch of auto/ ratio-branches will arrive on any external push.
+- **Blockers**: Notion 401. Ledger DLQ. PushNotification unavailable. CI 0-jobs non-CodeQL (recurring, non-blocking).
+
 ### 2026-06-19 (this run — idle; 13th+ consecutive idle run)
 - **Workstream**: None — all workstreams A–AAAAAAAAA + SEC-FIX 1–4 done; no new workstreams defined
 - **Build**: clean (ch1tty@4.1.0) | **Tests**: 3304/0/2 | **Audit**: 0 vulnerabilities
