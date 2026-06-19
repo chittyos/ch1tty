@@ -211,7 +211,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **What was done**:
   - npm ci clean, build clean, npm test: 3304/0/2.
   - Board read from DRIVER-BOARD.md (Notion 401 — recurring blocker). `git fetch --all`.
-  - Remote branch count: 768 total (259 cast-explain rogue, 441 other auto). No open PRs.
+  - Remote branch count: 768 total (259 cast-explain auto, 441 other auto, 68 non-auto). No open PRs.
   - Ch1tty MCP status: no Notion server in registry (no mcp__notion__ tools available).
   - PushNotification / send_later tools not available in this session (claude-code-remote MCP not connected).
   - No code changes made — system at steady state.
@@ -219,11 +219,11 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4: DONE
   - `buildCastExplanation` metric freeze: ACTIVE (CLAUDE.md guardrail). 106 numeric-prefix rogue test files + 239 rogue metric strings in `src-stdio/aggregator.ts` already on main as historical debt.
   - 0 vulnerabilities; Tests: 3304/0/2; No open PRs.
-  - 768 stale `auto/` branches on remote (259 cast-explain, rest other auto).
+  - 768 remote branches: 700 auto (259 cast-explain, 441 other), 68 non-auto.
 - **Human action required** (8th+ consecutive idle run):
   1. **Disable or redirect hourly schedule** — no incomplete workstreams; every run is idle
   2. **Add new workstreams** to DRIVER-BOARD.md if any planned (candidates: new `apps/*-mcp` server, new backends, scenario expansion)
-  3. **Stale branch cleanup** — 768 remote `auto/` branches; enable auto-delete in repo settings or bulk-delete
+  3. **Stale branch cleanup** — 700 remote `auto/` branches (259 cast-explain + 441 other); enable auto-delete in repo settings or bulk-delete
   4. **Rogue cast-explain metrics** — 106 test files + source metrics violate CLAUDE.md freeze; decide: (a) revert, (b) accept as debt
   5. **Ledger DLQ** — 11+ entries; `ledger.chitty.cc` unreachable from remote container
   6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token` to restore Notion board
