@@ -205,6 +205,30 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 ## Run Log
 
+### 2026-06-19 (this run — idle; 24th consecutive idle run)
+- **Workstream**: None — all workstreams A–AAAAAAAAA + SEC-FIX 1–4 done; no new workstreams defined
+- **Build**: clean (ch1tty@4.1.0) | **Tests**: 1337/0/2 | **Audit**: 0 vulnerabilities | **Open PRs**: 0
+- **What was done**:
+  - `npm ci` clean, `npm run build` clean, `npm test`: 1337 pass / 0 fail / 2 skipped. `npm audit`: 0 vulnerabilities.
+  - Board read from DRIVER-BOARD.md (Notion 401 — recurring). `git fetch --all` pulled ~4 new stale remote branches (auto/ cast-explain batch). Total stale remote `auto/` branches: ~719.
+  - No open PRs. HEAD: fb32162 (PR #813 — 23rd idle run log). No code changes.
+  - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 confirmed DONE (24th consecutive idle run).
+  - `src-stdio/aggregator.ts` inspection: PR #811 removed 213 description-string lines from tool spec. Computation code for statistical moments (entropy, Gini, skewness, kurtosis) still present — these are legitimately the "120+ fields managed by verbosity". Rogue description strings removed; computation remains. No new action needed.
+  - PushNotification tool unavailable (claude-code-remote MCP not connected — recurring).
+- **State summary**:
+  - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4: DONE
+  - Tests: 1337/0/2. Audit: 0 vulnerabilities. No open PRs. ~719 stale remote `auto/` branches.
+  - `buildCastExplanation` metric freeze ACTIVE; PR #811 cleaned description strings; computation in src-stdio/aggregator.ts is the legitimate 120+ fields.
+- **Human action required** (24th consecutive idle run — same as all prior idle runs):
+  1. **Disable or redirect hourly schedule** — no incomplete workstreams; every run is idle and costs compute with no benefit
+  2. **Add new workstreams** to DRIVER-BOARD.md if any planned (e.g. new `apps/*-mcp` server, new backends, scenario expansion)
+  3. **Stale branch cleanup** — 719+ remote `auto/` branches; enable auto-delete in repo settings or run bulk-delete
+  4. **`register-chittyconnect-mcp` merge decision** — PR #504 closed/deferred; merge when surgery owner clears it
+  5. **Ledger DLQ** — 11+ entries; `ledger.chitty.cc` unreachable from remote container
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token` to restore Notion board
+- **Next run**: Same idle state expected unless new workstreams are added to this board.
+- **Blockers**: Notion 401. Ledger DLQ. PushNotification unavailable. CI 0-jobs non-CodeQL (recurring, non-blocking).
+
 ### 2026-06-19 (this run — idle; 21st+ consecutive idle run)
 - **Workstream**: None — all workstreams A–AAAAAAAAA + SEC-FIX 1–4 done; no new workstreams defined
 - **Build**: clean (ch1tty@4.1.0) | **Tests**: 1337/0/2 | **Audit**: 0 vulnerabilities | **Open PRs**: 0
