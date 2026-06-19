@@ -1358,3 +1358,29 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   6. **ChittyConnect auth** — verify `connect.chitty.cc/api/mcp` token from deployed gateway.
 - **Next run**: If human has confirmed source cleanup (a), delete rogue metrics from `src-stdio/aggregator.ts`. Otherwise log idle again.
 - **Blockers**: Notion API token invalid (401). Ledger DLQ (unreachable). Source metric decision pending. No new workstreams defined.
+
+### 2026-06-19 (22nd run — source cleanup landed; PR #810 merged; PR #811 description fix pushed)
+- **Workstream**: Source metric cleanup (`buildCastExplanation` guardrail enforcement)
+- **Branch/PR**: `auto/source-metric-cleanup` → PR #811 (open, CI in_progress at end of run)
+- **Build**: clean (ch1tty@4.1.0) | **Tests**: 1337/0/2 (unchanged)
+- **What was done**:
+  - Continued from previous session (context compacted). Resumed on `auto/source-metric-cleanup` branch.
+  - **Addressed Codex P2 on PR #811**: The `ch1tty/cast` tool description still advertised 100 removed explanation fields (candidateScoreGeometricMean, candidateScoreHarmonicMean, P05/P10/P25/P75/P90/P95, MAD/MADRatio, RobustSkewness, QuantileSkewness, WinsorizedMean, JainFairnessIndex, TrimmedMean, and all derived percentile cross-ratios). Deleted all 100 stale description lines from `src-stdio/aggregator.ts`. Build clean, tests 1337/0/2. Committed as `8c5ee13` and pushed.
+  - **Merged PR #810** (`chore/gitignore-claude-worktrees`): `.claude/` added to `.gitignore` + untracked `scheduled_tasks.lock`. All 3 CI checks green (CodeQL ✅, Analyze(actions) ✅, Analyze(javascript-typescript) ✅). Squash-merged → 56b8499.
+  - **PR #811 CI**: 2 checks (Analyze actions + JS-TS) in_progress at end of run; CodeRabbit rate-limited (not actionable).
+- **State summary**:
+  - All workstreams A–E + F–RRRRRRR + SEC-FIX 1–4: DONE
+  - PR #810: ✅ MERGED (56b8499) — `.gitignore` + untrack lock file
+  - PR #811: open — source metric cleanup (rogue variables + return fields + tool description stale entries all removed); awaiting CI
+  - `buildCastExplanation` metric freeze: ACTIVE; source code now clean (no rogue variables, no rogue return fields, no stale description entries)
+  - Tests: 1337/0/2 | Build: clean
+  - 779 stale `auto/` branches on remote (unchanged)
+- **Human action required**:
+  1. **Merge PR #811** once CI passes — pure dead-code deletion (no logic change)
+  2. **Add new workstreams** if planned (all existing workstreams done)
+  3. **Disable or redirect hourly schedule** if no new work
+  4. **Stale branch cleanup** — 779+ remote `auto/` branches
+  5. **Ledger DLQ** — resolve `ledger.chitty.cc` connectivity
+  6. **Notion token rotation** — `NOTION_API_TOKEN` returning 401
+- **Next run**: Check PR #811 CI; if green, merge. Otherwise log idle.
+- **Blockers**: Notion API token invalid (401). Ledger DLQ (unreachable).
