@@ -8,3 +8,6 @@ coverage/
 
 # local deploy/secret-shaped artifacts — never commit
 .deploy/
+
+# Claude Code tooling (worktrees, session state) — never commit
+.claude/
