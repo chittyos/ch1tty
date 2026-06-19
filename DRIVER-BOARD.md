@@ -205,7 +205,33 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 ## Run Log
 
-### 2026-06-19 (this run — idle; all workstreams done)
+### 2026-06-19 (this run — idle; 10th+ consecutive idle run)
+- **Workstream**: None — all workstreams A–AAAAAAAAA + SEC-FIX 1–4 done; no new workstreams defined
+- **Build**: clean (ch1tty@4.1.0) | **Tests**: 3304/0/2 | **Vulnerabilities**: 0
+- **What was done**:
+  - npm ci clean, build clean, npm test: 3304/0/2. npm audit: 0 vulnerabilities.
+  - Board read from DRIVER-BOARD.md (Notion 401 — recurring blocker). `git fetch --all`.
+  - Merged PR #795 (previous run's idle board log) → main at 4cc9fd1.
+  - Confirmed `verbosity` param ('low'/'medium'/'full') IS fully in codebase: `src/aggregator.ts` re-exports `src-stdio/aggregator.ts` which has the full implementation + 261-line test suite.
+  - Confirmed `auto/verbosity-prune-cast-explain` branch is STALE — pre-dates re-export refactor; no action needed.
+  - Open PRs: 0 (after merging #795). Open issues: 0. 702 remote auto/ branches (stale).
+  - No code changes made — system at steady state.
+- **State summary**:
+  - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4: DONE
+  - `buildCastExplanation` metric freeze: ACTIVE (CLAUDE.md guardrail). Historical debt on main.
+  - `verbosity` param: SHIPPED (src-stdio/aggregator.ts line 2013, tested in test/cast-explain-verbosity.test.ts).
+  - 0 vulnerabilities; Tests: 3304/0/2; No open PRs.
+  - 702+ remote auto/ branches (stale litter); new 01010101–30303030 batches pushed since last run.
+- **Human action required** (10th+ consecutive idle run):
+  1. **Disable or redirect hourly schedule** — no incomplete workstreams; every run is idle
+  2. **Add new workstreams** to DRIVER-BOARD.md if any planned (candidates: new `apps/*-mcp` server, new backends, scenario expansion)
+  3. **Stale branch cleanup** — 700+ remote `auto/` branches; enable auto-delete in repo settings or bulk-delete
+  4. **Rogue cast-explain metrics** — historical debt; decide: (a) revert, (b) accept as technical debt
+  5. **Ledger DLQ** — 11+ entries; `ledger.chitty.cc` unreachable from remote container
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token` to restore Notion board
+- **Blockers**: Notion 401. Ledger DLQ. CI 0-jobs non-CodeQL (recurring, non-blocking).
+
+### 2026-06-19 (prior run — idle; all workstreams done)
 - **Workstream**: None — all workstreams A–AAAAAAAAA + SEC-FIX 1–4 done; no new workstreams defined
 - **Build**: clean (ch1tty@4.1.0) | **Tests**: 3304/0/2 (confirmed on main HEAD d3f8dda)
 - **What was done**:
