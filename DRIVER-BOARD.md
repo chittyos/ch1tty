@@ -1185,3 +1185,29 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - Tests: 3304/0/2 on branch (0 vulns)
 - **Blockers**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). CI 0-jobs non-CodeQL (recurring, non-blocking).
 
+
+### 2026-06-19 (this run — guardrail enforcement: purge 246 prohibited metric tests)
+- **Workstream**: Guardrail cleanup — enforce `buildCastExplanation` metric freeze (CLAUDE.md binding)
+- **Branch/PR**: `auto/purge-prohibited-metric-tests` → PR #802 (open; CodeQL in progress)
+- **Build**: clean (ch1tty@4.1.0) | **Tests**: 1337/0/2 (was 3304/0/2; 1967 rogue tests removed)
+- **What was done**:
+  - Startup: npm ci clean, build clean, npm test: 3304/0/2. Board read from DRIVER-BOARD.md. `git fetch --all`.
+  - Confirmed 246 rogue test files in `test/` violating the `buildCastExplanation` metric freeze guardrail (accumulated by prior automated runs; first noted at 135 files on 2026-06-18, now 246). All follow the `NN-cast-explain-*-ratio.test.ts` / alphabetic-prefix-cast-explain-*.test.ts naming pattern.
+  - Deleted all 246 rogue files on branch `auto/purge-prohibited-metric-tests`. Build: clean. Tests: 1337/0/2 (0 failures). npm audit: 0 vulnerabilities.
+  - Opened PR #802. CodeRabbit skipped (246 > 150 file limit — not actionable). CodeQL in progress.
+  - No open PRs before this run; 259 stale `auto/*-cast-explain-*-ratio` branches on remote (unchanged).
+- **State summary**:
+  - All workstreams A–E: DONE
+  - PR #802: OPEN — guardrail test purge, CodeQL in progress, 0 review comments
+  - `buildCastExplanation` metric freeze: ACTIVE (CLAUDE.md guardrail)
+  - Tests: 1337/0/2 on PR branch (main still shows 3304 until merge)
+  - Source metrics in `src-stdio/aggregator.ts`: rogue computation variables (geometric/harmonic mean, P05–P95, trimmed/Winsorized mean, etc.) still present; serve no tests after this PR — removal requires human decision
+  - 259 stale `auto/*-cast-explain-*-ratio` remote branches
+- **Human action required**:
+  1. **Merge PR #802** — pure test deletion, no logic change; CodeQL is the gate
+  2. **Source metric cleanup** — decide whether to revert ~30 rogue computation variables from `src-stdio/aggregator.ts` `buildCastExplanation` (lines ~2224–2336 + corresponding full-verbosity return fields)
+  3. **Stale branch cleanup** — 259 remote `auto/*-cast-explain-*-ratio` branches; enable auto-delete or bulk-delete
+  4. **Add new workstreams** if any planned
+  5. **Disable or redirect hourly schedule** if no new workstreams planned
+- **Next run**: Check PR #802 CI; if green and no review blocks, merge. Then do source-metric cleanup if directed, else log idle.
+- **Blockers**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). Source metric cleanup requires human decision.
