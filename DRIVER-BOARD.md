@@ -205,7 +205,30 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 ## Run Log
 
-### 2026-06-19 (this run — idle; 18th+ consecutive idle run)
+### 2026-06-19 (this run — idle; 19th+ consecutive idle run)
+- **Workstream**: None — all workstreams A–AAAAAAAAA + SEC-FIX 1–4 done; no new workstreams defined
+- **Build**: clean (ch1tty@4.1.0) | **Tests**: 1337/0/2 | **Open PRs before this**: 1 (PR #806, merged this run)
+- **What was done**:
+  - `npm ci` clean, `npm run build` clean, `npm test`: 1337/0/2. `npm audit`: 0 vulnerabilities.
+  - Board read from DRIVER-BOARD.md (Notion 401 — recurring). `git fetch --all`.
+  - 1 open PR found: PR #806 (`auto/board-run-log-18th-idle-run`). CI: 3/3 ✅ green. Squash-merged → 7652deb.
+  - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 confirmed DONE. No code changes.
+- **State summary**:
+  - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4: DONE
+  - `buildCastExplanation` metric freeze: ACTIVE. Test files purged (PR #802). Source metrics in `src-stdio/aggregator.ts` — human decision pending.
+  - Tests: 1337/0/2. Audit: 0. No open PRs after merge. ~760+ stale remote `auto/` branches.
+- **Human action required** (19th+ consecutive idle run — same as all prior idle runs):
+  1. **Disable or redirect hourly schedule** — no incomplete workstreams; every run is idle
+  2. **Add new workstreams** to DRIVER-BOARD.md if any planned (e.g. new `apps/*-mcp` server, new backends, scenario expansion)
+  3. **Stale branch cleanup** — ~760+ remote `auto/` branches; enable auto-delete or bulk-delete
+  4. **Source metric decision** — rogue `buildCastExplanation` metrics in `src-stdio/aggregator.ts` (test files purged PR #802); decide: (a) revert, (b) accept as permanent debt
+  5. **`register-chittyconnect-mcp` merge decision** — PR #504 closed/deferred; merge to add ChittyConnect backend when surgery owner clears it
+  6. **Ledger DLQ** — 11+ entries; `ledger.chitty.cc` unreachable from remote container
+  7. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token` to restore Notion board
+- **Next run**: Same idle state expected unless new workstreams added.
+- **Blockers**: Notion 401. Ledger DLQ. PushNotification unavailable. CI 0-jobs non-CodeQL (recurring, non-blocking).
+
+### 2026-06-19 (prior run — idle; 18th+ consecutive idle run)
 - **Workstream**: None — all workstreams A–AAAAAAAAA + SEC-FIX 1–4 done; no new workstreams defined
 - **Build**: clean (ch1tty@4.1.0) | **Tests**: 1337/0/2 | **Open PRs**: 0
 - **What was done**:
