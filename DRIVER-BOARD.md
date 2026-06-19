@@ -944,6 +944,29 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Blockers**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). CI 0-jobs non-CodeQL (recurring, non-blocking).
 - **Blockers**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable). PR #784 surface violation requires human fix or explicit human decision to relax the 5-tool guardrail.
 
+### 2026-06-19 (this run — steady-state verification)
+- **Workstream**: None — all workstreams A–E + SEC-FIX 1–4 done; no new workstreams defined
+- **Build**: clean (ch1tty@4.1.0) | **Tests**: 3304/0/2 (confirmed on main HEAD 8c4df29)
+- **What was done**:
+  - Startup: npm ci clean, build clean, npm test: 3304/0/2. `npm audit (root)`: 0 vulnerabilities.
+  - Board read from DRIVER-BOARD.md (Notion 401 — recurring blocker). `git fetch --all`.
+  - **Board correction**: PR #784 (`feat/ch1tty-do-codemode`) is **CLOSED+MERGED** (merged_at 2026-06-18T21:00:03Z by chitcommit) — prior board entries listed it as still OPEN. The regression it caused was fixed by PR #790 (2fadc16). No open PRs remain.
+  - PushNotification tool not available in this session (claude-code-remote MCP not connected).
+  - No code changes made — system at steady state.
+- **State summary**:
+  - All workstreams A–E + F–WWWWWWW + SEC-FIX 1–4: DONE
+  - `buildCastExplanation` metric freeze: ACTIVE (CLAUDE.md guardrail)
+  - 0 vulnerabilities across all install roots; Tests: 3304/0/2 on main (HEAD 8c4df29)
+  - PR #784: MERGED (then regression reverted by #790). No open PRs.
+  - ~700+ stale `auto/` branches on remote (no open PRs; cleanup requires human auth to bulk-delete)
+- **Human action required** (unchanged — 7th+ consecutive run with no new direction):
+  1. **Add new workstreams** to DRIVER-BOARD.md — candidates: new `apps/*-mcp` server, cast chain improvements, new backends, scenario harness expansion
+  2. **Disable or redirect hourly schedule** — no incomplete workstreams; every run is idle
+  3. **Stale branch cleanup** — ~700+ remote `auto/` branches (enable repo auto-delete on merge in settings, or bulk-delete)
+  4. **Verify ChittyConnect** (`connect.chitty.cc/api/mcp`) auth token from deployed gateway
+  5. **Ledger DLQ** — 11 entries; resolve `ledger.chitty.cc` connectivity from the deployed gateway
+- **Blockers**: Notion API token invalid (401). Ledger DLQ (ledger.chitty.cc unreachable from remote container). CI 0-jobs non-CodeQL (recurring, non-blocking).
+
 ### 2026-06-18 (this run — SEC-FIX-4: restore stdio stack after PR #784 regression)
 - **Workstream**: SEC-FIX-4 — fix critical regression introduced by PR #784 merge
 - **Branch/PR**: `auto/sec-fix-4-root-wrangler-undici-ws` → PR #790 (open, CI in progress)
