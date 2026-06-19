@@ -222,7 +222,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Human action required** (11th+ consecutive idle run — same as all prior idle runs):
   1. **Disable or redirect hourly schedule** — no incomplete workstreams; every run is idle
   2. **Add new workstreams** to DRIVER-BOARD.md if any planned (e.g. new `apps/*-mcp` server, new backends, scenario expansion)
-  3. **Stale branch cleanup** — 771 remote `auto/` branches; enable auto-delete or bulk-delete
+  3. **Stale branch cleanup** — 703 remote `auto/` branches; enable auto-delete or bulk-delete
   4. **Rogue cast-explain metrics** — 246 test files violate CLAUDE.md freeze; decide: (a) revert, (b) accept as debt
   5. **Ledger DLQ** — 11+ entries; `ledger.chitty.cc` unreachable from remote container
   6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token` to restore Notion board
