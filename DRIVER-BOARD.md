@@ -211,7 +211,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **What was done**:
   - npm ci clean, npm run build clean, npm test: 3306 total (3304 pass / 0 fail / 2 skip). npm audit: 0 vulnerabilities.
   - Board read from DRIVER-BOARD.md (Notion 401 — recurring blocker). `git fetch --all`.
-  - HEAD: 6db978f (PR #799 — 13th+ idle run). No open PRs (confirmed via GitHub MCP).
+  - HEAD: 6db978f (PR #799 — prior run: 13th+ idle run log). No open PRs (confirmed via GitHub MCP).
   - `git fetch --all` pulled 16 new `auto/01010101–16161616-cast-explain-*-ratio` branches — same guardrail-violating pattern as prior batches; no PRs created from them.
   - PushNotification tool unavailable (claude-code-remote MCP not connected — recurring).
   - No code changes made — system at steady state.
