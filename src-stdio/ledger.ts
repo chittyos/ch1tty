@@ -11,7 +11,7 @@
  * @canon chittycanon://gov/governance#ledger-is-append-only
  */
 
-import { appendFileSync, mkdirSync, readFileSync } from 'node:fs';
+import { appendFileSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, unlinkSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { log } from './logger.js';
@@ -79,6 +79,7 @@ export class LedgerClient {
   private totalDropped = 0;
   private flushErrors = 0;
   private lastFlushAt: Date | null = null;
+  private replaying = false;
 
   constructor(dlqPath?: string) {
     this.dlqPath = dlqPath ?? DEAD_LETTER_PATH;
@@ -93,9 +94,16 @@ export class LedgerClient {
     // Start periodic flush
     if (!this.flushTimer) {
       this.flushTimer = setInterval(() => {
-        this.flush().catch((err) => {
-          log.warn(`Periodic flush error: ${err}`);
-        });
+        this.flush()
+          .then(async () => {
+            // After each flush, replay any DLQ entries if the backend is now reachable.
+            if (this.backend && this.serverId && this.dlqEntries() > 0) {
+              await this.replayDlq();
+            }
+          })
+          .catch((err) => {
+            log.warn(`Periodic flush error: ${err}`);
+          });
       }, FLUSH_INTERVAL_MS);
       // Don't keep the process alive just for background flushes (important for tests/CLI one-shots).
       this.flushTimer.unref();
@@ -242,6 +250,78 @@ export class LedgerClient {
       total += count;
     }
     return total;
+  }
+
+  /**
+   * Attempt to replay entries from the dead-letter WAL against the bound backend.
+   * Entries that succeed are removed from the DLQ file; entries that fail remain.
+   * Returns the number of entries successfully replayed.
+   * No-op when no backend is bound or the DLQ is empty.
+   */
+  async replayDlq(): Promise<number> {
+    if (this.replaying || !this.backend || !this.serverId) return 0;
+
+    type DlqEntry = LedgerEntry & { droppedAt?: string };
+    const entries = this.dlqReadEntries(1000) as DlqEntry[];
+    if (entries.length === 0) return 0;
+
+    this.replaying = true;
+    const failed: DlqEntry[] = [];
+    let replayed = 0;
+
+    try {
+      for (const entry of entries) {
+        try {
+          const result = await this.backend.callTool(this.serverId, 'chitty_ledger_record', {
+            event_type: entry.event_type,
+            entity_id: entry.entity_id,
+            session_id: entry.session_id,
+            metadata: entry.metadata,
+            timestamp: entry.timestamp,
+          });
+          if (result.isError) throw new Error(`ledger replay rejected: ${JSON.stringify(result.content)}`);
+          replayed++;
+        } catch {
+          failed.push(entry);
+        }
+      }
+
+      this.rewriteDlq(failed);
+
+      if (replayed > 0) {
+        log.info(`Ledger DLQ replay: ${replayed} entries replayed (${failed.length} remaining in DLQ)`);
+      }
+    } finally {
+      this.replaying = false;
+    }
+
+    return replayed;
+  }
+
+  /** Rewrite the DLQ file with the given entries. Removes the file if the list is empty. */
+  private rewriteDlq(entries: object[]): void {
+    try {
+      if (entries.length === 0) {
+        try { unlinkSync(this.dlqPath); } catch { /* file may not exist or already gone */ }
+        return;
+      }
+      const targetDir = dirname(this.dlqPath);
+      mkdirSync(targetDir, { recursive: true });
+      const lines = entries.map((e) => JSON.stringify(e)).join('\n') + '\n';
+      // Stage the rewrite in a unique temp dir (same filesystem as the DLQ so renameSync
+      // is atomic), then rename into place. mkdtempSync provides the secure unique path;
+      // renameSync avoids exposing a partially-written file to concurrent readers.
+      const tmpDir = mkdtempSync(join(targetDir, '.dlq-tmp-'));
+      const tmpPath = join(tmpDir, 'dlq.jsonl');
+      try {
+        writeFileSync(tmpPath, lines, { encoding: 'utf8', mode: 0o600 });
+        renameSync(tmpPath, this.dlqPath);
+      } finally {
+        try { rmSync(tmpDir, { recursive: true, force: true }); } catch { /* cleanup best-effort */ }
+      }
+    } catch (err) {
+      log.error(`Ledger DLQ rewrite failed (${this.dlqPath}): ${err}`);
+    }
   }
 
   /** Read up to `limit` most-recent entries from the dead-letter WAL file (chronological order). Skips malformed JSON and non-object lines. */
