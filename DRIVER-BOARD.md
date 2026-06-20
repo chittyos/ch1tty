@@ -8,7 +8,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 ## Workstream Status (A–E: original; F+: ongoing observability improvements; SEC-FIX: security)
 
 
-- [ ] **SEC-FIX** — Fix Dependabot high-severity `hono` vulnerability: `"overrides": {"hono": ">=4.12.25"}` in package.json. PR #773 `auto/sec-hono-override` — open for review (2026-06-18).
+- [x] **SEC-FIX** — Fix Dependabot high-severity `hono` vulnerability: PR #773 ✅ MERGED (stale duplicate entry closed 2026-06-20 run 37).
 - [x] **SEC-FIX** — Fix Dependabot high-severity `hono` vulnerability: `"overrides": {"hono": ">=4.12.25"}` across root + 5 sub-packages. PR #773 ✅ MERGED (b55b9f7, 2026-06-18). DONE.
 - [x] **SEC-FIX-2** — Pin ws >=8.21.0 in worker: HIGH DoS CVE (GHSA-3h5q-q39x-f9gh) via wrangler→miniflare chain. PR #777 ✅ MERGED (c0dc5c1, 2026-06-18). DONE.
 - [x] **SEC-FIX-3** — Pin undici >=7.28.0 + esbuild >=0.28.1 in worker: 2 HIGH undici CVEs (GHSA-vmh5-mc38-953g TLS bypass, GHSA-pr7r-676h-xcf6 cache disclosure) + LOW esbuild CVE (GHSA-g7r4-m6w7-qqqr). PR #781 ✅ MERGED (abc56ee, 2026-06-18). DONE.
