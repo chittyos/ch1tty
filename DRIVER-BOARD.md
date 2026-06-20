@@ -196,6 +196,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - [x] *(unlabelled parallel)* — cast explanation.candidateScoreP75P05Ratio: number. PR #617 ✅ MERGED. DONE.
 - [x] *(unlabelled parallel)* — cast explanation.candidateScoreP10P05Ratio: number. PR #618 ✅ MERGED. DONE.
 - [x] **AAAAAAAAA** — cast explanation.topCandidatesKurtosis: number (4th moment of topCandidates pool; first 9-letter label). PR #611 ✅ MERGED (bc9f562d, 2026-06-16). 8 new tests, 2324/0/2. DONE.
+- [x] **GUARDRAIL-CLEANUP** — Removed 55+ rogue `buildCastExplanation` source metrics from `src-stdio/aggregator.ts` that bypassed the AAAAAAAAA freeze point (non-winner z-scores, heaviness ratios, non-winner Pythagorean means, cross-pool ratio groups). PR #827 ✅ MERGED (17b2f5a7, 2026-06-20). Pure removal — no new fields. Tests stable at 1344/0/2. DONE.
 
 ## Blockers
 
@@ -204,6 +205,31 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **CI (main ci.yml)** — 0-jobs queue failure (non-CodeQL). Only CodeQL runs on PRs. Recurring pattern, non-blocking.
 
 ## Run Log
+
+### 2026-06-20 (active — 35th run; GUARDRAIL-CLEANUP)
+- **Workstream**: GUARDRAIL-CLEANUP — Enforced binding `buildCastExplanation` metric freeze; removed 55+ rogue source metrics from `src-stdio/aggregator.ts`
+- **Build**: clean (ch1tty@4.1.0) | **Tests**: 1344/0/2 | **Open PRs before this run**: 1 (PR #827, merged this run)
+- **What was done**:
+  - `npm ci` clean, `npm run build` clean (exit 0), `npm test`: 1344 pass / 0 fail / 2 skipped (45 suites).
+  - Board read from DRIVER-BOARD.md (Notion 401 — recurring). `git fetch --all` — 730+ remote `auto/` branches (rogue cast-explain batch continuing to accumulate).
+  - Found PR #827 open (`auto/guardrail-cleanup-rogue-source-metrics`): removes 55+ rogue fields from `buildCastExplanation` source in `src-stdio/aggregator.ts`. CI green: CodeQL ✅, Analyze (actions) ✅, Analyze (javascript-typescript) ✅. `mergeable_state: clean`. Build + 1344/0/2 tests on PR branch confirmed.
+  - Verified diff: pure removal, no new metrics added. Fields removed: `thirdCandidateScore*`, `lowestCandidateScoreZScore`, `candidateScoreStandardizedRange`, `nonWinnerMeanZScore`, all `*HeavinessRatio` beyond freeze, all `*MassRatio`, `NonWinnerGeometric/Harmonic/Pythagorean` means, cross-pool z-scores. Clean 47-field set through AAAAAAAAA preserved.
+  - Squash-merged PR #827 → 17b2f5a7. Resolves the 35-run pending "source metric decision" blocker.
+  - `buildCastExplanation` source is now clean: 47 legitimate fields through AAAAAAAAA freeze point. Source + tests aligned.
+  - PushNotification tool unavailable (claude-code-remote MCP not connected — recurring).
+- **State summary**:
+  - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP: DONE
+  - Tests: 1344/0/2. Build: clean. No open PRs after merge.
+  - `buildCastExplanation` source metrics: CLEANED (PR #827). Guardrail fully enforced in source.
+  - Ledger DLQ: replay code merged (PR #815); 11 stuck entries auto-replay once CF Access configured on prod.
+- **Human action required**:
+  1. **Disable or redirect hourly schedule** — all workstreams done; every idle run costs compute
+  2. **Add new workstreams** to DRIVER-BOARD.md if any planned (e.g. new `apps/*-mcp` server, new backends, scenario expansion)
+  3. **Stale branch cleanup** — 730+ remote `auto/` branches; enable auto-delete in repo settings or run bulk-delete
+  4. **Configure CF Access credentials** on `ch1tty.chitty.cc` prod server (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) to clear 11 DLQ entries
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token` to restore Notion board
+- **Next run**: Idle (all workstreams done including GUARDRAIL-CLEANUP). No pending source blockers.
+- **Blockers**: Notion 401. Ledger DLQ (replay code in place, needs CF Access on prod). PushNotification unavailable. CI 0-jobs non-CodeQL (recurring, non-blocking).
 
 ### 2026-06-20 (idle — 34th consecutive idle run)
 - **Workstream**: None — all workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 done; no new workstreams defined
