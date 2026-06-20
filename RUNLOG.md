@@ -399,7 +399,7 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   - Checked DRIVER-BOARD.md + RUNLOG.md (37th run entry at bottom).
   - Verified all deliverables in place: `focus-profiles.json` (6 profiles), `focus-suggestions.json` (~1.8 MB, ~1750 combos), `src/focus.ts`, `src-stdio/suggestions.ts`, `test/scenario.test.ts`, `test/simulation.test.ts`.
   - Confirmed `src-stdio/aggregator.ts` has 0 `cast-explain` occurrences — source metric cleanup from PR #827 is still clean.
-  - Confirmed `servers.json` github entry uses official hosted remote endpoint (`https://api.githubcopilot.com/mcp/`) — workstream B migration intact.
+  - Confirmed `servers.json` GitHub entry uses official hosted remote endpoint (`https://api.githubcopilot.com/mcp/`) — workstream B migration intact.
   - No open PRs; no new Dependabot/audit vulnerabilities.
   - 730 stale `auto/` branches on remote (259 are cast-explain ratio violation branches; all harmless, no open PRs from them).
   - Notion: 401 (persists). RUNLOG.md remains fallback cross-run board.
