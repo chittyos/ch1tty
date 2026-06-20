@@ -205,6 +205,32 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 ## Run Log
 
+### 2026-06-20 (idle — 25th+ consecutive idle run)
+- **Workstream**: None — all workstreams A–AAAAAAAAA + SEC-FIX 1–4 done; no new workstreams defined
+- **Build**: clean (ch1tty@4.1.0) | **Tests**: 1344/0/2 | **Audit**: 0 vulnerabilities | **Open PRs**: 0
+- **What was done**:
+  - `npm ci` clean, `npm run build` clean, `npm test`: 1344/0/2 (+7 from PR #815 DLQ replay already on main). `npm audit`: 0 vulnerabilities.
+  - Board read from DRIVER-BOARD.md (Notion 401 — recurring). `git fetch --all` — 259 rogue `auto/XXXXXXXX-cast-explain-*-ratio` branches confirmed; no PRs opened from them (guardrail enforced).
+  - HEAD: 13d7676 (PR #816 — prior run DLQ replay board log, merged 2026-06-20). No open PRs.
+  - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 confirmed DONE (25th+ consecutive idle run).
+  - PushNotification tool unavailable (claude-code-remote MCP not connected — recurring).
+- **State summary**:
+  - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4: DONE
+  - Tests: 1344/0/2. Audit: 0 vulnerabilities. No open PRs.
+  - `buildCastExplanation` metric freeze ACTIVE; source metrics in `src-stdio/aggregator.ts` — human decision pending.
+  - Ledger DLQ: replay code merged (PR #815); 11 stuck entries will auto-clear once CF Access credentials configured on prod.
+  - 259 rogue `cast-explain-*-ratio` remote branches remain (no PRs opened; guardrail enforced).
+- **Human action required** (25th+ consecutive idle run — same as all prior idle runs):
+  1. **Disable or redirect hourly schedule** — no incomplete workstreams; every run is idle and costs compute
+  2. **Add new workstreams** to DRIVER-BOARD.md if any planned (e.g. new `apps/*-mcp` server, new backends, scenario expansion)
+  3. **Stale branch cleanup** — 719+ remote `auto/` branches; enable auto-delete in repo settings or run bulk-delete
+  4. **Configure CF Access credentials** on `ch1tty.chitty.cc` production server (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) so DLQ auto-replay can reconnect chittyos backend and clear 11 stuck ledger entries
+  5. **Source metric decision** — rogue `buildCastExplanation` metrics in `src-stdio/aggregator.ts` (test files purged PR #802); decide: (a) revert, (b) accept as permanent debt
+  6. **`register-chittyconnect-mcp` merge decision** — PR #504 closed/deferred; merge when surgery owner clears it
+  7. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token` to restore Notion board
+- **Next run**: Same idle state expected unless new workstreams added.
+- **Blockers**: Notion 401. Ledger DLQ (replay code in place, needs CF Access on prod). PushNotification unavailable. CI 0-jobs non-CodeQL (recurring, non-blocking).
+
 ### 2026-06-20 (active run — ledger DLQ replay)
 - **Workstream**: Production gateway DEGRADED — `ledgerDlq auto-replay` — PR #815 `fix(ledger): add DLQ replay on periodic flush` ✅ MERGED (08adeee)
 - **Build**: clean (ch1tty@4.1.0) | **Tests**: 1344/0/2 (+7 new) | **Audit**: 0 vulnerabilities
