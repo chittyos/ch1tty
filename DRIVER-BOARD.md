@@ -205,6 +205,32 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 ## Run Log
 
+### 2026-06-20 (idle — 36th run; closed stale PR #828; all workstreams done)
+- **Workstream**: None — all workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP done; no new workstreams defined
+- **Build**: clean (ch1tty@4.1.0) | **Tests**: 1344/0/2 | **Open PRs before this run**: 1 (PR #828, closed this run as superseded)
+- **What was done**:
+  - `npm ci` clean, `npm run build` clean (exit 0), `npm test`: 1344 pass / 0 fail / 2 skipped.
+  - Board read from DRIVER-BOARD.md (Notion 401 — recurring). `git fetch --all` — 265 rogue cast-explain remote branches; no PRs from them (guardrail enforced).
+  - HEAD: 17b2f5a (PR #827 guardrail fix — most recent commit on origin/main). Confirmed guardrail fix already includes 35th run board log entry.
+  - PR #828 (`chore/board-run-guardrail-cleanup-35th`) was DIRTY/conflicted — PR #827 had already committed the 35th run board entry to DRIVER-BOARD.md in the same commit. Closed #828 as superseded.
+  - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP confirmed DONE (36th run, 1st since guardrail cleanup merged).
+  - Live gateway: status OK (connected: cloudflare-builds, evidence, browser-rendering, context7, orchestrator = 5/15). Ledger DLQ: 11 entries (CF Access blocker unchanged).
+  - PushNotification tool unavailable (claude-code-remote MCP not connected — recurring).
+- **State summary**:
+  - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP: DONE
+  - Tests: 1344/0/2. Build: clean. No open PRs.
+  - `buildCastExplanation` metric freeze ACTIVE and fully enforced in source (PR #827 merged).
+  - Ledger DLQ: 11 entries; replay code in place (PR #815); auto-clear once CF Access configured on prod.
+  - 265 rogue cast-explain branches on remote; no PRs from them (guardrail enforced).
+- **Human action required** (36th run — same recurring asks):
+  1. **Disable or redirect hourly schedule** — all workstreams done; every idle run costs compute with no benefit
+  2. **Add new workstreams** to DRIVER-BOARD.md if any planned (e.g. new `apps/*-mcp` server, new backends, scenario expansion)
+  3. **Stale branch cleanup** — 265+ rogue `auto/` branches; enable auto-delete in repo settings or run bulk-delete
+  4. **Configure CF Access credentials** on `ch1tty.chitty.cc` prod server (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) to clear 11 DLQ entries
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token` to restore Notion board
+- **Next run**: Same idle state expected unless new workstreams added.
+- **Blockers**: Notion 401. Ledger DLQ (replay code in place, needs CF Access on prod). PushNotification unavailable. CI 0-jobs non-CodeQL (recurring, non-blocking).
+
 ### 2026-06-20 (active — GUARDRAIL-CLEANUP: remove rogue buildCastExplanation source metrics)
 - **Workstream**: GUARDRAIL-CLEANUP — enforce `buildCastExplanation` metric freeze by removing rogue computation fields from `src-stdio/aggregator.ts`. PR: `auto/guardrail-cleanup-rogue-source-metrics`
 - **Build**: clean (ch1tty@4.1.0) | **Tests**: 1344/0/2 (no regression) | **Open PRs before this run**: 0
