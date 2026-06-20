@@ -1868,3 +1868,17 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   2. Ledger DLQ growing — configure CF Access creds on prod
   3. 811 stale `auto/` branches — enable auto-delete or bulk-delete
   4. Hourly schedule running idle — disable or add new workstreams
+
+### 2026-06-20 (idle — 45th run; all workstreams done)
+- **Workstream**: None (all A–E + extensions done)
+- **Branch/PR**: `auto/45th-idle-board-log` → PR opened this run
+- **Build**: clean (`tsc` exit 0) | **Tests**: 1344/0/2 (45 suites) | **npm audit**: 0 vulns
+- **Actions**: No PRs to merge (returned `[]`). Synced local main to `origin/main` (detached HEAD / diverged local reset to `7f3c9aa`).
+- **Live gateway**: DEGRADED — ledger DLQ 11 entries; chittyos/github/notion/linear not connected (CF Access blocker, unchanged). 8/15 servers connected, 66 total tools, 141 active sessions.
+- **Ledger DLQ**: 11 entries — unchanged since last run; `ledger.chitty.cc` unreachable from remote container; replay code merged PR #815 — clears once CF Access configured on prod
+- **Remote branches**: 812 total (259 violate `buildCastExplanation` freeze; 1 new since last run; no open PRs from them; guardrail enforced)
+- **Blockers** (unchanged, all human-action):
+  1. Notion token 401 — `op://ChittyOS-Integrations/notion/api_token`
+  2. Ledger DLQ growing — configure CF Access creds on prod (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`)
+  3. 812 stale `auto/` branches — enable auto-delete in repo settings or run bulk-delete
+  4. Hourly schedule running idle — disable or add new workstreams to DRIVER-BOARD.md
