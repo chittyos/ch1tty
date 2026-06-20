@@ -409,3 +409,29 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   1. All workstreams done. System healthy. If Notion token is rotated, first run will restore board access.
   2. If new guardrail violations appear (new cast-explain ratio branches or PRs), reject them per CLAUDE.md binding freeze.
   3. Consider adding new workstreams if any planned (new `apps/*-mcp` surface, cast chain improvements, new backends).
+
+### 2026-06-20 (run 44 — 44th idle run; merged PR #836)
+- **Workstream advanced**: None — all workstreams complete; idle run
+- **Branch/PR**: `auto/44th-idle-board-log` → PR opened this run
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0)
+- **Tests**: 1344 pass, 0 fail, 2 skipped (45 suites, 1346 total)
+- **npm audit**: 0 vulnerabilities
+- **What was done**:
+  - Startup: `npm ci` clean, `npm run build` clean, `npm test` 1344/0/2.
+  - Read CLAUDE.md + CHITTY.md; confirmed guardrails (5-tool surface, `buildCastExplanation` freeze).
+  - `git fetch --all`; read DRIVER-BOARD.md + RUNLOG.md tail.
+  - Found 1 open PR: #836 (43rd idle board log). CI: CodeRabbit ✅. Merged it (squash → 403bb49).
+  - All workstreams A–E + F–RRRR+ SEC-FIX + GUARDRAIL-CLEANUP: **DONE**. No new work to advance.
+  - 811 remote branches (up from ~730 two runs ago); 266 are guardrail-violating `cast-explain-ratio` branches, all without open PRs. Source code is clean — no metrics in `src-stdio/aggregator.ts`.
+  - Ledger DLQ: **11 entries** (was 8 in run 37, growing ~1/run). Root cause: `ledger.chitty.cc` unreachable from deployed gateway; blocked on CF Access config.
+  - Notion: 401 (persists). RUNLOG.md remains fallback cross-run board.
+- **Workstream state**: A✅ B✅ C✅ D✅ E✅ F-RRRR+ ✅ SEC-FIX✅ GUARDRAIL✅. No open workstreams.
+- **Blockers**:
+  1. Notion auth 401 — rotate `NOTION_API_TOKEN` at `op://ChittyOS-Integrations/notion/api_token`
+  2. Ledger DLQ (11 entries, growing) — configure `CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET` on prod gateway
+  3. 811 stale `auto/` branches on remote — enable auto-delete on merge in repo settings, or bulk-delete
+  4. Hourly schedule still running with no workstreams — disable or add new workstreams
+- **Next run priority**:
+  1. If DLQ exceeds 20 entries, escalate as urgent infra issue.
+  2. If any new `cast-explain-ratio` PRs open, close them per CLAUDE.md guardrail freeze.
+  3. If new workstreams are defined, advance the earliest incomplete one.
