@@ -205,6 +205,32 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 ## Run Log
 
+### 2026-06-20 (active — GUARDRAIL-CLEANUP: remove rogue buildCastExplanation source metrics)
+- **Workstream**: GUARDRAIL-CLEANUP — enforce `buildCastExplanation` metric freeze by removing rogue computation fields from `src-stdio/aggregator.ts`. PR: `auto/guardrail-cleanup-rogue-source-metrics`
+- **Build**: clean (ch1tty@4.1.0) | **Tests**: 1344/0/2 (no regression) | **Open PRs before this run**: 0
+- **What was done**:
+  - `npm ci` clean, `npm run build` clean (exit 0), `npm test`: 1344 pass / 0 fail / 2 skipped.
+  - Removed 61 lines from `src-stdio/aggregator.ts` (2314 → 2253 lines):
+    - Line 2224: removed trailing `nonWinnerScoreHeavinessRatio` spread from winner-block
+    - Line 2225: replaced enormous rogue inline object (55+ fields beyond AAAAAAAAA freeze point) with clean version containing only the 47 legitimate fields ending at `topCandidatesKurtosis` / `topCandidatesGiniCoefficient`
+    - 59 rogue description string lines removed (`thirdCandidateScore`, `lowestCandidateScoreZScore`, `candidateScoreStandardizedRange`, `nonWinnerMeanZScore`, all `NonWinner*`, all `*HeavinessRatio` beyond freeze, `*MassRatio` fields, cross-pool z-score comparisons, etc.)
+  - Build + tests clean after all removals. Created branch, committed, pushed, opened PR.
+  - "Source metric decision" blocker RESOLVED — no longer requires human action.
+  - PushNotification tool unavailable (claude-code-remote MCP not connected — recurring).
+- **State summary**:
+  - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP: DONE (PR open for merge)
+  - Tests: 1344/0/2. Build: clean. 1 open PR.
+  - `buildCastExplanation` metric freeze ACTIVE and now fully enforced in source.
+  - Ledger DLQ: replay code merged (PR #815); 11 stuck entries auto-replay once CF Access configured on prod.
+- **Human action required**:
+  1. **Review and merge** `auto/guardrail-cleanup-rogue-source-metrics` PR — removes 61 rogue lines from `src-stdio/aggregator.ts`
+  2. **Disable or redirect hourly schedule** — all workstreams done; every idle run costs compute with no benefit
+  3. **Stale branch cleanup** — 730+ remote `auto/` branches; enable auto-delete in repo settings or run bulk-delete
+  4. **Configure CF Access credentials** on `ch1tty.chitty.cc` prod server (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) to clear 11 DLQ entries
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token` to restore Notion board
+- **Next run**: Merge open guardrail-cleanup PR if CI green; otherwise idle.
+- **Blockers**: Notion 401. Ledger DLQ (replay code in place, needs CF Access on prod). PushNotification unavailable. CI 0-jobs non-CodeQL (recurring, non-blocking).
+
 ### 2026-06-20 (idle — 34th consecutive idle run)
 - **Workstream**: None — all workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 done; no new workstreams defined
 - **Build**: clean (ch1tty@4.1.0) | **Tests**: 1344/0/2 | **Open PRs before this run**: 0
