@@ -206,7 +206,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 ## Run Log
 
 ### 2026-06-20 (idle — 27th+ consecutive idle run)
-- **Workstream**: None — all workstreams A–AAAAAAAAA + SEC-FIX 1–4 done; no new workstreams defined
+- **Workstream**: None — all workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 done; no new workstreams defined
 - **Build**: clean (ch1tty@4.1.0) | **Tests**: 1344/0/2 | **Audit**: 0 vulnerabilities | **Open PRs**: 0
 - **What was done**:
   - `npm ci` clean, `npm run build` clean, `npm test`: 1344/0/2. `npm audit`: 0 vulnerabilities.
