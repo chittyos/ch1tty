@@ -11,7 +11,7 @@
  * @canon chittycanon://gov/governance#ledger-is-append-only
  */
 
-import { appendFileSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
+import { appendFileSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, unlinkSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { log } from './logger.js';
@@ -305,9 +305,20 @@ export class LedgerClient {
         try { unlinkSync(this.dlqPath); } catch { /* file may not exist or already gone */ }
         return;
       }
-      mkdirSync(dirname(this.dlqPath), { recursive: true });
+      const targetDir = dirname(this.dlqPath);
+      mkdirSync(targetDir, { recursive: true });
       const lines = entries.map((e) => JSON.stringify(e)).join('\n') + '\n';
-      writeFileSync(this.dlqPath, lines, 'utf8');
+      // Stage the rewrite in a unique temp dir (same filesystem as the DLQ so renameSync
+      // is atomic), then rename into place. mkdtempSync provides the secure unique path;
+      // renameSync avoids exposing a partially-written file to concurrent readers.
+      const tmpDir = mkdtempSync(join(targetDir, '.dlq-tmp-'));
+      const tmpPath = join(tmpDir, 'dlq.jsonl');
+      try {
+        writeFileSync(tmpPath, lines, { encoding: 'utf8', mode: 0o600 });
+        renameSync(tmpPath, this.dlqPath);
+      } finally {
+        try { rmSync(tmpDir, { recursive: true, force: true }); } catch { /* cleanup best-effort */ }
+      }
     } catch (err) {
       log.error(`Ledger DLQ rewrite failed (${this.dlqPath}): ${err}`);
     }
