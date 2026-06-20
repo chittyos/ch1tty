@@ -1852,3 +1852,19 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   6. **Notion token rotation** — `NOTION_API_TOKEN` returning 401
 - **Next run**: Check PR #811 CI; if green, merge. Otherwise log idle.
 - **Blockers**: Notion API token invalid (401). Ledger DLQ (unreachable).
+
+---
+
+## Run Log — 2026-06-20 (44th run)
+
+- **Workstream**: None (all A–E + extensions done)
+- **Branch/PR**: `auto/44th-idle-board-log` → PR opened this run
+- **Build**: clean (`tsc` exit 0) | **Tests**: 1344/0/2 (45 suites) | **npm audit**: 0 vulns
+- **Actions**: Merged PR #836 (43rd idle log; squash → 403bb49)
+- **Ledger DLQ**: 11 entries (was 8 in run 37, growing ~1/run) — `ledger.chitty.cc` unreachable
+- **Remote branches**: 811 total (266 violate `buildCastExplanation` freeze; no open PRs from them)
+- **Blockers** (unchanged, all human-action):
+  1. Notion token 401 — `op://ChittyOS-Integrations/notion/api_token`
+  2. Ledger DLQ growing — configure CF Access creds on prod
+  3. 811 stale `auto/` branches — enable auto-delete or bulk-delete
+  4. Hourly schedule running idle — disable or add new workstreams
