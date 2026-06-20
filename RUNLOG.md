@@ -367,3 +367,22 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 - **Next run priority**:
   1. Check PR #458 — if CodeQL green, merge it.
   2. Plan RRRR: candidates include (a) `ch1tty/search` `latencyMs` (times the registry fetch + scoring — no backend, but useful for diagnosing slow registry caches), (b) `ch1tty/reload` enriched response (add `latencyMs` for how long hot-reload took + `serversAdded`/`serversRemoved` diff vs prior config), (c) `ch1tty/execute` `latencyMs` for no-session path (currently backward-compat omitted), (d) a coverage sweep for any new branch gaps introduced by QQQQ.
+
+### 2026-06-20 (run 37 — current)
+- **Workstream advanced**: None — all workstreams complete; idle run
+- **Branch/PR**: none
+- **Build**: clean (`tsc`)
+- **Tests**: 1344 pass, 0 fail, 2 skipped
+- **What was done**:
+  - Startup: `npm ci` clean, `npm run build` clean, 1344/0/2. No open PRs on GitHub.
+  - Verified all workstreams A–E and all F+ observability extensions complete (186 done, 0 open on DRIVER-BOARD.md).
+  - Closed stale duplicate [ ] SEC-FIX entry on DRIVER-BOARD.md (PR #773 was already merged and marked [x] on the adjacent line).
+  - Gateway status: version 4.1.0, 15 servers (8 connected), 66 tools, 134 active sessions. `systemHealth.status: "degraded"` due to `ledgerStatus: "degraded"` (DLQ has 8 entries from session `cc-session-2`, 2026-06-20T14:05:52 — ledger backend endpoint unreachable so replay is not clearing). Embedding brain: 0/17 successes, 24 timeouts (embedding service down), circuit not open. Both are persistent infrastructure issues, not code defects.
+  - Observed 30+ rogue `auto/NN-cast-explain-*` remote branches (e.g. `auto/01010101-cast-explain-runner-up-score-to-median-ratio`) — all violate the `buildCastExplanation` metric freeze guardrail in CLAUDE.md. None have open PRs; main was patched twice (PRs #827, #811). Branches are dead weight in remote but harmless. Code in `src-stdio/aggregator.ts` has no new violations.
+  - Notion not accessible (auth 401); RUNLOG.md remains fallback cross-run board.
+- **Workstream state**: A✅ B✅ C✅ D✅ E✅ F-RRRR+ ✅ SEC-FIX✅. No open workstreams.
+- **Blocker**: Notion auth 401 persists — RUNLOG.md is cross-run fallback board. Fix: rotate `NOTION_API_TOKEN` at op://ChittyOS-Integrations/notion/api_token.
+- **Next run priority**:
+  1. All workstreams done. Check for new Dependabot alerts (security).
+  2. If ledger DLQ grows beyond 20 entries, investigate whether the ledger endpoint is permanently gone or needs config update.
+  3. If new guardrail-violating branches appear, reject any associated PRs and note the pattern.
