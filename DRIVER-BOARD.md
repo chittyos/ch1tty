@@ -205,6 +205,30 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 ## Run Log
 
+### 2026-06-20 (idle — 29th+ consecutive idle run)
+- **Workstream**: None — all workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 done; no new workstreams defined
+- **Build**: clean (ch1tty@4.1.0) | **Tests**: 1344/0/2 | **Audit**: 0 vulnerabilities | **Open PRs before this run**: 1 (PR #820, merged this run)
+- **What was done**:
+  - `npm ci` clean, `npm run build` clean, `npm test`: 1344/0/2. `npm audit`: 0 vulnerabilities.
+  - Board read from DRIVER-BOARD.md (Notion 401 — recurring). `git fetch --all` — new batch of rogue cast-explain auto/ branches; no PRs opened from them (guardrail enforced).
+  - Found PR #820 open (28th idle run log from prior session; CI 3/3 ✅ CodeQL+Analyze). Squash-merged → d0ff2c3.
+  - Local main reset to d0ff2c3 (post-merge). All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 confirmed DONE (29th consecutive idle run).
+  - PushNotification tool unavailable (claude-code-remote MCP not connected — recurring).
+- **State summary**:
+  - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4: DONE
+  - Tests: 1344/0/2. Audit: 0 vulnerabilities. No open PRs after merge.
+  - `buildCastExplanation` metric freeze ACTIVE; guardrail enforced on all rogue cast-explain branches.
+  - Ledger DLQ: replay code merged (PR #815); 11 stuck entries auto-replay once CF Access configured on prod.
+- **Human action required** (29th consecutive idle run — same as all prior idle runs):
+  1. **Disable or redirect hourly schedule** — no incomplete workstreams; every run is idle and costs compute
+  2. **Add new workstreams** to DRIVER-BOARD.md if any planned (e.g. new `apps/*-mcp` server, new backends, scenario expansion)
+  3. **Stale branch cleanup** — 750+ remote `auto/` branches; enable auto-delete in repo settings or run bulk-delete
+  4. **Configure CF Access credentials** on `ch1tty.chitty.cc` prod server (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) to clear 11 DLQ entries
+  5. **Source metric decision** — rogue `buildCastExplanation` metrics in `src-stdio/aggregator.ts`; decide: (a) revert, (b) accept as permanent debt
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token` to restore Notion board
+- **Next run**: Same idle state expected unless new workstreams added.
+- **Blockers**: Notion 401. Ledger DLQ (replay code in place, needs CF Access on prod). PushNotification unavailable. CI 0-jobs non-CodeQL (recurring, non-blocking).
+
 ### 2026-06-20 (idle — 28th+ consecutive idle run)
 - **Workstream**: None — all workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 done; no new workstreams defined
 - **Build**: clean (ch1tty@4.1.0) | **Tests**: 1344/0/2 | **Audit**: 0 vulnerabilities | **Open PRs**: 0
