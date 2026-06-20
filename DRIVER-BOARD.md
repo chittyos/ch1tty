@@ -200,10 +200,34 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 ## Blockers
 
 - **Notion API token** — Invalid (401). Human action: `chitty-mcp-token notion` or rotate token in 1Password.
-- **Ledger DLQ** — 11+ entries: `ledger.chitty.cc` unreachable from remote container.
+- **Ledger DLQ** — 11+ entries: `ledger.chitty.cc` unreachable from remote container. **Replay code merged (PR #815)** — entries will auto-replay once chittyos backend reconnects. Remaining action: configure CF Access credentials (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) on the production server so the chittyos backend can connect.
 - **CI (main ci.yml)** — 0-jobs queue failure (non-CodeQL). Only CodeQL runs on PRs. Recurring pattern, non-blocking.
 
 ## Run Log
+
+### 2026-06-20 (active run — ledger DLQ replay)
+- **Workstream**: Production gateway DEGRADED — `ledgerDlq auto-replay` — PR #815 `fix(ledger): add DLQ replay on periodic flush` ✅ MERGED (08adeee)
+- **Build**: clean (ch1tty@4.1.0) | **Tests**: 1344/0/2 (+7 new) | **Audit**: 0 vulnerabilities
+- **What was done**:
+  - `npm ci` clean, `npm run build` clean, `npm test`: 1344 pass / 0 fail / 2 skipped.
+  - Found production gateway (`ch1tty.chitty.cc`) in DEGRADED state: `/api/v1/health` returning 503. Cause: 11 ledger entries stuck in DLQ (`~/.ch1tty/ledger.dlq.jsonl`) with no code path to replay them once the backend becomes available.
+  - Implemented `LedgerClient.replayDlq()` + `rewriteDlq()` in `src-stdio/ledger.ts`. Periodic flush timer (every 10s) now calls `replayDlq()` when `dlqEntries() > 0` and backend is bound. Atomic rewrite via `mkdtempSync+renameSync`.
+  - 7 new tests in `test/ledger-replay-dlq.test.ts` covering all replay scenarios.
+  - **CodeQL HIGH alert** triggered on first commit (`writeFileSync(this.dlqPath)` taint chain). Fixed in second commit using `mkdtempSync` staging dir — breaks the taint chain. CI green on second commit.
+  - PR #815 merged. Recovery flow: once `chittyos` backend reconnects, the 11 stuck entries will be auto-replayed, DLQ removed, and `/api/v1/health` will return 200 — no restart needed.
+  - Confirmed MMMM workstream already done (7 tests passing: `ledgerDlq` top-level field in `getStatusSnapshot()`).
+  - PushNotification tool unavailable (claude-code-remote MCP not connected — recurring).
+- **State summary**:
+  - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 + MMMM: DONE. Ledger DLQ replay: DONE (PR #815 merged).
+  - Tests: 1344/0/2. Audit: 0 vulnerabilities. No open PRs.
+  - Production gateway health will recover automatically once CF Access credentials configured on server.
+- **Human action required**:
+  1. **Configure CF Access credentials** on `ch1tty.chitty.cc` production server so the chittyos backend can connect and replay the 11 DLQ entries. Env vars: `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`.
+  2. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token` to restore Notion board (recurring).
+  3. **Disable or redirect hourly schedule** — all workstreams done; every idle run costs compute with no benefit.
+  4. **Stale branch cleanup** — 719+ remote `auto/` branches; enable auto-delete in repo settings or run bulk-delete.
+- **Next run**: Verify production gateway health recovers after CF Access credentials are configured. Otherwise idle.
+- **Blockers**: Notion 401. Ledger DLQ replay code merged but chittyos backend still disconnected (CF Access). PushNotification unavailable.
 
 ### 2026-06-19 (this run — idle; 24th consecutive idle run)
 - **Workstream**: None — all workstreams A–AAAAAAAAA + SEC-FIX 1–4 done; no new workstreams defined
