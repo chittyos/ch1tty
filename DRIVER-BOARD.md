@@ -1875,7 +1875,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **Build**: clean (`tsc` exit 0) | **Tests**: 1344/0/2 (45 suites) | **npm audit**: 0 vulns
 - **Actions**: No PRs to merge (returned `[]`). Synced local main to `origin/main` (detached HEAD / diverged local reset to `7f3c9aa`).
 - **Live gateway**: DEGRADED — ledger DLQ 11 entries; chittyos/github/notion/linear not connected (CF Access blocker, unchanged). 8/15 servers connected, 66 total tools, 141 active sessions.
-- **Ledger DLQ**: 11 entries (stable since run 25; `ledger.chitty.cc` unreachable from remote container; replay code merged PR #815 — clears once CF Access configured on prod)
+- **Ledger DLQ**: 11 entries — unchanged since last run; `ledger.chitty.cc` unreachable from remote container; replay code merged PR #815 — clears once CF Access configured on prod
 - **Remote branches**: 812 total (259 violate `buildCastExplanation` freeze; 1 new since last run; no open PRs from them; guardrail enforced)
 - **Blockers** (unchanged, all human-action):
   1. Notion token 401 — `op://ChittyOS-Integrations/notion/api_token`
