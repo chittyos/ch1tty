@@ -386,3 +386,26 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   1. All workstreams done. Check for new Dependabot alerts (security).
   2. If ledger DLQ grows beyond 20 entries, investigate whether the ledger endpoint is permanently gone or needs config update.
   3. If new guardrail-violating branches appear, reject any associated PRs and note the pattern.
+
+### 2026-06-20 (run 38 — current)
+- **Workstream advanced**: None — all workstreams complete; idle run
+- **Branch/PR**: none
+- **Build**: clean (`tsc`)
+- **Tests**: 1344 pass, 0 fail, 2 skipped
+- **npm audit**: 0 vulnerabilities
+- **What was done**:
+  - Startup: `npm ci` clean, `npm run build` clean, `npm test` 1344/0/2 (45 suites, 1346 total).
+  - Read CLAUDE.md + CHITTY.md; confirmed architectural guardrails (5-tool surface, buildCastExplanation freeze).
+  - Checked DRIVER-BOARD.md + RUNLOG.md (37th run entry at bottom).
+  - Verified all deliverables in place: `focus-profiles.json` (6 profiles), `focus-suggestions.json` (~1.8 MB, ~1750 combos), `src/focus.ts`, `src-stdio/suggestions.ts`, `test/scenario.test.ts`, `test/simulation.test.ts`.
+  - Confirmed `src-stdio/aggregator.ts` has 0 `cast-explain` occurrences — source metric cleanup from PR #827 is still clean.
+  - Confirmed `servers.json` GitHub entry uses official hosted remote endpoint (`https://api.githubcopilot.com/mcp/`) — workstream B migration intact.
+  - No open PRs; no new Dependabot/audit vulnerabilities.
+  - 730 stale `auto/` branches on remote (259 are cast-explain ratio violation branches; all harmless, no open PRs from them).
+  - Notion: 401 (persists). RUNLOG.md remains fallback cross-run board.
+- **Workstream state**: A✅ B✅ C✅ D✅ E✅ F-RRRR+ ✅ SEC-FIX✅. No open workstreams.
+- **Blockers**: Notion auth 401 (rotate `NOTION_API_TOKEN` at op://ChittyOS-Integrations/notion/api_token). Ledger DLQ (ledger.chitty.cc unreachable — persistent infra issue).
+- **Next run priority**:
+  1. All workstreams done. System healthy. If Notion token is rotated, first run will restore board access.
+  2. If new guardrail violations appear (new cast-explain ratio branches or PRs), reject them per CLAUDE.md binding freeze.
+  3. Consider adding new workstreams if any planned (new `apps/*-mcp` surface, cast chain improvements, new backends).
