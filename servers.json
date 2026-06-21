@@ -435,6 +435,306 @@
       "authTokenKey": "chittymcp",
       "lazy": true,
       "enabled": true
+    },
+    {
+      "_comment": "── chittyagent fleet: deployed agents with MCP endpoints ─────"
+    },
+    {
+      "id": "finance",
+      "name": "ChittyFinance",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "ecosystem",
+      "endpoint": "https://finance.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "canon",
+      "name": "ChittyCanon",
+      "type": "remote",
+      "access": "read",
+      "category": "ecosystem",
+      "endpoint": "https://canon.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "schema",
+      "name": "Schema Validator",
+      "type": "remote",
+      "access": "read",
+      "category": "ecosystem",
+      "endpoint": "https://schema.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "dispatch",
+      "name": "Dispatch",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "ecosystem",
+      "endpoint": "https://dispatch.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "monitor",
+      "name": "Monitor",
+      "type": "remote",
+      "access": "read",
+      "category": "ecosystem",
+      "endpoint": "https://monitor.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "gam",
+      "name": "Google Admin (GAM)",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "ecosystem",
+      "endpoint": "https://gam.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "comptroller",
+      "name": "Comptroller",
+      "type": "remote",
+      "access": "read",
+      "category": "ecosystem",
+      "endpoint": "https://comptroller.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "ship",
+      "name": "Ship (Deploy)",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "ecosystem",
+      "endpoint": "https://ship.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "scrape",
+      "name": "Scraper",
+      "type": "remote",
+      "access": "read",
+      "category": "ecosystem",
+      "endpoint": "https://scrape.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "storage",
+      "name": "Storage",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "ecosystem",
+      "endpoint": "https://storage.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "turbotenant",
+      "name": "TurboTenant",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "ecosystem",
+      "endpoint": "https://turbotenant.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "dispute",
+      "name": "Dispute Resolution",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "ecosystem",
+      "endpoint": "https://dispute.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "auth",
+      "name": "Auth",
+      "type": "remote",
+      "access": "read",
+      "category": "ecosystem",
+      "endpoint": "https://auth.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "notes",
+      "name": "Notes",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "documents",
+      "endpoint": "https://notes.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "resolve",
+      "name": "Resolver",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "ecosystem",
+      "endpoint": "https://resolve.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "sandbox",
+      "name": "Sandbox",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "ecosystem",
+      "endpoint": "https://sandbox.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "viewport",
+      "name": "Viewport",
+      "type": "remote",
+      "access": "read",
+      "category": "ecosystem",
+      "endpoint": "https://viewport.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "market",
+      "name": "Market Intelligence",
+      "type": "remote",
+      "access": "read",
+      "category": "ecosystem",
+      "endpoint": "https://market.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "autoassist",
+      "name": "Auto-Assist",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "ecosystem",
+      "endpoint": "https://autoassist.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "bindings",
+      "name": "Bindings",
+      "type": "remote",
+      "access": "read",
+      "category": "ecosystem",
+      "endpoint": "https://bindings.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "cleaner",
+      "name": "Cleaner",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "ecosystem",
+      "endpoint": "https://cleaner.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "chatgpt",
+      "name": "ChatGPT Bridge",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "ecosystem",
+      "endpoint": "https://chatgpt.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "bluebubbles",
+      "name": "BlueBubbles (iMessage)",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "communication",
+      "endpoint": "https://bluebubbles.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "ai",
+      "name": "AI Gateway",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "ecosystem",
+      "endpoint": "https://ai.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "git",
+      "name": "Git Agent",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "code",
+      "endpoint": "https://git.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "helper",
+      "name": "Helper",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "ecosystem",
+      "endpoint": "https://helper.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
+    },
+    {
+      "id": "quo",
+      "name": "Status Quo",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "ecosystem",
+      "endpoint": "https://quo.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
     }
   ]
 }
