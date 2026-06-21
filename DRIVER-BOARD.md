@@ -205,6 +205,37 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 ## Run Log
 
+### 2026-06-21 (idle — 62nd run; all workstreams done)
+- **Workstream**: None — all workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP done; no new workstreams defined
+- **Build**: clean (ch1tty@4.1.0) | **Tests**: 1344/0/2 (45 suites) | **Open PRs before this run**: 0
+- **What was done**:
+  - `npm ci` clean, `npm run build` clean (tsc exit 0), `npm test`: 1344 pass / 0 fail / 2 skipped (45 suites).
+  - Board read from DRIVER-BOARD.md (Notion 401 — recurring). `git fetch --all` — 753 remote `auto/` branches; no open PRs.
+  - origin/main: `d30d0e2` (61st idle run log). Checked out `auto/board-run-log-62nd-idle` from origin/main.
+  - Live gateway via Ch1tty MCP: DEGRADED (Ledger DLQ 11 entries, chittyos/github/notion/linear not connected — CF Access blocker, unchanged); 66 tools / 8 connected servers / 153 active sessions.
+  - Four new non-auto/ branches observed (not from driver): `fix/viewport-probe-namespacing`, `fix/worker-routes-and-deps`, `refactor/backend-interface`, `register-chittyconnect-mcp` — likely local user work; no PRs opened from them.
+  - `buildCastExplanation` metric freeze ACTIVE and enforced in source (PR #827 — unchanged).
+  - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP confirmed DONE (62nd consecutive idle run).
+  - PushNotification tool unavailable (claude-code-remote MCP not connected — recurring).
+- **State summary**:
+  - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP: DONE
+  - Tests: 1344/0/2. Build: clean. No open PRs.
+  - `buildCastExplanation` metric freeze ACTIVE and enforced in source.
+  - Ledger DLQ: 11 entries; replay code in place (PR #815); auto-clear once CF Access configured on prod.
+  - 753 remote `auto/` branches; no PRs from them (guardrail enforced).
+  - ⚠️ RECURRING BLOCKER: Local `main` (`5570c53`, feat(E)) diverged from `origin/main` (`d30d0e2`, 61st board log).
+  - 4 new non-auto/ branches: `fix/viewport-probe-namespacing`, `fix/worker-routes-and-deps`, `refactor/backend-interface`, `register-chittyconnect-mcp`.
+- **Human action required** (62nd consecutive idle run):
+  1. **Review new branches** — `fix/viewport-probe-namespacing`, `fix/worker-routes-and-deps`, `refactor/backend-interface`, `register-chittyconnect-mcp` appeared this run; determine if they need PRs opened or can be merged/closed.
+  2. **Resolve main branch divergence** ⚠️ — local `main` (`5570c53`) diverged from `origin/main` (`d30d0e2`). Decide which is authoritative; rebase or force-push to align.
+  3. **Disable or redirect hourly schedule** — all workstreams done; every idle run costs compute with no benefit.
+  4. **Add new workstreams** to DRIVER-BOARD.md if any planned (new `apps/*-mcp` server, new backends, scenario expansion).
+  5. **Stale branch cleanup** — 753 rogue `auto/` branches; enable auto-delete in repo settings or bulk-delete.
+  6. **Configure CF Access credentials** on `ch1tty.chitty.cc` prod server (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) to clear 11 DLQ entries.
+  7. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token` to restore Notion board.
+- **Next run**: Same idle state expected unless new workstreams added or main divergence resolved.
+- **Blockers**: Notion 401. Ledger DLQ (needs CF Access on prod). PushNotification unavailable. CI 0-jobs non-CodeQL (non-blocking). Main branch divergence (recurring since run 60).
+
 ### 2026-06-21 (idle — 61st run; all workstreams done)
 - **Workstream**: None — all workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP done; no new workstreams defined
 - **Build**: clean (ch1tty@4.1.0) | **Tests**: 1344/0/2 | **Open PRs before this run**: 1 (PR #854 — 60th idle run log; CI 3/3 ✅; squash-merged this run → 7be4534)
