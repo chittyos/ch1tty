@@ -421,6 +421,20 @@
       "authTokenKey": "chittymcp",
       "lazy": false,
       "enabled": true
+    },
+    {
+      "_comment": "ChittyAgent-Google — Google Workspace MCP gateway (hybrid: dynamic MCP discovery for Gmail/Drive/Calendar/Chat/People + static gap-fillers + custom wrappers for Docs/Sheets/Tasks). Direct endpoint, not proxied via mcp.chitty.cc. Auth via chittymcp service token."
+    },
+    {
+      "id": "google",
+      "name": "Google Workspace",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "ecosystem",
+      "endpoint": "https://google.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
     }
   ]
 }
