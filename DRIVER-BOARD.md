@@ -205,6 +205,34 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 ## Run Log
 
+### 2026-06-21 (idle — 61st run; all workstreams done)
+- **Workstream**: None — all workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP done; no new workstreams defined
+- **Build**: clean (ch1tty@4.1.0) | **Tests**: 1344/0/2 | **Open PRs before this run**: 1 (PR #854 — 60th idle run log; CI 3/3 ✅; squash-merged this run → 7be4534)
+- **What was done**:
+  - `npm ci` clean, `npm run build` clean (tsc exit 0), `npm test`: 1344 pass / 0 fail / 2 skipped (45 suites).
+  - Board read from DRIVER-BOARD.md (Notion 401 — recurring). `git fetch --all` — 828+ remote `auto/` branches (259 rogue cast-explain, balance completed/board-log branches); no open PRs from them (guardrail enforced).
+  - Repo started in detached HEAD at `3e15654` (58th board log = origin/main pre-merge). PR #854 found open with CI 3/3 green (CodeQL + Analyze × 2); squash-merged → `7be4534`. Fetched updated origin/main; checked out `auto/board-run-log-61st-idle` from it.
+  - Local `main` branch remains at `5570c53` (feat(E) PR #176), still diverged from `origin/main` (`7be4534`). Working from origin/main as the authoritative remote state (recurring since run 60).
+  - `buildCastExplanation` metric freeze ACTIVE in CLAUDE.md and enforced in source (PR #827 — unchanged).
+  - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP confirmed DONE (61st consecutive idle run).
+  - PushNotification tool unavailable (claude-code-remote MCP not connected — recurring).
+- **State summary**:
+  - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP: DONE
+  - Tests: 1344/0/2. Build: clean. PR #854 merged this run. No open PRs.
+  - `buildCastExplanation` metric freeze ACTIVE and enforced in source.
+  - Ledger DLQ: 11 entries; replay code in place (PR #815); auto-clear once CF Access configured on prod.
+  - 828+ remote `auto/` branches (259 rogue cast-explain); no PRs from them (guardrail enforced).
+  - ⚠️ RECURRING BLOCKER: Local `main` (`5570c53`, feat(E)) diverged from `origin/main` (`7be4534`, 60th board log) — needs human resolution.
+- **Human action required** (61st consecutive idle run):
+  1. **Resolve main branch divergence** ⚠️ — local `main` (`5570c53`) diverged from `origin/main` (`7be4534`). Decide which is authoritative; rebase or force-push to align.
+  2. **Disable or redirect hourly schedule** — all workstreams done; every idle run costs compute with no benefit.
+  3. **Add new workstreams** to DRIVER-BOARD.md if any planned (new `apps/*-mcp` server, new backends, scenario expansion).
+  4. **Stale branch cleanup** — 828+ rogue `auto/` branches; enable auto-delete in repo settings or bulk-delete.
+  5. **Configure CF Access credentials** on `ch1tty.chitty.cc` prod server (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) to clear 11 DLQ entries.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token` to restore Notion board.
+- **Next run**: Same idle state expected unless new workstreams added or main divergence resolved.
+- **Blockers**: Notion 401. Ledger DLQ (needs CF Access on prod). PushNotification unavailable. CI 0-jobs non-CodeQL (non-blocking). Main branch divergence (recurring since run 60).
+
 ### 2026-06-21 (idle — 60th run; all workstreams done)
 - **Workstream**: None — all workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP done; no new workstreams defined
 - **Build**: clean (ch1tty@4.1.0) | **Tests**: 1344/0/2 | **Open PRs before this run**: 1 (PR #853 — 59th idle run log, stale; closed this run)
