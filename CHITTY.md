@@ -115,6 +115,7 @@ Ch1tty is **greater than the sum of its registered backends**. Through the **Alc
 This is **ongoing intelligent design and decisioning** — ch1tty's topology evolves from use, not from upfront architectural decree. The fractal property makes this natural: the Code-Mode-over-focused-servers shape can replicate at any scale, so ch1tty grows new sub-surfaces without changing its 5-meta-tool public contract.
 
 Cross-references:
+- `docs/ALCHEMICAL_PROMOTION.md` — the promotion mechanics & substrate (molten→solid, AI-Gateway memory, recall/reinforce/merge clustering, skills as cold-start seeds)
 - `project_alchemist_integration.md` — 3-layer cast pipeline (keyword → Ollama → Alchemist contextual routing)
 - `project_ch1tty_user_mirror.md` — "fission when the relationship outgrows the container" (spawn = fission)
 - `project_session_coordinator_vision.md` — session coordinator stages the memories/patterns that inform alchemy
