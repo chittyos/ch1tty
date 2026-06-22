@@ -2614,7 +2614,7 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   - 776 total `auto/` branches on remote (259 cast-explain + 517 idle-board-log/catalog-pass branches).
 - **Action required (human)**: Delete the 259 violating branches:
   ```bash
-  git fetch --prune && git branch -r | grep "cast-explain" | sed 's/  origin\///' | xargs -I{} git push origin --delete {}
+  git fetch --prune && git branch -r | grep "cast-explain" | while read branch; do git push origin --delete "${branch#origin/}"; done
   ```
 - No code changes made this run.
 
