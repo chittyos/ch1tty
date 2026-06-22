@@ -2596,3 +2596,39 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
    - `orchestrator/skill_execute(pr-review)` (2/6, needs design+finance+communication+ops)
    - Pick 2 per profile: tools that can naturally cross into that profile
 3. Fix Notion auth: `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`
+
+---
+
+### 2026-06-22 — Session (run 85 — idle; guardrail violation audit)
+
+**Workstream advanced**: None (all A–E complete). Guardrail audit performed.
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → **1344 pass / 0 fail / 2 skipped** (up from 938 — coverage work on main added 406 tests across apps/* and branch-gap suites)
+- No open PRs.
+- Board state confirmed: all workstreams A–E checked complete. Catalog: `focus-suggestions.json` says "154th pass — COMPLETE COVERAGE" — 1750 combos / 596 verified / 1759 prompts.
+- **Guardrail violation audit (CLAUDE.md — `buildCastExplanation` metric freeze)**:
+  - Found **259 stale remote branches** matching `auto/XXXXXXXX-cast-explain-<metric>-ratio`. Each adds a new statistical ratio to `buildCastExplanation`, directly violating the CLAUDE.md freeze: "Do NOT add new statistical fields, ratios, percentile cross-comparisons… MUST be rejected."
+  - **None are merged to main.** `git log main | grep "cast/explain"` → 0 results. No open PRs on any of them.
+  - Main is clean. Stale unmerged branches only.
+  - 776 total `auto/` branches on remote (259 cast-explain + 517 idle-board-log/catalog-pass branches).
+- **Action required (human)**: Delete the 259 violating branches:
+  ```bash
+  git fetch --prune && git branch -r | grep "cast-explain" | sed 's/  origin\///' | xargs -I{} git push origin --delete {}
+  ```
+- No code changes made this run.
+
+**Branch / PR**: `auto/85th-idle-board-log` → (this PR)
+
+**Build + test counts**: build clean, 1344 pass / 0 fail / 2 skipped
+
+**Board state**: A ✅ B ✅ C ✅ D ✅ E ✅ — all done. Catalog: 154th pass, COMPLETE COVERAGE — 1750 combos / 596 verified / 1759 prompts.
+
+**Blockers**:
+- Notion auth 401: run `chitty-mcp-token notion` or rotate integration token.
+- 259 stale `cast-explain-*` remote branches violating CLAUDE.md metric freeze — require human cleanup (see command above).
+
+**Next run priority**:
+1. All workstreams complete — no workstream work remains.
+2. Human action: delete the 259 cast-explain branches from remote.
+3. Consider reducing run cadence or refreshing the task list — 85 consecutive idle runs suggests the hourly schedule is no longer productive.
