@@ -319,7 +319,7 @@ export class LedgerClient {
       } finally {
         try { rmSync(tmpDir, { recursive: true, force: true }); } catch { /* cleanup best-effort */ }
       }
-    } catch (err) {
+    } catch (err) { /* c8 ignore next 2 -- requires OS-level fault (ENOSPC/EROFS), untestable in sandbox */
       log.error(`Ledger DLQ rewrite failed (${this.dlqPath}): ${err}`);
     }
   }
