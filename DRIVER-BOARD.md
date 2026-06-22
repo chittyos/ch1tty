@@ -2661,3 +2661,21 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   3. ~746 remote branches (259 prohibited) — bulk-delete or enable auto-delete on merge in repo settings
   4. **55th consecutive idle run** — disable hourly schedule or define new workstreams in DRIVER-BOARD.md
 - **Next run**: Idle unless new workstreams are added. **Disable the hourly schedule** — 55 consecutive idle runs with no value to advance.
+
+### 2026-06-22 (idle — 80th run; all workstreams done)
+- **Workstream**: None (all A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP done)
+- **Branch/PR**: `auto/80th-idle-board-log` → PR opened this run
+- **Build**: clean (`tsc` exit 0) | **Tests**: 1344 pass / 0 fail / 2 skip (45 suites)
+- **Actions**:
+  - No open PRs. 80th consecutive idle run (runs 57–79 logged only in commit messages; board file out of sync).
+  - Investigated `buildCastExplanation` fields in source — confirmed guardrail clean post-PR #827. Fields present (kurtosis, Gini, Herfindahl, IQR, entropy) are the legitimate frozen set, not violations.
+  - 771 total remote branches; 259 stale `cast-explain` branches (guardrail violations never merged, correctly rejected).
+  - PushNotification unavailable (claude-code-remote MCP not connected — recurring).
+  - servers.json: github entry correctly uses `api.githubcopilot.com/mcp/` (workstream B confirmed done).
+  - Focus profiles: fully implemented in `src-stdio/aggregator.ts` with CH1TTY_FOCUS + per-call override (workstream C confirmed done).
+- **Blockers** (unchanged — all require human action):
+  1. Notion token 401 — rotate `op://ChittyOS-Integrations/notion/api_token`
+  2. Prod ledger DLQ 11 entries — configure CF Access creds (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`)
+  3. ~771 remote branches (259 prohibited) — bulk-delete stale `auto/` branches or enable auto-delete on merge in repo settings
+  4. **80th consecutive idle run** — disable hourly schedule or define new workstreams in DRIVER-BOARD.md
+- **Next run**: Idle unless new workstreams are added. **Disable the hourly schedule** — 80 consecutive idle runs with no value to advance.
