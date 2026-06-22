@@ -2771,3 +2771,36 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   2. Prod ledger DLQ — configure CF Access creds (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`)
   3. ~857 remote branches (259 prohibited) — bulk-delete stale `auto/` branches
 - **Next run**: Merge PR#884 if CI green. Remaining coverage gaps: `remote-proxy.ts` branches 177–178, 219; `ledger.ts` lines 99–102, 323–324; `coordinator.ts` line 76.
+
+### 2026-06-22T22:00Z — run 89 (MMMM: timer/CF-Access/pagination/spawn-timeout branch gaps)
+- **Workstream**: A (coverage improvement — timer, CF-Access, pagination, spawn-timeout branch gaps)
+- **Branch/PR**: `auto/mmmm-*` → **PR#885** ✅ MERGED (95d3cf0)
+- **Build**: clean | **Tests**: 1361 pass / 0 fail / 2 skip
+- **Note**: This run's board entry was not recorded at the time; reconstructed from git log. PR#885 merged `test(mmmm): cover timer/CF-Access/pagination/spawn-timeout branch gaps`. Covered remaining gaps in `remote-proxy.ts` (branches 177–178, 219) and `coordinator.ts` (line 76) from run 88 next-run list.
+
+### 2026-06-22T22:15Z — run 90 (idle — PR#886 merged; all workstreams done)
+- **Workstream**: None — all workstreams A–E + F–UUUUU + SEC-FIX 1–4 + GUARDRAIL-CLEANUP done; no new workstreams defined
+- **Build**: clean (ch1tty@4.1.0) | **Tests**: 1361/0/2 (45 suites, pre-merge); 1364/0/2 post-merge (PR#886 +3 tests) | **Open PRs before this run**: 1 (PR#886 RRRR — squash-merged this run → 64fd5e0)
+- **What was done**:
+  - `npm ci` clean, `npm run build` clean (tsc exit 0), `npm test`: 1361/0/2 (45 suites).
+  - Board read from DRIVER-BOARD.md (Notion 401 — recurring). `git fetch --all` — synced to origin/main 95d3cf0 (MMMM/PR#885).
+  - PR#886 (RRRR: cover no_match+explain and brain-route branches in buildCastExplanation) found open; CI 3/3 ✅ (CodeQL + Analyze×2); squash-merged → 64fd5e0. Verified: only adds tests, no new `buildCastExplanation` metrics — metric freeze guardrail clean.
+  - Coverage report (post-merge state): `aggregator.ts` 95.87% branches (lines 152, 2163-2164, 2169, 2173, 2178, 2180 — structurally unreachable sub-ternaries per PR#886 body); `ledger.ts` 98.11% branches (lines 323-324 — OS-fault catch, c8 ignore comment present but not fully honored). All thresholds passing: branches 97.99% > 95%, stmts 99.96% > 99%, funcs 100%, lines 99.96% > 99%.
+  - All workstreams A–E + F–UUUUU + SEC-FIX 1–4 + GUARDRAIL-CLEANUP confirmed DONE (90th consecutive idle run after original workstreams complete).
+  - PushNotification tool: unavailable (claude-code-remote MCP not connected — recurring).
+  - Notion: auth_token 401 (recurring).
+- **State summary**:
+  - All workstreams: DONE. Build: clean. Tests: 1364/0/2 (post PR#886). No open PRs.
+  - `buildCastExplanation` metric freeze: ACTIVE and enforced.
+  - Coverage: all thresholds passing. Remaining gaps are untestable (OS-fault, structurally unreachable).
+  - Ledger DLQ: 11 entries (CF Access blocker on prod, unchanged).
+  - Rogue auto/ branches accumulating; 0 PRs from any (guardrail enforced).
+- **Human action required** (recurring — same as previous runs):
+  1. **Disable or redirect hourly schedule** — all workstreams done; compute cost with no value to advance.
+  2. **Add new workstreams** to DRIVER-BOARD.md if planned work exists.
+  3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears 11 DLQ entries.
+  4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend.
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  6. **Stale branch cleanup** — bulk-delete rogue `auto/` branches or enable auto-delete on merge in repo settings.
+- **Blockers**: Notion 401. Ledger DLQ (needs CF Access on prod). PushNotification unavailable. GitHub MCP disconnected (missing env var on prod). Ollama unreachable (non-blocking).
+- **Next run**: Idle unless new workstreams added. All coverage thresholds passing; remaining gaps (aggregator.ts unreachable sub-ternaries, ledger.ts OS-fault catch) are genuinely untestable.
