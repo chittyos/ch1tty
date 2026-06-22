@@ -2685,3 +2685,33 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 2. Cover remaining aggregator.ts gaps: lines 1877, 2022 (check what they are); line 2186 (zero-margin guard)
 3. Cover ledger.ts lines 99-102, 323-324 and remote-proxy.ts lines 53-60, 280-281, 328-329, 404-405
 4. Fix Notion auth; delete 259 guardrail branches (human action needed)
+
+---
+
+## Run 87 — 2026-06-22
+
+**Session**: https://claude.ai/code/session_011HMhLFsdDED5RH8FbSRcX6
+
+**Actions**:
+1. Resumed from run 86 — PR #881 (JJJJ) had all CI green; merged it via squash.
+2. Pulled merged main, confirmed 1350 pass / 0 fail.
+3. Identified 3 remaining aggregator.ts statement/branch gaps: lines 1877 (unfocusedWinner), 2022 (odd-count median), 2186 (zero-margin focusBias).
+4. Created `test/kkkk-aggregator-unfocused-winner-odd-median-zerotie-gaps.test.ts` with 2 tests.
+5. Tests pass (1352 pass / 0 fail). Coverage: aggregator.ts 100% stmts (was 99.86%), branches 95.34% (was 94.15%), all-files branches 97.45% (was 96.91%).
+6. Opened PR #882 on branch `auto/kkkk-aggregator-unfocused-winner-odd-median-zerotie`.
+
+**CI status**: Pending at log time.
+
+**Codex bot**: usage-limit comment on both #881 and #882 — not a blocking review.
+
+**Remaining gaps after this run**:
+- `aggregator.ts` branches 2161-2164, 2169, 2173, 2178, 2180, 2187 — deeply nested ternaries in verbosity='full' block; very hard to trigger all sides
+- `coordinator.ts` line 76 — setInterval callback (eviction timer)
+- `ledger.ts` lines 99-102, 323-324
+- `remote-proxy.ts` lines 53-60, 280-281, 328-329, 404-405
+
+**Next run priority**:
+1. Merge PR #882 (CI green expected)
+2. Target `remote-proxy.ts` error-path gaps (non-connection error → recordSuccess): need HTTP test server throwing non-McpError
+3. Target `ledger.ts` DLQ rewrite error (line 323-324): need filesystem failure during rewrite
+4. Fix Notion auth; delete 259 guardrail branches (human action needed)
