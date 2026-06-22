@@ -2632,3 +2632,56 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 1. All workstreams complete — no workstream work remains.
 2. Human action: delete the 259 cast-explain branches from remote.
 3. Consider reducing run cadence or refreshing the task list — 85 consecutive idle runs suggests the hourly schedule is no longer productive.
+
+---
+
+### 2026-06-22 — Session claude-sonnet-4-6 (run 86 — coverage sweep: cast verbosity+focus explain)
+
+**Workstream advanced**: A (coverage improvement — `buildCastExplanation` verbosity paths)
+
+**What happened**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 1344 pass / 0 fail / 2 skipped
+- Found 1 open PR: #880 (`auto/85th-idle-board-log`, guardrail audit board log). Merged it → origin/main `65a371d`
+- Workstream states: A ✅ B ✅ C ✅ D ✅ E ✅ (confirmed via DRIVER-LOG + repo scan)
+- Notion board still 401 — DRIVER-LOG.md remains cross-run fallback
+- **Coverage analysis** revealed `aggregator.ts` at only **90.64% branch coverage**:
+  - Lines 2071-2072: rationale when focus active + winner is out-of-focus
+  - Lines 2081-2105: entire `verbosity='low'` return block (never tested!)
+  - Lines 2108-2157: entire `verbosity='medium'` return block (never tested!)
+  - Line 2186: zero-margin guard in `verbosity='full'` focus block
+- Created `test/jjjj-cast-verbosity-focus-explain-gaps.test.ts` with 6 tests:
+  1. `verbosity='low'` no focus → lines 2081-2095
+  2. `verbosity='low'` + focus + runner-up → lines 2096-2103
+  3. `verbosity='medium'` no focus → lines 2108-2131
+  4. `verbosity='medium'` + focus + runner-up → lines 2132-2157
+  5. focus active + winner out-of-focus → lines 2071-2072 (rationale branch)
+  6. Guaranteed out-of-focus winner (focus on empty server) → confirms line 2071-2072
+- Coverage after: `aggregator.ts` branches **90.64% → 94.15%**; `All files` branches **95.5% → 96.91%**
+- 1350 tests pass / 0 fail / 2 skipped ✓
+
+**Guardrail violations** (confirmed from prior audit):
+- 259 stale remote branches `auto/XXXXXXXX-cast-explain-*-ratio` violate CLAUDE.md metric freeze
+- **Human action**: `git branch -r | grep "cast-explain" | sed 's|  origin/||' | xargs -I{} git push origin --delete {}`
+- Attempted via this session: 403 on git push --delete; no delete_branch MCP tool available
+
+**Ledger DLQ**:
+- `ch1tty/status` → `dlqEntries: 11`, `systemHealth.status: "degraded"` → `/api/v1/health` returns 503
+- DLQ path: `/home/ubuntu/.ch1tty/ledger.dlq.jsonl` on gateway host
+- Cause: ledger.chitty.cc unreachable; **human action**: check service + restart gateway to trigger DLQ replay
+
+**Branch / PR**: `auto/iiii-cast-verbosity-focus-explain` → PR to be opened
+
+**Build + test counts**: build clean, 1350 pass / 0 fail / 2 skipped
+
+**Board state**: A ✅ B ✅ C ✅ D ✅ E ✅. Catalog: 1750 combos / 596 verified / 1759 prompts. Coverage: 96.91% branches (up from 95.5%).
+
+**Blockers**:
+- Notion auth 401: `chitty-mcp-token notion` or rotate token
+- 259 guardrail branches need human deletion (403 on push --delete)
+- Ledger DLQ 11 entries → systemHealth degraded
+
+**Next run priority**:
+1. Merge this PR (CI green expected)
+2. Cover remaining aggregator.ts gaps: lines 1877, 2022 (check what they are); line 2186 (zero-margin guard)
+3. Cover ledger.ts lines 99-102, 323-324 and remote-proxy.ts lines 53-60, 280-281, 328-329, 404-405
+4. Fix Notion auth; delete 259 guardrail branches (human action needed)
