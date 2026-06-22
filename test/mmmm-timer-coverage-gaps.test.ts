@@ -171,6 +171,8 @@ async function startMcpFixture(
 test(
   'coordinator.ts:76 — setInterval eviction callback fires with short interval',
   async () => {
+    const prevEvict = process.env.CH1TTY_SESSION_EVICT_INTERVAL_MS;
+    const prevTtl = process.env.CH1TTY_SESSION_TTL_MS;
     // Set very short interval so the timer fires within the test
     process.env.CH1TTY_SESSION_EVICT_INTERVAL_MS = '5';
     process.env.CH1TTY_SESSION_TTL_MS = '1';
@@ -184,8 +186,10 @@ test(
       assert.equal(typeof snap.activeSessions, 'number');
     } finally {
       coord.close();
-      delete process.env.CH1TTY_SESSION_EVICT_INTERVAL_MS;
-      delete process.env.CH1TTY_SESSION_TTL_MS;
+      if (prevEvict === undefined) delete process.env.CH1TTY_SESSION_EVICT_INTERVAL_MS;
+      else process.env.CH1TTY_SESSION_EVICT_INTERVAL_MS = prevEvict;
+      if (prevTtl === undefined) delete process.env.CH1TTY_SESSION_TTL_MS;
+      else process.env.CH1TTY_SESSION_TTL_MS = prevTtl;
     }
   },
 );
@@ -198,6 +202,8 @@ test(
   'remote-proxy.ts:177-178 — CF-Access headers present → "set (...)" diagnostic logged',
   async () => {
     const fixture = await startMcpFixture();
+    const prevClientId = process.env.CF_ACCESS_CLIENT_ID;
+    const prevClientSecret = process.env.CF_ACCESS_CLIENT_SECRET;
     // Set CF-Access env vars so envHeaders resolve to truthy values
     process.env.CF_ACCESS_CLIENT_ID = 'test-client-id-abcdefgh';
     process.env.CF_ACCESS_CLIENT_SECRET = 'test-secret-xyz';
@@ -219,8 +225,10 @@ test(
       const tools = await proxy.listTools('mmmm-cfaccess');
       assert.ok(Array.isArray(tools));
     } finally {
-      delete process.env.CF_ACCESS_CLIENT_ID;
-      delete process.env.CF_ACCESS_CLIENT_SECRET;
+      if (prevClientId === undefined) delete process.env.CF_ACCESS_CLIENT_ID;
+      else process.env.CF_ACCESS_CLIENT_ID = prevClientId;
+      if (prevClientSecret === undefined) delete process.env.CF_ACCESS_CLIENT_SECRET;
+      else process.env.CF_ACCESS_CLIENT_SECRET = prevClientSecret;
       await proxy.shutdown();
       await fixture.stop();
     }
