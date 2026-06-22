@@ -2745,3 +2745,42 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 1. Merge PR #885 once CI green
 2. Investigate aggregator.ts deeply nested ternary gaps — assess if triggerable
 3. Fix Notion auth; delete 259 guardrail branches (human action needed)
+
+---
+
+## Run 89 — 2026-06-22
+
+**Session**: https://claude.ai/code/session_01AXoveXVeVAfoJhKG8R957v
+
+**Actions**:
+1. Startup: `npm ci` clean, `npm run build` clean, `npm test` → 1363 tests: 1361 pass / 0 fail / 2 skipped.
+2. No open PRs (PR #885 was already merged to main).
+3. Workstream states: A ✅ B ✅ C ✅ D ✅ E ✅ (confirmed via DRIVER-LOG + repo scan).
+4. Coverage analysis: overall 97.79% branches (95% threshold). Remaining aggregator.ts gaps at `2161-2164,2169,2173,2178,2180,2187`.
+5. Investigated gaps: identified which are reachable vs unreachable:
+   - **Reachable**: line 2161 TRUE (brainMs defined → brain-route), line 2163/2164/2169/2187 FALSE (best=undefined → no_match+explain path at aggregator.ts:1283)
+   - **Unreachable**: lines 2173/2178/2180 (zero-score false branches — scoreIntent always returns t.score>0.1, so scores can't be 0 when buildCastExplanation is called with a winner)
+6. Created `test/rrrr-cast-explain-nomatch-brain-branchgaps.test.ts` (3 tests, all pass):
+   - Test 1: no_match + explain:true + verbosity:'full' → best=undefined path
+   - Test 2: same + focus active → focus block best=undefined path
+   - Test 3: BrainCoord subclass (routeIntent returns confidence=0.9) → brainMs truthy
+7. Coverage after: 97.79% → 97.99% overall; aggregator.ts 95.34% → 95.87% branches.
+   Line 2161 (brainMs TRUE) and 2187 (topCandidates<=1 in focus block) now covered.
+8. Opened PR #886 on branch `auto/rrrr-cast-explain-nomatch-brain-branchgaps`.
+
+**CI status**: CI in progress at log time.
+
+**Remaining gaps after this run** (all in aggregator.ts verbosity='full' block):
+- Lines 2163/2164/2169: outer ternaries now covered, but inner sub-ternaries remain (e.g. `candidateScoreEntropyTotal>0` false — unreachable since scores always >0.1). Reported by c8 because multiple branches share the same source line.
+- Lines 2173/2178/2180: provably unreachable false branches (winner/runner-up scores always >0.1).
+
+**Board state**: A ✅ B ✅ C ✅ D ✅ E ✅. Overall branch coverage: 97.99%. All thresholds pass.
+
+**Blockers**:
+- Notion auth 401: run `chitty-mcp-token notion` or rotate integration token.
+- 259 stale `auto/XXXXXXXX-cast-explain-*` remote branches violating CLAUDE.md guardrail — need human deletion.
+
+**Next run priority**:
+1. Merge PR #886 once CI green.
+2. Consider adding `/* c8 ignore */` markers to lines 2173/2178/2180 in src-stdio/aggregator.ts (provably unreachable false branches) — this would close those from the report without test risk.
+3. Otherwise all workstreams done; minimal further work needed unless new issues surface.
