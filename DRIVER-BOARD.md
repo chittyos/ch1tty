@@ -2679,3 +2679,21 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   3. ~771 remote branches (259 prohibited) — bulk-delete stale `auto/` branches or enable auto-delete on merge in repo settings
   4. **80th consecutive idle run** — disable hourly schedule or define new workstreams in DRIVER-BOARD.md
 - **Next run**: Idle unless new workstreams are added. **Disable the hourly schedule** — 80 consecutive idle runs with no value to advance.
+
+### 2026-06-22 (idle — 81st run; all workstreams done)
+- **Workstream**: None (all A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP done)
+- **Branch/PR**: `auto/81st-idle-board-log` → PR opened this run
+- **Build**: clean (`tsc` exit 0) | **Tests**: 1344 pass / 0 fail / 2 skip (45 suites) | **npm audit**: 0 vulns
+- **Actions**:
+  - Merged PR #874 (80th idle run log; 3/3 CI green → squash c96b368).
+  - Build clean, tests 1344/0/2 (45 suites). All green.
+  - 849 total remote branches (259 prohibited `buildCastExplanation` metric violations; guardrail enforced in source post-PR #827).
+  - No new open PRs after merging #874.
+  - PushNotification unavailable (claude-code-remote MCP not connected — recurring).
+  - servers.json: github at `api.githubcopilot.com/mcp/` (workstream B done). Focus profiles wired in aggregator (workstream C done). No changes to source.
+- **Blockers** (unchanged — all require human action):
+  1. Notion token 401 — rotate `op://ChittyOS-Integrations/notion/api_token`
+  2. Prod ledger DLQ 11 entries — configure CF Access creds (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`)
+  3. ~849 remote branches (259 prohibited) — bulk-delete stale `auto/` branches or enable auto-delete on merge in repo settings
+  4. **81st consecutive idle run** — disable hourly schedule or define new workstreams in DRIVER-BOARD.md
+- **Next run**: Idle unless new workstreams are added. **Disable the hourly schedule** — 81 consecutive idle runs with no value to advance.
