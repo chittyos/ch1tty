@@ -833,6 +833,26 @@
 
 ---
 
+### 2026-06-22T19:15Z — run 88 (LLLL coverage: remote-proxy non-connection RPC errors)
+
+- **Workstream advanced**: A (coverage improvement)
+- **Startup checks**: `npm ci` clean, `npm run build` clean (0 errors), `npm test` → **1352 pass / 0 fail / 2 skip** ✓
+- **State inspection**: No open PRs at startup. main at `6829f71` (run 87 board log). Workstreams A–E all confirmed done. All guardrails clean (5 meta-tools, buildCastExplanation freeze enforced). 857 remote branches (259 prohibited `cast-explain-*` — unmerged violations, source clean via PR #802+#811).
+- **Notion board**: Still unavailable (API 401). `.driver/run-log.md` + `DRIVER-BOARD.md` as fallback.
+- **DRIVER-LOG.md run 87 noted remaining coverage gaps**: `remote-proxy.ts` lines 52–60, 280–281, 328–329, 404–405; `ledger.ts` lines 99–102, 323–324; `coordinator.ts` line 76.
+- **Coverage analysis**: Identified that existing fixtures all use HTTP 5xx → SDK throws "Streamable HTTP error: …" which matches line 51 of `isConnectionError` before the `'code' in err` check (lines 52–60) is ever reached. New fixture uses HTTP 200 + application/json + JSON-RPC error body → SDK throws `McpError(code, …)` with `.message = "MCP error <code>: …"` — none of the string guards fire, code check is reached.
+- **Created `test/llll-remote-proxy-rpc-error-nonconnection.test.ts`** with 4 tests:
+  1. `McpError code=-32000` → isConnectionError true (lines 52–59 truthy) → callTool evicts
+  2. `McpError code=-32603` → isConnectionError false (lines 52–60 falsy) → callTool recordSuccess (lines 280–281) → connection survives
+  3. `McpError code=-32603` → listPrompts recordSuccess (lines 404–405) → connection survives
+  4. Fixture B (init also fails, code=-32603) → listResources outer catch → recordSuccess (lines 328–329)
+- **Results**: 1352 → **1356 pass** / 0 fail / 2 skip. Coverage: all files branches 97.45% → 97.62%; `remote-proxy.ts` 100% statements.
+- **Branch**: `auto/llll-remote-proxy-rpc-error-nonconnection`. **PR#884** open. CI in_progress (CodeQL). Codex: usage-limit notice (not blocking).
+- **Workstream status**: A ✅ B ✅ C ✅ D ✅ E ✅ (all done; A coverage continuously improving)
+- **Next run**: Merge PR#884 if CI green. Remaining gaps: `remote-proxy.ts` branches 177–178, 219; `ledger.ts` lines 99–102 (DLQ replay timer), 323–324 (DLQ rewrite fs failure); `coordinator.ts` line 76 (eviction timer). Human blockers unchanged: (1) Notion token 401; (2) 857 remote branches (259 prohibited); (3) disable hourly schedule or keep advancing coverage.
+
+---
+
 ### 2026-06-19T18:00Z — 23rd idle run
 
 - **Workstream advanced**: None (all done — idle run)
