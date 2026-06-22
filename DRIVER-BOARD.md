@@ -213,7 +213,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - Board read from DRIVER-BOARD.md (Notion auth_token_unavailable — recurring). `git fetch --all` — 767 rogue `auto/cast-explain-*-ratio` branches present; 0 open PRs from any — guardrail holds.
   - No open PRs before this run. origin/main at `04ad302` (75th idle run log PR #869).
   - Live gateway via Ch1tty MCP: DEGRADED (Ledger DLQ 11 entries — CF Access blocker, unchanged); 66 tools / 8 connected servers (cloudflare-builds, evidence, browser-rendering, context7, thinking, fs, playwright, orchestrator) / 171 active sessions. Uptime: 667599s (~7.7 days). GitHub MCP: not connected (missing `GITHUB_MCP_AUTHORIZATION` env var — unchanged). Notion/Linear/Stripe/Neon/Cloudflare backends: disconnected (auth/env blockers, unchanged). Embedding brain: 19 calls / 0 successes / 26 timeouts (Ollama unreachable). Brain circuit: closed (OK).
-  - `buildCastExplanation` metric freeze ACTIVE and enforced. All rogue cast-explain auto/ branches have 0 open PRs; guardrail holds.
+  - `buildCastExplanation` metric freeze ACTIVE and enforced in source (PR #827 — unchanged). All rogue cast-explain auto/ branches have 0 open PRs; guardrail holds.
   - All workstreams A–E + F–UUUUU + SEC-FIX 1–4 + GUARDRAIL-CLEANUP confirmed DONE (76th consecutive idle run).
   - PushNotification tool unavailable (claude-code-remote MCP not connected — recurring).
 - **State summary**:
