@@ -2804,3 +2804,32 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   6. **Stale branch cleanup** — bulk-delete rogue `auto/` branches or enable auto-delete on merge in repo settings.
 - **Blockers**: Notion 401. Ledger DLQ (needs CF Access on prod). PushNotification unavailable. GitHub MCP disconnected (missing env var on prod). Ollama unreachable (non-blocking).
 - **Next run**: Idle unless new workstreams added. All coverage thresholds passing; remaining gaps (aggregator.ts unreachable sub-ternaries, ledger.ts OS-fault catch) are genuinely untestable.
+
+### 2026-06-22 (idle — 91st run; all workstreams done)
+- **Workstream**: None (all A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP done)
+- **Branch/PR**: `auto/run-91-board-log` → PR opened this run
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1364 pass / 0 fail / 2 skip (45 suites, 1366 total) | **npm audit**: 0 vulns
+- **Actions**:
+  - `npm ci` clean, `npm run build` clean (tsc exit 0), `npm test`: 1364/0/2 (1366 total, 45 suites). Up from 1344 in runs 74–87 — 20 new tests from PRs #884 (llll/remote-proxy RPC error paths), #885 (mmmm/timer-CF-Access-pagination), #886 (rrrr/buildCastExplanation nomatch+brain branches), all merged in runs 88–90.
+  - Read CLAUDE.md + CHITTY.md; confirmed architectural guardrails (5-tool surface, buildCastExplanation freeze).
+  - `git fetch --all` — 784 stale `auto/` remote branches (259 prohibited cast-explain-ratio metric violations; source clean post-PR #827); no open PRs.
+  - `buildCastExplanation` metric freeze: ACTIVE and enforced. Rogue cast-explain branches present; 0 open PRs from any. Source clean.
+  - PushNotification: unavailable (claude-code-remote MCP not connected — recurring pattern, every run since deployment).
+  - Notion: 401 (recurring). DRIVER-BOARD.md remains cross-run fallback board.
+  - Coverage thresholds all passing (reported in run 90): branches 97.99% > 95%, stmts 99.96% > 99%, funcs 100%, lines 99.96% > 99%. Remaining gaps (aggregator.ts unreachable sub-ternaries, ledger.ts OS-fault catch) are genuinely untestable.
+  - No source changes. No new workstreams to advance.
+- **State summary**:
+  - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP: DONE (91st consecutive idle run)
+  - Tests: 1364/0/2. Build: clean. No open PRs. 0 vulnerabilities.
+  - `buildCastExplanation` metric freeze: ACTIVE and enforced in source (PR #827, unchanged).
+  - Ledger DLQ: 11 entries (CF Access blocker on prod, unchanged since ~run 50).
+  - 784 rogue `auto/` branches accumulating; 0 PRs from any.
+- **Human action required** (unchanged — same blockers as prior 90 runs):
+  1. **Disable or redirect hourly schedule** — 91 idle runs with no value to advance; every run burns compute and adds stale branches.
+  2. **Add new workstreams** to DRIVER-BOARD.md if planned work exists.
+  3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears 11 DLQ entries.
+  4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend.
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  6. **Stale branch cleanup** — bulk-delete 784 rogue `auto/` branches or enable auto-delete on merge in repo settings.
+- **Next run**: Idle unless new workstreams added to DRIVER-BOARD.md. All coverage thresholds passing; all guardrails enforced.
+- **Blockers**: Notion 401. Ledger DLQ (CF Access on prod). PushNotification unavailable. GitHub MCP disconnected. Ollama unreachable (non-blocking).
