@@ -205,6 +205,31 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 ## Run Log
 
+### 2026-06-22 (idle — 76th run; all workstreams done)
+- **Workstream**: None — all workstreams A–E + F–UUUUU + SEC-FIX 1–4 + GUARDRAIL-CLEANUP done; no new workstreams defined
+- **Build**: clean (ch1tty@4.1.0) | **Tests**: 1344/0/2 (45 suites) | **Open PRs before this run**: 0
+- **What was done**:
+  - `npm ci` clean, `npm run build` clean (tsc exit 0), `npm test`: 1344 pass / 0 fail / 2 skipped (45 suites).
+  - Board read from DRIVER-BOARD.md (Notion auth_token_unavailable — recurring). `git fetch --all` — 767 rogue `auto/cast-explain-*-ratio` branches present; 0 open PRs from any — guardrail holds.
+  - No open PRs before this run. origin/main at `04ad302` (75th idle run log PR #869).
+  - Live gateway via Ch1tty MCP: DEGRADED (Ledger DLQ 11 entries — CF Access blocker, unchanged); 66 tools / 8 connected servers (cloudflare-builds, evidence, browser-rendering, context7, thinking, fs, playwright, orchestrator) / 171 active sessions. Uptime: 667599s (~7.7 days). GitHub MCP: not connected (missing `GITHUB_MCP_AUTHORIZATION` env var — unchanged). Notion/Linear/Stripe/Neon/Cloudflare backends: disconnected (auth/env blockers, unchanged). Embedding brain: 19 calls / 0 successes / 26 timeouts (Ollama unreachable). Brain circuit: closed (OK).
+  - `buildCastExplanation` metric freeze ACTIVE and enforced in source (PR #827 — unchanged). All rogue cast-explain auto/ branches have 0 open PRs; guardrail holds.
+  - All workstreams A–E + F–UUUUU + SEC-FIX 1–4 + GUARDRAIL-CLEANUP confirmed DONE (76th consecutive idle run).
+  - PushNotification tool unavailable (claude-code-remote MCP not connected — recurring).
+- **State summary**:
+  - All workstreams: DONE. Tests: 1344/0/2. Build: clean. No open PRs.
+  - Gateway DEGRADED: Ledger DLQ 11 entries (CF Access blocker, unchanged since run ~50).
+  - 767 rogue auto/ branches (cast-explain-*-ratio) accumulating; 0 PRs; guardrail holds.
+- **Human action required** (76th consecutive idle run):
+  1. **Disable or redirect hourly schedule** — nothing left to advance; every idle run costs compute.
+  2. **Add new workstreams** to DRIVER-BOARD.md if planned.
+  3. **Stale branch cleanup** — 767+ rogue `auto/` branches; enable auto-delete in repo settings or bulk-delete via API.
+  4. **Configure CF Access credentials** on prod (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears 11 DLQ entries.
+  5. **Set `GITHUB_MCP_AUTHORIZATION`** env var on prod to reconnect GitHub MCP backend.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+- **Next run**: Same idle state expected unless new workstreams added to DRIVER-BOARD.md.
+- **Blockers**: Notion auth unavailable. Ledger DLQ (needs CF Access on prod). PushNotification unavailable. GitHub MCP disconnected (missing env var). Ollama unreachable (non-blocking).
+
 ### 2026-06-22 (idle — 75th run; all workstreams done)
 - **Workstream**: None — all workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP done; no new workstreams defined
 - **Build**: clean (ch1tty@4.1.0) | **Tests**: 1344/0/2 (45 suites) | **Open PRs before this run**: 0
