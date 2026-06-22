@@ -2751,3 +2751,23 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   3. ~851 remote branches (259 prohibited) — bulk-delete stale `auto/` branches or enable auto-delete on merge in repo settings
   4. **84th consecutive idle run** — disable hourly schedule or define new workstreams in DRIVER-BOARD.md
 - **Next run**: Idle unless new workstreams are added. **Disable the hourly schedule** — 84 consecutive idle runs with no value to advance.
+
+### 2026-06-22T19:15Z — run 88 (LLLL: remote-proxy non-connection RPC error paths)
+- **Workstream**: A (coverage improvement — `remote-proxy.ts` non-connection error paths)
+- **Branch/PR**: `auto/llll-remote-proxy-rpc-error-nonconnection` → **PR#884**
+- **Build**: clean (`tsc` exit 0) | **Tests**: 1356 pass / 0 fail / 2 skip (was 1352) | **Coverage**: branches 97.62% (was 97.45%)
+- **Actions**:
+  - Startup: npm ci clean, build clean, tests 1352/0/2. No open PRs. main at `6829f71`.
+  - All workstreams A–E done. 857 remote branches (259 prohibited, source clean post-PR #802+#811).
+  - DRIVER-LOG run 87 identified gaps: `remote-proxy.ts` lines 52–60, 280–281, 328–329, 404–405.
+  - Root cause: existing fixtures use HTTP 5xx → SDK throws "Streamable HTTP error: …" (line 51) before the `'code' in err` check (lines 52–60) is reached.
+  - Fix: new fixture returns HTTP 200 + application/json + JSON-RPC error body → SDK throws `McpError(code, …)` with message "MCP error <code>: …" — string guards don't fire, code check is reached.
+  - Created `test/llll-remote-proxy-rpc-error-nonconnection.test.ts` (4 tests): code=-32000 truthy (evict), code=-32603 falsy callTool (recordSuccess), code=-32603 falsy listPrompts (recordSuccess), init-fail listResources outer catch (recordSuccess lines 328–329).
+  - All 4 tests pass. Full suite 1352 → 1356 pass / 0 fail.
+  - Codex + CodeRabbit: both rate-limited (usage notices, not blocking reviews).
+  - CI: CodeQL in_progress at log time.
+- **Blockers** (unchanged):
+  1. Notion token 401 — rotate `op://ChittyOS-Integrations/notion/api_token`
+  2. Prod ledger DLQ — configure CF Access creds (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`)
+  3. ~857 remote branches (259 prohibited) — bulk-delete stale `auto/` branches
+- **Next run**: Merge PR#884 if CI green. Remaining coverage gaps: `remote-proxy.ts` branches 177–178, 219; `ledger.ts` lines 99–102, 323–324; `coordinator.ts` line 76.
