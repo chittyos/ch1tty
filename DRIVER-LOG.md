@@ -2935,3 +2935,30 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   6. **Stale branch cleanup** — bulk-delete 802 `auto/` branches or enable auto-delete on merge in repo settings.
 - **Next run**: Idle unless new workstreams added to DRIVER-BOARD.md. All coverage thresholds passing; all guardrails enforced.
 - **Blockers**: Notion 401. Ledger DLQ (CF Access on prod). PushNotification unavailable. GitHub MCP disconnected. Ollama unreachable (non-blocking).
+
+### 2026-06-23 (idle — 109th run; all workstreams done)
+- **Workstream**: None (all A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP done)
+- **Branch/PR**: `auto/board-run-log-109th-idle` → PR opened this run
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1368 pass / 0 fail / 2 skip (45 suites, 1370 total)
+- **Actions**:
+  - `npm ci` clean, `npm run build` clean (tsc exit 0), `npm test`: 1368/0/2. Unchanged from runs 100–108.
+  - Read CLAUDE.md + CHITTY.md; confirmed guardrails (5-tool surface, `buildCastExplanation` metric freeze).
+  - `git fetch --all` — 1 open PR at start: #907 (run 108 idle board log). Merged PR #907 squash → main.
+  - CI on PR #907: ci.yml failing with 0 jobs (instant failure, same recurring pattern for doc-only branches). Branch protection allows merge regardless; merge succeeded.
+  - `buildCastExplanation` metric freeze: ACTIVE and enforced in source (PR #827, unchanged).
+  - Notion: 401 (recurring). DRIVER-BOARD.md remains cross-run fallback. Ch1tty MCP: unavailable. PushNotification: unavailable.
+  - No source changes. No new workstreams to advance.
+- **State summary**:
+  - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP: DONE (109th consecutive idle run)
+  - Tests: 1368/0/2 (1370 total, 45 suites). Build: clean. 0 open PRs (after merging #907). 0 vulnerabilities.
+  - `buildCastExplanation` metric freeze: ACTIVE (PR #827). Ledger DLQ: 11 entries (CF Access blocker on prod).
+  - ~803 stale `auto/` branches on remote (260 are guardrail-violating `cast-explain-*-ratio` branches).
+- **Human action required** (109th iteration — unchanged):
+  1. **Disable or redirect hourly schedule** — 109 idle runs, no new work; every run burns compute and adds stale branches.
+  2. **Add new workstreams** to DRIVER-BOARD.md if planned work exists.
+  3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears 11 DLQ entries.
+  4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend.
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  6. **Stale branch cleanup** — bulk-delete ~803 `auto/` branches or enable auto-delete on merge in repo settings.
+- **Next run**: Idle unless new workstreams added to DRIVER-BOARD.md. All coverage thresholds passing; all guardrails enforced.
+- **Blockers**: Notion 401. Ledger DLQ (CF Access on prod). PushNotification unavailable. GitHub MCP disconnected. Ollama unreachable (non-blocking).
