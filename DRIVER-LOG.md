@@ -2935,4 +2935,3 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   6. **Stale branch cleanup** — bulk-delete 802 `auto/` branches or enable auto-delete on merge in repo settings.
 - **Next run**: Idle unless new workstreams added to DRIVER-BOARD.md. All coverage thresholds passing; all guardrails enforced.
 - **Blockers**: Notion 401. Ledger DLQ (CF Access on prod). PushNotification unavailable. GitHub MCP disconnected. Ollama unreachable (non-blocking).
-- **Blockers**: Notion 401. Ledger DLQ (CF Access on prod). PushNotification unavailable. GitHub MCP disconnected. Ollama unreachable (non-blocking).
