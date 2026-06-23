@@ -2861,4 +2861,3 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   6. **Stale branch cleanup** — bulk-delete 862 rogue `auto/` branches or enable auto-delete on merge in repo settings.
 - **Next run**: Idle unless new workstreams added to DRIVER-BOARD.md. All coverage thresholds passing; all guardrails enforced.
 - **Blockers**: Notion 401. Ledger DLQ (CF Access on prod). PushNotification unavailable. GitHub MCP disconnected (missing env var on prod). Ollama unreachable (non-blocking).
-- **Blockers**: Notion 401. Ledger DLQ (CF Access on prod). PushNotification unavailable. GitHub MCP disconnected. Ollama unreachable (non-blocking).
