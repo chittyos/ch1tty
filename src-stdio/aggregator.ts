@@ -1179,7 +1179,7 @@ export class Aggregator {
           const t = byName.get(r.tool.namespacedName);
           return t ? { ...t, score: r.confidence } : null;
         })
-        .filter((t): t is NamespacedTool & { score: number } => t !== null);
+        .filter((t): t is NamespacedTool & { score: number } => t !== null && t.score > 0);
       // When focus is active, the brain may have truncated in-focus candidates
       // to topK before the bias step can act. Augment with top keyword-scored
       // in-focus tools from the full registry so none are invisible to the lens.
@@ -1934,7 +1934,7 @@ function buildCastExplanation(
     scoredTools.length > 1 && candidateScoreEntropyTotal > 0
       ? -scoredTools.reduce((s, t) => {
           const p = t.score / candidateScoreEntropyTotal;
-          /* c8 ignore next */ // p > 0 always true since score > 0.1 and total > 0
+          /* c8 ignore next */ // p > 0: keyword scores > 0.1 (scoreIntent filter); brain scores > 0 (line 1182 filter)
           return s + (p > 0 ? p * Math.log2(p) : 0);
         }, 0)
       : undefined;
@@ -1944,7 +1944,7 @@ function buildCastExplanation(
     if (topCandidates.length < 2) return undefined;
     const sorted = [...topCandidates].sort((a, b) => a.score - b.score).map((c) => c.score);
     const total = sorted.reduce((s, v) => s + v, 0);
-    /* c8 ignore next */ // total > 0: topCandidate scores always > 0.1
+    /* c8 ignore next */ // total > 0: all scores > 0 (keyword: > 0.1 filter; brain: > 0 filter at line 1182)
     if (total === 0) return undefined;
     const n = sorted.length;
     return (2 * sorted.reduce((s, v, i) => s + (i + 1) * v, 0) / (n * total)) - (n + 1) / n;
@@ -1953,7 +1953,7 @@ function buildCastExplanation(
   // Gini coefficient of the full candidate pool; absent when < 2 candidates or all scores are 0.
   const candidateGiniCoefficient: number | undefined = (() => {
     if (scoredTools.length < 2) return undefined;
-    /* c8 ignore next */ // total > 0: scoreIntent filters at > 0.1
+    /* c8 ignore next */ // total > 0: all scores > 0 (keyword: > 0.1 filter; brain: > 0 filter at line 1182)
     if (candidateScoreEntropyTotal === 0) return undefined;
     const sorted = [...scoredTools].sort((a, b) => a.score - b.score).map((t) => t.score);
     const n = sorted.length;
@@ -2026,7 +2026,7 @@ function buildCastExplanation(
       : (scoredTools[mid - 1].score + scoredTools[mid].score) / 2;
   })();
 
-  /* c8 ignore next */ // t.score > 0 always true: scoreIntent filters at > 0.1
+  /* c8 ignore next */ // t.score > 0: keyword scores > 0.1; brain scores > 0 (filtered at line 1182)
   const nonZeroCandidateFraction: number | undefined = scoredTools.length >= 2
     ? scoredTools.reduce((c, t) => c + (t.score > 0 ? 1 : 0), 0) / scoredTools.length
     : undefined;
@@ -2043,7 +2043,7 @@ function buildCastExplanation(
     ? 1 / candidateScoreHerfindahlIndex
     : undefined;
 
-  /* c8 ignore next */ // scoreIntent filters at > 0.1, so t.score > 0 is always true
+  /* c8 ignore next */ // t.score > 0: keyword scores > 0.1; brain scores > 0 (filtered at line 1182)
   const nonZeroCount = scoredTools.reduce((c, t) => c + (t.score > 0 ? 1 : 0), 0);
   const scoreEntropyNormalized: number | undefined =
     candidateScoreEntropy !== undefined && nonZeroCount >= 2
@@ -2175,16 +2175,16 @@ function buildCastExplanation(
       ...(best !== undefined && topCandidates.length > 1 ? {
         focusDecisive: (best.score - (winnerInFocus ? focusBoost : 0)) < topCandidates[1].score,
         focusMargin: best.score - topCandidates[1].score,
-        /* c8 ignore next */ // score always > 0.1 — false branch unreachable
+        /* c8 ignore next */ // best.score > 0: original score > 0 for both routes (line 1182 + scoreIntent filter)
         ...(best.score > 0 ? { focusMarginRatio: (best.score - topCandidates[1].score) / best.score } : {}),
         runnerUpInFocus: isInFocus(focus!, scoredTools[1]),
         runnerUpFocusBoost: isInFocus(focus!, scoredTools[1]) ? focusBoost : 0,
         runnerUpScoreBase: topCandidates[1].score - (isInFocus(focus!, scoredTools[1]) ? focusBoost : 0),
         rawFocusMargin: (best.score - (winnerInFocus ? focusBoost : 0)) - (topCandidates[1].score - (isInFocus(focus!, scoredTools[1]) ? focusBoost : 0)),
-        /* c8 ignore next */ // score - boost always > 0 — false branch unreachable
+        /* c8 ignore next */ // score - boost > 0: original score > 0 (both routes); focus boost ≥ 0
         ...((best.score - (winnerInFocus ? focusBoost : 0)) > 0 ? { rawFocusMarginRatio: ((best.score - (winnerInFocus ? focusBoost : 0)) - (topCandidates[1].score - (isInFocus(focus!, scoredTools[1]) ? focusBoost : 0))) / (best.score - (winnerInFocus ? focusBoost : 0)) } : {}),
         focusNetBoostDelta: (winnerInFocus ? focusBoost : 0) - (isInFocus(focus!, scoredTools[1]) ? focusBoost : 0),
-        /* c8 ignore next */ // runner-up score always > 0.1 — false branch unreachable
+        /* c8 ignore next */ // runner-up score > 0: both routes guarantee > 0 (line 1182 + scoreIntent filter)
         ...(topCandidates[1].score > 0 ? { runnerUpFocusBoostRatio: (isInFocus(focus!, scoredTools[1]) ? focusBoost : 0) / topCandidates[1].score } : {}),
         ...((best.score - topCandidates[1].score) !== 0
           ? {

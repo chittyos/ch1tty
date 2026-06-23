@@ -465,10 +465,9 @@ test('jjjj: brain-route cast + verbosity=low covers brainMs truthy branch (line 
     const data = JSON.parse(result.content[0].text as string) as Record<string, unknown>;
     const exp = data.explanation as Record<string, unknown> | undefined;
     assert.ok(exp !== undefined, 'explanation present');
-    // Brain route fires → brainMs is set (line 2087 TRUE branch)
-    if (exp.method === 'brain') {
-      assert.equal(typeof exp.brainMs, 'number', 'brainMs present in low verbosity when brain-routed (line 2087)');
-    }
+    // BrainCoord always routes via brain when candidates exist; assert unconditionally.
+    assert.equal(exp.method, 'brain', 'BrainCoord always produces brain route');
+    assert.equal(typeof exp.brainMs, 'number', 'brainMs present in low verbosity when brain-routed (line 2087)');
   } finally {
     await agg.shutdown();
   }
@@ -495,10 +494,9 @@ test('jjjj: brain-route cast + verbosity=medium covers brainMs truthy branch (li
     const data = JSON.parse(result.content[0].text as string) as Record<string, unknown>;
     const exp = data.explanation as Record<string, unknown> | undefined;
     assert.ok(exp !== undefined, 'explanation present');
-    // Brain route fires → brainMs is set (line 2114 TRUE branch)
-    if (exp.method === 'brain') {
-      assert.equal(typeof exp.brainMs, 'number', 'brainMs present in medium verbosity when brain-routed (line 2114)');
-    }
+    // BrainCoord always routes via brain when candidates exist; assert unconditionally.
+    assert.equal(exp.method, 'brain', 'BrainCoord always produces brain route');
+    assert.equal(typeof exp.brainMs, 'number', 'brainMs present in medium verbosity when brain-routed (line 2114)');
   } finally {
     await agg.shutdown();
   }
