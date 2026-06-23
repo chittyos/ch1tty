@@ -18,6 +18,7 @@ import test from 'node:test';
 import { Aggregator } from '../src/aggregator.js';
 import { SessionCoordinator } from '../src/coordinator.js';
 import type { FocusProfiles } from '../src/focus.js';
+import type { RoutedTool, ToolCandidate } from '../src/ollama-brain.js';
 import type { ServerConfig } from '../src/types.js';
 import { FixtureBackend } from './fixture-backend.js';
 
@@ -27,6 +28,13 @@ function dlq(label: string): string {
 
 class KeywordCoord extends SessionCoordinator {
   override async routeIntent(): Promise<null> { return null; }
+}
+
+class BrainCoord extends SessionCoordinator {
+  override async routeIntent(_q: string, candidates: ToolCandidate[]): Promise<RoutedTool[] | null> {
+    if (candidates.length === 0) return null;
+    return [{ tool: candidates[0], confidence: 0.9, reason: 'test-brain' }];
+  }
 }
 
 /** Two-server fixture: alpha (in-focus for 'testfocus'), beta (out-of-focus). */
@@ -324,6 +332,171 @@ test('jjjj: rationale out-of-focus branch guaranteed (lines 2071-2072) — focus
     }
     // Focus name appears in explanation regardless
     assert.equal(exp.focus, 'emptyfocus', 'focus name present even with all-out-of-focus candidates');
+  } finally {
+    await agg.shutdown();
+  }
+});
+
+// ── 6. verbosity='medium' + out-of-focus winner + non-zero margin ───────────
+//
+// Covers:
+//  - Lines 2136-2137: `winnerInFocus ? focusBoost : 0` FALSE branches (winnerInFocus=false)
+//  - Lines 2148, 2152: same ternary false branches in the runner-up block
+//  - Line 2151: `if (margin !== 0)` TRUE branch — existing test-4 only hits margin=0
+//
+// Setup: focus on 'emptyfocus' (no matching tools → all candidates out-of-focus) so
+// winnerInFocus is always false. Intent 'list invoices' matches list_invoices (score 1.0)
+// and list_projects (score 0.5, only "list" matches) so both survive the >0.1 filter and
+// margin = 1.0 - 0.5 = 0.5 ≠ 0.
+
+test('jjjj: cast explain verbosity=medium with out-of-focus winner + non-zero margin covers winnerInFocus=false branches (lines 2136-2137,2148,2151-2152)', async () => {
+  const { backend, configs } = makeTwoServerFixture();
+  const d = dlq('medium-outoffocus-margin');
+  const coord = new KeywordCoord({}, { enabled: false }, d);
+  const focusProfiles: FocusProfiles = {
+    profiles: {
+      emptyfocus: { categories: [], servers: ['zz-empty'], boost: 0.5 },
+    },
+  };
+  const agg = new Aggregator(configs, {
+    backendFactory: () => backend,
+    embedEnabled: false,
+    ledgerDlqPath: d,
+    suggestionsCatalog: {},
+    coordinator: coord,
+    focus: 'emptyfocus',
+    focusProfiles,
+  });
+  try {
+    // 'list invoices': list_invoices scores 1.0 (both keywords match), list_projects
+    // scores 0.5 (only "list" matches). Neither is in 'emptyfocus' (zz-empty has no
+    // fixture tools) → winnerInFocus=false → false branch of winnerInFocus? ternaries.
+    // margin = 1.0 - 0.5 = 0.5 ≠ 0 → if (margin !== 0) TRUE → line 2152 executes.
+    const result = await agg.callTool('ch1tty/cast', {
+      intent: 'list invoices',
+      explain: true,
+      verbosity: 'medium',
+      dryRun: true,
+    });
+    const data = JSON.parse(result.content[0].text as string) as Record<string, unknown>;
+    const exp = data.explanation as Record<string, unknown> | undefined;
+    assert.ok(exp !== undefined, 'explanation present');
+    assert.equal(exp.focus, 'emptyfocus', 'focus name in explanation');
+    assert.equal(exp.winnerInFocus, false, 'winner is out-of-focus (zz-empty has no fixture tools)');
+    // winnerFocusBoost = winnerInFocus ? focusBoost : 0 = 0 (false branch, line 2136)
+    assert.equal(exp.winnerFocusBoost, 0, 'winnerFocusBoost is 0 for out-of-focus winner');
+    // Runner-up must be present (list_invoices + list_projects both score > 0.1)
+    assert.equal(typeof exp.focusMargin, 'number', 'focusMargin set when runner-up present');
+    // margin ≠ 0 → focusConfidence is set (line 2152)
+    if ((exp.focusMargin as number) !== 0) {
+      assert.equal(typeof exp.focusConfidence, 'number', 'focusConfidence set when margin !== 0 (line 2152)');
+    }
+  } finally {
+    await agg.shutdown();
+  }
+});
+
+// ── 7. verbosity='low' + out-of-focus winner + runner-up (line 2101) ────────
+//
+// Line 2101: `(winnerInFocus ? focusBoost : 0)` FALSE branch in the low verbosity focus
+// block — fires when winner is out of focus. Same emptyfocus + 'list invoices' approach.
+
+test('jjjj: cast explain verbosity=low with out-of-focus winner + runner-up covers winnerInFocus=false ternary (line 2101)', async () => {
+  const { backend, configs } = makeTwoServerFixture();
+  const d = dlq('low-outoffocus-margin');
+  const coord = new KeywordCoord({}, { enabled: false }, d);
+  const focusProfiles: FocusProfiles = {
+    profiles: {
+      emptyfocus: { categories: [], servers: ['zz-empty'], boost: 0.5 },
+    },
+  };
+  const agg = new Aggregator(configs, {
+    backendFactory: () => backend,
+    embedEnabled: false,
+    ledgerDlqPath: d,
+    suggestionsCatalog: {},
+    coordinator: coord,
+    focus: 'emptyfocus',
+    focusProfiles,
+  });
+  try {
+    const result = await agg.callTool('ch1tty/cast', {
+      intent: 'list invoices',
+      explain: true,
+      verbosity: 'low',
+      dryRun: true,
+    });
+    const data = JSON.parse(result.content[0].text as string) as Record<string, unknown>;
+    const exp = data.explanation as Record<string, unknown> | undefined;
+    assert.ok(exp !== undefined, 'explanation present');
+    assert.equal(exp.focus, 'emptyfocus', 'focus name in low verbosity explanation');
+    assert.equal(exp.winnerInFocus, false, 'winner out-of-focus (zz-empty has no fixture tools)');
+    // focusDecisive in low verbosity uses `(winnerInFocus ? focusBoost : 0)` — false branch now covered
+    assert.equal(typeof exp.focusDecisive, 'boolean', 'focusDecisive present when runner-up exists (line 2101)');
+  } finally {
+    await agg.shutdown();
+  }
+});
+
+// ── 8. brainMs truthy in verbosity='low' and 'medium' (lines 2087, 2114) ───
+//
+// Lines 2087 and 2114: `if (brainMs !== undefined) r.brainMs = brainMs;` in the low
+// and medium verbosity blocks. BrainCoord returns a result → castRoute='brain' → brainMs
+// is set. These lines are only covered in verbosity='full' by the rrrr tests.
+
+test('jjjj: brain-route cast + verbosity=low covers brainMs truthy branch (line 2087)', async () => {
+  const { backend, configs } = makeTwoServerFixture();
+  const d = dlq('low-brain-ms');
+  const coord = new BrainCoord({}, { enabled: false }, d);
+  const agg = new Aggregator(configs, {
+    backendFactory: () => backend,
+    embedEnabled: false,
+    ledgerDlqPath: d,
+    suggestionsCatalog: {},
+    coordinator: coord,
+  });
+  try {
+    const result = await agg.callTool('ch1tty/cast', {
+      intent: 'list',
+      explain: true,
+      verbosity: 'low',
+      dryRun: true,
+    });
+    const data = JSON.parse(result.content[0].text as string) as Record<string, unknown>;
+    const exp = data.explanation as Record<string, unknown> | undefined;
+    assert.ok(exp !== undefined, 'explanation present');
+    // BrainCoord always routes via brain when candidates exist; assert unconditionally.
+    assert.equal(exp.method, 'brain', 'BrainCoord always produces brain route');
+    assert.equal(typeof exp.brainMs, 'number', 'brainMs present in low verbosity when brain-routed (line 2087)');
+  } finally {
+    await agg.shutdown();
+  }
+});
+
+test('jjjj: brain-route cast + verbosity=medium covers brainMs truthy branch (line 2114)', async () => {
+  const { backend, configs } = makeTwoServerFixture();
+  const d = dlq('medium-brain-ms');
+  const coord = new BrainCoord({}, { enabled: false }, d);
+  const agg = new Aggregator(configs, {
+    backendFactory: () => backend,
+    embedEnabled: false,
+    ledgerDlqPath: d,
+    suggestionsCatalog: {},
+    coordinator: coord,
+  });
+  try {
+    const result = await agg.callTool('ch1tty/cast', {
+      intent: 'list',
+      explain: true,
+      verbosity: 'medium',
+      dryRun: true,
+    });
+    const data = JSON.parse(result.content[0].text as string) as Record<string, unknown>;
+    const exp = data.explanation as Record<string, unknown> | undefined;
+    assert.ok(exp !== undefined, 'explanation present');
+    // BrainCoord always routes via brain when candidates exist; assert unconditionally.
+    assert.equal(exp.method, 'brain', 'BrainCoord always produces brain route');
+    assert.equal(typeof exp.brainMs, 'number', 'brainMs present in medium verbosity when brain-routed (line 2114)');
   } finally {
     await agg.shutdown();
   }
