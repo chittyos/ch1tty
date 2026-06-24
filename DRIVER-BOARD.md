@@ -205,6 +205,30 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 
 ## Run Log
 
+### 2026-06-24 (idle — run 124; all workstreams done)
+- **Workstream**: None — all workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP done; no new workstreams defined
+- **Build**: clean (ch1tty@4.1.0) | **Tests**: 1368/0/2 (45 suites) | **Open PRs before this run**: 0 (PR #922 — run 123 idle log — was already merged by parallel session)
+- **What was done**:
+  - `npm ci` clean, `npm run build` clean (tsc exit 0), `npm test`: 1368 pass / 0 fail / 2 skipped (45 suites).
+  - Board read from DRIVER-BOARD.md (Notion 401 — recurring). 0 open PRs. Parallel session (PR #922) already recorded run 123 in RUNLOG.md.
+  - `buildCastExplanation` metric freeze ACTIVE — 800+ rogue `auto/cast-explain-*-ratio` branches present; 0 open PRs from them (guardrail holds).
+  - Live gateway NOT checked this run (Ch1tty MCP not connected in this container).
+  - PushNotification sent — 124th consecutive idle run.
+- **State summary**:
+  - All workstreams A–E: DONE (124th consecutive idle run)
+  - Tests: 1368/0/2. Build: clean. No PRs to merge this run.
+  - `buildCastExplanation` metric freeze: ACTIVE and enforced in source.
+  - Ledger DLQ: 11 entries (last known); replay code in place (PR #815); auto-clear once CF Access configured on prod.
+  - 800+ rogue cast-explain auto/ branches; 0 open PRs from them.
+- **Human action required** (124th consecutive idle run):
+  1. **Disable or redirect hourly schedule** — 124 idle runs with no new work; every run costs compute.
+  2. **Add new workstreams** to DRIVER-BOARD.md if there is planned work.
+  3. **Stale branch cleanup** — 800+ rogue `auto/` branches; enable auto-delete in repo settings.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears 11 DLQ entries.
+  5. **Set `GITHUB_MCP_AUTHORIZATION`** on prod (`Bearer $(op read op://ChittyOS-Integrations/github/personal_access_token)`) — reconnects GitHub MCP backend.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+- **Next run**: Same idle state expected unless new workstreams added to DRIVER-BOARD.md.
+
 ### 2026-06-24 (idle — run 122; all workstreams done)
 - **Workstream**: None — all workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP done; no new workstreams defined
 - **Build**: clean (ch1tty@4.1.0) | **Tests**: 1368/0/2 (45 suites, 1370 total) | **Open PRs before this run**: 1 (PR #920 — run 121 idle log; CI 3/3 ✅; squash-merged this run → 6069e955)
