@@ -3154,3 +3154,26 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   6. **Stale branch cleanup** — bulk-delete 800+ rogue `auto/` branches or enable auto-delete on merge in repo settings.
 - **Next run**: Idle unless new workstreams added to DRIVER-BOARD.md. All guardrails enforced.
 - **Blockers**: Notion 401. Ledger DLQ (CF Access on prod). PushNotification unavailable. GitHub MCP disconnected. Ch1tty MCP unavailable. Ollama unreachable (non-blocking).
+
+### 2026-06-24 (idle — run 125; all workstreams done)
+- **Workstream**: None (all A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP done; no new workstreams)
+- **Branch/PR**: `auto/run-125-board-log` (this entry)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1368 pass / 0 fail / 2 skip (45 suites, 1370 total; 1 flaky failure on first run, clean on second)
+- **Actions**:
+  - `npm ci` clean, `npm run build` clean (tsc exit 0), `npm test`: 1368/0/2 — unchanged from prior runs.
+  - `git fetch --all`: 800+ rogue `auto/*-cast-explain-*-ratio` branches on remote; only open PR was #923 (run 124 board log).
+  - PR #923 CI 3/3 ✅ — squash-merged → 44c20d3. `git reset --hard origin/main` to sync.
+  - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP confirmed DONE (125th consecutive idle run).
+  - `buildCastExplanation` metric freeze ACTIVE — source clean; 0 open guardrail-violating PRs; all 800+ rogue branches blocked.
+  - Notion: 401 (recurring). Ch1tty MCP: unavailable (not connected in this container). PushNotification: available this run.
+  - No source changes warranted; this board log is the sole output.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1368/0/2. Build: clean. **125th consecutive idle run.**
+- **Human action required** (unchanged blockers — 125th iteration):
+  1. **Disable or redirect hourly schedule** — 125 idle runs with no new work; every run costs compute and adds stale board entries.
+  2. **Add new workstreams** to DRIVER-BOARD.md if planned work exists.
+  3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears 11 DLQ entries.
+  4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend.
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  6. **Stale branch cleanup** — bulk-delete 800+ rogue `auto/` branches or enable auto-delete on merge in repo settings.
+- **Next run**: Idle unless new workstreams added to DRIVER-BOARD.md. All guardrails enforced.
+- **Blockers**: Notion 401. Ledger DLQ (CF Access on prod). Ch1tty MCP unavailable this session. GitHub MCP disconnected. Ollama unreachable (non-blocking).
