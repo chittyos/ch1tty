@@ -572,7 +572,7 @@ _(Prior run log entries archived to git history — runs 1–123 trimmed for rea
   - `git fetch --all`: 915 remote branches (260 rogue `auto/*-cast-explain-*-ratio` + ~655 other stale `auto/`); 0 open PRs confirmed.
   - **Branch cleanup attempted**: `git push origin --delete` on all 260 rogue `cast-explain` branches → HTTP 403 from local git proxy. No `delete_branch` tool in GitHub MCP. Branch cleanup is BLOCKED in this remote container environment.
   - **Cleanup command for human** (run from local clone with push access):
-    `git branch -r | grep 'origin/auto/' | sed 's|  remotes/origin/||' | xargs -P4 -n50 git push origin --delete`
+    `git branch -r | grep 'origin/auto/' | sed 's|^  origin/||' | xargs -r -P4 -n1 git push origin --delete`
     Or enable "Automatically delete head branches" in GitHub Settings → General.
   - All workstreams A–E confirmed DONE (145th consecutive idle run). `buildCastExplanation` metric freeze ACTIVE. Source clean.
   - Notion: 401. Ch1tty MCP: unavailable. GitHub MCP: GITHUB_MCP_AUTHORIZATION unset. Branch delete: 403.
