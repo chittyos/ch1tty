@@ -932,3 +932,28 @@
   6. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend in live gateway.
   7. **Rotate Notion token** — `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`.
 - **Next run**: Same idle state expected. No new workstreams to advance.
+
+---
+
+### 2026-06-25T00:00Z — run 143 (idle)
+
+- **Workstream advanced**: None (all A–E done — idle run)
+- **Branch/PR**: direct commit to main (run log only; no source changes)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1368/0/2 (45 suites, 1370 total)
+- **Actions**:
+  - `npm ci` clean, `npm run build` clean (0 errors), `npm test` → **1368 pass / 0 fail / 2 skip** ✓
+  - Read CLAUDE.md + CHITTY.md; confirmed guardrails (5-tool surface fixed; `buildCastExplanation` metric freeze ACTIVE).
+  - `git fetch --all`; 0 open PRs at run start. Local main synced to origin/main (a40e10d, run 142).
+  - Confirmed all workstreams: A ✓ B ✓ C ✓ D ✓ E ✓ (all done — 143rd consecutive idle run).
+  - Guardrail audit: 900+ remote auto/ branches (259 prohibited cast-explain-* metric branches — source clean, no open PRs from them).
+  - Notion board: unavailable (API 401).
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E ✓ (all done)
+- **Blockers** (unchanged — all require human action):
+  1. **Disable or redirect hourly schedule** — 143 consecutive runs, ~122+ idle; no new work.
+  2. **Add new workstreams** to `.driver/run-log.md` if planned work exists.
+  3. **Decide fate of DDDD–HHHH branches** — `origin/auto/DDDD-*` through `origin/auto/HHHH-*` have test/feature improvements from prior session (no merge-base with origin/main, no open PRs). Open PRs or close them.
+  4. **Clean up 259 prohibited branches**: `git push origin --delete $(git branch -r | grep 'origin/auto/[0-9]*-cast-explain' | sed 's|origin/||')`.
+  5. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`).
+  6. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend in live gateway.
+  7. **Rotate Notion token** — `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`.
+- **Next run**: Same idle state expected. No new workstreams to advance.
