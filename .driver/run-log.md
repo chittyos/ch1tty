@@ -906,3 +906,29 @@
 - **Notion board**: Still unavailable (API 401).
 - **Workstream status**: A ✓ B ✓ C ✓ D ✓ E ✓ (all done)
 - **Next run**: Steady state. Human actions: (1) Decide fate of `origin/auto/DDDD-*` through `origin/auto/HHHH-*` branches (advanced coverage/features from prior session — open PRs or close branches); (2) Clean up 259 prohibited cast-explain branches; (3) Restore Notion token.
+
+---
+
+### 2026-06-25T00:00Z — run 142 (idle)
+
+- **Workstream advanced**: None (all A–E done — idle run)
+- **Branch/PR**: `auto/142nd-idle-board-log` → (this PR)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1368/0/2 (45 suites, 1370 total) | no failures
+- **Actions**:
+  - `npm ci` clean, `npm run build` clean (0 errors), `npm test` → **1368 pass / 0 fail / 2 skip** ✓
+  - Read CLAUDE.md + CHITTY.md; confirmed guardrails (5-tool surface fixed at search/execute/status/reload/cast; `buildCastExplanation` metric freeze ACTIVE).
+  - `git fetch --all`; 1 open PR at run start: #940 (run 141 idle board log — all CI checks green). Merged it via squash.
+  - Confirmed all workstreams: A (build/tests green ✓); B (github in servers.json → `https://api.githubcopilot.com/mcp/` ✓); C (focus-profiles.json: 6 profiles, src/focus.ts present ✓); D (test/scenario.test.ts 1157 lines ✓); E (focus-suggestions.json: 1750 combos + 1759 prompts across 6 profiles ✓).
+  - Local/origin divergence confirmed: local `main` still has 50 commits with no merge-base vs `origin/main`. Branch created from `origin/main` directly.
+  - Guardrail audit: 836 remote `auto/` branches (259 are prohibited `auto/NNNNNNNN-cast-explain-*-ratio` branches — source clean, no open PRs from them).
+  - Notion board: unavailable (API 401 — token not resolvable in remote container).
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E ✓ (all done)
+- **Blockers** (unchanged — all require human action):
+  1. **Disable or redirect hourly schedule** — 142 consecutive runs, ~121 idle; no new work.
+  2. **Add new workstreams** to DRIVER-BOARD.md / `.driver/run-log.md` if planned work exists.
+  3. **Decide fate of DDDD–HHHH branches** — `origin/auto/DDDD-*` through `origin/auto/HHHH-*` have test/feature improvements from a prior session (no merge-base with origin/main, no open PRs). Open PRs or close them.
+  4. **Clean up 259 prohibited branches**: `git push origin --delete $(git branch -r | grep 'origin/auto/[0-9]*-cast-explain' | sed 's|origin/||')` or enable auto-delete on merge in repo settings.
+  5. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`).
+  6. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend in live gateway.
+  7. **Rotate Notion token** — `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`.
+- **Next run**: Same idle state expected. No new workstreams to advance.
