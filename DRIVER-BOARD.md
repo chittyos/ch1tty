@@ -1032,7 +1032,7 @@ _(Prior run log entries archived to git history — runs 1–123 trimmed for rea
 - **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1368 pass / 0 fail / 2 skip (45 suites, 1370 total)
 - **Actions**:
   - `npm ci` clean, `npm run build` clean (tsc exit 0), `npm test`: 1368/0/2 — unchanged from all prior runs.
-  - `git reset --hard origin/main`: synced to b8b2839 (run-174 log, squash-merged from PR #974 this run, 3/3 CI green). 945 remote branches.
+  - `git reset --hard origin/main`: synced to b8b2839 (run-174 log, squash-merged from PR #974 this run, 3/3 CI green). 945 stale `auto/` branches on remote (push --delete blocked 403).
   - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP confirmed DONE (175th consecutive idle run).
   - `buildCastExplanation` metric freeze ACTIVE — source clean; 0 open PRs from prohibited branches.
   - Notion: unavailable (401). Ch1tty MCP: unavailable. GitHub MCP: connected. PushNotification: silent (nothing new).
