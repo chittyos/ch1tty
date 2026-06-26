@@ -968,7 +968,7 @@ _(Prior run log entries archived to git history — runs 1–123 trimmed for rea
   - `npm ci` clean, `npm run build` clean (tsc exit 0), `npm test`: 1368/0/2 — unchanged from all prior runs.
   - `git reset --hard origin/main`: synced to f364dd6 (run-162 log). 0 open PRs.
   - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP confirmed DONE (163rd consecutive idle run).
-  - `buildCastExplanation` metric freeze ACTIVE — source clean; 0 open PRs from prohibited branches. 188 guardrail-violating stale branches on remote (never merged; pruning blocked by 403).
+  - `buildCastExplanation` metric freeze ACTIVE — source clean; 0 open PRs from prohibited branches. 260 stale `auto/*cast-explain*` branches on remote (never merged; pruning blocked by 403). Note: DRIVER-LOG run-85 audit counted 259 using the same `auto/XXXXXXXX-cast-explain-*` pattern; current count is 260 (1 added since). Earlier figure of 188 in this entry was erroneous (used a narrower suffix filter); corrected to 260 by PR review.
   - Notion: unavailable. Ch1tty MCP: unavailable. GitHub MCP: connected. PushNotification: sent (163rd idle run milestone).
   - No source code changes this run.
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1368/0/2. Build: clean. **163rd consecutive idle run.**
@@ -978,6 +978,6 @@ _(Prior run log entries archived to git history — runs 1–123 trimmed for rea
   3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears 11+ DLQ entries.
   4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect ch1tty github backend.
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
-  6. **Stale branch cleanup** — 857+ rogue `auto/` branches (188 guardrail-violating metric branches); `git push --delete` returns 403 in remote container. Must run locally or enable auto-delete in GitHub Settings → General.
+  6. **Stale branch cleanup** — 857+ rogue `auto/` branches (260 guardrail-violating `cast-explain` metric branches); `git push --delete` returns 403 in remote container. Must run locally or enable auto-delete in GitHub Settings → General.
 - **Next run**: Idle unless new workstreams added to DRIVER-BOARD.md. All guardrails enforced.
 - **Blockers**: Notion unavailable. Ledger DLQ (CF Access on prod). Ch1tty MCP unavailable. ch1tty github backend: unavailable (GITHUB_MCP_AUTHORIZATION unset). Branch delete: 403 (must run locally). Ollama unreachable (non-blocking).
