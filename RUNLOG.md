@@ -778,3 +778,50 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
   6. **Stale branch cleanup** — 860 rogue `auto/` branches; enable auto-delete in GitHub Settings or run locally.
 - **Next run**: Same idle state expected. Disable the schedule or add new workstreams.
+---
+
+### 2026-06-26 (idle — 169th run; all workstreams done)
+- **Workstream**: None (all A–E + F–AAAAAAAAA + SEC-FIX + GUARDRAIL-CLEANUP done)
+- **Branch/PR**: `auto/run-169-board-log` → PR #968 (opened then closed — conflicted with run-168 direct commit)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1368/0/2 (45 suites, 1370 total)
+- **Actions**:
+  - `npm ci` clean, `npm run build` clean (tsc exit 0), `npm test` 1368/0/2.
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface, `buildCastExplanation` metric freeze ACTIVE).
+  - `git fetch --all`; origin/main at run-168 (`6e4d9fb`). ~938 stale `auto/` branches on remote (uncleared, 403 blocks remote push --delete).
+  - All workstreams A–E + F–AAAAAAAAA + SEC-FIX + GUARDRAIL-CLEANUP confirmed DONE (169th consecutive idle run).
+  - Notion: 401 (unavailable). Ch1tty MCP: unavailable. GitHub MCP: connected.
+  - No source changes.
+- **Workstream state**: A✅ B✅ C✅ D✅ E✅ F–AAAAAAAAA ✅ SEC-FIX ✅ GUARDRAIL ✅
+- **Blockers** (all require human action):
+  1. **Disable or redirect hourly schedule** — 169 consecutive idle runs; pure compute churn.
+  2. **Add new workstreams** to DRIVER-BOARD.md / RUNLOG.md if planned work exists.
+  3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend.
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  6. **Stale branch cleanup** — ~938 rogue `auto/` branches; enable auto-delete in GitHub Settings or run locally.
+- **Next run**: Same idle state expected. Disable the schedule or add new workstreams to DRIVER-BOARD.md.
+
+---
+
+### 2026-06-26 (idle — 170th run; all workstreams done)
+- **Workstream**: None (all A–E + F–AAAAAAAAA + SEC-FIX + GUARDRAIL-CLEANUP done)
+- **Branch/PR**: `auto/run-170-board-log` → this PR
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1368/0/2 (45 suites, 1370 total)
+- **Actions**:
+  - `npm ci` clean, `npm run build` clean (tsc exit 0), `npm test`: 1368 pass / 0 fail / 2 skip (45 suites, 1370 total).
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface, `buildCastExplanation` metric freeze ACTIVE).
+  - `git fetch --all`; origin/main at run-168 (`60ce28c`). 1 open PR (#968, stale run-169 log — closed this run).
+  - ~938 stale `auto/` branches on remote (uncleared — 403 blocks push --delete from remote container).
+  - All workstreams A–E + F–AAAAAAAAA + SEC-FIX + GUARDRAIL-CLEANUP confirmed DONE (170th consecutive idle run).
+  - `buildCastExplanation` metric freeze: ACTIVE (source clean, 0 open PRs from prohibited branches).
+  - Notion: 401 (unavailable). Ch1tty MCP: unavailable. GitHub MCP: connected. PushNotification: sent.
+  - No source changes.
+- **Workstream state**: A✅ B✅ C✅ D✅ E✅ F–AAAAAAAAA ✅ SEC-FIX ✅ GUARDRAIL ✅
+- **Blockers** (all require human action):
+  1. **Disable or redirect hourly schedule** — 170 consecutive idle runs; pure compute churn.
+  2. **Add new workstreams** to DRIVER-BOARD.md / RUNLOG.md if planned work exists.
+  3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend.
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  6. **Stale branch cleanup** — ~938 rogue `auto/` branches; enable auto-delete in GitHub Settings or run locally.
+- **Next run**: Same idle state expected. Disable the schedule or add new workstreams to DRIVER-BOARD.md.
