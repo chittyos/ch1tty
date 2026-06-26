@@ -764,10 +764,10 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 - **Actions**:
   - `npm ci` clean, `npm run build` clean (tsc exit 0), `npm test` 1368/0/2.
   - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface, `buildCastExplanation` metric freeze ACTIVE).
-  - `git reset --hard origin/main`: synced to 6e4d9fb (run-167 log). 0 open PRs. 938 stale `auto/` branches on remote.
+  - `git reset --hard origin/main`: synced to 6e4d9fb (run-167 log). 0 open PRs. 860 stale `auto/` branches on remote.
   - All workstreams A–E + F–AAAAAAAAA + SEC-FIX + GUARDRAIL-CLEANUP confirmed DONE (168th consecutive idle run).
   - `buildCastExplanation` metric freeze: ACTIVE (source clean; 0 open PRs from prohibited branches).
-  - Notion: 401 (unavailable). Ch1tty MCP: unavailable. GitHub MCP: connected. PushNotification: sent.
+  - Notion: 401 (unavailable). Ch1tty MCP: unavailable. GitHub MCP: connected. PushNotification: silent (nothing new).
   - No source changes.
 - **Workstream state**: A✅ B✅ C✅ D✅ E✅ F–AAAAAAAAA ✅ SEC-FIX ✅ GUARDRAIL ✅
 - **Blockers** (all require human action):
@@ -776,5 +776,5 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
   4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend.
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
-  6. **Stale branch cleanup** — 938 rogue `auto/` branches; enable auto-delete in GitHub Settings or run locally.
+  6. **Stale branch cleanup** — 860 rogue `auto/` branches; enable auto-delete in GitHub Settings or run locally.
 - **Next run**: Same idle state expected. Disable the schedule or add new workstreams.
