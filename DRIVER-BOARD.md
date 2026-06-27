@@ -1491,7 +1491,7 @@ _(Prior run log entries archived to git history — runs 1–123 trimmed for rea
 
 ### 2026-06-27 (idle — run 195; all workstreams done; test count +2)
 - **Workstream**: None — all A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP done; no new workstreams defined.
-- **Branch/PR**: direct commit to main (run log only; no source changes)
+- **Branch/PR**: `auto/run-195-board-log` → PR #997 (board log only; no source changes)
 - **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total) — **+2 vs run 194** (PR #996 merged between runs)
 - **Actions**:
   - `npm ci` clean, `npm run build` clean (tsc exit 0), `npm test`: 1370/0/2.
