@@ -1319,7 +1319,7 @@ _(Prior run log entries archived to git history — runs 1–123 trimmed for rea
 - **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1368 pass / 0 fail / 2 skip (45 suites, 1370 total)
 - **Actions**:
   - `npm ci` clean, `npm run build` clean (tsc exit 0), `npm test`: 1368/0/2 — unchanged from all prior runs.
-  - `git fetch --all`: 960+ remote branches (800+ rogue `auto/*-cast-explain-*-ratio`); 1 open PR (#987 run-186 log) — CodeRabbit ✅, 3/3 CI checks ✅ — squash-merged (d3b56ab). `git reset --hard origin/main` to sync.
+  - `git fetch --all`: 960+ remote branches (800+ rogue `auto/*-cast-explain-*-ratio`); PR #987 (run-186 log) — CodeRabbit ✅, 3/3 CI checks ✅ — squash-merged (d3b56ab).
   - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP confirmed DONE (187th consecutive idle run).
   - `buildCastExplanation` metric freeze ACTIVE — source clean; 0 open PRs from prohibited branches.
   - Notion: unavailable (401). Ch1tty MCP: unavailable. GitHub MCP: connected. PushNotification: sent.
