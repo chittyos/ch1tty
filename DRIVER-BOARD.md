@@ -1491,7 +1491,7 @@ _(Prior run log entries archived to git history — runs 1–123 trimmed for rea
 
 ### 2026-06-27 (idle — run 195; all workstreams done; test count +2)
 - **Workstream**: None — all A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP done; no new workstreams defined.
-- **Branch/PR**: `auto/run-195-board-log` → PR #997 (board log only; no source changes)
+- **Branch/PR**: `auto/run-195-board-log` → PR #997 ✅ MERGED (squash, c3c26f1, this run 196)
 - **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total) — **+2 vs run 194** (PR #996 merged between runs)
 - **Actions**:
   - `npm ci` clean, `npm run build` clean (tsc exit 0), `npm test`: 1370/0/2.
@@ -1504,6 +1504,26 @@ _(Prior run log entries archived to git history — runs 1–123 trimmed for rea
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **195th consecutive idle run.**
 - **Human action required** (same blockers — 195th iteration):
   1. **Disable or redirect hourly schedule** — 195 idle runs with no new work; every run costs compute and adds stale entries.
+  2. **Add new workstreams** to DRIVER-BOARD.md if planned work exists.
+  3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ entries.
+  4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect ch1tty github backend (distinct from the Claude Code session's GitHub MCP tools).
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  6. **Stale branch cleanup** — 967 rogue `auto/` branches; run `git push --delete` locally or enable auto-delete in GitHub Settings.
+
+### 2026-06-27 (idle — run 196; all workstreams done; PR #997 merged this run)
+- **Workstream**: None — all A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP done; no new workstreams defined.
+- **Branch/PR**: `auto/run-196-board-log` → PR #998 (board log only; no source changes)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total) — **unchanged from run 195**
+- **Actions**:
+  - `npm ci` clean, `npm run build` clean (tsc exit 0), `npm test`: 1370/0/2 — unchanged.
+  - `git fetch --all`: 967 remote branches (800+ rogue `auto/*-cast-explain-*-ratio`); 1 open PR (#997) → merged squash (c3c26f1) this run.
+  - All workstreams A–E + F–AAAAAAAAA + SEC-FIX 1–4 + GUARDRAIL-CLEANUP confirmed DONE (196th consecutive idle run).
+  - `buildCastExplanation` metric freeze ACTIVE — source clean; 0 open PRs from prohibited branches.
+  - Notion: unavailable (401). Ch1tty MCP: unavailable. GitHub MCP (session tools): connected. ch1tty github backend (servers.json): unavailable (GITHUB_MCP_AUTHORIZATION unset on prod).
+  - No source code changes this run.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **196th consecutive idle run.**
+- **Human action required** (same blockers — 196th iteration):
+  1. **Disable or redirect hourly schedule** — 196 idle runs with no new work; every run costs compute and adds stale entries.
   2. **Add new workstreams** to DRIVER-BOARD.md if planned work exists.
   3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ entries.
   4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect ch1tty github backend (distinct from the Claude Code session's GitHub MCP tools).
