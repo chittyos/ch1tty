@@ -1,1 +1,176 @@
-IyBjaDF0dHkgZ29hbC1kcml2ZXIgYm9hcmQKCkZhbGxiYWNrIGJvYXJkIOKAlCBOb3Rpb24gQVBJIHRva2VuIGludmFsaWQgKDQwMSkuIFRoaXMgZmlsZSBpcyB0aGUgY3Jvc3MtcnVuIGR1cmFibGUgc3RhdGUuCkJsb2NrZXIgdG8gcmVzdG9yZSBOb3Rpb246IHJvdGF0ZSBgTk9USU9OX0FQSV9UT0tFTmAgKG9wOi8vQ2hpdHR5T1MtSW50ZWdyYXRpb25zL25vdGlvbi9hcGlfdG9rZW4pLgoKTk9URTogQm9hcmQgdHJpbW1lZCBhdCBydW4gMjAxICgyMDI2LTA2LTI3KS4gRnVsbCBoaXN0b3J5IHByZXNlcnZlZCBpbiBnaXQuIFByaW9yIHRyaW0gYXQgcnVuIDEyNi4KCiMjIFdvcmtzdHJlYW0gU3RhdHVzCgpBbGwgd29ya3N0cmVhbXMgYXJlIERPTkUgYXMgb2YgMjAyNi0wNi0xNSB0byAyMDI2LTA2LTIwLiBCdWlsZCBjbGVhbiwgdGVzdHMgZ3JlZW4sIGd1YXJkcmFpbHMgZW5mb3JjZWQuCgotIFt4XSAqKlNFQy1GSVggMS0zKiog4oCUIERlcGVuZGFib3QgaGlnaC1zZXZlcml0eSB2dWxucyAoaG9ubywgd3MsIHVuZGljaSwgZXNidWlsZCkuIFBScyAjNzczLyM3NzcvIzc4MSDinIUgTUVSR0VELgotIFt4XSAqKkEqKiDigJQgR2F0ZXdheSB1cC9yZWZyZXNoZWQvdGVzdGVkLiBCdWlsZCBjbGVhbiwgNSBtZXRhLXRvb2xzIGNvbmZpcm1lZC4gRE9ORS4KLSBbeF0gKipCKiog4oCUIEdpdEh1YiBNQ1AgbWlncmF0aW9uOiBgc2VydmVycy5qc29uYCBnaXRodWIg4oaSIGBodHRwczovL2FwaS5naXRodWJjb3BpbG90LmNvbS9tY3AvYCB3aXRoIGVudkhlYWRlcnMuIERPTkUuCi0gW3hdICoqQyoqIOKAlCBGb2N1cy1wcm9maWxlIGxheWVyOiBgZm9jdXMtcHJvZmlsZXMuanNvbmAgKDYgcHJvZmlsZXMpLCBDSDFUVFlfRk9DVVMsIHBlci1jYWxsIGZvY3VzIHBhcmFtLCBzdGF0dXMgcmVwb3J0aW5nLCB0ZXN0cy4gRE9ORS4KLSBbeF0gKipEKiog4oCUIFNjZW5hcmlvIHRlc3RpbmcgKyBzaW11bGF0aW9uOiBgdGVzdC9zY2VuYXJpby50ZXN0LnRzYCwgYHRlc3Qvc2ltdWxhdGlvbi50ZXN0LnRzYCwgYHNpbS9zY2VuYXJpb3MudHNgIGhhcm5lc3MuIERPTkUuCi0gW3hdICoqRSoqIOKAlCBBbGNoZW1pc3QgY2F0YWxvZzogYGZvY3VzLXN1Z2dlc3Rpb25zLmpzb25gIOKAlCAzNzIvMzcyIHRvb2xzIGF0IDYvNiwgMTAwJSBjb3ZlcmFnZSAocnVuIDkxKS4gRE9ORS4KLSBbeF0gKipG4oCTQUFBQUFBQUFBKiog4oCUIE9ic2VydmFiaWxpdHkgaW1wcm92ZW1lbnRzOiBjYXN0L3NlYXJjaC9leGVjdXRlL3N0YXR1cyBsYXRlbmN5LCBzZXNzaW9uIGNvbnRleHQsIGZvY3VzIGZpZWxkcywgZXhwbGFuYXRpb24gZmllbGRzLCBjaGFpbiBleGVjdXRpb24sIGNhdGFsb2cgc3RhdHMsIHNlc3Npb24gVFRMLCBkcnlSdW4sIHNjb3BlLCB0b3BUb29scywgbGVkZ2VyIGhlYWx0aCwgSVFSL2VudHJvcHkva3VydG9zaXMvZXRjLiB+MTUwIFBScyAjMzY14oCTIzYxOS4gQWxsIOKchSBNRVJHRUQuCi0gW3hdICoqR1VBUkRSQUlMLUNMRUFOVVAqKiDigJQgUmV2ZXJ0ZWQgODAwKyByb2d1ZSBgYXV0by8qLWNhc3QtZXhwbGFpbi0qLXJhdGlvYCBicmFuY2hlcyB0aGF0IHZpb2xhdGVkIHRoZSBgYnVpbGRDYXN0RXhwbGFuYXRpb25gIG1ldHJpYyBmcmVlemUuIFNvdXJjZSBjbGVhbi4gMCB2aW9sYXRpb25zIGluIG9wZW4gUFJzLgoKIyMgR3VhcmRyYWlsOiBidWlsZENhc3RFeHBsYW5hdGlvbiBtZXRyaWMgZnJlZXplCgoqKkFDVElWRS4qKiBFdmVyeSBmaWVsZCB0aGF0IGJlbG9uZ3MgaW4gYGNhc3QgZXhwbGFpbmAgaXMgYWxyZWFkeSB0aGVyZS4gTm8gbmV3IHN0YXRpc3RpY2FsIGZpZWxkcywgcmF0aW9zLCBwZXJjZW50aWxlIGNyb3NzLWNvbXBhcmlzb25zLCBvciBvYnNlcnZhYmlsaXR5IG1ldHJpY3MgbWF5IGJlIGFkZGVkIHRvIGBidWlsZENhc3RFeHBsYW5hdGlvbmAuIEFueSBQUiBhZGRpbmcgc3VjaCBhIGZpZWxkIE1VU1QgYmUgcmVqZWN0ZWQuIFNlZSBDTEFVREUubWQgwqcgKkFyY2hpdGVjdHVyYWwgR3VhcmRyYWlsKi4KCiMjIEJsb2NrZXJzCgotICoqTm90aW9uIEFQSSB0b2tlbioqIOKAlCBJbnZhbGlkICg0MDEpLiBIdW1hbiBhY3Rpb246IHJvdGF0ZSBgTk9USU9OX0FQSV9UT0tFTmAgaW4gMVBhc3N3b3JkIChgb3A6Ly9DaGl0dHlPUy1JbnRlZ3JhdGlvbnMvbm90aW9uL2FwaV90b2tlbmApLgotICoqTGVkZ2VyIERMUSoqIOKAlCBFbnRyaWVzIHByZXNlbnQ6IGBsZWRnZXIuY2hpdHR5LmNjYCB1bnJlYWNoYWJsZSBmcm9tIHJlbW90ZSBjb250YWluZXIuIFJlcGxheSBjb2RlIG1lcmdlZCAoUFIgIzgxNSkuIEFjdGlvbjogY29uZmlndXJlIENGIEFjY2VzcyBjcmVkZW50aWFscyAoYENISVRUWV9DRl9BQ0NFU1NfQ0xJRU5UX0lEYCAvIGBDSElUVFlfQ0ZfQUNDRVNTX0NMSUVOVF9TRUNSRVRgKSBvbiBwcm9kLgotICoqY2gxdHR5IGdpdGh1YiBiYWNrZW5kKiog4oCUIGBHSVRIVUJfTUNQX0FVVEhPUklaQVRJT05gIHVuc2V0IG9uIHByb2QuIFNldCBlbnYgdmFyIHRvIHJlY29ubmVjdCB0aGUgYGdpdGh1YmAgYmFja2VuZCBpbiBgc2VydmVycy5qc29uYC4KLSAqKkJyYW5jaCBjbGVhbnVwKiog4oCUIDk3NSByb2d1ZSBgYXV0by9gIGJyYW5jaGVzICgyNjAgY2FzdC1leHBsYWluIHZpb2xhdGlvbnMpLiBHaXQgcHVzaCAtLWRlbGV0ZSBmYWlscyBpbiB0aGlzIGNvbnRhaW5lci4gSHVtYW4gYWN0aW9uOiBlbmFibGUgIkF1dG9tYXRpY2FsbHkgZGVsZXRlIGhlYWQgYnJhbmNoZXMiIGluIEdpdEh1YiBTZXR0aW5ncyDihpIgR2VuZXJhbCwgb3IgcnVuIGJ1bGstZGVsZXRlIGxvY2FsbHkuCi0gKipDSSAobWFpbiBjaS55bWwpKiog4oCUIDAtam9iLXF1ZXVlIGZhaWx1cmUgKG5vbi1Db2RlUUwpLiBSZWN1cnJpbmcsIG5vbi1ibG9ja2luZy4KCiMjIEh1bWFuIEFjdGlvbnMgUmVxdWlyZWQgKHBlcnNpc3RlbnQgc2luY2UgcnVuIDEyMSkKCjEuICoqRGlzYWJsZSBvciByZWRpcmVjdCBob3VybHkgc2NoZWR1bGUqKiDigJQgMjE4KyBpZGxlIHJ1bnMgd2l0aCBubyBuZXcgd29yazsgZXZlcnkgcnVuIGNvc3RzIGNvbXB1dGUuCjIuICoqQWRkIG5ldyB3b3Jrc3RyZWFtcyoqIHRvIERSSVZFUi1CT0FSRC5tZCBpZiBwbGFubmVkIHdvcmsgZXhpc3RzLgozLiAqKkNvbmZpZ3VyZSBDRiBBY2Nlc3Mgb24gcHJvZCoqIChgQ0hJVFRZX0NGX0FDQ0VTU19DTElFTlRfSURgIC8gYENISVRUWV9DRl9BQ0NFU1NfQ0xJRU5UX1NFQ1JFVGApIOKAlCBjbGVhcnMgbGVkZ2VyIERMUS4KNC4gKipTZXQgYEdJVEhVQl9NQ1BfQVVUSE9SSVpBVElPTmAqKiBvbiBwcm9kIHRvIHJlY29ubmVjdCBjaDF0dHkgZ2l0aHViIGJhY2tlbmQuCjUuICoqUm90YXRlIE5vdGlvbiB0b2tlbioqIOKAlCBgb3A6Ly9DaGl0dHlPUy1JbnRlZ3JhdGlvbnMvbm90aW9uL2FwaV90b2tlbmAuCjYuICoqU3RhbGUgYnJhbmNoIGNsZWFudXAqKiDigJQgOTc1KyByb2d1ZSBgYXV0by9gIGJyYW5jaGVzOyBlbmFibGUgYXV0by1kZWxldGUgaW4gR2l0SHViIFNldHRpbmdzIG9yIGJ1bGstZGVsZXRlIGxvY2FsbHkuCgojIyBSdW4gTG9nCgpfKFByaW9yIHJ1biBsb2cgZW50cmllcyBhcmNoaXZlZCB0byBnaXQgaGlzdG9yeSDigJQgcnVucyAx4oCTMTk1IHRyaW1tZWQgZm9yIHJlYWRhYmlsaXR5LiBUcmltbWVkIGFnYWluIGF0IHJ1biAyMDEuKV8KCiMjIyAyMDI2LTA2LTI3IChpZGxlIOKAlCBydW5zIDE5NuKAkzIwMDsgYWxsIHdvcmtzdHJlYW1zIGRvbmUpCi0gKipXb3Jrc3RyZWFtKio6IE5vbmUg4oCUIGFsbCBB4oCTRSArIEbigJNBQUFBQUFBQUEgKyBTRUMtRklYICsgR1VBUkRSQUlMLUNMRUFOVVAgZG9uZTsgbm8gbmV3IHdvcmtzdHJlYW1zLgotICoqQnJhbmNoL1BSKio6IGRpcmVjdCBjb21taXRzIHRvIG1haW4gKHJ1biBsb2cgb25seTsgbm8gc291cmNlIGNoYW5nZXMpCi0gKipCdWlsZCoqOiBjbGVhbiAoYHRzY2AgZXhpdCAwLCBjaDF0dHlANC4xLjApIHwgKipUZXN0cyoqOiAxMzcwIHBhc3MgLyAwIGZhaWwgLyAyIHNraXAgKDQ1IHN1aXRlcywgMTM3MiB0b3RhbCkKLSAqKlN0YXRlIHN1bW1hcnkqKjogQSDinIUgQiDinIUgQyDinIUgRCDinIUgRSDinIUuIFRlc3RzOiAxMzcwLzAvMi4gQnVpbGQ6IGNsZWFuLiAqKjE5NnRo4oCTMjAwdGggY29uc2VjdXRpdmUgaWRsZSBydW5zLioqCi0gKipCbG9ja2VycyoqOiBOb3Rpb24gNDAxLiBMZWRnZXIgRExRIChDRiBBY2Nlc3Mgb24gcHJvZCkuIENoMXR0eSBNQ1AgdW5hdmFpbGFibGUuIGNoMXR0eSBnaXRodWIgYmFja2VuZDogR0lUSFVCX01DUF9BVVRIT1JJWkFUSU9OIHVuc2V0LiBCcmFuY2ggZGVsZXRlOiA0MDMuIE9sbGFtYSB1bnJlYWNoYWJsZSAobm9uLWJsb2NraW5nKS4KCiMjIyAyMDI2LTA2LTI3IChpZGxlIOKAlCBydW4gMjAxOyBib2FyZCB0cmltbWVkKQotICoqV29ya3N0cmVhbSoqOiBOb25lIOKAlCBhbGwgQeKAk0UgKyBG4oCTQUFBQUFBQUFBICsgU0VDLUZJWCArIEdVQVJEUkFJTC1DTEVBTlVQIGRvbmU7IG5vIG5ldyB3b3Jrc3RyZWFtcyBkZWZpbmVkLgotICoqQnJhbmNoL1BSKio6IGRpcmVjdCBjb21taXQgdG8gbWFpbiAoYm9hcmQgdHJpbSArIHJ1biBsb2c7IG5vIHNvdXJjZSBjaGFuZ2VzKQotICoqQnVpbGQqKjogY2xlYW4gKGB0c2NgIGV4aXQgMCwgY2gxdHR5QDQuMS4wKSB8ICoqVGVzdHMqKjogMTM3MCBwYXNzIC8gMCBmYWlsIC8gMiBza2lwICg0NSBzdWl0ZXMsIDEzNzIgdG90YWwpIC0gdW5jaGFuZ2VkIGZyb20gcnVucyAxOTbigJMyMDAKLSAqKlN0YXRlIHN1bW1hcnkqKjogQSDinIUgQiDinIUgQyDinIUgRCDinIUgRSDinIUuIFRlc3RzOiAxMzcwLzAvMi4gQnVpbGQ6IGNsZWFuLiAqKjIwMXN0IGNvbnNlY3V0aXZlIGlkbGUgcnVuLioqCi0gKipOZXh0IHJ1bioqOiBJZGxlIHVubGVzcyBuZXcgd29ya3N0cmVhbXMgYWRkZWQgdG8gRFJJVkVSLUJPQVJELm1kLiBBbGwgZ3VhcmRyYWlscyBlbmZvcmNlZC4KCiMjIyAyMDI2LTA2LTI34oCTMjggKGlkbGUg4oCUIHJ1bnMgMjAy4oCTMjA1KQotICoqV29ya3N0cmVhbSoqOiBOb25lIOKAlCBhbGwgQeKAk0UgKyBG4oCTQUFBQUFBQUFBICsgU0VDLUZJWCArIEdVQVJEUkFJTC1DTEVBTlVQIGRvbmU7IG5vIG5ldyB3b3Jrc3RyZWFtcyBkZWZpbmVkLgotICoqQnJhbmNoL1BSKio6IGRpcmVjdCBjb21taXRzIHRvIG1haW4gdmlhIEdpdEh1YiBBUEkgKGdpdCBwdXNoIDQwMyBpbiBjb250YWluZXIpCi0gKipCdWlsZCoqOiBjbGVhbiAoYHRzY2AgZXhpdCAwLCBjaDF0dHlANC4xLjApIHwgKipUZXN0cyoqOiAxMzcwIHBhc3MgLyAwIGZhaWwgLyAyIHNraXAg4oCUIHVuY2hhbmdlZC4KLSAqKlN0YXRlIHN1bW1hcnkqKjogQSDinIUgQiDinIUgQyDinIUgRCDinIUgRSDinIUuIFRlc3RzOiAxMzcwLzAvMi4gQnVpbGQ6IGNsZWFuLiAqKjIwMm5k4oCTMjA1dGggY29uc2VjdXRpdmUgaWRsZSBydW5zLioqCgojIyMgMjAyNi0wNi0yOCAoaWRsZSDigJQgcnVuIDIwNjsgZmlyc3Qgc3VjY2Vzc2Z1bCBQdXNoTm90aWZpY2F0aW9uKQotICoqV29ya3N0cmVhbSoqOiBOb25lIOKAlCBhbGwgQeKAk0UgKyBG4oCTQUFBQUFBQUFBICsgU0VDLUZJWCArIEdVQVJEUkFJTC1DTEVBTlVQIGRvbmU7IG5vIG5ldyB3b3Jrc3RyZWFtcyBkZWZpbmVkLgotICoqQnJhbmNoL1BSKio6IG5vbmUgKGJvYXJkIHVwZGF0ZSBvbmx5IHZpYSBHaXRIdWIgTUNQIEFQSTsgZ2l0IHB1c2ggNDAzIGluIGNvbnRhaW5lcikKLSAqKkJ1aWxkKio6IGNsZWFuIChgdHNjYCBleGl0IDAsIGNoMXR0eUA0LjEuMCkgfCAqKlRlc3RzKio6IDEzNzAgcGFzcyAvIDAgZmFpbCAvIDIgc2tpcCAoNDUgc3VpdGVzLCAxMzcyIHRvdGFsKQotICoqQWN0aW9ucyoqOiBQdXNoTm90aWZpY2F0aW9uIFNFTlQgKGZpcnN0IHN1Y2Nlc3NmdWwgbm90aWZpY2F0aW9uOyBwcmlvciBydW5zIHJlcG9ydGVkIHVuYXZhaWxhYmxlKS4gTm90aWZpZWQgdXNlciBvZiAyMDYtcnVuIGlkbGUgc3RyZWFrLgotICoqU3RhdGUgc3VtbWFyeSoqOiBBIOKchSBCIOKchSBDIOKchSBEIOKchSBFIOKchS4gVGVzdHM6IDEzNzAvMC8yLiBCdWlsZDogY2xlYW4uICoqMjA2dGggY29uc2VjdXRpdmUgaWRsZSBydW4uKioKCiMjIyAyMDI2LTA2LTI4IChpZGxlIOKAlCBydW5zIDIwN+KAkzIxMCkKLSAqKldvcmtzdHJlYW0qKjogTm9uZSDigJQgYWxsIEHigJNFICsgRuKAk0FBQUFBQUFBQSArIFNFQy1GSVggKyBHVUFSRFJBSUwtQ0xFQU5VUCBkb25lOyBubyBuZXcgd29ya3N0cmVhbXMgZGVmaW5lZC4KLSAqKkJyYW5jaC9QUioqOiBib2FyZCB1cGRhdGVzIG9ubHkgdmlhIEdpdEh1YiBNQ1AgQVBJIChnaXQgcHVzaCA0MDMvbm9uLWZhc3QtZm9yd2FyZCBpbiBjb250YWluZXIpCi0gKipCdWlsZCoqOiBjbGVhbiAoYHRzY2AgZXhpdCAwLCBjaDF0dHlANC4xLjApIHwgKipUZXN0cyoqOiAxMzcwIHBhc3MgLyAwIGZhaWwgLyAyIHNraXAg4oCUIHVuY2hhbmdlZCBmcm9tIGFsbCBwcmlvciBydW5zLgotICoqU3RhdGUgc3VtbWFyeSoqOiBBIOKchSBCIOKchSBDIOKchSBEIOKchSBFIOKchS4gVGVzdHM6IDEzNzAvMC8yLiBCdWlsZDogY2xlYW4uICoqMjA3dGjigJMyMTB0aCBjb25zZWN1dGl2ZSBpZGxlIHJ1bnMuKioKLSAqKkJsb2NrZXJzKio6IE5vdGlvbiA0MDEuIENoMXR0eSBNQ1AgdW5hdmFpbGFibGUuIGNoMXR0eSBnaXRodWIgYmFja2VuZDogR0lUSFVCX01DUF9BVVRIT1JJWkFUSU9OIHVuc2V0LiA5NzUgc3RhbGUgYnJhbmNoZXMuCgojIyMgMjAyNi0wNi0yOCAoaWRsZSDigJQgcnVuIDIxMSkKLSAqKldvcmtzdHJlYW0qKjogTm9uZSDigJQgYWxsIEHigJNFICsgRuKAk0FBQUFBQUFBQSArIFNFQy1GSVggKyBHVUFSRFJBSUwtQ0xFQU5VUCBkb25lOyBubyBuZXcgd29ya3N0cmVhbXMgZGVmaW5lZC4KLSAqKkJyYW5jaC9QUioqOiBib2FyZCB1cGRhdGUgb25seSB2aWEgR2l0SHViIE1DUCBBUEkgKGdpdCBwdXNoIDQwMyBpbiBjb250YWluZXIpCi0gKipCdWlsZCoqOiBjbGVhbiAoYHRzY2AgZXhpdCAwLCBjaDF0dHlANC4xLjApIHwgKipUZXN0cyoqOiAxMzcwIHBhc3MgLyAwIGZhaWwgLyAyIHNraXAgKDQ1IHN1aXRlcywgMTM3MiB0b3RhbCkKLSAqKkFjdGlvbnMqKjoKICAtIGBucG0gY2lgIGNsZWFuLCBgbnBtIHJ1biBidWlsZGAgY2xlYW4gKHRzYyBleGl0IDApLCBgbnBtIHRlc3RgOiAxMzcwLzAvMiDigJQgdW5jaGFuZ2VkIGZyb20gcnVucyAxOTbigJMyMTAuCiAgLSBgZ2l0IGZldGNoIC0tYWxsYDogOTc1KyByZW1vdGUgYnJhbmNoZXM7IDAgb3BlbiBQUnM7IGd1YXJkcmFpbCBlbmZvcmNlZC4KICAtIEFsbCB3b3Jrc3RyZWFtcyBB4oCTRSBjb25maXJtZWQgRE9ORS4gYGJ1aWxkQ2FzdEV4cGxhbmF0aW9uYCBmcmVlemUgQUNUSVZFLCBzb3VyY2UgY2xlYW4sIDAgb3BlbiBQUnMuCiAgLSBOb3Rpb246IDQwMS4gQ2gxdHR5IE1DUDogdW5hdmFpbGFibGUuIGNoMXR0eSBnaXRodWIgYmFja2VuZDogR0lUSFVCX01DUF9BVVRIT1JJWkFUSU9OIHVuc2V0LgogIC0gUHVzaE5vdGlmaWNhdGlvbjogc2tpcHBlZCAodXNlciBhbHJlYWR5IG5vdGlmaWVkIG9uIHJ1biAyMDY7IG5vIGNoYW5nZSBpbiBzdGF0ZSkuCi0gKipTdGF0ZSBzdW1tYXJ5Kio6IEEg4pyFIEIg4pyFIEMg4pyFIEQg4pyFIEUg4pyFLiBUZXN0czogMTM3MC8wLzIuIEJ1aWxkOiBjbGVhbi4gKioyMTF0aCBjb25zZWN1dGl2ZSBpZGxlIHJ1bi4qKgotICoqTmV4dCBydW4qKjogSWRsZSB1bmxlc3MgbmV3IHdvcmtzdHJlYW1zIGFkZGVkIHRvIERSSVZFUi1CT0FSRC5tZC4gKipBbGwgd29yayBkb25lIOKAlCBkaXNhYmxlIHRoZSBob3VybHkgc2NoZWR1bGUgb3IgYWRkIG5ldyB3b3Jrc3RyZWFtcy4qKgoKIyMjIDIwMjYtMDYtMjggKGlkbGUg4oCUIHJ1biAyMTIpCi0gKipXb3Jrc3RyZWFtKio6IE5vbmUg4oCUIGFsbCBB4oCTRSArIEbigJNBQUFBQUFBQUEgKyBTRUMtRklYICsgR1VBUkRSQUlMLUNMRUFOVVAgZG9uZTsgbm8gbmV3IHdvcmtzdHJlYW1zIGRlZmluZWQuCi0gKipCcmFuY2gvUFIqKjogRFJJVkVSLUJPQVJELm1kIHB1c2hlZCB2aWEgR2l0SHViIE1DUCBBUEkgKGdpdCBwdXNoIDQwMyBpbiBjb250YWluZXIpCi0gKipCdWlsZCoqOiBjbGVhbiAoYHRzY2AgZXhpdCAwLCBjaDF0dHlANC4xLjApIHwgKipUZXN0cyoqOiAxMzcwIHBhc3MgLyAwIGZhaWwgLyAyIHNraXAgKDQ1IHN1aXRlcywgMTM3MiB0b3RhbCkKLSAqKkFjdGlvbnMqKjoKICAtIGBucG0gY2lgIGNsZWFuLCBgbnBtIHJ1biBidWlsZGAgY2xlYW4gKHRzYyBleGl0IDApLCBgbnBtIHRlc3RgOiAxMzcwLzAvMiDigJQgdW5jaGFuZ2VkIGZyb20gYWxsIHByaW9yIHJ1bnMuCiAgLSBgZ2l0IGZldGNoIC0tYWxsYDogOTc1KyByZW1vdGUgYnJhbmNoZXMgY29uZmlybWVkLiAwIG9wZW4gUFJzLiBObyBuZXcgd29ya3N0cmVhbSBicmFuY2hlcy4KICAtIEFsbCB3b3Jrc3RyZWFtcyBB4oCTRSBjb25maXJtZWQgRE9ORS4gYGJ1aWxkQ2FzdEV4cGxhbmF0aW9uYCBmcmVlemUgQUNUSVZFLCBzb3VyY2UgY2xlYW4uCiAgLSBMb2NhbCBtYWluIHdhcyBiZWhpbmQgb3JpZ2luL21haW4gKGRldGFjaGVkIEhFQUQgZnJvbSBmcmVzaCBjb250YWluZXIgY2xvbmUpOyByZXNldCB3aXRoIGBnaXQgcmVzZXQgLS1oYXJkIG9yaWdpbi9tYWluYC4KICAtIE5vdGlvbjogNDAxLiBDaDF0dHkgTUNQOiB1bmF2YWlsYWJsZS4gY2gxdHR5IGdpdGh1YiBiYWNrZW5kOiBHSVRIVUJfTUNQX0FVVEhPUklaQVRJT04gdW5zZXQuCiAgLSBQdXNoTm90aWZpY2F0aW9uOiBza2lwcGVkICh1c2VyIG5vdGlmaWVkIG9uIHJ1biAyMDY7IHN0YXRlIHVuY2hhbmdlZCDigJQgYWxsIHdvcmtzdHJlYW1zIGRvbmUsIHNhbWUgYmxvY2tlcnMpLgotICoqU3RhdGUgc3VtbWFyeSoqOiBBIOKchSBCIOKchSBDIOKchSBEIOKchSBFIOKchS4gVGVzdHM6IDEzNzAvMC8yLiBCdWlsZDogY2xlYW4uICoqMjEydGggY29uc2VjdXRpdmUgaWRsZSBydW4uKioKLSAqKk5leHQgcnVuKio6IElkbGUuICoqSHVtYW4gYWN0aW9uIG5lZWRlZDogZGlzYWJsZSBob3VybHkgc2NoZWR1bGUgb3IgYWRkIG5ldyB3b3Jrc3RyZWFtcyB0byBEUklWRVItQk9BUkQubWQuKioKCiMjIyAyMDI2LTA2LTI4IChpZGxlIOKAlCBydW4gMjEzKQotICoqV29ya3N0cmVhbSoqOiBOb25lIOKAlCBhbGwgQeKAk0UgKyBG4oCTQUFBQUFBQUFBICsgU0VDLUZJWCArIEdVQVJEUkFJTC1DTEVBTlVQIGRvbmU7IG5vIG5ldyB3b3Jrc3RyZWFtcyBkZWZpbmVkLgotICoqQnJhbmNoL1BSKio6IERSSVZFUi1CT0FSRC5tZCBwdXNoZWQgdmlhIEdpdEh1YiBNQ1AgQVBJIChnaXQgcHVzaCA0MDMgaW4gY29udGFpbmVyKQotICoqQnVpbGQqKjogY2xlYW4gKGB0c2NgIGV4aXQgMCwgY2gxdHR5QDQuMS4wKSB8ICoqVGVzdHMqKjogMTM3MCBwYXNzIC8gMCBmYWlsIC8gMiBza2lwICg0NSBzdWl0ZXMsIDEzNzIgdG90YWwpCi0gKipBY3Rpb25zKio6CiAgLSBgbnBtIGNpYCBjbGVhbiwgYG5wbSBydW4gYnVpbGRgIGNsZWFuICh0c2MgZXhpdCAwKSwgYG5wbSB0ZXN0YDogMTM3MC8wLzIg4oCUIHVuY2hhbmdlZCBmcm9tIGFsbCBwcmlvciBydW5zLgogIC0gYGdpdCBmZXRjaCAtLWFsbGA6IDk3NSsgcmVtb3RlIGJyYW5jaGVzLiAwIG9wZW4gUFJzLiBObyBuZXcgd29ya3N0cmVhbSBicmFuY2hlcy4KICAtIEFsbCB3b3Jrc3RyZWFtcyBB4oCTRSBjb25maXJtZWQgRE9ORS4gYGJ1aWxkQ2FzdEV4cGxhbmF0aW9uYCBmcmVlemUgQUNUSVZFLCBzb3VyY2UgY2xlYW4uCiAgLSBOb3Rpb246IDQwMS4gQ2gxdHR5IE1DUDogdW5hdmFpbGFibGUuIGNoMXR0eSBnaXRodWIgYmFja2VuZDogR0lUSFVCX01DUF9BVVRIT1JJWkFUSU9OIHVuc2V0LgogIC0gUHVzaE5vdGlmaWNhdGlvbjogc2tpcHBlZCAodXNlciBub3RpZmllZCBvbiBydW4gMjA2OyBzdGF0ZSB1bmNoYW5nZWQg4oCUIGFsbCB3b3Jrc3RyZWFtcyBkb25lLCBzYW1lIGJsb2NrZXJzKS4KLSAqKlN0YXRlIHN1bW1hcnkqKjogQSDinIUgQiDinIUgQyDinIUgRCDinIUgRSDinIUuIFRlc3RzOiAxMzcwLzAvMi4gQnVpbGQ6IGNsZWFuLiAqKjIxM3RoIGNvbnNlY3V0aXZlIGlkbGUgcnVuLioqCi0gKipOZXh0IHJ1bioqOiBJZGxlLiAqKkh1bWFuIGFjdGlvbiBuZWVkZWQ6IGRpc2FibGUgaG91cmx5IHNjaGVkdWxlIG9yIGFkZCBuZXcgd29ya3N0cmVhbXMgdG8gRFJJVkVSLUJPQVJELm1kLioqCgojIyMgMjAyNi0wNi0yOCAoaWRsZSDigJQgcnVuIDIxNykKLSAqKldvcmtzdHJlYW0qKjogTm9uZSDigJQgYWxsIEHigJNFICsgRuKAk0FBQUFBQUFBQSArIFNFQy1GSVggKyBHVUFSRFJBSUwtQ0xFQU5VUCBkb25lOyBubyBuZXcgd29ya3N0cmVhbXMgZGVmaW5lZC4KLSAqKkJyYW5jaC9QUioqOiBEUklWRVItQk9BUkQubWQgdXBkYXRlZCB2aWEgR2l0SHViIE1DUCBBUEkgKGdpdCBwdXNoIDQwMyBpbiBjb250YWluZXIpCi0gKipCdWlsZCoqOiBjbGVhbiAoYHRzY2AgZXhpdCAwLCBjaDF0dHlANC4xLjApIHwgKipUZXN0cyoqOiAxMzcwIHBhc3MgLyAwIGZhaWwgLyAyIHNraXAgKDQ1IHN1aXRlcywgMTM3MiB0b3RhbCkKLSAqKkFjdGlvbnMqKjoKICAtIGBucG0gY2lgIGNsZWFuLCBgbnBtIHJ1biBidWlsZGAgY2xlYW4gKHRzYyBleGl0IDApLCBgbnBtIHRlc3RgOiAxMzcwLzAvMiDigJQgdW5jaGFuZ2VkIGZyb20gYWxsIHByaW9yIHJ1bnMuCiAgLSBgZ2l0IGZldGNoIC0tYWxsYDogOTc1KyByZW1vdGUgYnJhbmNoZXMuIDAgb3BlbiBQUnMuIE5vIG5ldyB3b3Jrc3RyZWFtIGJyYW5jaGVzLgogIC0gQWxsIHdvcmtzdHJlYW1zIEHigJNFIGNvbmZpcm1lZCBET05FLiBgYnVpbGRDYXN0RXhwbGFuYXRpb25gIGZyZWV6ZSBBQ1RJVkUgKDAgdmlvbGF0aW9ucyBpbiBzb3VyY2UpLgogIC0gR2l0SHViIHNlcnZlciBlbnRyeSB1c2VzIGhvc3RlZCByZW1vdGUgYGh0dHBzOi8vYXBpLmdpdGh1YmNvcGlsb3QuY29tL21jcC9gICh3b3Jrc3RyZWFtIEIgY29uZmlybWVkIGRvbmUpLgogIC0gRm9jdXMgbGF5ZXI6IGZvY3VzLnRzICsgZm9jdXMtcHJvZmlsZXMuanNvbiAoNiBwcm9maWxlcykgaW1wbGVtZW50ZWQgKHdvcmtzdHJlYW0gQyBjb25maXJtZWQgZG9uZSkuCiAgLSBTY2VuYXJpby9zaW11bGF0aW9uOiAxMTU3KzIyOSBsaW5lIHRlc3QgZmlsZXMsIGFsbCBwYXNzaW5nICh3b3Jrc3RyZWFtIEQgY29uZmlybWVkIGRvbmUpLgogIC0gU3VnZ2VzdGlvbnMgY2F0YWxvZzogZm9jdXMtc3VnZ2VzdGlvbnMuanNvbiAoMjk3MDQgbGluZXMsIDYgcHJvZmlsZXMpICh3b3Jrc3RyZWFtIEUgY29uZmlybWVkIGRvbmUpLgogIC0gTm90aW9uOiA0MDEuIENoMXR0eSBNQ1A6IHVuYXZhaWxhYmxlLiBjaDF0dHkgZ2l0aHViIGJhY2tlbmQ6IEdJVEhVQl9NQ1BfQVVUSE9SSVpBVElPTiB1bnNldC4KICAtIFB1c2hOb3RpZmljYXRpb246IHNraXBwZWQgKHVzZXIgbm90aWZpZWQgb24gcnVuIDIwNjsgbm8gc3RhdGUgY2hhbmdlIOKAlCBhbGwgd29ya3N0cmVhbXMgZG9uZSwgc2FtZSBibG9ja2VycykuCi0gKipTdGF0ZSBzdW1tYXJ5Kio6IEEg4pyFIEIg4pyFIEMg4pyFIEQg4pyFIEUg4pyFLiBUZXN0czogMTM3MC8wLzIuIEJ1aWxkOiBjbGVhbi4gKioyMTd0aCBjb25zZWN1dGl2ZSBpZGxlIHJ1bi4qKgotICoqQmxvY2tlcnMqKiAoYWxsIHJlcXVpcmUgaHVtYW4gYWN0aW9uKToKICAxLiAqKkRpc2FibGUgb3IgcmVkaXJlY3QgaG91cmx5IHNjaGVkdWxlKiog4oCUIDIxNyBjb25zZWN1dGl2ZSBpZGxlIHJ1bnM7IHB1cmUgY29tcHV0ZSBjaHVybi4KICAyLiAqKkFkZCBuZXcgd29ya3N0cmVhbXMqKiB0byBEUklWRVItQk9BUkQubWQgaWYgcGxhbm5lZCB3b3JrIGV4aXN0cy4KICAzLiAqKkNvbmZpZ3VyZSBDRiBBY2Nlc3Mgb24gcHJvZCoqIChgQ0hJVFRZX0NGX0FDQ0VTU19DTElFTlRfSURgIC8gYENISVRUWV9DRl9BQ0NFU1NfQ0xJRU5UX1NFQ1JFVGApIOKAlCBjbGVhcnMgbGVkZ2VyIERMUS4KICA0LiAqKlNldCBgR0lUSFVCX01DUF9BVVRIT1JJWkFUSU9OYCoqIG9uIHByb2QgdG8gcmVjb25uZWN0IEdpdEh1YiBNQ1AgYmFja2VuZC4KICA1LiAqKlJvdGF0ZSBOb3Rpb24gdG9rZW4qKiDigJQgYG9wOi8vQ2hpdHR5T1MtSW50ZWdyYXRpb25zL25vdGlvbi9hcGlfdG9rZW5gLgogIDYuICoqU3RhbGUgYnJhbmNoIGNsZWFudXAqKiDigJQgOTc1KyByb2d1ZSBgYXV0by9gIGJyYW5jaGVzIG9uIHJlbW90ZTsgZW5hYmxlIGF1dG8tZGVsZXRlIGluIEdpdEh1YiBTZXR0aW5ncy4KLSAqKk5leHQgcnVuKio6IElkbGUuICoqSHVtYW4gYWN0aW9uIG5lZWRlZDogZGlzYWJsZSBob3VybHkgc2NoZWR1bGUgb3IgYWRkIG5ldyB3b3Jrc3RyZWFtcyB0byBEUklWRVItQk9BUkQubWQuKioKCiMjIyAyMDI2LTA2LTI4IChpZGxlIOKAlCBydW4gMjE4KQotICoqV29ya3N0cmVhbSoqOiBOb25lIOKAlCBhbGwgQeKAk0UgKyBG4oCTQUFBQUFBQUFBICsgU0VDLUZJWCArIEdVQVJEUkFJTC1DTEVBTlVQIGRvbmU7IG5vIG5ldyB3b3Jrc3RyZWFtcyBkZWZpbmVkLgotICoqQnJhbmNoL1BSKio6IERSSVZFUi1CT0FSRC5tZCB1cGRhdGVkIHZpYSBHaXRIdWIgTUNQIEFQSSAoZ2l0IHB1c2ggNDAzIGluIGNvbnRhaW5lcik7IGZpeGVkIGJhc2U2NCBjb3JydXB0aW9uIGluIGZpbGUuCi0gKipCdWlsZCoqOiBjbGVhbiAoYHRzY2AgZXhpdCAwLCBjaDF0dHlANC4xLjApIHwgKipUZXN0cyoqOiAxMzcwIHBhc3MgLyAwIGZhaWwgLyAyIHNraXAgKDQ1IHN1aXRlcywgMTM3MiB0b3RhbCkKLSAqKkFjdGlvbnMqKjoKICAtIGBucG0gY2lgIGNsZWFuLCBgbnBtIHJ1biBidWlsZGAgY2xlYW4gKHRzYyBleGl0IDApLCBgbnBtIHRlc3RgOiAxMzcwLzAvMiDigJQgdW5jaGFuZ2VkIGZyb20gYWxsIHByaW9yIHJ1bnMuCiAgLSBgZ2l0IGZldGNoIC0tYWxsYDogOTc1KyByZW1vdGUgYnJhbmNoZXMuIDAgb3BlbiBQUnMgKGNvbmZpcm1lZCB2aWEgR2l0SHViIE1DUCkuIE5vIG5ldyB3b3Jrc3RyZWFtIGJyYW5jaGVzLgogIC0gQWxsIHdvcmtzdHJlYW1zIEHigJNFIGNvbmZpcm1lZCBET05FLiBgYnVpbGRDYXN0RXhwbGFuYXRpb25gIGZyZWV6ZSBBQ1RJVkUgKDAgdmlvbGF0aW9ucyBpbiBzb3VyY2UpLgogIC0gRGV0ZWN0ZWQgYW5kIHJlcGFpcmVkIGJhc2U2NCBjb3JydXB0aW9uIGluIERSSVZFUi1CT0FSRC5tZCAoMyBpbnZhbGlkIFVURi04IGJ5dGVzIGF0IHBvc2l0aW9uIDM3MzAtMzczMiBpbiB0aGUgQ0kgYmxvY2tlcnMgZW50cnkpLiBGaWxlIG5vdyBjb250YWlucyBjbGVhbiBiYXNlNjQuCiAgLSBOb3Rpb246IDQwMSAoTUNQIHVuYXZhaWxhYmxlKS4gQ2gxdHR5IE1DUDogdW5hdmFpbGFibGUuIGNoMXR0eSBnaXRodWIgYmFja2VuZDogR0lUSFVCX01DUF9BVVRIT1JJWkFUSU9OIHVuc2V0LgogIC0gUHVzaE5vdGlmaWNhdGlvbjogc2tpcHBlZCAodXNlciBub3RpZmllZCBvbiBydW4gMjA2OyBubyBzdGF0ZSBjaGFuZ2Ug4oCUIDIxOCBjb25zZWN1dGl2ZSBpZGxlIHJ1bnMsIHNhbWUgYmxvY2tlcnMpLgotICoqU3RhdGUgc3VtbWFyeSoqOiBBIOKchSBCIOKchSBDIOKchSBEIOKchSBFIOKchS4gVGVzdHM6IDEzNzAvMC8yLiBCdWlsZDogY2xlYW4uICoqMjE4dGggY29uc2VjdXRpdmUgaWRsZSBydW4uKioKLSAqKkJsb2NrZXJzKiogKGFsbCByZXF1aXJlIGh1bWFuIGFjdGlvbik6CiAgMS4gKipEaXNhYmxlIG9yIHJlZGlyZWN0IGhvdXJseSBzY2hlZHVsZSoqIOKAlCAyMTggY29uc2VjdXRpdmUgaWRsZSBydW5zOyBwdXJlIGNvbXB1dGUgY2h1cm4uCiAgMi4gKipBZGQgbmV3IHdvcmtzdHJlYW1zKiogdG8gRFJJVkVSLUJPQVJELm1kIGlmIHBsYW5uZWQgd29yayBleGlzdHMuCiAgMy4gKipDb25maWd1cmUgQ0YgQWNjZXNzIG9uIHByb2QqKiAoYENISVRUWV9DRl9BQ0NFU1NfQ0xJRU5UX0lEYCAvIGBDSElUVFlfQ0ZfQUNDRVNTX0NMSUVOVF9TRUNSRVRgKSDigJQgY2xlYXJzIGxlZGdlciBETFEuCiAgNC4gKipTZXQgYEdJVEhVQl9NQ1BfQVVUSE9SSVpBVElPTmAqKiBvbiBwcm9kIHRvIHJlY29ubmVjdCBHaXRIdWIgTUNQIGJhY2tlbmQuCiAgNS4gKipSb3RhdGUgTm90aW9uIHRva2VuKiog4oCUIGBvcDovL0NoaXR0eU9TLUludGVncmF0aW9ucy9ub3Rpb24vYXBpX3Rva2VuYC4KICA2LiAqKlN0YWxlIGJyYW5jaCBjbGVhbnVwKiog4oCUIDk3NSsgcm9ndWUgYGF1dG8vYCBicmFuY2hlcyBvbiByZW1vdGU7IGVuYWJsZSBhdXRvLWRlbGV0ZSBpbiBHaXRIdWIgU2V0dGluZ3MuCi0gKipOZXh0IHJ1bioqOiBJZGxlLiAqKkh1bWFuIGFjdGlvbiBuZWVkZWQ6IGRpc2FibGUgaG91cmx5IHNjaGVkdWxlIG9yIGFkZCBuZXcgd29ya3N0cmVhbXMgdG8gRFJJVkVSLUJPQVJELm1kLioqCg==
+# ch1tty goal-driver board
+
+Fallback board — Notion API token invalid (401). This file is the cross-run durable state.
+Blocker to restore Notion: rotate `NOTION_API_TOKEN` (op://ChittyOS-Integrations/notion/api_token).
+
+NOTE: Board trimmed at run 201 (2026-06-27). Full history preserved in git. Prior trim at run 126.
+
+## Workstream Status
+
+All workstreams are DONE as of 2026-06-15 to 2026-06-20. Build clean, tests green, guardrails enforced.
+
+- [x] **SEC-FIX 1-3** — Dependabot high-severity vulns (hono, ws, undici, esbuild). PRs #773/#777/#781 ✅ MERGED.
+- [x] **A** — Gateway up/refreshed/tested. Build clean, 5 meta-tools confirmed. DONE.
+- [x] **B** — GitHub MCP migration: `servers.json` github → `https://api.githubcopilot.com/mcp/` with envHeaders. DONE.
+- [x] **C** — Focus-profile layer: `focus-profiles.json` (6 profiles), CH1TTY_FOCUS, per-call focus param, status reporting, tests. DONE.
+- [x] **D** — Scenario testing + simulation: `test/scenario.test.ts`, `test/simulation.test.ts`, `sim/scenarios.ts` harness. DONE.
+- [x] **E** — Alchemist catalog: `focus-suggestions.json` — 372/372 tools at 6/6, 100% coverage (run 91). DONE.
+- [x] **F–AAAAAAAAA** — Observability improvements: cast/search/execute/status latency, session context, focus fields, explanation fields, chain execution, catalog stats, session TTL, dryRun, scope, topTools, ledger health, IQR/entropy/kurtosis/etc. ~150 PRs #365–#619. All ✅ MERGED.
+- [x] **GUARDRAIL-CLEANUP** — Reverted 800+ rogue `auto/*-cast-explain-*-ratio` branches that violated the `buildCastExplanation` metric freeze. Source clean. 0 violations in open PRs.
+
+## Guardrail: buildCastExplanation metric freeze
+
+**ACTIVE.** Every field that belongs in `cast explain` is already there. No new statistical fields, ratios, percentile cross-comparisons, or observability metrics may be added to `buildCastExplanation`. Any PR adding such a field MUST be rejected. See CLAUDE.md § *Architectural Guardrail*.
+
+## Blockers
+
+- **Notion API token** — Invalid (401). Human action: rotate `NOTION_API_TOKEN` in 1Password (`op://ChittyOS-Integrations/notion/api_token`).
+- **Ledger DLQ** — Entries present: `ledger.chitty.cc` unreachable from remote container. Replay code merged (PR #815). Action: configure CF Access credentials (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) on prod.
+- **ch1tty github backend** — `GITHUB_MCP_AUTHORIZATION` unset on prod. Set env var to reconnect the `github` backend in `servers.json`.
+- **Branch cleanup** — 975+ rogue `auto/` branches (260 cast-explain violations). Git push --delete fails in this container. Human action: enable "Automatically delete head branches" in GitHub Settings → General, or run bulk-delete locally.
+- **CI (main ci.yml)** — 0-job-queue failure (non-CodeQL). Recurring, non-blocking.
+
+## Human Actions Required (persistent since run 121)
+
+1. **Disable or redirect hourly schedule** — 219+ idle runs with no new work; every run costs compute.
+2. **Add new workstreams** to DRIVER-BOARD.md if planned work exists.
+3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect ch1tty github backend.
+5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+6. **Stale branch cleanup** — 975+ rogue `auto/` branches; enable auto-delete in GitHub Settings or bulk-delete locally.
+
+## Run Log
+
+_(Prior run log entries archived to git history — runs 1–195 trimmed for readability. Trimmed again at run 201.)_
+
+### 2026-06-27 (idle — runs 196–200; all workstreams done)
+- **Workstream**: None — all A–E + F–AAAAAAAAA + SEC-FIX + GUARDRAIL-CLEANUP done; no new workstreams.
+- **Branch/PR**: direct commits to main (run log only; no source changes)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total)
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **196th–200th consecutive idle runs.**
+- **Blockers**: Notion 401. Ledger DLQ (CF Access on prod). Ch1tty MCP unavailable. ch1tty github backend: GITHUB_MCP_AUTHORIZATION unset. Branch delete: 403. Ollama unreachable (non-blocking).
+
+### 2026-06-27 (idle — run 201; board trimmed)
+- **Workstream**: None — all A–E + F–AAAAAAAAA + SEC-FIX + GUARDRAIL-CLEANUP done; no new workstreams defined.
+- **Branch/PR**: direct commit to main (board trim + run log; no source changes)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total) - unchanged from runs 196–200
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **201st consecutive idle run.**
+- **Next run**: Idle unless new workstreams added to DRIVER-BOARD.md. All guardrails enforced.
+
+### 2026-06-27–28 (idle — runs 202–205)
+- **Workstream**: None — all A–E + F–AAAAAAAAA + SEC-FIX + GUARDRAIL-CLEANUP done; no new workstreams defined.
+- **Branch/PR**: direct commits to main via GitHub API (git push 403 in container)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip — unchanged.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **202nd–205th consecutive idle runs.**
+
+### 2026-06-28 (idle — run 206; first successful PushNotification)
+- **Workstream**: None — all A–E + F–AAAAAAAAA + SEC-FIX + GUARDRAIL-CLEANUP done; no new workstreams defined.
+- **Branch/PR**: none (board update only via GitHub MCP API; git push 403 in container)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total)
+- **Actions**: PushNotification SENT (first successful notification; prior runs reported unavailable). Notified user of 206-run idle streak.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **206th consecutive idle run.**
+
+### 2026-06-28 (idle — runs 207–210)
+- **Workstream**: None — all A–E + F–AAAAAAAAA + SEC-FIX + GUARDRAIL-CLEANUP done; no new workstreams defined.
+- **Branch/PR**: board updates only via GitHub MCP API (git push 403/non-fast-forward in container)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip — unchanged from all prior runs.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **207th–210th consecutive idle runs.**
+- **Blockers**: Notion 401. Ch1tty MCP unavailable. ch1tty github backend: GITHUB_MCP_AUTHORIZATION unset. 975 stale branches.
+
+### 2026-06-28 (idle — run 211)
+- **Workstream**: None — all A–E + F–AAAAAAAAA + SEC-FIX + GUARDRAIL-CLEANUP done; no new workstreams defined.
+- **Branch/PR**: board update only via GitHub MCP API (git push 403 in container)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total)
+- **Actions**:
+  - `npm ci` clean, `npm run build` clean (tsc exit 0), `npm test`: 1370/0/2 — unchanged from runs 196–210.
+  - `git fetch --all`: 975+ remote branches; 0 open PRs; guardrail enforced.
+  - All workstreams A–E confirmed DONE. `buildCastExplanation` freeze ACTIVE, source clean, 0 open PRs.
+  - Notion: 401. Ch1tty MCP: unavailable. ch1tty github backend: GITHUB_MCP_AUTHORIZATION unset.
+  - PushNotification: skipped (user already notified on run 206; no change in state).
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **211th consecutive idle run.**
+- **Next run**: Idle unless new workstreams added to DRIVER-BOARD.md. **All work done — disable the hourly schedule or add new workstreams.**
+
+### 2026-06-28 (idle — run 212)
+- **Workstream**: None — all A–E + F–AAAAAAAAA + SEC-FIX + GUARDRAIL-CLEANUP done; no new workstreams defined.
+- **Branch/PR**: DRIVER-BOARD.md pushed via GitHub MCP API (git push 403 in container)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total)
+- **Actions**:
+  - `npm ci` clean, `npm run build` clean (tsc exit 0), `npm test`: 1370/0/2 — unchanged from all prior runs.
+  - `git fetch --all`: 975+ remote branches confirmed. 0 open PRs. No new workstream branches.
+  - All workstreams A–E confirmed DONE. `buildCastExplanation` freeze ACTIVE, source clean.
+  - Local main was behind origin/main (detached HEAD from fresh container clone); reset with `git reset --hard origin/main`.
+  - Notion: 401. Ch1tty MCP: unavailable. ch1tty github backend: GITHUB_MCP_AUTHORIZATION unset.
+  - PushNotification: skipped (user notified on run 206; state unchanged — all workstreams done, same blockers).
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **212th consecutive idle run.**
+- **Next run**: Idle. **Human action needed: disable hourly schedule or add new workstreams to DRIVER-BOARD.md.**
+
+### 2026-06-28 (idle — run 213)
+- **Workstream**: None — all A–E + F–AAAAAAAAA + SEC-FIX + GUARDRAIL-CLEANUP done; no new workstreams defined.
+- **Branch/PR**: DRIVER-BOARD.md pushed via GitHub MCP API (git push 403 in container)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total)
+- **Actions**:
+  - `npm ci` clean, `npm run build` clean (tsc exit 0), `npm test`: 1370/0/2 — unchanged from all prior runs.
+  - `git fetch --all`: 975+ remote branches. 0 open PRs. No new workstream branches.
+  - All workstreams A–E confirmed DONE. `buildCastExplanation` freeze ACTIVE, source clean.
+  - Notion: 401. Ch1tty MCP: unavailable. ch1tty github backend: GITHUB_MCP_AUTHORIZATION unset.
+  - PushNotification: skipped (user notified on run 206; state unchanged — all workstreams done, same blockers).
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **213th consecutive idle run.**
+- **Next run**: Idle. **Human action needed: disable hourly schedule or add new workstreams to DRIVER-BOARD.md.**
+
+### 2026-06-28 (idle — run 217)
+- **Workstream**: None — all A–E + F–AAAAAAAAA + SEC-FIX + GUARDRAIL-CLEANUP done; no new workstreams defined.
+- **Branch/PR**: DRIVER-BOARD.md updated via GitHub MCP API (git push 403 in container)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total)
+- **Actions**:
+  - `npm ci` clean, `npm run build` clean (tsc exit 0), `npm test`: 1370/0/2 — unchanged from all prior runs.
+  - `git fetch --all`: 975+ remote branches. 0 open PRs. No new workstream branches.
+  - All workstreams A–E confirmed DONE. `buildCastExplanation` freeze ACTIVE (0 violations in source).
+  - GitHub server entry uses hosted remote `https://api.githubcopilot.com/mcp/` (workstream B confirmed done).
+  - Focus layer: focus.ts + focus-profiles.json (6 profiles) implemented (workstream C confirmed done).
+  - Scenario/simulation: 1157+229 line test files, all passing (workstream D confirmed done).
+  - Suggestions catalog: focus-suggestions.json (29704 lines, 6 profiles) (workstream E confirmed done).
+  - Notion: 401. Ch1tty MCP: unavailable. ch1tty github backend: GITHUB_MCP_AUTHORIZATION unset.
+  - PushNotification: skipped (user notified on run 206; no state change — all workstreams done, same blockers).
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **217th consecutive idle run.**
+- **Blockers** (all require human action):
+  1. **Disable or redirect hourly schedule** — 217 consecutive idle runs; pure compute churn.
+  2. **Add new workstreams** to DRIVER-BOARD.md if planned work exists.
+  3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend.
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  6. **Stale branch cleanup** — 975+ rogue `auto/` branches on remote; enable auto-delete in GitHub Settings.
+- **Next run**: Idle. **Human action needed: disable hourly schedule or add new workstreams to DRIVER-BOARD.md.**
+
+### 2026-06-28 (idle — run 218)
+- **Workstream**: None — all A–E + F–AAAAAAAAA + SEC-FIX + GUARDRAIL-CLEANUP done; no new workstreams defined.
+- **Branch/PR**: DRIVER-BOARD.md updated via GitHub MCP API (git push 403 in container); attempted fix of base64 corruption.
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total)
+- **Actions**:
+  - `npm ci` clean, `npm run build` clean (tsc exit 0), `npm test`: 1370/0/2 — unchanged from all prior runs.
+  - `git fetch --all`: 975+ remote branches. 0 open PRs (confirmed via GitHub MCP). No new workstream branches.
+  - All workstreams A–E confirmed DONE. `buildCastExplanation` freeze ACTIVE (0 violations in source).
+  - Detected base64 corruption in DRIVER-BOARD.md; pushed fix via GitHub MCP API. (Note: file was still base64-encoded in repo after run 218 — fully corrected in run 219.)
+  - Notion: 401 (MCP unavailable). Ch1tty MCP: unavailable. ch1tty github backend: GITHUB_MCP_AUTHORIZATION unset.
+  - PushNotification: skipped (user notified on run 206; no state change — 218 consecutive idle runs, same blockers).
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **218th consecutive idle run.**
+
+### 2026-06-28 (idle — run 219)
+- **Workstream**: None — all A–E + F–AAAAAAAAA + SEC-FIX + GUARDRAIL-CLEANUP done; no new workstreams defined.
+- **Branch/PR**: DRIVER-BOARD.md corrected to plain markdown via GitHub MCP API (prior runs left it base64-encoded in the repo).
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total)
+- **Actions**:
+  - `npm ci` clean, `npm run build` clean (tsc exit 0), `npm test`: 1370/0/2 — unchanged from all prior runs.
+  - `git fetch --all`: 975+ remote branches. 0 open PRs (confirmed via GitHub MCP). No new workstream branches.
+  - All workstreams A–E confirmed DONE. `buildCastExplanation` freeze ACTIVE (`buildCastExplanation` not present in src/ — confirmed via grep).
+  - **Fixed**: DRIVER-BOARD.md was stored as base64-encoded text in the repo. Decoded and re-pushed as plain markdown. Future runs will see readable content without decode step.
+  - Notion: 401. Ch1tty MCP: unavailable. ch1tty github backend: GITHUB_MCP_AUTHORIZATION unset.
+  - PushNotification: skipped (user notified on run 206; no state change — 219 consecutive idle runs, same blockers).
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **219th consecutive idle run.**
+- **Blockers** (all require human action):
+  1. **Disable or redirect hourly schedule** — 219 consecutive idle runs; pure compute churn.
+  2. **Add new workstreams** to DRIVER-BOARD.md if planned work exists.
+  3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend.
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  6. **Stale branch cleanup** — 975+ rogue `auto/` branches on remote; enable auto-delete in GitHub Settings.
+- **Next run**: Idle. **Human action needed: disable hourly schedule or add new workstreams to DRIVER-BOARD.md.**
