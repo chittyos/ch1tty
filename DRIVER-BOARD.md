@@ -27,17 +27,17 @@ All workstreams are DONE as of 2026-06-15 to 2026-06-20. Build clean, tests gree
 - **Notion API token** — Invalid (401). Human action: rotate `NOTION_API_TOKEN` in 1Password (`op://ChittyOS-Integrations/notion/api_token`).
 - **Ledger DLQ** — Entries present: `ledger.chitty.cc` unreachable from remote container. Replay code merged (PR #815). Action: configure CF Access credentials (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) on prod.
 - **ch1tty github backend** — `GITHUB_MCP_AUTHORIZATION` unset on prod. Set env var to reconnect the `github` backend in `servers.json`.
-- **Branch cleanup** — 975 rogue `auto/` branches. Git push --delete fails 403 in this container. Human action: enable "Automatically delete head branches" in GitHub Settings → General, or run bulk-delete locally.
+- **Branch cleanup** — 973 rogue `auto/` branches (260 cast-explain violations). Git push --delete fails in this container. Human action: enable "Automatically delete head branches" in GitHub Settings → General, or run bulk-delete locally.
 - **CI (main ci.yml)** — 0-jobs queue failure (non-CodeQL). Recurring, non-blocking.
 
 ## Human Actions Required (persistent since run 121)
 
-1. **Disable or redirect hourly schedule** — 208+ idle runs with no new work; every run costs compute.
+1. **Disable or redirect hourly schedule** — 209+ idle runs with no new work; every run costs compute.
 2. **Add new workstreams** to DRIVER-BOARD.md if planned work exists.
 3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
 4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect ch1tty github backend.
 5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
-6. **Stale branch cleanup** — 975 rogue `auto/` branches; enable auto-delete in GitHub Settings or bulk-delete locally.
+6. **Stale branch cleanup** — 973 rogue `auto/` branches; enable auto-delete in GitHub Settings or bulk-delete locally.
 
 ## Run Log
 
@@ -147,3 +147,15 @@ _(Prior run log entries archived to git history — runs 1–195 trimmed for rea
   - Notion: 401. Ch1tty MCP: unavailable. ch1tty github backend: GITHUB_MCP_AUTHORIZATION unset.
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **208th consecutive idle run.**
 - **Next run**: Idle unless new workstreams added to DRIVER-BOARD.md. **All work done — add new workstreams or disable the schedule.**
+
+### 2026-06-28 (idle — run 209)
+- **Workstream**: None — all A–E + F–AAAAAAAAA + SEC-FIX + GUARDRAIL-CLEANUP done; no new workstreams defined.
+- **Branch/PR**: board update only via GitHub MCP API (git push non-fast-forward in container)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total)
+- **Actions**:
+  - `npm ci` clean, `npm run build` clean (tsc exit 0), `npm test`: 1370/0/2 — unchanged from all prior runs.
+  - `git fetch --all`: 973 remote branches (260 cast-explain violations, 34 idle-log branches); 0 open PRs; guardrail enforced.
+  - All workstreams A–E confirmed DONE. `buildCastExplanation` freeze ACTIVE, source clean, 0 open PRs.
+  - Notion: 401. Ch1tty MCP: unavailable. ch1tty github backend: GITHUB_MCP_AUTHORIZATION unset.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **209th consecutive idle run.**
+- **Next run**: Idle unless new workstreams added to DRIVER-BOARD.md. **All work done — disable the hourly schedule or add new workstreams.**
