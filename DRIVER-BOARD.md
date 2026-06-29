@@ -31,7 +31,7 @@ All workstreams are DONE. Build clean, tests green, guardrails enforced.
 
 ## Human Actions Required
 
-1. **Disable or redirect hourly schedule** — 247+ idle runs with no new work; every run costs compute.
+1. **Disable or redirect hourly schedule** — 249+ idle runs with no new work; every run costs compute.
 2. **Add new workstreams** to DRIVER-BOARD.md if planned work exists.
 3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
 4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect ch1tty github backend.
@@ -81,3 +81,11 @@ _(Prior run log entries archived to git history — runs 1–244 trimmed. Full e
   - Notion board: unavailable (API 401 — token not resolvable in remote container).
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **248th run.**
 - **Next run**: Same idle state expected. Schedule should be disabled or new workstreams added.
+
+### 2026-06-29 (run 249 — idle, all workstreams done)
+- **Workstream**: None — all A–E confirmed done.
+- **Branch/PR**: None. Board updated via GitHub MCP API (direct push to main blocked 403).
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total).
+- **Actions**: `npm ci` clean. `npm run build` clean. `npm test` → 1370/0/2. Guardrails confirmed (5-tool surface fixed; `buildCastExplanation` metric freeze ACTIVE). 0 open PRs. All workstreams verified complete.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **249th run.**
+- **Next run**: Schedule should be DISABLED. All workstreams done. If new work is needed, add workstreams to this board. See "Human Actions Required" above.
