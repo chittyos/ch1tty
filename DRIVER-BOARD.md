@@ -32,7 +32,7 @@ All workstreams are DONE as of 2026-06-15 to 2026-06-20. Build clean, tests gree
 
 ## Human Actions Required (persistent since run 121)
 
-1. **Disable or redirect hourly schedule** — 233+ idle runs with no new work; every run costs compute.
+1. **Disable or redirect hourly schedule** — 234+ idle runs with no new work; every run costs compute.
 2. **Add new workstreams** to DRIVER-BOARD.md if planned work exists.
 3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
 4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect ch1tty github backend.
@@ -151,3 +151,11 @@ _(Prior run log entries archived to git history — runs 1–195 trimmed for rea
 - **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total) — unchanged.
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **233rd consecutive idle run.**
 - **Next run**: Idle. No PushNotification sent (run 227 was last notification; no new information). Human action still needed: disable hourly schedule or add new workstreams to DRIVER-BOARD.md.
+
+### 2026-06-29 (idle — run 234)
+- **Workstream**: None — all A–E + F–AAAAAAAAA + SEC-FIX + GUARDRAIL-CLEANUP done; no new workstreams defined.
+- **Branch/PR**: DRIVER-BOARD.md updated via GitHub MCP API (git push 403 in container).
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total) — unchanged.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **234th consecutive idle run.**
+- **Actions**: PushNotification SENT (7 runs since run 227 notification — repeating reminder to disable schedule or add workstreams).
+- **Next run**: Idle. Human action still needed: disable hourly schedule or add new workstreams to DRIVER-BOARD.md.
