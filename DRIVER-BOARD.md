@@ -31,7 +31,7 @@ All workstreams are DONE. Build clean, tests green, guardrails enforced.
 
 ## Human Actions Required
 
-1. **Disable or redirect hourly schedule** — 246+ idle runs with no new work; every run costs compute.
+1. **Disable or redirect hourly schedule** — 247+ idle runs with no new work; every run costs compute.
 2. **Add new workstreams** to DRIVER-BOARD.md if planned work exists.
 3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
 4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect ch1tty github backend.
@@ -40,7 +40,7 @@ All workstreams are DONE. Build clean, tests green, guardrails enforced.
 
 ## Run Log
 
-_(Prior run log entries archived to git history — runs 1–244 trimmed. Full entries for runs 245–246 below.)_
+_(Prior run log entries archived to git history — runs 1–244 trimmed. Full entries for runs 245–247 below.)_
 
 ### 2026-06-29 (run 245 — recovery branch investigation)
 - **Workstream**: None (all A–E done) — discovered claimed git divergence: local main allegedly had 50 unpushed code commits absent from origin/main.
@@ -60,3 +60,11 @@ _(Prior run log entries archived to git history — runs 1–244 trimmed. Full e
   - PushNotification SENT (run 246 findings; schedule can be disabled).
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **246th run.**
 - **Next run**: All workstreams done. Schedule should be disabled or new workstreams added. If run again: just verify build+tests and update this log.
+
+### 2026-06-29 (run 247 — idle, all workstreams done)
+- **Workstream**: None — all A–E confirmed done.
+- **Branch/PR**: None. Board updated via GitHub MCP API (direct push to main blocked 403).
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total).
+- **Actions**: `npm ci` clean. `npm run build` clean. `npm test`: 1370/0/2 (minor flakiness on first run, 0 fail on second — pre-existing, not a regression). No open PRs. No in-flight workstream branches.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **247th run.**
+- **Next run**: Schedule should be DISABLED. If enabled, next run will find the same idle state. See "Human Actions Required" above.
