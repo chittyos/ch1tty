@@ -31,12 +31,13 @@ All workstreams are DONE. Build clean, tests green, guardrails enforced.
 
 ## Human Actions Required
 
-1. **Disable or redirect hourly schedule** — 14+ idle runs with no new work (runs 245–258; prior history archived in git); every run costs compute.
-2. **Add new workstreams** to DRIVER-BOARD.md if planned work exists.
-3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
-4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect ch1tty github backend.
-5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
-6. **Stale branch cleanup** — 900+ rogue `auto/` branches; enable auto-delete in GitHub Settings or bulk-delete locally.
+1. **Disable or redirect hourly schedule** — 24+ idle runs with no new work (runs 245–268); every run costs compute.
+2. **Merge the consolidated board-update PR** (runs 260–268) once CI passes — then this board is current on main.
+3. **Add new workstreams** to DRIVER-BOARD.md if planned work exists.
+4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+5. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect ch1tty GitHub backend.
+6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+7. **Stale branch cleanup** — 985+ rogue `auto/` branches; enable auto-delete in GitHub Settings or bulk-delete locally.
 
 ## Run Log
 
@@ -191,3 +192,34 @@ _(Prior run log entries archived to git history — runs 1–244 trimmed. Full e
   - Human action still needed: merge PR #1007 to restore readable board on main; disable/redirect schedule or add new workstreams.
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **259th run.**
 - **Next run**: Same idle state expected. **Schedule should be DISABLED or new workstreams added.** See "Human Actions Required" above.
+
+### 2026-06-30 (runs 260–267 — idle, all workstreams done)
+- **Workstream**: None — all A–E confirmed done on every run.
+- **Branch/PR**: PRs #1008–#1014 (board-only updates, one per run) — all branched from same base (d009059), all conflicting with each other. Closed in batch during run 268.
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total) on each run.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **260th–267th runs (8 idle runs).**
+
+### 2026-06-30 (run 268 — consolidated board cleanup)
+- **Workstream**: None — all A–E confirmed done.
+- **Branch/PR**: `auto/run268-board-consolidated` → new PR. Closed stale PRs #1008–#1014 (7 conflicting board-only PRs from runs 260–267, all branched from same base, irreconcilable). Created this clean consolidated PR from fresh origin/main.
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total).
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean (exit 0). `npm test` → 1370/0/2. Guardrails confirmed: 5-tool surface fixed (search/execute/status/reload/cast); `buildCastExplanation` metric freeze ACTIVE; 0 violations on main.
+  - Diagnosed PR accumulation problem: each idle run was creating a new board-update PR from the same base commit but with a different DRIVER-BOARD.md edit, creating 7 mutually-conflicting open PRs. Root fix: close all 7, create one clean branch from origin/main.
+  - Notion board: unavailable (API 401 — `NOTION_API_TOKEN` not resolvable in remote container).
+  - PushNotification SENT: 268th idle run; 24+ runs since last new workstream; schedule should be disabled or new work added.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **268th run.**
+- **Next run**: All workstreams done. **Schedule should be DISABLED or new workstreams added.** Merge this PR first so board is current on main.
+
+### 2026-06-30 (run 269 — idle, all workstreams done)
+- **Workstream**: None — all A–E confirmed done.
+- **Branch/PR**: Appended to PR #1015 (`auto/run268-board-consolidated`). PR still awaiting human merge.
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total).
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean (exit 0). `npm test` → 1370/0/2. Guardrails confirmed: 5-tool surface fixed (search/execute/status/reload/cast); `buildCastExplanation` metric freeze ACTIVE; no new fields on main.
+  - Verified all workstreams: A (build/tests green ✓); B (servers.json github → `https://api.githubcopilot.com/mcp/` with envHeaders ✓); C (focus-profiles.json 6 profiles, src/focus.ts ✓); D (test/scenario.test.ts + test/simulation.test.ts ✓); E (focus-suggestions.json 1.8MB ✓).
+  - 1 open PR (#1015 — consolidated board runs 260–268). PR #1015 still awaiting human merge.
+  - Notion board: unavailable (API 401 — `NOTION_API_TOKEN` not resolvable in remote container).
+  - Human Actions Required (unchanged): disable schedule or add new workstreams; merge PR #1015; bulk-delete 985+ stale auto/ branches; set GITHUB_MCP_AUTHORIZATION on prod; rotate Notion token.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **269th run.**
+- **Next run**: Same idle state expected. **Schedule should be DISABLED or new workstreams added.** PR #1015 must be merged first to restore current board on main.
