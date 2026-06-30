@@ -192,9 +192,32 @@ _(Prior run log entries archived to git history — runs 1–244 trimmed. Full e
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **259th run.**
 - **Next run**: Same idle state expected. **Schedule should be DISABLED or new workstreams added.** See "Human Actions Required" above.
 
+### 2026-06-30 (run 260 — idle, all workstreams done)
+- **Workstream**: None — all A–E confirmed done.
+- **Branch/PR**: `auto/run260-board-update` → PR #1008 opened. Board update via push_files (avoids base64 corruption).
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total).
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean. `npm test` → 1370/0/2. Guardrails confirmed: 5-tool surface fixed (search/execute/status/reload/cast); `buildCastExplanation` metric freeze ACTIVE; no new fields on main.
+  - All workstreams A–E verified complete. 1 open PR (#1008 — opened this run). Notion board: unavailable (API 401). 981 remote branches (900+ stale auto/ stubs, none merged to main).
+  - PushNotification sent: 260th consecutive idle run; schedule should be disabled or new workstreams added.
+  - Fixed idle-run count to 16+ (CodeRabbit review finding: runs 245–260 inclusive = 16 runs).
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **260th run.**
+- **Next run**: Same idle state expected. **Schedule should be DISABLED or new workstreams added.** See "Human Actions Required" above.
+
+### 2026-06-30 (run 261 — idle, all workstreams done)
+- **Workstream**: None — all A–E confirmed done.
+- **Branch/PR**: Appended to existing PR #1008 (`auto/run260-board-update`).
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total).
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean. `npm test` → 1370/0/2. Guardrails confirmed: 5-tool surface fixed (search/execute/status/reload/cast); `buildCastExplanation` metric freeze ACTIVE; no new fields on main.
+  - All workstreams A–E verified complete. 1 open PR (#1008 — board update, pending merge). Notion board: unavailable (API 401).
+  - Verified: B (servers.json github → `https://api.githubcopilot.com/mcp/` with envHeaders ✓); C (focus-profiles.json 6 profiles, src/focus.ts ✓); D (test/scenario.test.ts + test/simulation.test.ts ✓); E (focus-suggestions.json 1.8MB ✓).
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **261st run.**
+- **Next run**: Same idle state expected. **Schedule should be DISABLED or new workstreams added.** See "Human Actions Required" above.
+
 ### 2026-06-30 (run 262 — idle, all workstreams done)
 - **Workstream**: None — all A–E confirmed done.
-- **Branch/PR**: `auto/run262-board-update` → PR opened. Board updated via git push (not GitHub MCP API, to avoid base64 corruption).
+- **Branch/PR**: `auto/run262-board-update` → PR #1009 opened. Board updated via git push (not GitHub MCP API, to avoid base64 corruption); includes runs 260-261 (ported from PR #1008) to keep the log contiguous.
 - **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total).
 - **Actions**:
   - `npm ci` clean. `npm run build` clean. `npm test` → 1370/0/2. Guardrails confirmed: 5-tool surface fixed (search/execute/status/reload/cast); `buildCastExplanation` metric freeze ACTIVE; no new fields on main.
