@@ -198,7 +198,7 @@ _(Prior run log entries archived to git history — runs 1–244 trimmed. Full e
 - **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total).
 - **Actions**:
   - `npm ci` clean. `npm run build` clean. `npm test` → 1370/0/2. Guardrails confirmed: 5-tool surface fixed (search/execute/status/reload/cast); `buildCastExplanation` metric freeze ACTIVE; no new fields on main.
-  - All workstreams A–E verified complete. 0 open PRs. Notion board: unavailable (API 401). 981 remote branches (900+ stale auto/ stubs, none merged to main).
+  - All workstreams A–E verified complete. 1 open PR (#1008 — opened this run). Notion board: unavailable (API 401). 981 remote branches (900+ stale auto/ stubs, none merged to main).
   - PushNotification sent: 260th consecutive idle run; schedule should be disabled or new workstreams added.
   - Fixed idle-run count to 16+ (CodeRabbit review finding: runs 245–260 inclusive = 16 runs).
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **260th run.**
