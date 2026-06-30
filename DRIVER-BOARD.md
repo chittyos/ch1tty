@@ -179,3 +179,15 @@ _(Prior run log entries archived to git history — runs 1–244 trimmed. Full e
   - Notion board: unavailable (API 401 — token not resolvable in remote container).
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **258th run.**
 - **Next run**: Same idle state expected. **Schedule should be DISABLED or new workstreams added.** See "Human Actions Required" above. To prevent future base64 corruption: push DRIVER-BOARD.md via direct git commit/push, not via GitHub MCP API create_or_update_file (which encodes content as base64 then the stored file content becomes base64 text when read back).
+
+### 2026-06-30 (run 259 — idle, all workstreams done)
+- **Workstream**: None — all A–E confirmed done.
+- **Branch/PR**: Updated PR #1007 (`auto/run258-board-fix`) with run 259 log entry.
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total).
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean. `npm test` → 1370/0/2. Guardrails confirmed: 5-tool surface fixed (search/execute/status/reload/cast); `buildCastExplanation` metric freeze ACTIVE; no new fields on main.
+  - DRIVER-BOARD.md was base64-corrupted on main again (recurring). PR branch `auto/run258-board-fix` (PR #1007) has the decoded version; appended run 259 entry there.
+  - 1 open PR (#1007 — board fix). All workstreams A–E verified complete. Notion board: unavailable (API 401).
+  - Human action still needed: merge PR #1007 to restore readable board on main; disable/redirect schedule or add new workstreams.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **259th run.**
+- **Next run**: Same idle state expected. **Schedule should be DISABLED or new workstreams added.** See "Human Actions Required" above.
