@@ -31,7 +31,7 @@ All workstreams are DONE. Build clean, tests green, guardrails enforced.
 
 ## Human Actions Required
 
-1. **Disable or redirect hourly schedule** —  256+ idle runs with no new work; every run costs compute.
+1. **Disable or redirect hourly schedule** — 14+ idle runs with no new work (runs 245–258; prior history archived in git); every run costs compute.
 2. **Add new workstreams** to DRIVER-BOARD.md if planned work exists.
 3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
 4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect ch1tty github backend.
