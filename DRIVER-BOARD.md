@@ -248,18 +248,6 @@ _(Prior run log entries archived to git history — runs 1–244 trimmed. Full e
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **271st run.**
 - **Next run**: Same idle state expected. **Schedule should be DISABLED or new workstreams added.** See "Human Actions Required" above.
 
-### 2026-06-30 (run 273 — idle, all workstreams done; investigated 4 new branches)
-- **Workstream**: None — all A–E confirmed done.
-- **Branch/PR**: Direct commit to main (board-only update).
-- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total).
-- **Actions**:
-  - `npm ci` clean. `npm run build` clean (exit 0). `npm test` → 1370/0/2. Guardrails confirmed: 5-tool surface fixed (search/execute/status/reload/cast); `buildCastExplanation` metric freeze ACTIVE; no new fields on main.
-  - `git fetch --all`: discovered 4 new branches not seen in prior runs: `fix/viewport-probe-namespacing`, `fix/worker-routes-and-deps`, `refactor/backend-interface`, `register-chittyconnect-mcp`. Investigated each — all stale (their top commits' changes are already on main). Key checks: viewport-probe namespacing fix already in `scripts/viewport-probe.mjs` ✓; ChittyConnect `connect` server already in `servers.json` ✓; worker routes `mcp.ch1tty.com`+`sdk.chitty.cc` already in `workers/chittyagent-ch1tty/wrangler.jsonc` ✓.
-  - 0 open PRs. Notion board: unavailable (API 401 — `NOTION_API_TOKEN` not resolvable in remote container).
-  - Verified all workstreams: A (build/tests green ✓); B (servers.json github → `https://api.githubcopilot.com/mcp/` with envHeaders ✓); C (focus-profiles.json 6 profiles, src/focus.ts ✓); D (test/scenario.test.ts + test/simulation.test.ts ✓); E (focus-suggestions.json 1.8MB ✓).
-- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **273rd run.**
-- **Next run**: Same idle state expected. **Schedule should be DISABLED or new workstreams added.** See "Human Actions Required" above.
-
 ### 2026-06-30 (run 272 — idle, all workstreams done; merged PR #1017)
 - **Workstream**: None — all A–E confirmed done.
 - **Branch/PR**: Merged PR #1017 (`auto/run271-board-log`) via GitHub MCP. Run 272 log entry pushed via `auto/run272-board-log`.
@@ -270,4 +258,17 @@ _(Prior run log entries archived to git history — runs 1–244 trimmed. Full e
   - All workstreams A–E verified complete. Notion board: unavailable (API 401).
   - 985+ stale `auto/` branches remain (human cleanup still needed).
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **272nd run.**
+- **Next run**: Same idle state expected. **Schedule should be DISABLED or new workstreams added.** See "Human Actions Required" above.
+
+### 2026-06-30 (run 273 — idle, all workstreams done; investigated 4 new branches)
+- **Workstream**: None — all A–E confirmed done.
+- **Branch/PR**: PR #1019 (`auto/run273-board-log`).
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total).
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean (exit 0). `npm test` → 1370/0/2. Guardrails confirmed: 5-tool surface fixed (search/execute/status/reload/cast); `buildCastExplanation` metric freeze ACTIVE; no new fields on main.
+  - `git fetch --all`: discovered 4 new branches not seen in prior runs: `fix/viewport-probe-namespacing`, `fix/worker-routes-and-deps`, `refactor/backend-interface`, `register-chittyconnect-mcp`. Investigated each — all stale (their top commits' changes are already on main). Key checks: viewport-probe namespacing fix already in `scripts/viewport-probe.mjs` ✓; ChittyConnect `connect` server already in `servers.json` ✓; worker routes `mcp.ch1tty.com`+`sdk.chitty.cc` already in `workers/chittyagent-ch1tty/wrangler.jsonc` ✓.
+  - 0 open PRs. Notion board: unavailable (API 401 — `NOTION_API_TOKEN` not resolvable in remote container).
+  - Verified all workstreams: A (build/tests green ✓); B (servers.json github → `https://api.githubcopilot.com/mcp/` with envHeaders ✓); C (focus-profiles.json 6 profiles, src/focus.ts ✓); D (test/scenario.test.ts + test/simulation.test.ts ✓); E (focus-suggestions.json 1.8MB ✓).
+  - Fixed run-log ordering in this PR (run 273 was accidentally prepended before run 272; corrected to append after).
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **273rd run.**
 - **Next run**: Same idle state expected. **Schedule should be DISABLED or new workstreams added.** See "Human Actions Required" above.
