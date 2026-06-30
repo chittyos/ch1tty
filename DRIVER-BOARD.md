@@ -35,7 +35,7 @@ All workstreams are DONE. Build clean, tests green, guardrails enforced.
 2. **Merge the consolidated board-update PR** (runs 260–268) once CI passes — then this board is current on main.
 3. **Add new workstreams** to DRIVER-BOARD.md if planned work exists.
 4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
-5. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect ch1tty github backend.
+5. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect ch1tty GitHub backend.
 6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
 7. **Stale branch cleanup** — 985+ rogue `auto/` branches; enable auto-delete in GitHub Settings or bulk-delete locally.
 
