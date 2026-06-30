@@ -31,12 +31,13 @@ All workstreams are DONE. Build clean, tests green, guardrails enforced.
 
 ## Human Actions Required
 
-1. **Disable or redirect hourly schedule** — 14+ idle runs with no new work (runs 245–258; prior history archived in git); every run costs compute.
-2. **Add new workstreams** to DRIVER-BOARD.md if planned work exists.
-3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
-4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect ch1tty github backend.
-5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
-6. **Stale branch cleanup** — 900+ rogue `auto/` branches; enable auto-delete in GitHub Settings or bulk-delete locally.
+1. **Disable or redirect hourly schedule** — 22+ idle runs with no new work (runs 245–266; prior history archived in git); every run costs compute.
+2. **Merge or close open PRs** #1008, #1009, #1010, #1011, #1012 (board updates for runs 260–265) — they conflict with each other and accumulate.
+3. **Add new workstreams** to DRIVER-BOARD.md if planned work exists.
+4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+5. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect ch1tty github backend.
+6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+7. **Stale branch cleanup** — 984 rogue `auto/` branches; enable auto-delete in GitHub Settings or bulk-delete locally.
 
 ## Run Log
 
@@ -190,4 +191,17 @@ _(Prior run log entries archived to git history — runs 1–244 trimmed. Full e
   - 1 open PR (#1007 — board fix). All workstreams A–E verified complete. Notion board: unavailable (API 401).
   - Human action still needed: merge PR #1007 to restore readable board on main; disable/redirect schedule or add new workstreams.
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **259th run.**
+- **Next run**: Same idle state expected. **Schedule should be DISABLED or new workstreams added.** See "Human Actions Required" above.
+
+### 2026-06-30 (run 266 — idle, all workstreams done)
+- **Workstream**: None — all A–E confirmed done.
+- **Branch/PR**: `auto/run266-board-update` → PR #1013 opened. Board updated via git commit/push (not GitHub MCP API, to avoid recurring base64 corruption).
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total).
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean. `npm test` → 1370/0/2. Guardrails confirmed: 5-tool surface fixed (search/execute/status/reload/cast); `buildCastExplanation` metric freeze ACTIVE; no new fields on main.
+  - Board on main ends at run 259 (run 259 was in merged PR #1007). PRs #1008–#1012 (runs 260–265) still open/unmerged.
+  - 984 remote branches (unchanged; ~260+ prohibited cast-explain-* stubs none merged; bulk cleanup still needs human action).
+  - Notion board: unavailable (API 401 — token not resolvable in remote container).
+  - Updated "Human Actions Required": idle-run count → 22+ (runs 245–266); added item to merge/close open PRs #1008–#1012; updated stale branch count to 984.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **266th run.**
 - **Next run**: Same idle state expected. **Schedule should be DISABLED or new workstreams added.** See "Human Actions Required" above.
