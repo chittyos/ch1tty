@@ -25,18 +25,18 @@ All workstreams are DONE. Build clean, tests green, guardrails enforced.
 
 - **Notion API token** — Invalid (401). Human action: rotate `NOTION_API_TOKEN` in 1Password (`op://ChittyOS-Integrations/notion/api_token`).
 - **ch1tty github backend** — `GITHUB_MCP_AUTHORIZATION` unset on prod. Set env var to reconnect the `github` backend in `servers.json`.
-- **Branch cleanup** — 900+ stale `auto/` branches (including 260+ cast-explain violations). Git push --delete fails in this container. Human action: enable "Automatically delete head branches" in GitHub Settings → General, or run bulk-delete locally.
+- **Branch cleanup** — 1000+ stale `auto/` branches (including 260+ cast-explain violations). Git push --delete fails in this container. Human action: enable "Automatically delete head branches" in GitHub Settings → General, or run bulk-delete locally.
 - **CI (main ci.yml)** — 0-job-queue failure (non-CodeQL). Recurring, non-blocking.
 - **Ledger DLQ** — `ledger.chitty.cc` unreachable from remote container. Action: configure CF Access credentials (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) on prod.
 
 ## Human Actions Required
 
-1. **Disable or redirect hourly schedule** — 27+ idle runs with no new work (runs 245–272); every run costs compute.
+1. **Disable or redirect hourly schedule** — 42+ idle runs with no new work (runs 246–288); every run costs compute.
 2. **Add new workstreams** to DRIVER-BOARD.md if planned work exists.
 3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
 4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect ch1tty GitHub backend.
 5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
-6. **Stale branch cleanup** — 985+ rogue `auto/` branches; enable auto-delete in GitHub Settings or bulk-delete locally.
+6. **Stale branch cleanup** — 1000+ rogue `auto/` branches; enable auto-delete in GitHub Settings or bulk-delete locally.
 
 ## Run Log
 
@@ -442,4 +442,17 @@ _(Prior run log entries archived to git history — runs 1–244 trimmed. Full e
   - 1000+ stale `auto/` branches remain on remote (260+ prohibited cast-explain-* stubs, none merged; human bulk cleanup still needed).
   - Notion board: unavailable (API 401 — `NOTION_API_TOKEN` not resolvable in remote container).
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **287th run.**
+- **Next run**: Same idle state expected. **Schedule should be DISABLED or new workstreams added.** See "Human Actions Required" above.
+
+### 2026-07-02 (run 288 — idle, all workstreams done; merged PR #1032)
+- **Workstream**: None — all A–E confirmed done.
+- **Branch/PR**: Merged PR #1032 (run 287 board log) at run start. Board updated directly on main via GitHub MCP push_files.
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total).
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean (exit 0). `npm test` → 1370/0/2. Guardrails confirmed: 5-tool surface fixed (search/execute/status/reload/cast); `buildCastExplanation` metric freeze ACTIVE; no new fields on main.
+  - Merged PR #1032 (run 287 board log) via GitHub MCP (squash).
+  - Verified all workstreams: A (build/tests green ✓); B (servers.json github → `https://api.githubcopilot.com/mcp/` with envHeaders ✓); C (focus-profiles.json 6 profiles, src/focus.ts ✓); D (test/scenario.test.ts + test/simulation.test.ts ✓); E (focus-suggestions.json 1.8MB ✓).
+  - 1000+ stale `auto/` branches remain on remote (260+ prohibited cast-explain-* stubs, none merged; human bulk cleanup still needed).
+  - Notion board: unavailable (API 401 — `NOTION_API_TOKEN` not resolvable in remote container).
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **288th run.**
 - **Next run**: Same idle state expected. **Schedule should be DISABLED or new workstreams added.** See "Human Actions Required" above.
