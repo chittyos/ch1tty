@@ -322,3 +322,22 @@ _(Prior run log entries archived to git history — runs 1–244 trimmed. Full e
   - Notion board: unavailable (API 401 — `NOTION_API_TOKEN` not resolvable in remote container).
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **277th run.**
 - **Next run**: Same idle state expected. **Schedule should be DISABLED or new workstreams added.** See "Human Actions Required" above.
+
+### 2026-07-02 (run 278 — idle, all workstreams done)
+- **Workstream**: None — all A–E confirmed done.
+- **Branch/PR**: `auto/run278-board-log` → PR #1024 opened. PR #1024 closed by run 279 (no code changes; pure noise).
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total).
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **278th run.**
+
+### 2026-07-02 (run 279 — idle, all workstreams done; closed PR #1024)
+- **Workstream**: None — all A–E confirmed done.
+- **Branch/PR**: None. Closed stale PR #1024 (run 278 idle log). Board updated via direct commit to main.
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total).
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean (exit 0). `npm test` → 1370/0/2. Guardrails confirmed: 5-tool surface fixed (search/execute/status/reload/cast); `buildCastExplanation` metric freeze ACTIVE; no new fields on main.
+  - Closed PR #1024 (run 278 idle log — no code changes, pure noise).
+  - Verified all workstreams: A (build/tests green ✓); B (servers.json github → `https://api.githubcopilot.com/mcp/` with envHeaders ✓); C (focus-profiles.json 6 profiles, src/focus.ts ✓); D (test/scenario.test.ts + test/simulation.test.ts ✓); E (focus-suggestions.json 1.8MB ✓).
+  - 260+ prohibited cast-explain-* branches remain on remote (none merged; human cleanup still needed).
+  - Notion board: unavailable (API 401 — `NOTION_API_TOKEN` not resolvable in remote container).
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **279th run.**
+- **Next run**: Same idle state expected. **Schedule should be DISABLED or new workstreams added.** See "Human Actions Required" above.
