@@ -480,3 +480,15 @@ _(Prior run log entries archived to git history — runs 1–244 trimmed. Full e
   - Notion board: unavailable (API 401 — `NOTION_API_TOKEN` not resolvable in remote container).
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **290th run.**
 - **Next run**: Same idle state expected. **Schedule should be DISABLED or new workstreams added.** See "Human Actions Required" above.
+
+### 2026-07-02 (run 291 — idle, all workstreams done)
+- **Workstream**: None — all A–E confirmed done.
+- **Branch/PR**: `auto/run291-board-log` → PR opened; merged PR #1034 (run 290 board log) at start of run.
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total).
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean (exit 0). `npm test` → 1370/0/2. Guardrails confirmed: 5-tool surface fixed (search/execute/status/reload/cast); `buildCastExplanation` metric freeze ACTIVE; no new fields on main.
+  - `git fetch --all`: 1 open PR at run start (PR #1034 run-290 board log) — merged via GitHub MCP squash.
+  - Verified all workstreams: A (build/tests green, 5 meta-tools confirmed in src-stdio/aggregator.ts ✓); B (servers.json github → `https://api.githubcopilot.com/mcp/` remote with envHeaders, no deprecated `@modelcontextprotocol/server-github` ✓); C (focus-profiles.json exists, src-stdio/focus.ts ✓); D (test/scenario.test.ts + test/simulation.test.ts ✓); E (focus-suggestions.json 1.8MB, 1750 combos/1759 prompts ✓).
+  - Notion board: unavailable (API 401 — `NOTION_API_TOKEN` not resolvable in remote container; DRIVER-BOARD.md is the durable board).
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **291st run.**
+- **Next run**: Same idle state expected. **Schedule should be DISABLED or new workstreams added.** See "Human Actions Required" above.
