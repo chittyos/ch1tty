@@ -684,3 +684,17 @@ _(Prior run log entries archived to git history — runs 1–244 trimmed. Full e
   - PushNotification: NOT sent (run 307 already notified; state unchanged — 311th run).
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **311th run.**
 - **Next run**: Same idle state expected. **Schedule should be DISABLED or new workstreams added.** See "Human Actions Required" above.
+
+### 2026-07-03 (run 312 — idle, all workstreams done; sim validated)
+- **Workstream**: None — all A–E confirmed done.
+- **Branch/PR**: Direct push to main via GitHub MCP (board-only update, no source changes).
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total).
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test` → 1370/0/2. Guardrails confirmed: 5-tool surface fixed (search/execute/status/reload/cast); `buildCastExplanation` metric freeze ACTIVE; no new fields on main.
+  - `git fetch origin main` + `git reset --hard origin/main`: local main aligned to 2cce37e (run 311 log). 0 open PRs. 1000+ stale `auto/` branches (260+ prohibited cast-explain-* stubs, none merged; bulk cleanup still requires human action).
+  - Ran `npm run sim` — fully green: 39/39 resolution scenarios pass, 14/14 out-of-focus reachability probes pass (lens not gate), 3/3 failure scenarios pass. Total cast time 88ms.
+  - Verified all workstreams: A (build/tests green ✓); B (servers.json github → `https://api.githubcopilot.com/mcp/` with envHeaders ✓); C (focus-profiles.json 6 profiles, src-stdio/focus.ts ✓); D (test/scenario.test.ts 1157 lines + test/simulation.test.ts 229 lines + sim 39/39 ✓); E (focus-suggestions.json 1.8MB, 1750 combos/1759 prompts ✓).
+  - Notion board: unavailable (API 401). DRIVER-BOARD.md is durable board.
+  - PushNotification: NOT sent (unchanged idle state; run 307 was last notification — 5 runs ago; no new findings).
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. Sim: 39/39. **312th run.**
+- **Next run**: Same idle state expected. **Schedule should be DISABLED or new workstreams added.** See "Human Actions Required" above.
