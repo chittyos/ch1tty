@@ -286,6 +286,21 @@ _(Prior run log entries archived to git history — runs 1–346 trimmed at run 
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. Sim: 39/39. **362nd run.**
 - **Next run**: Same idle state expected. **DISABLE SCHEDULE** — see "Human Actions Required".
 
+### 2026-07-05 (run 363 — idle, all workstreams done)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done)
+- **Branch/PR**: none (direct commit to main)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total)
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1370/0/2 (all pass, no regressions).
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface fixed; `buildCastExplanation` metric freeze ACTIVE).
+  - `git fetch --all` + open PR check: 0 open PRs.
+  - Verified all workstreams: A ✓ B ✓ C ✓ D ✓ E ✓.
+  - `npm run sim` → 39/39 resolution scenarios pass, 14/14 out-of-focus reachability probes pass, 3/3 failure scenarios pass. Total cast time 82.26ms.
+  - Notion board: unavailable (API 401). DRIVER-BOARD.md is durable board.
+  - PushNotification: NOT sent (no new findings; state unchanged; last notification run 362).
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. Sim: 39/39. **363rd run.**
+- **Next run**: Same idle state expected. **DISABLE SCHEDULE** — see "Human Actions Required".
+
 ### 2026-07-05 (run 364 — idle, all workstreams done)
 - **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done)
 - **Branch/PR**: none (direct commit to main)
@@ -301,17 +316,17 @@ _(Prior run log entries archived to git history — runs 1–346 trimmed at run 
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. Sim: 39/39. **364th run.**
 - **Next run**: Same idle state expected. **DISABLE SCHEDULE** — see "Human Actions Required".
 
-### 2026-07-05 (run 363 — idle, all workstreams done)
+### 2026-07-05 (run 365 — idle, all workstreams done)
 - **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done)
 - **Branch/PR**: none (direct commit to main)
 - **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total)
 - **Actions**:
   - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1370/0/2 (all pass, no regressions).
   - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface fixed; `buildCastExplanation` metric freeze ACTIVE).
-  - `git fetch --all` + open PR check: 0 open PRs.
+  - `git reset --hard origin/main`. GitHub MCP: 0 open PRs.
   - Verified all workstreams: A ✓ B ✓ C ✓ D ✓ E ✓.
-  - `npm run sim` → 39/39 resolution scenarios pass, 14/14 out-of-focus reachability probes pass, 3/3 failure scenarios pass. Total cast time 82.26ms.
+  - `npm run sim` → 39/39 resolution scenarios pass, 14/14 out-of-focus reachability probes pass, 3/3 failure scenarios pass. Total cast time 94.33ms.
   - Notion board: unavailable (API 401). DRIVER-BOARD.md is durable board.
   - PushNotification: NOT sent (no new findings; state unchanged; last notification run 362).
-- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. Sim: 39/39. **363rd run.**
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. Sim: 39/39. **365th run.**
 - **Next run**: Same idle state expected. **DISABLE SCHEDULE** — see "Human Actions Required".
