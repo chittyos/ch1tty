@@ -4,7 +4,7 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 
 ---
 
-## Workstream status (as of 2026-06-09)
+## Workstream status (as of 2026-07-05, run 369)
 
 | Workstream | Status |
 |---|---|
