@@ -261,7 +261,7 @@ _(Prior run log entries archived to git history — runs 1–346 trimmed at run 
 - **Actions**:
   - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1370/0/2 (all pass, no regressions).
   - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface fixed; `buildCastExplanation` metric freeze ACTIVE).
-  - `git fetch origin main` + `git reset --hard origin/main` (local/remote had diverged 50/50 — reset clean).
+  - `git reset --hard origin/main` (local/remote had diverged 50/50 — reset clean).
   - GitHub MCP: 0 open PRs.
   - Verified all workstreams: A ✓ B ✓ C ✓ D ✓ E ✓.
   - `npm run sim` → 39/39 resolution scenarios pass, 3/3 failure scenarios pass. Total cast time 100.35ms.
@@ -797,4 +797,19 @@ _(Prior run log entries archived to git history — runs 1–346 trimmed at run 
   - Notion board: unavailable (API 401). DRIVER-BOARD.md is durable board.
   - PushNotification: NOT sent (no new findings; last notification run 395, 4 runs ago; state unchanged).
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. Sim: 39/39. **399th run.**
+- **Next run**: Same idle state expected. **DISABLE SCHEDULE** — see "Human Actions Required".
+
+### 2026-07-07 (run 400 — idle, all workstreams done)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done)
+- **Branch/PR**: none (direct commit to main via GitHub MCP)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total)
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1370/0/2 (all pass, no regressions).
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface fixed; `buildCastExplanation` metric freeze ACTIVE).
+  - `git fetch --all` + `git reset --hard origin/main`. GitHub MCP: 0 open PRs. 1000+ stale `auto/` branches (human cleanup still pending).
+  - Verified all workstreams: A ✓ B (github → `https://api.githubcopilot.com/mcp/` ✓) C (focus-profiles.json 6 profiles ✓) D (scenario.test.ts + simulation.test.ts ✓) E (focus-suggestions.json ✓).
+  - `npm run sim` → 39/39 resolution scenarios pass, 14/14 out-of-focus reachability probes pass, 3/3 failure scenarios pass. Total cast time 88.33ms.
+  - Notion board: unavailable (API 401). DRIVER-BOARD.md is durable board.
+  - **PushNotification: SENT** — run 400 milestone; schedule still active despite 50+ consecutive idle runs requesting DISABLE.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. Sim: 39/39. **400th run.**
 - **Next run**: Same idle state expected. **DISABLE SCHEDULE** — see "Human Actions Required".
