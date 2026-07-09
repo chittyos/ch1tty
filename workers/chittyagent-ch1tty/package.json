@@ -6,8 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",
-    "deploy": "cf deploy",
-    "deploy:production": "cf deploy --env production",
+    "deploy": "wrangler deploy",
+    "deploy:production": "wrangler deploy --env production",
     "test": "vitest run"
   },
   "dependencies": {

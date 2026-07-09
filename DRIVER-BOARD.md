@@ -1584,7 +1584,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
   - **PR #783** (`auto/board-sec-fix-3-done`): board-only update, all 3 CodeQL ✅, `mergeable_state: clean`. Squash-merged → 84ca710.
   - **PR #784** (`feat/ch1tty-do-codemode`): 8 commits from June 10–18, 47 files changed, 13,532 additions, 2,325 deletions. All 3 CodeQL checks ✅ but `mergeable_state: dirty` (git history divergence — branch built atop catalog commits not in squash-merged main; first 2 commits already upstream).
     - Core content: ports the ch1tty gateway from Node.js stdio/HTTP to **Cloudflare Workers + Durable Objects** per CHITTY.md split-architecture. DO holds session/coordinator/ledger/evaluator per-session in SQLite; alarm() closes idle sessions; Workers AI replaces Ollama; remote-proxy no longer shells to chitty-mcp-token (tokens from env Secrets Store). Old stdio sources archived to `src-stdio/`.
-    - **Blocker for merge**: root `package.json` scripts changed to `cf deploy`/`wrangler dev`; `test` script removed entirely. Existing 3304-test Node.js suite tests `src/aggregator.ts` etc. which no longer exist in DO version. `npm test` would fail.
+    - **Blocker for merge**: root `package.json` scripts changed to `wrangler deploy`/`wrangler dev`; `test` script removed entirely. Existing 3304-test Node.js suite tests `src/aggregator.ts` etc. which no longer exist in DO version. `npm test` would fail.
     - **Resolution options** (human decision required):
       a. Move Worker code to `workers/gateway-do/` (separate package.json), keep `src/` Node.js stdio intact — tests continue passing; Worker deployed separately
       b. Port the test suite to test `src/ch1tty-do.ts` and the Worker runtime — significant work
@@ -1635,7 +1635,7 @@ NOTE: Previous runs stored this file as base64, causing 2000-byte truncation. Re
 - **What was done**:
   - Startup: npm ci clean, build clean, npm test: 3304 pass / 0 fail / 2 skip. npm audit: 0 vulnerabilities.
   - Board read from DRIVER-BOARD.md (Notion 401 — recurring). Fetched and inspected PR #784 branch.
-  - PR #784 (`feat/ch1tty-do-codemode`): OPEN — **no common merge base** with current main (built on pre-squash history). `package.json` has no `test` script (`build: "tsc --noEmit"`, `deploy: "cf deploy"`, `dev: "wrangler dev"`). `src/` contains only CF Workers+DO files; original stdio code archived to `src-stdio/`. This is a complete rewrite — the existing 3304-test suite tests code (`src/aggregator.ts` etc.) that no longer exists in this branch's `src/`. Option (a) restructuring is feasible but non-trivial; requires explicit human direction.
+  - PR #784 (`feat/ch1tty-do-codemode`): OPEN — **no common merge base** with current main (built on pre-squash history). `package.json` has no `test` script (`build: "tsc --noEmit"`, `deploy: "wrangler deploy"`, `dev: "wrangler dev"`). `src/` contains only CF Workers+DO files; original stdio code archived to `src-stdio/`. This is a complete rewrite — the existing 3304-test suite tests code (`src/aggregator.ts` etc.) that no longer exists in this branch's `src/`. Option (a) restructuring is feasible but non-trivial; requires explicit human direction.
   - `buildCastExplanation` metric freeze guardrail confirmed active — no new metrics added.
   - No code changes made.
 - **State summary**:
