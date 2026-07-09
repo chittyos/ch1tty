@@ -15413,7 +15413,7 @@
             "orchestrator/skill_execute(chittyos-devops:chitty-health)",
             "notion/API-post-page"
           ],
-          "accomplishes": "Chico (ChittyConnect concierge) handles token rotation, 1Password secret reads, and wrangler secret put for any worker that needs fresh credentials; chitty-deploy redeploys the updated Cloudflare Workers with the new bindings; chitty-health confirms all services at *.chitty.cc/health are returning 200 — a zero-downtime secret rotation and redeploy pipeline. Notion logs the rotation event with the new token fingerprint and deploy status as a DevOps audit record.",
+          "accomplishes": "Chico (ChittyConnect concierge) handles token rotation, chittysecrets secret reads, and wrangler secret put for any worker that needs fresh credentials; chitty-deploy redeploys the updated Cloudflare Workers with the new bindings; chitty-health confirms all services at *.chitty.cc/health are returning 200 — a zero-downtime secret rotation and redeploy pipeline. Notion logs the rotation event with the new token fingerprint and deploy status as a DevOps audit record.",
           "verified": true,
           "notes": "All confirmed live 2026-06-06 thirty-fifth-pass. user:chico (execution:agent, triggers: '/chico', 'chico', 'chittyconnect concierge') confirmed in registry. chittyos-devops:chitty-deploy and chitty-health both confirmed (execution:local). orchestrator/skill_execute confirmed (13 tools). First combo using chico concierge skill. Chain extended with notion/API-post-page audit log. All confirmed live 2026-06-06 thirty-fifth-pass."
         },
@@ -18995,7 +18995,7 @@
           "resolves_to": "ch1tty-self-discovery-docs"
         },
         {
-          "text": "Run Chico to rotate tokens, update 1Password secrets, deploy the change, and verify service health.",
+          "text": "Run Chico to rotate tokens, update chittysecrets secrets, deploy the change, and verify service health.",
           "resolves_to": "chico-secret-rotation-deploy-health"
         },
         {

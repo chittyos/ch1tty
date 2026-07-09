@@ -13,7 +13,7 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 
 ## Blocker
 
-- **Notion auth invalid (401)**: `notion` MCP server connects but API calls fail. Fix: refresh the Notion integration token in workspace settings → Settings & Members → Connections → ch1tty integration, or run `chitty-mcp-token notion` to rotate via 1Password.
+- **Notion auth invalid (401)**: `notion` MCP server connects but API calls fail. Fix: refresh the Notion integration token in workspace settings → Settings & Members → Connections → ch1tty integration, or run `chitty-mcp-token notion` to rotate via chittysecrets.
 
 ## Run log
 

@@ -49,7 +49,7 @@ Dual transport: **stdio** (always active) + **Streamable HTTP** on `/mcp` (enabl
 | Runtime | Node.js |
 | Language | TypeScript (ES2022, Node16 modules) |
 | MCP SDK | `@modelcontextprotocol/sdk` |
-| Auth | `chitty-mcp-token` (1Password CLI wrapper) |
+| Auth | `chitty-mcp-token` (chittysecrets CLI wrapper) |
 | Config | `servers.json` (declarative, with path interpolation) |
 
 ## Ecosystem Position

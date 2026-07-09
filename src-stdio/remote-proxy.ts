@@ -100,7 +100,7 @@ export class RemoteProxy implements Backend {
     } catch (err) {
       // C2 — auth was explicitly requested (authTokenKey set). Do NOT silently fall back to
       // an unauthenticated connection; surface the retrieval failure to callers so they see
-      // the real cause (1Password down, token rotated, CLI missing) rather than a downstream 401.
+      // the real cause (chittysecrets down, token rotated, CLI missing) rather than a downstream 401.
       log.error(`Failed to get auth token (key '${config.authTokenKey}'): ${err}`, config.id);
       throw new Error(`auth_token_unavailable: ${config.authTokenKey}`);
     }

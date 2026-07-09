@@ -21,7 +21,7 @@ The portal requires OAuth. Ch1tty (the VM-based aggregator) doesn't implement OA
 ```bash
 npm install
 npm run dev                          # Local dev server
-npx wrangler deploy --env production # Deploy
+npx cf deploy --env production # Deploy
 ```
 
 ## Architecture

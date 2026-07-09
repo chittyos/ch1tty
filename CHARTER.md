@@ -57,7 +57,7 @@ Passthrough — returns union of all backend prompts, namespaced as `{serverId}/
 
 ### Upstream (Ch1tty depends on)
 - `mcp-portal.chitty.cc/mcp` — ChittyOS ecosystem MCP portal (`chittycanon://core/services/chittyconnect`), CF Access-protected
-- `chitty-mcp-token` — Auth token helper (1Password-backed, via `chittycanon://core/services/auth`)
+- `chitty-mcp-token` — Auth token helper (chittysecrets-backed, via `chittycanon://core/services/auth`)
 - Local MCP servers (filesystem, context7, sequential-thinking, etc.)
 - Cloudflare MCP endpoints (`mcp.cloudflare.com`, `autorag.mcp.cloudflare.com`, `browser.mcp.cloudflare.com`)
 
