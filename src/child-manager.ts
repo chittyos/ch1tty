@@ -110,12 +110,12 @@ export class ChildManager implements Backend {
   private async resolveEnv(config: LocalServerConfig): Promise<Record<string, string>> {
     const configEnv = config.env || {};
 
-    // Resolve 1Password op:// references from config.env only (not process.env)
+    // Resolve chittysecrets op:// references from config.env only (not process.env)
     const resolved: Record<string, string> = { ...configEnv };
     const opKeys = Object.entries(configEnv).filter(([, v]) => v.startsWith('op://'));
     if (opKeys.length > 0) {
       if (!(await this.isOpAvailable())) {
-        log.warn(`1Password CLI not configured — skipping op:// env resolution`, config.id);
+        log.warn(`chittysecrets CLI not configured — skipping op:// env resolution`, config.id);
         for (const [key] of opKeys) {
           delete resolved[key];
         }
@@ -131,7 +131,7 @@ export class ChildManager implements Backend {
           if (result.status === 'fulfilled') {
             resolved[result.value.key] = result.value.value;
           } else {
-            log.error(`Failed to resolve env from 1Password: ${result.reason}`, config.id);
+            log.error(`Failed to resolve env from chittysecrets: ${result.reason}`, config.id);
           }
         }
       }
