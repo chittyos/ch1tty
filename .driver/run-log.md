@@ -1063,7 +1063,7 @@
 
 ---
 
-### 2026-07-10T00:00Z — run 466 (idle)
+### 2026-07-10T20:11Z — run 466 (idle)
 
 - **Workstream advanced**: None (all A–E done — idle run)
 - **Branch/PR**: `auto/466th-idle-board-log`
@@ -1080,7 +1080,7 @@
 - **Blockers** (unchanged — all require human action):
   1. **Disable or redirect hourly schedule** — 466+ consecutive runs, ~250+ idle; no new work to advance.
   2. **Add new workstreams** to `.driver/run-log.md` if planned work exists.
-  3. **Resolve local main divergence** — local main is 50 commits behind/ahead of origin/main (all idle board logs). Run: `git checkout main && git reset --hard origin/main` to align.
+  3. **Resolve local main divergence** — first back up and inspect local-only commits, then reset if safe: `git branch backup/main-before-reset main && git log --oneline origin/main..main`; if confirmed all idle board logs, then: `git checkout main && git reset --hard origin/main`.
   4. **Decide fate of DDDD–HHHH branches** — `origin/auto/DDDD-*` through `origin/auto/HHHH-*` have test/feature improvements from prior session (no merge-base with origin/main, no open PRs).
   5. **Clean up 260+ prohibited branches**: `git push origin --delete $(git branch -r | grep 'origin/auto/[0-9]*-cast-explain' | sed 's|origin/||')`.
   6. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`).
