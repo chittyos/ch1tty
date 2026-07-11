@@ -106,15 +106,15 @@ _(Prior run log entries archived to git history — runs 1–478 trimmed at run 
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. Sim: 39/39. **484th run.**
 - **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add new workstreams to this board.
 
-### 2026-07-11 (run 485 — idle, all workstreams done)
-- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done)
-- **Branch/PR**: none (direct commit to main)
-- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total)
-- **Actions**:
-  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1370/0/2 (all pass, no regressions).
-  - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface; `buildCastExplanation` metric freeze ACTIVE).
-  - `git fetch --all`. 0 open PRs. 1000+ stale `auto/` branches remain.
-  - Verified all workstreams: A ✓ B (github → `https://api.githubcopilot.com/mcp/`) ✓ C (focus-profiles.json 6 profiles) ✓ D (scenario/simulation tests) ✓ E (focus-suggestions.json: 1750 combos, 1759 prompts, 6 profiles) ✓.
-  - PushNotification: NOT sent (notification already sent at run 484; state unchanged).
-- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **485th run.**
+### 2026-07-11 (runs 485–487 — idle, all workstreams done)
+- **Workstreams**: None (all A–E + GUARDRAIL-CLEANUP done)
+- **Branch/PR**: none (direct commits to main)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370/0/2 (45 suites, 1372 total) — all three runs identical
+- **Actions** (run 487):
+  - `npm ci` clean. `npm run build` clean. `npm test`: 1370/0/2. `npm run sim`: 39/39 / 14/14 / 3/3 (95.75ms).
+  - Guardrails confirmed: 5-tool surface; `buildCastExplanation` metric freeze ACTIVE.
+  - 0 open PRs. 1000+ stale `auto/` branches remain (human cleanup pending).
+  - All workstreams: A ✓ B ✓ C ✓ D ✓ E ✓.
+  - PushNotification: NOT sent (last sent run 484; state unchanged for 3 runs).
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. Sim: 39/39. **487th run.**
 - **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add new workstreams to this board.
