@@ -106,15 +106,29 @@ _(Prior run log entries archived to git history — runs 1–478 trimmed at run 
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. Sim: 39/39. **484th run.**
 - **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add new workstreams to this board.
 
-### 2026-07-11 (runs 485–488 — idle, all workstreams done)
+### 2026-07-11 (runs 485–489 — idle, all workstreams done)
 - **Workstreams**: None (all A–E + GUARDRAIL-CLEANUP done)
 - **Branch/PR**: none (direct commits to main)
 - **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370/0/2 (45 suites, 1372 total) — all runs identical
-- **Actions** (run 488):
+- **Actions** (run 489):
   - `npm ci` clean. `npm run build` clean. `npm test`: 1370/0/2. `npm run sim`: 39/39 / 14/14 / 3/3 (87.16ms).
   - Guardrails confirmed: 5-tool surface; `buildCastExplanation` metric freeze ACTIVE.
   - 0 open PRs. 1000+ stale `auto/` branches remain (human cleanup pending).
   - All workstreams: A ✓ B ✓ C ✓ D ✓ E ✓.
-  - PushNotification: NOT sent (last sent run 484; state unchanged for 4 runs).
-- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. Sim: 39/39. **488th run.**
+  - PushNotification: NOT sent (last sent run 484; state unchanged for 5 runs).
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. Sim: 39/39. **489th run.**
+- **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add new workstreams to this board.
+
+### 2026-07-11 (run 490 — idle, investigated 4 new stale branches)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done)
+- **Branch/PR**: none (direct commit to main)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370/0/2 (45 suites, 1372 total)
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1370/0/2.
+  - `git fetch --all` surfaced 4 new remote branches not seen in prior runs: `fix/viewport-probe-namespacing`, `fix/worker-routes-and-deps`, `refactor/backend-interface`, `register-chittyconnect-mcp`. Investigated all 4.
+  - **All 4 are stale/superseded**: viewport-probe fix (May 28) already in main's `scripts/viewport-probe.mjs`; worker-routes fix (May 7) already in main's `wrangler.jsonc`; register-chittyconnect (June 15) changes already in main's `servers.json` (connect + github entries present); refactor/backend-interface is an ancient early-history branch superseded by current src/ layout.
+  - 0 open PRs. origin/main was force-updated (efaa7b8→88defd0) — board-log commits squashed forward.
+  - Guardrails confirmed: 5-tool surface; `buildCastExplanation` metric freeze ACTIVE.
+  - PushNotification: NOT sent (state unchanged; new branches turned out non-actionable).
+- **Workstream state**: A✅ B✅ C✅ D✅ E✅
 - **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add new workstreams to this board.
