@@ -244,3 +244,17 @@ _(Prior run log entries archived to git history — runs 1–478 trimmed at run 
   - PushNotification: SENT (run 500; milestone — 500th consecutive idle run; schedule disable remains unactioned since run 484).
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. Sim: 39/39. **500th run.**
 - **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add new workstreams to this board.
+
+### 2026-07-12 (run 504 — idle, all workstreams done)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done)
+- **Branch/PR**: none (direct commit to main)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total)
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1370/0/2. `npm run sim`: 39/39 / 14/14 / 3/3 (96.8ms).
+  - Local main synced to origin/main (e1429d6 = run 503). No source changes lost.
+  - Guardrails confirmed: 5-tool surface; `buildCastExplanation` metric freeze ACTIVE.
+  - 0 open PRs. 1016+ stale `auto/` branches remain (human cleanup still pending).
+  - All workstreams: A ✓ B ✓ C ✓ D ✓ E ✓.
+  - PushNotification: NOT sent (last sent run 500; 4 idle runs; state unchanged).
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. Sim: 39/39. **504th run.**
+- **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add new workstreams to this board.
