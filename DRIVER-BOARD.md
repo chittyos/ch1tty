@@ -31,7 +31,7 @@ All workstreams are DONE. Build clean, tests green, guardrails enforced.
 
 ## Human Actions Required
 
-1. **Disable or redirect hourly schedule** — 484+ idle runs with no new work; every run costs compute.
+1. **Disable or redirect hourly schedule** — 491+ idle runs with no new work; every run costs compute.
 2. **Add new workstreams** to DRIVER-BOARD.md if planned work exists.
 3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
 4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect ch1tty GitHub backend.
@@ -131,4 +131,18 @@ _(Prior run log entries archived to git history — runs 1–478 trimmed at run 
   - Guardrails confirmed: 5-tool surface; `buildCastExplanation` metric freeze ACTIVE.
   - PushNotification: NOT sent (state unchanged; new branches turned out non-actionable).
 - **Workstream state**: A✅ B✅ C✅ D✅ E✅
+- **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add new workstreams to this board.
+
+### 2026-07-12 (run 491 — idle, all workstreams done)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done)
+- **Branch/PR**: none (direct commit to main)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total)
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1370/0/2. `npm run sim`: 39/39 / 14/14 / 3/3 (87.65ms).
+  - Observed local `main` branch diverged 50/50 from `origin/main` (old "driver run 393–412" history vs current "run 471–490" history). Reset local main to `origin/main` (`git reset --hard origin/main`). No source changes lost — divergence was only in board-log commits from a stale session.
+  - Guardrails confirmed: 5-tool surface; `buildCastExplanation` metric freeze ACTIVE.
+  - 0 open PRs. 1018 stale `auto/` branches remain (human cleanup still pending).
+  - All workstreams: A ✓ B ✓ C ✓ D ✓ E ✓.
+  - PushNotification: SENT (run 491; last sent at run 484; 7 runs since; persistent human-action items remain unresolved).
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. Sim: 39/39. **491st run.**
 - **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add new workstreams to this board.
