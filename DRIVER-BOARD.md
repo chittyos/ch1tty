@@ -513,3 +513,18 @@ _(Prior run log entries archived to git history — runs 1–478 trimmed at run 
   - PushNotification: NOT sent (run 525 was last, same day 2026-07-13; state unchanged; human has been notified repeatedly).
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **526th run.**
 - **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add new workstreams to this board.
+
+### 2026-07-13 (runs 527–528 — idle, all workstreams done)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done)
+- **Branch/PR**: none (direct commits to main)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total)
+- **Actions** (run 528):
+  - `git fetch --all`; 0 open PRs; HEAD detached from refs/heads/main (expected container state).
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1370/0/2 (first run showed 1 transient fail; second run confirmed 1370/0/2 — flaky timing test, not a regression).
+  - `npm run sim`: 39/39 resolution / 14/14 out-of-focus reachability / 3/3 failure scenarios (113.8ms).
+  - Guardrails confirmed: 5-tool surface; `buildCastExplanation` metric freeze ACTIVE. 0 violations on main.
+  - 0 open PRs. 1000+ stale `auto/` branches remain (human cleanup still pending).
+  - All workstreams: A ✓ B ✓ C ✓ D ✓ E ✓.
+  - PushNotification: NOT sent (last sent run 525, same day 2026-07-13; state unchanged; 3 consecutive idle runs since notification).
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. Sim: 39/39. **528th run.**
+- **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add new workstreams to this board.
