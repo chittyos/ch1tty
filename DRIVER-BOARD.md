@@ -416,6 +416,21 @@ _(Prior run log entries archived to git history — runs 1–478 trimmed at run 
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. Sim: 39/39. **518th run.**
 - **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add new workstreams to this board.
 
+### 2026-07-13 (run 520 — idle, all workstreams done)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done)
+- **Branch/PR**: none (direct commit to main)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total)
+- **Actions**:
+  - Local main was diverged 50/50 from origin/main (recurring stale-session artifact); reset to origin/main (9d4d6a9 = run 519). No source changes lost.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1370/0/2 (40.3s).
+  - `npm run sim`: 39/39 / 14/14 / 3/3 (93.09ms).
+  - Guardrails confirmed: 5-tool surface; `buildCastExplanation` metric freeze ACTIVE.
+  - 0 open PRs. 1000+ stale `auto/` branches remain (human cleanup still pending).
+  - All workstreams: A ✓ B ✓ C ✓ D ✓ E ✓.
+  - PushNotification: SENT (run 514 was last; 6 idle runs since; schedule burning compute for no work).
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. Sim: 39/39. **520th run.**
+- **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add new workstreams to this board.
+
 ### 2026-07-13 (run 519 — idle, all workstreams done)
 - **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done)
 - **Branch/PR**: none (direct commit to main)
