@@ -753,7 +753,7 @@
       "type": "remote",
       "access": "readwrite",
       "category": "ecosystem",
-      "endpoint": "https://contextual.agent.chitty.cc/mcp",
+      "endpoint": "https://contextual.chitty.cc/mcp",
       "authTokenKey": "chittymcp",
       "lazy": true,
       "enabled": true
