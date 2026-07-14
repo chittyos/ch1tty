@@ -38,9 +38,9 @@
   // Vectorize tool-embedding index (NEW RESOURCE — must be created before deploy):
   //   wrangler vectorize create ch1tty-tool-index --dimensions=768 --metric=cosine
   // 768-dim matches @cf/baai/bge-base-en-v1.5 (and the prior nomic-embed-text 768-dim).
-  // "agent_memory": [
-  //   { "binding": "MEMORY", "namespace": "ch1tty-memory" }
-  // ],
+  "agent_memory": [
+    { "binding": "MEMORY", "namespace": "ch1tty-memory" }
+  ],
   "vectorize": [
     { "binding": "VECTORIZE", "index_name": "ch1tty-tool-index" }
   ],

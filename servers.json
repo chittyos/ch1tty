@@ -735,6 +735,17 @@
       "authTokenKey": "chittymcp",
       "lazy": true,
       "enabled": true
+    },
+    {
+      "id": "context",
+      "name": "Context Agent",
+      "type": "remote",
+      "access": "readwrite",
+      "category": "ecosystem",
+      "endpoint": "https://context.chitty.cc/mcp",
+      "authTokenKey": "chittymcp",
+      "lazy": true,
+      "enabled": true
     }
   ]
 }
