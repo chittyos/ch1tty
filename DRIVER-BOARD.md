@@ -1220,7 +1220,7 @@ _(Prior run log entries archived to git history — runs 1–478 trimmed at run 
 
 ### 2026-07-15 (run 584 — idle, all workstreams done)
 - **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done)
-- **Branch/PR**: chore/runlog-run584-board / [PR below]
+- **Branch/PR**: chore/runlog-run584-board / https://github.com/chittyos/ch1tty/pull/1043
 - **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total)
 - **Actions**:
   - Read CLAUDE.md + CHITTY.md. Guardrails: 5-tool surface fixed; `buildCastExplanation` metric freeze ACTIVE.
