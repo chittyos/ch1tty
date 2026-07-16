@@ -1217,3 +1217,17 @@ _(Prior run log entries archived to git history — runs 1–478 trimmed at run 
   - PushNotification: NOT sent (runs 562 and 569 already sent notifications today 2026-07-15; state unchanged; 14 idle runs since last notification at run 569).
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **583rd run.**
 - **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add new workstreams to this board.
+
+### 2026-07-16 (run 585 — idle, all workstreams done)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done)
+- **Branch/PR**: auto/runlog-run585-board
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total)
+- **Actions**:
+  - `git checkout -B auto/runlog-run585-board origin/main`. `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1370/0/2 (55s).
+  - `npm run sim`: 39/39 resolution / 14/14 out-of-focus reachability / 3/3 failure scenarios (112ms).
+  - Read CLAUDE.md + CHITTY.md. Guardrails confirmed: 5-tool surface fixed; `buildCastExplanation` metric freeze ACTIVE. 0 violations on main.
+  - `git fetch --all`; 1 open PR (#1043 — run 584 board log, still pending merge). 1000+ stale `auto/` branches.
+  - All workstreams: A ✓ B ✓ C ✓ D ✓ E ✓.
+  - PushNotification: SENT — new day (2026-07-16), first run since 2026-07-15 notifications at runs 562/569. Schedule still idle.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. Sim: 39/39. **585th run.**
+- **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add new workstreams to this board.
