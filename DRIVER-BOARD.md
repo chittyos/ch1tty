@@ -1245,3 +1245,17 @@ _(Prior run log entries archived to git history — runs 1–478 trimmed at run 
   - PushNotification: NOT sent (run 588 already sent one today 2026-07-16; state unchanged).
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. Sim: 39/39. **589th run.**
 - **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add new workstreams to this board.
+
+### 2026-07-16 (run 590 — idle, all workstreams done)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done)
+- **Branch/PR**: none (direct commit to main — 4 idle PRs #1043–#1046 stacking on run 583 base, unmerged)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total)
+- **Actions**:
+  - `git checkout -B main origin/main`; HEAD at c719dad (run 589). No divergence.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1370/0/2. `npm run sim`: 39/39 / 14/14 / 3/3 (86ms).
+  - `git fetch --all`; 4 open PRs (#1043–#1046) still stacking on run 583 base (human merge/close needed). 1000+ stale `auto/` branches remain.
+  - Guardrails confirmed: 5-tool surface; `buildCastExplanation` metric freeze ACTIVE. 0 violations on main.
+  - All workstreams: A ✓ B ✓ C ✓ D ✓ E ✓.
+  - PushNotification: NOT sent (run 588 already sent one today 2026-07-16; state unchanged since then).
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. Sim: 39/39. **590th run.**
+- **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add new workstreams to this board.
