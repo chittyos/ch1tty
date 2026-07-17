@@ -282,3 +282,17 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **627th run.**
 - **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add new workstreams to this board.
 - **PushNotification**: NOT sent (last sent at run 609; state unchanged — 627 idle runs).
+
+### 2026-07-17 (run 628 — idle, all workstreams done)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done)
+- **Branch/PR**: none (direct commit to main)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total)
+- **Actions**:
+  - `git checkout -B main origin/main`; HEAD at 28c0f94 (run 627). Up to date.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1370/0/2.
+  - 0 open PRs. State identical to run 627.
+  - Guardrails confirmed: 5-tool surface; `buildCastExplanation` metric freeze ACTIVE.
+  - Note: Notion API token still invalid (401); board lives in DRIVER-BOARD.md.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **628th run.**
+- **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add new workstreams to this board.
+- **PushNotification**: NOT sent (last sent at run 609; state unchanged — 628 idle runs).
