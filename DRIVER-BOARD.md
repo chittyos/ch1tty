@@ -182,3 +182,19 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **620th run.**
 - **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add new workstreams to this board.
 - **PushNotification**: NOT sent (last sent at run 609; state unchanged — 620 idle runs).
+
+### 2026-07-17 (run 621 — idle, all workstreams done)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done)
+- **Branch/PR**: none
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total)
+- **Actions**:
+  - `git pull origin main`; fast-forwarded 15 commits to fc14df7 (run 620). Up to date.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1370/0/2 (~42s).
+  - 0 open PRs. State identical to run 620.
+  - Confirmed: 5-tool surface (`ch1tty/search`, `ch1tty/execute`, `ch1tty/status`, `ch1tty/reload`, `ch1tty/cast`) — all at `META_SERVER_ID='ch1tty'`, SEPARATOR='/'.
+  - Skipped tests: 2 (real Ollama integration — Ollama unreachable, expected).
+  - Guardrails confirmed: 5-tool surface; `buildCastExplanation` metric freeze ACTIVE.
+  - Note: Notion API token still invalid (401); board lives in DRIVER-BOARD.md.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **621st run.**
+- **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add new workstreams to this board.
+- **PushNotification**: NOT sent (last sent at run 609; state unchanged — 621 idle runs).
