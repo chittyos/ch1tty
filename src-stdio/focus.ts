@@ -4,7 +4,11 @@ import { fileURLToPath } from 'node:url';
 import type { ServerCategory } from './types.js';
 import { log } from './logger.js';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+// Lazy: import.meta.url is undefined in the workerd bundle, and the Worker
+// never resolves on-disk config paths — only the stdio gateway does.
+function moduleDir(): string {
+  return dirname(fileURLToPath(import.meta.url));
+}
 
 // Mirror the VALID_CATEGORIES set in config.ts — focus profiles reference the
 // same category vocabulary as servers.json.
@@ -116,7 +120,7 @@ export function validateFocusProfiles(raw: unknown): FocusProfiles {
 }
 
 export function resolveFocusProfilesPath(): string {
-  return process.env.CH1TTY_FOCUS_PROFILES || resolve(__dirname, '..', 'focus-profiles.json');
+  return process.env.CH1TTY_FOCUS_PROFILES || resolve(moduleDir(), '..', 'focus-profiles.json');
 }
 
 /**
