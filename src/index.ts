@@ -5,25 +5,48 @@
 // Never one mega-DO — one DO per session (the coordinator already sharded ~32
 // sessions; here each is its own isolate with its own SQLite + circuit state).
 import { Ch1ttyDO } from './ch1tty-do.js';
+import { Ch1ttyMcpAgent } from './mcp-agent.js';
 import type { Env } from './types.js';
 import { VERSION } from './utils.js';
 
-export { Ch1ttyDO };
+export { Ch1ttyDO, Ch1ttyMcpAgent };
 
 function mintSessionId(): string {
   return crypto.randomUUID();
 }
 
+/** Constant-time string compare — avoids leaking token length/prefix via timing. */
+function timingSafeEqual(a: string, b: string): boolean {
+  // Compare fixed-length UTF-8 byte views. Length difference still returns
+  // false, but the byte loop runs over max(len) so it doesn't short-circuit on
+  // the first differing byte.
+  const enc = new TextEncoder();
+  const ab = enc.encode(a);
+  const bb = enc.encode(b);
+  const len = Math.max(ab.length, bb.length);
+  let diff = ab.length ^ bb.length;
+  for (let i = 0; i < len; i++) {
+    diff |= (ab[i] ?? 0) ^ (bb[i] ?? 0);
+  }
+  return diff === 0;
+}
+
+/**
+ * Bearer check for the LEGACY /mcp DO path. Preserves prior behavior: when no
+ * token is configured it stays open (warned at deploy). The new /mcp2 surface
+ * does NOT use this — it fails closed (see fetch()), because it exposes `code`
+ * (sandboxed code exec) and `provision` (infra mutation).
+ */
 function checkAuth(req: Request, token?: string): boolean {
   if (!token) return true; // no token configured → open (warned at deploy)
   const auth = req.headers.get('authorization');
   if (!auth) return false;
   const [scheme, value] = auth.split(' ', 2);
-  return scheme?.toLowerCase() === 'bearer' && value === token;
+  return scheme?.toLowerCase() === 'bearer' && typeof value === 'string' && timingSafeEqual(value, token);
 }
 
 export default {
-  async fetch(req: Request, env: Env): Promise<Response> {
+  async fetch(req: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(req.url);
     const path = url.pathname;
 
@@ -47,7 +70,27 @@ export default {
       return Response.json(snap);
     }
 
-    // MCP endpoint.
+    // McpAgent transport (streamable HTTP via Agents SDK). Parallel to the
+    // legacy DO path at /mcp — same bearer check, same Ch1ttyCore underneath.
+    if (path === '/mcp2' || path.startsWith('/mcp2/')) {
+      const tokenSecret = typeof env.CH1TTY_MCP_TOKEN === 'string' && env.CH1TTY_MCP_TOKEN
+        ? env.CH1TTY_MCP_TOKEN : undefined;
+      // FAIL CLOSED: /mcp2 exposes code (sandbox exec) + provision (infra
+      // mutation). Unlike the legacy /mcp path, an unbound token is a
+      // misconfiguration, not "open" — refuse rather than expose these tools.
+      if (!tokenSecret) {
+        return Response.json(
+          { error: 'POLICY_BLOCKED_MCP2_TOKEN_UNBOUND', message: 'CH1TTY_MCP_TOKEN is not configured; /mcp2 refuses to serve unauthenticated.' },
+          { status: 503 },
+        );
+      }
+      if (!checkAuth(req, tokenSecret)) {
+        return Response.json({ error: 'unauthorized' }, { status: 401 });
+      }
+      return Ch1ttyMcpAgent.serve('/mcp2', { binding: 'MCP_OBJECT' }).fetch(req, env, ctx);
+    }
+
+    // MCP endpoint (legacy JSON-RPC DO path — untouched).
     if (path === '/mcp') {
       const tokenSecret = typeof env.CH1TTY_MCP_TOKEN === 'string' ? env.CH1TTY_MCP_TOKEN : undefined;
       if (!checkAuth(req, tokenSecret)) {

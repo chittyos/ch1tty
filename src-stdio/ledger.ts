@@ -20,18 +20,91 @@ import type { Backend, ToolCallResult } from './types.js';
 const DEAD_LETTER_PATH = process.env.CH1TTY_LEDGER_DLQ ?? join(homedir(), '.ch1tty', 'ledger.dlq.jsonl');
 
 /**
- * Write entries to the dead-letter WAL for offline replay.
- * Best-effort and synchronous (called from shutdown / drop paths).
+ * Pluggable dead-letter store (mirrors the RemoteProxy TokenSource pattern).
+ * The stdio gateway uses FileDlqStore (node:fs); the Worker/DO runtime injects
+ * a DO-SQLite-backed store — a Worker has no persistent filesystem, so the
+ * node:fs DLQ silently throws or lands on ephemeral storage while getStats()
+ * reports the entries as durably saved. append/rewrite MUST persist durably;
+ * count() must reflect only what is actually recoverable.
  */
-function writeDeadLetter(entries: LedgerEntry[], dlqPath: string): void {
-  /* c8 ignore next -- all callers guard with buffer.length > 0 before calling; defensive only */
-  if (entries.length === 0) return;
-  try {
-    mkdirSync(dirname(dlqPath), { recursive: true });
-    const lines = entries.map((e) => JSON.stringify({ ...e, droppedAt: new Date().toISOString() })).join('\n') + '\n';
-    appendFileSync(dlqPath, lines, 'utf8');
-  } catch (err) {
-    log.error(`Ledger DLQ write failed (${dlqPath}): ${err}`);
+export interface DlqStore {
+  /** Append entries to the DLQ (stamps droppedAt). Best-effort, must not throw. */
+  append(entries: LedgerEntry[]): void;
+  /** Read up to `limit` most-recent entries (chronological). */
+  readEntries(limit: number): object[];
+  /** Replace the DLQ contents with the given entries (empty => clear). */
+  rewrite(entries: object[]): void;
+  /** Count of durably-stored DLQ entries. */
+  count(): number;
+  /** Human-readable location, surfaced in getStats().dlqPath. */
+  describe(): string;
+}
+
+/** Default stdio store: a JSONL WAL under ~/.ch1tty (or $CH1TTY_LEDGER_DLQ). */
+export class FileDlqStore implements DlqStore {
+  constructor(private readonly dlqPath: string) {}
+
+  describe(): string { return this.dlqPath; }
+
+  append(entries: LedgerEntry[]): void {
+    /* c8 ignore next -- all callers guard with length > 0; defensive only */
+    if (entries.length === 0) return;
+    try {
+      mkdirSync(dirname(this.dlqPath), { recursive: true });
+      const lines = entries.map((e) => JSON.stringify({ ...e, droppedAt: new Date().toISOString() })).join('\n') + '\n';
+      appendFileSync(this.dlqPath, lines, 'utf8');
+    } catch (err) {
+      log.error(`Ledger DLQ write failed (${this.dlqPath}): ${err}`);
+    }
+  }
+
+  readEntries(limit = 50): object[] {
+    try {
+      const text = readFileSync(this.dlqPath, 'utf8');
+      const lines = text.split('\n').filter((l) => l.trim().length > 0);
+      const parsed: object[] = [];
+      for (const l of lines) {
+        try {
+          const v = JSON.parse(l) as unknown;
+          if (v !== null && typeof v === 'object' && !Array.isArray(v)) parsed.push(v as object);
+        } catch { /* skip malformed */ }
+      }
+      return parsed.slice(-limit);
+    } catch {
+      return [];
+    }
+  }
+
+  rewrite(entries: object[]): void {
+    try {
+      if (entries.length === 0) {
+        try { unlinkSync(this.dlqPath); } catch { /* file may not exist or already gone */ }
+        return;
+      }
+      const targetDir = dirname(this.dlqPath);
+      mkdirSync(targetDir, { recursive: true });
+      const lines = entries.map((e) => JSON.stringify(e)).join('\n') + '\n';
+      // Stage in a unique temp dir on the same filesystem, then atomic rename.
+      const tmpDir = mkdtempSync(join(targetDir, '.dlq-tmp-'));
+      const tmpPath = join(tmpDir, 'dlq.jsonl');
+      try {
+        writeFileSync(tmpPath, lines, { encoding: 'utf8', mode: 0o600 });
+        renameSync(tmpPath, this.dlqPath);
+      } finally {
+        try { rmSync(tmpDir, { recursive: true, force: true }); } catch { /* cleanup best-effort */ }
+      }
+    } catch (err) { /* c8 ignore next 2 -- requires OS-level fault (ENOSPC/EROFS), untestable in sandbox */
+      log.error(`Ledger DLQ rewrite failed (${this.dlqPath}): ${err}`);
+    }
+  }
+
+  count(): number {
+    try {
+      const text = readFileSync(this.dlqPath, 'utf8');
+      return text.split('\n').filter((l) => l.trim().length > 0).length;
+    } catch {
+      return 0;
+    }
   }
 }
 
@@ -61,6 +134,8 @@ export interface LedgerStats {
 
 const MAX_BUFFER_SIZE = 500;
 const FLUSH_INTERVAL_MS = 10_000; // 10 seconds
+/** Exported for the DO alarm scheduler (Worker runtime has no setInterval-driven flush). */
+export const LEDGER_FLUSH_INTERVAL_MS = FLUSH_INTERVAL_MS;
 const BATCH_SIZE = 25; // entries per flush batch
 const MAX_RETRIES = 3;
 
@@ -72,6 +147,7 @@ export class LedgerClient {
   private flushing = false;
   private backend?: Backend;
   private serverId?: string;
+  private readonly dlq: DlqStore;
   readonly dlqPath: string;
 
   // Stats
@@ -81,8 +157,18 @@ export class LedgerClient {
   private lastFlushAt: Date | null = null;
   private replaying = false;
 
-  constructor(dlqPath?: string) {
-    this.dlqPath = dlqPath ?? DEAD_LETTER_PATH;
+  /**
+   * @param dlqPathOrStore  A filesystem path (stdio default → FileDlqStore) or
+   *   an explicit DlqStore (Worker/DO passes a SQLite-backed store). Undefined
+   *   uses the default ~/.ch1tty WAL path.
+   */
+  constructor(dlqPathOrStore?: string | DlqStore) {
+    if (dlqPathOrStore && typeof dlqPathOrStore !== 'string') {
+      this.dlq = dlqPathOrStore;
+    } else {
+      this.dlq = new FileDlqStore(dlqPathOrStore ?? DEAD_LETTER_PATH);
+    }
+    this.dlqPath = this.dlq.describe();
   }
 
   /** Bind to the ecosystem backend for ledger writes. */
@@ -106,7 +192,8 @@ export class LedgerClient {
           });
       }, FLUSH_INTERVAL_MS);
       // Don't keep the process alive just for background flushes (important for tests/CLI one-shots).
-      this.flushTimer.unref();
+      // workerd timers return numbers (no unref); guard for Worker/DO runtime.
+      this.flushTimer.unref?.();
     }
   }
 
@@ -218,7 +305,7 @@ export class LedgerClient {
             this.totalDropped++;
             // Canon: chittycanon://gov/governance#ledger-is-append-only — elevate to error + WAL.
             log.error(`Ledger entry dropped after ${MAX_RETRIES} retries: ${entry.event_type} (session ${entry.session_id}) — written to DLQ`);
-            writeDeadLetter([entry], this.dlqPath);
+            this.dlq.append([entry]);
           }
         }
       }
@@ -298,59 +385,19 @@ export class LedgerClient {
     return replayed;
   }
 
-  /** Rewrite the DLQ file with the given entries. Removes the file if the list is empty. */
+  /** Rewrite the DLQ with the given entries (delegates to the store). */
   private rewriteDlq(entries: object[]): void {
-    try {
-      if (entries.length === 0) {
-        try { unlinkSync(this.dlqPath); } catch { /* file may not exist or already gone */ }
-        return;
-      }
-      const targetDir = dirname(this.dlqPath);
-      mkdirSync(targetDir, { recursive: true });
-      const lines = entries.map((e) => JSON.stringify(e)).join('\n') + '\n';
-      // Stage the rewrite in a unique temp dir (same filesystem as the DLQ so renameSync
-      // is atomic), then rename into place. mkdtempSync provides the secure unique path;
-      // renameSync avoids exposing a partially-written file to concurrent readers.
-      const tmpDir = mkdtempSync(join(targetDir, '.dlq-tmp-'));
-      const tmpPath = join(tmpDir, 'dlq.jsonl');
-      try {
-        writeFileSync(tmpPath, lines, { encoding: 'utf8', mode: 0o600 });
-        renameSync(tmpPath, this.dlqPath);
-      } finally {
-        try { rmSync(tmpDir, { recursive: true, force: true }); } catch { /* cleanup best-effort */ }
-      }
-    } catch (err) { /* c8 ignore next 2 -- requires OS-level fault (ENOSPC/EROFS), untestable in sandbox */
-      log.error(`Ledger DLQ rewrite failed (${this.dlqPath}): ${err}`);
-    }
+    this.dlq.rewrite(entries);
   }
 
-  /** Read up to `limit` most-recent entries from the dead-letter WAL file (chronological order). Skips malformed JSON and non-object lines. */
+  /** Read up to `limit` most-recent DLQ entries (delegates to the store). */
   dlqReadEntries(limit = 50): object[] {
-    try {
-      const text = readFileSync(this.dlqPath, 'utf8');
-      const lines = text.split('\n').filter((l) => l.trim().length > 0);
-      const parsed: object[] = [];
-      for (const l of lines) {
-        try {
-          const v = JSON.parse(l) as unknown;
-          if (v !== null && typeof v === 'object' && !Array.isArray(v)) parsed.push(v as object);
-        } catch { /* skip malformed */ }
-      }
-      return parsed.slice(-limit);
-    } catch {
-      return [];
-    }
+    return this.dlq.readEntries(limit);
   }
 
-  /** Stats snapshot for status endpoint. */
-  /** Count entries currently in the dead-letter WAL file. Returns 0 if the file doesn't exist. */
+  /** Count of durably-stored DLQ entries (delegates to the store). */
   dlqEntries(): number {
-    try {
-      const text = readFileSync(this.dlqPath, 'utf8');
-      return text.split('\n').filter((l) => l.trim().length > 0).length;
-    } catch {
-      return 0;
-    }
+    return this.dlq.count();
   }
 
   getStats(): LedgerStats {
@@ -381,7 +428,7 @@ export class LedgerClient {
       if (this.buffer.length > 0) {
         // Append-only integrity — write remaining entries to DLQ instead of losing them.
         const lost = this.buffer.length;
-        writeDeadLetter(this.buffer, this.dlqPath);
+        this.dlq.append(this.buffer);
         this.totalDropped += lost;
         this.buffer = [];
         log.error(`Ledger shutdown: ${lost} unflushed entries written to DLQ (${this.dlqPath})`);
@@ -389,7 +436,7 @@ export class LedgerClient {
     } else if (this.buffer.length > 0) {
       // Never bound — still flush to DLQ so entries aren't lost on shutdown.
       const lost = this.buffer.length;
-      writeDeadLetter(this.buffer, this.dlqPath);
+      this.dlq.append(this.buffer);
       this.totalDropped += lost;
       this.buffer = [];
       log.error(`Ledger shutdown: ${lost} entries never flushed (no backend bound) — written to DLQ`);

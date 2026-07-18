@@ -13,7 +13,7 @@
  */
 
 import { log } from './logger.js';
-import { LedgerClient } from './ledger.js';
+import { LedgerClient, type DlqStore } from './ledger.js';
 import { OllamaBrain, type OllamaBrainConfig, type RoutedTool, type ToolCandidate } from './ollama-brain.js';
 import { EmbeddingBrain, type EmbeddingBrainConfig } from './embedding-brain.js';
 import type { Backend, ToolCallResult } from './types.js';
@@ -64,9 +64,12 @@ export class SessionCoordinator {
   constructor(
     brainConfig: Partial<OllamaBrainConfig> = {},
     embedConfig: Partial<EmbeddingBrainConfig> = {},
-    ledgerDlqPath?: string,
+    // A filesystem path (stdio) or an explicit DlqStore (Worker/DO passes a
+    // DO-SQLite-backed store so failed ledger entries survive — a Worker has no
+    // durable filesystem).
+    ledgerDlq?: string | DlqStore,
   ) {
-    this.ledger = new LedgerClient(ledgerDlqPath);
+    this.ledger = new LedgerClient(ledgerDlq);
     this.brain = new OllamaBrain(brainConfig);
     this.embeddingBrain = new EmbeddingBrain(embedConfig);
     this.sessionTtlMs = Number(process.env.CH1TTY_SESSION_TTL_MS ?? 3_600_000);
@@ -75,7 +78,8 @@ export class SessionCoordinator {
       this.evictTimer = setInterval(() => {
         this.evictStaleSessions(Date.now(), this.sessionTtlMs);
       }, evictIntervalMs);
-      this.evictTimer.unref();
+      // workerd timers return numbers (no unref); guard for Worker/DO runtime.
+      this.evictTimer.unref?.();
     }
     // Warm the primary embedding brain so the first cast doesn't pay model-load latency.
     void this.embeddingBrain.warmup().catch(() => {/* best-effort */});
@@ -291,6 +295,21 @@ export class SessionCoordinator {
     }
     this._evictedSessions += count;
     return count;
+  }
+
+  /**
+   * Session ids that have been inactive longer than idleMs (staging-complete
+   * only, mirroring evictStaleSessions). Used by the DO alarm() to drive
+   * onSessionEnd for idle sessions — a per-session DO has no transport-close.
+   */
+  idleSessions(idleMs: number): string[] {
+    if (idleMs <= 0) return [];
+    const cutoff = Date.now() - idleMs;
+    const out: string[] = [];
+    for (const [id, ctx] of this.contexts) {
+      if (ctx.stagingComplete && ctx.lastActiveAt <= cutoff) out.push(id);
+    }
+    return out;
   }
 
   /** Release in-flight context and stop the background eviction timer. */

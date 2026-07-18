@@ -11,3 +11,6 @@ coverage/
 
 # Claude Code tooling (worktrees, session state) — never commit
 .claude/
+
+# wrangler dev local state
+.wrangler/

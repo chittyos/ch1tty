@@ -1,5 +1,4 @@
-import { execFile } from 'node:child_process';
-import { promisify } from 'node:util';
+import { execFileSync } from 'node:child_process';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import type { ServerConfig, RemoteServerConfig, ResourceEntry, ResourceTemplateEntry, PromptEntry, ToolEntry, ToolCallResult, BackendStatus, Backend, ContentItem } from './types.js';
@@ -7,7 +6,28 @@ import { VERSION, withTimeout, normalizeToolResult } from './utils.js';
 import { log } from './logger.js';
 import { CircuitBreaker } from './circuit-breaker.js';
 
-const execFileAsync = promisify(execFile);
+/**
+ * Pluggable auth-token retrieval. The stdio gateway shells out to the
+ * `chitty-mcp-token` CLI (CliTokenSource, the default); the Worker/DO runtime
+ * injects a source that reads env bindings / the ChittyConnect broker instead
+ * (a Worker cannot execFile). Implementations MUST throw on failure — never
+ * return a placeholder.
+ */
+export interface TokenSource {
+  getToken(key: string): Promise<string>;
+}
+
+/** Default stdio-side source: `chitty-mcp-token <key>` (1Password-backed CLI). */
+export class CliTokenSource implements TokenSource {
+  async getToken(key: string): Promise<string> {
+    const stdout = execFileSync('chitty-mcp-token', [key], { encoding: 'utf8', timeout: 10_000 });
+    const token = stdout.trim();
+    if (!token) {
+      throw new Error(`chitty-mcp-token returned empty value for key '${key}'`);
+    }
+    return token;
+  }
+}
 
 interface TokenCache {
   token: string;
@@ -68,6 +88,11 @@ export class RemoteProxy implements Backend {
   private connecting = new Map<string, Promise<RemoteConnection>>();
   private tokenCaches = new Map<string, TokenCache>();
   private breaker = new CircuitBreaker();
+  private tokenSource: TokenSource;
+
+  constructor(tokenSource: TokenSource = new CliTokenSource()) {
+    this.tokenSource = tokenSource;
+  }
 
   registerServer(config: ServerConfig): void {
     if (config.type !== 'remote') return;
@@ -83,12 +108,9 @@ export class RemoteProxy implements Backend {
     }
 
     try {
-      const { stdout } = await execFileAsync('chitty-mcp-token', [config.authTokenKey], {
-        timeout: 10_000,
-      });
-      const token = stdout.trim();
+      const token = await this.tokenSource.getToken(config.authTokenKey);
       if (!token) {
-        throw new Error(`chitty-mcp-token returned empty value for key '${config.authTokenKey}'`);
+        throw new Error(`token source returned empty value for key '${config.authTokenKey}'`);
       }
 
       this.tokenCaches.set(config.id, {

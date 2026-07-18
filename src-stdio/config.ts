@@ -4,7 +4,11 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { ServerAccess, ServerCategory, ServerConfig, ServersConfig } from './types.js';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+// Lazy: import.meta.url is undefined in the workerd bundle, and the Worker
+// never resolves on-disk config paths — only the stdio gateway does.
+function moduleDir(): string {
+  return dirname(fileURLToPath(import.meta.url));
+}
 
 const VALID_ACCESS: Set<string> = new Set(['read', 'write', 'readwrite']);
 const VALID_CATEGORIES: Set<string> = new Set([
@@ -235,7 +239,7 @@ export function validateServersConfig(raw: unknown): ServersConfig {
 }
 
 export function resolveConfigPath(): string {
-  return process.env.CH1TTY_CONFIG || resolve(__dirname, '..', 'servers.json');
+  return process.env.CH1TTY_CONFIG || resolve(moduleDir(), '..', 'servers.json');
 }
 
 export function loadConfigFromPath(path: string): ServersConfig {

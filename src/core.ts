@@ -1,0 +1,1149 @@
+// Ch1ttyCore — transport-agnostic session core, extracted from Ch1ttyDO so the
+// legacy JSON-RPC DO (/mcp) and the new McpAgent transport (/mcp2) share one
+// implementation of: registry build, search, execute, code, cast, provision,
+// status, reload, memory tools, resource/prompt passthrough, coordinator,
+// ledger, evaluator, and the codemode bridge.
+//
+// One core per DO instance; the owning DO drives alarm()-based flushing via
+// flush() / closeIdleSessions() / hasBufferedWork().
+//
+// FAST-FOLLOW (deferred from the Phase-1 adversarial review, not blocking):
+//  - token-source: invalidate the SQLite token cache on a downstream 401 so a
+//    rotated/revoked token isn't served from cache for the full TTL.
+//  - refreshRegistry: negative-cache an empty/failed registry with its own TTL
+//    so every call doesn't re-hit unreachable upstreams (currently expiresAt is
+//    still advanced, but a partial success + later failure isn't distinguished).
+//  - mcp-agent.toMcpResult: an embedded resource with neither text nor blob is
+//    coerced to text:'' — consider surfacing isError instead of silently emptying.
+//  - handleProvision: OntologyClient.isValidType fails OPEN (canon down =>
+//    unknown types pass); acceptable for now but should warn on the fail-open path.
+//  - refreshRegistry map: a malformed server record (missing id/endpoints) is
+//    skipped via the endpoint guard, but other malformed shapes could still throw
+//    inside the map — wrap per-record parsing defensively.
+import type {
+  Env, ServerConfig, ServerStatus, ServerCategory, ServerAccess,
+  ToolCallResult, ContentItem,
+} from './types.js';
+import { RemoteProxy } from './remote-proxy.js';
+import { WorkerTokenSource } from './token-source.js';
+import { SqliteDlqStore } from './dlq-store.js';
+import { SessionTracker } from './session.js';
+import { SessionCoordinator } from './coordinator.js';
+import { LedgerClient } from './ledger.js';
+import { Evaluator } from './evaluator.js';
+import { WorkersAiBrain, type ToolCandidate } from './workers-ai-brain.js';
+import { validateServersConfig } from './config.js';
+import { validateFocusProfiles, resolveFocus, isInFocus, applyFocusBias, type FocusProfile, type FocusProfiles } from './focus.js';
+import { getSuggestionsForFocus, type FocusSuggestions } from './suggestions.js';
+import { FOCUS_PROFILES_RAW, REMOTE_SERVERS } from './config-data.js';
+import { CodemodeBridge } from './codemode-bridge.js';
+import { OntologyClient } from '@chittyos/schema-client';
+import { VERSION } from './utils.js';
+import { log } from './logger.js';
+
+const SEPARATOR = '/';
+const META_SERVER_ID = 'ch1tty';
+const META_TOOL_VERBS: ReadonlySet<string> = new Set(['search', 'execute', 'status', 'reload', 'cast', 'code', 'provision']);
+const REGISTRY_TTL = 5 * 60 * 1000;
+/** Idle window after which the owning DO's alarm() runs onSessionEnd for a session. */
+export const SESSION_IDLE_MS = 15 * 60 * 1000;
+
+/**
+ * Extract the canonical entity-type code (T position) from a ChittyID of the
+ * form VV-G-LLL-SSSS-T-YM-C-X. Returns the single-letter code (e.g. 'P') when
+ * the id matches that shape, else null (callers skip type validation rather
+ * than guess). @canon chittycanon://gov/governance#core-types
+ */
+/**
+ * True when the URL's host is chitty.cc or a *.chitty.cc subdomain (https only).
+ * Used to allowlist dynamically-ingested upstream endpoints before sending them
+ * inherited credentials. Rejects look-alikes like chitty.cc.evil.com.
+ */
+function isChittyHost(url: string): boolean {
+  let host: string;
+  let protocol: string;
+  try {
+    const u = new URL(url);
+    host = u.hostname.toLowerCase();
+    protocol = u.protocol;
+  } catch {
+    return false;
+  }
+  if (protocol !== 'https:') return false;
+  return host === 'chitty.cc' || host.endsWith('.chitty.cc');
+}
+
+function extractEntityTypeCode(entityId: string): string | null {
+  const parts = entityId.split('-');
+  // VV-G-LLL-SSSS-T-YM-C-X => exactly 8 segments, type code is index 4.
+  if (parts.length === 8 && /^[A-Z]$/.test(parts[4]!)) return parts[4]!;
+  return null;
+}
+
+interface NamespacedTool {
+  serverId: string;
+  serverName: string;
+  category: ServerCategory;
+  access: ServerAccess;
+  name: string;
+  namespacedName: string;
+  description: string;
+  inputSchema: Record<string, unknown>;
+}
+
+/** Descriptor for a meta-tool: MCP name + description + JSON input schema. */
+export interface MetaToolDescriptor {
+  name: string;
+  description: string;
+  inputSchema: Record<string, unknown>;
+}
+
+export class Ch1ttyCore {
+  private proxy: RemoteProxy;
+  readonly sessions = new SessionTracker();
+  readonly coordinator: SessionCoordinator;
+  /** Append-only ledger — the coordinator owns it; alias for alarm-driven flush. */
+  readonly ledger: LedgerClient;
+  readonly evaluator: Evaluator;
+  private brain: WorkersAiBrain;
+  private codemode: CodemodeBridge;
+  // Canonical entity-type ontology (P/L/T/E/A) via @chittyos/schema-client.
+  // Used to type-check the entity a provision_bind attaches to.
+  private ontology: OntologyClient;
+  private memoryNs?: Env['MEMORY'];
+
+  private configs: ServerConfig[];
+  private focusProfiles: FocusProfiles;
+  private suggestionsCatalog: Record<string, FocusSuggestions> = {};
+  private startedAt = Date.now();
+
+  private registry: NamespacedTool[] = [];
+  private registryExpiresAt = 0;
+  private registryRefreshing: Promise<void> | null = null;
+  private indexed = false;
+  private sessionStarting = new Map<string, Promise<void>>();
+
+  constructor(sql: SqlStorage, private env: Env) {
+    log.setLevel(typeof env.CH1TTY_LOG_LEVEL === 'string' ? env.CH1TTY_LOG_LEVEL : undefined);
+
+    this.evaluator = new Evaluator(sql);
+    this.brain = new WorkersAiBrain(env.AI, env.VECTORIZE);
+    // Coordinator with default (Ollama/embedding) brains disabled-by-failure in
+    // a Worker; intent routing goes through WorkersAiBrain (env.AI) below.
+    // DLQ is backed by DO SQLite — the stdio FileDlqStore's node:fs WAL is
+    // ephemeral/throwing in a Worker, so failed ledger entries would be lost
+    // while getStats().dlqEntries reported them safe.
+    this.coordinator = new SessionCoordinator({}, {}, new SqliteDlqStore(sql));
+    this.ledger = this.coordinator.ledger;
+
+    this.proxy = new RemoteProxy(new WorkerTokenSource(env, sql));
+    this.configs = validateServersConfig({ servers: REMOTE_SERVERS }).servers;
+    this.focusProfiles = validateFocusProfiles(FOCUS_PROFILES_RAW);
+    this.codemode = new CodemodeBridge(env.LOADER);
+    this.ontology = new OntologyClient();
+    if (env.MEMORY) {
+      this.memoryNs = env.MEMORY;
+    }
+
+    this.rebuildBackends();
+  }
+
+  // ── JSON-RPC surface (shared by Ch1ttyDO /mcp and harnesses) ─
+
+  /** Minimal MCP JSON-RPC handler (initialize / tools/list / tools/call / resources / prompts). */
+  async handleJsonRpc(
+    body: { jsonrpc?: string; id?: unknown; method?: string; params?: Record<string, unknown> },
+    sessionId: string,
+  ): Promise<Record<string, unknown>> {
+    const id = body.id ?? null;
+    const ok = (result: unknown) => ({ jsonrpc: '2.0', id, result });
+    const err = (code: number, message: string) => ({ jsonrpc: '2.0', id, error: { code, message } });
+
+    switch (body.method) {
+      case 'initialize':
+        // Start the coordinator session exactly once per session (begins entity
+        // staging + emits session_start). hasSession guards re-initialize.
+        await this.startSession(sessionId);
+        return ok({
+          protocolVersion: '2025-06-18',
+          capabilities: { tools: {}, resources: {}, prompts: {} },
+          serverInfo: { name: 'ch1tty', version: VERSION },
+        });
+      case 'notifications/initialized':
+        return ok({});
+      case 'tools/list':
+        return ok(await this.listAllTools());
+      case 'tools/call': {
+        // Lazily start the session for clients that skip initialize. hasSession
+        // makes this a no-op once started, so affinity/patterns still accumulate.
+        await this.startSession(sessionId);
+        const name = String(body.params?.name ?? '');
+        const args = (body.params?.arguments && typeof body.params.arguments === 'object')
+          ? (body.params.arguments as Record<string, unknown>) : {};
+        return ok(await this.callTool(name, args, sessionId));
+      }
+      case 'resources/list':
+        return ok(await this.listAllResources());
+      case 'resources/templates/list':
+        return ok(await this.listAllResourceTemplates());
+      case 'resources/read':
+        return ok(await this.readResource(String(body.params?.uri ?? '')));
+      case 'prompts/list':
+        return ok(await this.listAllPrompts());
+      case 'prompts/get':
+        return ok(await this.getPrompt(String(body.params?.name ?? ''), body.params?.arguments as Record<string, string> | undefined));
+      default:
+        return err(-32601, `Method not found: ${body.method}`);
+    }
+  }
+
+  /** Idempotently start coordinator session + session tracker for an id.
+   * Deduplicates concurrent calls for the same sessionId so coordinator
+   * initialization completes before the first tool call proceeds. */
+  async startSession(sessionId: string): Promise<void> {
+    this.sessions.getOrCreate(sessionId, 'http');
+    if (this.coordinator.hasSession(sessionId)) return;
+    const inflight = this.sessionStarting.get(sessionId);
+    if (inflight) { await inflight; return; }
+    const p = this.coordinator.onSessionStart(sessionId, 'http').finally(() => {
+      this.sessionStarting.delete(sessionId);
+    });
+    this.sessionStarting.set(sessionId, p);
+    await p;
+  }
+
+  // ── Backends ────────────────────────────────────────────────
+
+  private rebuildBackends(): void {
+    // No ChildManager — a Worker cannot spawn stdio children. RemoteProxy only.
+    for (const config of this.activeConfigs()) {
+      this.proxy.registerServer(config);
+    }
+    this.registry = [];
+    this.registryExpiresAt = 0;
+
+    const ecosystemConfig = this.activeConfigs().find((c) => c.type === 'remote' && c.category === 'ecosystem');
+    if (ecosystemConfig) {
+      this.coordinator.bindEcosystem(this.proxy, ecosystemConfig.id);
+    }
+  }
+
+  private activeConfigs(): ServerConfig[] {
+    return this.configs.filter((c) => c.enabled !== false);
+  }
+
+  // ── Registry ────────────────────────────────────────────────
+
+  private async refreshRegistry(): Promise<void> {
+    if (this.registryRefreshing) return this.registryRefreshing;
+    this.registryRefreshing = (async () => {
+      // Ingest dynamically from aggregator
+      try {
+        const res = await fetch('https://mcp.chitty.cc/v0.1/servers');
+        if (res.ok) {
+          const data = await res.json() as { servers: Array<Record<string, unknown>> };
+          const dynamicConfigs = data.servers.flatMap((s) => {
+            const existingBase = this.configs.find(c => c.id === s.id);
+            const existing = existingBase?.type === 'remote' ? existingBase as import('./types.js').RemoteServerConfig : undefined;
+            // SECURITY: a dynamically-ingested config inherits authTokenKey
+            // 'chittymcp' + CF-Access creds, which RemoteProxy sends to `endpoint`.
+            // If the aggregator response is spoofed, an attacker-controlled URL
+            // would exfiltrate those secrets. Trust the endpoint only when it
+            // reuses a known static config's endpoint OR its host is *.chitty.cc.
+            const endpoint = existing?.endpoint || (s.endpoints as { aggregated?: string } | undefined)?.aggregated;
+            if (typeof endpoint !== 'string' || !endpoint) {
+              log.warn(`Registry ingest: server "${String(s.id)}" has no usable endpoint — skipped`);
+              return [];
+            }
+            if (!existing?.endpoint && !isChittyHost(endpoint)) {
+              log.warn(`Registry ingest: server "${String(s.id)}" endpoint host not in *.chitty.cc allowlist (${endpoint}) — skipped to avoid credential exfiltration`);
+              return [];
+            }
+            return [{
+              id: String(s.id),
+              name: String(s.label || s.name),
+              type: 'remote' as const,
+              access: existingBase?.access || 'readwrite' as const,
+              category: (s.category as ServerCategory) || 'ecosystem',
+              endpoint,
+              authTokenKey: existing?.authTokenKey || 'chittymcp',
+              envHeaders: existing?.envHeaders || {
+                'CF-Access-Client-Id': 'CHITTY_CF_ACCESS_CLIENT_ID',
+                'CF-Access-Client-Secret': 'CHITTY_CF_ACCESS_CLIENT_SECRET',
+              },
+              lazy: existingBase?.lazy ?? true,
+              enabled: existingBase?.enabled ?? true
+            }];
+          });
+
+          const configMap = new Map<string, ServerConfig>();
+          for (const c of this.configs) configMap.set(c.id, c);
+          for (const c of dynamicConfigs) {
+            configMap.set(c.id, c);
+            this.proxy.registerServer(c);
+          }
+          this.configs = Array.from(configMap.values());
+          log.info(`Ingested ${dynamicConfigs.length} servers from registry`);
+        } else {
+          log.warn(`Registry ingest failed: HTTP ${res.status}`);
+        }
+      } catch (err) {
+        log.error(`Registry ingest error: ${err}`);
+      }
+
+      const toolPromises = this.activeConfigs().map(async (config) => {
+        try {
+          const tools = await this.proxy.listTools(config.id);
+          return tools.map((t): NamespacedTool => ({
+            serverId: config.id,
+            serverName: config.name,
+            category: config.category,
+            access: config.access,
+            name: t.name,
+            namespacedName: `${config.id}${SEPARATOR}${t.name}`,
+            description: t.description ?? t.name,
+            inputSchema: t.inputSchema,
+          }));
+        } catch (err) {
+          log.error(`Failed to list tools: ${err}`, config.id);
+          return [];
+        }
+      });
+      const results = await Promise.allSettled(toolPromises);
+      this.registry = results.flatMap((r) => (r.status === 'fulfilled' ? r.value : []));
+      this.registryExpiresAt = Date.now() + REGISTRY_TTL;
+
+      // Upsert tool vectors into Vectorize (no-op without the binding).
+      const candidates: ToolCandidate[] = this.registry.map((t) => ({
+        namespacedName: t.namespacedName,
+        description: t.description,
+        category: t.category,
+        serverName: t.serverName,
+      }));
+      this.brain.indexCandidates(candidates).then((n) => {
+        if (n > 0) { this.indexed = true; log.info(`Indexed ${n} tool vectors into Vectorize`); }
+      }).catch((e) => log.warn(`Vectorize index failed: ${e}`));
+    })();
+    try {
+      await this.registryRefreshing;
+    } finally {
+      this.registryRefreshing = null;
+    }
+  }
+
+  private async getRegistry(): Promise<NamespacedTool[]> {
+    if (Date.now() >= this.registryExpiresAt) await this.refreshRegistry();
+    return this.registry;
+  }
+
+  // ── Meta-tools ──────────────────────────────────────────────
+
+  metaTools(): MetaToolDescriptor[] {
+    const remoteIds = this.activeConfigs().filter((c) => c.type === 'remote').map((c) => c.id);
+    const tools: MetaToolDescriptor[] = [
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}search`,
+        description: 'Search the tool registry. Returns matching tool names, descriptions, and input schemas. Use before execute.',
+        inputSchema: {
+          type: 'object' as const,
+          properties: {
+            query: { type: 'string', description: 'Search keywords matched against tool names and descriptions' },
+            server: { type: 'string', description: 'Filter by server id (e.g. "neon", "chittyos")' },
+            category: { type: 'string', description: 'Filter by category (ecosystem, code, search, reasoning, desktop, documents, communication)' },
+            focus: { type: 'string', description: 'Focus profile to bias results toward. A soft lens — out-of-focus tools still appear. Use "none" to disable.' },
+            limit: { type: 'number', description: 'Max results to return (default 20)' },
+          },
+        },
+      },
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}execute`,
+        description: 'Execute a tool by its namespaced name (serverId/toolName). Use search to discover available tools first.',
+        inputSchema: {
+          type: 'object' as const,
+          properties: {
+            tool: { type: 'string', description: 'Namespaced tool name from search results (e.g. "neon/list_projects")' },
+            args: { type: 'object', description: 'Arguments to pass to the tool' },
+          },
+          required: ['tool'],
+        },
+      },
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}code`,
+        description:
+          'Run model-written TypeScript in an isolated sandbox where each remote upstream is a typed namespace. ' +
+          'Compose multiple upstream calls in one pass instead of round-tripping execute. ' +
+          CodemodeBridge.describeNamespaces(remoteIds),
+        inputSchema: {
+          type: 'object' as const,
+          properties: {
+            code: { type: 'string', description: 'Async function body. Return the final value. Call upstream namespaces (e.g. await neon.execute("run_sql", {...})).' },
+          },
+          required: ['code'],
+        },
+      },
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}cast`,
+        description:
+          'Describe what you want done in natural language. Ch1tty searches its full surface — tools, prompts, and resources — ' +
+          'resolves intent, and executes the best tool match.',
+        inputSchema: {
+          type: 'object' as const,
+          properties: {
+            intent: { type: 'string', description: 'Natural language description of what you want accomplished' },
+            args: { type: 'object', description: 'Arguments to pass to the resolved tool (if known)' },
+            confirm: { type: 'boolean', description: 'If true, return the execution plan without running it (default false)' },
+            focus: { type: 'string', description: 'Focus profile to bias resolution toward. Use "none" to disable.' },
+          },
+          required: ['intent'],
+        },
+      },
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}provision`,
+        description:
+          'Provision a persistent agent for an intent and bind it to an entity ("attach a system to a thing"). ' +
+          'Forks an Agent DO via the orchestrator (provision_fork) and binds it (provision_bind).',
+        inputSchema: {
+          type: 'object' as const,
+          properties: {
+            intent: { type: 'string', description: 'What the provisioned agent should accomplish' },
+            entityId: { type: 'string', description: 'ChittyID of the entity to attach the agent to' },
+          },
+          required: ['intent', 'entityId'],
+        },
+      },
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}status`,
+        description: 'Get the status of all configured backend MCP servers',
+        inputSchema: { type: 'object' as const },
+      },
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}memory_recall`,
+        description: 'Search stored memories in a profile. Returns a synthesized answer grounded in the stored content.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            profile: { type: 'string', description: 'Name of the memory profile (e.g. user ID, team name, case ID).' },
+            query: { type: 'string', description: 'Natural language question or search query.' },
+          },
+          required: ['profile', 'query']
+        }
+      },
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}memory_ingest`,
+        description: 'Extract structured memories from a conversation. Identifies facts, events, instructions, and tasks automatically.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            profile: { type: 'string' },
+            sessionId: { type: 'string', description: 'Optional session identifier to scope extraction.' },
+            messages: {
+              type: 'array',
+              description: 'Conversation messages to process',
+              items: {
+                type: 'object',
+                properties: {
+                  role: { type: 'string', enum: ['system', 'user', 'assistant'] },
+                  content: { type: 'string' }
+                },
+                required: ['role', 'content']
+              }
+            }
+          },
+          required: ['profile', 'messages']
+        }
+      },
+      {
+        name: `${META_SERVER_ID}${SEPARATOR}memory_summary`,
+        description: 'Generate a structured Markdown summary of everything stored in a memory profile.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            profile: { type: 'string' },
+            sessionId: { type: 'string' }
+          },
+          required: ['profile']
+        }
+      },
+    ];
+
+    return tools;
+  }
+
+  private async handleMetaTool(toolName: string, args: Record<string, unknown>, sessionId?: string): Promise<ToolCallResult> {
+    const started = Date.now();
+    let result: ToolCallResult;
+    switch (toolName) {
+      case 'search': result = await this.handleSearch(args, sessionId); break;
+      case 'execute': result = await this.handleExecute(args, sessionId); break;
+      case 'code': result = await this.handleCode(args, sessionId); break;
+      case 'cast': result = await this.handleCast(args, sessionId); break;
+      case 'provision': result = await this.handleProvision(args, sessionId); break;
+      case 'status': result = await this.handleStatus(); break;
+      case 'reload': result = await this.handleReload(); break;
+      case 'memory_recall': result = await this.handleMemoryRecall(args); break;
+      case 'memory_ingest': result = await this.handleMemoryIngest(args); break;
+      case 'memory_summary': result = await this.handleMemorySummary(args); break;
+      default:
+        result = { content: [{ type: 'text', text: `Unknown tool: ch1tty/${toolName}` }], isError: true };
+    }
+    this.evaluator.record({
+      ts: started, route: toolName, latency_ms: Date.now() - started,
+      ok: !result.isError,
+    });
+    return result;
+  }
+
+  // ── Search ──────────────────────────────────────────────────
+
+  private resolveActiveFocus(perCall: unknown): { name?: string; profile?: FocusProfile } {
+    let name: string | undefined;
+    if (typeof perCall === 'string') {
+      const trimmed = perCall.trim();
+      name = trimmed === '' || trimmed.toLowerCase() === 'none' ? undefined : trimmed;
+    }
+    return { name, profile: resolveFocus(this.focusProfiles, name) };
+  }
+
+  private async handleSearch(args: Record<string, unknown>, sessionId?: string): Promise<ToolCallResult> {
+    const query = typeof args.query === 'string' ? args.query.toLowerCase() : '';
+    const serverFilter = typeof args.server === 'string' ? args.server : undefined;
+    const categoryFilter = typeof args.category === 'string' ? args.category : undefined;
+    const limit = typeof args.limit === 'number' ? args.limit : 20;
+    const { name: focusName, profile: focus } = this.resolveActiveFocus(args.focus);
+
+    const registry = await this.getRegistry();
+
+    const recentServerIds = new Set<string>();
+    if (sessionId) {
+      const affinity = this.coordinator.getServerAffinity(sessionId);
+      for (const serverId of affinity.keys()) recentServerIds.add(serverId);
+      if (recentServerIds.size === 0) {
+        for (const tool of this.sessions.getRecentTools(sessionId)) {
+          const sep = tool.indexOf(SEPARATOR);
+          if (sep > 0) recentServerIds.add(tool.slice(0, sep));
+        }
+      }
+    }
+
+    let matches = registry;
+    if (serverFilter) matches = matches.filter((t) => t.serverId === serverFilter);
+    if (categoryFilter) matches = matches.filter((t) => t.category === categoryFilter);
+
+    let partialFallback = false;
+    if (query) {
+      const queryTerms = query.split(/\s+/).filter((t) => t.length > 0);
+      const andMatches = matches.filter((t) => {
+        const haystack = `${t.namespacedName} ${t.description} ${t.serverName} ${t.category}`.toLowerCase();
+        return queryTerms.every((term) => haystack.includes(term));
+      });
+      if (andMatches.length === 0 && queryTerms.length > 1) {
+        matches = matches.filter((t) => {
+          const haystack = `${t.namespacedName} ${t.description} ${t.serverName} ${t.category}`.toLowerCase();
+          return queryTerms.some((term) => haystack.includes(term));
+        });
+        partialFallback = true;
+      } else {
+        matches = andMatches;
+      }
+    }
+
+    if (!query && !serverFilter && !categoryFilter) {
+      let serverSummary = this.activeConfigs().map((c) => {
+        const count = registry.filter((t) => t.serverId === c.id).length;
+        const inFocus = focus ? isInFocus(focus, { serverId: c.id, category: c.category }) : false;
+        return { server: c.id, name: c.name, category: c.category, tools: count, ...(focus ? { inFocus } : {}) };
+      });
+      if (focus) serverSummary = [...serverSummary].sort((a, b) => Number(b.inFocus) - Number(a.inFocus));
+      const entity = sessionId ? this.coordinator.getEntityContext(sessionId) : undefined;
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            hint: 'Use query, server, or category to search for specific tools',
+            ...(entity?.chittyId ? { entity: entity.chittyId, identityClass: entity.identityClass } : {}),
+            ...(focusName ? { focus: focusName } : {}),
+            servers: serverSummary,
+            totalTools: registry.length,
+          }, null, 2),
+        }],
+      };
+    }
+
+    const relevanceMap = new Map<string, number>();
+    if (query) {
+      const queryTerms = query.split(/\s+/).filter((t) => t.length > 0);
+      for (const t of matches) {
+        const haystack = `${t.namespacedName} ${t.description} ${t.serverName} ${t.category}`.toLowerCase();
+        const matchCount = queryTerms.filter((term) => haystack.includes(term)).length;
+        const kwScore = queryTerms.length > 0 ? matchCount / queryTerms.length : 0;
+        const nameBonus = queryTerms.some((term) => t.name.toLowerCase() === term || t.serverId.toLowerCase() === term) ? 0.3 : 0;
+        relevanceMap.set(t.namespacedName, Math.round((kwScore + nameBonus) * 100) / 100);
+      }
+    }
+
+    const focused = (t: NamespacedTool): boolean => (focus ? isInFocus(focus, t) : false);
+    if (relevanceMap.size > 0 || focus || recentServerIds.size > 0) {
+      matches = [...matches].sort((a, b) => {
+        const aRel = relevanceMap.get(a.namespacedName) ?? 0;
+        const bRel = relevanceMap.get(b.namespacedName) ?? 0;
+        if (aRel !== bRel) return bRel - aRel;
+        const aFocus = focused(a) ? 1 : 0;
+        const bFocus = focused(b) ? 1 : 0;
+        if (aFocus !== bFocus) return bFocus - aFocus;
+        const aRecent = recentServerIds.has(a.serverId) ? 1 : 0;
+        const bRecent = recentServerIds.has(b.serverId) ? 1 : 0;
+        return bRecent - aRecent;
+      });
+    }
+
+    const results = matches.slice(0, limit).map((t) => ({
+      tool: t.namespacedName,
+      server: t.serverId,
+      category: t.category,
+      description: t.description,
+      inputSchema: t.inputSchema,
+      ...(relevanceMap.size > 0 ? { score: relevanceMap.get(t.namespacedName) ?? 0 } : {}),
+      ...(recentServerIds.has(t.serverId) ? { recentlyUsed: true } : {}),
+      ...(focus && focused(t) ? { inFocus: true } : {}),
+    }));
+
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify({
+          matches: results.length,
+          total: matches.length,
+          ...(partialFallback ? { mode: 'partial' } : {}),
+          ...(focusName ? { focus: focusName } : {}),
+          ...(sessionId ? { sessionId } : {}),
+          tools: results,
+        }, null, 2),
+      }],
+    };
+  }
+
+  // ── Execute ─────────────────────────────────────────────────
+
+  private async handleExecute(args: Record<string, unknown>, sessionId?: string): Promise<ToolCallResult> {
+    const toolName = typeof args.tool === 'string' ? args.tool : '';
+    const toolArgs = (typeof args.args === 'object' && args.args !== null && !Array.isArray(args.args))
+      ? (args.args as Record<string, unknown>) : {};
+
+    if (!toolName) {
+      return { content: [{ type: 'text', text: 'Missing required "tool" argument. Use ch1tty/search to find tools first.' }], isError: true };
+    }
+    const sepIndex = toolName.indexOf(SEPARATOR);
+    if (sepIndex === -1) {
+      return { content: [{ type: 'text', text: `Invalid tool name "${toolName}". Expected format: serverId/toolName.` }], isError: true };
+    }
+    const serverId = toolName.slice(0, sepIndex);
+    const name = toolName.slice(sepIndex + 1);
+
+    if (!this.proxy.isRegistered(serverId)) {
+      const known = this.activeConfigs().map((c) => c.id).join(', ') || '(none)';
+      return { content: [{ type: 'text', text: `Unknown server "${serverId}". Known servers: ${known}` }], isError: true };
+    }
+
+    const started = Date.now();
+    try {
+      const result = await this.proxy.callTool(serverId, name, toolArgs);
+      this.evaluator.record({ ts: started, route: 'upstream', latency_ms: Date.now() - started, ok: !result.isError, server: serverId, capability: name });
+      if (sessionId) {
+        this.sessions.recordToolCall(sessionId, toolName);
+        this.coordinator.onToolCall(sessionId, toolName);
+      }
+      return result;
+    } catch (err) {
+      this.evaluator.record({ ts: started, route: 'upstream', latency_ms: Date.now() - started, ok: false, server: serverId, capability: name });
+      return { content: [{ type: 'text', text: `Execute failed for ${toolName}: ${String(err)}` }], isError: true };
+    }
+  }
+
+  // ── Code mode ───────────────────────────────────────────────
+
+  private async handleCode(args: Record<string, unknown>, sessionId?: string): Promise<ToolCallResult> {
+    const code = typeof args.code === 'string' ? args.code : '';
+    if (!code.trim()) {
+      return { content: [{ type: 'text', text: 'Missing required "code" argument.' }], isError: true };
+    }
+    const remoteIds = this.activeConfigs().filter((c) => c.type === 'remote').map((c) => c.id);
+    const host = {
+      remoteServerIds: () => remoteIds,
+      runTool: async (namespacedTool: string, a: Record<string, unknown>, sid?: string) => {
+        const res = await this.handleExecute({ tool: namespacedTool, args: a }, sid);
+        // Hand the sandbox structured content, not the MCP envelope.
+        if (res.content.length === 1 && res.content[0]!.type === 'text') {
+          const text = (res.content[0] as { text: string }).text;
+          try { return JSON.parse(text); } catch { return text; }
+        }
+        return res.content;
+      },
+      searchTools: async (query: string, server?: string) => {
+        const reg = await this.getRegistry();
+        const q = query.toLowerCase();
+        return reg
+          .filter((t) => (server ? t.serverId === server : true))
+          .filter((t) => !q || `${t.namespacedName} ${t.description}`.toLowerCase().includes(q))
+          .slice(0, 30)
+          .map((t) => ({ tool: t.namespacedName, description: t.description, inputSchema: t.inputSchema }));
+      },
+    };
+
+    const out = await this.codemode.run(code, host, sessionId);
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify({
+          code: out.error ? 'error' : 'executed',
+          ...(out.error ? { error: out.error } : {}),
+          result: out.result,
+          ...(out.logs && out.logs.length ? { logs: out.logs } : {}),
+        }, null, 2),
+      }],
+      isError: Boolean(out.error),
+    };
+  }
+
+  // ── Agent Memory ─────────────────────────────────────────────
+
+  private async handleMemoryRecall(args: Record<string, unknown>): Promise<ToolCallResult> {
+    if (!this.memoryNs) return { content: [{ type: 'text', text: 'Agent Memory not configured.' }], isError: true };
+    try {
+      const profileName = String(args.profile ?? '');
+      const query = String(args.query ?? '');
+      const profile = await this.memoryNs.getProfile(profileName);
+      const res = await profile.recall(query);
+      return { content: [{ type: 'text', text: JSON.stringify(res, null, 2) }] };
+    } catch (err) {
+      return { content: [{ type: 'text', text: String(err) }], isError: true };
+    }
+  }
+
+  private async handleMemoryIngest(args: Record<string, unknown>): Promise<ToolCallResult> {
+    if (!this.memoryNs) return { content: [{ type: 'text', text: 'Agent Memory not configured.' }], isError: true };
+    try {
+      const profileName = String(args.profile ?? '');
+      const messages = args.messages as Array<{ role: 'system' | 'user' | 'assistant'; content: string }>;
+      const opts = args.sessionId ? { sessionId: String(args.sessionId) } : undefined;
+      const profile = await this.memoryNs.getProfile(profileName);
+      await profile.ingest(messages, opts);
+      return { content: [{ type: 'text', text: `Successfully ingested ${messages.length} messages into profile '${profileName}'.` }] };
+    } catch (err) {
+      return { content: [{ type: 'text', text: String(err) }], isError: true };
+    }
+  }
+
+  private async handleMemorySummary(args: Record<string, unknown>): Promise<ToolCallResult> {
+    if (!this.memoryNs) return { content: [{ type: 'text', text: 'Agent Memory not configured.' }], isError: true };
+    try {
+      const profileName = String(args.profile ?? '');
+      const opts = args.sessionId ? { sessionId: String(args.sessionId) } : undefined;
+      const profile = await this.memoryNs.getProfile(profileName);
+      const res = await profile.getSummary(opts);
+      return { content: [{ type: 'text', text: res.summary }] };
+    } catch (err) {
+      return { content: [{ type: 'text', text: String(err) }], isError: true };
+    }
+  }
+
+  // ── Provision (orchestrator provision_fork + provision_bind) ─
+
+  private async handleProvision(args: Record<string, unknown>, sessionId?: string): Promise<ToolCallResult> {
+    const intent = typeof args.intent === 'string' ? args.intent.trim() : '';
+    const entityId = typeof args.entityId === 'string' ? args.entityId.trim() : '';
+    if (!intent || !entityId) {
+      return { content: [{ type: 'text', text: 'Missing required "intent" and/or "entityId".' }], isError: true };
+    }
+
+    // Entity typing: a ChittyID's type segment (VV-G-LLL-SSSS-T-YM-C-X) is the
+    // T position. Validate it against the canonical ontology (P/L/T/E/A) before
+    // binding. canon down => OntologyClient falls back to the five core types,
+    // so a recognized type still passes; an unrecognized type is rejected up
+    // front rather than binding a malformed entity.
+    const typeCode = extractEntityTypeCode(entityId);
+    if (typeCode) {
+      const known = await this.ontology.isValidType(typeCode);
+      if (!known) {
+        return {
+          content: [{ type: 'text', text: `Entity "${entityId}" has non-canonical type "${typeCode}" (expected one of P/L/T/E/A). Refusing to provision.` }],
+          isError: true,
+        };
+      }
+    }
+    if (!this.proxy.isRegistered('orchestrator')) {
+      return { content: [{ type: 'text', text: 'Orchestrator upstream not registered — cannot provision.' }], isError: true };
+    }
+
+    // Step 1: fork a persistent Agent DO for the intent.
+    const forkRes = await this.proxy.callTool('orchestrator', 'provision_fork', { intent, entity_id: entityId });
+    if (forkRes.isError) {
+      return { content: [{ type: 'text', text: `provision_fork failed: ${textOf(forkRes)}` }], isError: true };
+    }
+    const forkParsed = parseJsonContent(forkRes);
+    const agentId = (forkParsed?.agent_id ?? forkParsed?.agentId ?? forkParsed?.id) as string | undefined;
+
+    // Step 2: bind the forked agent to the entity ("attach a system to a thing").
+    const bindArgs: Record<string, unknown> = { entity_id: entityId, intent };
+    if (agentId) bindArgs.agent_id = agentId;
+    const bindRes = await this.proxy.callTool('orchestrator', 'provision_bind', bindArgs);
+
+    if (sessionId) {
+      this.coordinator.logEvent(sessionId, `provisioned agent for ${entityId}`, 'provision', { intent, agentId, bound: !bindRes.isError });
+    }
+
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify({
+          provision: bindRes.isError ? 'fork_only' : 'bound',
+          entityId,
+          intent,
+          agentId: agentId ?? null,
+          fork: forkParsed ?? textOf(forkRes),
+          bind: bindRes.isError ? { error: textOf(bindRes) } : parseJsonContent(bindRes) ?? textOf(bindRes),
+        }, null, 2),
+      }],
+      isError: bindRes.isError,
+    };
+  }
+
+  // ── Status / Reload ─────────────────────────────────────────
+
+  getStatusSnapshot() {
+    const statuses: ServerStatus[] = this.activeConfigs().map((config) => {
+      const status = this.proxy.getStatus(config.id);
+      return { id: config.id, name: config.name, type: config.type, enabled: config.enabled !== false, ...status };
+    });
+
+    const coordinatorSnap = this.coordinator.getSnapshot();
+    const brainStats = this.brain.getStats();
+    const brainCircuitOpen = brainStats.circuitOpen;
+    const ledgerStats = coordinatorSnap.ledger;
+    const ledgerWarn = ledgerStats.buffered > 0 || ledgerStats.flushErrors > 0;
+    const ledgerStatus: 'ok' | 'warn' | 'degraded' = ledgerWarn ? 'warn' : 'ok';
+    const brainDegraded = brainCircuitOpen;
+    const systemStatus: 'ok' | 'warn' | 'degraded' = brainDegraded || ledgerStatus === 'warn' ? 'warn' : 'ok';
+
+    return {
+      gateway: 'ch1tty',
+      version: VERSION,
+      uptime: Math.round((Date.now() - this.startedAt) / 1000),
+      totalServers: statuses.length,
+      connectedServers: statuses.filter((s) => s.connected).length,
+      totalTools: statuses.reduce((sum, s) => sum + s.toolCount, 0),
+      registryCached: Date.now() < this.registryExpiresAt,
+      vectorizeIndexed: this.indexed,
+      activeSessions: this.sessions.count,
+      availableFocusProfiles: Object.keys(this.focusProfiles.profiles),
+      systemHealth: { status: systemStatus, brainDegraded, ledgerStatus },
+      brainHealth: { status: brainDegraded ? 'degraded' : 'ok', circuitOpen: brainCircuitOpen, vectorize: brainStats.vectorize },
+      ledgerHealth: { status: ledgerStatus, buffered: ledgerStats.buffered, flushed: ledgerStats.flushed, flushErrors: ledgerStats.flushErrors },
+      evaluator: this.evaluator.getStats(),
+      coordinator: coordinatorSnap,
+      servers: statuses,
+    };
+  }
+
+  private async handleStatus(): Promise<ToolCallResult> {
+    return { content: [{ type: 'text', text: JSON.stringify(this.getStatusSnapshot(), null, 2) }] };
+  }
+
+  private async handleReload(): Promise<ToolCallResult> {
+    this.configs = validateServersConfig({ servers: REMOTE_SERVERS }).servers;
+    this.rebuildBackends();
+    await this.refreshRegistry();
+    return {
+      content: [{ type: 'text', text: JSON.stringify({ reloaded: true, totalServers: this.activeConfigs().length }, null, 2) }],
+    };
+  }
+
+  // ── Cast ────────────────────────────────────────────────────
+
+  private async handleCast(args: Record<string, unknown>, sessionId?: string): Promise<ToolCallResult> {
+    const intent = typeof args.intent === 'string' ? args.intent.trim() : '';
+    const toolArgs = (typeof args.args === 'object' && args.args !== null && !Array.isArray(args.args))
+      ? (args.args as Record<string, unknown>) : {};
+    const confirm = args.confirm === true;
+    const { name: focusName, profile: focus } = this.resolveActiveFocus(args.focus);
+
+    if (!intent) {
+      return { content: [{ type: 'text', text: 'Missing required "intent". Describe what you want done.' }], isError: true };
+    }
+
+    const terms = intent.toLowerCase().split(/\s+/).filter((t) => t.length > 2);
+
+    const [registryResult, promptsResult, resourcesResult] = await Promise.allSettled([
+      this.getRegistry(), this.listAllPrompts(), this.listAllResources(),
+    ]);
+    if (registryResult.status !== 'fulfilled') throw registryResult.reason;
+    const registry = registryResult.value;
+    const allPrompts = promptsResult.status === 'fulfilled' ? promptsResult.value.prompts : [];
+    const allResources = resourcesResult.status === 'fulfilled' ? resourcesResult.value.resources : [];
+
+    const candidates: ToolCandidate[] = registry.map((t) => ({
+      namespacedName: t.namespacedName, description: t.description, category: t.category, serverName: t.serverName,
+    }));
+    // Workers AI brain (env.AI embeddings / Vectorize) — null means fall back
+    // to the deterministic keyword path, same contract as the stdio brains.
+    const routed = await this.brain.route(intent, candidates);
+
+    let scoredTools: Array<NamespacedTool & { score: number }>;
+    let castRoute: 'brain' | 'fallback';
+    const keywordAugmented = new Set<string>();
+    if (routed && routed.length > 0) {
+      const byName = new Map(registry.map((t) => [t.namespacedName, t]));
+      scoredTools = routed
+        .map((r) => {
+          const t = byName.get(r.tool.namespacedName);
+          return t ? { ...t, score: r.confidence } : null;
+        })
+        .filter((t): t is NamespacedTool & { score: number } => t !== null);
+      if (focus) {
+        const seen = new Set(scoredTools.map((t) => t.namespacedName));
+        let added = 0;
+        for (const t of this.scoreIntent(intent, registry, sessionId)) {
+          if (added >= 5) break;
+          if (!seen.has(t.namespacedName) && isInFocus(focus, t)) {
+            scoredTools.push(t);
+            seen.add(t.namespacedName);
+            keywordAugmented.add(t.namespacedName);
+            added++;
+          }
+        }
+      }
+      castRoute = 'brain';
+    } else {
+      scoredTools = this.scoreIntent(intent, registry, sessionId);
+      castRoute = 'fallback';
+    }
+
+    if (focus) scoredTools = applyFocusBias(focus, scoredTools);
+
+    if (sessionId) {
+      this.coordinator.ledger.record(sessionId, 'cast_route', {
+        intent: intent.slice(0, 200), route: castRoute, confirm,
+        candidate_count: scoredTools.length, ...(focusName ? { focus: focusName } : {}),
+      });
+    }
+
+    const scoredPrompts = allPrompts
+      .map((p) => {
+        const haystack = `${p.name} ${p.description || ''}`.toLowerCase();
+        const matchCount = terms.filter((t) => haystack.includes(t)).length;
+        const score = terms.length > 0 ? Math.round((matchCount / terms.length) * 100) / 100 : 0;
+        return { ...p, score };
+      })
+      .filter((p) => p.score > 0.1).sort((a, b) => b.score - a.score).slice(0, 5);
+
+    const scoredResources = allResources
+      .map((r) => {
+        const haystack = `${r.uri} ${r.name} ${r.description || ''}`.toLowerCase();
+        const matchCount = terms.filter((t) => haystack.includes(t)).length;
+        const score = terms.length > 0 ? Math.round((matchCount / terms.length) * 100) / 100 : 0;
+        return { ...r, score };
+      })
+      .filter((r) => r.score > 0.1).sort((a, b) => b.score - a.score).slice(0, 5);
+
+    let resolvedBy: 'brain' | 'keyword' = castRoute === 'brain' ? 'brain' : 'keyword';
+
+    if (scoredTools.length === 0 && scoredPrompts.length === 0 && scoredResources.length === 0) {
+      return {
+        content: [{ type: 'text', text: JSON.stringify({ cast: 'no_match', resolvedBy, intent, hint: 'No tools, prompts, or resources matched. Try ch1tty/search with different keywords.' }, null, 2) }],
+      };
+    }
+
+    const best = scoredTools[0];
+    if (best && castRoute === 'brain' && keywordAugmented.has(best.namespacedName)) resolvedBy = 'keyword';
+    const alternatives = scoredTools.slice(1, 4).map((t) => ({ tool: t.namespacedName, score: t.score, description: t.description }));
+
+    const related: Record<string, unknown> = {};
+    if (scoredPrompts.length > 0) related.prompts = scoredPrompts.map((p) => ({ name: p.name, description: p.description, arguments: p.arguments, score: p.score }));
+    if (scoredResources.length > 0) related.resources = scoredResources.map((r) => ({ uri: r.uri, name: r.name, description: r.description, mimeType: r.mimeType, score: r.score }));
+
+    if (!best) {
+      return { content: [{ type: 'text', text: JSON.stringify({ cast: 'discovered', resolvedBy, intent, hint: 'No executable tools matched, but related prompts/resources found.', ...related }, null, 2) }] };
+    }
+
+    const focusSuggestions = focusName ? getSuggestionsForFocus(focusName, this.suggestionsCatalog, { intent }) : null;
+
+    if (confirm) {
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            cast: 'plan', resolvedBy, intent, ...(focusName ? { focus: focusName } : {}),
+            resolved: { tool: best.namespacedName, server: best.serverId, category: best.category, description: best.description, score: best.score, inputSchema: best.inputSchema },
+            alternatives, ...related, ...(focusSuggestions ? { suggestions: focusSuggestions } : {}), args: toolArgs,
+            hint: 'Call cast again without confirm to execute, or use ch1tty/execute directly.',
+          }, null, 2),
+        }],
+      };
+    }
+
+    const result = await this.handleExecute({ tool: best.namespacedName, args: toolArgs }, sessionId);
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify({
+            cast: 'executed', resolvedBy, intent, ...(focusName ? { focus: focusName } : {}),
+            resolved: best.namespacedName, score: best.score,
+            ...(alternatives.length > 0 ? { alternatives } : {}), ...related,
+            ...(focusSuggestions ? { suggestions: focusSuggestions } : {}),
+          }),
+        },
+        ...result.content,
+      ],
+      isError: result.isError,
+    };
+  }
+
+  private scoreIntent(intent: string, registry: NamespacedTool[], sessionId?: string): Array<NamespacedTool & { score: number }> {
+    const terms = intent.toLowerCase().split(/\s+/).filter((t) => t.length > 2);
+    const shortTerms = intent.toLowerCase().split(/\s+/).filter((t) => t.length === 2);
+    if (terms.length === 0 && shortTerms.length === 0) return [];
+
+    const affinityMap = sessionId ? this.coordinator.getServerAffinity(sessionId) : new Map<string, number>();
+
+    const scored = registry.map((tool) => {
+      const haystack = `${tool.namespacedName} ${tool.description} ${tool.serverName} ${tool.category}`.toLowerCase();
+      const matchCount = terms.filter((term) => haystack.includes(term)).length;
+      const keywordScore = terms.length > 0 ? matchCount / terms.length : 0;
+      const affinityTs = affinityMap.get(tool.serverId);
+      const affinityScore = affinityTs ? 0.2 * Math.exp(-(Date.now() - affinityTs) / (10 * 60 * 1000)) : 0;
+      const nameBonus = [...terms, ...shortTerms].some((t) => tool.name.toLowerCase() === t || tool.serverId.toLowerCase() === t) ? 0.3 : 0;
+      const score = Math.round((keywordScore + affinityScore + nameBonus) * 100) / 100;
+      return { ...tool, score };
+    });
+    return scored.filter((t) => t.score > 0.1).sort((a, b) => b.score - a.score);
+  }
+
+  // ── Public MCP interface ────────────────────────────────────
+
+  async listAllTools() {
+    return { tools: this.metaTools() };
+  }
+
+  async callTool(namespacedName: string, args: Record<string, unknown> = {}, sessionId?: string): Promise<ToolCallResult> {
+    const normalized = this.normalizeToolName(namespacedName);
+    const sepIndex = normalized.indexOf(SEPARATOR);
+    if (sepIndex === -1) {
+      return { content: [{ type: 'text', text: `Invalid tool name "${namespacedName}". Available: ch1tty/search, ch1tty/execute, ch1tty/code, ch1tty/cast, ch1tty/provision, ch1tty/status, ch1tty/reload` }], isError: true };
+    }
+    const serverId = normalized.slice(0, sepIndex);
+    const toolName = normalized.slice(sepIndex + 1);
+    if (serverId !== META_SERVER_ID) {
+      return { content: [{ type: 'text', text: `Unknown tool "${namespacedName}". Use ch1tty/search to discover tools, then ch1tty/execute.` }], isError: true };
+    }
+    return this.handleMetaTool(toolName, args, sessionId);
+  }
+
+  private normalizeToolName(raw: string): string {
+    if (!raw) return raw;
+    let name = raw;
+    const prefix = `${META_SERVER_ID}${SEPARATOR}`;
+    const doubled = name.toLowerCase();
+    if (doubled.startsWith(`${prefix}${META_SERVER_ID}`)) name = name.slice(prefix.length);
+    if (name.toLowerCase().startsWith(`${META_SERVER_ID}.`)) name = `${prefix}${name.slice(META_SERVER_ID.length + 1)}`;
+    if (name === 'gateway_status') name = `${prefix}status`;
+    if (!name.includes(SEPARATOR) && !name.includes('.') && META_TOOL_VERBS.has(name)) name = `${prefix}${name}`;
+    return name;
+  }
+
+  // ── Resources / Prompts (passthrough) ───────────────────────
+
+  async listAllResources() {
+    const resourcePromises = this.activeConfigs().map(async (config) => {
+      try {
+        const { resources } = await this.proxy.listResources(config.id);
+        return resources.map((r) => ({ uri: `${config.id}://${r.uri}`, name: `[${config.name}] ${r.name}`, description: r.description, mimeType: r.mimeType }));
+      } catch (err) {
+        log.error(`Failed to list resources: ${err}`, config.id);
+        return [];
+      }
+    });
+    const results = await Promise.allSettled(resourcePromises);
+    return { resources: results.flatMap((r) => (r.status === 'fulfilled' ? r.value : [])) };
+  }
+
+  async listAllResourceTemplates() {
+    const templatePromises = this.activeConfigs().map(async (config) => {
+      try {
+        const { templates } = await this.proxy.listResources(config.id);
+        return templates.map((t) => ({ uriTemplate: `${config.id}://${t.uriTemplate}`, name: `[${config.name}] ${t.name}`, description: t.description, mimeType: t.mimeType }));
+      } catch (err) {
+        log.error(`Failed to list resource templates: ${err}`, config.id);
+        return [];
+      }
+    });
+    const results = await Promise.allSettled(templatePromises);
+    return { resourceTemplates: results.flatMap((r) => (r.status === 'fulfilled' ? r.value : [])) };
+  }
+
+  async readResource(uri: string) {
+    const match = uri.match(/^([^:]+):\/\/(.+)$/);
+    if (!match) throw new Error(`Invalid namespaced resource URI: ${uri}`);
+    const [, serverId, originalUri] = match;
+    if (!this.proxy.isRegistered(serverId!)) throw new Error(`Unknown server "${serverId}" in resource URI: ${uri}`);
+    return this.proxy.readResource(serverId!, originalUri!);
+  }
+
+  async listAllPrompts() {
+    const promptPromises = this.activeConfigs().map(async (config) => {
+      try {
+        const prompts = await this.proxy.listPrompts(config.id);
+        return prompts.map((p) => ({ name: `${config.id}${SEPARATOR}${p.name}`, description: `[${config.name}] ${p.description || p.name}`, arguments: p.arguments }));
+      } catch (err) {
+        log.error(`Failed to list prompts: ${err}`, config.id);
+        return [];
+      }
+    });
+    const results = await Promise.allSettled(promptPromises);
+    return { prompts: results.flatMap((r) => (r.status === 'fulfilled' ? r.value : [])) };
+  }
+
+  async getPrompt(namespacedName: string, args?: Record<string, string>): Promise<{ description?: string; messages: Array<{ role: 'user' | 'assistant'; content: ContentItem }> }> {
+    const sepIndex = namespacedName.indexOf(SEPARATOR);
+    if (sepIndex === -1) throw new Error(`Invalid prompt name "${namespacedName}". Expected format: serverId/promptName`);
+    const serverId = namespacedName.slice(0, sepIndex);
+    const promptName = namespacedName.slice(sepIndex + 1);
+    if (!this.proxy.isRegistered(serverId)) throw new Error(`Unknown server "${serverId}" for prompt: ${namespacedName}`);
+    return this.proxy.getPrompt(serverId, promptName, args);
+  }
+
+  // ── Flush / lifecycle (driven by the owning DO's alarm()) ───
+
+  /** End sessions idle longer than idleMs (context_checkpoint + session_end ledger). */
+  async closeIdleSessions(idleMs: number = SESSION_IDLE_MS): Promise<void> {
+    for (const sid of this.coordinator.idleSessions(idleMs)) {
+      await this.coordinator.onSessionEnd(sid).catch((e) => log.warn(`onSessionEnd(${sid}) failed: ${e}`));
+      this.sessions.remove(sid);
+    }
+  }
+
+  /** Flush ledger buffer + evaluator rows. Returns counts. */
+  async flush(): Promise<{ ledger: number; eval: number }> {
+    const ledgerN = await this.ledger.flush();
+    const evalN = await this.evaluator.flush();
+    return { ledger: ledgerN, eval: evalN };
+  }
+
+  /** Whether anything remains buffered or any session is still active. */
+  hasBufferedWork(): boolean {
+    return this.ledger.getStats().buffered > 0
+      || this.evaluator.getStats().buffered > 0
+      || this.sessions.count > 0;
+  }
+}
+
+// ── helpers ───────────────────────────────────────────────────
+
+function textOf(r: ToolCallResult): string {
+  const c = r.content?.[0];
+  return c && c.type === 'text' ? c.text : JSON.stringify(r.content);
+}
+
+function parseJsonContent(r: ToolCallResult): Record<string, unknown> | null {
+  const t = textOf(r);
+  try { return JSON.parse(t); } catch { return null; }
+}

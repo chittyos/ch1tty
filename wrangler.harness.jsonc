@@ -1,0 +1,48 @@
+{
+  // Local-dev/harness config for scripts/mcp2-harness.mjs ONLY. Identical to
+  // wrangler.jsonc minus bindings that cannot start under `wrangler dev` on
+  // this account: agent_memory (remote-only, requires Agent Memory entitlement
+  // [code 10193]) and the chittytrack observability destinations/tail (not
+  // running locally). Deploys always use wrangler.jsonc.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ch1tty",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-03-24",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "global_fetch_strictly_public"
+  ],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./public"
+  },
+  "ai": {
+    "binding": "AI"
+  },
+  "browser": {
+    "binding": "BROWSER"
+  },
+  "durable_objects": {
+    "bindings": [
+      { "name": "CH1TTY", "class_name": "Ch1ttyDO" },
+      { "name": "MCP_OBJECT", "class_name": "Ch1ttyMcpAgent" }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["Ch1ttyDO"]
+    },
+    {
+      "tag": "v2",
+      "new_sqlite_classes": ["Ch1ttyMcpAgent"]
+    }
+  ],
+  "worker_loaders": [
+    { "binding": "LOADER" }
+  ],
+  "vectorize": [
+    { "binding": "VECTORIZE", "index_name": "ch1tty-tool-index" }
+  ],
+  "upload_source_maps": true
+}
