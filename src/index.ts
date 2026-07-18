@@ -5,10 +5,11 @@
 // Never one mega-DO — one DO per session (the coordinator already sharded ~32
 // sessions; here each is its own isolate with its own SQLite + circuit state).
 import { Ch1ttyDO } from './ch1tty-do.js';
+import { Ch1ttyMcpAgent } from './mcp-agent.js';
 import type { Env } from './types.js';
 import { VERSION } from './utils.js';
 
-export { Ch1ttyDO };
+export { Ch1ttyDO, Ch1ttyMcpAgent };
 
 function mintSessionId(): string {
   return crypto.randomUUID();
@@ -23,7 +24,7 @@ function checkAuth(req: Request, token?: string): boolean {
 }
 
 export default {
-  async fetch(req: Request, env: Env): Promise<Response> {
+  async fetch(req: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(req.url);
     const path = url.pathname;
 
@@ -47,7 +48,17 @@ export default {
       return Response.json(snap);
     }
 
-    // MCP endpoint.
+    // McpAgent transport (streamable HTTP via Agents SDK). Parallel to the
+    // legacy DO path at /mcp — same bearer check, same Ch1ttyCore underneath.
+    if (path === '/mcp2' || path.startsWith('/mcp2/')) {
+      const tokenSecret = typeof env.CH1TTY_MCP_TOKEN === 'string' ? env.CH1TTY_MCP_TOKEN : undefined;
+      if (!checkAuth(req, tokenSecret)) {
+        return Response.json({ error: 'unauthorized' }, { status: 401 });
+      }
+      return Ch1ttyMcpAgent.serve('/mcp2', { binding: 'MCP_OBJECT' }).fetch(req, env, ctx);
+    }
+
+    // MCP endpoint (legacy JSON-RPC DO path — untouched).
     if (path === '/mcp') {
       const tokenSecret = typeof env.CH1TTY_MCP_TOKEN === 'string' ? env.CH1TTY_MCP_TOKEN : undefined;
       if (!checkAuth(req, tokenSecret)) {

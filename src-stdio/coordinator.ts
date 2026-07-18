@@ -75,7 +75,8 @@ export class SessionCoordinator {
       this.evictTimer = setInterval(() => {
         this.evictStaleSessions(Date.now(), this.sessionTtlMs);
       }, evictIntervalMs);
-      this.evictTimer.unref();
+      // workerd timers return numbers (no unref); guard for Worker/DO runtime.
+      this.evictTimer.unref?.();
     }
     // Warm the primary embedding brain so the first cast doesn't pay model-load latency.
     void this.embeddingBrain.warmup().catch(() => {/* best-effort */});
@@ -291,6 +292,21 @@ export class SessionCoordinator {
     }
     this._evictedSessions += count;
     return count;
+  }
+
+  /**
+   * Session ids that have been inactive longer than idleMs (staging-complete
+   * only, mirroring evictStaleSessions). Used by the DO alarm() to drive
+   * onSessionEnd for idle sessions — a per-session DO has no transport-close.
+   */
+  idleSessions(idleMs: number): string[] {
+    if (idleMs <= 0) return [];
+    const cutoff = Date.now() - idleMs;
+    const out: string[] = [];
+    for (const [id, ctx] of this.contexts) {
+      if (ctx.stagingComplete && ctx.lastActiveAt <= cutoff) out.push(id);
+    }
+    return out;
   }
 
   /** Release in-flight context and stop the background eviction timer. */

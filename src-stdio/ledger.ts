@@ -61,6 +61,8 @@ export interface LedgerStats {
 
 const MAX_BUFFER_SIZE = 500;
 const FLUSH_INTERVAL_MS = 10_000; // 10 seconds
+/** Exported for the DO alarm scheduler (Worker runtime has no setInterval-driven flush). */
+export const LEDGER_FLUSH_INTERVAL_MS = FLUSH_INTERVAL_MS;
 const BATCH_SIZE = 25; // entries per flush batch
 const MAX_RETRIES = 3;
 
@@ -106,7 +108,8 @@ export class LedgerClient {
           });
       }, FLUSH_INTERVAL_MS);
       // Don't keep the process alive just for background flushes (important for tests/CLI one-shots).
-      this.flushTimer.unref();
+      // workerd timers return numbers (no unref); guard for Worker/DO runtime.
+      this.flushTimer.unref?.();
     }
   }
 

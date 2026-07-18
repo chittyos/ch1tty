@@ -25,6 +25,17 @@ export class Logger {
     this.json = process.env.CH1TTY_LOG_FORMAT === 'json';
   }
 
+  /**
+   * Override the minimum level at runtime. The Worker/DO runtime configures the
+   * level from env.CH1TTY_LOG_LEVEL (a Worker env binding is not process.env at
+   * construction time). Unknown/undefined values are ignored.
+   */
+  setLevel(level?: string): void {
+    if (!level) return;
+    const parsed = LEVEL_ORDER[level.toLowerCase() as LogLevel];
+    if (parsed !== undefined) this.minLevel = parsed;
+  }
+
   private write(level: LogLevel, msg: string, server?: string, extra?: Record<string, unknown>): void {
     if (LEVEL_ORDER[level] < this.minLevel) return;
 

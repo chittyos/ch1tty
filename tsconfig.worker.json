@@ -1,0 +1,19 @@
+{
+  // Typecheck config for the Worker/DO codebase (src/). The root tsconfig.json
+  // builds only the stdio gateway (src-stdio/); this config typechecks the
+  // Worker entry, DO, core, and McpAgent against the generated workerd runtime
+  // types (worker-configuration.d.ts). No emit — wrangler bundles src directly.
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022"],
+    "types": ["node"],
+    "noEmit": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*.ts", "src-stdio/**/*.ts", "worker-configuration.d.ts"]
+}
