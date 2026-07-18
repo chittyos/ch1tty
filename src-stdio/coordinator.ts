@@ -13,7 +13,7 @@
  */
 
 import { log } from './logger.js';
-import { LedgerClient } from './ledger.js';
+import { LedgerClient, type DlqStore } from './ledger.js';
 import { OllamaBrain, type OllamaBrainConfig, type RoutedTool, type ToolCandidate } from './ollama-brain.js';
 import { EmbeddingBrain, type EmbeddingBrainConfig } from './embedding-brain.js';
 import type { Backend, ToolCallResult } from './types.js';
@@ -64,9 +64,12 @@ export class SessionCoordinator {
   constructor(
     brainConfig: Partial<OllamaBrainConfig> = {},
     embedConfig: Partial<EmbeddingBrainConfig> = {},
-    ledgerDlqPath?: string,
+    // A filesystem path (stdio) or an explicit DlqStore (Worker/DO passes a
+    // DO-SQLite-backed store so failed ledger entries survive — a Worker has no
+    // durable filesystem).
+    ledgerDlq?: string | DlqStore,
   ) {
-    this.ledger = new LedgerClient(ledgerDlqPath);
+    this.ledger = new LedgerClient(ledgerDlq);
     this.brain = new OllamaBrain(brainConfig);
     this.embeddingBrain = new EmbeddingBrain(embedConfig);
     this.sessionTtlMs = Number(process.env.CH1TTY_SESSION_TTL_MS ?? 3_600_000);

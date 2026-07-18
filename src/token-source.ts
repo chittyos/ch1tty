@@ -65,16 +65,24 @@ export class WorkerTokenSource implements TokenSource {
       : DEFAULT_BROKER_URL;
     const url = `${base}/v1/credentials/services/${encodeURIComponent(key)}/service_token`;
 
+    // FAIL CLOSED locally: without a service token the broker request is
+    // unauthenticated and would either 401 (best case) or, against a
+    // misconfigured broker, hand back a credential to an unauthenticated caller.
+    // Refuse before making the request rather than relying on the broker to
+    // reject us.
+    const serviceToken = this.env.CHITTYCONNECT_SERVICE_TOKEN;
+    if (typeof serviceToken !== 'string' || !serviceToken) {
+      log.error(`ChittyConnect broker call for key '${key}' blocked: CHITTYCONNECT_SERVICE_TOKEN is unbound`);
+      throw new Error(`POLICY_BLOCKED_CHITTYCONNECT_UNAVAILABLE: service token unbound for '${key}'`);
+    }
+
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'X-Request-ID': crypto.randomUUID(),
       'X-Source-Service': 'ch1tty',
       'X-Canonical-URI': 'chittycanon://core/services/ch1tty',
+      'Authorization': `Bearer ${serviceToken}`,
     };
-    const serviceToken = this.env.CHITTYCONNECT_SERVICE_TOKEN;
-    if (typeof serviceToken === 'string' && serviceToken) {
-      headers['Authorization'] = `Bearer ${serviceToken}`;
-    }
 
     let res: Response;
     try {

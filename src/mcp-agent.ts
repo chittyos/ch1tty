@@ -225,13 +225,24 @@ export class Ch1ttyMcpAgent extends McpAgent<Env> {
   }
 
   async flushTick(): Promise<void> {
-    await this.core.closeIdleSessions(SESSION_IDLE_MS);
-    const { ledger, eval: evalN } = await this.core.flush();
-    log.debug(`McpAgent flush: ledger=${ledger} eval=${evalN}`);
-    // Reschedule while there's anything buffered OR any session is still
-    // active (so it can be idle-closed later); otherwise let the tick lapse.
-    if (this.core.hasBufferedWork()) {
-      await this.schedule(FLUSH_TICK_SECONDS, 'flushTick');
+    // Guard the whole body: if closeIdleSessions()/flush() throws and we don't
+    // reschedule, flushing halts PERMANENTLY for this DO (buffered ledger +
+    // session_end for abandoned sessions lost forever). Reschedule in finally.
+    try {
+      await this.core.closeIdleSessions(SESSION_IDLE_MS);
+      const { ledger, eval: evalN } = await this.core.flush();
+      log.debug(`McpAgent flush: ledger=${ledger} eval=${evalN}`);
+    } catch (err) {
+      log.error(`McpAgent flushTick error (will reschedule): ${String(err)}`);
+    } finally {
+      // Reschedule while there's anything buffered OR any session is still
+      // active (so it can be idle-closed later); otherwise let the tick lapse.
+      // hasBufferedWork can't throw (pure stat reads); guard defensively anyway.
+      let more = true;
+      try { more = this.core.hasBufferedWork(); } catch { more = true; }
+      if (more) {
+        await this.schedule(FLUSH_TICK_SECONDS, 'flushTick');
+      }
     }
   }
 }

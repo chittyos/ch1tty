@@ -68,15 +68,23 @@ export class Ch1ttyDO extends DurableObject<Env> {
     // (context_checkpoint to ContextConsciousness + session_end ledger summary)
     // is driven here: close sessions idle longer than SESSION_IDLE_MS. This is
     // the real lifecycle-end path the stdio gateway ran on transport.onclose.
-    await this.core.closeIdleSessions(SESSION_IDLE_MS);
-
-    const { ledger, eval: evalN } = await this.core.flush();
-    log.debug(`Alarm flush: ledger=${ledger} eval=${evalN}`);
-
-    // Reschedule while there's anything still buffered OR any session is still
-    // active (so it can be idle-closed later); otherwise let the alarm lapse.
-    if (this.core.hasBufferedWork()) {
-      await this.ctx.storage.setAlarm(Date.now() + LEDGER_FLUSH_INTERVAL_MS);
+    // Guard the body: a throw before we reschedule would halt flushing
+    // permanently for this DO (buffered ledger + session_end lost). Reschedule
+    // in finally whenever work remains.
+    try {
+      await this.core.closeIdleSessions(SESSION_IDLE_MS);
+      const { ledger, eval: evalN } = await this.core.flush();
+      log.debug(`Alarm flush: ledger=${ledger} eval=${evalN}`);
+    } catch (err) {
+      log.error(`Alarm flush error (will reschedule): ${String(err)}`);
+    } finally {
+      // Reschedule while there's anything still buffered OR any session is still
+      // active (so it can be idle-closed later); otherwise let the alarm lapse.
+      let more = true;
+      try { more = this.core.hasBufferedWork(); } catch { more = true; }
+      if (more) {
+        await this.ctx.storage.setAlarm(Date.now() + LEDGER_FLUSH_INTERVAL_MS);
+      }
     }
   }
 }

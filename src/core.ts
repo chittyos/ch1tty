@@ -6,12 +6,27 @@
 //
 // One core per DO instance; the owning DO drives alarm()-based flushing via
 // flush() / closeIdleSessions() / hasBufferedWork().
+//
+// FAST-FOLLOW (deferred from the Phase-1 adversarial review, not blocking):
+//  - token-source: invalidate the SQLite token cache on a downstream 401 so a
+//    rotated/revoked token isn't served from cache for the full TTL.
+//  - refreshRegistry: negative-cache an empty/failed registry with its own TTL
+//    so every call doesn't re-hit unreachable upstreams (currently expiresAt is
+//    still advanced, but a partial success + later failure isn't distinguished).
+//  - mcp-agent.toMcpResult: an embedded resource with neither text nor blob is
+//    coerced to text:'' — consider surfacing isError instead of silently emptying.
+//  - handleProvision: OntologyClient.isValidType fails OPEN (canon down =>
+//    unknown types pass); acceptable for now but should warn on the fail-open path.
+//  - refreshRegistry map: a malformed server record (missing id/endpoints) is
+//    skipped via the endpoint guard, but other malformed shapes could still throw
+//    inside the map — wrap per-record parsing defensively.
 import type {
   Env, ServerConfig, ServerStatus, ServerCategory, ServerAccess,
   ToolCallResult, ContentItem,
 } from './types.js';
 import { RemoteProxy } from './remote-proxy.js';
 import { WorkerTokenSource } from './token-source.js';
+import { SqliteDlqStore } from './dlq-store.js';
 import { SessionTracker } from './session.js';
 import { SessionCoordinator } from './coordinator.js';
 import { LedgerClient } from './ledger.js';
@@ -39,6 +54,25 @@ export const SESSION_IDLE_MS = 15 * 60 * 1000;
  * the id matches that shape, else null (callers skip type validation rather
  * than guess). @canon chittycanon://gov/governance#core-types
  */
+/**
+ * True when the URL's host is chitty.cc or a *.chitty.cc subdomain (https only).
+ * Used to allowlist dynamically-ingested upstream endpoints before sending them
+ * inherited credentials. Rejects look-alikes like chitty.cc.evil.com.
+ */
+function isChittyHost(url: string): boolean {
+  let host: string;
+  let protocol: string;
+  try {
+    const u = new URL(url);
+    host = u.hostname.toLowerCase();
+    protocol = u.protocol;
+  } catch {
+    return false;
+  }
+  if (protocol !== 'https:') return false;
+  return host === 'chitty.cc' || host.endsWith('.chitty.cc');
+}
+
 function extractEntityTypeCode(entityId: string): string | null {
   const parts = entityId.split('-');
   // VV-G-LLL-SSSS-T-YM-C-X => 8 segments, type code is index 4.
@@ -95,7 +129,10 @@ export class Ch1ttyCore {
     this.brain = new WorkersAiBrain(env.AI, env.VECTORIZE);
     // Coordinator with default (Ollama/embedding) brains disabled-by-failure in
     // a Worker; intent routing goes through WorkersAiBrain (env.AI) below.
-    this.coordinator = new SessionCoordinator();
+    // DLQ is backed by DO SQLite — the stdio FileDlqStore's node:fs WAL is
+    // ephemeral/throwing in a Worker, so failed ledger entries would be lost
+    // while getStats().dlqEntries reported them safe.
+    this.coordinator = new SessionCoordinator({}, {}, new SqliteDlqStore(sql));
     this.ledger = this.coordinator.ledger;
 
     this.proxy = new RemoteProxy(new WorkerTokenSource(env, sql));
@@ -197,16 +234,30 @@ export class Ch1ttyCore {
         const res = await fetch('https://mcp.chitty.cc/v0.1/servers');
         if (res.ok) {
           const data = await res.json() as { servers: Array<Record<string, unknown>> };
-          const dynamicConfigs = data.servers.map((s) => {
+          const dynamicConfigs = data.servers.flatMap((s) => {
             const existingBase = this.configs.find(c => c.id === s.id);
             const existing = existingBase?.type === 'remote' ? existingBase as import('./types.js').RemoteServerConfig : undefined;
-            return {
+            // SECURITY: a dynamically-ingested config inherits authTokenKey
+            // 'chittymcp' + CF-Access creds, which RemoteProxy sends to `endpoint`.
+            // If the aggregator response is spoofed, an attacker-controlled URL
+            // would exfiltrate those secrets. Trust the endpoint only when it
+            // reuses a known static config's endpoint OR its host is *.chitty.cc.
+            const endpoint = existing?.endpoint || (s.endpoints as { aggregated?: string } | undefined)?.aggregated;
+            if (typeof endpoint !== 'string' || !endpoint) {
+              log.warn(`Registry ingest: server "${String(s.id)}" has no usable endpoint — skipped`);
+              return [];
+            }
+            if (!existing?.endpoint && !isChittyHost(endpoint)) {
+              log.warn(`Registry ingest: server "${String(s.id)}" endpoint host not in *.chitty.cc allowlist (${endpoint}) — skipped to avoid credential exfiltration`);
+              return [];
+            }
+            return [{
               id: String(s.id),
               name: String(s.label || s.name),
               type: 'remote' as const,
               access: existingBase?.access || 'readwrite' as const,
               category: (s.category as ServerCategory) || 'ecosystem',
-              endpoint: existing?.endpoint || (s.endpoints as { aggregated: string }).aggregated,
+              endpoint,
               authTokenKey: existing?.authTokenKey || 'chittymcp',
               envHeaders: existing?.envHeaders || {
                 'CF-Access-Client-Id': 'CHITTY_CF_ACCESS_CLIENT_ID',
@@ -214,7 +265,7 @@ export class Ch1ttyCore {
               },
               lazy: existingBase?.lazy ?? true,
               enabled: existingBase?.enabled ?? true
-            };
+            }];
           });
 
           const configMap = new Map<string, ServerConfig>();
