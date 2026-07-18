@@ -57,6 +57,20 @@ Note: `ch1tty/reload` is intentionally absent from `/mcp2` — hot-reload is a s
 
 _(Prior run log entries archived to git history — runs 1–609 trimmed at run 610. Full history in git log.)_
 
+### 2026-07-18 (run 650 — idle, all workstreams done)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; workstream F still awaiting human decision)
+- **Branch/PR**: none
+- **Build**: clean (tsc exit 0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total)
+- **Actions**:
+  - `git pull origin main`; fast-forwarded to HEAD e7b0a58 (run 649). `npm ci` clean.
+  - `npm run build` clean (tsc exit 0). `npm test`: 1370/0/2 (45 suites, 1372 total).
+  - 0 open PRs. State identical to runs 643–649.
+  - Verified: B (github→githubcopilot.com/mcp envHeaders), C (focus.ts + focus-profiles.json), D (scenario.test.ts), E (focus-suggestions.json). All DONE.
+  - Guardrails confirmed: 5-tool Node.js stdio surface; `buildCastExplanation` metric freeze ACTIVE.
+  - Workstream F candidate (McpAgent Phases 2–4) still awaiting human decision — no change since run 643.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **650th run.**
+- **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add workstream F (McpAgent Phases 2–4) to DRIVER-BOARD.md.
+
 ### 2026-07-18 (run 642 — idle, PR #1047 merged to main)
 - **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done)
 - **Branch/PR**: none new; PR #1047 `feat/mcp-agent-migration` MERGED ✅
