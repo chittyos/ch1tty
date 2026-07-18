@@ -528,3 +528,17 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **640th run.**
 - **Next run**: PR #1047 awaiting review. Check PR CI status and any review comments. If green + approved → merge. **DISABLE THE SCHEDULE** or add new workstreams.
 - **PushNotification**: SENT — new PR #1047 open, auto-merge disabled, needs review.
+
+### 2026-07-18 (run 644 — idle, all workstreams done)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; no workstream F yet)
+- **Branch/PR**: none
+- **Build**: clean (tsc exit 0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total)
+- **Actions**:
+  - `git fetch --all`; HEAD at ce5418b (run 643). Up to date.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1370/0/2 (~42s).
+  - 0 open PRs. State identical to run 643. All workstreams A–E verified done.
+  - Guardrails confirmed: 5-tool surface (stdio/Node.js side); `buildCastExplanation` metric freeze ACTIVE.
+  - Note: Notion API token still invalid (401); board lives in DRIVER-BOARD.md.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **644th run.**
+- **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add workstream F (McpAgent Phases 2–4) to this board.
+- **PushNotification**: NOT sent (run 632 already sent for 2026-07-18; state unchanged — 644 runs total).
