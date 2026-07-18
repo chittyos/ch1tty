@@ -5,7 +5,7 @@
   // The single Worker keeps the canonical name "ch1tty".
   "name": "ch1tty",
   "main": "src/index.ts",
-  "compatibility_date": "2026-03-16",
+  "compatibility_date": "2026-03-24",
   "compatibility_flags": [
     "nodejs_compat",
     "global_fetch_strictly_public"
@@ -22,13 +22,18 @@
   },
   "durable_objects": {
     "bindings": [
-      { "name": "CH1TTY", "class_name": "Ch1ttyDO" }
+      { "name": "CH1TTY", "class_name": "Ch1ttyDO" },
+      { "name": "MCP_OBJECT", "class_name": "Ch1ttyMcpAgent" }
     ]
   },
   "migrations": [
     {
       "tag": "v1",
       "new_sqlite_classes": ["Ch1ttyDO"]
+    },
+    {
+      "tag": "v2",
+      "new_sqlite_classes": ["Ch1ttyMcpAgent"]
     }
   ],
   // Worker Loader binding for codemode DynamicWorkerExecutor sandbox.
