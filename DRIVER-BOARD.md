@@ -42,6 +42,23 @@ All workstreams are DONE. Build clean, tests green, guardrails enforced.
 
 _(Prior run log entries archived to git history — runs 1–609 trimmed at run 610. Full history in git log.)_
 
+### 2026-07-18 (run 641 — PR #1047 CodeRabbit review fixes pushed)
+- **Workstream**: PR #1047 `feat/mcp-agent-migration` (McpAgent / Phase 0+1)
+- **Branch/PR**: `feat/mcp-agent-migration` → https://github.com/chittyos/ch1tty/pull/1047
+- **Build**: clean (tsc exit 0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md. `npm ci` clean. Build clean. Tests 1370/0/2.
+  - Found PR #1047 open (CI green 3/3). CodeRabbit review posted 10 actionable comments.
+  - Pushed commit `1003f0e` with fixes:
+    - `src/mcp-agent.ts`: all tools registered with `ch1tty/` namespace; `await startSession`
+    - `src/token-source.ts`: BROKER_CACHE_TTL_MS → 11 h; AbortSignal.timeout(10_000) on fetch; no error-body logging
+    - `src/core.ts`: extractEntityTypeCode → 8 segments; remove `.catch(() => true)` from provision; startSession async + in-flight dedup
+    - `src-stdio/remote-proxy.ts`: execFileAsync intentionally kept (linter declined execFileSync)
+  - Remaining blockers on PR: `@chittyos/schema-client` file: reference (needs npm publish); dynamic config refresh (deferred)
+  - Posted automated review-fix comment on PR #1047.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. PR #1047 active — 8/10 CodeRabbit items fixed; 2 deferred.
+- **Next run**: Check if PR #1047 CI is green on new commit; review any new comments; merge when clean.
+
 ### 2026-07-17 (run 612 — idle, all workstreams done)
 - **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done)
 - **Branch/PR**: none
