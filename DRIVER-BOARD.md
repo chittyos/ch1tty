@@ -42,6 +42,19 @@ All workstreams are DONE. Build clean, tests green, guardrails enforced.
 
 _(Prior run log entries archived to git history — runs 1–609 trimmed at run 610. Full history in git log.)_
 
+### 2026-07-18 (run 642 — idle, PR #1047 merged to main)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done)
+- **Branch/PR**: none new; PR #1047 `feat/mcp-agent-migration` MERGED ✅
+- **Build**: clean (tsc exit 0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total)
+- **Actions**:
+  - `git pull origin main`; fast-forwarded 38 commits (PR #1047 merge commit at HEAD).
+  - `npm ci` clean. `npm run build` clean. `npm test`: 1370/0/2 (~35s).
+  - Confirmed all workstreams A–E done. No open PRs. No new branches with substantive work.
+  - PR #1047 (McpAgent Phase 0+1) was merged by chitcommit. New files: `src/mcp-agent.ts`, `src/core.ts`, `src/token-source.ts`, `src/dlq-store.ts`, `tsconfig.worker.json`, `scripts/mcp2-harness.mjs`.
+  - Phases 2–4 of McpAgent migration (Code Mode `openApiMcpServer`, OAuth cutover on `/mcp`, legacy `/mcp` decommission) remain unscheduled — add as workstream F if desired.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. PR #1047 MERGED. Tests: 1370/0/2. Build: clean.
+- **Next run**: Same idle state expected unless new workstreams added. Human: add workstream F (McpAgent Phases 2–4) or disable schedule.
+
 ### 2026-07-18 (run 641 — PR #1047 CodeRabbit review fixes pushed)
 - **Workstream**: PR #1047 `feat/mcp-agent-migration` (McpAgent / Phase 0+1)
 - **Branch/PR**: `feat/mcp-agent-migration` → https://github.com/chittyos/ch1tty/pull/1047
