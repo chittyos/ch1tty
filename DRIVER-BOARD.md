@@ -29,10 +29,25 @@ All workstreams are DONE. Build clean, tests green, guardrails enforced.
 - **CI (main ci.yml)** — 0-job-queue failure (non-CodeQL). Recurring, non-blocking.
 - **Ledger DLQ** — `ledger.chitty.cc` unreachable from remote container. Action: configure CF Access credentials (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) on prod.
 
+## Candidate Workstream F (McpAgent Phases 2–4) — Awaiting Human Decision
+
+PR #1047 (merged run 642) completed Phases 0+1 of the Cloudflare McpAgent migration:
+- Phase 0: deps aligned (agents ^0.17.4, MCP SDK 1.29, zod v4, wrangler compat date)
+- Phase 1: `Ch1ttyCore` extracted; `/mcp2` McpAgent endpoint added; 9 tools registered (search, execute, code, cast, provision, status, memory_recall, memory_ingest, memory_summary)
+
+**Phases 2–4 (unscheduled):**
+- Phase 2: Code Mode — wire `openApiMcpServer`-based typed API surface for `ch1tty/code` so clients get schema-validated tool calls instead of raw code strings
+- Phase 3: OAuth cutover — migrate `/mcp` auth from bearer token to proper OAuth 2.0 via `@cloudflare/workers-oauth-provider`; unify auth with `/mcp2`
+- Phase 4: Legacy decommission — deprecate and remove the legacy JSON-RPC DO at `/mcp`, making `/mcp2` the canonical endpoint
+
+**Human action**: Add workstream F to enable Phase 2 work in the next run, or leave blank if phases 2–4 are not yet prioritized.
+
+Note: `ch1tty/reload` is intentionally absent from `/mcp2` — hot-reload is a stdio/process-lifetime concern, not a Durable Object one.
+
 ## Human Actions Required
 
-1. **Disable or redirect hourly schedule** — 610+ idle runs with no new work; every run costs compute.
-2. **Add new workstreams** to DRIVER-BOARD.md if planned work exists.
+1. **Disable or redirect hourly schedule** — 640+ idle runs with no new work; every run costs compute.
+2. **Add workstream F** (McpAgent Phases 2–4) to DRIVER-BOARD.md to give the driver new work to advance.
 3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
 4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect ch1tty GitHub backend.
 5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
@@ -54,6 +69,23 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   - Phases 2–4 of McpAgent migration (Code Mode `openApiMcpServer`, OAuth cutover on `/mcp`, legacy `/mcp` decommission) remain unscheduled — add as workstream F if desired.
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. PR #1047 MERGED. Tests: 1370/0/2. Build: clean.
 - **Next run**: Same idle state expected unless new workstreams added. Human: add workstream F (McpAgent Phases 2–4) or disable schedule.
+
+### 2026-07-18 (run 643 — idle, post-PR-#1047-merge)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; no workstream F yet)
+- **Branch/PR**: none
+- **Build**: clean (tsc exit 0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total)
+- **Actions**:
+  - `git pull origin main`; fast-forwarded 39 commits to HEAD 7c5f2aa (run 642 log). `npm ci` clean.
+  - `npm run build` clean (tsc exit 0). `npm test`: 1370/0/2 (~52s; 1 flaky on first run, 0 on retry — known circuit-breaker timing race).
+  - 0 open PRs. State identical to run 642. All workstreams A–E verified done.
+  - Inspected `src/mcp-agent.ts` (248 lines) and `src-stdio/aggregator.ts` (re-exports from `src-stdio/`):
+    - Node.js stdio gateway still has exactly 5 meta-tools (search/execute/status/reload/cast) — guardrail clean.
+    - `/mcp2` McpAgent transport has 9 tools (adds code/provision/memory_*) — intentional per Phase 1 scope.
+  - Added Workstream F candidate block to board for human decision (McpAgent Phases 2–4).
+  - Guardrails confirmed: 5-tool Node.js surface; `buildCastExplanation` metric freeze ACTIVE.
+  - Note: Notion API token still invalid (401); board lives in DRIVER-BOARD.md.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **643rd run.**
+- **Next run**: Same idle state expected unless human adds workstream F or new work. **DISABLE THE SCHEDULE** or add new workstreams.
 
 ### 2026-07-18 (run 641 — PR #1047 CodeRabbit review fixes pushed)
 - **Workstream**: PR #1047 `feat/mcp-agent-migration` (McpAgent / Phase 0+1)
