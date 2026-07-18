@@ -16,9 +16,9 @@ import type { TokenSource } from './remote-proxy.js';
 import type { Env } from './types.js';
 import { log } from './logger.js';
 
-/** Brokered tokens are cached in DO SQLite for 30 minutes (matches the
- * ChittyServ broker's `services/*` cache TTL of 1800s). */
-const BROKER_CACHE_TTL_MS = 30 * 60 * 1000;
+/** Brokered tokens are cached in DO SQLite for 11 hours (matches the
+ * stdio CliTokenSource TOKEN_CACHE_TTL; tokens last ~12h). */
+const BROKER_CACHE_TTL_MS = 11 * 60 * 60 * 1000;
 
 const DEFAULT_BROKER_URL = 'https://connect.chitty.cc';
 
@@ -86,14 +86,13 @@ export class WorkerTokenSource implements TokenSource {
 
     let res: Response;
     try {
-      res = await fetch(url, { method: 'GET', headers });
+      res = await fetch(url, { method: 'GET', headers, signal: AbortSignal.timeout(10_000) });
     } catch (err) {
       log.error(`ChittyConnect broker unreachable for key '${key}': ${String(err)}`);
       throw new Error(`POLICY_BLOCKED_CHITTYCONNECT_UNAVAILABLE: broker fetch failed for '${key}'`);
     }
     if (!res.ok) {
-      const body = await res.text().catch(() => '');
-      log.error(`ChittyConnect broker HTTP ${res.status} for key '${key}'${body ? `: ${body.slice(0, 200)}` : ''}`);
+      log.error(`ChittyConnect broker HTTP ${res.status} for key '${key}' (requestId=${headers['X-Request-ID']})`);
       throw new Error(`POLICY_BLOCKED_CHITTYCONNECT_UNAVAILABLE: broker returned ${res.status} for '${key}'`);
     }
 

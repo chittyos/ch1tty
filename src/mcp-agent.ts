@@ -114,31 +114,31 @@ export class Ch1ttyMcpAgent extends McpAgent<Env> {
 
   async init() {
     this.core = new Ch1ttyCore(this.ctx.storage.sql, this.env);
-    this.core.startSession(this.sessionId);
+    await this.core.startSession(this.sessionId);
 
     // Dispatch through the same normalize/dispatch path the JSON-RPC DO uses,
     // so both transports execute identical code.
-    const call = async (tool: string, args: Record<string, unknown>) => {
+    const call = async (verb: string, args: Record<string, unknown>) => {
       await this.ensureFlushSchedule();
-      return toMcpResult(await this.core.callTool(`ch1tty/${tool}`, args, this.sessionId));
+      return toMcpResult(await this.core.callTool(`ch1tty/${verb}`, args, this.sessionId));
     };
 
     this.server.tool(
-      'search',
+      'ch1tty/search',
       'Search the tool registry. Returns matching tool names, descriptions, and input schemas. Use before execute.',
       SearchSchema,
       async (args) => call('search', args),
     );
 
     this.server.tool(
-      'execute',
+      'ch1tty/execute',
       'Execute a tool by its namespaced name (serverId/toolName). Use search to discover available tools first.',
       ExecuteSchema,
       async (args) => call('execute', args),
     );
 
     this.server.tool(
-      'code',
+      'ch1tty/code',
       'Run model-written TypeScript in an isolated sandbox where each remote upstream is a typed namespace. ' +
       'Compose multiple upstream calls in one pass instead of round-tripping execute.',
       CodeSchema,
@@ -146,41 +146,41 @@ export class Ch1ttyMcpAgent extends McpAgent<Env> {
     );
 
     this.server.tool(
-      'cast',
+      'ch1tty/cast',
       'Describe what you want done in natural language. Ch1tty searches its full surface — tools, prompts, and resources — resolves intent, and executes the best tool match.',
       CastSchema,
       async (args) => call('cast', args),
     );
 
     this.server.tool(
-      'provision',
+      'ch1tty/provision',
       'Provision a persistent agent for an intent and bind it to an entity ("attach a system to a thing"). Forks an Agent DO via the orchestrator (provision_fork) and binds it (provision_bind).',
       ProvisionSchema,
       async (args) => call('provision', args),
     );
 
     this.server.tool(
-      'status',
+      'ch1tty/status',
       'Get the status of all configured backend MCP servers',
       async () => call('status', {}),
     );
 
     this.server.tool(
-      'memory_recall',
+      'ch1tty/memory_recall',
       'Search stored memories in a profile. Returns a synthesized answer grounded in the stored content.',
       MemoryRecallSchema,
       async (args) => call('memory_recall', args),
     );
 
     this.server.tool(
-      'memory_ingest',
+      'ch1tty/memory_ingest',
       'Extract structured memories from a conversation. Identifies facts, events, instructions, and tasks automatically.',
       MemoryIngestSchema,
       async (args) => call('memory_ingest', args),
     );
 
     this.server.tool(
-      'memory_summary',
+      'ch1tty/memory_summary',
       'Generate a structured Markdown summary of everything stored in a memory profile.',
       MemorySummarySchema,
       async (args) => call('memory_summary', args),

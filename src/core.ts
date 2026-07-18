@@ -75,8 +75,8 @@ function isChittyHost(url: string): boolean {
 
 function extractEntityTypeCode(entityId: string): string | null {
   const parts = entityId.split('-');
-  // VV-G-LLL-SSSS-T-YM-C-X => 8 segments, type code is index 4.
-  if (parts.length >= 5 && /^[A-Z]$/.test(parts[4]!)) return parts[4]!;
+  // VV-G-LLL-SSSS-T-YM-C-X => exactly 8 segments, type code is index 4.
+  if (parts.length === 8 && /^[A-Z]$/.test(parts[4]!)) return parts[4]!;
   return null;
 }
 
@@ -121,6 +121,7 @@ export class Ch1ttyCore {
   private registryExpiresAt = 0;
   private registryRefreshing: Promise<void> | null = null;
   private indexed = false;
+  private sessionStarting = new Map<string, Promise<void>>();
 
   constructor(sql: SqlStorage, private env: Env) {
     log.setLevel(typeof env.CH1TTY_LOG_LEVEL === 'string' ? env.CH1TTY_LOG_LEVEL : undefined);
@@ -162,7 +163,7 @@ export class Ch1ttyCore {
       case 'initialize':
         // Start the coordinator session exactly once per session (begins entity
         // staging + emits session_start). hasSession guards re-initialize.
-        this.startSession(sessionId);
+        await this.startSession(sessionId);
         return ok({
           protocolVersion: '2025-06-18',
           capabilities: { tools: {}, resources: {}, prompts: {} },
@@ -175,7 +176,7 @@ export class Ch1ttyCore {
       case 'tools/call': {
         // Lazily start the session for clients that skip initialize. hasSession
         // makes this a no-op once started, so affinity/patterns still accumulate.
-        this.startSession(sessionId);
+        await this.startSession(sessionId);
         const name = String(body.params?.name ?? '');
         const args = (body.params?.arguments && typeof body.params.arguments === 'object')
           ? (body.params.arguments as Record<string, unknown>) : {};
@@ -196,12 +197,19 @@ export class Ch1ttyCore {
     }
   }
 
-  /** Idempotently start coordinator session + session tracker for an id. */
-  startSession(sessionId: string): void {
+  /** Idempotently start coordinator session + session tracker for an id.
+   * Deduplicates concurrent calls for the same sessionId so coordinator
+   * initialization completes before the first tool call proceeds. */
+  async startSession(sessionId: string): Promise<void> {
     this.sessions.getOrCreate(sessionId, 'http');
-    if (!this.coordinator.hasSession(sessionId)) {
-      void this.coordinator.onSessionStart(sessionId, 'http');
-    }
+    if (this.coordinator.hasSession(sessionId)) return;
+    const inflight = this.sessionStarting.get(sessionId);
+    if (inflight) { await inflight; return; }
+    const p = this.coordinator.onSessionStart(sessionId, 'http').finally(() => {
+      this.sessionStarting.delete(sessionId);
+    });
+    this.sessionStarting.set(sessionId, p);
+    await p;
   }
 
   // ── Backends ────────────────────────────────────────────────
@@ -754,7 +762,7 @@ export class Ch1ttyCore {
     // front rather than binding a malformed entity.
     const typeCode = extractEntityTypeCode(entityId);
     if (typeCode) {
-      const known = await this.ontology.isValidType(typeCode).catch(() => true);
+      const known = await this.ontology.isValidType(typeCode);
       if (!known) {
         return {
           content: [{ type: 'text', text: `Entity "${entityId}" has non-canonical type "${typeCode}" (expected one of P/L/T/E/A). Refusing to provision.` }],

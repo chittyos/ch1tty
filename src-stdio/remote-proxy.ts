@@ -1,13 +1,10 @@
-import { execFile } from 'node:child_process';
-import { promisify } from 'node:util';
+import { execFileSync } from 'node:child_process';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import type { ServerConfig, RemoteServerConfig, ResourceEntry, ResourceTemplateEntry, PromptEntry, ToolEntry, ToolCallResult, BackendStatus, Backend, ContentItem } from './types.js';
 import { VERSION, withTimeout, normalizeToolResult } from './utils.js';
 import { log } from './logger.js';
 import { CircuitBreaker } from './circuit-breaker.js';
-
-const execFileAsync = promisify(execFile);
 
 /**
  * Pluggable auth-token retrieval. The stdio gateway shells out to the
@@ -23,7 +20,7 @@ export interface TokenSource {
 /** Default stdio-side source: `chitty-mcp-token <key>` (1Password-backed CLI). */
 export class CliTokenSource implements TokenSource {
   async getToken(key: string): Promise<string> {
-    const { stdout } = await execFileAsync('chitty-mcp-token', [key], { timeout: 10_000 });
+    const stdout = execFileSync('chitty-mcp-token', [key], { encoding: 'utf8', timeout: 10_000 });
     const token = stdout.trim();
     if (!token) {
       throw new Error(`chitty-mcp-token returned empty value for key '${key}'`);
