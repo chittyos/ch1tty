@@ -452,3 +452,17 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **639th run.**
 - **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add new workstreams to this board.
 - **PushNotification**: NOT sent (run 632 already sent for 2026-07-18; state unchanged — 639 runs total).
+
+### 2026-07-18 (run 640 — idle; new PR #1047 detected)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done)
+- **Branch/PR**: PR #1047 open (feat(mcp): migrate ch1tty gateway to Cloudflare McpAgent Phase 0+1) — opened today 07:58 UTC by chitcommit. Auto-merge NOT enabled; awaiting review. Live harness 7/7 pass; stdio suite 1371/1372 (1 flaky). PR notes bugs fixed: wrong DO ctor args, blank dispatch cases for code/provision/memory_*.
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1370 pass / 0 fail / 2 skip (45 suites, 1372 total) on main
+- **Actions**:
+  - `git pull origin main`; HEAD at cbcecb8 (run 639). Fast-forwarded 34 commits.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1370/0/2 (~39s).
+  - **1 open PR found**: #1047 (McpAgent migration). Previous runs logged 0 open PRs — this PR opened today.
+  - Guardrails confirmed: 5-tool surface; `buildCastExplanation` metric freeze ACTIVE. 0 violations on main.
+  - Note: Notion API token still invalid (401); board lives in DRIVER-BOARD.md.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **640th run.**
+- **Next run**: PR #1047 awaiting review. Check PR CI status and any review comments. If green + approved → merge. **DISABLE THE SCHEDULE** or add new workstreams.
+- **PushNotification**: SENT — new PR #1047 open, auto-merge disabled, needs review.
