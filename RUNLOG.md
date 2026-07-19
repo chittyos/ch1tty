@@ -1326,3 +1326,23 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend.
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
 - **Next run**: Same idle state expected. **Disable the schedule or add new workstreams.**
+
+### 2026-07-19 (run 671 — workstream A gap-fill: health endpoint test assertions)
+- **Workstream**: A (gateway gap-fill — health endpoint contract verification)
+- **Branch/PR**: `auto/A-health-endpoint-field-assertions` → PR #1050
+- **Build**: clean (`tsc` exit 0) | **Tests**: 1375 pass / 0 fail / 2 skip (+1 new test vs baseline 1374)
+- **Actions**:
+  - `npm ci` + `npm run build` clean. Full test suite: 1375/0/2.
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface FIXED; `buildCastExplanation` freeze ACTIVE).
+  - Verified all workstreams A–E complete on main.
+  - Found gap: `/api/v1/health` returns `ledgerOk`, `brainCircuitOpen`, `ledgerWarn`, `ledgerDlq` fields per CLAUDE.md contract — these were implemented in `src-stdio/http-server.ts` but not asserted in tests. Added assertions to 3 existing tests + 1 new `ledgerWarn` test case.
+  - Closed stale idle board-log PR #1049 (run 670).
+  - CodeRabbit review in progress on #1050; CI: 2 CodeQL scans in progress.
+- **Workstream state**: A✅ B✅ C✅ D✅ E✅
+- **Blockers** (unchanged):
+  1. **Disable or redirect hourly schedule** — 670+ consecutive runs, most idle; real work is exhausted.
+  2. **Stale branch cleanup** — 1000+ remote `auto/` branches (260+ prohibited cast-explain metric branches).
+  3. **Configure CF Access on prod** — clears ledger DLQ.
+  4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend.
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+- **Next run**: Merge #1050 when CodeRabbit review is done. No further code gaps known — consider disabling schedule or defining new workstreams.
