@@ -757,3 +757,18 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. **662nd run.**
 - **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add workstream F (McpAgent Phases 2–4) to this board.
 - **PushNotification**: NOT sent (run 656 already notified for 2026-07-19; state unchanged — 662 runs total).
+
+### 2026-07-19 (run 663 — PR #1048 merged)
+- **Workstream**: A (gateway quality) — merged fix for empty-registry negative-cache TTL
+- **Branch/PR**: `auto/registry-empty-short-ttl` → PR #1048 (merged to main as 83d9082)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1372 pass / 0 fail / 2 skip (45 suites, 1374 total; +2 new tests from PR)
+- **Actions**:
+  - `git fetch --all`; checked 1 open PR: #1048 (fix: negative-cache empty registry, checks all green).
+  - `npm ci` clean. `npm run build` clean. `npm test`: 1372/0/2 (1374 total, ~40s) post-merge.
+  - Merged PR #1048 via squash (all checks green; `enable_pr_auto_merge` reported "already clean status").
+    Fix: `REGISTRY_TTL_EMPTY = 30s` used when all backends fail + registry is empty; full 5-min TTL restores on success. 2 new tests added.
+  - Guardrails confirmed: 5-tool surface; `buildCastExplanation` metric freeze ACTIVE. PR touched `src-stdio/aggregator.ts` only — no new metrics added.
+  - Notion token still invalid (401); board lives in DRIVER-BOARD.md. 1023+ stale auto/* branches pending human cleanup.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1372/0/2. Build: clean. **663rd run.**
+- **Next run**: Idle expected. **DISABLE THE SCHEDULE** or add workstream F (McpAgent Phases 2–4).
+- **PushNotification**: SENT — PR #1048 merged (registry empty-TTL fix, first productive run since run 642).
