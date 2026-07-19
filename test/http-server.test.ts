@@ -83,6 +83,7 @@ test('GET /api/v1/health returns 200 with systemHealth at startup', async () => 
       status: string;
       service: string;
       systemHealth: { status: string; brainDegraded: boolean; ledgerStatus: string };
+      ledgerOk?: boolean;
     };
     assert.equal(body.status, 'ok');
     assert.equal(body.service, 'ch1tty');
@@ -90,6 +91,7 @@ test('GET /api/v1/health returns 200 with systemHealth at startup', async () => 
     assert.equal(body.systemHealth.status, 'ok');
     assert.equal(body.systemHealth.brainDegraded, false);
     assert.equal(body.systemHealth.ledgerStatus, 'ok');
+    assert.equal(body.ledgerOk, true, 'ledgerOk must be true when status ok and ledgerStatus ok');
   } finally {
     await stop(s);
   }
@@ -112,11 +114,14 @@ test('GET /api/v1/health returns 503 when systemHealth is degraded (ledger DLQ b
     s.aggregator.getStatusSnapshot = () => ({
       ...orig(),
       systemHealth: { status: 'degraded' as const, brainDegraded: false, ledgerStatus: 'degraded' as const },
+      ledgerDlq: { entryCount: 7 },
     });
     const res = await fetch(`${s.baseUrl}/api/v1/health`);
     assert.equal(res.status, 503);
-    const body = await res.json() as { status: string };
+    const body = await res.json() as { status: string; ledgerDlq?: { entryCount: number } };
     assert.equal(body.status, 'degraded');
+    assert.ok(body.ledgerDlq, 'ledgerDlq must be present on 503 body');
+    assert.equal(body.ledgerDlq?.entryCount, 7, 'ledgerDlq.entryCount must reflect DLQ backlog depth');
   } finally {
     await stop(s);
   }
@@ -132,8 +137,27 @@ test('GET /api/v1/health returns 200 when brain circuit open (brain degraded is 
     });
     const res = await fetch(`${s.baseUrl}/api/v1/health`);
     assert.equal(res.status, 200, 'brain circuit open must not cause 503 — keyword fallback still serves traffic');
-    const body = await res.json() as { status: string };
+    const body = await res.json() as { status: string; brainCircuitOpen?: boolean };
     assert.equal(body.status, 'warn');
+    assert.equal(body.brainCircuitOpen, true, 'brainCircuitOpen must be true when brainDegraded and status warn');
+  } finally {
+    await stop(s);
+  }
+});
+
+test('GET /api/v1/health returns 200 warn with ledgerWarn when ledger has drops but no DLQ backlog', async () => {
+  const s = await startServer();
+  try {
+    const orig = s.aggregator.getStatusSnapshot.bind(s.aggregator);
+    s.aggregator.getStatusSnapshot = () => ({
+      ...orig(),
+      systemHealth: { status: 'warn' as const, brainDegraded: false, ledgerStatus: 'warn' as const },
+    });
+    const res = await fetch(`${s.baseUrl}/api/v1/health`);
+    assert.equal(res.status, 200, 'ledger warn must not cause 503 — traffic still flows');
+    const body = await res.json() as { status: string; ledgerWarn?: boolean };
+    assert.equal(body.status, 'warn');
+    assert.equal(body.ledgerWarn, true, 'ledgerWarn must be true when status warn and ledgerStatus warn');
   } finally {
     await stop(s);
   }
