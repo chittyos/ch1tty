@@ -801,3 +801,18 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1372/0/2 (1374 total). Build: clean. **666th run.**
 - **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add workstream F (McpAgent Phases 2–4) to this board.
 - **PushNotification**: NOT sent (runs 656 and 663 already notified today 2026-07-19; state unchanged).
+
+### 2026-07-19 (run 667 — idle, all workstreams done)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; workstream F still awaiting human decision)
+- **Branch/PR**: none
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1372 pass / 0 fail / 2 skip (45 suites, 1374 total)
+- **Actions**:
+  - `git checkout -B main origin/main`; HEAD at 2e764cd (run 666). Up to date.
+  - `npm ci` clean (notice: npm@12 available). `npm run build` clean (tsc exit 0). `npm test`: 1372/0/2 (1374 total, ~40s).
+  - 0 open PRs (GitHub MCP confirmed — `list_pull_requests` returned empty).
+  - Verified: B (github → https://api.githubcopilot.com/mcp/ ✅); C (focus-profiles.json 6 profiles ✅); D (scenario.test.ts + simulation.test.ts ✅); E (focus-suggestions.json ✅).
+  - Guardrails confirmed: 5-tool Node.js stdio surface; `buildCastExplanation` metric freeze ACTIVE. 0 violations on main.
+  - Note: Notion API token still invalid (401); board lives in DRIVER-BOARD.md. 1023+ stale auto/* branches pending human cleanup.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1372/0/2 (1374 total). Build: clean. **667th run.**
+- **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add workstream F (McpAgent Phases 2–4) to this board.
+- **PushNotification**: NOT sent (runs 656 and 663 already notified today 2026-07-19; state unchanged).
