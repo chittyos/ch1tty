@@ -222,3 +222,40 @@ test('TTL sentinel is set to ≈5 min in the future after refresh', async () => 
   assert.ok(exp > before + 4 * 60 * 1000, 'TTL sentinel at least 4 min ahead');
   assert.ok(exp <= before + 6 * 60 * 1000, 'TTL sentinel at most 6 min ahead');
 });
+
+test('all-backends-failed — empty registry gets short TTL (< 1 min)', async () => {
+  // When every backend throws on listTools the registry comes back empty.
+  // The implementation should use REGISTRY_TTL_EMPTY (~30 s) so unreachable
+  // upstreams are retried quickly instead of waiting the full 5-minute window.
+  const fb = new FixtureBackend();
+  fb.defineServer('alpha', { tools: [], listToolsError: true });
+  const cb = new CountingBackend(fb);
+  const agg = buildAgg(cb);
+  const before = Date.now();
+  const tools = await searchTools(agg, 'anything');
+  assert.equal(tools.length, 0, 'search returns empty when all backends fail');
+  assert.equal(cb.listToolsCalls, 1, 'one attempt was made');
+  const exp = expiresAt(agg);
+  assert.ok(exp > before, 'TTL sentinel is set (not zero)');
+  assert.ok(exp < before + 60 * 1000, 'TTL is short (< 1 min) after all-backends-fail');
+});
+
+test('successful refresh restores full TTL after an empty-registry cycle', async () => {
+  // After backends recover and the empty TTL expires, a successful refresh
+  // should set the full 5-minute TTL again (not the short one).
+  const fb = new FixtureBackend();
+  fb.defineServer('alpha', { tools: [], listToolsError: true });
+  const cb = new CountingBackend(fb);
+  const agg = buildAgg(cb);
+  // Prime with a failed registry → short TTL
+  await searchTools(agg, 'anything');
+  const shortExp = expiresAt(agg);
+  // Backend recovers
+  fb.defineServer('alpha', { tools: [makeTool('run_query', 'SQL')] });
+  expireRegistry(agg);
+  const before = Date.now();
+  await searchTools(agg, 'run_query');
+  const fullExp = expiresAt(agg);
+  assert.ok(fullExp > before + 4 * 60 * 1000, 'full TTL restored after successful refresh');
+  assert.ok(fullExp > shortExp, 'expiry extended beyond the short-TTL value');
+});

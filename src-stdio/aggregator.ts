@@ -112,6 +112,8 @@ export class Aggregator {
   private registryExpiresAt = 0;
   private registryRefreshing: Promise<void> | null = null;
   private static readonly REGISTRY_TTL = 5 * 60 * 1000; // 5 minutes
+  // Shorter TTL when all backends fail so unreachable upstreams are retried quickly.
+  private static readonly REGISTRY_TTL_EMPTY = 30 * 1000; // 30 seconds
 
   constructor(configs: ServerConfig[], options?: AggregatorOptions) {
     this.accessFilter = options?.accessFilter;
@@ -245,7 +247,8 @@ export class Aggregator {
     if (this.registryRefreshing) return this.registryRefreshing;
 
     this.registryRefreshing = (async () => {
-      const toolPromises = this.activeConfigs().map(async (config) => {
+      const configs = this.activeConfigs();
+      const toolPromises = configs.map(async (config) => {
         try {
           const backend = this.backendFor(config.id);
           if (!backend) return [];
@@ -272,7 +275,12 @@ export class Aggregator {
         /* c8 ignore next -- each toolPromise has its own try/catch, so rejected never occurs */
         r.status === 'fulfilled' ? r.value : [],
       );
-      this.registryExpiresAt = Date.now() + Aggregator.REGISTRY_TTL;
+      // Negative-cache: when all backends fail (empty registry but backends were
+      // expected), use a short TTL so unreachable upstreams are retried quickly
+      // rather than waiting the full 5 minutes.
+      this.registryExpiresAt = Date.now() + (this.registry.length === 0 && configs.length > 0
+        ? Aggregator.REGISTRY_TTL_EMPTY
+        : Aggregator.REGISTRY_TTL);
     })();
 
     try {
