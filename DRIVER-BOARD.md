@@ -772,3 +772,17 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1372/0/2. Build: clean. **663rd run.**
 - **Next run**: Idle expected. **DISABLE THE SCHEDULE** or add workstream F (McpAgent Phases 2–4).
 - **PushNotification**: SENT — PR #1048 merged (registry empty-TTL fix, first productive run since run 642).
+
+### 2026-07-19 (run 665 — idle, all workstreams done)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; workstream F still awaiting human decision)
+- **Branch/PR**: none
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1372 pass / 0 fail / 2 skip (45 suites, 1374 total)
+- **Actions**:
+  - `git reset --hard origin/main`; HEAD at 77676f3 (run 664). Recovered from stale-fetch divergence: local main was at 10c554c (run 605 via checkout -B), force-fetched origin/main to 77676f3; reset succeeded.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1372/0/2 (1374 total, ~42s).
+  - 0 open PRs (GitHub MCP confirmed). PR #1048 confirmed merged (merged_at 2026-07-19T10:09:45Z, SHA 83d9082).
+  - Guardrails confirmed: 5-tool Node.js stdio surface; `buildCastExplanation` metric freeze ACTIVE. 0 violations on main.
+  - Note: Notion API token still invalid (401); board lives in DRIVER-BOARD.md. 1023+ stale auto/* branches still pending human cleanup.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1372/0/2 (1374 total). Build: clean. **665th run.**
+- **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add workstream F (McpAgent Phases 2–4) to this board.
+- **PushNotification**: NOT sent (run 656 and run 663 already notified today 2026-07-19; state unchanged).
