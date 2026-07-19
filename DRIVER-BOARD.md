@@ -816,3 +816,18 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1372/0/2 (1374 total). Build: clean. **667th run.**
 - **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add workstream F (McpAgent Phases 2–4) to this board.
 - **PushNotification**: NOT sent (runs 656 and 663 already notified today 2026-07-19; state unchanged).
+
+### 2026-07-19 (run 673 — idle, all workstreams done)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; workstream F still awaiting human decision)
+- **Branch/PR**: none
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1373 pass / 0 fail / 2 skip (45 suites, 1375 total)
+- **Actions**:
+  - git fetch --all; reset --hard origin/main; HEAD at 22bc4a3 (run 672). Synced (local was 50 commits behind — concurrent session divergence).
+  - npm ci clean. npm run build clean (tsc exit 0). npm test: 1373/0/2 (1375 total, ~37s).
+  - sim (CH1TTY_EMBED_ENABLED=false): 39/39 resolution | 14/14 reachability | 3/3 failure scenarios | 84.62ms
+  - 0 open PRs (GitHub MCP confirmed). PR #1050 (health endpoint field assertions) merged in prior run 672.
+  - All workstreams A–E verified done. Guardrails confirmed: 5-tool Node.js stdio surface; buildCastExplanation metric freeze ACTIVE.
+  - Note: Notion API token still invalid (401); board lives in DRIVER-BOARD.md. 1023+ stale auto/* branches pending human cleanup.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1373/0/2 (1375 total). Build: clean. **673rd run.**
+- **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add workstream F (McpAgent Phases 2–4) to this board.
+- **PushNotification**: NOT sent (runs 656 and 663 already notified today 2026-07-19; state unchanged — 673 runs total).
