@@ -1135,3 +1135,30 @@
   6. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend in live gateway.
   7. **Rotate Notion token** — `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`.
 - **Next run**: Same idle state expected unless new workstreams are added or blockers resolved.
+
+---
+
+### 2026-07-20T00:00Z — run 682 (idle)
+
+- **Workstream advanced**: None (all A–E done — idle run)
+- **Branch/PR**: direct commit to main (run log only; no source changes)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1373/0/2 (45 suites, 1375 total)
+- **Actions**:
+  - `npm ci` clean, `npm run build` clean (0 errors), `npm test` → **1373 pass / 0 fail / 2 skip** ✓ (up 3 from prior 1370)
+  - Read CLAUDE.md + CHITTY.md; confirmed guardrails (5-tool surface fixed at search/execute/status/reload/cast; `buildCastExplanation` metric freeze ACTIVE).
+  - `git fetch --all`; origin/main at `ad8ce60` (run 681). No open PRs.
+  - Confirmed all workstreams: A (build/tests green ✓); B (github → `https://api.githubcopilot.com/mcp/` with `envHeaders: GITHUB_MCP_AUTHORIZATION` ✓); C (focus-profiles.json 6 profiles, src/focus.ts ✓); D (test/scenario.test.ts + test/simulation.test.ts ✓); E (focus-suggestions.json: 1750 combos + 1759 prompts ✓).
+  - Guardrail audit: 5 meta-tools confirmed (search/execute/status/reload/cast). buildCastExplanation metric freeze upheld. 260+ prohibited cast-explain-* metric branches on origin (source clean — never merged).
+  - Notion board: unavailable (API 401 — `op://ChittyOS-Integrations/notion/api_token` not resolvable in remote container).
+  - `origin/auto/focus-code-profile` branch noted: 1 commit ahead of main with only a stale `.claude/scheduled_tasks.lock` + deletes (`.deploy/backends.env.proposed`, `.driver/run-log.md`). Do NOT merge.
+  - `origin/auto/focus-profiles-v2` branch noted: far behind main (60+ commits old). Do NOT merge.
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E ✓ (all done)
+- **Blockers** (unchanged — all require human action):
+  1. **Disable or redirect hourly schedule** — 682 consecutive runs, ~300+ idle; no new work to advance.
+  2. **Add new workstreams** to `.driver/run-log.md` if planned work exists.
+  3. **Clean up 260+ prohibited branches**: `git push origin --delete $(git branch -r | grep 'origin/auto/[0-9]*-cast-explain' | sed 's|origin/||')`
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`).
+  5. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend in live gateway.
+  6. **Rotate Notion token** — `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`.
+  7. **Delete stale branch** `auto/focus-code-profile` — has stale lock file + deletes run-log; do not merge.
+- **Next run**: Same idle state expected unless new workstreams are added or blockers resolved.
