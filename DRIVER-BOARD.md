@@ -861,3 +861,18 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1373/0/2 (1375 total). Build: clean. **676th run.**
 - **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add workstream F (McpAgent Phases 2–4) to this board.
 - **PushNotification**: SENT (new day 2026-07-20; actionable human tasks still pending after 676 runs).
+
+### 2026-07-20 (run 678 — idle, all workstreams done)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; workstream F still awaiting human decision)
+- **Branch/PR**: none
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1373 pass / 0 fail / 2 skip (45 suites, 1375 total)
+- **Actions**:
+  - `git checkout -B main origin/main`; HEAD at c809799 (run 677 — idle commit, no DRIVER-BOARD.md diff). Up to date.
+  - `npm ci` clean (notice: npm@12 available). `npm run build` clean (tsc exit 0). `npm test`: 1373/0/2 (1375 total, ~38s).
+  - 0 open PRs (GitHub MCP confirmed — `list_pull_requests` returned empty).
+  - Note: run 677 committed to main but DRIVER-BOARD.md diff was empty; entry reconstructed this run.
+  - Guardrails confirmed: 5-tool Node.js stdio surface; `buildCastExplanation` metric freeze ACTIVE. 0 violations on main.
+  - Notion API token still invalid (401); board lives in DRIVER-BOARD.md. 1023+ stale auto/* branches pending human cleanup.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1373/0/2 (1375 total). Build: clean. **678th run.**
+- **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add workstream F (McpAgent Phases 2–4) to this board.
+- **PushNotification**: NOT sent (run 676 already notified today 2026-07-20; state unchanged — 678 runs total).
