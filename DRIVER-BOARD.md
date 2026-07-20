@@ -951,3 +951,17 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1373/0/2 (1375 total). Build: clean. **685th run.**
 - **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add workstream F (McpAgent Phases 2–4) to this board.
 - **PushNotification**: NOT sent (run 676 already notified today 2026-07-20; state unchanged — 685 runs total).
+
+### 2026-07-20 (run 686 — idle, all workstreams done)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; workstream F still awaiting human decision)
+- **Branch/PR**: none
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1373 pass / 0 fail / 2 skip (45 suites, 1375 total)
+- **Actions**:
+  - Session started in detached HEAD at run 685 / 201f490. `git checkout -B main origin/main`; HEAD at 201f490 (run 685) after force-update was detected; reset --hard to sync after rebase conflict. Up to date.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1373/0/2 (1375 total, ~50s).
+  - 0 open PRs (GitHub MCP `list_pull_requests` returned empty). 943+ stale auto/* branches (all guardrail violations; pending human bulk-delete).
+  - Guardrails confirmed: 5-tool Node.js stdio surface; `buildCastExplanation` metric freeze ACTIVE. 0 violations on main.
+  - Notion API token still invalid (401); board lives in DRIVER-BOARD.md.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1373/0/2. Build: clean. **686th run.**
+- **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add workstream F (McpAgent Phases 2–4) to this board.
+- **PushNotification**: NOT sent (run 676 already notified today 2026-07-20; state unchanged).
