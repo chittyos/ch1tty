@@ -1010,3 +1010,18 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1373/0/2 (1375 total). Build: clean. **690th run.**
 - **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add workstream F (McpAgent Phases 2–4) to this board.
 - **PushNotification**: NOT sent (run 687 already notified today 2026-07-20; state unchanged — 690 runs total).
+
+### 2026-07-20 (run 691 — idle, all workstreams done)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; workstream F still awaiting human decision)
+- **Branch/PR**: none
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1373 pass / 0 fail / 2 skip (45 suites, 1375 total)
+- **Actions**:
+  - `git checkout main && git reset --hard origin/main`; HEAD at c14c75a (run 690). Up to date.
+  - `npm ci` clean (notice: npm@12 available). `npm run build` clean (tsc exit 0). `npm test`: 1373/0/2 (1375 total, ~42s).
+  - 0 open PRs (GitHub MCP `list_pull_requests` returned empty). 943 stale auto/* branches on origin (all guardrail violations; content never merged; pending human bulk-delete).
+  - Verified: B (github → https://api.githubcopilot.com/mcp/ with envHeaders ✅); C (focus-profiles.json exists ✅); D (test suite green ✅); E (all done ✅).
+  - Guardrails confirmed: 5-tool surface; `buildCastExplanation` metric freeze ACTIVE. 0 violations on main.
+  - Notion API token still invalid (401); board lives in DRIVER-BOARD.md. 943 stale auto/* branches pending human cleanup.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1373/0/2 (1375 total). Build: clean. **691st run.**
+- **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add workstream F (McpAgent Phases 2–4) to this board.
+- **PushNotification**: NOT sent (run 687 already notified today 2026-07-20; state unchanged — 691 runs total).
