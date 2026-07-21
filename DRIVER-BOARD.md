@@ -1272,3 +1272,10 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1373/0/2 (1375 total). Build: clean. **714th run.**
 - **Next run**: Same idle state expected. **DISABLE THE SCHEDULE** or add workstream F (McpAgent Phases 2–4) to this board.
 - **PushNotification**: NOT sent (run 701 already notified today 2026-07-21; state unchanged — 714 runs total).
+
+### 2026-07-21 (run 714 addendum — security fix)
+- **Workstream**: Security (not A–E; opportunistic fix)
+- **Branch/PR**: `auto/sec-audit-fix-run714` → [PR #1051](https://github.com/chittyos/ch1tty/pull/1051)
+- **Change**: `npm audit fix` — resolved high-severity `brace-expansion` DoS (GHSA-3jxr-9vmj-r5cp, via c8 devDep) and low `body-parser` (GHSA-v422-hmwv-36x6, via @modelcontextprotocol/sdk). Lock file only, 4 packages updated. `npm audit` now shows 0 vulnerabilities.
+- **Validation**: Build clean (tsc exit 0). Tests 1373/0/2 (1375 total, 45 suites). `npm audit`: 0 vulns.
+- **CI**: CodeQL check in progress at time of log. CodeRabbit skipped (package-lock.json path-filtered, expected). Subscribed to PR activity.
