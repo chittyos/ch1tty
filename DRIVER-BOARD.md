@@ -57,6 +57,24 @@ Note: `ch1tty/reload` is intentionally absent from `/mcp2` — hot-reload is a s
 
 _(Prior run log entries archived to git history — runs 1–609 trimmed at run 610. Full history in git log.)_
 
+### 2026-07-21 (run 712 — PR cleanup: #1054 merged, #1055 closed)
+- **Workstream**: Maintenance (no named workstream; open PR triage)
+- **Branch/PR**: PR #1054 MERGED ✅ (Dependabot: body-parser 2.3.0 + hono 4.12.31 across apps/ + workers/) | PR #1055 CLOSED ✅ (superseded — fast-uri HIGH already fixed on main via f6acfbf)
+- **Build**: clean (tsc exit 0) | **Tests**: 1373 pass / 0 fail / 2 skip (45 suites, 1375 total)
+- **Actions**:
+  - `git checkout -B main origin/main`; HEAD at c7cebc1 (run 718 addendum). Up to date.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1373/0/2 (~44s).
+  - Found 2 open PRs: #1054 (Dependabot bump) and #1055 (fast-uri override — dirty/stale).
+  - **PR #1055** (`auto/security-fast-uri-3.1.4`): `mergeable_state: dirty`. fast-uri HIGH already resolved on main via f6acfbf (lock-file pin). Added closing comment explaining supersession, then closed.
+  - **PR #1054** (Dependabot): body-parser 2.2.2→2.3.0 + hono 4.12.26→4.12.31 across 5 subdirectory lock files + workers/chittyagent-ch1tty/package.json. Root test suite unaffected. CI: CodeQL neutral (lock-file-only PR). Merged via squash.
+  - `git pull origin main` — fast-forwarded to 1f650a7 (PR #1054 merge).
+  - `npm audit` confirmed: 0 HIGH, 4 moderate (all @hono/node-server <2.0.5, Windows-only, no non-breaking fix available).
+  - Guardrails confirmed: 5-tool Node.js stdio surface; `buildCastExplanation` metric freeze ACTIVE.
+  - Note: Notion API token still invalid (401); board lives in DRIVER-BOARD.md. 940+ stale auto/* branches pending human cleanup.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1373/0/2. Build: clean. **712th run.** 0 open PRs.
+- **Next run**: Same idle state expected unless new PRs open. **DISABLE THE SCHEDULE** or add workstream F (McpAgent Phases 2–4) to this board.
+- **PushNotification**: NOT sent (run 706 already sent for 2026-07-21; PR cleanup complete, no action needed from human).
+
 ### 2026-07-21 (run 711 — idle, all workstreams done)
 - **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; workstream F still awaiting human decision)
 - **Branch/PR**: none
