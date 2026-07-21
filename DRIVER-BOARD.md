@@ -1320,3 +1320,10 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
 - **Next run**: All workstreams done; no open PRs. Idle unless new workstreams defined. **DISABLE THE SCHEDULE** or add workstream F.
 - **PushNotification**: SENT — PR #1052 (hono GHSA-xgm2-5f3f-mvvc) merged; 4 moderate vulns remain (Windows-only, non-blocking).
+
+### 2026-07-21 (run 718 addendum — merged PR #1053; fast-uri GHSA-4c8g-83qw-93j6)
+- **Branch/PR**: `auto/security-fast-uri-ghsa-4c8g-83qw-93j6` → [PR #1053](https://github.com/chittyos/ch1tty/pull/1053) → MERGED (sha f6acfbf)
+- **Change**: `npm audit fix` — upgrades fast-uri from 3.0.0–3.1.2 to 3.1.3+. Fixes high-severity host confusion via failed IDN canonicalization. Lock file only.
+- **CI**: CodeQL ✅, Analyze/actions ✅, Analyze/javascript-typescript ✅ (all green before merge).
+- **npm audit after**: 4 moderate `@hono/node-server <2.0.5` (Windows-only, no non-breaking fix).
+- **State**: A ✅ B ✅ C ✅ D ✅ E ✅. No open PRs. Build clean. Tests 1373/0/2. Two security vulns resolved this run.
