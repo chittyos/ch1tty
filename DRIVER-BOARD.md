@@ -1348,3 +1348,27 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
 - **CI**: CodeQL ✅, Analyze/actions ✅, Analyze/javascript-typescript ✅ (all green before merge).
 - **npm audit after**: 4 moderate `@hono/node-server <2.0.5` (Windows-only, no non-breaking fix).
 - **State**: A ✅ B ✅ C ✅ D ✅ E ✅. No open PRs. Build clean. Tests 1373/0/2. Two security vulns resolved this run.
+
+### 2026-07-21 (run 719 — merged PR #1056; fast-uri GHSA-4c8g-83qw-93j6 fully remediated)
+- **Workstream**: Security (opportunistic, not A–E)
+- **Branch/PR**: `auto/security-apps-fast-uri-fix` → [PR #1056](https://github.com/chittyos/ch1tty/pull/1056) → MERGED (sha ac526c6)
+- **Build**: clean (tsc exit 0) | **Tests**: 1373 pass / 0 fail / 2 skip (45 suites, 1375 total)
+- **Actions**:
+  - `git pull origin main --rebase`; HEAD at 2d31052 before merge, ac526c6 after.
+  - `npm ci` clean. `npm run build` clean. `npm test`: 1373/0/2 (1375 total, 45 suites, ~41s).
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface FIXED; `buildCastExplanation` freeze ACTIVE; no new statistical fields/ratios added).
+  - Verified all workstreams A–E complete on main (github entry → api.githubcopilot.com/mcp/; focus-profiles.json: 6 profiles; focus-suggestions.json: 1750+ combos across 6 profiles; sim/scenarios.ts harness present).
+  - Found 1 open PR (#1056): lock-file-only fast-uri 3.1.2 → 3.1.4 in apps/evidence-mcp, apps/ledger-mcp, apps/session-coordinator-mcp, apps/tasks-mcp, workers/chittyagent-ch1tty. CI 3/3 green (CodeQL ✅).
+  - Merged PR #1056 via squash → sha ac526c6. **Fast-uri GHSA-4c8g-83qw-93j6 HIGH now fully remediated across the entire monorepo** (root fixed in run 718, apps/+workers/ fixed this run).
+  - Guardrails confirmed: 5-tool stdio surface; `buildCastExplanation` metric freeze ACTIVE. 0 violations on main.
+  - Note: Notion API token still 401; board lives in DRIVER-BOARD.md. Stale auto/* branches still pending human cleanup.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1373/0/2. Build: clean. PR #1056 MERGED. **719th run.**
+- **Human-action items** (unchanged):
+  1. **Disable or redirect hourly schedule** — 719+ consecutive idle runs; no A–E workstream work remains.
+  2. **Stale branch cleanup** — ~1000+ remote `auto/` branches. Command: `git push origin --delete $(git branch -r | grep 'origin/auto/' | sed 's|origin/||')`.
+  3. **Configure CF Access on prod** — clears ledger DLQ entries.
+  4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend.
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  6. **Add workstream F** (McpAgent Phases 2–4) to this board to give the driver new work.
+- **Next run**: All workstreams done; no open PRs. Idle unless new workstreams defined. **DISABLE THE SCHEDULE** or add workstream F.
+- **PushNotification**: SENT — PR #1056 merged; fast-uri GHSA-4c8g-83qw-93j6 HIGH fully remediated across all of root + apps/ + workers/. 4 moderate @hono/node-server remain (Windows-only, non-blocking).
