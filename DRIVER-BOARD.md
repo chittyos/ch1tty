@@ -75,8 +75,8 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
 - **Next run**: Same idle state expected unless new PRs open. **DISABLE THE SCHEDULE** or add workstream F (McpAgent Phases 2–4) to this board.
 - **PushNotification**: NOT sent (run 706 already sent for 2026-07-21; PR cleanup complete but PR #1056 open for human review).
 
-### 2026-07-21 (run 712 addendum — PR #1056 open: fast-uri HIGH fix for apps/+workers/)
-- PR #1056 `auto/security-apps-fast-uri-fix` open: resolves fast-uri GHSA-4c8g-83qw-93j6 (HIGH) in 5 subpackages (4 apps/ + workers/chittyagent-ch1tty). Before: 5 HIGH. After: 0 HIGH repo-wide. CI: CodeQL in-progress. Awaiting merge.
+### 2026-07-21 (run 712 addendum — PR #1056 MERGED: fast-uri HIGH fix for apps/+workers/)
+- PR #1056 `auto/security-apps-fast-uri-fix` MERGED ✅ (ac526c6). Resolves fast-uri GHSA-4c8g-83qw-93j6 (HIGH) in 5 subpackages. Repo-wide HIGH vulns: 5 → 0. CodeQL: success.
 
 ### 2026-07-21 (run 711 — idle, all workstreams done)
 - **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; workstream F still awaiting human decision)
