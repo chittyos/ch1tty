@@ -1297,3 +1297,26 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
 - **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1370/0/2. Build: clean. PR #1051 MERGED. **716th run.**
 - **Next run**: All workstreams done; no open PRs. Same idle state expected. **DISABLE THE SCHEDULE** or add workstream F (McpAgent Phases 2–4) to this board.
 - **PushNotification**: SENT — PR #1051 (security fix) merged; 0 vulns on main.
+
+### 2026-07-21 (run 718 — merged PR #1052; hono GHSA-xgm2-5f3f-mvvc)
+- **Workstream**: Security (opportunistic, not A–E)
+- **Branch/PR**: `auto/security-hono-4.12.31` → [PR #1052](https://github.com/chittyos/ch1tty/pull/1052) → MERGED (sha c41f00f)
+- **Build**: clean (tsc exit 0) | **Tests**: 1373 pass / 0 fail / 2 skip (45 suites, 1375 total)
+- **Actions**:
+  - `npm ci` + `npm run build` clean. Full test suite: 1373/0/2 (50s).
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface FIXED; `buildCastExplanation` freeze ACTIVE).
+  - Verified all workstreams A–E complete on main (servers.json: github uses api.githubcopilot.com/mcp/; focus-profiles.json: 6 profiles present).
+  - Found PR #1052 open with CI 3/3 green (CodeQL ✅, Analyze/actions ✅, Analyze/javascript-typescript ✅). No blocking reviews.
+  - Merged PR #1052 via squash → sha c41f00f. Hono GHSA-xgm2-5f3f-mvvc (API Gateway v1 adapter header de-duplication) now resolved on main.
+  - Remaining: 4 moderate `@hono/node-server <2.0.5` (Windows-only, no non-breaking fix — tracked upstream).
+  - Guardrails confirmed: 5-tool stdio surface; `buildCastExplanation` metric freeze ACTIVE. 0 violations on main.
+  - Notion API token still 401; board lives in DRIVER-BOARD.md. ~1026 stale auto/* branches pending human cleanup.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1373/0/2. Build: clean. PR #1052 MERGED. **718th run.**
+- **Human-action items** (unchanged — 718th iteration):
+  1. **Disable or redirect hourly schedule** — 718+ consecutive runs, real work is exhausted.
+  2. **Stale branch cleanup** — ~1026 remote `auto/` branches (260+ prohibited cast-explain metric branches). Command: `git push origin --delete $(git branch -r | grep 'origin/auto/' | sed 's|origin/||')`.
+  3. **Configure CF Access on prod** — clears ledger DLQ entries.
+  4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend.
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+- **Next run**: All workstreams done; no open PRs. Idle unless new workstreams defined. **DISABLE THE SCHEDULE** or add workstream F.
+- **PushNotification**: SENT — PR #1052 (hono GHSA-xgm2-5f3f-mvvc) merged; 4 moderate vulns remain (Windows-only, non-blocking).
