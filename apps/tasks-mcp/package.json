@@ -1,7 +1,7 @@
 {
   "name": "@ch1tty/tasks-mcp",
   "version": "1.0.0",
-  "description": "Ch1tty focused MCP surface — ChittyAgent Tasks (REST adapter)",
+  "description": "Ch1tty focused MCP surface \u2014 ChittyAgent Tasks (REST adapter)",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
@@ -22,6 +22,7 @@
     "node": ">=20"
   },
   "overrides": {
-    "hono": ">=4.12.25"
+    "hono": ">=4.12.25",
+    "@hono/node-server": ">=2.0.5"
   }
 }

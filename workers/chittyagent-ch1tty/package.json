@@ -1,7 +1,7 @@
 {
   "name": "chittyagent-ch1tty",
   "version": "1.0.0",
-  "description": "OAuth-protected MCP portal gateway — proxies to ch1tty aggregator via Agents SDK",
+  "description": "OAuth-protected MCP portal gateway \u2014 proxies to ch1tty aggregator via Agents SDK",
   "main": "src/index.ts",
   "type": "module",
   "scripts": {
@@ -27,6 +27,8 @@
   "overrides": {
     "ws": ">=8.21.0",
     "undici": ">=7.28.0",
-    "esbuild": ">=0.28.1"
+    "esbuild": ">=0.28.1",
+    "@hono/node-server": ">=2.0.5",
+    "sharp": ">=0.35.0"
   }
 }
