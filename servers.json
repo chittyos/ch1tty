@@ -319,7 +319,7 @@
       "id": "comms",
       "name": "ChittyComms",
       "type": "local",
-      "access": "readwrite",
+      "access": "read",
       "category": "communication",
       "command": "node",
       "args": [
