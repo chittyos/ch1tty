@@ -273,3 +273,29 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   6. Rotate Notion token — op://ChittyOS-Integrations/notion/api_token.
 - **Next run**: No open PRs; 0 vulns; all workstreams done. Idle. DISABLE THE SCHEDULE or add workstream F.
 - **PushNotification**: NOT sent (run 731 sent one 2 runs ago; no new signal).
+
+### 2026-07-22 (run 734 — real work: wired comms-mcp gap)
+- **Workstream**: A (gap fix — apps/comms-mcp added in bfb4761 but never registered in servers.json)
+- **Branch/PR**: `auto/A-wire-comms-mcp` → PR #1059 (https://github.com/chittyos/ch1tty/pull/1059)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1389 pass / 0 fail / 3 skip (1392 total, 49 suites)
+- **Actions**:
+  - Detected new commit bfb4761 on origin/main since run 733: feat(comms-mcp) — added apps/comms-mcp (+3687 lines, 1 tool: comms.recentLog). Test count rose 1373→1389 (+16 from comms-mcp test files).
+  - comms-mcp was NOT registered in servers.json — binding architectural rule violation. Fixed: added `comms` entry (local, lazy, enabled:false) and added `comms`+`bluebubbles` to communication focus profile.
+  - Built apps/comms-mcp (npm ci + npm run build → dist/ clean).
+  - npm test (root): 1389/0/3 — clean after changes.
+  - npm audit: 0 vulnerabilities (comms-mcp deps: @modelcontextprotocol/sdk, ajv, ajv-formats — audit note present but 0 actual vulns).
+  - Pushed branch auto/A-wire-comms-mcp; opened PR #1059. CodeRabbit rate-limited (not a finding).
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE; 0 violations on main.
+  - Notion token still invalid (401); board in DRIVER-BOARD.md.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1389/0/3. Build: clean. 0 vulns. **734th run. PR #1059 open.**
+- **Human-action items**:
+  1. Review + merge PR #1059 (wires comms-mcp into servers.json + communication focus profile).
+  2. Enable comms server once per-channel provider env vars configured (`COMMS_MCP_<SERVERID>_ENDPOINT/TOKEN`).
+  3. Add workstream F (McpAgent Phases 2-4) to this board to give the driver new work.
+  4. Disable or redirect hourly schedule — 734+ consecutive runs; defined workstreams exhausted after F merge.
+  5. Stale branch cleanup — 1000+ remote auto/ branches.
+  6. Configure CF Access on prod — clears ledger DLQ.
+  7. Set GITHUB_MCP_AUTHORIZATION on prod to reconnect GitHub MCP backend.
+  8. Rotate Notion token — op://ChittyOS-Integrations/notion/api_token.
+- **Next run**: PR #1059 pending review. If merged, no further workstream work (F still unscheduled). Idle otherwise.
+- **PushNotification**: SENT (real work done — comms-mcp gap fixed, PR #1059 open).
