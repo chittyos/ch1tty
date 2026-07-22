@@ -1364,3 +1364,25 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend.
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
 - **Next run**: All workstreams done. No further code gaps known. Define new workstreams or disable schedule.
+
+---
+
+### 2026-07-22 (run 735 — merged PR #1059; comms-mcp registration)
+- **Workstream**: A (gateway gap-fill — comms-mcp was added in bfb4761 but never registered in servers.json)
+- **Branch/PR**: `auto/A-wire-comms-mcp` → PR #1059 **MERGED** this run
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1389 pass / 0 fail / 3 skip (49 suites, 1392 total)
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test` 1389/0/3 on pre-merge main; re-verified 1389/0/3 post-merge — no regressions.
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE).
+  - `git fetch --all`; found 1 open PR: #1059 (auto/A-wire-comms-mcp). All 3 CI checks green (CodeQL success ×3). CodeRabbit rate-limited (bot note, no action). Codex review had 2 comments (access:readwrite → read; Worker embedded focus config not synced) — both addressed in fix commit bb78339.
+  - Merged PR #1059 (squash → b9bf2e2). Diff: adds `comms` server entry to `servers.json` (local, disabled, lazy, access:read), adds `comms`/`bluebubbles` to communication profile in both `focus-profiles.json` and `src/config-data.ts` (Worker config sync).
+  - Confirmed all workstreams A–E complete, all guardrails clean, 1032 total remote branches (260+ are prohibited cast-explain metric violation branches — no open PRs from them, source clean).
+  - Notion board: unavailable (API 401). RUNLOG.md is durable fallback board.
+- **Workstream state**: A✅ B✅ C✅ D✅ E✅
+- **Human-action items** (unchanged — all require human action):
+  1. **Disable or redirect hourly schedule** — 735 runs, most idle; a PR was available to merge this run, but with no workstreams remaining the schedule generates pure churn.
+  2. **Stale branch cleanup** — 1032 remote `auto/` branches (260+ prohibited cast-explain metric branches). Enable auto-delete on merge in repo settings, or bulk-delete with `git push origin --delete` for `auto/cast-explain-*` branches.
+  3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend.
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+- **Next run**: All workstreams done. Define new workstreams or disable schedule.
