@@ -17,8 +17,7 @@
         "./apps/tasks-mcp/dist/index.js"
       ],
       "env": {
-        "CHITTY_TASKS_URL": "https://tasks.chitty.cc",
-        "CHITTY_TASKS_TOKEN": "op://ChittyOS-Integrations/chittytasks/token"
+        "CHITTY_TASKS_URL": "https://tasks.chitty.cc"
       },
       "lazy": true,
       "enabled": false
@@ -37,8 +36,7 @@
         "./apps/ledger-mcp/dist/index.js"
       ],
       "env": {
-        "CHITTY_LEDGER_URL": "https://ledger.chitty.cc",
-        "CHITTY_LEDGER_TOKEN": "op://ChittyOS-Integrations/chittyledger/token"
+        "CHITTY_LEDGER_URL": "https://ledger.chitty.cc"
       },
       "lazy": true,
       "enabled": false
@@ -57,8 +55,7 @@
         "./apps/session-coordinator-mcp/dist/index.js"
       ],
       "env": {
-        "CHITTY_SESSION_URL": "https://session.chitty.cc",
-        "CHITTY_SESSION_TOKEN": "op://ChittyOS-Integrations/chittysession/token"
+        "CHITTY_SESSION_URL": "https://session.chitty.cc"
       },
       "lazy": true,
       "enabled": false
@@ -77,8 +74,7 @@
         "./apps/evidence-mcp/dist/index.js"
       ],
       "env": {
-        "CHITTY_EVIDENCE_URL": "https://evidence.chitty.cc",
-        "CHITTY_EVIDENCE_TOKEN": "op://ChittyOS-Integrations/chittyevidence/token"
+        "CHITTY_EVIDENCE_URL": "https://evidence.chitty.cc"
       },
       "lazy": true,
       "enabled": false
@@ -156,7 +152,7 @@
       "enabled": false
     },
     {
-      "_comment": "github: official GitHub hosted MCP server (replaces deprecated @modelcontextprotocol/server-github). Auth via GITHUB_MCP_AUTHORIZATION env var holding 'Bearer <PAT>'; populate from op://ChittyOS-Integrations/github/personal_access_token (e.g. export GITHUB_MCP_AUTHORIZATION=\"Bearer $(op read op://ChittyOS-Integrations/github/personal_access_token)\"). The chitty-mcp-token broker has no 'github' key, so authTokenKey is not used here."
+      "_comment": "github: official GitHub hosted MCP server (replaces deprecated @modelcontextprotocol/server-github). Auth via GITHUB_MCP_AUTHORIZATION env var holding 'Bearer <PAT>'. The chitty-mcp-token broker has no 'github' key, so authTokenKey is not used here."
     },
     {
       "id": "github",
@@ -211,9 +207,6 @@
         "-y",
         "@stripe/mcp"
       ],
-      "env": {
-        "STRIPE_SECRET_KEY": "op://ChittyOS-Integrations/stripe/secret_key"
-      },
       "lazy": true,
       "enabled": true
     },
@@ -303,9 +296,6 @@
       "args": [
         "~/Desktop/Projects/github.com/CHITTYOS/chittymac/build/server.js"
       ],
-      "env": {
-        "NEON_DATABASE_URL": "op://Connect Serv - Production/NEON Notion DB - ChittyChain /password"
-      },
       "lazy": true,
       "enabled": false
     },
@@ -351,9 +341,6 @@
       "args": [
         "~/.config/claude/mcp-servers/chitty-quality/build/index.js"
       ],
-      "env": {
-        "NEON_DATABASE_URL": "op://Private/Neon/database_url"
-      },
       "lazy": true,
       "enabled": false
     },

@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.chitty.cc/comms/v1/messages-provider.schema.json",
+  "title": "MessagesProvider",
+  "description": "The INJECTION-POINT contract a late-bound message provider (quo, twilio, imessage, gmail) must satisfy to plug into the comms.recentLog combo (ALCHEMICAL_PROMOTION.md §2b 'freeze the shape, not the wiring'). The combo references THIS capability, never a concrete MCP tool. The agent binds a provider; codemode is the adaptive joint that reshapes the provider's RAW response into rawToUnified's output. quo and twilio are interchangeable because both satisfy this same capability shape. This schema describes the binding descriptor, not an executable — the methods are abstract operations codemode targets.",
+  "type": "object",
+  "required": ["capability", "channel", "resolveContact", "listMessages", "rawToUnified"],
+  "additionalProperties": false,
+  "properties": {
+    "capability": {
+      "description": "Fixed capability name the combo binds against. Every provider declares the same value; that is what makes them swappable.",
+      "type": "string",
+      "const": "messages"
+    },
+    "channel": {
+      "description": "Which UnifiedCommsEntry.channel this binding emits.",
+      "type": "string",
+      "enum": ["quo", "imessage", "email", "twilio", "voice"]
+    },
+    "provider": {
+      "description": "Concrete provider id for provenance.",
+      "type": "string",
+      "examples": ["openphone", "gmail", "twilio", "imessage-local"]
+    },
+    "binding": {
+      "description": "How the agent reaches this provider. The combo never hardcodes these; they are supplied at bind time.",
+      "type": "object",
+      "required": ["mcpServerId"],
+      "additionalProperties": false,
+      "properties": {
+        "mcpServerId": {
+          "description": "ch1tty servers.json id of the backend (e.g. 'chittyagent-quo', 'chittyagent-twilio', 'gmail').",
+          "type": "string"
+        },
+        "tools": {
+          "description": "Concrete tool names this binding maps the abstract operations onto. The ONLY place provider wiring lives — swapping quo->twilio rewrites this map, nothing else in the combo.",
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "examples": [
+            { "resolveContact": "quo_lookup_contact_context", "listMessages": "quo_recent_messages_local", "getMessage": "quo_get_message" },
+            { "resolveContact": "search_threads", "listMessages": "search_threads", "getMessage": "get_thread" }
+          ]
+        }
+      }
+    },
+    "resolveContact": {
+      "description": "Abstract op: (contactRef) -> provider-native identifiers for that Person. Maps a person/contact ref to the endpoint identifiers (E.164 numbers, email addresses) the provider's listMessages needs. Quo: quo_lookup_contact_context. Gmail: a from:/to: query builder. Output feeds listMessages.",
+      "$ref": "#/$defs/Operation"
+    },
+    "listMessages": {
+      "description": "Abstract op: (identifiers, window, limit) -> RAW provider message rows. The provider's native list call. Quo live: quo_list_messages (requires participants[] array — see drift note). Quo local: quo_recent_messages_local / quo_recent_events (no participants needed). Gmail: search_threads + get_thread. Twilio: list_messages (from/to). Returns the provider's untouched shape; rawToUnified normalizes it.",
+      "$ref": "#/$defs/Operation"
+    },
+    "getMessage": {
+      "description": "Optional abstract op: (providerMessageId) -> single RAW message, for body/transcript hydration when list returned only snippets.",
+      "$ref": "#/$defs/Operation"
+    },
+    "rawToUnified": {
+      "description": "THE adaptive joint. A codemode-generated pure mapping fn (rawProviderRow) -> UnifiedCommsEntry. This is the only brittle surface (ALCHEMICAL_PROMOTION.md §2b): a new/changed provider regenerates JUST this, live. Must populate the UnifiedCommsEntry required fields from the provider's actual shape. fieldMap documents the observed-real mappings.",
+      "type": "object",
+      "required": ["outputSchemaRef", "fieldMap"],
+      "additionalProperties": false,
+      "properties": {
+        "outputSchemaRef": {
+          "type": "string",
+          "const": "https://schema.chitty.cc/comms/v1/unified-comms-entry.schema.json"
+        },
+        "fieldMap": {
+          "description": "Provider-field -> UnifiedCommsEntry-field, grounded in REAL observed responses. Keyed by provider for the bindings that have been verified live.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          },
+          "examples": [
+            {
+              "quo": {
+                "external_id": "providerMessageId",
+                "message_id": "internalId",
+                "external_thread_id": "threadRef",
+                "direction": "direction",
+                "sent_at": "occurredAt",
+                "body_text": "body",
+                "source": "source",
+                "parties[]": "participants[] (role->role, identifier->identifier; collapse owner aliases to self=true)"
+              },
+              "gmail": {
+                "id": "providerMessageId",
+                "<thread>.id": "threadRef",
+                "date": "occurredAt",
+                "sender": "participants[] role=sender",
+                "toRecipients[]": "participants[] role=recipient",
+                "ccRecipients[]": "participants[] role=cc",
+                "subject": "subject",
+                "snippet": "snippet",
+                "labelIds[]": "labels[]",
+                "<derived from owner addr>": "direction"
+              }
+            }
+          ]
+        },
+        "deriveDirection": {
+          "description": "For providers that do NOT emit direction natively (gmail). codemode derives inbound/outbound by testing whether the owner identity-bundle appears as sender. Quo/twilio emit direction directly so this is null for them.",
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "supports": {
+      "description": "Capability flags so the combo can skip ops a provider lacks rather than fail.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "transcripts": { "type": "boolean", "description": "Provider can supply call transcripts (quo voice yes; gmail no)." },
+        "nativeDirection": { "type": "boolean" },
+        "nativeThreadId": { "type": "boolean" },
+        "localCache": { "type": "boolean", "description": "Has a local store bypassing live-API pagination/filters (quo: true via recent_messages_local)." }
+      }
+    }
+  },
+  "$defs": {
+    "Operation": {
+      "description": "An abstract operation the combo invokes by capability, resolved to a concrete tool via binding.tools at bind time.",
+      "type": "object",
+      "required": ["op"],
+      "additionalProperties": false,
+      "properties": {
+        "op": { "type": "string", "description": "Abstract op name (matches the key in binding.tools)." },
+        "inputShape": { "type": "object", "additionalProperties": true, "description": "Documented input the combo passes; codemode adapts to the provider's real param names (e.g. quo participants[], gmail query)." },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}
