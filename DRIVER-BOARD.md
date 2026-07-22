@@ -300,3 +300,27 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
 - **PR #1059 outcome**: MERGED (same session, post-Codex review). Two follow-up fixes landed before merge: (1) `src/config-data.ts` FOCUS_PROFILES_RAW.communication.servers synced to match focus-profiles.json (Worker path was stale); (2) `servers.json` comms access changed `readwrite` → `read` (comms.recentLog is read-only; aggregator uses exact equality filter). Final branch: bb78339. All 3 files correct on main.
 - **Next run**: 0 open PRs. comms-mcp wired. No further workstream work (F still unscheduled). Idle unless new commits land.
 - **PushNotification**: SENT (real work done — comms-mcp gap fixed, PR #1059 open).
+
+### 2026-07-22 (run 736 — security: comms-mcp vulns cleared)
+- **Workstream**: A (security maintenance — apps/comms-mcp vulnerability remediation)
+- **Branch/PR**: `auto/A-comms-mcp-hono-node-server-override` → PR #1063 (https://github.com/chittyos/ch1tty/pull/1063) — open, CI in progress (CodeQL)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1389 pass / 0 fail / 3 skip (1392 total, 49 suites)
+- **Actions**:
+  - Synced to origin/main HEAD 06a664e (run 735). npm ci clean. npm run build clean (tsc exit 0). npm test: 1389/0/3.
+  - Found 1 open PR: Dependabot #1062 (fast-uri 3.1.2→3.1.4 HIGH GHSA-v2hh-gcrm-f6hx + hono 4.12.26→4.12.31 moderate). Merged via squash.
+  - Post-merge audit on apps/comms-mcp: 2 moderate remain (@hono/node-server <2.0.5, GHSA-frvp-7c67-39w9).
+  - Fix: added `"@hono/node-server": ">=2.0.5"` to apps/comms-mcp/package.json overrides (mirrors root package.json). npm audit: 0 vulnerabilities. Tests: 1389/0/3.
+  - Pushed branch auto/A-comms-mcp-hono-node-server-override; opened PR #1063. CodeQL running.
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE.
+  - Notion token still invalid (401); board in DRIVER-BOARD.md.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1389/0/3. Build: clean. apps/comms-mcp audit: 0 vulns. **736th run. PR #1063 open.**
+- **Human-action items**:
+  1. Review + merge PR #1063 (adds @hono/node-server >=2.0.5 override in apps/comms-mcp; clears 2 moderate vulns).
+  2. Add workstream F (McpAgent Phases 2-4) to this board to give the driver new work.
+  3. Disable or redirect hourly schedule — 736+ consecutive runs; defined workstreams exhausted after F.
+  4. Stale branch cleanup — 1000+ remote auto/ branches.
+  5. Configure CF Access on prod — clears ledger DLQ.
+  6. Set GITHUB_MCP_AUTHORIZATION on prod to reconnect GitHub MCP backend.
+  7. Rotate Notion token — op://ChittyOS-Integrations/notion/api_token.
+- **Next run**: PR #1063 may be merged (CodeQL); no new workstreams unless F is added. Idle otherwise.
+- **PushNotification**: SENT (security fix: fast-uri HIGH + hono moderate cleared in comms-mcp; PR #1063 open for remaining 2 moderate).
