@@ -90,3 +90,24 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   6. Rotate Notion token — op://ChittyOS-Integrations/notion/api_token.
 - **Next run**: All workstreams done; no open PRs; 0 vulns. Same idle state expected. DISABLE THE SCHEDULE or define workstream F.
 - **PushNotification**: NOT sent (nothing new since runs 720-721 security notification; state unchanged).
+
+### 2026-07-22 (run 724 — idle, all workstreams done)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; workstream F still awaiting human decision)
+- **Branch/PR**: none (direct commit to main — run log only)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1373 pass / 0 fail / 2 skip (1375 total)
+- **Actions**:
+  - npm ci clean. npm run build clean. npm test: 1373/0/2.
+  - 0 open PRs. npm audit: 0 vulnerabilities.
+  - Inspected `auto/C-ops-focus-profile` branch (65 commits ahead of origin/main). Found regressions: removes valid `linear` (in servers.json) from code+governance profiles and `cloudflare-builds` (also in servers.json) from ops profile. test/focus.test.ts:100-101 would fail. Branch should NOT be merged; confirmed stale.
+  - Guardrails confirmed: 5-tool surface intact; buildCastExplanation metric freeze ACTIVE.
+  - Notion token still invalid (401); board in DRIVER-BOARD.md.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1373/0/2. Build: clean. 0 vulns. **724th run.**
+- **Human-action items** (unchanged — 724th iteration):
+  1. Disable or redirect hourly schedule — 724+ consecutive runs; all defined workstreams exhausted.
+  2. Add workstream F (McpAgent Phases 2-4) to this board to give the driver new work.
+  3. Stale branch cleanup — 1000+ remote auto/ branches (including C-ops-focus-profile w/ regressions). Enable "Automatically delete head branches" in GitHub Settings or run bulk-delete locally.
+  4. Configure CF Access on prod — clears ledger DLQ.
+  5. Set GITHUB_MCP_AUTHORIZATION on prod to reconnect GitHub MCP backend.
+  6. Rotate Notion token — op://ChittyOS-Integrations/notion/api_token.
+- **Next run**: No open PRs; 0 vulns; all workstreams done. Idle. DISABLE THE SCHEDULE or add workstream F.
+- **PushNotification**: NOT sent (state unchanged since runs 720-721).
