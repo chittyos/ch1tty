@@ -313,6 +313,22 @@
       "enabled": false
     },
     {
+      "_comment": "comms-mcp — unified comms.recentLog surface fusing quo/imessage/email/twilio into one time-ordered log. Build: cd apps/comms-mcp && npm ci && npm run build. Enable once built; set per-channel COMMS_MCP_<SERVERID>_ENDPOINT/TOKEN env vars for each provider."
+    },
+    {
+      "id": "comms",
+      "name": "ChittyComms",
+      "type": "local",
+      "access": "read",
+      "category": "communication",
+      "command": "node",
+      "args": [
+        "./apps/comms-mcp/dist/index.js"
+      ],
+      "lazy": true,
+      "enabled": false
+    },
+    {
       "_comment": "── disabled: need local install or not yet ported ────────────"
     },
     {

@@ -185,7 +185,7 @@ export const FOCUS_PROFILES_RAW = {
     communication: {
       description: 'Cross-channel messaging, notes, team communication, and follow-up task creation',
       categories: ['communication'],
-      servers: ['notion', 'chittymac', 'imessage', 'tasks'],
+      servers: ['notion', 'chittymac', 'imessage', 'tasks', 'comms', 'bluebubbles'],
       boost: 0.5,
     },
     ops: {
