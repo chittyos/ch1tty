@@ -297,5 +297,6 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   6. Configure CF Access on prod — clears ledger DLQ.
   7. Set GITHUB_MCP_AUTHORIZATION on prod to reconnect GitHub MCP backend.
   8. Rotate Notion token — op://ChittyOS-Integrations/notion/api_token.
-- **Next run**: PR #1059 pending review. If merged, no further workstream work (F still unscheduled). Idle otherwise.
+- **PR #1059 outcome**: MERGED (same session, post-Codex review). Two follow-up fixes landed before merge: (1) `src/config-data.ts` FOCUS_PROFILES_RAW.communication.servers synced to match focus-profiles.json (Worker path was stale); (2) `servers.json` comms access changed `readwrite` → `read` (comms.recentLog is read-only; aggregator uses exact equality filter). Final branch: bb78339. All 3 files correct on main.
+- **Next run**: 0 open PRs. comms-mcp wired. No further workstream work (F still unscheduled). Idle unless new commits land.
 - **PushNotification**: SENT (real work done — comms-mcp gap fixed, PR #1059 open).
