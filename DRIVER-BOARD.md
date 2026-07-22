@@ -1372,3 +1372,33 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   6. **Add workstream F** (McpAgent Phases 2–4) to this board to give the driver new work.
 - **Next run**: All workstreams done; no open PRs. Idle unless new workstreams defined. **DISABLE THE SCHEDULE** or add workstream F.
 - **PushNotification**: SENT — PR #1056 merged; fast-uri GHSA-4c8g-83qw-93j6 HIGH fully remediated across all of root + apps/ + workers/. 4 moderate @hono/node-server remain (Windows-only, non-blocking).
+
+### 2026-07-21/22 (runs 720–721 — @hono/node-server moderate fix)
+- **Workstream**: Security (opportunistic, not A–E)
+- **Branch/PR**: `auto/fix-hono-node-server-moderate-vuln` → [PR #1058](https://github.com/chittyos/ch1tty/pull/1058) → MERGED
+- **Change**: Added `@hono/node-server >=2.0.5` npm override to root + all 4 apps + worker (1.19.14 → 2.0.11). Also added `sharp >=0.35.0` to worker. Resolves 4 moderate GHSA-frvp-7c67-39w9 advisories. `npm audit`: 0 vulnerabilities across all packages.
+- **State**: A ✅ B ✅ C ✅ D ✅ E ✅. Build clean. Tests: 1373/0/2.
+- **Note**: Runs 720–721 wrote board logs to commit messages only; this entry reconstructed from git log.
+
+### 2026-07-22 (run 722 — idle, all workstreams done)
+- **Workstream**: None (all A–E + security vulns resolved; no new workstream F defined)
+- **Branch/PR**: none (direct commit to main — run log only)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1373 pass / 0 fail / 2 skip (45 suites, 1375 total)
+- **Actions**:
+  - `git checkout -B main origin/main`; HEAD at c426dc6 (run 721). Up to date.
+  - `npm ci` clean (0 vulnerabilities). `npm run build` clean (tsc exit 0). `npm test`: 1373/0/2 (1375 total, 45 suites, ~55s).
+  - 0 open PRs (GitHub MCP `list_pull_requests` returned empty).
+  - Verified all workstreams: A (build/tests green ✅); B (github entry → `https://api.githubcopilot.com/mcp/` with `envHeaders: GITHUB_MCP_AUTHORIZATION` ✅); C (focus-profiles.json: 6 profiles — finance, governance, design, code, communication, ops ✅); D (test/scenario.test.ts + test/simulation.test.ts ✅); E (focus-suggestions.json: 1750 combos ✅).
+  - `npm audit`: 0 vulnerabilities (all HIGH + moderate now resolved; PR #1058 merged run 721).
+  - Guardrails confirmed: 5-tool stdio surface (search/execute/status/reload/cast); `buildCastExplanation` metric freeze ACTIVE. 0 violations on main.
+  - Notion API token still invalid (401); board lives in DRIVER-BOARD.md.
+- **State summary**: A ✅ B ✅ C ✅ D ✅ E ✅. Tests: 1373/0/2. Build: clean. npm audit: 0 vulns. **722nd run.**
+- **Human-action items** (unchanged — 722nd iteration):
+  1. **Disable or redirect hourly schedule** — 722+ consecutive runs; all defined workstreams exhausted.
+  2. **Add workstream F** (McpAgent Phases 2–4) to this board to give the driver new work.
+  3. **Stale branch cleanup** — 1000+ remote `auto/` branches. Command: `git push origin --delete $(git branch -r | grep 'origin/auto/' | sed 's|origin/||')`.
+  4. **Configure CF Access on prod** — clears ledger DLQ entries.
+  5. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+- **Next run**: All workstreams done; no open PRs; 0 vulns. Same idle state expected. **DISABLE THE SCHEDULE** or define workstream F.
+- **PushNotification**: NOT sent (routine idle run; PR #1058 security fix already notified in runs 720–721; nothing new to report).
