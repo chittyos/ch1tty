@@ -409,3 +409,24 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   7. Rotate Notion token — op://ChittyOS-Integrations/notion/api_token.
 - **Next run**: No open PRs; 0 vulns; all workstreams done. Idle. DISABLE THE SCHEDULE or add workstream F.
 - **PushNotification**: NOT sent (no new signal since run 741 Dependabot alert notification).
+
+### 2026-07-23 (run 744 — idle, all workstreams done)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; workstream F still awaiting human decision)
+- **Branch/PR**: none (direct commit to main — run log only)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1389 pass / 0 fail / 3 skip (1392 total, 49 suites)
+- **Actions**:
+  - Synced to origin/main HEAD b3ff6cc (run 743). npm ci clean. npm run build clean. npm test: 1389/0/3.
+  - 0 open PRs (GitHub MCP confirmed). npm audit: 0 vulns (root + all apps/*-mcp).
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact.
+  - All workstreams verified: A (build/tests green), B (github → api.githubcopilot.com/mcp/), C (focus-profiles.json + 15 focus tests), D (scenario.test.ts 1157L + simulation.test.ts 229L), E (focus-suggestions.json with 6 focus profiles).
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1389/0/3. Build: clean. 0 vulns. **744th run.**
+- **Human-action items** (unchanged):
+  1. Disable or redirect hourly schedule — 744+ consecutive idle runs; all defined workstreams exhausted.
+  2. Add workstream F (McpAgent Phases 2-4) to this board to give the driver new work.
+  3. Dismiss stale Dependabot alerts in GitHub Security tab (6 open — stale; all local audits show 0 vulns).
+  4. Stale branch cleanup — 1000+ remote auto/ branches. Enable "Automatically delete head branches" in GitHub Settings or bulk-delete locally.
+  5. Configure CF Access on prod — clears ledger DLQ.
+  6. Set GITHUB_MCP_AUTHORIZATION on prod to reconnect GitHub MCP backend.
+  7. Rotate Notion token — op://ChittyOS-Integrations/notion/api_token.
+- **Next run**: No open PRs; 0 vulns; all workstreams done. Idle. DISABLE THE SCHEDULE or add workstream F.
+- **PushNotification**: NOT sent (no new signal; state identical to runs 742–743).
