@@ -721,3 +721,27 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   9. Major package bumps pending human review: typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.19.
 - **Next run**: PR #1065 likely merged (CodeQL should pass for lockfile-only diff). No further open workstreams unless F is added.
 - **PushNotification**: SENT (real work done — 5 in-range deps refreshed, PR #1065 open).
+
+### 2026-07-24 (run 768 — PR #1065 merged: dep refresh)
+- **Workstream**: A (gateway refresh — merged in-range dependency update)
+- **Branch/PR**: PR #1065 merged (https://github.com/chittyos/ch1tty/pull/1065) → squash into main @ 9d60478
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1389 pass / 0 fail / 3 skip (1392 total, 49 suites)
+- **Actions**:
+  - Synced to origin/main HEAD edc3cc7 (run 767). npm ci clean. npm run build clean (tsc exit 0). npm test: 1389/0/3 (~41s).
+  - PR #1065 was open from run 767. CI all green: 3/3 checks passed (CodeQL, Analyze (actions), Analyze (javascript-typescript)).
+  - Merged PR #1065 via squash. SHA: 9d60478. Packages merged: @cloudflare/codemode 0.4.3→0.4.4, @types/node 22.19.21→22.20.1, tsx 4.22.4→4.23.1, wrangler 4.112.0→4.114.0, zod 4.3.6→4.4.3.
+  - Pulled updated main. Fast-forwarded 8 commits.
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE; 0 violations on main.
+  - Notion token still invalid (401); board in DRIVER-BOARD.md.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1389/0/3. Build: clean. 0 vulns. **768th run. PR #1065 merged.**
+- **Human-action items**:
+  1. Disable or redirect hourly schedule — 768+ consecutive runs; all defined workstreams exhausted (A–E done; workstream F still pending human decision).
+  2. Add workstream F (McpAgent Phases 2-4) to this board to give the driver new work.
+  3. Dismiss stale Dependabot alerts in GitHub Security tab (6 open — stale; local audits show 0 vulns).
+  4. Stale branch cleanup — 1000+ remote auto/ branches. Enable "Automatically delete head branches" in GitHub Settings or bulk-delete locally.
+  5. Configure CF Access on prod — clears ledger DLQ.
+  6. Set GITHUB_MCP_AUTHORIZATION on prod to reconnect GitHub MCP backend.
+  7. Rotate Notion token — op://ChittyOS-Integrations/notion/api_token.
+  8. Major package bumps pending human review: typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.19.
+- **Next run**: No open PRs; 0 vulns; all workstreams done. Idle unless workstream F is added.
+- **PushNotification**: SENT (PR #1065 merged — dep refresh landed).
