@@ -692,3 +692,32 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   7. Rotate Notion token — op://ChittyOS-Integrations/notion/api_token.
 - **Next run**: No open PRs; 0 vulns; all workstreams done. Idle. DISABLE THE SCHEDULE or add workstream F.
 - **PushNotification**: NOT sent (run 764 sent one 2 runs ago; no new signal).
+
+### 2026-07-24 (run 767 — dep refresh: 5 in-range packages bumped)
+- **Workstream**: A (gateway refresh — in-range dependency update)
+- **Branch/PR**: `auto/A-dep-refresh-jul2026` → PR #1065 (https://github.com/chittyos/ch1tty/pull/1065)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1389 pass / 0 fail / 3 skip (1392 total, 49 suites)
+- **Actions**:
+  - Synced to origin/main HEAD 029b6cf (run 766). npm ci clean. npm run build clean (tsc exit 0). npm test: 1389/0/3 (~41s).
+  - 0 open PRs pre-run (GitHub MCP confirmed). npm audit: 0 vulnerabilities.
+  - `npm outdated` found 5 in-range (within ^) packages available: @cloudflare/codemode 0.4.3→0.4.4, @types/node 22.19.21→22.20.1, tsx 4.22.4→4.23.1, wrangler 4.112.0→4.114.0, zod 4.3.6→4.4.3.
+  - Ran `npm update` for those 5 packages. Build clean. Tests: 1389/0/3 (unchanged). npm audit: 0 vulns.
+  - Opened PR #1065 (package-lock.json only, 1 file, 46 insertions / 55 deletions).
+  - PR bot comments: chatgpt-codex usage limit (not actionable) + coderabbitai skip (package-lock.json excluded by path filter — expected). No review findings.
+  - CI: 2 CodeQL checks in-progress (Analyze actions + Analyze javascript-typescript) — expected to pass for lockfile-only diff.
+  - Excluded from update: typescript 5→7 (major), @types/node 22→26 (major), c8 11→12 (major), agents 0.17→0.19 (outside ^ range) — all require human review before bumping.
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE; 0 violations on main.
+  - Notion token still invalid (401); board in DRIVER-BOARD.md.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1389/0/3. Build: clean. 0 vulns. **767th run. PR #1065 open (dep refresh).**
+- **Human-action items**:
+  1. Review + merge PR #1065 (in-range dep refresh — package-lock.json only, no code changes, tests green).
+  2. Disable or redirect hourly schedule — 767+ consecutive runs; all defined workstreams exhausted (A–E done).
+  3. Add workstream F (McpAgent Phases 2-4) to this board to give the driver new work.
+  4. Dismiss stale Dependabot alerts in GitHub Security tab (6 open — stale from before PRs #1062/#1063; all local audits show 0 vulns).
+  5. Stale branch cleanup — 1000+ remote auto/ branches. Enable "Automatically delete head branches" in GitHub Settings or bulk-delete locally.
+  6. Configure CF Access on prod — clears ledger DLQ.
+  7. Set GITHUB_MCP_AUTHORIZATION on prod to reconnect GitHub MCP backend.
+  8. Rotate Notion token — op://ChittyOS-Integrations/notion/api_token.
+  9. Major package bumps pending human review: typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.19.
+- **Next run**: PR #1065 likely merged (CodeQL should pass for lockfile-only diff). No further open workstreams unless F is added.
+- **PushNotification**: SENT (real work done — 5 in-range deps refreshed, PR #1065 open).
