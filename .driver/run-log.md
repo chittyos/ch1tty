@@ -1312,4 +1312,26 @@
   6. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend in live gateway.
   7. **Rotate Notion token** — `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`.
 - **Next run**: Same idle state expected. No new work until workstream F is added or blockers resolved.
+
+### 2026-07-25T12:00Z — run 798 (idle — all workstreams done)
+- **Workstream**: None (A–E done; workstream F awaiting human decision)
+- **Branch/PR**: direct commit to main (run log only; no source changes)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1392/1389/0/3 (49 suites)
+- **Actions**:
+  - `npm ci` clean, `npm run build` clean (tsc exit 0), `npm test` → **1389 pass / 0 fail / 3 skip** ✓
+  - `npm audit` → **0 vulnerabilities** ✓
+  - Pulled origin/main HEAD 7795ff5 (run 797) — was on detached HEAD; fast-forwarded local main (41 commits, incl. package-lock.json update). Re-ran ci+build+test — all clean.
+  - 0 open PRs (GitHub MCP confirmed). Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE.
+  - Dependabot alert #88: still open per prior runs; npm audit 0 vulns locally; human action to dismiss.
+  - Notion board: unavailable (401); board in DRIVER-BOARD.md.
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E ✓ (all done)
+- **Blockers** (unchanged):
+  1. **Disable or redirect hourly schedule** — 798 consecutive runs, ~345+ idle.
+  2. **Add workstream F** (McpAgent Phases 2–4 awaiting decision).
+  3. **Dismiss Dependabot alert #88** — npm audit clean locally; visit GitHub Security tab.
+  4. **Stale branch cleanup** — 1038 auto/* branches; enable "Automatically delete head branches" in GitHub Settings.
+  5. **Configure CF Access on prod** — clears ledger DLQ.
+  6. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend.
+  7. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+- **Next run**: Same idle state expected. PushNotification periodic escalation due at run ~803.
 - **PushNotification**: NOT sent (Dependabot alert notified last run at 794; periodic escalation at 791 — threshold ~10 runs).
