@@ -1271,3 +1271,25 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
 - **Next run**: 0 vulns; 0 open PRs; all workstreams done. Idle unless workstream F added.
 - **Security**: NEW HIGH Dependabot alert #88 surfaced on push to main. npm audit shows 0 vulnerabilities locally — alert is in GitHub advisory database but not npm registry. Human action: visit https://github.com/chittyos/ch1tty/security/dependabot/88 to inspect and dismiss or remediate.
 - **PushNotification**: SENT — new HIGH Dependabot alert #88 appeared on push; warrants human review.
+
+### 2026-07-25 (run 795 — idle, all workstreams done)
+- **Workstream**: None (all A–E done; workstream F still awaiting human decision)
+- **Branch/PR**: none (direct commit to main — run log only)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1389 pass / 0 fail / 3 skip (1392 total, 49 suites)
+- **Actions**:
+  - Pulled origin/main HEAD e4b76a1 (run 794). npm ci clean. npm run build clean (tsc exit 0). npm test: 1389/0/3.
+  - 0 open PRs. 0 open issues. npm audit: 0 vulnerabilities. Guardrails confirmed: 5-tool surface intact; buildCastExplanation metric freeze ACTIVE.
+  - Notion token still invalid; board in DRIVER-BOARD.md. 3 skips confirmed intentional.
+  - Dependabot alert #88: still open per GitHub; npm audit 0 vulns locally. No new alerts.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1389/0/3. Build: clean. 0 vulns. **795th run.**
+- **Human-action items** (unchanged — 795th iteration):
+  1. Disable or redirect hourly schedule — 795+ consecutive idle runs; all defined workstreams exhausted.
+  2. Add workstream F (McpAgent Phases 2-4) to this board to give the driver new work.
+  3. Dismiss stale Dependabot alert #88 in GitHub Security tab (npm audit 0 locally; advisory not in npm registry).
+  4. Stale branch cleanup — 955+ remote auto/* branches (260 cast-explain-ratio guardrail violators). Enable "Automatically delete head branches" in GitHub Settings.
+  5. Configure CF Access on prod — clears ledger DLQ.
+  6. Set GITHUB_MCP_AUTHORIZATION on prod to reconnect GitHub MCP backend.
+  7. Rotate Notion token — op://ChittyOS-Integrations/notion/api_token.
+  8. Major/breaking package bumps pending human review: @cloudflare/codemode 0.4.4→0.5.0, typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.19.
+- **Next run**: 0 vulns; 0 open PRs; all workstreams done. Idle unless workstream F added.
+- **PushNotification**: NOT sent (Dependabot alert #88 notified 1 run ago at run 794; periodic escalation at run 791, threshold ~10 runs).
