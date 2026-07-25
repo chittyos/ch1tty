@@ -1261,3 +1261,30 @@
   5. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend in live gateway.
   6. **Rotate Notion token** — `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`.
 - **Next run**: Same idle state expected unless new workstreams are added or blockers resolved.
+
+---
+
+### 2026-07-25T10:00Z — run 791 (idle — periodic escalation)
+
+- **Workstream advanced**: None (all A–E done — idle run)
+- **Branch/PR**: direct commit to main (run log only; no source changes)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1392/1389/0/3 (49 suites)
+- **Actions**:
+  - `npm ci` clean, `npm run build` clean (0 errors), `npm test` → **1389 pass / 0 fail / 3 skip** ✓
+  - `npm audit` → **0 vulnerabilities** ✓
+  - Read CLAUDE.md + CHITTY.md; confirmed guardrails (5-tool surface fixed at search/execute/status/reload/cast; `buildCastExplanation` metric freeze ACTIVE).
+  - `git fetch --all`; origin/main at `a5972a8` (run 790). No open PRs.
+  - Confirmed all workstreams: A (build/tests green ✓); B (github → `https://api.githubcopilot.com/mcp/` ✓); C (focus-profiles.json 6 profiles: finance/governance/design/code/communication/ops ✓); D (scenario/simulation tests ✓); E (focus-suggestions.json ✓).
+  - Guardrail audit: 5 meta-tools confirmed (search/execute/status/reload/cast). buildCastExplanation metric freeze upheld. 960+ stale `auto/*` remote branches noted; 260+ are cast-explain violations.
+  - Notion board: unavailable (API 401 — token not resolvable in remote container).
+  - **Periodic escalation fired** (run 791 = 9 runs after last notification at run 782; ~10-run cadence).
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E ✓ (all done)
+- **Blockers** (unchanged — all require human action):
+  1. **Disable or redirect hourly schedule** — 791 consecutive runs, ~342+ idle; no new work to advance.
+  2. **Add new workstreams** (Workstream F McpAgent Phases 2–4 awaiting decision — see DRIVER-BOARD.md).
+  3. **Clean up 260+ prohibited branches**: `git push origin --delete $(git branch -r | grep 'origin/auto/[0-9]*-cast-explain' | sed 's|origin/||')`
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`).
+  5. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend in live gateway.
+  6. **Rotate Notion token** — `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`.
+- **Next run**: Same idle state expected unless new workstreams are added or blockers resolved.
+- **PushNotification**: SENT (periodic escalation; run 791 = 9 after run 782).
