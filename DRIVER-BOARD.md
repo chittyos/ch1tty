@@ -1085,5 +1085,6 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   6. Set GITHUB_MCP_AUTHORIZATION on prod to reconnect GitHub MCP backend.
   7. Rotate Notion token — op://ChittyOS-Integrations/notion/api_token.
   8. Major/breaking package bumps pending human review: @cloudflare/codemode 0.4.4→0.5.0, typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.19.
-- **Next run**: 0 vulns; 0 open PRs; all workstreams done. Idle unless workstream F added.
-- **PushNotification**: NOT sent (run 782 sent one for brace-expansion fix; no new signal this run).
+- **Addendum**: On push, GitHub reported "1 HIGH vulnerability — Dependabot alert #88". All 6 package scopes (root + 5 apps/*-mcp) return `found 0 vulnerabilities` from npm audit. This is a stale Dependabot advisory for the brace-expansion package that was just fixed in run 782 — Dependabot hasn't auto-dismissed it yet. Human action: dismiss alert #88 in GitHub Security tab. No code action possible.
+- **Next run**: 0 vulns locally; 1 stale Dependabot alert on GitHub (#88); 0 open PRs; all workstreams done. Idle unless workstream F added.
+- **PushNotification**: NOT sent (run 782 sent one for brace-expansion fix; alert #88 is stale residual of that same fix).
