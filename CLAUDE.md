@@ -5,7 +5,7 @@ type: procedure
 version: 4.1.0
 status: CERTIFIED
 registered_with: chittycanon://core/services/canon
-certifier: chittycanon://core/services/chittycertify
+certifier: chittycanon://core/foundation/mychitty-vault
 title: "Ch1tty Development Guide"
 visibility: PUBLIC
 ---
