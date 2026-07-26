@@ -110,6 +110,48 @@ export class ChildManager implements Backend {
     return this.opAvailable;
   }
 
+  private async resolveChittySecret(name: string): Promise<string> {
+    const secretsUrl = process.env.CHITTYSECRETS_URL || 'https://secrets.chitty.cc';
+    const clientId = process.env.CF_ACCESS_CLIENT_ID || process.env.CHITTY_CF_ACCESS_CLIENT_ID;
+    const clientSecret = process.env.CF_ACCESS_CLIENT_SECRET || process.env.CHITTY_CF_ACCESS_CLIENT_SECRET;
+
+    if (!clientId || !clientSecret) {
+      throw new Error(`CF Access Client Credentials (CF_ACCESS_CLIENT_ID/SECRET) not found in process environment`);
+    }
+
+    const res = await fetch(`${secretsUrl}/mcp?action=reveal`, {
+      method: 'POST',
+      headers: {
+        'CF-Access-Client-Id': clientId,
+        'CF-Access-Client-Secret': clientSecret,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name }),
+    });
+
+    if (!res.ok) {
+      let errMsg = `HTTP ${res.status} ${res.statusText}`;
+      try {
+        const errJson = await res.json() as any;
+        if (errJson.error) {
+          errMsg += `: ${errJson.error} (${errJson.reason || "no reason"})`;
+        }
+      } catch {}
+      throw new Error(`ChittySecrets failed: ${errMsg}`);
+    }
+
+    const json = await res.json() as any;
+    if (json.error) {
+      throw new Error(`ChittySecrets error: ${json.error}`);
+    }
+
+    if (!json.value) {
+      throw new Error(`ChittySecrets returned empty value for secret ${name}`);
+    }
+
+    return json.value.trim();
+  }
+
   private async resolveEnv(config: LocalServerConfig): Promise<Record<string, string>> {
     const configEnv = config.env || {};
 
@@ -135,6 +177,32 @@ export class ChildManager implements Backend {
             resolved[result.value.key] = result.value.value;
           } else {
             log.error(`Failed to resolve env from 1Password: ${result.reason}`, config.id);
+          }
+        }
+      }
+    }
+
+    // Resolve ChittySecrets references
+    const secretKeys = Object.entries(configEnv).filter(
+      ([, v]) => v.startsWith('secrets://') || v.startsWith('chittysecrets://')
+    );
+    if (secretKeys.length > 0) {
+      const results = await Promise.allSettled(
+        secretKeys.map(async ([key, ref]) => {
+          const secretName = ref.replace(/^(secrets|chittysecrets):\/\//, '');
+          const val = await this.resolveChittySecret(secretName);
+          return { key, value: val };
+        })
+      );
+
+      for (const result of results) {
+        if (result.status === 'fulfilled') {
+          resolved[result.value.key] = result.value.value;
+        } else {
+          log.error(`Failed to resolve env from ChittySecrets: ${result.reason}`, config.id);
+          const idx = results.indexOf(result);
+          if (idx !== -1 && secretKeys[idx]) {
+            delete resolved[secretKeys[idx][0]];
           }
         }
       }

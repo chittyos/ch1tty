@@ -17,10 +17,11 @@
         "./apps/tasks-mcp/dist/index.js"
       ],
       "env": {
-        "CHITTY_TASKS_URL": "https://tasks.chitty.cc"
+        "CHITTY_TASKS_URL": "https://tasks.chitty.cc",
+        "CHITTY_TASKS_TOKEN": "chittysecrets://CHITTY_TASKS_TOKEN"
       },
       "lazy": true,
-      "enabled": false
+      "enabled": true
     },
     {
       "_comment": "ChittyLedger — apps/ledger-mcp local MCP surface wrapping the ledger.chitty.cc append-only ledger REST API. Enable once CHITTY_LEDGER_TOKEN is set. Build: cd apps/ledger-mcp && npm ci && npm run build"
@@ -36,10 +37,11 @@
         "./apps/ledger-mcp/dist/index.js"
       ],
       "env": {
-        "CHITTY_LEDGER_URL": "https://ledger.chitty.cc"
+        "CHITTY_LEDGER_URL": "https://ledger.chitty.cc",
+        "CHITTY_LEDGER_TOKEN": "chittysecrets://CHITTY_LEDGER_TOKEN"
       },
       "lazy": true,
-      "enabled": false
+      "enabled": true
     },
     {
       "_comment": "ChittyOS Session Coordinator — apps/session-coordinator-mcp local MCP surface wrapping the session.chitty.cc REST API. Enable once CHITTY_SESSION_TOKEN is set. Build: cd apps/session-coordinator-mcp && npm ci && npm run build"
@@ -55,10 +57,11 @@
         "./apps/session-coordinator-mcp/dist/index.js"
       ],
       "env": {
-        "CHITTY_SESSION_URL": "https://session.chitty.cc"
+        "CHITTY_SESSION_URL": "https://session.chitty.cc",
+        "CHITTY_SESSION_TOKEN": "chittysecrets://CHITTY_SESSION_TOKEN"
       },
       "lazy": true,
-      "enabled": false
+      "enabled": true
     },
     {
       "_comment": "ChittyEvidence — apps/evidence-mcp local MCP surface wrapping the evidence.chitty.cc document ingest + canonical URI REST API. Enable once CHITTY_EVIDENCE_TOKEN is set. Build: cd apps/evidence-mcp && npm ci && npm run build"
@@ -74,10 +77,11 @@
         "./apps/evidence-mcp/dist/index.js"
       ],
       "env": {
-        "CHITTY_EVIDENCE_URL": "https://evidence.chitty.cc"
+        "CHITTY_EVIDENCE_URL": "https://evidence.chitty.cc",
+        "CHITTY_EVIDENCE_TOKEN": "chittysecrets://CHITTY_EVIDENCE_TOKEN"
       },
       "lazy": true,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": "chittyos",
