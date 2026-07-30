@@ -21,7 +21,8 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CANONICAL = 'https://agent.chitty.cc/orchestrator/mcp';
 const FORBIDDEN = [
   'https://orchestrator.chitty.cc/mcp',
-  'chittyagent-orchestrator.workers.dev/mcp',
+  // Catches any *.workers.dev MCP endpoint — not just the named orchestrator one.
+  '.workers.dev/mcp',
 ];
 
 describe('orchestrator endpoint — catalog drift prevention', () => {
