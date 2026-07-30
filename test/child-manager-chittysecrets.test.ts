@@ -167,7 +167,7 @@ describe('ChildManager — chittysecrets URI resolution', { concurrency: false }
       return { ok: true, status: 200, statusText: 'OK', json: async () => ({ value: 'v' }) } as unknown as Response;
     };
     await (cm as any).resolveEnv(makeConfig({ K: 'chittysecrets://k' }));
-    assert.ok(capturedUrl.startsWith('https://custom-secrets.example.com'), `Expected custom URL, got: ${capturedUrl}`);
+    assert.equal(capturedUrl, 'https://custom-secrets.example.com/mcp?action=reveal');
   });
 
   // ── CF Access credential forwarding ─────────────────────────────────────────
