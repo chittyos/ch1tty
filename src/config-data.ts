@@ -137,7 +137,7 @@ export const REMOTE_SERVERS: ServerConfig[] = [
     type: 'remote',
     access: 'readwrite',
     category: 'ecosystem',
-    endpoint: 'https://orchestrator.chitty.cc/mcp',
+    endpoint: 'https://agent.chitty.cc/orchestrator/mcp',
     authTokenKey: 'chittymcp',
     lazy: false,
     enabled: true,
