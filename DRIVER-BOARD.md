@@ -1649,3 +1649,30 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   8. Major/breaking package bumps pending human review: @cloudflare/codemode 0.4.4→0.5.0, typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.19.
 - **Next run**: 0 vulns; 0 open PRs; all workstreams done. Idle. DISABLE THE SCHEDULE or add workstream F. Next periodic escalation due at run ~824.
 - **PushNotification**: SENT (periodic escalation — 10 runs since run 804 escalation; schedule still running with no work to do).
+
+### 2026-07-30 (run 815 — guardrail enforcement: cast-explain field-count drift guard)
+- **Workstream**: A+ (guardrail enforcement — not a new workstream, but real work needed)
+- **Branch/PR**: `auto/cast-explain-field-count-drift-guard` → PR #1073
+- **Build**: clean (tsc exit 0) | **Tests**: 1412 pass / 0 fail / 3 skip (+2 new drift-guard tests) | **Coverage**: exit 0 (lines 99.74%, branches 98.51%, funcs 99.15%)
+- **Actions**:
+  - Discovered 957 remote `auto/` branches, majority named `auto/*-cast-explain-*-ratio` — previous runs had been adding statistical ratio/distribution fields to `buildCastExplanation` in direct violation of the CLAUDE.md metric freeze guardrail.
+  - Verified all 5 workstreams A–E are complete on main; build and tests green.
+  - Measured current explanation field counts: 56 (no-focus) and 87 (focus:code active) at verbosity:full.
+  - Added `test/zzzz-cast-explain-field-count-drift-guard.test.ts` — two tests that freeze these exact counts so CI fails immediately if any future run adds another metric. Pushed and opened PR #1073.
+  - CodeRabbit review: no actionable comments, all 5 pre-merge checks passed.
+  - CI on PR branch shows `conclusion: failure` but this is pre-existing on `main` (failing for 5+ consecutive commits including base SHA 5524b7c5). GitHub Actions jobs API returns 0 jobs from this environment — unable to pinpoint failing job. Build, test, and coverage all pass locally.
+  - Notion not installed in session (not_installed); board maintained in DRIVER-BOARD.md.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1412/0/3. Build: clean. 0 vulns. **815th run.** New: cast-explain drift guard in PR #1073.
+- **Human-action items** (updated — run 815):
+  1. **Merge PR #1073** — drift guard is correct, locally green; pre-existing CI failure on base branch needs separate investigation.
+  2. **Investigate pre-existing CI failure** — `.github/workflows/ci.yml` has been `conclusion: failure` on every main push for 5+ commits. Jobs API returns 0 jobs from this container (proxy limitation). Check GitHub Actions UI directly to identify the failing job/matrix entry.
+  3. Disable or redirect hourly schedule — 815+ consecutive runs; all defined workstreams exhausted.
+  4. Add workstream F (McpAgent Phases 2-4) to this board to give the driver new work.
+  5. Dismiss stale Dependabot alert #88 in GitHub Security tab (npm audit 0 locally).
+  6. Stale branch cleanup — 957 remote auto/* branches (260+ cast-explain-ratio guardrail violators). Enable "Automatically delete head branches" in GitHub Settings.
+  7. Configure CF Access on prod — clears ledger DLQ.
+  8. Set GITHUB_MCP_AUTHORIZATION on prod to reconnect GitHub MCP backend.
+  9. Rotate Notion token — op://ChittyOS-Integrations/notion/api_token.
+  10. Major/breaking package bumps pending human review: @cloudflare/codemode 0.4.4→0.5.0, typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.19.
+- **Next run**: PR #1073 open (drift guard). Pre-existing CI failure on main needs human investigation. Next periodic escalation due at run ~824.
+- **PushNotification**: SENT (real work done: PR #1073 opened — cast-explain field-count drift guard enforcing CLAUDE.md metric freeze; 957 guardrail-violating branches identified).
