@@ -77,6 +77,8 @@ describe('ChildManager — chittysecrets URI resolution', { concurrency: false }
   let savedClientId: string | undefined;
   let savedClientSecret: string | undefined;
   let savedSecretsUrl: string | undefined;
+  let savedFallbackClientId: string | undefined;
+  let savedFallbackClientSecret: string | undefined;
   let cm: ChildManager;
 
   before(() => {
@@ -84,6 +86,8 @@ describe('ChildManager — chittysecrets URI resolution', { concurrency: false }
     savedClientId = process.env.CF_ACCESS_CLIENT_ID;
     savedClientSecret = process.env.CF_ACCESS_CLIENT_SECRET;
     savedSecretsUrl = process.env.CHITTYSECRETS_URL;
+    savedFallbackClientId = process.env.CHITTY_CF_ACCESS_CLIENT_ID;
+    savedFallbackClientSecret = process.env.CHITTY_CF_ACCESS_CLIENT_SECRET;
   });
 
   after(() => {
@@ -94,6 +98,10 @@ describe('ChildManager — chittysecrets URI resolution', { concurrency: false }
     else process.env.CF_ACCESS_CLIENT_SECRET = savedClientSecret;
     if (savedSecretsUrl === undefined) delete process.env.CHITTYSECRETS_URL;
     else process.env.CHITTYSECRETS_URL = savedSecretsUrl;
+    if (savedFallbackClientId === undefined) delete process.env.CHITTY_CF_ACCESS_CLIENT_ID;
+    else process.env.CHITTY_CF_ACCESS_CLIENT_ID = savedFallbackClientId;
+    if (savedFallbackClientSecret === undefined) delete process.env.CHITTY_CF_ACCESS_CLIENT_SECRET;
+    else process.env.CHITTY_CF_ACCESS_CLIENT_SECRET = savedFallbackClientSecret;
   });
 
   beforeEach(() => {
