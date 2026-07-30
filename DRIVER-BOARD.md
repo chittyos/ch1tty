@@ -1531,3 +1531,49 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   8. Major/breaking package bumps pending human review: @cloudflare/codemode 0.4.4→0.5.0, typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.19.
 - **Next run**: 0 vulns; 0 open PRs; all workstreams done. Idle unless workstream F added. Next periodic escalation due at run ~814.
 - **PushNotification**: NOT sent (1 run since run 804 escalation; next threshold ~814).
+
+### 2026-07-30 (run 806 — workstream A: ChittySecrets tests, PR #1067)
+- **Workstream**: A (gateway tested — ChittySecrets env resolution tests)
+- **Branch/PR**: `auto/A-chittysecrets-tests` → PR #1067 (merged with CodeQL fix + CodeRabbit nitpick)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1405 pass / 0 fail / 3 skip (1408 total, 50 suites)
+- **Actions**:
+  - Found gap: commit 3f125b7 added ChittySecrets env resolution to ChildManager but shipped without tests. Added test/child-manager-chittysecrets.test.ts (16 tests: happy path, credential forwarding, error paths, no-op guard).
+  - PR #1067 opened; CodeQL high fixed (replaced startsWith URL check with assert.equal); CodeRabbit nitpick addressed (save/restore CF Access vars). PR merged.
+  - Tests rose from 1389/0/3 to 1405/0/3 (+16 from chittysecrets tests).
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1405/0/3. Build: clean. 0 vulns. **806th run.**
+- **PushNotification**: NOT logged (logged in git commit messages only for runs 806-807).
+
+### 2026-07-30 (run 807 — idle, all workstreams done)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; workstream F still awaiting human decision)
+- **Branch/PR**: none (direct commit to main — run log only)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1405 pass / 0 fail / 3 skip (1408 total, 50 suites)
+- **Actions**:
+  - PR #1067 already merged (run 806 addendum). npm ci clean. npm run build clean. npm test: 1405/0/3.
+  - 0 open PRs. 0 vulnerabilities.
+  - Guardrails confirmed: 5-tool surface intact; buildCastExplanation metric freeze ACTIVE.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1405/0/3. Build: clean. 0 vulns. **807th run.**
+- **PushNotification**: NOT sent (no new signal; note logged in git commit only).
+
+### 2026-07-30 (run 808 — idle, all workstreams done)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; workstream F still awaiting human decision)
+- **Branch/PR**: none (direct commit to main — run log only)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1405 pass / 0 fail / 3 skip (1408 total, 50 suites)
+- **Actions**:
+  - Reset detached HEAD → origin/main HEAD 9901ee0 (run 807). npm ci clean. npm run build clean (tsc exit 0). npm test: 1405/0/3 (~38s, 50 suites).
+  - 0 open PRs (GitHub MCP confirmed). npm audit: 0 vulnerabilities (root).
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE; 0 violations on main.
+  - Backfilled board log entries for runs 806–807 (those runs committed directly to git without updating DRIVER-BOARD.md).
+  - 1038+ remote auto/* branches (260+ cast-explain-ratio guardrail violators, stale, never merged); git push --delete still 403 from container.
+  - Notion token still invalid (401); board in DRIVER-BOARD.md. 3 skips confirmed intentional.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1405/0/3. Build: clean. 0 vulns. **808th run.**
+- **Human-action items** (unchanged — 808th iteration):
+  1. Disable or redirect hourly schedule — 808+ consecutive runs; all defined workstreams exhausted.
+  2. Add workstream F (McpAgent Phases 2-4) to this board to give the driver new work.
+  3. Dismiss stale Dependabot alert #88 in GitHub Security tab (npm audit 0 locally).
+  4. Stale branch cleanup — 1038+ remote auto/* branches (260+ cast-explain-ratio guardrail violators). Enable "Automatically delete head branches" in GitHub Settings. Note: git push --delete returns 403 from container.
+  5. Configure CF Access on prod — clears ledger DLQ.
+  6. Set GITHUB_MCP_AUTHORIZATION on prod to reconnect GitHub MCP backend.
+  7. Rotate Notion token — op://ChittyOS-Integrations/notion/api_token.
+  8. Major/breaking package bumps pending human review: @cloudflare/codemode 0.4.4→0.5.0, typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.19.
+- **Next run**: 0 vulns; 0 open PRs; all workstreams done. Idle unless workstream F added. Next periodic escalation due at run ~814.
+- **PushNotification**: NOT sent (4 runs since run 804 escalation; next threshold ~814).
