@@ -1600,3 +1600,28 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   8. Major/breaking package bumps pending human review: @cloudflare/codemode 0.4.4→0.5.0, typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.19.
 - **Next run**: 0 vulns; 0 open PRs; all workstreams done. Idle unless workstream F added. Next periodic escalation due at run ~814.
 - **PushNotification**: NOT sent (5 runs since run 804 escalation; next threshold ~814).
+
+### 2026-07-30 (run 813 — workstream A: merged PR #1068 orchestrator drift-guard tests)
+- **Workstream**: A (gateway tested — orchestrator endpoint CI drift-guard tests)
+- **Branch/PR**: `auto/fix-orchestrator-endpoint` → PR #1068 merged (squash, SHA 32333978)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1410 pass / 0 fail / 3 skip (1413 total, 51 suites)
+- **Actions**:
+  - Synced to origin/main HEAD 0245f8c (run 812). npm ci clean. npm run build clean (tsc exit 0). npm test: 1405/0/3 (50 suites — pre-merge).
+  - Found PR #1068 open (`auto/fix-orchestrator-endpoint`): 3/3 CI checks green (CodeQL + 2× CodeQL Analyze). CodeRabbit left COMMENTED review (not blocking); the suggestion (`.workers.dev` broad pattern) was already addressed in the PR's second commit `88ebffd`.
+  - Confirmed no merge conflicts: `git merge-tree` showed only the new test file added from the PR branch; servers.json + config-data.ts were identical between main and PR (endpoint fix `8ddb16c` was already on main).
+  - Merged PR #1068 via squash → main HEAD 32333978.
+  - Reset local main to 32333978. npm test: 1410/0/3 (51 suites, ~40s). 5 new orchestrator-endpoint drift-guard tests all passing.
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE; 0 violations on main.
+  - Notion token still invalid (401); board in DRIVER-BOARD.md. git push --delete still 403 from container.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1410/0/3. Build: clean. 0 vulns. **813th run. PR #1068 merged.**
+- **Human-action items** (unchanged — 813th iteration):
+  1. Disable or redirect hourly schedule — 813+ consecutive runs; all defined workstreams exhausted.
+  2. Add workstream F (McpAgent Phases 2-4) to this board to give the driver new work.
+  3. Dismiss stale Dependabot alert #88 in GitHub Security tab (npm audit 0 locally).
+  4. Stale branch cleanup — 1038+ remote auto/* branches (260+ cast-explain-ratio guardrail violators). Enable "Automatically delete head branches" in GitHub Settings. Note: git push --delete returns 403 from container.
+  5. Configure CF Access on prod — clears ledger DLQ.
+  6. Set GITHUB_MCP_AUTHORIZATION on prod to reconnect GitHub MCP backend.
+  7. Rotate Notion token — op://ChittyOS-Integrations/notion/api_token.
+  8. Major/breaking package bumps pending human review: @cloudflare/codemode 0.4.4→0.5.0, typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.19.
+- **Next run**: No open PRs; 0 vulns; all workstreams done. Idle. DISABLE THE SCHEDULE or add workstream F.
+- **PushNotification**: SENT (real work: PR #1068 merged — orchestrator endpoint drift-guard +5 tests; tests 1405→1410).
