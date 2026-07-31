@@ -1674,5 +1674,6 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   8. Set GITHUB_MCP_AUTHORIZATION on prod to reconnect GitHub MCP backend.
   9. Rotate Notion token — op://ChittyOS-Integrations/notion/api_token.
   10. Major/breaking package bumps pending human review: @cloudflare/codemode 0.4.4→0.5.0, typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.19.
-- **Next run**: PR #1073 open (drift guard). Pre-existing CI failure on main needs human investigation. Next periodic escalation due at run ~824.
+- **PR #1073 merged** (2026-07-31, end of run 815 context window). Drift guard is now on main.
+- **Next run**: All workstreams done. Drift guard merged. Pre-existing CI failure on main still needs human investigation. Next periodic escalation due at run ~824. DISABLE THE SCHEDULE or add workstream F.
 - **PushNotification**: SENT (real work done: PR #1073 opened — cast-explain field-count drift guard enforcing CLAUDE.md metric freeze; 957 guardrail-violating branches identified).
