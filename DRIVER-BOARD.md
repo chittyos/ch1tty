@@ -1943,3 +1943,35 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
 - **Next run**: PR #1076 likely merged (CodeQL should pass for lockfile-only diff). If merged, check for any further in-range updates. Next periodic escalation due at run ~836.
 - **PushNotification**: SENT (real work: wrangler 4.116→4.117 in-range bump, PR #1076 open, CodeQL in progress).
 - **Addendum**: PR #1076 MERGED (squash → main fc884af). Run 827 (concurrent session) confirmed CI green. Merge landed post-run-827 board log. Wrangler 4.117.0 now on main. 0 open PRs.
+
+### 2026-07-31 (run 827 — idle, all workstreams done, PR #1076 CI green)
+- **Workstream**: None
+- **Branch/PR**: none (empty commit — DRIVER-BOARD.md not updated)
+- **Build**: clean | **Tests**: 1412/0/3 (1415 total, 51 suites)
+- **Actions**: PR #1076 CI confirmed 3/3 success. All workstreams A–E DONE. 0 additional open PRs. 0 vulns.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1412/0/3. Build: clean. **827th run. PR #1076 open, CI green.**
+- **PushNotification**: NOT SENT (state unchanged; run 826 notified).
+
+### 2026-07-31 (run 828 — workstream A: confirmed PR #1076 merge, wrangler 4.117.0 on main)
+- **Workstream**: A (gateway maintenance — confirmed wrangler 4.116.0→4.117.0 merge, board logged)
+- **Branch/PR**: PR #1076 MERGED by concurrent run 826 addendum session (sha: fc884af → main 75775d3)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1412 pass / 0 fail / 3 skip (1415 total, 51 suites) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - Synced to origin/main HEAD 75775d3 (run 826 addendum). npm ci clean. npm run build clean (tsc exit 0). npm test: 1412/0/3 (51 suites). npm audit: 0 vulnerabilities.
+  - Attempted PR #1076 merge (CI 3/3 green) — concurrent session had already merged it (fc884af). Resolved gracefully: reset to origin/main, appended board log.
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE (drift guard frozen at 56/87 fields). 0 violations on main.
+  - ~1047 remote auto/* branches (stale; git push --delete still 403 from container). Notion token still invalid (401).
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1412/0/3. Build: clean. 0 vulns. **828th run. 0 open PRs.**
+- **Human-action items** (updated — run 828):
+  1. **`mcp.ch1tty.com` health routing** — `/health` and `/api/v1/health` return 404 in prod. Add CF routing rules.
+  2. **`mcp.ch1tty.com` OAuth layer** — `/mcp` returns OAuth 401 error format. Confirm CF Access / MCP gateway layer compatibility.
+  3. **Investigate pre-existing CI failure** — ci.yml fails at queue phase instantly. CodeQL succeeds on same SHAs.
+  4. Disable or redirect hourly schedule — **828+ consecutive runs; all defined workstreams exhausted**.
+  5. Add workstream F (McpAgent Phases 2-4) to give the driver new work.
+  6. Stale branch cleanup — ~1047 remote auto/* branches. Enable "Automatically delete head branches" in GitHub Settings.
+  7. Configure CF Access on prod (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  8. Set GITHUB_MCP_AUTHORIZATION on prod to reconnect GitHub MCP backend.
+  9. Rotate Notion token — op://ChittyOS-Integrations/notion/api_token.
+  10. Major/breaking package bumps pending human review: @cloudflare/codemode 0.4.4→0.5.1, typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20.
+- **Next run**: 0 open PRs; 0 vulns; all workstreams done. Idle. Next periodic escalation due at run ~836.
+- **PushNotification**: SENT (wrangler 4.117.0 merged to main, all clean).
