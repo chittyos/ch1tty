@@ -48,6 +48,9 @@ export interface BrainStats {
 export const EMBED_MODEL = '@cf/baai/bge-base-en-v1.5';
 export const EMBED_DIM = 768;
 
+/** Maximum time to wait for a Workers AI embedding response before treating it as a failure. */
+const AI_EMBED_TIMEOUT_MS = 30_000;
+
 export interface WorkersAiBrainConfig {
   enabled: boolean;
   minSimilarity: number;
@@ -320,7 +323,18 @@ export class WorkersAiBrain {
   private async embed(inputs: string[]): Promise<Float32Array[] | null> {
     if (inputs.length === 0) return [];
     try {
-      const resp = (await this.ai.run(EMBED_MODEL, { text: inputs })) as { data?: number[][]; shape?: number[] };
+      // Wrap ai.run() in a manual timeout: if Workers AI hangs, the circuit
+      // breaker only fires on thrown errors — a stalled promise leaves the
+      // caller awaiting forever. AI_EMBED_TIMEOUT_MS caps that wait so the
+      // catch block below runs and the circuit-breaker counter increments.
+      const aiPromise = this.ai.run(EMBED_MODEL, { text: inputs }) as Promise<{ data?: number[][]; shape?: number[] }>;
+      const resp = await new Promise<{ data?: number[][]; shape?: number[] }>((resolve, reject) => {
+        const timer = setTimeout(
+          () => reject(new Error(`Workers AI embed timed out after ${AI_EMBED_TIMEOUT_MS}ms`)),
+          AI_EMBED_TIMEOUT_MS,
+        );
+        aiPromise.then((v) => { clearTimeout(timer); resolve(v); }, (e) => { clearTimeout(timer); reject(e); });
+      });
       const data = resp?.data;
       if (!Array.isArray(data) || data.length !== inputs.length) {
         this.errors++;

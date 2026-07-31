@@ -34,7 +34,7 @@ export class Ch1ttyDO extends DurableObject<Env> {
     const sessionId = req.headers.get('mcp-session-id') ?? `do-${crypto.randomUUID().slice(0, 8)}`;
     // Session start is idempotent (core.startSession) so per-request calls do
     // not wipe affinity/patterns or re-stage the entity.
-    this.core.startSession(sessionId);
+    await this.core.startSession(sessionId);
     // Ensure the alarm is scheduled so buffered events flush + idle sessions close.
     await this.ensureAlarm();
 
