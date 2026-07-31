@@ -1913,3 +1913,32 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   10. Major/breaking package bumps pending human review: @cloudflare/codemode 0.4.4→0.5.1, typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20.
 - **Next run**: 0 open PRs; all workstreams done. Idle. Next periodic escalation due at run ~836.
 - **PushNotification**: NOT SENT (state unchanged since run 824; periodic escalation already sent; next due at ~836).
+
+### 2026-07-31 (run 826 — workstream A: wrangler 4.116→4.117 dep refresh, PR #1076 open)
+- **Workstream**: A (gateway maintenance — in-range dep refresh: wrangler 4.116.0→4.117.0)
+- **Branch/PR**: `auto/A-dep-refresh-wrangler-4117` → PR #1076 (https://github.com/chittyos/ch1tty/pull/1076) — open, CodeQL in progress
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1412 pass / 0 fail / 3 skip (1415 total, 51 suites) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - Synced to origin/main HEAD d39bc6d (run 825). npm ci clean. npm run build clean (tsc exit 0). npm test: 1412/0/3 (~43s, 51 suites). npm audit: 0 vulnerabilities.
+  - 0 open PRs pre-run (GitHub MCP confirmed). All workstreams A–E DONE.
+  - `npm outdated`: found 1 new in-range update — `wrangler 4.116.0→4.117.0` (within ^4.79.0). All other outdated packages are out-of-range (human review required).
+  - Ran `npm update wrangler`. Verified wrangler@4.117.0 installed. Build clean. Tests: 1412/0/3. npm audit: 0 vulns.
+  - Change: `package-lock.json` only (7 insertions / 10 deletions). No source changes; no API surface change.
+  - Pushed `auto/A-dep-refresh-wrangler-4117`; opened PR #1076. 2 CodeQL checks in-progress. CodeRabbit skipped (lockfile excluded by path filter — expected). Codex usage limit hit (bot comment only — not a finding).
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE (drift guard frozen at 56/87 fields). 0 violations on main.
+  - ~1044 remote auto/* branches (stale; git push --delete still 403 from container). Notion token still invalid (401).
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1412/0/3. Build: clean. 0 vulns. **826th run. PR #1076 open.**
+- **Human-action items** (updated — run 826):
+  1. Review + merge PR #1076 (wrangler 4.116→4.117, package-lock.json only; CodeQL pending).
+  2. **`mcp.ch1tty.com` health routing** — `/health` and `/api/v1/health` return 404 in prod. Add CF routing rules or update monitoring.
+  3. **`mcp.ch1tty.com` OAuth layer** — `/mcp` returns OAuth 401 error format. Confirm CF Access / MCP gateway layer compatibility.
+  4. **Investigate pre-existing CI failure** — ci.yml (workflow ID 247007350) fails instantly at queue phase (created_at == updated_at, 0 jobs). CodeQL succeeds on same SHAs.
+  5. Disable or redirect hourly schedule — **826+ consecutive runs; all defined workstreams exhausted**.
+  6. Add workstream F (McpAgent Phases 2-4) to give the driver new work.
+  7. Stale branch cleanup — ~1044 remote auto/* branches. Enable "Automatically delete head branches" in GitHub Settings. git push --delete returns 403 from container.
+  8. Configure CF Access on prod (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  9. Set GITHUB_MCP_AUTHORIZATION on prod to reconnect GitHub MCP backend.
+  10. Rotate Notion token — op://ChittyOS-Integrations/notion/api_token.
+  11. Major/breaking package bumps pending human review: @cloudflare/codemode 0.4.4→0.5.1, typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20.
+- **Next run**: PR #1076 likely merged (CodeQL should pass for lockfile-only diff). If merged, check for any further in-range updates. Next periodic escalation due at run ~836.
+- **PushNotification**: SENT (real work: wrangler 4.116→4.117 in-range bump, PR #1076 open, CodeQL in progress).
