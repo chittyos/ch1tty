@@ -1942,3 +1942,4 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   11. Major/breaking package bumps pending human review: @cloudflare/codemode 0.4.4→0.5.1, typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20.
 - **Next run**: PR #1076 likely merged (CodeQL should pass for lockfile-only diff). If merged, check for any further in-range updates. Next periodic escalation due at run ~836.
 - **PushNotification**: SENT (real work: wrangler 4.116→4.117 in-range bump, PR #1076 open, CodeQL in progress).
+- **Addendum**: PR #1076 MERGED (squash → main fc884af). Run 827 (concurrent session) confirmed CI green. Merge landed post-run-827 board log. Wrangler 4.117.0 now on main. 0 open PRs.
