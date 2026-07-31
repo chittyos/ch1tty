@@ -1703,3 +1703,31 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   9. Major/breaking package bumps pending human review: @cloudflare/codemode 0.4.4→0.5.0, typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.19.
 - **Next run**: 0 open PRs; 0 vulns; all workstreams done. Idle. DISABLE THE SCHEDULE or add workstream F. Pre-existing CI failure needs human investigation. Next periodic escalation due at run ~824.
 - **PushNotification**: SENT (real work: PR #1073 merged — cast-explain field-count drift guard live; tests 1412/0/3; pre-existing CI failure still active on main).
+
+### 2026-07-31 (run 817 — idle, CI failure root-caused: workflow-specific, not billing)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; idle)
+- **Branch/PR**: none (direct commit to main — run log only)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1412 pass / 0 fail / 3 skip (1415 total, 51 suites) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - npm ci clean. npm run build clean (tsc exit 0). npm test: 1412/0/3 (~55s, 51 suites). npm audit: 0 vulns.
+  - 0 open PRs (GitHub MCP confirmed). All workstreams A–E DONE.
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE (drift guard in test/zzzz-cast-explain-field-count-drift-guard.test.ts, 56/87 field counts frozen).
+  - **CI failure investigation (NEW)**: Identified 5 workflows in org. For SHA `de835184` (run 816 board log):
+    - `.github/workflows/ci.yml` (workflow 247007350): conclusion=failure, created_at==updated_at (instant failure, 0 jobs)
+    - `CodeQL` (workflow 243299023, "Push on main"): conclusion=**success**, ran for ~72s
+    - Finding: CodeQL succeeds simultaneously on the same commit — rules out org-level billing, runner outage, or general Actions suspension. The failure is SPECIFIC to ci.yml. list_workflow_jobs returns total_count=0 (proxy limitation — cannot see failing job). Governance.yml shows in API list but does not exist in repo (stale record, deleted workflow). Root cause still unconfirmed without GitHub Settings UI access but narrowed: org-level policy blocking ci.yml specifically, or a runner/matrix issue unique to ci.yml's configuration.
+  - All 4 app builds+tests pass locally: tasks-mcp (15/0), ledger-mcp (13/0), session-coordinator-mcp (20/0), evidence-mcp (18/0).
+  - 957 remote auto/* branches; git push --delete still 403. Notion token still invalid (401).
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1412/0/3. Build: clean. 0 vulns. **817th run.**
+- **Human-action items** (updated — run 817):
+  1. **Investigate pre-existing CI failure** — ci.yml has been `conclusion: failure` (instant, 0 jobs) for 60+ main commits. NEW FINDING: CodeQL (a different workflow on the same trigger) succeeds on the same SHAs. This proves the failure is ci.yml-specific, not a billing or runner outage. Check GitHub Settings → Actions → Workflow permissions for any policy blocking ci.yml. Also check if ci.yml requires a GitHub Actions environment or secret that isn't set.
+  2. Disable or redirect hourly schedule — 817+ consecutive runs; all defined workstreams exhausted.
+  3. Add workstream F (McpAgent Phases 2-4) to this board to give the driver new work.
+  4. Dismiss stale Dependabot alert #88 in GitHub Security tab (npm audit 0 locally).
+  5. Stale branch cleanup — 957 remote auto/* branches (260+ cast-explain-ratio guardrail violators). Enable "Automatically delete head branches" in GitHub Settings. Note: git push --delete returns 403 from container.
+  6. Configure CF Access on prod — clears ledger DLQ.
+  7. Set GITHUB_MCP_AUTHORIZATION on prod to reconnect GitHub MCP backend.
+  8. Rotate Notion token — op://ChittyOS-Integrations/notion/api_token.
+  9. Major/breaking package bumps pending human review: @cloudflare/codemode 0.4.4→0.5.0, typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.19.
+- **Next run**: 0 open PRs; 0 vulns; all workstreams done. Idle. DISABLE THE SCHEDULE or add workstream F. CI failure narrowed to ci.yml-specific (not billing); still needs GitHub UI to resolve. Next periodic escalation due at run ~824.
+- **PushNotification**: NOT SENT (all workstreams done; idle run; new CI diagnosis finding logged but no new human-actionable urgency beyond what was already on board).
