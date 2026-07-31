@@ -2114,4 +2114,5 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   9. Rotate Notion token — `op://ChittyOS-Integrations/notion/api_token`.
   10. Major/breaking package bumps pending human review: typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20.
 - **Next run**: 0 open PRs; 0 vulns; all workstreams done. Idle. Next periodic escalation due at run ~848.
-- **PushNotification**: NOT SENT (run 836 sent one 2 runs ago; no new signal; next due at ~848).
+- **Dependabot alert**: GitHub reported 1 HIGH vulnerability (alert #88) on push. npm audit returns 0 vulns across all 6 package scopes (root + 5 apps/*-mcp). Same pattern as run 741 (stale Dependabot advisory not yet auto-dismissed after prior fixes). Human can review at https://github.com/chittyos/ch1tty/security/dependabot/88 and dismiss if stale.
+- **PushNotification**: SENT (new Dependabot alert #88 HIGH on push, despite npm audit clean across all scopes — same stale-advisory pattern as run 741; surfacing for human review).
