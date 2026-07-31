@@ -2031,3 +2031,31 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   10. Major/breaking package bumps pending human review: typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20.
 - **Next run**: 0 open PRs; 0 vulns; all workstreams done. Idle. **Periodic escalation due at run ~836 (next run) — send PushNotification.**
 - **PushNotification**: NOT SENT (periodic escalation due at run ~836, not this run).
+
+---
+
+### 2026-07-31 (run 836 — idle, all workstreams done; periodic escalation)
+- **Workstream**: None (all A–E done; workstream F still awaiting human decision)
+- **Branch/PR**: none (direct commit to main — run log only)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1412 pass / 0 fail / 3 skip (1415 total, 51 suites) | **Audit**: 0 vulnerabilities (not re-run; confirmed runs 833-835)
+- **Actions**:
+  - Reset local main → origin/main HEAD 5c07853 (run 835). npm ci clean. npm run build clean (tsc exit 0). npm test: 1412/0/3 (~41s, 51 suites).
+  - 0 open PRs (GitHub MCP confirmed). All workstreams A–E DONE.
+  - `npm outdated`: same 4 out-of-range packages (typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20). No in-range updates available.
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE (drift guard frozen at 56/87 fields). 0 violations on main.
+  - ~963 remote auto/* branches (stale; git push --delete still 403 from container). Notion token still invalid (401).
+  - State identical to runs 833–835: all A–E done, 0 open PRs, 0 in-range dep updates, 0 vulns.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1412/0/3. Build: clean. **836th run.**
+- **Human-action items** (updated — run 836):
+  1. **`mcp.ch1tty.com` health routing** — `/health` and `/api/v1/health` return 404 in prod. Add CF routing rules.
+  2. **`mcp.ch1tty.com` OAuth layer** — `/mcp` returns OAuth 401 error format. Confirm CF Access compatibility.
+  3. **Investigate pre-existing CI failure** — ci.yml fails instantly at queue phase. CodeQL succeeds. Check GitHub Settings → Actions → Workflow policies.
+  4. **Disable or redirect hourly schedule** — 836 consecutive runs; all defined workstreams exhausted.
+  5. **Add workstream F** (McpAgent Phases 2-4) to give the driver new work.
+  6. **Stale branch cleanup** — ~963 remote auto/* branches. Enable "Automatically delete head branches" in GitHub repo settings; or batch-delete with `git push origin --delete`.
+  7. Configure CF Access on prod (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  8. Set GITHUB_MCP_AUTHORIZATION on prod to reconnect GitHub MCP backend.
+  9. Rotate Notion token — `op://ChittyOS-Integrations/notion/api_token`.
+  10. Major/breaking package bumps pending human review: typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20.
+- **Next run**: 0 open PRs; 0 vulns; all workstreams done. Idle. Next periodic escalation due at run ~848.
+- **PushNotification**: SENT (run 836; periodic escalation — 836 consecutive runs, no new work; schedule should be disabled or workstream F added).
