@@ -1677,3 +1677,29 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
 - **PR #1073 merged** (2026-07-31, end of run 815 context window). Drift guard is now on main.
 - **Next run**: All workstreams done. Drift guard merged. Pre-existing CI failure on main still needs human investigation. Next periodic escalation due at run ~824. DISABLE THE SCHEDULE or add workstream F.
 - **PushNotification**: SENT (real work done: PR #1073 opened — cast-explain field-count drift guard enforcing CLAUDE.md metric freeze; 957 guardrail-violating branches identified).
+
+### 2026-07-31 (run 816 — guardrail: merged PR #1073 drift guard)
+- **Workstream**: A+ (guardrail enforcement — merged cast-explain field-count drift guard)
+- **Branch/PR**: `auto/cast-explain-field-count-drift-guard` → PR #1073 merged (squash, SHA 65975d2)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1412 pass / 0 fail / 3 skip (1415 total, 51 suites)
+- **Actions**:
+  - Context resumed from run 815 summary. Synced to origin/main HEAD 65975d2 (PR #1073 squash-merged).
+  - Confirmed PR #1073 merged: `test/zzzz-cast-explain-field-count-drift-guard.test.ts` present on main. Two drift-guard tests passing: 56 fields (no-focus) and 87 fields (focus:code, verbosity:full).
+  - npm ci clean. npm run build clean (tsc exit 0). Post-merge tests: 1412/0/3 (51 suites, ~40s).
+  - 0 open PRs. Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE (drift guard now in place).
+  - Pre-existing CI failure still active on main (60+ consecutive failures; GitHub Actions jobs API returns 0 jobs from container — cannot pinpoint failing job without UI access).
+  - 957 remote auto/* branches (260+ cast-explain-ratio guardrail violators); git push --delete still 403.
+  - Notion token still invalid (401); board maintained in DRIVER-BOARD.md.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1412/0/3. Build: clean. 0 vulns. **816th run. PR #1073 merged.**
+- **Human-action items** (updated — run 816):
+  1. **Investigate pre-existing CI failure** — `.github/workflows/ci.yml` has been `conclusion: failure` on every main push for 60+ commits. Jobs API returns 0 jobs from this container (proxy limitation). Check GitHub Actions UI directly to identify the failing job/matrix entry.
+  2. Disable or redirect hourly schedule — 816+ consecutive runs; all defined workstreams exhausted.
+  3. Add workstream F (McpAgent Phases 2-4) to this board to give the driver new work.
+  4. Dismiss stale Dependabot alert #88 in GitHub Security tab (npm audit 0 locally).
+  5. Stale branch cleanup — 957 remote auto/* branches (260+ cast-explain-ratio guardrail violators). Enable "Automatically delete head branches" in GitHub Settings.
+  6. Configure CF Access on prod — clears ledger DLQ.
+  7. Set GITHUB_MCP_AUTHORIZATION on prod to reconnect GitHub MCP backend.
+  8. Rotate Notion token — op://ChittyOS-Integrations/notion/api_token.
+  9. Major/breaking package bumps pending human review: @cloudflare/codemode 0.4.4→0.5.0, typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.19.
+- **Next run**: 0 open PRs; 0 vulns; all workstreams done. Idle. DISABLE THE SCHEDULE or add workstream F. Pre-existing CI failure needs human investigation. Next periodic escalation due at run ~824.
+- **PushNotification**: SENT (real work: PR #1073 merged — cast-explain field-count drift guard live; tests 1412/0/3; pre-existing CI failure still active on main).
