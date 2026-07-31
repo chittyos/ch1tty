@@ -1833,3 +1833,33 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   9. Major/breaking package bumps pending human review: @cloudflare/codemode 0.4.4→0.5.0, typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.19.
 - **Next run**: 0 open PRs; 0 vulns; all workstreams done. Idle. DISABLE THE SCHEDULE or add workstream F. Next periodic escalation due at run ~824.
 - **PushNotification**: NOT SENT (state unchanged since run 821; periodic escalation due at ~run 824, not this run).
+
+### 2026-07-31 (run 823 — idle, new probe finding: mcp.ch1tty.com IS provisioned)
+- **Workstream**: None (all A–E done; workstream F still awaiting human decision)
+- **Branch/PR**: none (direct commit to main — run log + issue #1071 comment)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1412 pass / 0 fail / 3 skip (1415 total, 51 suites) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - Synced to origin/main HEAD 5316fe1 (run 822). npm ci clean. npm run build clean (tsc exit 0). npm test: 1412/0/3 (~40s, 51 suites). npm audit: 0 vulnerabilities.
+  - 0 open PRs (GitHub MCP confirmed). 2 open issues (#1071 extensibility rebuild, #1072 chittyagent-connect 1P canonical defect).
+  - All workstreams A–E confirmed done. No new code work available.
+  - **NEW FINDING — mcp.ch1tty.com probe** (settles issue #1071 open question):
+    - `GET /mcp` → HTTP 401 `{"error":"invalid_token","error_description":"Missing or invalid access token"}` — HOST IS PROVISIONED. OAuth-format error (not Worker's own `{"error":"unauthorized"}`) indicates a Cloudflare OAuth/MCP infrastructure layer in front of the Worker.
+    - `GET /health` → HTTP 404 (plain text, CF default) — health endpoints NOT routed. Cloudflare routing likely only forwards `/mcp*` to the MCP infrastructure; other paths hit CF's default 404.
+    - `GET /api/v1/health` → HTTP 404 — same; unreachable from outside.
+  - Added comment to issue #1071 (chittyos/ch1tty#issuecomment-5140808731) with full probe findings.
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE (drift guard frozen at 56/87 fields). 0 violations on main.
+  - ~960 remote auto/* branches (stale; git push --delete still 403 from container). Notion token still invalid (401).
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1412/0/3. Build: clean. 0 vulns. **823rd run.** Periodic escalation threshold: ~824 (NEXT RUN).
+- **Human-action items** (updated — run 823):
+  1. **`mcp.ch1tty.com` health routing** — NEW. Health endpoints (`/health`, `/api/v1/health`) return 404 in prod. Either add Cloudflare routing rules to forward those paths to the Worker, or update monitoring to not rely on them.
+  2. **`mcp.ch1tty.com` OAuth layer** — NEW. The `/mcp` response uses OAuth 2.0 error format, not the Worker's bearer check. Confirm whether a CF Access policy or MCP gateway layer owns auth in prod — and whether it's compatible with current client token expectations.
+  3. **Investigate pre-existing CI failure** — ci.yml (workflow ID 247007350) fails instantly at queue phase. CodeQL succeeds on same SHAs.
+  4. Disable or redirect hourly schedule — 823+ consecutive runs; all defined workstreams exhausted.
+  5. Add workstream F (McpAgent Phases 2-4) to this board to give the driver new work.
+  6. Stale branch cleanup — ~960 remote auto/* branches. Enable "Automatically delete head branches" in GitHub Settings. Note: git push --delete returns 403 from container.
+  7. Configure CF Access on prod — clears ledger DLQ.
+  8. Set GITHUB_MCP_AUTHORIZATION on prod to reconnect GitHub MCP backend.
+  9. Rotate Notion token — op://ChittyOS-Integrations/notion/api_token.
+  10. Major/breaking package bumps pending human review: @cloudflare/codemode 0.4.4→0.5.1, typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20.
+- **Next run**: Periodic escalation NEXT RUN (~824). 0 open PRs; 0 vulns; all workstreams done. Idle.
+- **PushNotification**: SENT (mcp.ch1tty.com probe: host IS provisioned, /mcp returns OAuth 401, /health 404 — health routing gap in prod; periodic escalation at ~824).
