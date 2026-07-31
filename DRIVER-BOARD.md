@@ -1731,3 +1731,27 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   9. Major/breaking package bumps pending human review: @cloudflare/codemode 0.4.4→0.5.0, typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.19.
 - **Next run**: 0 open PRs; 0 vulns; all workstreams done. Idle. DISABLE THE SCHEDULE or add workstream F. CI failure narrowed to ci.yml-specific (not billing); still needs GitHub UI to resolve. Next periodic escalation due at run ~824.
 - **PushNotification**: NOT SENT (all workstreams done; idle run; new CI diagnosis finding logged but no new human-actionable urgency beyond what was already on board).
+
+### 2026-07-31 (run 818 — idle, CI data point: instant failure confirmed at queue phase)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; workstream F still awaiting human decision)
+- **Branch/PR**: none (direct commit to main — run log only)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1412 pass / 0 fail / 3 skip (1415 total, 51 suites) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - npm ci clean. npm run build clean (tsc exit 0). npm test: 1412/0/3 (~44s, 51 suites). 0 open PRs. All workstreams A–E DONE.
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE (drift guard frozen at 56/87 fields).
+  - **CI investigation (NEW data point)**: For run 30596095097 (SHA 85ce753, run 817 board log), `get_workflow_run` shows `created_at == updated_at == run_started_at == "2026-07-31T01:20:49Z"` (same ms). Workflow fails in the queue/validation phase before any job is dispatched. `get_job_logs` returns `total_jobs: 0`. Pattern is consistent with org-level policy blocking workflow ID 247007350 (ci.yml) specifically, or a concurrency/spending limit scoped to that workflow.
+  - All apps dirs confirmed: tasks-mcp, ledger-mcp, session-coordinator-mcp, evidence-mcp all have package-lock.json/src/test present — no missing dirs.
+  - 957 remote auto/* branches; git push --delete still 403 from container. Notion token still invalid (401).
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1412/0/3. Build: clean. 0 vulns. **818th run.**
+- **Human-action items** (updated — run 818):
+  1. **Investigate pre-existing CI failure** — ci.yml (workflow ID 247007350) fails instantly at queue phase (created_at == updated_at, 0 jobs). CodeQL succeeds on same SHAs. Check GitHub Settings → Actions → Workflow policies for any rule blocking ci.yml specifically.
+  2. Disable or redirect hourly schedule — 818+ consecutive runs; all defined workstreams exhausted.
+  3. Add workstream F (McpAgent Phases 2-4) to this board to give the driver new work.
+  4. Dismiss stale Dependabot alert #88 in GitHub Security tab (npm audit 0 locally).
+  5. Stale branch cleanup — 957 remote auto/* branches. Enable "Automatically delete head branches" in GitHub Settings. Note: git push --delete returns 403 from container.
+  6. Configure CF Access on prod — clears ledger DLQ.
+  7. Set GITHUB_MCP_AUTHORIZATION on prod to reconnect GitHub MCP backend.
+  8. Rotate Notion token — op://ChittyOS-Integrations/notion/api_token.
+  9. Major/breaking package bumps pending human review: @cloudflare/codemode 0.4.4→0.5.0, typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.19.
+- **Next run**: 0 open PRs; 0 vulns; all workstreams done. Idle. DISABLE THE SCHEDULE or add workstream F. Next periodic escalation due at run ~824.
+- **PushNotification**: NOT SENT (no new actionable signal; periodic escalation due at ~run 824).
