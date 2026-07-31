@@ -1782,3 +1782,30 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   9. Major/breaking package bumps pending human review: @cloudflare/codemode 0.4.4→0.5.0, typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.19.
 - **Next run**: 0 open PRs; 0 vulns; all workstreams done. Idle. DISABLE THE SCHEDULE or add workstream F. Next periodic escalation due at run ~824.
 - **PushNotification**: SENT (real work: PR #1074 merged — P0 Workers AI embed hang fixed; gateway no longer hangs on stalled ai.run() calls).
+
+### 2026-07-31 (run 821 — workstream A: merged dep refresh PR #1075)
+- **Workstream**: A (gateway maintenance — dep refresh: wrangler 4.116, MCP SDK 1.30, workers-oauth-provider 0.8.3)
+- **Branch/PR**: `auto/A-dep-refresh-aug2026` → PR #1075 merged (squash, SHA 33e2d4d)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1412 pass / 0 fail / 3 skip (1415 total, 51 suites) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - Synced to origin/main HEAD 81b57f0 (run 820 addendum). npm ci clean. npm run build clean (tsc exit 0). npm test: 1412/0/3 (~50s, 51 suites).
+  - Found 1 open PR: #1075 (`auto/A-dep-refresh-aug2026`) opened by run 820. CodeQL 3/3 checks green (CodeQL + Analyze actions + Analyze javascript-typescript). `mergeable_state: unknown` → confirmed mergeable.
+  - PR reviewed: +360/-270 in package-lock.json. Bumps: wrangler 4.114.0→4.116.0 (addresses Dependabot high alert #88), @modelcontextprotocol/sdk 1.29.0→1.30.0, @cloudflare/workers-oauth-provider 0.8.2→0.8.3, 41 transitive packages.
+  - Merged PR #1075 via squash → main HEAD 33e2d4d.
+  - Post-merge: npm ci clean. npm test: 1412/0/3 — clean. npm audit: 0 vulnerabilities.
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE (drift guard frozen at 56/87 fields).
+  - 1044 remote auto/* branches (stale; git push --delete still 403 from container). Notion token still invalid (401).
+  - Note: run 820 board log was written to commit message rather than DRIVER-BOARD.md; state captured here.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1412/0/3. Build: clean. 0 vulns. **821st run. PR #1075 merged.**
+- **Human-action items** (updated — run 821):
+  1. **Investigate pre-existing CI failure** — ci.yml (workflow ID 247007350) fails instantly at queue phase (created_at == updated_at, 0 jobs dispatched). CodeQL succeeds on same SHAs. Check GitHub Settings → Actions → Workflow policies for any rule blocking ci.yml specifically.
+  2. Disable or redirect hourly schedule — 821+ consecutive runs; all defined workstreams exhausted.
+  3. Add workstream F (McpAgent Phases 2-4) to this board to give the driver new work.
+  4. Dismiss stale Dependabot alert #88 in GitHub Security tab (now resolved by PR #1075 / wrangler 4.116.0; npm audit 0 locally).
+  5. Stale branch cleanup — 1044 remote auto/* branches (260+ cast-explain-ratio guardrail violators). Enable "Automatically delete head branches" in GitHub Settings. Note: git push --delete returns 403 from container.
+  6. Configure CF Access on prod — clears ledger DLQ.
+  7. Set GITHUB_MCP_AUTHORIZATION on prod to reconnect GitHub MCP backend.
+  8. Rotate Notion token — op://ChittyOS-Integrations/notion/api_token.
+  9. Major/breaking package bumps pending human review: @cloudflare/codemode 0.4.4→0.5.0, typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.19.
+- **Next run**: 0 open PRs; 0 vulns; all workstreams done. Idle. DISABLE THE SCHEDULE or add workstream F. Next periodic escalation due at run ~824.
+- **PushNotification**: SENT (real work: PR #1075 merged — dep refresh clears Dependabot high alert #88; wrangler 4.116, MCP SDK 1.30, 41 transitive updates; tests 1412/0/3).
