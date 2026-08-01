@@ -284,7 +284,7 @@ const DefaultHandler = {
       });
     }
 
-    if (url.pathname === "/api/v1/status") {
+    if (url.pathname === "/api/v1/health" || url.pathname === "/api/v1/status") {
       return Response.json({
         status: "ok",
         service: "chittyagent-ch1tty",
