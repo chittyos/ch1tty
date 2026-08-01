@@ -2154,3 +2154,33 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   12. **issues #1071/#1072** — extensibility rebuild: P0.3b (role-portal OAuth DCR) and chittyagent-connect 1Password retirement items require human decisions.
 - **Next run**: PR #1079 may be merged (CodeQL). No further workstream work unless F is added. Idle otherwise.
 - **PushNotification**: SENT (new probe evidence: mcp.ch1tty.com IS provisioned; /api/v1/health code gap fixed; PR #1079 open; issues #1071/#1072 found — extensibility rebuild needs human decisions).
+
+---
+
+### 2026-08-01 (run 841 — idle, all workstreams done)
+- **Workstream**: None (all A–E done; workstream F still awaiting human decision)
+- **Branch/PR**: none (direct commit to main — run log only)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1412 pass / 0 fail / 3 skip (1415 total, 51 suites) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - Synced to origin/main HEAD c81bed2 (run 840). npm ci clean. npm run build clean (tsc exit 0). npm test: 1412/0/3 (~46s, 51 suites). npm audit: 0 vulnerabilities.
+  - 0 open PRs (GitHub MCP confirmed). All workstreams A–E DONE.
+  - `npm outdated`: same 4 out-of-range packages (typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20). No in-range updates available.
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE (drift guard at 56/87 fields in test/zzzz-cast-explain-field-count-drift-guard.test.ts). 0 violations on main.
+  - 2 open issues: #1071 (extensibility rebuild, updated 2026-08-01 — run 839 comment posted), #1072 (1Password retirement blocker). Both require human decisions; no driver action.
+  - ~1048 remote auto/* branches (stale; git push --delete still 403 from container). Notion token still invalid (401); board in DRIVER-BOARD.md.
+  - State identical to runs 839–840: all A–E done, 0 open PRs, 0 in-range dep updates, 0 vulns.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1412/0/3. Build: clean. 0 vulns. **841st run. 0 open PRs.**
+- **Human-action items** (updated — run 841):
+  1. **CF Access bypass rules** — add bypass policies for `GET /health` and `GET /api/v1/health` on `mcp.ch1tty.com` in CF dashboard (PR #1079 merged; code is live).
+  2. **`mcp.ch1tty.com` OAuth layer** — `/mcp` returns OAuth 401. Confirm CF Access / MCP gateway layer compatibility.
+  3. **Investigate pre-existing CI failure** — ci.yml fails instantly at queue phase. CodeQL succeeds. Check GitHub Settings → Actions → Workflow policies.
+  4. **Disable or redirect hourly schedule** — 841+ consecutive runs; all defined workstreams A–E exhausted.
+  5. **Add workstream F** (McpAgent Phases 2-4) to give the driver new work.
+  6. **Stale branch cleanup** — ~1048 remote auto/* branches (260+ cast-explain-ratio guardrail violators). Enable "Automatically delete head branches" in GitHub Settings.
+  7. Configure CF Access on prod (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  8. Set GITHUB_MCP_AUTHORIZATION on prod to reconnect GitHub MCP backend.
+  9. Rotate Notion token — `op://ChittyOS-Integrations/notion/api_token`.
+  10. Major/breaking package bumps pending human review: typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20.
+  11. **issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: 0 open PRs; 0 vulns; all workstreams done. Idle. Next periodic escalation due at run ~848.
+- **PushNotification**: NOT SENT (state unchanged from run 840; no new findings; periodic escalation next at run ~848).
