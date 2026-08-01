@@ -2223,18 +2223,18 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
 
 ---
 
-### 2026-08-01 (run 844 — idle, all workstreams done)
-- **Workstream**: None (all A–E done; workstream F still awaiting human decision)
-- **Branch/PR**: none (direct commit to main — run log only)
-- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1412 pass / 0 fail / 3 skip (1415 total, 51 suites) | **Audit**: 0 vulnerabilities
+### 2026-08-01 (run 844 — security: postcss HIGH remediated, PR #1080 open)
+- **Workstream**: Security (Dependabot alert #88 — postcss <= 8.5.17 HIGH, GHSA-r28c-9q8g-f849)
+- **Branch/PR**: `auto/security-workers-postcss-override` → PR #1080
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1412 pass / 0 fail / 3 skip (1415 total, 51 suites) | **Audit root**: 0 vulnerabilities | **Audit workers/chittyagent-ch1tty post-fix**: 0 vulnerabilities
 - **Actions**:
-  - Synced to origin/main HEAD f700784 (run 843). npm ci clean. npm run build clean (tsc exit 0). npm test: 1412/0/3 (51 suites, ~61s). npm audit: 0 vulnerabilities.
-  - 0 open PRs (GitHub MCP confirmed). All workstreams A–E DONE.
-  - Drift guard tests confirmed: cast explain frozen at 56 fields (no-focus) / 87 fields (with-focus). buildCastExplanation metric freeze ACTIVE. 0 violations on main.
-  - ~1048+ remote auto/* branches (stale; git push --delete still 403 from container). Notion token still invalid (401); board in DRIVER-BOARD.md.
-  - 2 open issues: #1071 (extensibility rebuild) + #1072 (1Password retirement blocker) — both require human decisions.
-  - State identical to runs 841–843: all A–E done, 0 open PRs, 0 vulns.
-- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1412/0/3. Build: clean. 0 vulns. **844th run. 0 open PRs.**
-- **Human-action items**: Same as run 841 — no changes.
-- **Next run**: Idle. Periodic escalation DUE at run ~848 (4 runs away).
-- **PushNotification**: NOT SENT (state unchanged; periodic escalation scheduled at ~848, not yet due).
+  - Synced to origin/main HEAD f700784 (run 843). npm ci clean. npm run build clean (tsc exit 0). npm test: 1412/0/3 (51 suites, ~61s).
+  - Discovered HIGH vulnerability in `workers/chittyagent-ch1tty`: `agents@0.17.4 → vite@8.0.16 → postcss@8.5.15` (postcss <= 8.5.17, GHSA-r28c-9q8g-f849, Path Traversal via sourceMappingURL). Root package was clean; only workers subpackage affected.
+  - Fix: added `"postcss": ">=8.5.18"` to overrides in `workers/chittyagent-ch1tty/package.json`. postcss bumped 8.5.15 → 8.5.25 overridden. Consistent with prior ws/undici/esbuild/hono/sharp override pattern.
+  - npm audit in workers/chittyagent-ch1tty: 0 vulnerabilities post-fix. PR #1080 opened; CI (CodeQL) in progress.
+  - Drift guard tests confirmed: cast explain frozen at 56/87 fields. buildCastExplanation metric freeze ACTIVE. 0 violations on main.
+  - ~1048+ stale auto/* branches (git push --delete still 403). Notion token still invalid (401); board in DRIVER-BOARD.md.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1412/0/3. Build: clean. Security: PR #1080 open (postcss HIGH). **844th run.**
+- **Human-action items**: Same as run 841, plus: merge PR #1080 once CI green.
+- **Next run**: Check PR #1080 CI; merge if green. Periodic escalation due at run ~848.
+- **PushNotification**: SENT — new HIGH security vuln found and fixed (PR #1080).
