@@ -2234,7 +2234,7 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   - npm audit in workers/chittyagent-ch1tty: 0 vulnerabilities post-fix. PR #1080 opened; CI (CodeQL) in progress.
   - Drift guard tests confirmed: cast explain frozen at 56/87 fields. buildCastExplanation metric freeze ACTIVE. 0 violations on main.
   - ~1048+ stale auto/* branches (git push --delete still 403). Notion token still invalid (401); board in DRIVER-BOARD.md.
-- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1412/0/3. Build: clean. Security: PR #1080 open (postcss HIGH). **844th run.**
-- **Human-action items**: Same as run 841, plus: merge PR #1080 once CI green.
-- **Next run**: Check PR #1080 CI; merge if green. Periodic escalation due at run ~848.
-- **PushNotification**: SENT — new HIGH security vuln found and fixed (PR #1080).
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1412/0/3. Build: clean. Security: PR #1080 MERGED (postcss HIGH remediated). **844th run.**
+- **Human-action items**: Same as run 841 — no open security issues remain.
+- **Next run**: Idle. Periodic escalation due at run ~848. Verify Dependabot alert #88 clears on main after merge.
+- **PushNotification**: SENT — new HIGH security vuln found and fixed (PR #1080 merged).
