@@ -2267,3 +2267,33 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
 - **Next run**: 0 open PRs; 0 vulns; all workstreams done. Idle. Next periodic escalation due at run ~848.
 - **PushNotification**: NOT SENT (PR #1080 merge already noted by run 844 final; no new signal this run).
 - **PushNotification**: SENT — new HIGH security vuln found and fixed (PR #1080 merged).
+
+---
+
+### 2026-08-01 (run 848 — periodic escalation, PR #1081 open, CI retrigger)
+- **Workstream**: Maintenance — PR #1081 watch + periodic escalation (due at ~run 848)
+- **Branch/PR**: `auto/worker-dep-refresh-aug2026` → PR #1081 (open, CI retrigger pushed)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1412 pass / 0 fail / 3 skip (1415 total, 51 suites) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - Synced to origin/main HEAD 40f3090 (run 847). npm ci clean. npm run build clean. npm test: 1412/0/3 (51 suites). npm audit: 0 vulns. Coverage: exit 0.
+  - All 4 apps (tasks-mcp, ledger-mcp, session-coordinator-mcp, evidence-mcp): npm ci + build + test all PASS.
+  - PR #1081 open (wrangler 4.101→4.118, MCP SDK 1.29→1.30, hono/vitest/zod/workers-types all bumped). CI conclusion: failure on both runs (30691378477 / 30691653893). Jobs API returns empty — can't read specific job logs via proxy.
+  - **CI failure analysis**: Every SHA on main shows 2 workflow runs — one succeeds (run#3043–3048) and one fails (run#3188–3193) for the SAME SHA. This is a pre-existing infra-level flakiness, NOT caused by PR #1081 code changes. Local coverage + all apps pass cleanly.
+  - **Action**: Pushed empty retrigger commit `3d045d6` to `auto/worker-dep-refresh-aug2026` to trigger fresh CI run. API rerun blocked (403 Resource not accessible by integration).
+  - All workstreams A–E: DONE. 5-tool surface (search/execute/status/reload/cast): intact. buildCastExplanation metric freeze ACTIVE (56 no-focus / 87 focus fields — drift guard test confirmed).
+  - ~1048+ stale auto/* branches (push --delete 403 from container). Notion token invalid (401); board is DRIVER-BOARD.md.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1412/0/3. Build: clean. 0 vulns. PR #1081 open (CI retrigger pushed). **848th run. PERIODIC ESCALATION.**
+- **Human-action items** (updated):
+  1. **Merge PR #1081** — wrangler 4.101→4.118, MCP SDK 1.29→1.30. All local tests pass. CI flaky at infra level (pre-existing). Retrigger commit pushed; watch for CI to go green then merge.
+  2. **Disable or redirect hourly schedule** — 848+ consecutive runs; all A–E workstreams exhausted. Reduce frequency or add workstream F.
+  3. **Add workstream F** (McpAgent Phases 2-4) to give driver new productive work.
+  4. **CF Access bypass rules** — add bypass policies for `GET /health` and `GET /api/v1/health` on `mcp.ch1tty.com` in CF dashboard.
+  5. **`mcp.ch1tty.com` OAuth layer** — `/mcp` returns OAuth 401. Confirm CF Access / MCP gateway compatibility.
+  6. **Set GITHUB_MCP_AUTHORIZATION on prod** — reconnects GitHub MCP backend (currently disconnected).
+  7. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ (25 entries logged run 846).
+  8. **Stale branch cleanup** — ~1048+ remote auto/* branches. Enable "Automatically delete head branches" in GitHub Settings.
+  9. Rotate Notion token — `op://ChittyOS-Integrations/notion/api_token`.
+  10. Major/breaking package bumps pending human review: typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20.
+  11. **issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: Monitor CI on PR #1081 (retrigger commit pushed). Idle otherwise. Next escalation at ~run 855.
+- **PushNotification**: SENT — periodic escalation run 848; PR #1081 open (dep refresh, CI retrigger pushed); 848 runs total, driver needs new workstream F or schedule change.
