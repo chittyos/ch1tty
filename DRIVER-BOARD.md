@@ -2324,3 +2324,30 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   11. **issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
 - **Next run**: Same idle state. Next periodic escalation at ~run 855.
 - **PushNotification**: NOT SENT (run 848 already sent periodic escalation; next at ~855).
+
+---
+
+### 2026-08-01 (run 850 — idle, PR #1081 CI still blocked)
+- **Workstream**: None (all A–E done; PR #1081 open but CI-blocked at infra level; workstream F still awaiting human decision)
+- **Branch/PR**: none (direct commit to main — run log only)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1412 pass / 0 fail / 3 skip (1415 total, 51 suites) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - Synced to origin/main HEAD 1022b45 (run 849). npm ci clean. npm run build clean (tsc exit 0). npm test: 1412/0/3 (51 suites, ~39s). npm audit: 0 vulns.
+  - PR #1081 (`auto/worker-dep-refresh-aug2026`): still open. CI run #3195 (30693441194, most recent) shows 0 jobs dispatched — same pre-existing infra failure as runs 848–849. No code fix possible from driver; needs GitHub Actions investigation.
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE (drift guard frozen at 56/87 fields). 0 violations on main.
+  - All workstreams A–E: DONE. No new work to advance.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1412/0/3. Build: clean. 0 vulns. PR #1081 open (CI blocked). **850th run. IDLE.**
+- **Human-action items** (unchanged from run 849):
+  1. **Merge PR #1081** — wrangler 4.101→4.118, MCP SDK 1.29→1.30. All local tests pass. CI blocked at infra level (0 jobs queued). No code fix possible from driver; needs GitHub Actions config investigation.
+  2. **Investigate GitHub Actions ci.yml failure** — Every ci.yml run shows 0 jobs dispatched (conclusion=failure) while CodeQL succeeds. Check GitHub Settings → Actions → Runners; check billing/quota; check if `cache: npm` or a required runner label is misconfigured.
+  3. **Disable or redirect hourly schedule** — 850+ consecutive runs; all A–E workstreams exhausted.
+  4. **Add workstream F** (McpAgent Phases 2-4) to give driver new productive work.
+  5. **CF Access bypass rules** — add bypass policies for `GET /health` and `GET /api/v1/health` on `mcp.ch1tty.com` in CF dashboard.
+  6. **Set GITHUB_MCP_AUTHORIZATION on prod** — reconnects GitHub MCP backend.
+  7. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  8. **Stale branch cleanup** — ~1048+ remote auto/* branches. Enable "Automatically delete head branches" in GitHub Settings.
+  9. Rotate Notion token — `op://ChittyOS-Integrations/notion/api_token`.
+  10. Major/breaking package bumps pending human review: typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20.
+  11. **issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: Same idle state. Next periodic escalation at ~run 855.
+- **PushNotification**: NOT SENT (run 848 sent periodic escalation 2 runs ago; next at ~855; no new signal this run).
