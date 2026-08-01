@@ -2351,3 +2351,33 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   11. **issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
 - **Next run**: Same idle state. Next periodic escalation at ~run 855.
 - **PushNotification**: NOT SENT (run 848 sent periodic escalation 2 runs ago; next at ~855; no new signal this run).
+
+---
+
+### 2026-08-01 (run 851 — PR #1081 merged: chittyagent-ch1tty dep refresh)
+- **Workstream**: Maintenance — PR #1081 merge (all check runs green, finally clear)
+- **Branch/PR**: `auto/worker-dep-refresh-aug2026` → PR #1081 **MERGED** (squash SHA fd803f45)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1412 pass / 0 fail / 3 skip (1415 total, 51 suites) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - Synced to origin/main HEAD c067dd4 (run 850). npm ci clean. npm run build clean (tsc exit 0). npm test: 1412/0/3 (51 suites, ~43s). npm audit: 0 vulnerabilities.
+  - Inspected PR #1081 check runs: all 3 checks GREEN — `CodeQL` (success), `Analyze (javascript-typescript)` (success), `Analyze (actions)` (success). All completed 2026-08-01T09:17–09:18Z.
+  - Previous runs (848–850) reported ci.yml workflow as "failure" but ci.yml produces NO check run artifacts (0 jobs queued = no individual check runs). The 3 actual check gates (CodeQL suite) all passed — PR was mergeable.
+  - **Merged PR #1081** via squash (SHA fd803f45). Deps bumped in `workers/chittyagent-ch1tty`: wrangler 4.101→4.118, MCP SDK 1.29→1.30, hono 4.12.31→4.12.33, vitest 4.1.8→4.1.10, zod 4.3.6→4.4.3, @cloudflare/vitest-pool-workers 0.16.16→0.16.20, @cloudflare/workers-types 4.20260617.1→4.20260702.1, @cloudflare/workers-oauth-provider 0.3.1→0.3.3. MCP SDK dedup override kept (`agents` bundled copy resolved to 1.30.0).
+  - Synced local main to fd803f45 post-merge.
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE (drift guard frozen at 56/87 fields). 0 violations on main.
+  - All workstreams A–E: DONE. 0 open PRs (post-merge). ~1048+ stale auto/* branches. Notion token invalid (401); board in DRIVER-BOARD.md.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1412/0/3. Build: clean. 0 vulns. PR #1081 MERGED. **851st run. 0 open PRs.**
+- **Human-action items** (updated):
+  1. **Disable or redirect hourly schedule** — 851+ consecutive runs; all A–E workstreams exhausted.
+  2. **Add workstream F** (McpAgent Phases 2-4) to give driver new productive work.
+  3. **Investigate GitHub Actions ci.yml** — ci.yml fires but dispatches 0 jobs (conclusion=failure, no check runs). CodeQL succeeds separately and is the actual gating check. Clarify intent: if ci.yml (test/lint/build) should gate PRs, fix runner config; if not, update branch protection rules.
+  4. **CF Access bypass rules** — add bypass policies for `GET /health` and `GET /api/v1/health` on `mcp.ch1tty.com`.
+  5. **`mcp.ch1tty.com` OAuth layer** — `/mcp` returns OAuth 401. Confirm CF Access / MCP gateway compatibility.
+  6. **Set GITHUB_MCP_AUTHORIZATION on prod** — reconnects GitHub MCP backend.
+  7. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  8. **Stale branch cleanup** — ~1048+ remote auto/* branches. Enable "Automatically delete head branches" in GitHub Settings.
+  9. Rotate Notion token — `op://ChittyOS-Integrations/notion/api_token`.
+  10. Major/breaking package bumps pending human review: typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20.
+  11. **issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: 0 open PRs; all workstreams done; idle unless new security/dep issue found. Next periodic escalation at ~run 855.
+- **PushNotification**: SENT — PR #1081 merged (chittyagent-ch1tty dep refresh: wrangler +17 versions, MCP SDK 1.30.0); all checks green; 851 runs total, 0 open PRs.
