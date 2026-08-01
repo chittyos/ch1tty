@@ -2237,4 +2237,33 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
 - **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1412/0/3. Build: clean. Security: PR #1080 MERGED (postcss HIGH remediated). **844th run.**
 - **Human-action items**: Same as run 841 — no open security issues remain.
 - **Next run**: Idle. Periodic escalation due at run ~848. Verify Dependabot alert #88 clears on main after merge.
+
+---
+
+### 2026-08-01 (run 845 — idle, PR #1080 merge confirmed)
+- **Workstream**: None (all A–E done; workstream F still awaiting human decision)
+- **Branch/PR**: none (direct commit to main — run log only)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1412 pass / 0 fail / 3 skip (1415 total, 51 suites) | **Audit**: 0 vulnerabilities (root + workers/chittyagent-ch1tty)
+- **Actions**:
+  - Synced to origin/main HEAD 04f1dae (run 844 final). npm ci clean. npm run build clean (tsc exit 0). npm test: 1412/0/3 (~48s, 51 suites).
+  - Confirmed PR #1080 (postcss HIGH fix) merged — CI green (CodeQL + Analyze checks all `success`). Squash merge SHA a2bc856. npm audit: 0 vulns across root and workers/chittyagent-ch1tty scopes post-merge.
+  - 0 open PRs (GitHub MCP confirmed). All workstreams A–E DONE.
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE (drift guard frozen at 56/87 fields). 0 violations on main.
+  - ~1048+ remote auto/* branches (stale; git push --delete still 403 from container). Notion token still invalid (401); board in DRIVER-BOARD.md.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1412/0/3. Build: clean. 0 vulns. **845th run. 0 open PRs.**
+- **Human-action items** (unchanged from run 841):
+  1. **CF Access bypass rules** — add bypass policies for `GET /health` and `GET /api/v1/health` on `mcp.ch1tty.com` in CF dashboard.
+  2. **`mcp.ch1tty.com` OAuth layer** — `/mcp` returns OAuth 401. Confirm CF Access / MCP gateway compatibility.
+  3. **Investigate pre-existing CI failure** — ci.yml fails instantly at queue phase. CodeQL succeeds. Check GitHub Settings → Actions.
+  4. **Disable or redirect hourly schedule** — 845+ consecutive runs; all defined workstreams A–E exhausted.
+  5. **Add workstream F** (McpAgent Phases 2-4) to give the driver new work.
+  6. **Stale branch cleanup** — ~1048+ remote auto/* branches. Enable "Automatically delete head branches" in GitHub Settings.
+  7. Configure CF Access on prod (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  8. Set GITHUB_MCP_AUTHORIZATION on prod to reconnect GitHub MCP backend.
+  9. Rotate Notion token — `op://ChittyOS-Integrations/notion/api_token`.
+  10. Major/breaking package bumps pending human review: typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20.
+  11. **issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+  12. **Dependabot alert #88** — dismiss if stale (npm audit 0 across all scopes post PR #1080 merge).
+- **Next run**: 0 open PRs; 0 vulns; all workstreams done. Idle. Next periodic escalation due at run ~848.
+- **PushNotification**: NOT SENT (PR #1080 merge already noted by run 844 final; no new signal this run).
 - **PushNotification**: SENT — new HIGH security vuln found and fixed (PR #1080 merged).
