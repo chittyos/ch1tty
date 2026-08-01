@@ -2417,3 +2417,30 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   11. **issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions. #1071 mcp.ch1tty.com probe: bearer layer reachable, provisioning contract incomplete (health/discovery 404).
 - **Next run**: All workstreams done; 0 open PRs. Next periodic escalation at ~run 855.
 - **PushNotification**: SENT — mcp.ch1tty.com confirmed provisioned (401 Bearer OAuth on /mcp); health routes 404 (gap to fix); comment on #1071 posted.
+
+---
+
+### 2026-08-01 (run 853 — idle, PR #1082 merged)
+- **Workstream**: None (all A–E done; merged open PR #1082 from concurrent run 852 instance)
+- **Branch/PR**: none (direct commit to main — run log only); PR #1082 squash-merged (SHA 9928735)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1412 pass / 0 fail / 3 skip (1415 total, 51 suites) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - Synced to origin/main HEAD 9928735 (post PR #1082 merge). npm ci clean. npm run build clean (tsc exit 0). npm test: 1412/0/3 (51 suites, ~39s). npm audit: 0 vulnerabilities.
+  - Found PR #1082 open (run 852 board log — mcp.ch1tty.com confirmed provisioned). All 3 check runs green (CodeQL success, Analyze actions/js-ts success). Merged via squash (SHA 9928735).
+  - 0 open PRs post-merge. 2 open issues: #1071 (extensibility rebuild) + #1072 (1Password retirement) — both require human decisions, no driver action.
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE (drift guard frozen at 56/87 fields). 0 violations on main.
+  - ~1050+ stale auto/* branches (push --delete 403 from container). Notion token invalid (401); board in DRIVER-BOARD.md.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1412/0/3. Build: clean. 0 vulns. PR #1082 MERGED. **853rd run. 0 open PRs.**
+- **Human-action items** (unchanged from run 852):
+  1. **Disable or redirect hourly schedule** — 853+ consecutive runs; all A–E workstreams exhausted.
+  2. **Add workstream F** (McpAgent Phases 2-4) to give driver new productive work.
+  3. **mcp.ch1tty.com health/discovery 404** — `/health`, `/.well-known/chitty.json` return 404. Verify CF worker route points to `chittyagent-ch1tty` and health paths aren't filtered by a proxy rule.
+  4. **mcp.ch1tty.com OAuth layer** — `/mcp` returns 401 Bearer OAuth. Confirm client authentication flow.
+  5. **Set GITHUB_MCP_AUTHORIZATION on prod** — reconnects GitHub MCP backend.
+  6. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  7. **Stale branch cleanup** — ~1050+ remote auto/* branches. Enable "Automatically delete head branches" in GitHub Settings.
+  8. Rotate Notion token — `op://ChittyOS-Integrations/notion/api_token`.
+  9. Major/breaking package bumps pending human review: typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20.
+  10. **issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: All workstreams done; 0 open PRs. Next periodic escalation at ~run 855.
+- **PushNotification**: NOT SENT (no new signal; PR #1082 merge is routine; next escalation at ~855).
