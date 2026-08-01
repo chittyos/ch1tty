@@ -1422,7 +1422,7 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 - **Workstream state**: A✅ B✅ C✅ D✅ E✅
 - **Human-action items** (unchanged — all require human action):
   1. **Disable or redirect hourly schedule** — 856+ runs; all real work done after run 735; every subsequent run is pure overhead.
-  2. **Stale branch cleanup** — ~1053 remote `auto/` branches (261 prohibited cast-explain metric branches). Bulk-delete: `git push origin --delete $(git branch -r | grep 'origin/auto/.*cast-explain' | sed 's|origin/||')` or enable auto-delete on merge in repo settings.
+  2. **Stale branch cleanup** — ~1053 remote `auto/` branches (261 prohibited cast-explain metric branches). Preview then delete: `git branch -r | grep -E '^[[:space:]]*origin/auto/.*cast-explain-' | sed -E 's|^[[:space:]]*origin/||'` (review output), then `git push origin --delete $(git branch -r | grep -E '^[[:space:]]*origin/auto/.*cast-explain-' | sed -E 's|^[[:space:]]*origin/||')`. Or enable auto-delete on merge in repo settings.
   3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
   4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend.
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
