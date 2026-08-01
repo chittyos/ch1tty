@@ -2390,3 +2390,30 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   11. **issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
 - **Next run**: 0 open PRs; all workstreams done; idle unless new security/dep issue found. Next periodic escalation at ~run 855.
 - **PushNotification**: SENT — PR #1081 merged (chittyagent-ch1tty dep refresh: wrangler +17 versions, MCP SDK 1.30.0); all checks green; 851 runs total, 0 open PRs.
+
+---
+
+### 2026-08-01 (run 852 — probe: mcp.ch1tty.com confirmed provisioned)
+- **Workstream**: Maintenance — probe mcp.ch1tty.com per open issue #1071
+- **Branch/PR**: `auto/852-board-log-mcp-ch1tty-com-provisioned` → PR TBD
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1412 pass / 0 fail / 3 skip (1415 total) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - Synced to origin/main HEAD 16fec66 (run 849 addendum). npm ci clean. npm run build clean. npm test: 1412/0/3. npm audit: 0 vulnerabilities.
+  - **Probe: mcp.ch1tty.com** — open item in #1071 ("whether mcp.ch1tty.com is genuinely un-provisioned rests on a single unverified inherited claim"). Results: `GET /mcp` → HTTP/2 401 with `WWW-Authenticate: Bearer realm="OAuth"` + JSON `{"error":"invalid_token"}`. This is ch1tty's own bearer-token guard, not a CF Access redirect or a connection error. **mcp.ch1tty.com IS provisioned.** `GET /health` and `GET /api/v1/health` both return 404 (health routes not exposed via this CF configuration — separate gap). Comment posted on #1071#issuecomment-5151363547 with full curl evidence.
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE (drift guard frozen at 56/87 fields). 0 violations on main.
+  - All workstreams A–E: DONE. 0 open PRs.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1412/0/3. Build: clean. 0 vulns. **852nd run. mcp.ch1tty.com provisioning confirmed.**
+- **Human-action items** (updated):
+  1. **Disable or redirect hourly schedule** — 852+ consecutive runs; all A–E workstreams exhausted.
+  2. **Add workstream F** (McpAgent Phases 2-4) to give driver new productive work.
+  3. **Investigate GitHub Actions ci.yml** — ci.yml fires but dispatches 0 jobs (conclusion=failure, no check runs). CodeQL succeeds separately and is the actual gating check.
+  4. **mcp.ch1tty.com health routes** — `GET /health` and `GET /api/v1/health` return 404. Add CF bypass rules for these paths or confirm intended omission. The MCP endpoint itself is operational.
+  5. **mcp.ch1tty.com OAuth layer** — `/mcp` returns 401 Bearer OAuth. Token needed to connect. Confirm how clients are expected to authenticate (Bearer token vs CF Access).
+  6. **Set GITHUB_MCP_AUTHORIZATION on prod** — reconnects GitHub MCP backend.
+  7. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  8. **Stale branch cleanup** — ~1050+ remote auto/* branches. Enable "Automatically delete head branches" in GitHub Settings.
+  9. Rotate Notion token — `op://ChittyOS-Integrations/notion/api_token`.
+  10. Major/breaking package bumps pending human review: typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20.
+  11. **issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions. #1071 "is mcp.ch1tty.com provisioned?" is now RESOLVED (yes).
+- **Next run**: All workstreams done; 0 open PRs. Probe of mcp.ch1tty.com answered. Next periodic escalation at ~run 855.
+- **PushNotification**: SENT — mcp.ch1tty.com confirmed provisioned (401 Bearer OAuth on /mcp); health routes 404 (gap to fix); comment on #1071 posted.
