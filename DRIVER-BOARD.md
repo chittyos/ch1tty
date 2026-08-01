@@ -2327,6 +2327,15 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
 
 ---
 
+### 2026-08-01 (run 849 addendum — PR #1081 MERGED)
+- **PR #1081 merged** — `auto/worker-dep-refresh-aug2026` squash-merged into main.
+  - wrangler 4.101.0 → 4.118.0, @modelcontextprotocol/sdk 1.29.0 → 1.30.0, hono 4.12.31 → 4.12.33, vitest 4.1.8 → 4.1.10, zod 4.3.6 → 4.4.3, @cloudflare/vitest-pool-workers 0.16.16 → 0.16.20, @cloudflare/workers-types 4.20260617.1 → 4.20260702.1, @cloudflare/workers-oauth-provider 0.3.1 → 0.3.3.
+  - MCP SDK deduplication fix (nested `agents` override) also landed.
+- **State summary**: 0 open PRs. All workstreams A–E DONE. Next run idle.
+- **PushNotification**: SENT — PR #1081 merged (worker dep refresh + SDK dedup fix).
+
+---
+
 ### 2026-08-01 (run 850 — idle, PR #1081 CI still blocked)
 - **Workstream**: None (all A–E done; PR #1081 open but CI-blocked at infra level; workstream F still awaiting human decision)
 - **Branch/PR**: none (direct commit to main — run log only)
