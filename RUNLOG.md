@@ -1406,3 +1406,24 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend.
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
 - **Next run**: All workstreams done. Define new workstreams or disable schedule.
+
+---
+
+### 2026-08-01 (run 856 — idle; all workstreams done)
+- **Workstream**: None (all A–E done since run 735; no new workstreams defined)
+- **Branch/PR**: `auto/856th-idle-board-log` → PR pending
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1412 pass / 0 fail / 3 skip (51 suites, 1415 total)
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test` 1412/0/3 — up 23 tests from run 735 (1389), no regressions.
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE, enforced by `zzzz-cast-explain-field-count-drift-guard.test.ts` checking exactly 56 fields no-focus / 87 fields focus:code).
+  - `git fetch --all`; 0 open PRs. Verified all workstreams via servers.json (B✅ — github→api.githubcopilot.com/mcp/), focus-profiles.json (C✅ — 6 profiles), test/scenario.test.ts (D✅ — 1157 lines), focus-suggestions.json (E✅ — 1750 combos / 1759 prompts / 6 profiles).
+  - 261 prohibited `cast-explain-*` branches on remote — freeze guard test blocks all from merging; source is clean; churn continues.
+  - Total remote branches: ~1053. Notion: 401. RUNLOG.md is durable board.
+- **Workstream state**: A✅ B✅ C✅ D✅ E✅
+- **Human-action items** (unchanged — all require human action):
+  1. **Disable or redirect hourly schedule** — 856+ runs; all real work done after run 735; every subsequent run is pure overhead.
+  2. **Stale branch cleanup** — ~1053 remote `auto/` branches (261 prohibited cast-explain metric branches). Bulk-delete: `git push origin --delete $(git branch -r | grep 'origin/auto/.*cast-explain' | sed 's|origin/||')` or enable auto-delete on merge in repo settings.
+  3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend.
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+- **Next run**: All workstreams done. Define new workstreams in DRIVER-BOARD.md or disable schedule.
