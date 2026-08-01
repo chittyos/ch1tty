@@ -2116,3 +2116,41 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
 - **Next run**: 0 open PRs; 0 vulns; all workstreams done. Idle. Next periodic escalation due at run ~848.
 - **Dependabot alert**: GitHub reported 1 HIGH vulnerability (alert #88) on push. npm audit returns 0 vulns across all 6 package scopes (root + 5 apps/*-mcp). Same pattern as run 741 (stale Dependabot advisory not yet auto-dismissed after prior fixes). Human can review at https://github.com/chittyos/ch1tty/security/dependabot/88 and dismiss if stale.
 - **PushNotification**: SENT (new Dependabot alert #88 HIGH on push, despite npm audit clean across all scopes — same stale-advisory pattern as run 741; surfacing for human review).
+
+---
+
+### 2026-08-01 (run 839 — real work: /api/v1/health gap fixed in chittyagent-ch1tty)
+- **Workstream**: A (maintenance — health endpoint gap in `workers/chittyagent-ch1tty`)
+- **Branch/PR**: `auto/A-chittyagent-health-v2` → PR #1079 (https://github.com/chittyos/ch1tty/pull/1079) — open, CodeQL running
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1412 pass / 0 fail / 3 skip (1415 total, 51 suites) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - Synced to origin/main HEAD dd01318 (run 838). npm ci clean. npm run build clean (tsc exit 0). npm test: 1412/0/3 (~50s, 51 suites). 0 vulns.
+  - Found 2 new open issues: #1071 (extensibility rebuild / MCP consolidation) + #1072 (chittyagent-connect 1Password retirement blocker).
+  - #1070 (gateway transport hang) already CLOSED as completed — not reopened.
+  - Ran direct HTTP probe of `mcp.ch1tty.com`:
+    - `GET /health` → 404 (CF Access intercepts before Worker)
+    - `GET /api/v1/health` → 404 (CF Access intercepts before Worker)
+    - `POST /mcp` → 401 OAuth error (`{"error":"invalid_token","error_description":"Missing or invalid access token"}`)
+  - **Key finding**: `mcp.ch1tty.com` IS provisioned (`workers/chittyagent-ch1tty` Worker is live). `/mcp` 401 OAuth response confirms the Worker is running. The 404s on health paths are CF Access blocking, not a provisioning gap.
+  - **Code gap found**: `DefaultHandler` in `workers/chittyagent-ch1tty/src/index.ts` handled `/health` and `/api/v1/status` but was missing `/api/v1/health`. Fixed: merged both paths into one condition.
+  - Confirmed guardrails: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE; 0 violations on main.
+  - Posted probe findings to issue #1071 (comment #5148520556).
+  - Pushed branch `auto/A-chittyagent-health-v2`; opened PR #1079. CodeQL + CodeRabbit running.
+  - Dependabot alert #88 still showing on push (same stale pattern as run 838; npm audit 0 across all scopes).
+  - Notion token still invalid (401); board in DRIVER-BOARD.md.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1412/0/3. Build: clean. 0 vulns. **839th run. PR #1079 open.**
+- **Human-action items** (updated — run 839):
+  1. **CF Access bypass rules** — add bypass policies for `GET /health` and `GET /api/v1/health` on `mcp.ch1tty.com` application in CF dashboard. Once merged + CF Access configured, health endpoints will be publicly reachable.
+  2. **Review + merge PR #1079** — adds `/api/v1/health` to `DefaultHandler` in `workers/chittyagent-ch1tty`; prerequisite for health routing to work post-CF-Access-fix.
+  3. **Dismiss stale Dependabot alert #88** — `npm audit` returns 0 vulns across all scopes; alert is stale. Review at https://github.com/chittyos/ch1tty/security/dependabot/88.
+  4. **`mcp.ch1tty.com` OAuth layer** — `/mcp` returns OAuth error format (correct; OAuthProvider in `workers/chittyagent-ch1tty` requires OAuth 2.1 consent). Confirm CF Access compatibility if needed.
+  5. **Disable or redirect hourly schedule** — 839+ consecutive runs; all defined workstreams A–E exhausted (F still unscheduled).
+  6. **Add workstream F** (McpAgent Phases 2-4) to give the driver new work.
+  7. **Stale branch cleanup** — ~963 remote auto/* branches. Enable "Automatically delete head branches" in GitHub repo settings.
+  8. Configure CF Access on prod (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  9. Set GITHUB_MCP_AUTHORIZATION on prod to reconnect GitHub MCP backend.
+  10. Rotate Notion token — `op://ChittyOS-Integrations/notion/api_token`.
+  11. Major/breaking package bumps pending human review: typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20.
+  12. **issues #1071/#1072** — extensibility rebuild: P0.3b (role-portal OAuth DCR) and chittyagent-connect 1Password retirement items require human decisions.
+- **Next run**: PR #1079 may be merged (CodeQL). No further workstream work unless F is added. Idle otherwise.
+- **PushNotification**: SENT (new probe evidence: mcp.ch1tty.com IS provisioned; /api/v1/health code gap fixed; PR #1079 open; issues #1071/#1072 found — extensibility rebuild needs human decisions).
