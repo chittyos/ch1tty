@@ -2647,3 +2647,41 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   9. Open issues #1071/#1072 — extensibility rebuild and 1Password retirement require human decisions.
 - **Next run**: All workstreams done; 0 open PRs. Idle. Next periodic escalation at ~run 868 (2 runs away).
 - **PushNotification**: NOT SENT (run 855 sent escalation 11 runs ago; next at ~run 868; no new signal).
+
+---
+
+### 2026-08-02 (run 867 — workstream A: PR #1084 merged, idleSessions coverage)
+
+_Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
+- **Workstream**: A (gateway tested — coordinator.ts idleSessions function-coverage gap closed)
+- **Branch/PR**: PR #1084 squash-merged (SHA 31fc16e → main 8a91d0f)
+- **Build**: clean | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites)
+- **Actions**: 6 new tests covering all `idleSessions()` branches. coordinator.ts now 100% function coverage. 0 open PRs post-merge. 0 vulnerabilities.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **867th run. 0 open PRs.**
+
+---
+
+### 2026-08-02 (run 868 — periodic escalation)
+- **Workstream**: None (all A–E done; workstream F still awaiting human decision)
+- **Branch/PR**: none (direct commit to main — run log only)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~65s) | **Audit**: 0 vulnerabilities (root + workers/chittyagent-ch1tty)
+- **Actions**:
+  - Synced to origin/main HEAD 8a91d0f (run 867). npm ci clean. npm run build clean (tsc exit 0). npm test: 1418/0/3 (1421 total, 51 suites, ~65s). npm audit: 0 vulnerabilities (root). workers/chittyagent-ch1tty audit: 0 vulnerabilities.
+  - 0 open PRs (GitHub MCP confirmed). 2 open issues: #1071 (extensibility rebuild) + #1072 (1Password retirement) — both require human decisions, unchanged.
+  - Note: test count is UP from 1412 (last board update) to 1418 — 6 new tests from PR #1084 (idleSessions coverage), confirmed clean.
+  - `npm outdated` (root): shows workers-subpackage MISSING items only — no in-range root updates available.
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation drift guard frozen at 56/87 fields; 0 violations on main. Focus profiles (6) + servers.json github→api.githubcopilot.com/mcp/ all intact.
+  - All workstreams A–E: DONE. ~1053+ stale auto/* branches remain (bulk-delete requires human action; git push --delete returns 403 from container). Notion token invalid (401); board in DRIVER-BOARD.md.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **868th run. 0 open PRs.**
+- **Human-action items** (periodic escalation update — run 868):
+  1. **Disable or redirect hourly schedule** — 868+ consecutive runs; all A–E exhausted since run 735. Every run is idle overhead. This is the scheduled periodic escalation.
+  2. **Add workstream F** (McpAgent Phases 2–4) to give driver new productive work. See "Candidate Workstream F" section above.
+  3. **mcp.ch1tty.com health/discovery 404** — `/health`, `/.well-known/chitty.json` return 404; verify CF worker route points to `chittyagent-ch1tty` and health paths aren't filtered.
+  4. **Set GITHUB_MCP_AUTHORIZATION on prod** — reconnects GitHub MCP backend (`https://api.githubcopilot.com/mcp/`).
+  5. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  6. **Stale branch cleanup** — ~1053+ remote `auto/` branches (260+ cast-explain-ratio guardrail violators). Enable "Automatically delete head branches" in GitHub Settings → General, or run bulk-delete locally: `git fetch --prune && git branch -r | grep 'origin/auto/' | sed 's|origin/||' | xargs -n 50 git push origin --delete`.
+  7. Rotate Notion token — `op://ChittyOS-Integrations/notion/api_token`.
+  8. Major/breaking package bumps pending human review: typescript 5.9.3→7.0.2, @types/node 22→26, c8 11→12, agents 0.17.4→0.20.1.
+  9. Open issues #1071/#1072 — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: All workstreams done; 0 open PRs. Idle. Next periodic escalation at ~run 879.
+- **PushNotification**: SENT — run 868 periodic escalation (scheduled from run 855, 13 runs ago); 868 consecutive idle runs; all A–E done; tests 1418/0/3; 0 vulns; no open PRs. No new blockers since run 855 escalation.
