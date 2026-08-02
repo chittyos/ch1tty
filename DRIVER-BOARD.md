@@ -2795,7 +2795,7 @@ _Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
 
 ### 2026-08-02 (run 883 — dep refresh: tsx 4.23.1 → 4.23.4)
 - **Workstream**: A (gateway refresh — in-range tsx patch update)
-- **Branch/PR**: `auto/A-dep-refresh-aug2026-tsx` → PR #1092 (https://github.com/chittyos/ch1tty/pull/1092) — open, CodeQL in progress
+- **Branch/PR**: `auto/A-dep-refresh-aug2026-tsx` → PR #1092 (https://github.com/chittyos/ch1tty/pull/1092) — **MERGED**
 - **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~65s) | **Audit**: 0 vulnerabilities
 - **Actions**:
   - Reset local main to origin/main HEAD f7b99d5 (run 882 — local had diverged 50 stale board-log commits; both sides idle). npm ci clean. npm run build clean (tsc exit 0). npm test: 1418/0/3 (1421 total, 51 suites, ~57s).
@@ -2817,5 +2817,6 @@ _Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
   8. Rotate Notion token — `op://ChittyOS-Integrations/notion/api_token`.
   9. Major/breaking bumps pending human review: typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20.
   10. Open issues #1071/#1072 — extensibility rebuild and 1Password retirement require human decisions.
-- **Next run**: PR #1092 likely merged (CodeQL should pass for lockfile-only diff). No further in-range updates found. Idle unless new commits land or workstream F is added.
+- **PR #1092 outcome**: MERGED (same session, post-CodeQL). tsx 4.23.1→4.23.4 landed on main.
+- **Next run**: No open PRs. No further in-range updates. Idle unless new commits land or workstream F is added.
 - **PushNotification**: SENT (tsx patch PR #1092 open; real work done).
