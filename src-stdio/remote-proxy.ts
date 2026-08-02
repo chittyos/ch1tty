@@ -17,7 +17,7 @@ export interface TokenSource {
   getToken(key: string): Promise<string>;
 }
 
-/** Default stdio-side source: `chitty-mcp-token <key>` (1Password-backed CLI). */
+/** Default stdio-side source: `chitty-mcp-token <key>` (ChittySecrets-backed CLI). */
 export class CliTokenSource implements TokenSource {
   async getToken(key: string): Promise<string> {
     const stdout = execFileSync('chitty-mcp-token', [key], { encoding: 'utf8', timeout: 10_000 });
