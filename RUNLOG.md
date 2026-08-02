@@ -1427,3 +1427,25 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend.
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
 - **Next run**: All workstreams done. Define new workstreams in DRIVER-BOARD.md or disable schedule.
+
+---
+
+### 2026-08-02 (run 870 — idle; all workstreams done)
+- **Workstream**: None (all A–E done; no new workstreams defined)
+- **Branch/PR**: None — idle run, appended log directly to main
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (51 suites, 1421 total)
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test` 1418/0/3 — matches run 869, no regressions.
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE).
+  - `git fetch --all`; 0 open PRs. Verified all workstreams: B✅ github→api.githubcopilot.com/mcp/, C✅ focus-profiles.json (6 profiles), D✅ sim/scenarios.ts + test/simulation.test.ts, E✅ focus-suggestions.json (1.8MB catalog).
+  - **Local main divergence detected**: local main was at run 814 tip, origin/main at run 869. All local-only commits were board logs + orchestrator endpoint fix already present in origin/main. Resolved with `git checkout -B main origin/main` (safe: no unique code lost).
+  - Notion: unavailable (RUNLOG.md is durable board).
+  - Remote branch count: 1032+ auto/* branches including 261+ prohibited `cast-explain-*` metric branches still present.
+- **Workstream state**: A✅ B✅ C✅ D✅ E✅
+- **Human-action items** (unchanged — all require human action):
+  1. **Disable or redirect hourly schedule** — 870 runs; all real work done after run 735; subsequent runs are pure overhead.
+  2. **Stale branch cleanup** — 1032+ remote `auto/` branches (261+ prohibited cast-explain metric branches). Preview then delete: `git branch -r | grep -E '^[[:space:]]*origin/auto/.*cast-explain-' | sed -E 's|^[[:space:]]*origin/||'` then pipe to `git push origin --delete`.
+  3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend.
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+- **Next run**: All workstreams done. Define new workstreams or disable schedule.
