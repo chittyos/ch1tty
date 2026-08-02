@@ -2790,3 +2790,32 @@ _Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
   9. Open issues #1071/#1072 — extensibility rebuild and 1Password retirement require human decisions.
 - **Next run**: All workstreams done; 0 open PRs. Idle. Next periodic escalation at ~run 893.
 - **PushNotification**: SENT — run 882 periodic escalation (overdue from run 879; 14 runs since run 868 escalation); 882 consecutive runs; all A–E done since run 735; tests 1418/0/3; 0 vulns; 0 open PRs.
+
+---
+
+### 2026-08-02 (run 883 — dep refresh: tsx 4.23.1 → 4.23.4)
+- **Workstream**: A (gateway refresh — in-range tsx patch update)
+- **Branch/PR**: `auto/A-dep-refresh-aug2026-tsx` → PR #1092 (https://github.com/chittyos/ch1tty/pull/1092) — open, CodeQL in progress
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~65s) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - Reset local main to origin/main HEAD f7b99d5 (run 882 — local had diverged 50 stale board-log commits; both sides idle). npm ci clean. npm run build clean (tsc exit 0). npm test: 1418/0/3 (1421 total, 51 suites, ~57s).
+  - `npm outdated`: 1 in-range update found: tsx 4.23.1 → 4.23.4 (patch, within ^4 range). All others are major-version bumps (typescript 5→7, @types/node 22→26, agents 0.17→0.20, c8 11→12) — held for human review.
+  - Ran `npm update tsx`. Build clean. Tests: 1418/0/3 (unchanged). npm audit: 0 vulns. package-lock.json: 1 file, 3 insertions / 3 deletions.
+  - Pushed branch auto/A-dep-refresh-aug2026-tsx; opened PR #1092.
+  - PR bot activity: chatgpt-codex rate-limited (not actionable); CodeRabbit skipped package-lock.json by path filter (expected). 2 CodeQL checks in progress (Analyze actions + Analyze javascript-typescript) — expected to pass for lockfile-only diff.
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation drift guard frozen; 0 violations on main.
+  - Notion token still invalid (401); board in DRIVER-BOARD.md.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **883rd run. PR #1092 open (tsx patch).**
+- **Human-action items**:
+  1. **Review + merge PR #1092** (tsx 4.23.1→4.23.4 patch; package-lock.json only; tests green).
+  2. **Disable or redirect hourly schedule** — 883+ consecutive runs; all A–E exhausted since run 735.
+  3. **Add workstream F** (McpAgent Phases 2–4) to give driver new productive work.
+  4. **mcp.ch1tty.com health/discovery 404** — verify CF worker route points to `chittyagent-ch1tty`.
+  5. **Set GITHUB_MCP_AUTHORIZATION on prod** — reconnects GitHub MCP backend.
+  6. **Configure CF Access on prod** — clears ledger DLQ.
+  7. **Stale branch cleanup** — 1053+ remote `auto/` branches.
+  8. Rotate Notion token — `op://ChittyOS-Integrations/notion/api_token`.
+  9. Major/breaking bumps pending human review: typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20.
+  10. Open issues #1071/#1072 — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: PR #1092 likely merged (CodeQL should pass for lockfile-only diff). No further in-range updates found. Idle unless new commits land or workstream F is added.
+- **PushNotification**: SENT (tsx patch PR #1092 open; real work done).
