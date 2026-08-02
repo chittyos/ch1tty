@@ -193,6 +193,96 @@ test('close: stops background timer (idempotent)', () => {
   coord.close();
 });
 
+// ── idleSessions ─────────────────────────────────────────────────────────────
+
+test('idleSessions: idleMs=0 returns empty without inspecting contexts', async () => {
+  const coord = makeCoord();
+  try {
+    await coord.onSessionStart('sess-zero', 'http');
+    const idle = coord.idleSessions(0);
+    assert.deepEqual(idle, [], 'idleMs=0 must short-circuit to []');
+  } finally {
+    coord.close();
+  }
+});
+
+test('idleSessions: idleMs<0 returns empty', async () => {
+  const coord = makeCoord();
+  try {
+    await coord.onSessionStart('sess-neg', 'http');
+    const idle = coord.idleSessions(-1);
+    assert.deepEqual(idle, [], 'negative idleMs must return []');
+  } finally {
+    coord.close();
+  }
+});
+
+test('idleSessions: returns staging-complete sessions past the idle cutoff', async () => {
+  const coord = makeCoord();
+  try {
+    await coord.onSessionStart('sess-stale', 'http');
+    // idleSessions uses Date.now() internally — fake staleness by passing a
+    // very small idleMs (1 ms) so the cutoff is Date.now()-1, which is almost
+    // certainly <= lastActiveAt. We need the opposite: lastActiveAt < cutoff.
+    // Achieve this by accessing the internal context and backdating lastActiveAt.
+    const ctx = (coord as unknown as { contexts: Map<string, { stagingComplete: boolean; lastActiveAt: number }> }).contexts.get('sess-stale');
+    assert.ok(ctx, 'context should exist');
+    ctx.lastActiveAt = Date.now() - 5_000; // 5 s ago
+    const idle = coord.idleSessions(1_000); // idle threshold: 1 s → cutoff = now-1s, lastActiveAt=now-5s → stale
+    assert.ok(idle.includes('sess-stale'), `expected sess-stale in idle list, got ${JSON.stringify(idle)}`);
+  } finally {
+    coord.close();
+  }
+});
+
+test('idleSessions: does NOT return sessions within the idle window', async () => {
+  const coord = makeCoord();
+  try {
+    await coord.onSessionStart('sess-fresh', 'http');
+    // lastActiveAt ≈ now; idleMs=60000 → cutoff = now-60s → session is NOT stale
+    const idle = coord.idleSessions(60_000);
+    assert.ok(!idle.includes('sess-fresh'), 'fresh session must not be in idle list');
+  } finally {
+    coord.close();
+  }
+});
+
+test('idleSessions: does NOT return staging-incomplete sessions even when past cutoff', async () => {
+  const coord = makeCoord();
+  try {
+    await coord.onSessionStart('sess-incomplete', 'http');
+    const ctx = (coord as unknown as { contexts: Map<string, { stagingComplete: boolean; lastActiveAt: number }> }).contexts.get('sess-incomplete');
+    assert.ok(ctx);
+    ctx.stagingComplete = false;
+    ctx.lastActiveAt = Date.now() - 5_000;
+    const idle = coord.idleSessions(1_000);
+    assert.ok(!idle.includes('sess-incomplete'), 'staging-incomplete session must be excluded');
+  } finally {
+    coord.close();
+  }
+});
+
+test('idleSessions: returns multiple stale staging-complete sessions', async () => {
+  const coord = makeCoord();
+  try {
+    await coord.onSessionStart('sess-a', 'http');
+    await coord.onSessionStart('sess-b', 'http');
+    await coord.onSessionStart('sess-c', 'http');
+    const backdateMs = Date.now() - 5_000;
+    for (const id of ['sess-a', 'sess-b', 'sess-c']) {
+      const ctx = (coord as unknown as { contexts: Map<string, { lastActiveAt: number }> }).contexts.get(id);
+      if (ctx) ctx.lastActiveAt = backdateMs;
+    }
+    const idle = coord.idleSessions(1_000);
+    assert.equal(idle.length, 3, 'all three stale sessions should be listed');
+    assert.ok(idle.includes('sess-a'));
+    assert.ok(idle.includes('sess-b'));
+    assert.ok(idle.includes('sess-c'));
+  } finally {
+    coord.close();
+  }
+});
+
 test('sessionTtlMs: read from CH1TTY_SESSION_TTL_MS env var', () => {
   const prev = process.env.CH1TTY_SESSION_TTL_MS;
   const prevI = process.env.CH1TTY_SESSION_EVICT_INTERVAL_MS;
