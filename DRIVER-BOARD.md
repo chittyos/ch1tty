@@ -2850,3 +2850,31 @@ _Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
 - **Next run**: PR #1093 open (tsx patch). If merged, no open PRs; no further in-range updates; idle unless workstream F defined or new commits land.
 - **PushNotification**: SENT (tsx patch PR #1093 open; real work done).
 - **PR #1093 outcome**: MERGED (same session, post-CodeQL ×3 all success). tsx 4.23.4→4.23.5 landed on main (7d61d83).
+
+---
+
+### 2026-08-03 (run ~889 — idle, all workstreams done)
+- **Workstream**: None (all A–E done since run 735; workstream F still awaiting human decision)
+- **Branch/PR**: none (direct commit to main — run log only)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~61s) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - Reset local main to origin/main HEAD a0082a3 (run ~888 post-merge). Local had diverged 50 stale idle commits; both sides were board-log-only.
+  - npm ci clean. npm run build clean (tsc exit 0). npm test: 1418/0/3 (1421 total, 51 suites, ~61s). npm audit: 0 vulnerabilities.
+  - npm outdated: 4 items, all major-version bumps held for human review (typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20). No in-range updates available.
+  - 0 open PRs (GitHub MCP confirmed). PR #1093 (tsx 4.23.4→4.23.5) merged previous session.
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation drift guard frozen at 56/87 fields (test lines 1197–1198); 0 violations on main.
+  - Workstream verification: B intact (servers.json github→api.githubcopilot.com/mcp/); C intact (focus-profiles.json, 6 profiles); D intact (sim/ harness + scenario/simulation tests); E intact (focus-suggestions.json 1.8MB catalog). All A–E deliverables unchanged.
+  - Notion token still invalid (401); DRIVER-BOARD.md is durable board.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **~889th run. 0 open PRs.**
+- **Human-action items** (unchanged):
+  1. **Disable or redirect hourly schedule** — 889+ consecutive runs; all A–E exhausted since run 735.
+  2. **Add workstream F** (McpAgent Phases 2–4) to give driver new productive work.
+  3. **mcp.ch1tty.com health/discovery 404** — verify CF worker route points to `chittyagent-ch1tty`.
+  4. **Set GITHUB_MCP_AUTHORIZATION on prod** — reconnects GitHub MCP backend.
+  5. **Configure CF Access on prod** — clears ledger DLQ.
+  6. **Stale branch cleanup** — 977+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings.
+  7. Rotate Notion token — `op://ChittyOS-Integrations/notion/api_token`.
+  8. Major/breaking bumps pending human review: typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20.
+  9. Open issues #1071/#1072 — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: No open PRs; no in-range updates; idle. Next periodic escalation at ~run 893 (4 runs away).
+- **PushNotification**: NOT SENT (nothing new since run 888 tsx patch notification; next escalation due at ~run 893).
