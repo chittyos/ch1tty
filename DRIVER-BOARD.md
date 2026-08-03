@@ -2956,3 +2956,29 @@ _Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
   9. Open issues #1071/#1072 — extensibility rebuild and 1Password retirement require human decisions.
 - **Next run**: No open PRs; no in-range updates; idle. **Next periodic escalation at ~run 898 (next run).**
 - **PushNotification**: NOT SENT (state unchanged from run 893 escalation; next escalation due at run ~898 — next run).
+
+---
+
+### 2026-08-03 (run ~898 — PERIODIC ESCALATION — idle, all workstreams done)
+- **Workstream**: None (all A–E done since run ~735; workstream F awaiting human decision)
+- **Branch/PR**: none (direct commit to main — run log only)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~47s) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - npm ci clean. npm run build clean (tsc exit 0). npm test: 1418/0/3 (1421 total, 51 suites). npm audit: 0 vulnerabilities.
+  - 0 open PRs (GitHub MCP confirmed). No new commits on origin/main since run ~897.
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE (56 no-focus / 87 with-focus fields — test lines 1197–1198); 0 violations on main.
+  - Notion token still invalid (401); DRIVER-BOARD.md is durable board.
+  - This is the scheduled periodic escalation at run ~898, flagged in run ~897 entry ("next periodic escalation at ~run 898 — next run").
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **~898th run. 0 open PRs.**
+- **Human-action items** (unchanged — ~898th iteration):
+  1. **Disable or redirect hourly schedule** — 898+ consecutive idle runs; all A–E exhausted since run ~735; compute wasted every hour.
+  2. **Add workstream F** (McpAgent Phases 2–4) to DRIVER-BOARD.md to give driver new productive work.
+  3. **mcp.ch1tty.com health/discovery 404** — verify CF worker route points to `chittyagent-ch1tty`.
+  4. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  5. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears 11 DLQ entries.
+  6. **Stale branch cleanup** — 978+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  7. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  8. **Major/breaking bumps** pending human review: typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20.
+  9. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: No open PRs; no in-range updates; idle. Next periodic escalation at ~run 903 (5 runs away).
+- **PushNotification**: SENT — periodic escalation at run ~898; schedule should be disabled or workstream F added.
