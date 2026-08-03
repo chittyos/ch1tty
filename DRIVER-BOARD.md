@@ -2849,3 +2849,4 @@ _Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
   10. Open issues #1071/#1072 — extensibility rebuild and 1Password retirement require human decisions.
 - **Next run**: PR #1093 open (tsx patch). If merged, no open PRs; no further in-range updates; idle unless workstream F defined or new commits land.
 - **PushNotification**: SENT (tsx patch PR #1093 open; real work done).
+- **PR #1093 outcome**: MERGED (same session, post-CodeQL ×3 all success). tsx 4.23.4→4.23.5 landed on main (7d61d83).
