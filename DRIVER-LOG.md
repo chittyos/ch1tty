@@ -3184,3 +3184,31 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   6. **Stale branch cleanup** — bulk-delete ~1062 `auto/` branches (260+ guardrail-violating); enable auto-delete on merge in repo settings.
 - **Next run**: Idle unless new workstreams added to DRIVER-BOARD.md. All thresholds passing; all guardrails enforced.
 - **Blockers**: Notion 401. Ledger DLQ (CF Access on prod). GitHub MCP disconnected. Ollama unreachable (non-blocking).
+
+---
+
+### 2026-08-06 (SEC-FIX-5 — run ~970; new vulnerabilities found and patched)
+
+- **Workstream**: Security fix (SEC-FIX-5) — new vulnerabilities detected during routine `npm audit`
+- **Branch/PR**: `auto/sec-fix-5-fast-uri-hono-aug2026` → PR #1095
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites)
+- **Actions**:
+  - `npm ci` clean, `npm run build` clean, `npm test`: 1418/0/3.
+  - `npm audit` found **5 vulnerabilities** (2 high, 3 moderate) — new since run ~900 (prior runs all reported 0):
+    - **fast-uri 3.1.4** — GHSA-7p8r-x3mc-p8w7 (HIGH): host confusion via backslash authority introducer. Fixed: bumped to 3.1.5.
+    - **hono 4.12.32** — GHSA-8j4g-w8fx-2239 (moderate): ReDoS in CORS middleware. Fixed: bumped to 4.13.0.
+    - **undici 7.0.0–7.28.0** — 4 moderate + 1 high in wrangler (devDependency only, not runtime). The npm-suggested fix would downgrade wrangler 4.118→4.35 (regression). Left for manual review.
+  - Applied `npm audit fix` (non-breaking): fast-uri and hono fixed. Build + tests still pass.
+  - Pushed branch, opened PR #1095. PushNotification sent to alert user.
+  - Notion: 401. GitHub MCP: disconnected. Ledger DLQ: 11 entries. Ollama: unreachable (non-blocking).
+- **State summary**:
+  - All workstreams A–E + extras: DONE. SEC-FIX-5 in review (PR #1095).
+  - Tests: 1418/0/3. Build: clean. 3 remaining vulnerabilities (all undici/wrangler devDep, not runtime).
+- **Human action required**:
+  1. **Review and merge PR #1095** — fast-uri + hono security fixes, build+tests green.
+  2. **undici/wrangler advisory** — 4 moderate + 1 high in wrangler devDep. Track wrangler updates for a safe undici. Consider `overrides: { "undici": ">=7.29.0" }` in package.json if a patched version is available.
+  3. **Disable or redirect hourly schedule** — still no new workstreams.
+  4. **Configure CF Access on prod**, **set GITHUB_MCP_AUTHORIZATION**, **rotate Notion token** (unchanged blockers).
+  5. **Stale branch cleanup** — ~1062 `auto/` branches on remote.
+- **Next run**: Idle unless workstreams added or PR #1095 needs follow-up.
+- **Blockers**: Notion 401. Ledger DLQ (CF Access on prod). GitHub MCP disconnected. undici in wrangler devDep (non-runtime).
