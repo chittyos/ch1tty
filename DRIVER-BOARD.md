@@ -3039,3 +3039,30 @@ _Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
   9. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
 - **Next run**: 0 open PRs; 0 vulns; all workstreams done. Idle unless F is added. Next periodic escalation at ~run 909 (5 runs away).
 - **PushNotification**: SENT — PR #1096 merged; undici HIGH CVE (GHSA-4cwx-7wf7-3272) cleared; main is clean.
+
+---
+
+### 2026-08-06 (run ~905 — SEC-FIX-8: worker hono 4.12.31 → 4.12.34 merged)
+- **Workstream**: A (security maintenance — PR #1098 merge confirmed)
+- **Branch/PR**: `auto/SEC-FIX-8-worker-hono-4.12.34` → PR #1098 (https://github.com/chittyos/ch1tty/pull/1098) — **MERGED** (sha a4be3a99)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~42s) | **Audit**: 0 vulnerabilities (root + worker)
+- **Actions**:
+  - Synced to origin/main HEAD 9907e2c. npm ci clean. npm run build clean (tsc exit 0). npm test: 1418/0/3.
+  - 1 open PR found: PR #1098 (`auto/SEC-FIX-8-worker-hono-4.12.34`) — all 3 CI checks ✅ (CodeQL, Analyze/actions, Analyze/javascript-typescript), mergeable_state: clean.
+  - **Merged PR #1098** via squash (sha a4be3a99). hono ^4.12.31 → ^4.12.34 in `workers/chittyagent-ch1tty`; closes Dependabot alert #110 (GHSA-8j4g-w8fx-2239 moderate 5.3 — ReDoS in CORS middleware).
+  - Post-merge: synced to origin/main HEAD a4be3a9. npm audit (root): 0 vulns. npm audit (worker): 0 vulns. npm test: 1418/0/3 (unchanged).
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE (56/87 field counts, test lines 1197–1198); 0 violations on main.
+  - Notion token still invalid (401); DRIVER-BOARD.md is durable board.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. Audit: 0 vulns (root + worker). **~905th run. 0 open PRs.**
+- **Human-action items** (unchanged — ~905th iteration):
+  1. **Disable or redirect hourly schedule** — 905+ consecutive runs; all A–E exhausted; security maintenance only.
+  2. **Add workstream F** (McpAgent Phases 2–4) to DRIVER-BOARD.md to give driver new productive work.
+  3. **mcp.ch1tty.com health/discovery 404** — verify CF worker route points to `chittyagent-ch1tty`.
+  4. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  5. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  6. **Stale branch cleanup** — 980+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  7. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  8. **Major/breaking bumps** pending human review: typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20, @cloudflare/codemode 0.4.x→0.5.x.
+  9. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: 0 open PRs; 0 vulns; all workstreams done. Idle unless F is added. Next periodic escalation at ~run 910 (5 runs away).
+- **PushNotification**: NOT SENT (PR #1098 merged — hono CVE cleared, no action needed from user; all workstreams done, state unchanged from run ~904 escalation).
