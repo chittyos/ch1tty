@@ -3212,3 +3212,32 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   5. **Stale branch cleanup** — ~1062 `auto/` branches on remote.
 - **Next run**: Idle unless workstreams added or PR #1095 needs follow-up.
 - **Blockers**: Notion 401. Ledger DLQ (CF Access on prod). GitHub MCP disconnected. undici in wrangler devDep (non-runtime).
+
+---
+
+### 2026-08-06T20+ (SEC-FIX-6 rebase — fresh CI trigger)
+
+- **Workstream**: Security (PR #1096 blocker triage + fresh CI push)
+- **Branch/PR**: `auto/SEC-FIX-6-undici-7.29` → PR #1096 (already open)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites)
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test` 1418/0/3 — unchanged.
+  - `git fetch --all`; confirmed 1 open PR: #1096 (SEC-FIX-6 undici >=7.29.0). All workstreams A–E still done.
+  - PR #1096 CI state: "Analyze (javascript-typescript)" (CodeQL) FAILED after 45 min; "Analyze (actions)" QUEUED (stuck). Logs unavailable (404). ci.yml run 31122295431 on old sha (0 jobs — cancelled on prior rebase push).
+  - PR #1096 was 2 commits behind origin/main (missing `eacbe80` run log + `f0310a3` SEC-FIX-7 apps). No conflict: PR only touches root package.json/lock, SEC-FIX-7 only touched app packages.
+  - Rebased PR branch onto `origin/main` (f0310a3) → new SHA `0a1d717` → force-pushed with `--force-with-lease` → fresh CI triggered.
+  - `npm audit` on origin/main: **3 vulnerabilities** (1 high, 2 moderate) — all undici via wrangler/miniflare (GHSA-4cwx-7wf7-3272 HIGH + 4 moderate); fixed by PR #1096 (undici >=7.29.0 override → 8.10.0).
+  - Notion: 401 (recurring). GitHub MCP: disconnected (GITHUB_MCP_AUTHORIZATION not set). Ledger DLQ: 11 entries. Ollama: unreachable.
+- **State summary**:
+  - All workstreams A–E: DONE. Tests: 1418/0/3. Build: clean.
+  - PR #1096 rebased on fresh main; CI re-running on `0a1d717`.
+  - Main still has 3 vulns (undici) — cleared when #1096 merges.
+- **Human action required**:
+  1. **Merge PR #1096** when CI passes — undici security fix (1 HIGH + 4 moderate CVEs via wrangler devDep; override forces miniflare to undici 8.10.0). If CodeQL keeps failing, check the CodeQL security alerts tab (https://github.com/chittyos/ch1tty/security/code-scanning) — the analysis runs on JS/TS source code, not package.json; a pre-existing alert may be blocking all PRs. Admin override may be needed.
+  2. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears 11 ledger DLQ entries.
+  3. **Set `GITHUB_MCP_AUTHORIZATION`** on prod — reconnects GitHub MCP backend.
+  4. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  5. **Stale branch cleanup** — ~1000+ `auto/` branches on remote (260+ prohibited `cast-explain-*` metric violators).
+  6. **Disable or redirect hourly schedule** — no new workstreams; each idle run adds noise.
+- **Next run**: Check if PR #1096 CI passed (look at check_runs on sha `0a1d717`). If CodeQL still failing, it is a pre-existing alert not introduced by this PR; human admin action needed to override or fix the underlying CodeQL alert.
+- **Blockers**: Notion 401. Ledger DLQ (CF Access on prod). GitHub MCP disconnected. CodeQL check on PR #1096 (unknown if pre-existing or new).

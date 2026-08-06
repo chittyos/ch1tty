@@ -1475,3 +1475,14 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend.
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
 - **Next run**: All workstreams done. Define new workstreams in RUNLOG.md or disable schedule.
+
+---
+
+### 2026-08-06T20+ (SEC-FIX-6 rebase — fresh CI)
+
+- **Workstream**: Security (PR #1096 blocker triage + rebase)
+- **Branch/PR**: `auto/SEC-FIX-6-undici-7.29` → PR #1096
+- **Build**: clean | **Tests**: 1418/0/3 (1421 total)
+- **Actions**: Triaged PR #1096 CI failures (CodeQL failed after 45 min — logs unavailable; "Analyze (actions)" stuck QUEUED). Rebased PR branch onto origin/main (f0310a3, +SEC-FIX-7) → `0a1d717` → force-pushed → fresh CI triggered. Only 2 files differ from main (root package.json + lock — correct). npm audit on main: 3 vulns undici (1 HIGH, 2 moderate) — fixed by PR #1096.
+- **Workstream state**: A✅ B✅ C✅ D✅ E✅
+- **Next run**: Verify CI on PR #1096 sha `0a1d717`. If CodeQL still failing, it is pre-existing on main — human admin needs to check security/code-scanning tab and either fix or override. Merge #1096 when CI green.
