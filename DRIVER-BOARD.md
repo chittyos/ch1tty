@@ -2982,3 +2982,34 @@ _Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
   9. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
 - **Next run**: No open PRs; no in-range updates; idle. Next periodic escalation at ~run 903 (5 runs away).
 - **PushNotification**: SENT — periodic escalation at run ~898; schedule should be disabled or workstream F added.
+
+---
+
+### 2026-08-06 (run ~903 — SEC-FIX-6: undici 7.28.0 → 8.10.0 override)
+- **Workstream**: A (security maintenance — undici CVE remediation)
+- **Branch/PR**: `auto/SEC-FIX-6-undici-7.29` → PR #1096 (https://github.com/chittyos/ch1tty/pull/1096) — open, CI queued (2 CodeQL checks)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites) | **Audit**: 0 vulnerabilities (post-fix)
+- **Actions**:
+  - Synced to origin/main HEAD 6454531 (run ~970 SEC-FIX-5 merge). npm ci clean. npm run build clean (tsc exit 0). npm test: 1418/0/3 (1421 total, 51 suites).
+  - npm audit: **3 vulnerabilities (1 high, 2 moderate)** — new signal. All in undici >=7.0.0 <7.29.0, pulled via wrangler 4.119.0 → miniflare 5.20260801.0-alpha → undici 7.28.0 (vulnerable).
+  - CVEs: GHSA-4cwx-7wf7-3272 (high 7.4), GHSA-8xcm-r25x-g524 (mod 4.8), GHSA-m8rv-5g2x-5cg5 (mod 4.2), GHSA-jr45-8vmc-qm54 (mod 5.9), GHSA-v3r7-h72x-cjcm (mod 4.8).
+  - Fix: added `"undici": ">=7.29.0"` to package.json overrides (same pattern as existing hono/sharp/@hono/node-server overrides). Also picked up tsx 4.23.5→4.23.9 (in-range, dev-only).
+  - npm install: undici resolved 7.28.0 → 8.10.0 (overridden). npm audit: 0 vulnerabilities.
+  - npm run build: clean. npm test: 1418/0/3 (unchanged).
+  - Pushed branch auto/SEC-FIX-6-undici-7.29; opened PR #1096. CI: 2 CodeQL checks queued. Subscribed to PR activity.
+  - Codex bot: hit usage limit (not actionable). CodeRabbit: review in progress (package-lock.json excluded by path filter — expected).
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE; 0 violations on main.
+  - Notion token still invalid (401); DRIVER-BOARD.md is durable board.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. **Audit: 0 vulns (post-fix)**. **~903rd run. PR #1096 open.**
+- **Human-action items**:
+  1. **Review + merge PR #1096** — undici >=7.29.0 override clears 1 HIGH + 4 moderate CVEs (GHSA-4cwx-7wf7-3272 is the critical one).
+  2. **Disable or redirect hourly schedule** — 903+ consecutive runs; A–E exhausted; this is security maintenance only.
+  3. **Add workstream F** (McpAgent Phases 2–4) to DRIVER-BOARD.md to give driver new productive work.
+  4. **mcp.ch1tty.com health/discovery 404** — verify CF worker route points to `chittyagent-ch1tty`.
+  5. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  6. **Configure CF Access on prod** — clears ledger DLQ.
+  7. **Stale branch cleanup** — 980+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings.
+  8. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  9. **Major/breaking bumps** pending human review: typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20, @cloudflare/codemode 0.4.x→0.5.x.
+- **Next run**: PR #1096 likely merged (CodeQL should pass for lockfile-only security fix). If merged, audit will be clean on main. No further workstream work until F is defined.
+- **PushNotification**: SENT — undici HIGH CVE (GHSA-4cwx-7wf7-3272, CVSS 7.4) found and fixed; PR #1096 open for review.
