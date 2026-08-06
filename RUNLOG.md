@@ -1486,3 +1486,11 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 - **Actions**: Triaged PR #1096 CI failures (CodeQL failed after 45 min — logs unavailable; "Analyze (actions)" stuck QUEUED). Rebased PR branch onto origin/main (f0310a3, +SEC-FIX-7) → `0a1d717` → force-pushed → fresh CI triggered. Only 2 files differ from main (root package.json + lock — correct). npm audit on main: 3 vulns undici (1 HIGH, 2 moderate) — fixed by PR #1096.
 - **Workstream state**: A✅ B✅ C✅ D✅ E✅
 - **Next run**: Verify CI on PR #1096 sha `0a1d717`. If CodeQL still failing, it is pre-existing on main — human admin needs to check security/code-scanning tab and either fix or override. Merge #1096 when CI green.
+
+---
+
+### 2026-08-06T20+ (update — PR #1096 merged)
+
+- PR #1096 (undici >=7.29.0 override, SEC-FIX-6) **MERGED** to main.
+- All 6 vulnerabilities reported on default branch (1 HIGH undici + 5 moderate) now cleared.
+- Workstream state: A✅ B✅ C✅ D✅ E✅ — no open PRs.

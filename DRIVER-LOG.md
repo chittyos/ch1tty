@@ -3241,3 +3241,5 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   6. **Disable or redirect hourly schedule** — no new workstreams; each idle run adds noise.
 - **Next run**: Check if PR #1096 CI passed (look at check_runs on sha `0a1d717`). If CodeQL still failing, it is a pre-existing alert not introduced by this PR; human admin action needed to override or fix the underlying CodeQL alert.
 - **Blockers**: Notion 401. Ledger DLQ (CF Access on prod). GitHub MCP disconnected. CodeQL check on PR #1096 (unknown if pre-existing or new).
+
+**Update (same run):** PR #1096 (undici SEC-FIX-6) **MERGED** to main. All undici CVEs (1 HIGH GHSA-4cwx-7wf7-3272 + 4 moderate) cleared. No open PRs remain.
