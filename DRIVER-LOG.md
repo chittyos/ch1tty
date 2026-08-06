@@ -3243,3 +3243,30 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 - **Blockers**: Notion 401. Ledger DLQ (CF Access on prod). GitHub MCP disconnected. CodeQL check on PR #1096 (unknown if pre-existing or new).
 
 **Update (same run):** PR #1096 (undici SEC-FIX-6) **MERGED** to main. All undici CVEs (1 HIGH GHSA-4cwx-7wf7-3272 + 4 moderate) cleared. No open PRs remain.
+
+---
+
+### 2026-08-06T21 (SEC-FIX-8 — worker hono bump)
+
+- **Workstream**: Security (SEC-FIX-8) — remaining Dependabot alert after PR #1096 merged
+- **Branch/PR**: `auto/SEC-FIX-8-worker-hono-4.12.34` → PR #1098
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites)
+- **Actions**:
+  - PR #1096 (SEC-FIX-6 undici) was merged mid-run (CI passed on fresh sha `0a1d717`). After merge, GitHub reported **1 moderate remaining** on default branch.
+  - `npm audit` on root + all 5 apps: 0 vulnerabilities. Found the remaining alert in `workers/chittyagent-ch1tty`: `hono ^4.12.31` → GHSA-8j4g-w8fx-2239 (moderate, ReDoS in CORS middleware). SEC-FIX-7 fixed the 5 apps but missed this worker.
+  - Fix: bumped `hono ^4.12.31 → ^4.12.34` (direct dep in this package); also tightened `overrides.undici >=7.28.0 → >=7.29.0` for consistency with root.
+  - `npm install --legacy-peer-deps` needed (pre-existing wrangler/workers-types peer conflict, unrelated to hono). After install: `npm audit` → 0 vulnerabilities.
+  - Opened PR #1098 (https://github.com/chittyos/ch1tty/pull/1098). CodeQL CI queued.
+  - Notion: 401 (recurring). GitHub MCP: connected this run. Ledger DLQ: 11 entries. Ollama: unreachable.
+- **State summary**:
+  - All workstreams A–E: DONE. 1 open PR: #1098 (SEC-FIX-8 worker hono).
+  - Root + 5 apps: 0 vulnerabilities. Worker: 0 vulnerabilities (after PR #1098 merges).
+  - Build: clean. Tests: 1418/0/3.
+- **Human action required**:
+  1. **Merge PR #1098** when CI passes — clears the last remaining Dependabot moderate alert.
+  2. **`workers/chittyagent-ch1tty` wrangler/workers-types peer conflict** — `wrangler ^4.79.0` now wants `@cloudflare/workers-types ^5.x` but package.json has `^4.x`. Requires separate manual update (`npm install wrangler@latest @cloudflare/workers-types@latest`).
+  3. **Configure CF Access on prod**, **set GITHUB_MCP_AUTHORIZATION**, **rotate Notion token** (unchanged blockers).
+  4. **Stale branch cleanup** — 1000+ `auto/` branches on remote.
+  5. **Disable or redirect hourly schedule** — no new workstreams after SEC-FIX-8.
+- **Next run**: Check if PR #1098 CI passed; merge if green. If CodeQL fails again, it is pre-existing — check https://github.com/chittyos/ch1tty/security/code-scanning.
+- **Blockers**: Notion 401. Ledger DLQ (CF Access on prod). GitHub MCP auth (GITHUB_MCP_AUTHORIZATION not set on prod). wrangler peer conflict in worker (non-blocking, pre-existing).
