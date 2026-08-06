@@ -3270,3 +3270,5 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   5. **Disable or redirect hourly schedule** — no new workstreams after SEC-FIX-8.
 - **Next run**: Check if PR #1098 CI passed; merge if green. If CodeQL fails again, it is pre-existing — check https://github.com/chittyos/ch1tty/security/code-scanning.
 - **Blockers**: Notion 401. Ledger DLQ (CF Access on prod). GitHub MCP auth (GITHUB_MCP_AUTHORIZATION not set on prod). wrangler peer conflict in worker (non-blocking, pre-existing).
+
+**Update (same run):** PR #1098 (SEC-FIX-8 worker hono) **MERGED** to main. All Dependabot alerts cleared: 0 vulnerabilities on root, 5 apps, and worker. No open PRs.

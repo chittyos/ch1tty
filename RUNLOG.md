@@ -1494,3 +1494,11 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 - PR #1096 (undici >=7.29.0 override, SEC-FIX-6) **MERGED** to main.
 - All 6 vulnerabilities reported on default branch (1 HIGH undici + 5 moderate) now cleared.
 - Workstream state: A✅ B✅ C✅ D✅ E✅ — no open PRs.
+
+---
+
+### 2026-08-06T21+ (update — PR #1098 merged)
+
+- PR #1098 (hono ^4.12.34 in chittyagent-ch1tty worker, SEC-FIX-8) **MERGED** to main.
+- All Dependabot alerts cleared. Root + 5 apps + worker: 0 vulnerabilities.
+- CodeRabbit: no actionable findings. All workstreams A–E done. No open PRs.
