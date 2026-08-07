@@ -3312,10 +3312,10 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 - **Actions**:
   - `npm ci` clean, `npm run build` clean, `npm test`: 1418/0/3. Identical to prior runs.
   - Read CLAUDE.md + CHITTY.md; 5-tool surface invariant and `buildCastExplanation` metric freeze confirmed intact on main.
-  - `git fetch --all`; 0 open PRs. ~50+ auto/ branches on remote (majority stale from prior runs).
+  - `git fetch --all`; 0 open PRs. ~983 remote `auto/` branches (majority stale from prior runs; no cleanup has run since prior logs recorded ~1,067).
   - Verified workstream states from repo: A (build+tests green ✓), B (servers.json github entry uses `https://api.githubcopilot.com/mcp/` remote ✓), C (focus-profiles.json + focus.test.ts ✓), D (scenario.test.ts passing ✓), E (focus-suggestions.json with 276–305 combos per profile, all 1418 tests pass ✓).
   - `npm audit`: **0 vulnerabilities** (root, confirmed).
-  - No security alerts. No new workstreams. System fully healthy.
+  - No security alerts. No new workstreams. Repository validation is healthy; production integration blockers remain.
   - **No push notification sent** — no new signal; system healthy, nothing changed.
 - **State summary**:
   - All workstreams A–E: DONE. Tests: 1418/0/3. Build: clean. 0 vulnerabilities. 0 open PRs.
@@ -3325,6 +3325,6 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears Ledger DLQ entries.
   4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod — reconnects GitHub MCP backend.
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
-  6. **Stale branch cleanup** — bulk-delete auto/ branches (enable auto-delete on merge in repo settings).
+  6. **Stale branch cleanup** — bulk-delete ~983 remote `auto/` branches (enable auto-delete on merge in repo settings).
 - **Next run**: Idle unless new workstreams added.
 - **Blockers**: Notion 401. Ledger DLQ (CF Access on prod). GitHub MCP disconnected on prod. Ollama unreachable (non-blocking).
