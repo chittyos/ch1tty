@@ -3395,3 +3395,23 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 - **State summary**: All workstreams A–E: DONE. Tests: 1418/0/3. Build: clean. 0 vulnerabilities. 0 open PRs.
 - **Next run priority**: Idle. Next periodic escalation at ~run 915 (3 runs away). No action unless workstream F is added to DRIVER-BOARD.md.
 - **Blockers** (unchanged): Notion 401. Ledger DLQ (CF Access on prod). GitHub MCP disconnected on prod (GITHUB_MCP_AUTHORIZATION not set). Ollama unreachable (non-blocking). wrangler/workers-types peer conflict in worker (non-blocking, pre-existing).
+
+---
+
+### 2026-08-07 (run ~921 — dep patch bump; PR #1107)
+
+- **Workstream**: Maintenance (all A–E done; doing safe patch dep bumps)
+- **Branch/PR**: `auto/dep-patch-tsx-wrangler-2026-08-07` → PR #1107
+- **Build**: clean (tsc exit 0) | **Tests**: 1418 pass / 0 fail / 3 skip | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean. `npm test`: 1418/0/3 ✓.
+  - Read CLAUDE.md + CHITTY.md; 5-tool surface and `buildCastExplanation` metric freeze confirmed intact.
+  - `git fetch --all`; open PRs: #1106 (stale escalation).
+  - Verified all A–E workstreams still DONE (build green, github remote MCP, focus-profiles.json, scenario tests, focus-suggestions.json).
+  - `npm outdated`: tsx 4.23.9→4.23.11 (patch), wrangler 4.119→4.120 (patch) available.
+  - Bumped tsx and wrangler in package.json, `npm install` updated lock. Build + tests confirmed green post-bump.
+  - Opened PR #1107. CodeQL CI in progress.
+  - Skipped: agents 0.20 (routeAgentRequest API risk), TypeScript 7 (major), @types/node 26 (major), c8 12 (major), workers-oauth-provider 0.10 (minor-in-0.x risk).
+- **State summary**: A–E DONE. PR #1107 open (dep patch). Tests: 1418/0/3. 0 vulns.
+- **Next run priority**: Check PR #1107 CI green → merge. If merged, all state clean. No new workstream F defined.
+- **Blockers** (unchanged): Notion 401. Ledger DLQ (CF Access on prod). GitHub MCP disconnected on prod. Stale `auto/` branches (~1000+). Major deps need human review (TypeScript 7, @types/node 26, agents 0.20, c8 12).
