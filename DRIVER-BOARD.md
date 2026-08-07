@@ -3177,3 +3177,30 @@ _Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
   9. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
 - **Next run**: No open PRs; no new workstreams. Idle. Next periodic escalation at ~run 915 (2 runs away).
 - **PushNotification**: NOT SENT (state unchanged; npm registry unreachable is ephemeral container issue; no new signal since run ~910 escalation).
+
+---
+
+### 2026-08-07 (run ~914 — idle; all workstreams done; PUSH NOTIFICATION SENT)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; workstream F awaiting human decision)
+- **Branch/PR**: none (direct commit to main — run log only). 1 open PR: #1106 (escalation notice, branch `auto/2026-08-07-run-log-b`)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~43s) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3 (1421 total, 51 suites, ~43s). `npm audit`: 0 vulnerabilities.
+  - `git fetch --all`. 1 open PR: #1106 (escalation run log, not a workstream PR).
+  - Verified all workstreams: A (build+tests green ✓), B (github → `api.githubcopilot.com/mcp/` remote, envHeaders ✓), C (focus-profiles.json 6 profiles: finance/governance/design/code/communication/ops ✓), D (scenario.test.ts + simulation.test.ts ✓), E (focus-suggestions.json 1750 combos/1759 prompts, 154th pass ✓). All DONE.
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE (test 1197: 56 fields no-focus, test 1198: 87 fields with focus:code). 0 violations on main.
+  - Notion token still invalid (401); DRIVER-BOARD.md is durable cross-run board.
+  - **PUSH NOTIFICATION SENT** — driver has been idle for 900+ runs; schedule burning compute with no productive work; human decision required.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **~914th run. 1 open PR: #1106 (escalation).**
+- **Human-action items** (unchanged — ~914th iteration):
+  1. **Disable or redirect hourly schedule** — 914+ consecutive runs; all A–E exhausted; schedule burns compute with no work to do.
+  2. **Add workstream F** (McpAgent Phases 2–4) to DRIVER-BOARD.md to give driver new productive work.
+  3. **mcp.ch1tty.com health/discovery 404** — verify CF worker route points to `chittyagent-ch1tty`.
+  4. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  5. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  6. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  7. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  8. **Major/breaking bumps** pending human review: typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20, @cloudflare/codemode 0.4.x→0.5.x.
+  9. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: No open PRs; no new workstreams. Idle. DISABLE THE SCHEDULE or add workstream F to DRIVER-BOARD.md.
+- **PushNotification**: SENT — driver idle 900+ runs; all workstreams done; please disable schedule or define workstream F.
