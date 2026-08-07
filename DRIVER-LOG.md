@@ -3407,7 +3407,7 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   - `npm ci` clean. `npm run build` clean. `npm test`: 1418/0/3. `npm audit`: 0 vulnerabilities.
   - Read CLAUDE.md + CHITTY.md; 5-tool surface invariant and `buildCastExplanation` metric freeze confirmed intact on main.
   - `git fetch --all`; 0 open PRs. No code changes since PR #1103 merged (agents@0.19.0 lockfile sync).
-  - Verified workstream states: A (build+tests green ✓), B (github remote=`https://api.githubcopilot.com/mcp/` ✓), C (focus-profiles.json + 6 profiles ✓), D (scenario.test.ts + simulation.test.ts passing ✓), E (focus-suggestions.json 276-305 combos + 278-304 prompts per profile ✓). All DONE.
+  - Verified workstream states: A (build+tests green ✓), B (github remote=`https://api.githubcopilot.com/mcp/` ✓), C (focus-profiles.json + 6 profiles ✓), D (scenario.test.ts + simulation.test.ts passing ✓), E (focus-suggestions.json 1750 combos/596 verified total, 154th pass; per-profile: 276-305 combos + 278-304 prompts ✓). All DONE.
   - No new workstreams in DRIVER-BOARD.md.
   - **PERIODIC ESCALATION (~915)**: This is the ~915th consecutive idle run. All A–E workstreams completed. No new work to do. Driver is spinning with no productive output.
 - **State summary**: All workstreams A–E: DONE. Tests: 1418/0/3. Build: clean. 0 vulnerabilities. 0 open PRs.

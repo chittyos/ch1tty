@@ -3186,7 +3186,7 @@ _Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
 
 **URGENT**: Please disable the hourly schedule or add workstream F. Every run is pure compute waste.
 
-**Workstream F (suggested)**: McpAgent Phases 2–4 — extend `apps/chittyagent-ch1tty/` with Phase 2 (tool annotations + MCP 2025-11-05 protocol upgrade), Phase 3 (stateful task queue in D1), Phase 4 (agent-to-agent communication via `cast`). This is the natural next frontier once the gateway is stable.
+**Workstream F (suggested)**: McpAgent Phases 2–4 per the canonical definition above — Phase 2 (Code Mode: wire `openApiMcpServer`-based typed API surface for `ch1tty/code`), Phase 3 (OAuth cutover: migrate `/mcp` auth to OAuth 2.0 via `@cloudflare/workers-oauth-provider`), Phase 4 (legacy decommission: remove legacy JSON-RPC DO at `/mcp`, making `/mcp2` canonical). This is the natural next frontier once the gateway is stable.
 
 **Active blockers for humans** (run ~915):
 - `GITHUB_MCP_AUTHORIZATION` not set on prod → GitHub backend disconnected
