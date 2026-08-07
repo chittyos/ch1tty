@@ -3328,3 +3328,30 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   6. **Stale branch cleanup** — bulk-delete ~983 remote `auto/` branches (enable auto-delete on merge in repo settings).
 - **Next run**: Idle unless new workstreams added.
 - **Blockers**: Notion 401. Ledger DLQ (CF Access on prod). GitHub MCP disconnected on prod. Ollama unreachable (non-blocking).
+
+---
+
+### 2026-08-07 (idle — all workstreams done; 0 vulnerabilities)
+
+- **Workstream**: None (all A–E done)
+- **Branch/PR**: run log commit only
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~45s) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3. Identical to prior runs.
+  - Read CLAUDE.md + CHITTY.md; 5-tool surface invariant and `buildCastExplanation` metric freeze confirmed intact on main (test lines 1197–1198: 56 fields no-focus / 87 fields with-focus).
+  - `git fetch --all`; 1 open PR: #1102 (idle-b run log from earlier today — no code changes, will remain open). ~986 remote `auto/` branches.
+  - Verified all workstream states: A (build+tests green ✓), B (servers.json github entry uses remote GitHub MCP ✓), C (focus-profiles.json + focus.test.ts ✓), D (scenario tests passing ✓), E (focus-suggestions.json present ✓). All DONE.
+  - `npm audit`: 0 vulnerabilities (root). No Dependabot alerts outstanding.
+  - Guardrails: 5-tool surface intact; buildCastExplanation metric freeze ACTIVE; 0 violations.
+  - Notion token invalid (401); DRIVER-LOG.md is durable board.
+  - **No push notification sent** — no new signal; system healthy, unchanged from prior runs.
+- **State summary**: All workstreams A–E: DONE. Tests: 1418/0/3. Build: clean. 0 vulnerabilities. 1 open PR (#1102, run log only).
+- **Human action required** (unchanged):
+  1. **Disable or redirect hourly schedule** — no new workstreams; each idle run burns compute.
+  2. **Add new workstreams** to DRIVER-BOARD.md if planned work exists (workstream F suggestion: McpAgent Phases 2–4).
+  3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears Ledger DLQ entries.
+  4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod — reconnects GitHub MCP backend.
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  6. **Stale branch cleanup** — bulk-delete ~986 remote `auto/` branches (enable auto-delete on merge in repo settings).
+- **Next run**: Idle unless new workstreams added to DRIVER-BOARD.md.
+- **Blockers**: Notion 401. Ledger DLQ (CF Access on prod). GitHub MCP disconnected on prod. Ollama unreachable (non-blocking).
