@@ -3122,3 +3122,31 @@ _Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
   10. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
 - **Next run**: PR #1103 CI re-running after rebase; check status and merge if green. No new workstream work. Next periodic escalation at ~run 915.
 - **PushNotification**: NOT SENT (no new critical state — same as run ~910 escalation; PR #1103 still needs human review, no new urgency).
+
+---
+
+### 2026-08-07 (run ~912 — idle; PR #1103 merged; all workstreams done)
+- **Workstream**: None (all A–E done; PR #1103 lockfile fix confirmed merged)
+- **Branch/PR**: none (direct commit to main — run log only)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3 (1421 total, 51 suites). `npm audit`: 0 vulnerabilities.
+  - `git fetch --all`; 0 open PRs. Confirmed PR #1103 (`fix: sync package-lock.json to agents@0.19.0`) merged at sha 68287c2.
+  - Verified workstream states: A (build+tests green ✓), B (servers.json github entry uses `https://api.githubcopilot.com/mcp/` remote ✓), C (focus-profiles.json + focus.test.ts ✓), D (scenario tests passing ✓), E (focus-suggestions.json 1750 combos/596 verified, 154th pass ✓). All DONE.
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE (56/87 field counts, test lines 1197–1198); 0 violations on main.
+  - `npm audit`: 0 vulnerabilities (root). No Dependabot alerts outstanding.
+  - Notion token still invalid (401); DRIVER-BOARD.md is durable cross-run board.
+  - No new workstreams. Nothing to advance. Previous periodic escalation sent at run ~910.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **~912th run. 0 open PRs. PR #1103 merged.**
+- **Human-action items** (unchanged):
+  1. **Disable or redirect hourly schedule** — 912+ consecutive runs; all A–E exhausted; schedule burns compute with no work to do.
+  2. **Add workstream F** (McpAgent Phases 2–4) to DRIVER-BOARD.md to give driver new productive work.
+  3. **mcp.ch1tty.com health/discovery 404** — verify CF worker route points to `chittyagent-ch1tty`.
+  4. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  5. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  6. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  7. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  8. **Major/breaking bumps** pending human review: typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20, @cloudflare/codemode 0.4.x→0.5.x.
+  9. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: Idle unless new workstreams added to DRIVER-BOARD.md. Next periodic escalation at ~run 915 (3 runs away).
+- **PushNotification**: NOT SENT (PR #1103 merged — already escalated at run ~910; no new critical signal).
