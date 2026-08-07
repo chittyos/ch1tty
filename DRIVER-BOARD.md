@@ -3094,3 +3094,31 @@ _Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
   10. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
 - **Next run**: PR #1103 still open (needs human approval, not auto-mergeable). No new workstream work. Idle. Next periodic escalation at ~run 915 (5 runs away).
 - **PushNotification**: SENT — periodic escalation at run ~910; PR #1103 (lockfile) needs human review; schedule should be disabled or workstream F added.
+
+---
+
+### 2026-08-07 (run ~911 — PR #1103 rebased on main; worker lockfile clean)
+- **Workstream**: A (maintenance — rebased PR #1103 to remove redundant root-lockfile commit)
+- **Branch/PR**: `auto/fix-lockfile-agents-0.19.0` → PR #1103 (https://github.com/chittyos/ch1tty/pull/1103) — open, rebased, CI pending re-run
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~43s) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - npm ci clean. npm run build clean (tsc exit 0). npm test: 1418/0/3. npm audit: 0 vulnerabilities.
+  - Found 1 open PR: PR #1103 (`auto/fix-lockfile-agents-0.19.0`). CI was green. Discovered that main already has the root lockfile fix (commit `259dbdc`) but the PR branch had not been rebased — it still carried the now-redundant root lockfile commit.
+  - **Rebased PR #1103 branch on main** (git rebase origin/main). The redundant root-lockfile commit was auto-dropped (cherry-pick skip). Branch now carries only 2 commits on top of main: run log entry + the worker lockfile fix (`workers/chittyagent-ch1tty/package-lock.json agents 0.17.4→0.19.0`).
+  - Force-pushed rebased branch (`--force-with-lease`). CI will re-run on the updated head.
+  - Verified: worker lockfile now correctly pins agents@0.19.0. Build clean after rebase. 5-tool surface intact. buildCastExplanation metric freeze ACTIVE (56/87 field counts, tests 1197–1198).
+  - Notion token still invalid (401); DRIVER-BOARD.md is durable board.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **~911th run. 1 open PR: #1103 (rebased, CI pending).**
+- **Human-action items**:
+  1. **Review + merge PR #1103** — https://github.com/chittyos/ch1tty/pull/1103 — worker lockfile sync only; root already on main; CI will re-run. `npm ci` in workers/ fails on fresh clones until merged.
+  2. **Disable or redirect hourly schedule** — 911+ consecutive runs; all A–E exhausted; schedule is consuming compute with no work to do.
+  3. **Add workstream F** (McpAgent Phases 2–4) to DRIVER-BOARD.md to give driver new productive work.
+  4. **mcp.ch1tty.com health/discovery 404** — verify CF worker route points to `chittyagent-ch1tty`.
+  5. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  6. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  7. **Stale branch cleanup** — 980+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  8. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  9. **Major/breaking bumps** pending human review: typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20, @cloudflare/codemode 0.4.x→0.5.x.
+  10. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: PR #1103 CI re-running after rebase; check status and merge if green. No new workstream work. Next periodic escalation at ~run 915.
+- **PushNotification**: NOT SENT (no new critical state — same as run ~910 escalation; PR #1103 still needs human review, no new urgency).
