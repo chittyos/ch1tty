@@ -3328,3 +3328,30 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   6. **Stale branch cleanup** — bulk-delete ~983 remote `auto/` branches (enable auto-delete on merge in repo settings).
 - **Next run**: Idle unless new workstreams added.
 - **Blockers**: Notion 401. Ledger DLQ (CF Access on prod). GitHub MCP disconnected on prod. Ollama unreachable (non-blocking).
+
+---
+
+### 2026-08-07T~hourly-2 (idle — all workstreams done; 0 vulnerabilities)
+
+- **Workstream**: None (all A–E done)
+- **Branch/PR**: `auto/2026-08-07-idle-b` / PR #1102 (run log only)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites)
+- **Actions**:
+  - `npm ci` clean, `npm run build` clean, `npm test`: 1418/0/3. Identical to prior runs.
+  - Read CLAUDE.md + CHITTY.md; 5-tool surface and `buildCastExplanation` metric freeze confirmed intact on main.
+  - `git fetch --all`; 1 open PR (#1101, stale idle log, no unique commits vs main) → closed as superseded.
+  - Verified workstream states: A (build+tests ✓), B (servers.json github → `https://api.githubcopilot.com/mcp/` ✓), C (focus-profiles.json 6 profiles ✓), D (scenario.test.ts 1157 lines ✓ + simulation.test.ts 229 lines ✓), E (focus-suggestions.json 29704 lines ✓).
+  - `npm audit`: **0 vulnerabilities**.
+  - Notion MCP not installed in this session (connector not_installed); DRIVER-LOG.md continues as fallback board.
+  - **No push notification sent** — system healthy, no new signal.
+- **State summary**:
+  - All workstreams A–E: DONE. Tests: 1418/0/3. Build: clean. 0 vulnerabilities.
+- **Human action required** (unchanged):
+  1. **Disable or redirect hourly schedule** — all workstreams done; idle runs burn compute with no output.
+  2. **Add new workstreams** to DRIVER-BOARD.md if planned work exists.
+  3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears Ledger DLQ entries.
+  4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod — reconnects GitHub MCP backend.
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  6. **Stale branch cleanup** — bulk-delete ~1000+ remote `auto/` branches (enable auto-delete on merge in repo settings).
+- **Next run**: Idle unless new workstreams added.
+- **Blockers**: Notion 401. Ledger DLQ (CF Access on prod). GitHub MCP disconnected on prod. Ollama unreachable (non-blocking).
