@@ -3150,3 +3150,30 @@ _Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
   9. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
 - **Next run**: Idle unless new workstreams added to DRIVER-BOARD.md. Next periodic escalation at ~run 915 (3 runs away).
 - **PushNotification**: NOT SENT (PR #1103 merged — already escalated at run ~910; no new critical signal).
+
+---
+
+### 2026-08-07 (run ~913 — idle; npm registry unreachable in container; no local build/test)
+- **Workstream**: None (all A–E done; workstream F awaiting human decision)
+- **Branch/PR**: none (direct commit to main — run log only)
+- **Build**: NOT RUN locally — `npm registry unreachable` (`registry.npmjs.org` timed out in container; node_modules cannot be installed). **Prior run (~912)**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests (prior)**: 1418/0/3 (1421 total, 51 suites) | **Audit (prior)**: 0 vulnerabilities
+- **Actions**:
+  - `npm install` attempted; `registry.npmjs.org` unreachable (10s curl timeout). Ephemeral container network issue — local build/test cannot run this session.
+  - 0 open PRs (GitHub MCP confirmed). 0 Dependabot dependency alerts (GitHub search confirmed).
+  - No new commits on origin/main since run ~912 (latest sha `fa4d7ba` = run ~912 board log entry, 2026-08-07T11:13:33Z).
+  - State consistent with run ~912: A DONE B DONE C DONE D DONE E DONE. No code changes since PR #1103 merged.
+  - Guardrails unchanged (no code changes). buildCastExplanation metric freeze ACTIVE.
+  - Notion token still invalid (401); DRIVER-BOARD.md is durable board.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Build: clean (per run ~912, no changes since). 0 vulns. **~913th run. 0 open PRs.**
+- **Human-action items** (unchanged — ~913th iteration):
+  1. **Disable or redirect hourly schedule** — 913+ consecutive runs; all A–E exhausted; schedule burns compute with no work to do.
+  2. **Add workstream F** (McpAgent Phases 2–4) to DRIVER-BOARD.md to give driver new productive work.
+  3. **mcp.ch1tty.com health/discovery 404** — verify CF worker route points to `chittyagent-ch1tty`.
+  4. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  5. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  6. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  7. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  8. **Major/breaking bumps** pending human review: typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20, @cloudflare/codemode 0.4.x→0.5.x.
+  9. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: No open PRs; no new workstreams. Idle. Next periodic escalation at ~run 915 (2 runs away).
+- **PushNotification**: NOT SENT (state unchanged; npm registry unreachable is ephemeral container issue; no new signal since run ~910 escalation).
