@@ -3177,3 +3177,19 @@ _Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
   9. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
 - **Next run**: No open PRs; no new workstreams. Idle. Next periodic escalation at ~run 915 (2 runs away).
 - **PushNotification**: NOT SENT (state unchanged; npm registry unreachable is ephemeral container issue; no new signal since run ~910 escalation).
+
+---
+
+### Board update — 2026-08-07 run ~915 (ESCALATION)
+
+**Status**: All A–E DONE since run ~735. No new workstreams. Driver has been idle for ~180 consecutive runs.
+
+**URGENT**: Please disable the hourly schedule or add workstream F. Every run is pure compute waste.
+
+**Workstream F (suggested)**: McpAgent Phases 2–4 — extend `apps/chittyagent-ch1tty/` with Phase 2 (tool annotations + MCP 2025-11-05 protocol upgrade), Phase 3 (stateful task queue in D1), Phase 4 (agent-to-agent communication via `cast`). This is the natural next frontier once the gateway is stable.
+
+**Active blockers for humans** (run ~915):
+- `GITHUB_MCP_AUTHORIZATION` not set on prod → GitHub backend disconnected
+- CF Access not configured → ledger DLQ accumulating  
+- Notion token 401 → board only accessible as file
+- 1000+ stale `auto/` branches → enable auto-delete on merge in GitHub Settings → General

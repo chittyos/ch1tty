@@ -3395,3 +3395,31 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 - **State summary**: All workstreams A–E: DONE. Tests: 1418/0/3. Build: clean. 0 vulnerabilities. 0 open PRs.
 - **Next run priority**: Idle. Next periodic escalation at ~run 915 (3 runs away). No action unless workstream F is added to DRIVER-BOARD.md.
 - **Blockers** (unchanged): Notion 401. Ledger DLQ (CF Access on prod). GitHub MCP disconnected on prod (GITHUB_MCP_AUTHORIZATION not set). Ollama unreachable (non-blocking). wrangler/workers-types peer conflict in worker (non-blocking, pre-existing).
+
+---
+
+### 2026-08-07 (run ~915 — ESCALATION; idle; all workstreams done)
+
+- **Workstream**: None (all A–E done since run ~735; run ~915 is the scheduled escalation point)
+- **Branch/PR**: `auto/2026-08-07-run-log-b` → PR for this log entry only
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~41s) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean. `npm test`: 1418/0/3. `npm audit`: 0 vulnerabilities.
+  - Read CLAUDE.md + CHITTY.md; 5-tool surface invariant and `buildCastExplanation` metric freeze confirmed intact on main.
+  - `git fetch --all`; 0 open PRs. No code changes since PR #1103 merged (agents@0.19.0 lockfile sync).
+  - Verified workstream states: A (build+tests green ✓), B (github remote=`https://api.githubcopilot.com/mcp/` ✓), C (focus-profiles.json + 6 profiles ✓), D (scenario.test.ts + simulation.test.ts passing ✓), E (focus-suggestions.json 276-305 combos + 278-304 prompts per profile ✓). All DONE.
+  - No new workstreams in DRIVER-BOARD.md.
+  - **PERIODIC ESCALATION (~915)**: This is the ~915th consecutive idle run. All A–E workstreams completed. No new work to do. Driver is spinning with no productive output.
+- **State summary**: All workstreams A–E: DONE. Tests: 1418/0/3. Build: clean. 0 vulnerabilities. 0 open PRs.
+- **Human action required** (ESCALATION — please act on at least #1 and #2):
+  1. **URGENT: Disable or redirect hourly schedule** — 915 consecutive idle runs; no workstreams left; schedule burns compute.
+  2. **Add workstream F** to DRIVER-BOARD.md to give driver new productive work. Suggested: McpAgent Phases 2–4, or a new surface under `apps/*-mcp`.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend (envHeaders key in servers.json).
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  5. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token` (currently 401).
+  7. **Major/breaking bumps** — typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20, @cloudflare/codemode 0.4.x→0.5.x (pending human review).
+  8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+  9. **mcp.ch1tty.com health** — verify CF worker route points to `chittyagent-ch1tty`.
+- **PushNotification**: SENT (periodic ~915 escalation; all workstreams done; driver spinning idle).
+- **Blockers** (unchanged): Notion 401. Ledger DLQ (CF Access on prod). GitHub MCP disconnected on prod. Ollama unreachable (non-blocking). wrangler/workers-types peer conflict in worker (non-blocking, pre-existing).
