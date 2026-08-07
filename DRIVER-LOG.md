@@ -3342,7 +3342,7 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   - `git fetch --all`; 1 open PR (#1101, stale idle log, no unique commits vs main) → closed as superseded.
   - Verified workstream states: A (build+tests ✓), B (servers.json github → `https://api.githubcopilot.com/mcp/` ✓), C (focus-profiles.json 6 profiles ✓), D (scenario.test.ts 1157 lines ✓ + simulation.test.ts 229 lines ✓), E (focus-suggestions.json 29704 lines ✓).
   - `npm audit`: **0 vulnerabilities**.
-  - Notion MCP not installed in this session (connector not_installed); DRIVER-LOG.md continues as fallback board.
+  - Notion: underlying failure is **token 401** (recorded on DRIVER-BOARD.md); connector also not_installed in this session. Same fix for both: rotate the token (`op://ChittyOS-Integrations/notion/api_token`) then re-enable the connector.
   - **No push notification sent** — system healthy, no new signal.
 - **State summary**:
   - All workstreams A–E: DONE. Tests: 1418/0/3. Build: clean. 0 vulnerabilities.
@@ -3351,7 +3351,7 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   2. **Add new workstreams** to DRIVER-BOARD.md if planned work exists.
   3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears Ledger DLQ entries.
   4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod — reconnects GitHub MCP backend.
-  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  5. **Rotate Notion token** (`op://ChittyOS-Integrations/notion/api_token`) — fixes the 401 and restores connector availability.
   6. **Stale branch cleanup** — bulk-delete ~1000+ remote `auto/` branches (enable auto-delete on merge in repo settings).
 - **Next run**: Idle unless new workstreams added.
-- **Blockers**: Notion 401. Ledger DLQ (CF Access on prod). GitHub MCP disconnected on prod. Ollama unreachable (non-blocking).
+- **Blockers**: Notion token 401 (connector also not_installed this session — same fix). Ledger DLQ (CF Access on prod). GitHub MCP disconnected on prod. Ollama unreachable (non-blocking).
