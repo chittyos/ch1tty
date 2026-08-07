@@ -3340,3 +3340,28 @@ _Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
   8. **Major bumps pending human review**: typescript 5→7, @types/node 22→26, c8 11→12.
 - **Next run**: PR #1108 CI running (CodeQL); check status and merge if green. No new workstream work expected unless F is defined.
 - **PushNotification**: NOT SENT (PR #1108 is a routine minor dep bump; no critical new signal since run ~914/~916 escalations).
+
+---
+
+### 2026-08-07 (run ~924 — idle; all workstreams done; no new signal)
+- **Workstream**: None (all A–E done; workstream F awaiting human decision)
+- **Branch/PR**: none (direct commit to main — run log only). 0 open PRs (PR #1106 escalation notice closed/merged since run ~922).
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~44s) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - `git checkout main && git pull origin main` (fast-forwarded 21 commits from detached HEAD). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3 (1421 total, 51 suites, ~44s). `npm audit`: 0 vulnerabilities.
+  - `git fetch --all`. 0 open PRs (GitHub MCP confirmed). 2 open issues: #1071, #1072 — both pending human decisions (extensibility rebuild, 1Password retirement).
+  - `npm outdated`: only major breaking bumps remain (typescript 5→7, @types/node 22→26, c8 11→12) — all flagged "pending human review".
+  - All workstreams verified: A ✓ B ✓ C ✓ D ✓ E ✓. Guardrails intact: 5-tool surface (search/execute/status/reload/cast); buildCastExplanation freeze — test 1197: 56 fields (no focus), test 1198: 87 fields (focus:code). 0 violations on main.
+  - Notion token still invalid (401); DRIVER-BOARD.md is durable cross-run board.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **~924th run. 0 open PRs.**
+- **Human-action items** (unchanged):
+  1. **Disable or redirect hourly schedule** — 924+ consecutive runs; all A–E exhausted; schedule burns compute with no productive work.
+  2. **Add workstream F** (McpAgent Phases 2–4) to DRIVER-BOARD.md — enables Phase 2 work next run.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  5. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  7. **Major bumps pending human review**: typescript 5→7, @types/node 22→26, c8 11→12.
+  8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: No open PRs; 0 vulns; all workstreams done. Idle. DISABLE THE SCHEDULE or add workstream F to DRIVER-BOARD.md.
+- **PushNotification**: NOT SENT (state unchanged since run ~916 escalation; no new signal).
