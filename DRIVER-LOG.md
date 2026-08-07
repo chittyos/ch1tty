@@ -3355,3 +3355,24 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   6. **Stale branch cleanup** — bulk-delete ~986 remote `auto/` branches (enable auto-delete on merge in repo settings).
 - **Next run**: Idle unless new workstreams added to DRIVER-BOARD.md.
 - **Blockers**: Notion 401. Ledger DLQ (CF Access on prod). GitHub MCP disconnected on prod. Ollama unreachable (non-blocking).
+
+---
+
+### 2026-08-07T06:15 UTC (fix: lockfile sync — npm ci broken on main)
+
+- **Workstream**: A (Gateway health) — `npm ci` was broken post-agents@0.19.0 upgrade
+- **Branch/PR**: `auto/fix-lockfile-agents-0.19.0` → [PR #1103](https://github.com/chittyos/ch1tty/pull/1103)
+- **Build**: clean | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total) | **Audit**: 0 vulnerabilities
+- **Root cause**: Commit f494e0d upgraded `agents` to `^0.19.0` in both `package.json` and `workers/chittyagent-ch1tty/package.json` but did not regenerate either lock file, leaving both at `agents@0.17.4`. `npm ci` in both directories failed with `EUSAGE: lock file out of sync`.
+- **Fix**: Regenerated root `package-lock.json` via `npm install`; regenerated `workers/chittyagent-ch1tty/package-lock.json` via `npm install --legacy-peer-deps` (worker has a pre-existing `wrangler`/`@cloudflare/workers-types` peer dep conflict requiring the flag). Both lock files now at `agents@0.19.0`; `npm ci` (root) and `npm ci --legacy-peer-deps` (worker) pass clean.
+- **PR #1103 CI**: CodeQL ✅ all 3 checks green. CodeRabbit: 5/5 pre-merge checks passed; 1 finding (worker lockfile also out of sync — addressed in follow-up commit). Codex usage-limit bot comment — no action.
+- **State summary**: All workstreams A–E: DONE. Lockfile now in sync. Tests: 1418/0/3. Build: clean. 0 vulnerabilities.
+- **Human action required** (unchanged + new):
+  1. **Merge PR #1103** — unblocks clean `npm ci` on every fresh clone/CI run.
+  2. **Disable or redirect hourly schedule** — all workstreams done; idle runs burn compute.
+  3. **Add new workstreams** to DRIVER-BOARD.md if planned work exists.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears Ledger DLQ.
+  5. **Set `GITHUB_MCP_AUTHORIZATION`** on prod — reconnects GitHub MCP backend.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  7. **Stale branch cleanup** — ~1000+ remote `auto/` branches (enable auto-delete on merge).
+- **Next run**: Watch PR #1103 CI; if green merge. Otherwise idle.
