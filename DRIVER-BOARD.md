@@ -3219,3 +3219,27 @@ _Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
 - **Next run**: Idle. DISABLE THE SCHEDULE or add workstream F to DRIVER-BOARD.md.
 - **PushNotification**: NOT SENT (already sent run ~914; no new signal).
 - **PushNotification**: SENT — driver idle 900+ runs; all workstreams done; please disable schedule or define workstream F.
+
+---
+
+### 2026-08-07 (run ~917 — idle; all workstreams done; no new signal)
+- **Workstream**: None (all A–E done; workstream F awaiting human decision)
+- **Branch/PR**: none (direct commit to main — run log only). 1 open PR: #1106 (escalation notice)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3 (1421 total). `npm audit`: 0 vulnerabilities.
+  - `git fetch --all`. 1 open PR: #1106 (escalation — `auto/2026-08-07-run-log-b`, awaiting human merge/close).
+  - All workstreams verified: A ✓ B ✓ C ✓ D ✓ E ✓. Guardrails intact (5-tool surface; buildCastExplanation freeze tests 1197+1198 green).
+  - No code changes on main since run ~916. No open Dependabot alerts.
+  - Notion token still invalid (401); DRIVER-BOARD.md is durable cross-run board.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **~917th run. 1 open PR: #1106 (escalation).**
+- **Human-action items** (unchanged):
+  1. **Disable or redirect hourly schedule** — 917+ consecutive idle runs; all A–E exhausted; schedule burns compute with no productive work.
+  2. **Add workstream F** (McpAgent Phases 2–4) to DRIVER-BOARD.md — enables Phase 2 work next run.
+  3. **Merge or close PR #1106** — escalation notice open since 2026-08-07T13:16Z.
+  4. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  5. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  6. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  7. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+- **Next run**: No open PRs (besides #1106); no new workstreams. Idle. DISABLE THE SCHEDULE or add workstream F to DRIVER-BOARD.md.
+- **PushNotification**: NOT SENT (already sent at run ~914 today; no new signal).
