@@ -3313,3 +3313,30 @@ _Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
   7. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
 - **Next run**: No new workstreams. Idle. DISABLE THE SCHEDULE or add workstream F to DRIVER-BOARD.md.
 - **PushNotification**: NOT SENT (sent at runs ~914 and ~916 today; no new signal).
+
+---
+
+### 2026-08-07 (run ~922 — minor dep bump: agents 0.19→0.20, workers-oauth-provider 0.8→0.10)
+- **Workstream**: A (maintenance — minor dep bump)
+- **Branch/PR**: `auto/A-dep-refresh-aug2026-oauth-agents` / PR #1108
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~51s) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - `git checkout main && git pull origin main` (fast-forwarded 18 commits). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3 (1421 total, 51 suites). `npm audit`: 0 vulnerabilities.
+  - `git fetch --all`. 0 open PRs at run start.
+  - `npm outdated`: `@cloudflare/workers-oauth-provider` 0.8.3→0.10.2 (minor) and `agents` 0.19.0→0.20.1 (minor) available. Major bumps (typescript 5→7, @types/node 22→26, c8 11→12) still pending human review.
+  - Created branch `auto/A-dep-refresh-aug2026-oauth-agents`; bumped `package.json` + `npm install`; verified build + tests green (1418/0/3). Pushed; opened PR #1108.
+  - PR #1108 CI: 2 CodeQL checks queued (Analyze javascript-typescript + Analyze actions). Codex bot posted usage-limit notice (no action needed).
+  - All workstreams verified: A ✓ B ✓ C ✓ D ✓ E ✓. Guardrails intact: 5-tool surface (search/execute/status/reload/cast); buildCastExplanation freeze — test 1197: 56 fields, test 1198: 87 fields.
+  - Notion token still invalid (401); DRIVER-BOARD.md is durable cross-run board.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **~922nd run. 1 open PR: #1108 (agents+oauth-provider minor bump).**
+- **Human-action items** (unchanged):
+  1. **Disable or redirect hourly schedule** — 922+ consecutive runs; all A–E exhausted; schedule burns compute with no productive work.
+  2. **Add workstream F** (McpAgent Phases 2–4) to DRIVER-BOARD.md — enables Phase 2 work next run.
+  3. **Merge or close PR #1106** — escalation notice open since 2026-08-07T13:16Z.
+  4. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  5. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  6. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  7. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  8. **Major bumps pending human review**: typescript 5→7, @types/node 22→26, c8 11→12.
+- **Next run**: PR #1108 CI running (CodeQL); check status and merge if green. No new workstream work expected unless F is defined.
+- **PushNotification**: NOT SENT (PR #1108 is a routine minor dep bump; no critical new signal since run ~914/~916 escalations).
