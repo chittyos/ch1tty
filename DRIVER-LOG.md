@@ -3348,10 +3348,10 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   - All workstreams A–E: DONE. Tests: 1418/0/3. Build: clean. 0 vulnerabilities.
 - **Human action required** (unchanged; schedule is burning compute with no work to do):
   1. **Disable or redirect hourly schedule** — all workstreams complete; each idle run consumes compute with no progress.
-  2. **Add new workstreams** to DRIVER-LOG.md if planned work exists.
+  2. **Add new workstreams** to DRIVER-BOARD.md if planned work exists.
   3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears Ledger DLQ entries.
   4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod — reconnects GitHub MCP backend.
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
   6. **Stale branch cleanup** — bulk-delete ~985 `auto/` branches (repo Settings → Branches → enable "Automatically delete head branches"; then batch-delete stale remotes).
-- **Next run**: Idle unless new workstreams added.
+- **Next run**: Idle unless new workstreams added to DRIVER-BOARD.md.
 - **Blockers**: Notion 401. Ledger DLQ (CF Access on prod). GitHub MCP disconnected on prod. Ollama unreachable (non-blocking).
