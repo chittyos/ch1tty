@@ -3355,3 +3355,29 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   6. **Stale branch cleanup** — bulk-delete ~986 remote `auto/` branches (enable auto-delete on merge in repo settings).
 - **Next run**: Idle unless new workstreams added to DRIVER-BOARD.md.
 - **Blockers**: Notion 401. Ledger DLQ (CF Access on prod). GitHub MCP disconnected on prod. Ollama unreachable (non-blocking).
+
+---
+
+### 2026-08-07T08:15 UTC (run ~908 — PR #1103 body fixed + auto-merge enabled)
+
+- **Workstream**: A (Gateway health) — triaged open PR, addressed CodeRabbit review comment, enabled auto-merge
+- **Build**: `npm run build` ✅ clean (tsc exit 0). `npm test` ✅ 1418/0/3 — unchanged from prior runs.
+- **Open PRs at run start**: #1103 (`auto/fix-lockfile-agents-0.19.0`) lockfile sync; #1104 (`auto/2026-08-07-run-log`) prior idle log.
+- **PR #1103 status**: `mergeable_state: blocked` — all CI checks green (CodeQL ✅, Analyze ✅). CodeRabbit flagged: (a) PR body said "`package-lock.json` only" but `workers/chittyagent-ch1tty/package-lock.json` was also updated, and (b) `npm ci ✅` claim was under-scoped — only the root passes bare `npm ci`; the worker requires `--legacy-peer-deps` due to a **pre-existing** `wrangler@4.118.0` / `@cloudflare/workers-types@^4` peer dep conflict unrelated to the agents bump.
+- **Actions taken**:
+  1. Confirmed worker lockfile is correct (agents@0.19.0 already in PR branch diff vs. main).
+  2. Updated PR #1103 body to accurately scope `npm ci` — root: bare `npm ci` ✅; worker dir: `npm ci --legacy-peer-deps` ✅; pre-existing peer dep conflict documented as separate item.
+  3. Enabled auto-merge (SQUASH) on PR #1103 — will fire once a reviewer approves.
+- **Workstream states** (confirmed by reading repo + test output):
+  - A (Gateway): PR #1103 open + auto-merge armed. Blocked on human review approval.
+  - B (GitHub migration): ✅ Done — `servers.json` `github` entry uses `https://api.githubcopilot.com/mcp/` with `envHeaders.Authorization: GITHUB_MCP_AUTHORIZATION`.
+  - C (Focus profiles): ✅ Done — `focus-profiles.json` + `src-stdio/focus.ts` + 15+ focus tests.
+  - D (Scenario testing): ✅ Done — `test/scenario.test.ts` + `test/simulation.test.ts` + `sim/scenarios.js` passing.
+  - E (Alchemist brainstorm): ✅ Done — `focus-suggestions.json` (1750 combos, 1759 prompts, 6 profiles) + `src-stdio/suggestions.ts` serving it.
+- **Follow-up actions**:
+  1. **Approve and merge PR #1103** — auto-merge is armed; one human review approval triggers it.
+  2. **Fix worker peer dep conflict** (separate issue) — `workers/chittyagent-ch1tty`: update to `@cloudflare/workers-types@^5.20260730.1` so bare `npm ci` passes.
+  3. **Close PR #1104** — superseded by this entry.
+  4. **Stale branch cleanup** — ~986+ remote `auto/` branches; enable auto-delete-on-merge or bulk delete.
+- **Next run**: Idle unless #1103 merges (then confirm A is done) or new workstreams added.
+- **Blockers**: PR #1103 needs human review approval. Notion 401. Ledger DLQ (CF Access on prod). GitHub MCP disconnected on prod (needs `GITHUB_MCP_AUTHORIZATION`). Ollama unreachable (non-blocking).
