@@ -3066,3 +3066,31 @@ _Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
   9. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
 - **Next run**: 0 open PRs; 0 vulns; all workstreams done. Idle unless F is added. Next periodic escalation at ~run 910 (5 runs away).
 - **PushNotification**: NOT SENT (PR #1098 merged — hono CVE cleared, no action needed from user; all workstreams done, state unchanged from run ~904 escalation).
+
+---
+
+### 2026-08-07 (run ~910 — PERIODIC ESCALATION — PR #1103 open, stale log PRs closed)
+- **Workstream**: None (all A–E done since run ~735; workstream F awaiting human decision)
+- **Branch/PR**: none (direct commit to main — run log only); closed PRs #1104 + #1105 (stale run-log PRs, superseded)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~41s) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - npm install clean. npm run build clean (tsc exit 0). npm test: 1418/0/3 (1421 total, 51 suites, ~41s). npm audit: 0 vulnerabilities.
+  - Found 3 open PRs: **PR #1103** (`auto/fix-lockfile-agents-0.19.0`) — lockfile sync after agents@0.19.0 bump; all CI checks ✅ (CodeQL, 2×Analyze); `mergeable_state: blocked` (needs human review/approval). PRs #1104 + #1105 — stale run-log PRs with only DRIVER-BOARD.md changes.
+  - **Closed PRs #1104 and #1105** (superseded by this log entry; they only updated the board with now-stale information).
+  - PR #1103 remains open and awaiting human approval. Until merged, `npm ci` fails on fresh clones (lockfile pinned at agents@0.17.4 while package.json requests @0.19.0).
+  - Guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) intact; buildCastExplanation metric freeze ACTIVE (56/87 field counts, tests 1197–1198); 0 violations on main.
+  - Notion token still invalid (401); DRIVER-BOARD.md is durable board.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **~910th run. 1 open PR: #1103 (needs review).**
+- **Human-action items**:
+  1. **Review + merge PR #1103** — https://github.com/chittyos/ch1tty/pull/1103 — lockfile sync; CI green; no code changes. `npm ci` fails on fresh clones until merged.
+  2. **Disable or redirect hourly schedule** — 910+ consecutive runs; all A–E exhausted; schedule is consuming compute with no work to do.
+  3. **Add workstream F** (McpAgent Phases 2–4) to DRIVER-BOARD.md to give driver new productive work.
+  4. **mcp.ch1tty.com health/discovery 404** — verify CF worker route points to `chittyagent-ch1tty`.
+  5. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  6. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  7. **Stale branch cleanup** — 980+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  8. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  9. **Major/breaking bumps** pending human review: typescript 5→7, @types/node 22→26, c8 11→12, agents 0.17→0.20, @cloudflare/codemode 0.4.x→0.5.x.
+  10. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: PR #1103 still open (needs human approval, not auto-mergeable). No new workstream work. Idle. Next periodic escalation at ~run 915 (5 runs away).
+- **PushNotification**: SENT — periodic escalation at run ~910; PR #1103 (lockfile) needs human review; schedule should be disabled or workstream F added.
