@@ -3513,3 +3513,28 @@ _Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
   8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
 - **Next run**: No open PRs; 0 vulns; all workstreams done. Idle. DISABLE THE SCHEDULE or add workstream F to DRIVER-BOARD.md.
 - **PushNotification**: SENT — run ~934 escalation (17+ runs since ~916 last escalation; schedule still burning compute).
+
+---
+
+### 2026-08-08 (run ~941 — idle; all workstreams done; escalation #2)
+- **Workstream**: None (all A–E done; workstream F awaiting human decision)
+- **Branch/PR**: none (direct commit to main — run log only). 0 open PRs.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~52s) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - `git checkout main && git pull origin main` (fast-forwarded 38 commits from detached HEAD — dep bumps: agents 0.17→0.20, workers-oauth-provider 0.8→0.10, tsx 4.22→4.23, wrangler 4.118→4.120, compatibility_date 2026-03-24→2026-08-07). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3 (1421 total, 51 suites, ~52s). `npm audit`: 0 vulnerabilities.
+  - GitHub MCP confirmed: 0 open PRs.
+  - `npm outdated`: only major breaking bumps (typescript 5→7, @types/node 22→26, c8 11→12) — all pending human review.
+  - All workstreams verified: A ✓ B ✓ C ✓ D ✓ E ✓. Guardrails intact: 5-tool surface (search/execute/status/reload/cast); buildCastExplanation freeze — test 1197: 56 fields (no focus), test 1198: 87 fields (focus:code). 0 violations on main.
+  - Notion token still invalid; DRIVER-BOARD.md is durable cross-run board.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **~941st run. 0 open PRs.**
+- **Human-action items** (unchanged):
+  1. **Disable or redirect hourly schedule** — 941+ consecutive runs; all A–E exhausted; schedule burns compute with no productive work.
+  2. **Add workstream F** (McpAgent Phases 2–4) to DRIVER-BOARD.md — enables Phase 2 work next run.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  5. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  7. **Major bumps pending human review**: typescript 5→7, @types/node 22→26, c8 11→12.
+  8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: No open PRs; 0 vulns; all workstreams done. Idle. DISABLE THE SCHEDULE or add workstream F to DRIVER-BOARD.md.
+- **PushNotification**: SENT — run ~941 escalation (#2 since ~934; 7 more idle runs since last ping; schedule still burning compute with nothing to do).
