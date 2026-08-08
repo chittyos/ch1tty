@@ -3452,3 +3452,29 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 - **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **~944th run. 0 open PRs.**
 - **Next run**: No open PRs; 0 vulns; all workstreams done. Idle. DISABLE THE SCHEDULE or add workstream F to DRIVER-BOARD.md.
 - **PushNotification**: NOT SENT (escalation #2 sent at run ~941, only 3 runs ago — too soon to re-escalate; next escalation if 10+ runs pass since ~941 without response).
+
+---
+
+### 2026-08-08 (run ~947 — idle; all workstreams done; no new signal)
+
+- **Workstream**: None (all A–E done)
+- **Branch/PR**: run log commit only
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~49s) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3. `npm audit`: 0 vulnerabilities.
+  - Read CLAUDE.md; 5-tool surface invariant and `buildCastExplanation` metric freeze confirmed intact on main (test 1197: 56 fields; test 1198: 87 fields).
+  - `git fetch --all`; 4 new local refs (fix/viewport-probe-namespacing, fix/worker-routes-and-deps, refactor/backend-interface, register-chittyconnect-mcp) — all from May–June 2026, pre-existing on origin, last commits 2026-05-07 to 2026-06-15; not new work.
+  - fast-forwarded 44 commits to main (all run log entries from runs ~903–946). 0 open PRs (GitHub MCP confirmed).
+  - All workstream states verified: A (build+tests green ✓), B (servers.json github → remote GitHub MCP ✓), C (focus-profiles.json ✓), D (scenario tests passing ✓), E (focus-suggestions.json ✓). All DONE.
+  - `npm outdated`: only major breaking bumps available (typescript 5→7, @types/node 22→26, c8 11→12) — all pending human review.
+  - Notion token still invalid (401); DRIVER-LOG.md + DRIVER-BOARD.md are durable cross-run board.
+- **State summary**: All workstreams A–E: DONE. Tests: 1418/0/3. Build: clean. 0 vulnerabilities. 0 open PRs. ~947th run.
+- **Human action required** (unchanged):
+  1. **Disable or redirect hourly schedule** — no new workstreams; idle runs burn compute.
+  2. **Add workstream F** to DRIVER-BOARD.md (McpAgent Phases 2–4 suggestion still open).
+  3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears Ledger DLQ.
+  4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod — reconnects GitHub MCP backend.
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  6. **Stale branch cleanup** — ~1000+ remote `auto/` branches.
+  7. **Review major dep bumps**: TypeScript 5→7, @types/node 22→26, c8 11→12.
+- **Next run**: Idle. Next escalation at ~951 (4 more idle runs).
