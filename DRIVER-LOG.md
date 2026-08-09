@@ -3543,3 +3543,30 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   8. **PR #1113 CI** — if CI re-run still fails, it's infrastructure flakiness (code is clean locally). Human may need to manually merge or investigate GitHub Actions runner health.
 - **Next run**: Check PR #1113 CI result. Escalation #4 due at ~964 (1 run away — last was ~954).
 - **PushNotification**: NOT SENT (escalation #3 at run ~954; threshold 10; ~964 is next — 1 run away from this ~963).
+
+---
+
+### 2026-08-09 (run ~964 — PR #1113 merged)
+
+- **Workstream**: Maintenance (all A–E done; PR #1113 driven to merge)
+- **Branch/PR**: PR #1113 merged (`auto/docs-comms-mcp-readme` → main; 4 commits: add row, clarify env vars, fix tool name + bound providers + env var examples, merge main)
+- **Build**: clean | **Tests**: 1418 pass / 0 fail / 3 skip | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - Found `comms-mcp` missing from `apps/README.md` focused-servers table (fully implemented, 6 source files, registered in servers.json, test coverage).
+  - PR #1113 created. Three reviewer rounds (CodeRabbit + Codex):
+    1. Clarified `_CF_ACCESS_CLIENT_ID`/`_CF_ACCESS_CLIENT_SECRET` over vague `_CF_ACCESS_*`; noted servers.json registry change required to activate.
+    2. Fixed tool name `recentLog` → `comms.recentLog` (bare name returns Unknown tool).
+    3. Corrected bound providers: only quo + email bound; imessage/twilio/voice degrade to ok:false.
+    4. Added concrete env var examples: `COMMS_MCP_CHITTYAGENT_QUO_*`, `COMMS_MCP_CHITTYAGENT_GOOGLE_*`.
+  - All CodeRabbit pre-merge checks (5/5) passed. CodeQL neutral. CI green. Merged.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. PR #1113 merged. ~964th run.
+- **Human-action items** (unchanged from run ~963):
+  1. **Disable or redirect hourly schedule** — 964+ consecutive runs; all A–E exhausted.
+  2. **Add workstream F** — McpAgent Phases 2–4 suggestion still open.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod**.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`).
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  6. **Stale branch cleanup** — 1000+ remote `auto/` branches accumulating.
+  7. **Major dep bumps pending**: TypeScript 5→7, @types/node 22→26, c8 11→12.
+- **Next run**: All workstreams done; no open PRs; no new signal. Consider adding workstream F (McpAgent Phases 2–4) or disabling schedule.
+- **PushNotification**: NOT SENT (all clear; PR merged; no blocker).
