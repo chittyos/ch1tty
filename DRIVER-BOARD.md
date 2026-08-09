@@ -3607,3 +3607,14 @@ _Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
   8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
 - **Next run**: No open PRs; 0 vulns; all workstreams done. Idle. DISABLE THE SCHEDULE or add workstream F to DRIVER-BOARD.md. Next escalation at ~951.
 - **PushNotification**: NOT SENT (escalation #2 sent at run ~941, 6 runs ago — threshold is 10; next escalation at ~951).
+
+---
+
+### 2026-08-09 (run ~949 — idle; all workstreams done; no new signal)
+- **Workstream**: None (all A–E done; workstream F awaiting human decision)
+- **Branch/PR**: none (direct commit to main — run log only). 0 open PRs.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~48s) | **Audit**: 0 vulnerabilities
+- **Actions**: `git checkout main && git pull origin main` (fast-forwarded 46 commits — all idle run logs + dep bumps: agents 0.19→0.20, workers-oauth-provider 0.8→0.10, tsx 4.23.11, wrangler 4.120). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3 (1421 total, 51 suites, ~48s). `npm audit`: 0 vulnerabilities. 0 open PRs (GitHub MCP confirmed). All A–E verified. Guardrails intact: 5-tool surface (search/execute/status/reload/cast); buildCastExplanation freeze at 56/87 fields.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **~949th run. 0 open PRs.**
+- **Next run**: No open PRs; 0 vulns; all workstreams done. Idle. DISABLE THE SCHEDULE or add workstream F to DRIVER-BOARD.md. Next escalation at ~951 (2 runs away).
+- **PushNotification**: NOT SENT (escalation #2 sent at run ~941, 8 runs ago — threshold is 10; next escalation at ~951).
