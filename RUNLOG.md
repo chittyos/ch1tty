@@ -1502,3 +1502,33 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 - PR #1098 (hono ^4.12.34 in chittyagent-ch1tty worker, SEC-FIX-8) **MERGED** to main.
 - All Dependabot alerts cleared. Root + 5 apps + worker: 0 vulnerabilities.
 - CodeRabbit: no actionable findings. All workstreams A–E done. No open PRs.
+
+---
+
+### 2026-08-09T~959 (idle — all workstreams done)
+
+- **Workstream**: None (A–E done; workstream F awaiting human decision)
+- **Branch/PR**: direct commit to main (run log only; no source changes)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1421 total (1418 pass / 0 fail / 3 skip)
+- **Actions**:
+  - `npm ci` clean, `npm run build` clean (tsc exit 0), `npm test` → **1418 pass / 0 fail / 3 skip** ✓
+  - `npm audit` → **0 vulnerabilities** ✓
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) fixed; `buildCastExplanation` metric freeze ACTIVE.
+  - `git fetch --all`; HEAD at origin/main `2ff7ba8`. No open PRs. Confirmed local branch = origin/main.
+  - **Workstream A**: build clean, 5 meta-tools confirmed ✓
+  - **Workstream B**: `github` → `https://api.githubcopilot.com/mcp/` with `envHeaders` in servers.json ✓
+  - **Workstream C**: `focus-profiles.json` (6 profiles), `src/focus.ts`, CH1TTY_FOCUS env, per-call focus param, status reporting, all focus tests pass ✓
+  - **Workstream D**: `test/scenario.test.ts`, `test/simulation.test.ts`, `sim/scenarios.ts` harness ✓
+  - **Workstream E**: `focus-suggestions.json` catalog (large, multi-profile) ✓
+  - Noted 2 stale focus branches (`auto/focus-profiles-v2`, `auto/focus-code-profile`) with unmerged commits; diff vs origin/main is 108k+ deletions (old work superseded by current main state). Not merging — content superseded.
+  - Notion board: unavailable (API 401 — token `op://ChittyOS-Integrations/notion/api_token` not resolvable in remote container). Board state maintained in DRIVER-BOARD.md.
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E ✓ (all done)
+- **Blockers** (unchanged — all require human action):
+  1. **Disable or redirect hourly schedule** — 959+ consecutive runs, ~550+ idle; no new work to advance.
+  2. **Add workstream F** (McpAgent Phases 2–4) to DRIVER-BOARD.md to give driver new work.
+  3. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend in live gateway.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) to clear ledger DLQ.
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  6. **Stale branch cleanup** — 1000+ auto/* branches; enable "Automatically delete head branches" in GitHub Settings.
+- **Next run**: Same idle state expected. No new work until workstream F is added or blockers resolved.
+- **PushNotification**: NOT sent (idle; notification cadence — escalate every ~10 runs; last at run ~791).
