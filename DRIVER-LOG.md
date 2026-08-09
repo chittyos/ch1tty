@@ -3570,3 +3570,27 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   7. **Major dep bumps pending**: TypeScript 5→7, @types/node 22→26, c8 11→12.
 - **Next run**: All workstreams done; no open PRs; no new signal. Consider adding workstream F (McpAgent Phases 2–4) or disabling schedule.
 - **PushNotification**: NOT SENT (all clear; PR merged; no blocker).
+
+---
+
+### 2026-08-09 (run ~965 — idle; all workstreams done; no new signal)
+
+- **Workstream**: None (all A–E done; workstream F awaiting human decision)
+- **Branch/PR**: none (direct commit to main — run log only). 0 open PRs.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~53s) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - Local main was detached (HEAD from prior run); fetched origin/main and reset local main to 3f49f84 (run ~964 — PR #1113 merged). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3 (1421 total, 51 suites, ~53s). `npm audit`: 0 vulnerabilities.
+  - 0 open PRs (GitHub MCP confirmed). 2 open issues: #1071 (extensibility rebuild) and #1072 (1Password retirement) — both ChittyOS-ecosystem level, no gateway code changes required.
+  - All workstreams verified: A ✓ B ✓ C ✓ D ✓ E ✓. Guardrails intact: 5-tool surface (search/execute/status/reload/cast); buildCastExplanation freeze at 56/87 fields (tests 1197/1198 pass). github → api.githubcopilot.com/mcp/ ✓. focus-profiles.json (6 profiles) ✓. focus-suggestions.json ✓. sim/ + scenario/simulation tests ✓.
+  - Notion token still invalid (401); DRIVER-LOG.md + DRIVER-BOARD.md are durable state.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **~965th run. 0 open PRs.**
+- **Human-action items** (unchanged from run ~964):
+  1. **Disable or redirect hourly schedule** — 965+ consecutive runs; all A–E exhausted; no new workstreams; burns compute hourly.
+  2. **Add workstream F** (McpAgent Phases 2–4) to DRIVER-BOARD.md to give driver new work.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears Ledger DLQ.
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  6. **Stale branch cleanup** — 1000+ remote `auto/` branches accumulating.
+  7. **Major dep bumps pending review**: TypeScript 5→7, @types/node 22→26, c8 11→12.
+- **Next run**: Same idle state expected. Escalation #4 due at ~974 (9 runs away; last escalation was #3 at ~954; #4 was skipped at ~964 because PR #1113 merged — real work done).
+- **PushNotification**: NOT SENT (idle; no new signal since run ~964 PR merge; escalation #4 due at ~974).
