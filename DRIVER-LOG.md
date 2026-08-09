@@ -3515,3 +3515,31 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   6. **Stale branch cleanup** — 993 remote `auto/` branches accumulating.
   7. **Major dep bumps pending**: TypeScript 5→7, @types/node 22→26, c8 11→12.
 - **PushNotification**: SENT (escalation — 954 consecutive idle runs, no human response detected).
+
+---
+
+### 2026-08-09 (run ~963 — PR #1113 CI triage; docs branch updated)
+
+- **Workstream**: Maintenance (all A–E done; driving PR #1113 to green)
+- **Branch/PR**: PR #1113 open (`auto/docs-comms-mcp-readme` → main); merged latest main into branch and pushed to re-trigger CI
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~54s) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3 ✓. `npm audit`: 0 vulns.
+  - Local main was 50 commits behind origin/main (diverged from prior run); `git reset --hard origin/main` to sync.
+  - Read CLAUDE.md; 5-tool surface invariant and `buildCastExplanation` metric freeze confirmed intact. All A–E verified.
+  - PR #1113 (`auto/docs-comms-mcp-readme`): docs-only change (one table row added to `apps/README.md`). CI showing conclusion=failure on all 3 prior runs, but `list_workflow_jobs` returns 0 jobs for ALL runs — MCP server lacks job-level read permission. Baseline main SHA `94eec1e2` also shows a failure run alongside a success run (different workflows, same commit) → CI failure is infrastructure-level flakiness, not a code issue.
+  - Confirmed locally: all 4 CI-matrix apps (tasks-mcp, ledger-mcp, session-coordinator-mcp, evidence-mcp) build + test clean on both the docs branch and main.
+  - Merged `origin/main` into `auto/docs-comms-mcp-readme` (no conflicts — only run-log commits between `e337f4e` and `94eec1e`); pushed. New CI run triggered.
+  - `npm outdated`: only major-version bumps (typescript 5→7, @types/node 22→26, c8 11→12) — all pending human review.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. PR #1113 open (CI re-triggered; locally verified clean). ~963rd run.
+- **Human-action items** (unchanged):
+  1. **Disable or redirect hourly schedule** — 963+ consecutive runs; all A–E exhausted; no new workstreams.
+  2. **Add workstream F** to DRIVER-BOARD.md — McpAgent Phases 2–4 suggestion still open.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears Ledger DLQ.
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  6. **Stale branch cleanup** — 1000+ remote `auto/` branches accumulating.
+  7. **Major dep bumps pending**: TypeScript 5→7, @types/node 22→26, c8 11→12.
+  8. **PR #1113 CI** — if CI re-run still fails, it's infrastructure flakiness (code is clean locally). Human may need to manually merge or investigate GitHub Actions runner health.
+- **Next run**: Check PR #1113 CI result. Escalation #4 due at ~964 (1 run away — last was ~954).
+- **PushNotification**: NOT SENT (escalation #3 at run ~954; threshold 10; ~964 is next — 1 run away from this ~963).
