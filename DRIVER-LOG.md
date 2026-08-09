@@ -3497,3 +3497,21 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   7. **Major dep bumps pending**: TypeScript 5→7, @types/node 22→26, c8 11→12.
 - **Next run**: Idle. **Next escalation at ~951 (1 run away)** — will send PushNotification next run.
 - **PushNotification**: NOT SENT (escalation #2 sent at run ~941, 9 runs ago — threshold is 10; escalating next run at ~951).
+
+---
+
+### 2026-08-09 (run ~954 — idle; all workstreams done; no new signal)
+- **Workstream**: None (all A–E done; workstream F awaiting human decision)
+- **Branch/PR**: `auto/2026-08-09-run-log-954` (this entry)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites)
+- **Actions**: `npm ci` clean. `npm run build` clean. `npm test`: 1418/0/3. All A–E verified. Merged stale PR #1109 (run ~953 idle log). Guardrails intact: 5-tool surface; buildCastExplanation freeze at 56/87 fields. `focus-suggestions.json`: 276–305 combos / 278–304 prompts per profile across 6 profiles. Notion token still invalid (401); durable state in DRIVER-LOG.md + DRIVER-BOARD.md.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 993 stale remote auto/ branches (incl. 261 guardrail-violation cast-explain-ratio branches — none merged; metric freeze tests pass). **~954th consecutive idle run.**
+- **Human-action items** (unchanged — escalation):
+  1. **Disable or redirect hourly schedule** — 954+ consecutive idle runs; all A–E exhausted; no new workstreams; burning compute hourly.
+  2. **Add workstream F** to DRIVER-BOARD.md — McpAgent Phases 2–4 suggestion from run ~600+ still open.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears Ledger DLQ.
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  6. **Stale branch cleanup** — 993 remote `auto/` branches accumulating.
+  7. **Major dep bumps pending**: TypeScript 5→7, @types/node 22→26, c8 11→12.
+- **PushNotification**: SENT (escalation — 954 consecutive idle runs, no human response detected).
