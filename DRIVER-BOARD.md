@@ -3618,3 +3618,27 @@ _Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
 - **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **~949th run. 0 open PRs.**
 - **Next run**: No open PRs; 0 vulns; all workstreams done. Idle. DISABLE THE SCHEDULE or add workstream F to DRIVER-BOARD.md. Next escalation at ~951 (2 runs away).
 - **PushNotification**: NOT SENT (escalation #2 sent at run ~941, 8 runs ago — threshold is 10; next escalation at ~951).
+
+---
+
+### 2026-08-09 (run ~956 — idle; all workstreams done; no new signal)
+- **Workstream**: None (all A–E done; workstream F awaiting human decision)
+- **Branch/PR**: none (direct commit to main — run log only). 0 open PRs (PR #1112 stale idle log, closed this run).
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~42s) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - Detected divergence: local main was 50 commits behind origin/main (local had Aug 6 security-fix commits already merged via PRs #1095–#1098; origin had Aug 7–9 idle run logs). Reset local main to origin/main (safe — all real code already in origin via merged PRs). `npm ci` clean (agents@0.20.0 + lockfile in sync). `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3 (1421 total, 51 suites, ~42s). `npm audit`: 0 vulnerabilities.
+  - Closed PR #1112 (stale idle run-log PR with no code changes).
+  - All workstreams verified: A ✓ B ✓ C ✓ D ✓ E ✓. Guardrails intact: 5-tool surface (search/execute/status/reload/cast); buildCastExplanation freeze tests 1197/1198 pass (56 fields no-focus, 87 fields focus:code). github entry → api.githubcopilot.com/mcp/ ✓. focus-profiles.json (6 profiles) ✓. focus-suggestions.json (6 profiles, ~280–305 combos+prompts each) ✓. scenario.test.ts + simulation.test.ts ✓.
+  - 996 stale auto/ branches on remote (incl. 261+ guardrail-violating cast-explain-ratio branches — all rejected, none merged to main). No action taken; requires human to enable auto-delete in GitHub Settings.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **~956th run. 0 open PRs.**
+- **Human-action items** (unchanged since ~947):
+  1. **Disable or redirect hourly schedule** — 956+ consecutive runs; all A–E exhausted; schedule is burning compute with no productive work.
+  2. **Add workstream F** (McpAgent Phases 2–4) to DRIVER-BOARD.md — enables next productive work.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  5. **Stale branch cleanup** — 996 remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  7. **Major bumps pending human review**: typescript 5→7, @types/node 22→26, c8 11→12.
+  8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: No open PRs; 0 vulns; all workstreams done. Idle. Escalation #3 due at ~961 (5 runs away; last was ~954).
+- **PushNotification**: NOT SENT (escalation #3 sent at run ~954, only 2 runs ago — threshold is 10; next escalation at ~964).
