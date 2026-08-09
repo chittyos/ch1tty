@@ -3478,3 +3478,22 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   6. **Stale branch cleanup** — ~1000+ remote `auto/` branches.
   7. **Review major dep bumps**: TypeScript 5→7, @types/node 22→26, c8 11→12.
 - **Next run**: Idle. Next escalation at ~951 (4 more idle runs).
+
+---
+
+### 2026-08-09 (run ~950 — idle; all workstreams done; no new signal)
+- **Workstream**: None (all A–E done; workstream F awaiting human decision)
+- **Branch/PR**: none (direct commit to main — run log only). 0 open PRs.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites) | **Audit**: 0 vulnerabilities
+- **Actions**: `git fetch --all` + `git pull origin main` (fast-forwarded 47 commits — all idle run logs). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3 (1421 total, 51 suites). `npm audit`: 0 vulnerabilities. 0 open PRs (GitHub MCP confirmed). All A–E verified. Guardrails intact: 5-tool surface (search/execute/status/reload/cast); buildCastExplanation freeze at 56/87 fields (tests 1197–1198 pass). Notion token still invalid (401); DRIVER-BOARD.md + DRIVER-LOG.md are durable board. 1076 remote auto/* branches (139 rogue cast-explain-ratio + 103 idle-log).
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **~950th run. 0 open PRs.**
+- **Human-action items** (unchanged):
+  1. **Disable or redirect hourly schedule** — 950+ consecutive runs; all A–E exhausted; burns compute with no productive work.
+  2. **Add workstream F** to DRIVER-BOARD.md — McpAgent Phases 2–4 suggestion still open.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** — clears Ledger DLQ.
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  6. **Stale branch cleanup** — 1076 remote `auto/` branches.
+  7. **Major dep bumps pending**: TypeScript 5→7, @types/node 22→26, c8 11→12.
+- **Next run**: Idle. **Next escalation at ~951 (1 run away)** — will send PushNotification next run.
+- **PushNotification**: NOT SENT (escalation #2 sent at run ~941, 9 runs ago — threshold is 10; escalating next run at ~951).
