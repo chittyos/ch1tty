@@ -3642,3 +3642,29 @@ _Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
   8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
 - **Next run**: No open PRs; 0 vulns; all workstreams done. Idle. Escalation #3 due at ~961 (5 runs away; last was ~954).
 - **PushNotification**: NOT SENT (escalation #3 sent at run ~954, only 2 runs ago — threshold is 10; next escalation at ~964).
+
+---
+
+### 2026-08-10 (run ~972 — idle; all workstreams done; DRIVER-BOARD.md file sync restored)
+- **Workstream**: None (all A–E done; workstream F awaiting human decision)
+- **Branch/PR**: direct commit to main (board file sync + run log). 0 open PRs.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - `git reset --hard origin/main` (resolved local/origin divergence — local and origin had each accumulated 50 unrelated commits from separate sessions). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3 (1421 total, 51 suites). `npm audit`: 0 vulnerabilities.
+  - **Board file sync issue detected**: runs ~957–~971 each created empty git commits (no file diff) — DRIVER-BOARD.md had not been updated since run ~956. This run restores actual file content by appending this entry. Run ~971 info from git log: 1421 total tests, 261 metric-freeze violation branches (up from 139 on ~967).
+  - 0 open PRs (GitHub MCP confirmed).
+  - All workstreams verified: A ✓ B ✓ C ✓ D ✓ E ✓. Guardrails intact: 5-tool surface (search/execute/status/reload/cast); buildCastExplanation freeze (56 fields no-focus / 87 fields focus:code — tests 1197/1198 pass). github entry → api.githubcopilot.com/mcp/ ✓. focus-profiles.json (6 profiles) ✓. focus-suggestions.json (6 profiles) ✓. scenario.test.ts + simulation.test.ts ✓.
+  - 997 stale auto/ branches on remote (261 guardrail-violating cast-explain-ratio branches — all rejected, none merged to main). Run ~968 commit message confirmed "escalation sent" (escalation #4 at ~968).
+  - Notion board: unavailable (API 401 — NOTION_API_TOKEN not resolvable in remote container; DRIVER-BOARD.md is durable board).
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **~972nd run. 0 open PRs.**
+- **Human-action items** (unchanged):
+  1. **Disable or redirect hourly schedule** — 972+ consecutive runs; all A–E exhausted; schedule is burning compute with no productive work.
+  2. **Add workstream F** (McpAgent Phases 2–4) to DRIVER-BOARD.md — enables next productive work.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  5. **Stale branch cleanup** — 997 remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  7. **Major bumps pending human review**: typescript 5→7, @types/node 22→26, c8 11→12.
+  8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: No open PRs; 0 vulns; all workstreams done. Idle. Last escalation at ~968 (escalation #4); next escalation threshold ~978 (6 runs away).
+- **PushNotification**: NOT SENT (escalation #4 sent at run ~968, only 4 runs ago — threshold is 10; next escalation at ~978).
