@@ -3642,3 +3642,11 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   7. **Major dep bumps pending review**: TypeScript 5→7, @types/node 22→26, c8 11→12.
 - **Next run**: Idle. Escalation #5 due at ~978 (3 more runs).
 - **PushNotification**: NOT SENT (escalation #4 sent at ~974; escalation #5 due at ~978 — 3 runs away).
+
+---
+
+### 2026-08-10 (run ~988 — idle; all workstreams done; ESCALATION #6)
+- **Workstream**: None (all A–E done; workstream F awaiting human decision)
+- **Branch/PR**: direct commit to main (board + log). 0 open PRs.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418/0/3 (1421 total, 51 suites, ~42s) | **Audit**: 0 vulnerabilities
+- **Most useful thing for next run**: All A–E exhausted. Next escalation #7 at ~998. If no workstream F added by then, escalation fires again.
