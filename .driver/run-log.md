@@ -1388,3 +1388,29 @@
   7. **Major dep updates deferred**: typescript 5→7, @types/node 22→26, c8 11→12 — human review needed.
 - **PushNotification**: NOT sent (escalation #5 at run ~978, only 4 runs ago; next periodic escalation at ~988).
 - **Next run**: Same idle state expected. Next escalation due ~988.
+
+---
+
+### 2026-08-10 — runs ~983–~992 (idle — catch-up entry)
+
+- **Workstream advanced**: None (all A–E done — idle runs)
+- **Branch/PR**: direct commits to main (run log only; no source changes in runs ~983-~992)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (51 suites, 1421 total)
+- **Actions (runs ~983–~991)**: Each run confirmed build clean, tests green (1418/0/3), 0 open PRs, guardrails (5-tool surface + `buildCastExplanation` freeze) intact. Committed run summary in commit messages; file content not updated those runs.
+- **Actions (this run ~992)**:
+  - `npm ci` clean, `npm run build` clean (0 errors, ch1tty@4.1.0), `npm test` → **1418 pass / 0 fail / 3 skip** ✓
+  - `git fetch --all`; origin/main force-updated to `dd5d7b8` (run ~991 commit). Reset to origin/main. 0 open PRs confirmed.
+  - Confirmed all workstreams: A (build/tests green ✓); B (github → `https://api.githubcopilot.com/mcp/` ✓); C (focus-profiles.json 6 profiles ✓); D (scenario+simulation tests ✓); E (focus-suggestions.json ✓); Linear MCP ✓; GUARDRAIL-CLEANUP ✓.
+  - DRIVER-BOARD.md: all workstreams done; Workstream F (McpAgent Phases 2–4) still awaiting human decision.
+  - Notion board: unavailable (API 401 — token not resolvable in remote container); board tracked in DRIVER-BOARD.md + this file.
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E ✓ (all done; no new workstreams authorized)
+- **Blockers** (unchanged — all require human action):
+  1. **Disable or redirect hourly schedule** — ~992 consecutive runs, ~440+ idle; no new work to advance.
+  2. **Add workstream F** (McpAgent Phases 2–4 awaiting decision — see DRIVER-BOARD.md).
+  3. **Stale branch cleanup** — 1000+ auto/* branches; enable "Automatically delete head branches" in GitHub Settings.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  5. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend in live gateway.
+  6. **Rotate Notion token** — `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`.
+  7. **Major dep updates deferred**: typescript 5→7, @types/node 22→26, c8 11→12 — human review needed.
+- **PushNotification**: NOT sent (escalation #6 at run ~988, only 4 runs ago; next periodic escalation #7 at ~998).
+- **Next run**: Same idle state expected. Next escalation due ~998 (6 more runs).
