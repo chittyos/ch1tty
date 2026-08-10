@@ -3872,4 +3872,13 @@ _Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
 ### 2026-08-10 (run ~989 — idle)
 - Build: clean | Tests: 1418/0/3 | PRs: 0 | Workstreams: A ✓ B ✓ C ✓ D ✓ E ✓
 - Escalation #6 sent at ~988; next #7 at ~998 (9 runs away).
+
+---
+
+### 2026-08-10 (run ~990 — idle)
+- Build: clean (tsc exit 0, ch1tty@4.1.0) | Tests: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites) | Audit: 0 vulnerabilities
+- PRs: 0 open (GitHub MCP confirmed). Workstreams: A ✓ B ✓ C ✓ D ✓ E ✓
+- Guardrails: 5-tool surface intact; buildCastExplanation metric freeze ACTIVE (tests 1197/1198: 56 fields no-focus / 87 fields focus:code). 0 violations on main.
+- Escalation #6 sent at ~988; next #7 at ~998 (8 runs away).
+- PushNotification: NOT SENT (escalation #6 at ~988, 2 runs ago; threshold is 10; next at ~998).
 - All blockers unchanged — require human action (see RUNLOG.md run ~989).
