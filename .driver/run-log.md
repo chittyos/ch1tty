@@ -1362,3 +1362,29 @@
 - **PushNotification**: SENT (periodic escalation — run ~968, 14 runs since ~954).
 - **Next run**: Same idle state expected unless new workstreams are added or blockers resolved.
 - **PushNotification**: NOT sent (Dependabot alert notified last run at 794; periodic escalation at 791 — threshold ~10 runs).
+
+---
+
+### 2026-08-10T10:20Z — run ~982 (idle — all workstreams done)
+
+- **Workstream advanced**: None (all A–E done — idle run)
+- **Branch/PR**: direct commit to main (run log only; no source changes)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (51 suites, 1421 total)
+- **Actions**:
+  - `npm ci` clean, `npm run build` clean (0 errors), `npm test` → **1418 pass / 0 fail / 3 skip** ✓
+  - Read CLAUDE.md + CHITTY.md; confirmed guardrails (5-tool surface fixed; `buildCastExplanation` metric freeze ACTIVE; freeze guard tests pass: 56 fields no-focus / 87 fields focus:code).
+  - `git fetch --all`; origin/main at `453fdc4` (run ~981). 0 open PRs confirmed.
+  - Confirmed all workstreams: A (build/tests green ✓); B (github → `https://api.githubcopilot.com/mcp/` ✓); C (focus-profiles.json 6 profiles ✓); D (scenario.test.ts + simulation.test.ts ✓); E (focus-suggestions.json ✓).
+  - **Metric-freeze violation audit**: 997 total remote branches, 261 are `auto/*cast-explain*` metric-freeze violations (none merged to main; freeze guard tests pass). Runs 969–981 were empty commits; this run writes actual file content to run log.
+  - Notion board: unavailable (API 401 — token not resolvable); board tracked in this file.
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E ✓ (all done)
+- **Blockers** (unchanged — all require human action):
+  1. **Disable or redirect hourly schedule** — ~982 consecutive runs, ~430+ idle.
+  2. **Add new workstreams** (Workstream F McpAgent Phases 2–4 awaiting human decision).
+  3. **Clean up 261 metric-freeze branches + 1000+ stale auto/* branches**: enable "Automatically delete head branches" in GitHub Settings, or: `git push origin --delete $(git branch -r | grep 'origin/auto/' | grep 'cast-explain' | sed 's|origin/||')`
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  5. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend in live gateway.
+  6. **Rotate Notion token** — `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`.
+  7. **Major dep updates deferred**: typescript 5→7, @types/node 22→26, c8 11→12 — human review needed.
+- **PushNotification**: NOT sent (escalation #5 at run ~978, only 4 runs ago; next periodic escalation at ~988).
+- **Next run**: Same idle state expected. Next escalation due ~988.
