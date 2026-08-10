@@ -1414,3 +1414,29 @@
   7. **Major dep updates deferred**: typescript 5→7, @types/node 22→26, c8 11→12 — human review needed.
 - **PushNotification**: NOT sent (escalation #6 at run ~988, only 4 runs ago; next periodic escalation #7 at ~998).
 - **Next run**: Same idle state expected. Next escalation due ~998 (6 more runs).
+
+---
+
+### 2026-08-10 — run ~993 (idle — all workstreams done)
+
+- **Workstream advanced**: None (all A–E done — idle run)
+- **Branch/PR**: direct commit to main (run log only; no source changes)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (51 suites, 1421 total)
+- **Actions**:
+  - `npm ci` clean, `npm run build` clean (0 errors, ch1tty@4.1.0), `npm test` → **1418 pass / 0 fail / 3 skip** ✓
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface fixed; `buildCastExplanation` metric freeze ACTIVE; freeze guard tests pass: 56 fields no-focus / 87 fields focus:code).
+  - `git fetch --all`; origin/main at `29f5cf6` (run ~992). 0 open PRs confirmed.
+  - Confirmed all workstreams: A (build/tests green ✓); B (github → `https://api.githubcopilot.com/mcp/` ✓); C (focus-profiles.json 6 profiles ✓); D (scenario+simulation tests ✓); E (focus-suggestions.json ✓).
+  - Remote branch audit: 1081 total branches, 997 auto/* branches, 265 `cast-explain`/metric violation branches (none merged to main; freeze guard tests pass).
+  - Notion board: unavailable (API 401 — token not resolvable in remote container); board tracked in DRIVER-BOARD.md + this file.
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E ✓ (all done; no new workstreams authorized)
+- **Blockers** (unchanged — all require human action):
+  1. **Disable or redirect hourly schedule** — ~993 consecutive runs, ~440+ idle; no new work to advance.
+  2. **Add workstream F** (McpAgent Phases 2–4 awaiting decision — see DRIVER-BOARD.md).
+  3. **Stale branch cleanup** — 1081 branches (997 auto/*; 265 metric-freeze violations); enable "Automatically delete head branches" in GitHub Settings.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  5. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend in live gateway.
+  6. **Rotate Notion token** — `export NOTION_TOKEN=$(op read op://ChittyOS-Integrations/notion/api_token)`.
+  7. **Major dep updates deferred**: typescript 5→7, @types/node 22→26, c8 11→12 — human review needed.
+- **PushNotification**: NOT sent (escalation #6 at run ~988, 5 runs ago; next periodic escalation #7 at ~998, 5 runs away).
+- **Next run**: Same idle state expected. Escalation #7 due at ~998 (4 more runs after this one).
