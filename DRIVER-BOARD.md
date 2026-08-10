@@ -3695,3 +3695,40 @@ _Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
 - **Next run**: No open PRs; 0 vulns; all workstreams done. Idle. Last escalation at ~968 (escalation #4); next escalation #5 at ~978 (4 runs away).
 - **PushNotification**: NOT SENT (escalation #4 at ~968, 6 runs ago — threshold is 10; next at ~978).
 - **PushNotification**: NOT SENT (escalation #4 sent at run ~968, only 4 runs ago — threshold is 10; next escalation at ~978).
+
+---
+
+### 2026-08-10 (run ~975 — retroactive board entry; board sync missed by prior session)
+- **Workstream**: None (all A–E done; workstream F awaiting human decision)
+- **Branch/PR**: direct commit to main (run log only). 0 open PRs.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites) | **Audit**: 0 vulnerabilities
+- **Actions** (per commit 7752b9b): npm ci clean. npm run build clean. npm test 1418/0/3. All workstreams confirmed done. 0 open PRs. Board sync file not updated by that session (empty diff issue); retroactively recorded here.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **~975th run. 0 open PRs.**
+- **PushNotification**: NOT SENT (escalation #4 at ~968, 7 runs ago — threshold is 10; next escalation #5 at ~978).
+
+---
+
+### 2026-08-10 (run ~976 — idle; all workstreams done)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; workstream F awaiting human decision)
+- **Branch/PR**: direct commit to main (run log only). 0 open PRs confirmed (GitHub MCP returned empty list).
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~42s) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - `git reset --hard origin/main` (resolved local/origin divergence — local main was at Aug-6 state, origin at ~975). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3 (1421 total, 51 suites, ~42s).
+  - Detected board-sync gap: run ~975 committed to main but DRIVER-BOARD.md was not updated; retroactive entry added above.
+  - 0 open PRs (GitHub MCP confirmed empty).
+  - All workstreams verified: A ✓ B ✓ (github→api.githubcopilot.com/mcp/ envHeaders) C ✓ (focus-profiles.json 6 profiles, CH1TTY_FOCUS, per-call focus param) D ✓ (scenario.test.ts + simulation.test.ts harness) E ✓ (focus-suggestions.json full catalog).
+  - Guardrails confirmed: 5-tool surface fixed (search/execute/status/reload/cast); buildCastExplanation metric freeze ACTIVE (tests 1197/1198 enforce 56 fields no-focus / 87 fields focus:code). 0 violations on main.
+  - Stale remote branches: 997 auto/ branches (270+ are prohibited cast-explain metric-freeze violations — all rejected, none merged to main). Requires human action (auto-delete in GitHub Settings).
+  - Notion board: unavailable (API 401 — NOTION_API_TOKEN not resolvable in remote container). DRIVER-BOARD.md is durable board.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **~976th run. 0 open PRs.**
+- **Human-action items** (unchanged):
+  1. **Disable or redirect hourly schedule** — 976+ consecutive runs; all A–E exhausted; schedule burns compute with no productive work.
+  2. **Add workstream F** (McpAgent Phases 2–4) to DRIVER-BOARD.md — enables next productive work.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  5. **Stale branch cleanup** — 997 remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  7. **Major bumps pending human review**: typescript 5→7, @types/node 22→26, c8 11→12.
+  8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: No open PRs; 0 vulns; all workstreams done. Idle. Last escalation at ~968 (escalation #4); next escalation #5 at ~978 (2 runs away).
+- **PushNotification**: NOT SENT (escalation #4 at ~968, 8 runs ago — threshold is 10; next escalation #5 at ~978).
