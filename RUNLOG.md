@@ -1621,3 +1621,26 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
 - **Next run**: Escalation #6 due at ~988 (4 runs away). Otherwise idle.
 - **PushNotification**: NOT sent (escalation #5 at ~978, 6 runs ago; threshold 10; next #6 at ~988).
+
+---
+
+### 2026-08-10 (run ~985 — idle; all workstreams done)
+- **Workstream**: None (A–E done; no new workstreams defined)
+- **Branch/PR**: none (direct commit to main — run log only)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (field-count guard tests 1197/1198: 56 no-focus / 87 focus:code).
+  - `git fetch --all`; synced to origin/main (c8ed3e5, run ~984). 0 open PRs. 997 remote auto/* branches (258 metric-freeze violation branches — none merged to main).
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test` → 1418 pass / 0 fail / 3 skip ✓
+  - All workstreams verified: A ✓ (build+tests green) B ✓ (github→api.githubcopilot.com/mcp/ with envHeaders.Authorization) C ✓ (focus-profiles.json 6 profiles, per-call focus param) D ✓ (simulation test harness) E ✓ (focus-suggestions.json catalog).
+  - Notion board: unavailable (API 401). DRIVER-BOARD.md / RUNLOG.md are durable fallbacks.
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E ✓ (all done)
+- **Blockers** (unchanged — all require human action):
+  1. **Disable or redirect hourly schedule** — 985+ consecutive runs; real work exhausted ~run 735; ~250 purely idle runs since.
+  2. **Add workstream F** — define new work in RUNLOG.md or DRIVER-BOARD.md.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  5. **Stale branch cleanup** — 997 remote `auto/` branches (258 metric-freeze violations): `git branch -r | grep -E 'origin/auto/.*cast-explain' | sed 's|origin/||' | xargs git push origin --delete`
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+- **Next run**: Escalation #6 due at ~988 (3 runs away). Otherwise idle.
+- **PushNotification**: NOT sent (escalation #5 at ~978, 7 runs ago; threshold 10; next #6 at ~988).
