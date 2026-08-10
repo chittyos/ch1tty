@@ -1567,3 +1567,57 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
 - **Next run**: Escalation #5 due at ~978 (4 runs away). Otherwise idle.
 - **PushNotification**: NOT sent (escalation #4 at ~968, 6 runs ago; threshold 10; next #5 at ~978).
+
+---
+
+### 2026-08-10 (runs ~975–~977 — catch-up; idle)
+- **Workstream**: None (A–E done)
+- **Branch/PR**: none
+- **Build**: clean | **Tests**: 1418/0/3
+- **Actions**: Startup checks, confirmed all workstreams done, build clean. Escalation #5 countdown continued (due at ~978).
+- **PushNotification**: NOT sent (~975: 7 runs since #4; ~976: 8; ~977: 9 — threshold 10).
+
+---
+
+### 2026-08-10 (run ~978 — escalation #5)
+- **Workstream**: None (A–E done)
+- **Branch/PR**: none (direct commit to main — run log + retroactive ~977 board entry)
+- **Build**: clean | **Tests**: 1418/0/3
+- **Actions**: Startup checks confirmed all A–E done, 997 auto/* branches (261 prohibited cast-explain metric branches). Retroactive board entry for ~977 added this run.
+- **PushNotification**: **SENT** — escalation #5 (10+ runs since #4; 997 stale branches, 261 metric-freeze violations, schedule at 978+ idle runs, no new workstreams).
+
+---
+
+### 2026-08-10 (runs ~979–~983 — catch-up; idle)
+- **Workstream**: None (A–E done)
+- **Branch/PR**: none (direct commits to main — run logs only)
+- **Build**: clean | **Tests**: 1418/0/3 (each run)
+- **Actions**: Startup checks each run. `git fetch --all`; realigned local main with origin/main when diverged. 0 open PRs. All A–E verified done. 997 remote branches (261 metric-freeze violations) — no change. Run ~982 "restored file-based run log" (prior runs diverged and RUNLOG.md updates were lost). Run ~983 added catch-up board entries for ~980–~982.
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E ✓ (all done)
+- **PushNotification**: NOT sent (escalation #5 at ~978; threshold 10 runs; next #6 at ~988).
+
+---
+
+### 2026-08-10 (run ~984 — idle; all workstreams done)
+- **Workstream**: None (A–E done; no new workstreams defined)
+- **Branch/PR**: none (direct commit to main — run log only)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (51 suites, 1421 total)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (guarded by field-count drift test: 56 no-focus / 87 focus:code).
+  - `git fetch --all`; reset to origin/main (ea8c377, run ~983). No open PRs. 0 open branches with live PRs.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test` → **1418 pass / 0 fail / 3 skip** ✓
+  - Confirmed RUNLOG.md on disk ended at run ~974 (entries for ~975-~983 were committed as messages but not written to file). Added catch-up entries above.
+  - Verified all workstreams: B✅ `github`→`https://api.githubcopilot.com/mcp/` with `envHeaders.Authorization`; C✅ `focus-profiles.json` (6 profiles), `src/focus.ts`, CH1TTY_FOCUS env; D✅ `sim/scenarios.ts` + `test/simulation.test.ts`; E✅ `focus-suggestions.json` catalog.
+  - servers.json github entry already migrated (Workstream B confirmed done).
+  - Remote branch count: 997+ auto/* branches; 261 prohibited `cast-explain-*` metric branches still present (none merged — metric-freeze guard test blocks them).
+  - Notion: unavailable (API 401). RUNLOG.md is durable board fallback.
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E ✓ (all done)
+- **Blockers** (unchanged — all require human action):
+  1. **Disable or redirect hourly schedule** — 984+ consecutive runs; real work exhausted after run 735; ~250+ purely idle runs since then.
+  2. **Add workstream F** — define in RUNLOG.md or DRIVER-BOARD.md; without it every run is an idle no-op.
+  3. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) to clear ledger DLQ.
+  5. **Stale branch cleanup** — 997 remote `auto/` branches: `git branch -r | grep -E '^[[:space:]]*origin/auto/.*cast-explain-' | sed -E 's|^[[:space:]]*origin/||' | xargs git push origin --delete`. Or enable "Automatically delete head branches" in GitHub Settings.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+- **Next run**: Escalation #6 due at ~988 (4 runs away). Otherwise idle.
+- **PushNotification**: NOT sent (escalation #5 at ~978, 6 runs ago; threshold 10; next #6 at ~988).
