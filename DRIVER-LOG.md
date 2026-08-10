@@ -3618,3 +3618,27 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   7. **Major dep bumps pending review**: TypeScript 5→7, @types/node 22→26, c8 11→12.
 - **Next run**: Escalation #4 due at ~974 (next run — 9 runs since last escalation #3 at ~954; real-work credit at ~964 has expired). PushNotification WILL be sent next run.
 - **PushNotification**: NOT SENT (one run away from threshold; escalation #4 fires at ~974).
+
+---
+
+### 2026-08-10 (run ~975 — idle; all workstreams done; no new signal)
+- **Workstream**: None (all A–E done; workstream F awaiting human decision)
+- **Branch/PR**: none (direct commit to main — run log only). 0 open PRs.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~43s) | **Audit**: 0 vulnerabilities
+- **Actions**:
+  - `git fetch --all`; local was detached (HEAD at ~974); pulled `origin/main` cleanly. `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3 (1421 total, 51 suites).
+  - Read CLAUDE.md + CHITTY.md; 5-tool surface invariant (search/execute/status/reload/cast) and `buildCastExplanation` metric freeze confirmed intact on main (tests 1197–1198: 56 fields no-focus / 87 fields focus:code — both pass).
+  - 0 open PRs (GitHub MCP list_pull_requests: []). All A–E verified via DRIVER-BOARD.md. Guardrails intact. Notion token still invalid (401); DRIVER-LOG.md + DRIVER-BOARD.md are durable state.
+  - `npm audit`: 0 vulnerabilities. No new deps to update (only major breaking bumps pending human review: typescript 5→7, @types/node 22→26, c8 11→12).
+  - No new signal, no open PRs requiring code work, no unblocked workstream.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. **~975th consecutive idle run. 0 open PRs.**
+- **Human-action items** (unchanged):
+  1. **Disable or redirect hourly schedule** — 975+ consecutive runs; all A–E exhausted; no new workstreams; burning compute hourly.
+  2. **Add workstream F** to DRIVER-BOARD.md — McpAgent Phases 2–4 suggestion still open.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears Ledger DLQ.
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  6. **Stale branch cleanup** — ~1000+ remote `auto/` branches accumulating.
+  7. **Major dep bumps pending review**: TypeScript 5→7, @types/node 22→26, c8 11→12.
+- **Next run**: Idle. Escalation #5 due at ~978 (3 more runs).
+- **PushNotification**: NOT SENT (escalation #4 sent at ~974; escalation #5 due at ~978 — 3 runs away).
