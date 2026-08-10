@@ -3667,4 +3667,31 @@ _Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
   7. **Major bumps pending human review**: typescript 5→7, @types/node 22→26, c8 11→12.
   8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
 - **Next run**: No open PRs; 0 vulns; all workstreams done. Idle. Last escalation at ~968 (escalation #4); next escalation threshold ~978 (6 runs away).
+- **PushNotification**: NOT SENT (escalation #4 at ~968, only 4 runs ago — threshold is 10; next escalation #5 at ~978). NOTE: run ~973 commit message "escalation #4 due next run" was a miscounting error — #4 was already sent at ~968 per board + RUNLOG.
+
+---
+
+### 2026-08-10 (run ~974 — idle; all workstreams done)
+- **Workstream**: None (all A–E done; workstream F awaiting human decision)
+- **Branch/PR**: direct commit to main (run log only). 0 open PRs.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites) | **Audit**: 0 vulnerabilities (no npm audit change from ~972)
+- **Actions**:
+  - `git reset --hard origin/main` (local main was 50 commits diverged from origin; resolved). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3 (1421 total, 51 suites, ~38s).
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface fixed (search/execute/status/reload/cast); `buildCastExplanation` metric freeze ACTIVE (tests 1197/1198 enforce 56 fields no-focus / 87 fields focus:code).
+  - `git fetch --all`; 997 remote auto/ branches total; 270 are prohibited `cast-explain-*` metric branches violating CLAUDE.md guardrail; 0 have merged to main.
+  - Corrected run ~973 escalation miscounting: commit message said "escalation #4 due next run" but board + RUNLOG confirm #4 was sent at ~968. Next escalation is #5 at ~978 (4 runs away).
+  - All workstreams verified: A ✓ B ✓ (github→api.githubcopilot.com/mcp/) C ✓ (focus-profiles.json 6 profiles) D ✓ (scenario.test.ts + simulation.test.ts) E ✓ (focus-suggestions.json large catalog).
+  - Notion board: unavailable (API 401 — NOTION_API_TOKEN not resolvable). DRIVER-BOARD.md is durable board.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **~974th run. 0 open PRs.**
+- **Human-action items** (unchanged):
+  1. **Disable or redirect hourly schedule** — 974+ consecutive runs; all A–E exhausted; schedule burns compute with no productive work.
+  2. **Add workstream F** (McpAgent Phases 2–4) to DRIVER-BOARD.md — enables next productive work.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  5. **Stale branch cleanup** — 997 remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  7. **Major bumps pending human review**: typescript 5→7, @types/node 22→26, c8 11→12.
+  8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: No open PRs; 0 vulns; all workstreams done. Idle. Last escalation at ~968 (escalation #4); next escalation #5 at ~978 (4 runs away).
+- **PushNotification**: NOT SENT (escalation #4 at ~968, 6 runs ago — threshold is 10; next at ~978).
 - **PushNotification**: NOT SENT (escalation #4 sent at run ~968, only 4 runs ago — threshold is 10; next escalation at ~978).

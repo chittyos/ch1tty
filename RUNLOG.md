@@ -1549,3 +1549,21 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   6. **Stale branch cleanup** — 1000+ auto/* branches; enable "Automatically delete head branches" in GitHub Settings.
 - **Next run**: Same idle state expected. No new work until workstream F is added or blockers resolved.
 - **PushNotification**: NOT sent (idle; last escalation at run ~968 — only 1 run ago, cadence is ~10 runs).
+
+---
+
+### 2026-08-10 (run ~974 — idle; all workstreams done)
+- **Workstream advanced**: none — all workstreams complete, idle run
+- **Branch/PR**: none (direct commit to main — run log only)
+- **Build**: clean (`tsc` exit 0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total)
+- **What was done**: `npm ci` + `npm run build` + `npm test` — all clean. 0 open PRs confirmed. 997 remote auto/ branches (270 prohibited metric-freeze violations, none merged). All workstreams A–E verified done. Corrected run ~973 escalation miscounting: commit "escalation #4 due next run" was wrong — #4 was sent at ~968. Next escalation is #5 at ~978 (4 runs away). No notification sent.
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E ✓ (all done)
+- **Blockers** (unchanged — all require human action):
+  1. **Disable or redirect hourly schedule** — 974+ consecutive runs; real work exhausted after run 735.
+  2. **Add workstream F** (McpAgent Phases 2–4) to DRIVER-BOARD.md.
+  3. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) to clear ledger DLQ.
+  5. **Stale branch cleanup** — 997 remote `auto/` branches; enable auto-delete in GitHub Settings.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+- **Next run**: Escalation #5 due at ~978 (4 runs away). Otherwise idle.
+- **PushNotification**: NOT sent (escalation #4 at ~968, 6 runs ago; threshold 10; next #5 at ~978).
