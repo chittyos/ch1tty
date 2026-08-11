@@ -4010,3 +4010,28 @@ _Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
 - **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. **~1004th run. 0 open PRs.** ~997 remote stale branches.
 - **Next run**: No open PRs; 0 vulns; all workstreams done. Idle. Last escalation at ~998 (escalation #7); next escalation #8 at ~1008 (4 runs away).
 - **PushNotification**: NOT SENT — nothing new (escalation #8 threshold at ~1008, still 4 runs away).
+
+---
+
+### 2026-08-11 (run ~1006 — idle; all workstreams done; post-escalation #7)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; workstream F awaiting human decision)
+- **Branch/PR**: direct commit to main (run log only). 1 open PR: #1114 (previous session's run log on `auto/2026-08-11-run-log` — clean, mergeable; no action needed this run).
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~56s)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1197/1198 enforce 56 fields no-focus / 87 fields focus:code). 0 violations on main.
+  - `git checkout main && git reset --hard origin/main` (synced to fdcba80, run ~1005). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3 (1421 total, 51 suites, ~56s).
+  - 1 open PR (#1114 — prior session's run log; clean, mergeable, no action needed).
+  - Guardrails confirmed: 5-tool surface intact; buildCastExplanation metric freeze ACTIVE; servers.json github→api.githubcopilot.com/mcp/ envHeaders; focus-profiles.json 6 profiles.
+  - Notion board: unavailable (API 401). DRIVER-BOARD.md is durable board.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **~1006th run. PR #1114 open (prior session run log).**
+- **Human-action items** (unchanged — 1006th iteration):
+  1. **Disable or redirect hourly schedule** — 1006+ consecutive runs; all A–E exhausted; schedule burns compute with no productive work.
+  2. **Add workstream F** (McpAgent Phases 2–4) to DRIVER-BOARD.md — enables next productive work.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  5. **Stale branch cleanup** — 1081+ remote `auto/` branches (261 cast-explain metric-freeze violations); enable "Automatically delete head branches" in GitHub Settings → General.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  7. **Major bumps pending human review**: typescript 5→7, @types/node 22→26, c8 11→12.
+  8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: PR #1114 open (run log, merge or close). 0 vulns; all workstreams done. Idle. Last escalation at ~998 (escalation #7); next escalation #8 at ~1008 (2 runs away).
+- **PushNotification**: NOT SENT — escalation #8 threshold at ~1008, still 2 runs away.
