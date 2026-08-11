@@ -107,3 +107,27 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
 - **Next run**: 0 open PRs; 0 vulns; all workstreams done. Idle. Last escalation at ~998 (escalation #7); **escalation #8 due at ~1008 (NEXT RUN)**.
 - **PushNotification**: NOT SENT — escalation #8 fires at ~1008 (next run; threshold = 10 runs after #7 at ~998).
+
+---
+
+### 2026-08-11 (run ~1008 — idle; all workstreams done; ESCALATION #8 sent)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; workstream F awaiting human decision)
+- **Branch/PR**: direct commit to main (run log only). 0 open PRs.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1197/1198 enforce 56/87 fields). 0 violations on main.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3 (1421 total, 51 suites, ~39s).
+  - 0 open PRs confirmed.
+  - **ESCALATION #8 sent** (PushNotification) — 1008+ idle runs; all A–E done; requesting human action on workstream F / schedule disable.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **~1008th run. 0 open PRs.**
+- **Human-action items** (unchanged — 1008th iteration; escalation #8 sent):
+  1. **Disable or redirect hourly schedule** — 1008+ consecutive runs; all A–E exhausted; schedule burns compute with no productive work.
+  2. **Add workstream F** (McpAgent Phases 2–4) to DRIVER-BOARD.md — enables next productive work.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  5. **Stale branch cleanup** — 1081+ remote `auto/` branches (261 cast-explain metric-freeze violations); enable "Automatically delete head branches" in GitHub Settings → General.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  7. **Major bumps pending human review**: typescript 5→7, @types/node 22→26, c8 11→12.
+  8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: 0 open PRs; 0 vulns; all workstreams done. Idle. Last escalation at ~1008 (escalation #8); next escalation #9 at ~1018 (10 runs away).
+- **PushNotification**: SENT — escalation #8 fired this run.
