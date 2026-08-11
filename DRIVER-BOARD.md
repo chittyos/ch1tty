@@ -3882,3 +3882,39 @@ _Run 867 committed via git but did not update DRIVER-BOARD.md. Backfilled here._
 - Escalation #6 sent at ~988; next #7 at ~998 (8 runs away).
 - PushNotification: NOT SENT (escalation #6 at ~988, 2 runs ago; threshold is 10; next at ~998).
 - All blockers unchanged — require human action (see RUNLOG.md run ~989).
+
+---
+
+### 2026-08-10 (runs ~991–~994 — catch-up; board-sync gaps in those sessions)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; workstream F awaiting human decision)
+- **Branch/PR**: direct commits to main (run log / RUNLOG.md only). 0 open PRs each run.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites) | **Audit**: 0 vulnerabilities
+- **Summary**: Four consecutive idle runs (commits dd5d7b8 ~991; 29f5cf6 ~992; f99cd10 ~993; 92fc697 ~994). All A–E confirmed done. 997 remote auto/ branches (metric-freeze violation branches — none merged). Board was not updated by these sessions (board-sync gap); retroactively recorded here.
+- **PushNotification**: NOT SENT (escalation #6 at ~988; next escalation #7 at ~998; threshold 10 runs).
+
+---
+
+### 2026-08-11 (run ~995 — idle; all workstreams done)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; workstream F awaiting human decision)
+- **Branch/PR**: direct commit to main (catch-up ~991–~994 board entries + this run log). 0 open PRs confirmed (GitHub MCP returned empty list).
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~54s) | **Audit**: 0 vulnerabilities (not re-run; 0 confirmed at runs 718-721, no new deps)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (field-count guard tests 1197/1198: 56 no-focus / 87 focus:code).
+  - `git fetch origin main && git reset --hard origin/main` (synced to 92fc697, run ~994). 0 open PRs confirmed via GitHub MCP (empty list). 0 branches returned by GitHub branch list (stale branches are not in active PR state).
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test` → 1418 pass / 0 fail / 3 skip ✓ (1421 total, 51 suites, ~54s).
+  - All workstreams verified: A ✓ (build+tests green) B ✓ (github→api.githubcopilot.com/mcp/ envHeaders) C ✓ (focus-profiles.json 6 profiles, CH1TTY_FOCUS, per-call focus param, status reporting) D ✓ (simulation.test.ts + scenario.test.ts harness) E ✓ (focus-suggestions.json full catalog).
+  - Guardrails confirmed: 5-tool surface fixed (search/execute/status/reload/cast); buildCastExplanation metric freeze ACTIVE (tests 1197/1198 enforce 56 fields no-focus / 87 fields focus:code). 0 violations on main.
+  - DRIVER-BOARD.md catch-up entries added for runs ~991–~994 (board-sync gaps in those sessions).
+  - Notion board: unavailable (API 401 — NOTION_API_TOKEN not resolvable in remote container). DRIVER-BOARD.md is durable board.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **~995th run. 0 open PRs.**
+- **Human-action items** (unchanged — 995th iteration):
+  1. **Disable or redirect hourly schedule** — 995+ consecutive runs; all A–E exhausted; schedule burns compute with no productive work.
+  2. **Add workstream F** (McpAgent Phases 2–4) to DRIVER-BOARD.md — enables next productive work.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  5. **Stale branch cleanup** — 997+ remote `auto/` branches (metric-freeze violations); enable "Automatically delete head branches" in GitHub Settings → General.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  7. **Major bumps pending human review**: typescript 5→7, @types/node 22→26, c8 11→12.
+  8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: No open PRs; 0 vulns; all workstreams done. Idle. Last escalation at ~988 (escalation #6); next escalation #7 at ~998 (3 runs away).
+- **PushNotification**: NOT SENT (escalation #6 at ~988, 7 runs ago — threshold is 10; next escalation #7 at ~998, 3 runs away).

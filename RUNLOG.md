@@ -1736,3 +1736,35 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
 - **Next run**: Idle. Escalation #6 sent at ~988; escalation #7 due at ~998 (7 runs away).
 - **PushNotification**: NOT sent (escalation #6 at ~988; next #7 at ~998, 7 runs away).
+
+---
+
+### 2026-08-10 (runs ~992–~994 — catch-up; board-sync gaps)
+- **Workstream**: None (A–E done; no new workstreams defined)
+- **Build**: clean | **Tests**: 1418/0/3 | **PRs**: 0 each run
+- **Summary**: Three idle runs committed to main. Board-sync gaps in those sessions; retroactively recorded here.
+- **PushNotification**: NOT sent each run (escalation #6 at ~988; next #7 at ~998).
+
+---
+
+### 2026-08-11 (run ~995 — idle; all workstreams done)
+- **Workstream**: None (A–E done; no new workstreams defined)
+- **Branch/PR**: none (direct commit to main — run log + catch-up board entries)
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~54s)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (field-count guard tests 1197/1198: 56 no-focus / 87 focus:code — both pass).
+  - `git fetch origin main && git reset --hard origin/main` (synced to 92fc697, run ~994). 0 open PRs confirmed via GitHub MCP (empty list).
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test` → 1418 pass / 0 fail / 3 skip ✓
+  - All workstreams verified: A ✓ (build+tests green) B ✓ (github→api.githubcopilot.com/mcp/ with envHeaders.Authorization) C ✓ (focus-profiles.json 6 profiles, per-call focus, status reporting) D ✓ (simulation.test.ts + scenario.test.ts) E ✓ (focus-suggestions.json full catalog).
+  - Notion board: unavailable (API 401). DRIVER-BOARD.md + RUNLOG.md are durable fallback.
+  - DRIVER-BOARD.md catch-up entries added for runs ~991–~994 (board-sync gaps); ~995 board entry added.
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E ✓ (all done)
+- **Blockers** (unchanged — all require human action):
+  1. **Disable or redirect hourly schedule** — 995+ consecutive runs; all A–E exhausted.
+  2. **Add workstream F** — define new work in DRIVER-BOARD.md to unblock next run.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  5. **Stale branch cleanup** — 997+ remote `auto/` branches (metric-freeze violations): `git branch -r | grep -E 'origin/auto/.*cast-explain' | sed 's|origin/||' | xargs git push origin --delete`
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+- **Next run**: Idle. Escalation #6 sent at ~988; escalation #7 due at ~998 (3 runs away).
+- **PushNotification**: NOT sent (escalation #6 at ~988, 7 runs ago; next #7 at ~998, 3 runs away; threshold is 10).
