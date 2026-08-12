@@ -195,3 +195,29 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
 - **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. **~1011th run. 0 open PRs.**
 - **Next run**: Idle. Last escalation at ~1008 (escalation #8); next escalation #9 at ~1018 (7 runs away).
 - **PushNotification**: NOT SENT — #9 threshold at ~1018 (7 runs away).
+
+---
+
+### 2026-08-12 (run ~1018 — idle; all workstreams done; post-escalation #9)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; workstream F awaiting human decision)
+- **Branch/PR**: direct commit to main (run log only). 0 open PRs confirmed.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~44s)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1197/1198 enforce 56/87 fields). 0 violations on main.
+  - `git reset --hard origin/main` (d7518f8, run ~1017). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3 (1421 total, 51 suites, ~44s). 0 failures.
+  - 0 open PRs confirmed (GitHub MCP returned empty list). All workstreams A–E verified done.
+  - Detected 998 stale remote `auto/` branches (graveyard — unchanged; requires human bulk-delete via GitHub Settings → General "Automatically delete head branches" or local bulk-delete).
+  - Escalation #9 sent at run ~1016 (per git log "post-escalation #9"). Next escalation #10 due at ~1026 (8 runs away).
+  - Notion board: unavailable (API 401). DRIVER-BOARD.md is durable board.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **~1018th run. 0 open PRs.**
+- **Human-action items** (unchanged):
+  1. **Disable or redirect hourly schedule** — 1018+ consecutive idle runs; all A–E exhausted; schedule burns compute with no productive work.
+  2. **Add workstream F** (McpAgent Phases 2–4) to DRIVER-BOARD.md — enables next productive work.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  5. **Stale branch cleanup** — 998+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  7. **Major bumps pending human review**: typescript 5→7, @types/node 22→26, c8 11→12.
+  8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: Idle. Last escalation at ~1016 (escalation #9); next escalation #10 at ~1026 (8 runs away).
+- **PushNotification**: NOT SENT — escalation #9 was just sent at run ~1016; #10 threshold at ~1026 (8 runs away).
