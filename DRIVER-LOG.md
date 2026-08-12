@@ -3691,3 +3691,22 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   7. **Major dep bumps pending review**: TypeScript 5→7, @types/node 22→26, c8 11→12.
 - **Most useful thing for next run**: Add workstream F to DRIVER-BOARD.md or disable the schedule. Nothing new to do until then.
 - **PushNotification**: SENT (escalation #15 — 1025+ idle runs, 14 prior escalations unanswered).
+
+---
+
+### 2026-08-12 (run ~1027 — idle; all workstreams done; ESCALATION #17)
+- **Workstream**: None (all A–E done; workstream F awaiting human decision)
+- **Branch/PR**: direct commit to main (run log only). 0 open PRs.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418/0/3 (1421 total, 51 suites, ~43s)
+- **Actions**: `git fetch --all`; local main had UNRELATED history (50 commits with stale deps from 2026-08-06 not on origin — including security fix merges that are already in origin/main at newer versions). Hard-reset local main to `origin/main` (7284f38). `npm ci` + `npm run build` + `npm test`: all clean. Guardrails intact (metric-freeze guard passes). 0 open PRs.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. **~1027th consecutive idle run. 0 open PRs. ESCALATION #17 sent.**
+- **Human-action items** (unchanged from #16):
+  1. **Disable or redirect hourly schedule** — 1027+ consecutive idle runs; all A–E exhausted; burning compute hourly.
+  2. **Add workstream F** to DRIVER-BOARD.md — e.g. McpAgent Phases 2–4, security audit pass, or major dep bumps (TypeScript 5→7, @types/node 22→26).
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend in servers.json.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears Ledger DLQ blocker.
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token` to restore durable board.
+  6. **Stale branch cleanup** — 1100+ remote `auto/` branches (261 metric-freeze violations). Enable auto-delete on merge in GitHub repo Settings or bulk-delete.
+  7. **Major dep bumps pending review**: TypeScript 5→7, @types/node 22→26, c8 11→12.
+- **Most useful thing for next run**: Add workstream F to DRIVER-BOARD.md or disable the schedule. Nothing new to do until then.
+- **PushNotification**: SENT (escalation #17 — 1027+ idle runs, 16 prior escalations unanswered).
