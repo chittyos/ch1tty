@@ -3672,3 +3672,22 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 - **Branch/PR**: direct commit to main (board + log). 0 open PRs.
 - **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418/0/3 (1421 total, 51 suites, ~42s) | **Audit**: 0 vulnerabilities
 - **Most useful thing for next run**: All A–E exhausted. Next escalation #7 at ~998. If no workstream F added by then, escalation fires again.
+
+---
+
+### 2026-08-12 (run ~1025 — idle; all workstreams done; ESCALATION #15)
+- **Workstream**: None (all A–E done; workstream F awaiting human decision)
+- **Branch/PR**: direct commit to main (run log only). 0 open PRs.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418/0/3 (1421 total, 51 suites, ~46s)
+- **Actions**: `git fetch --all`; local main was 50 commits behind origin/main (diverged) — hard-reset to `origin/main` (`5bf0bd9`). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3. Guardrails intact (tests 1197–1198: 56 fields no-focus / 87 focus:code pass). 261 metric-freeze violation branches on origin (none merged; guardrail holds). 0 open PRs. All workstreams A–E verified DONE via DRIVER-BOARD.md. Notion token still invalid (401).
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. **~1025th consecutive idle run. 0 open PRs. ESCALATION #15.**
+- **Human-action items** (unchanged):
+  1. **Disable or redirect hourly schedule** — 1025+ consecutive runs; all A–E exhausted; no new workstreams; burning compute hourly.
+  2. **Add workstream F** to DRIVER-BOARD.md — e.g. McpAgent Phases 2–4 (dynamic MCP routing/composition), security audit pass, or dependency major bumps (TypeScript 5→7, @types/node 22→26, c8 11→12).
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend in servers.json.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears Ledger DLQ blocker.
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token` to restore durable board.
+  6. **Stale branch cleanup** — 1100+ remote `auto/` branches (261 metric-freeze violations). Enable auto-delete on merge in GitHub repo Settings → General, or bulk-delete locally.
+  7. **Major dep bumps pending review**: TypeScript 5→7, @types/node 22→26, c8 11→12.
+- **Most useful thing for next run**: Add workstream F to DRIVER-BOARD.md or disable the schedule. Nothing new to do until then.
+- **PushNotification**: SENT (escalation #15 — 1025+ idle runs, 14 prior escalations unanswered).
