@@ -1548,7 +1548,16 @@
 - **Blockers** (all require human action):
   1. **Disable or redirect hourly schedule** — ~1030 consecutive runs, 500+ idle; no new work to advance.
   2. **Add workstream F** (McpAgent Phases 2–4, or any new goal — see DRIVER-BOARD.md).
-  3. **Stale branch cleanup** — 999 `auto/` branches (261 cast-explain metric-freeze violations). Delete with: `git push origin --delete $(git branch -r | grep 'origin/auto/' | grep 'cast-explain' | sed 's|origin/||')` or enable "Automatically delete head branches" in GitHub Settings → Branches.
+  3. **Stale branch cleanup** — 999 `auto/` branches total; the **261 `cast-explain` branches** are `buildCastExplanation` metric-freeze guardrail violations (none merged to main, none with open PRs — all prior cast-explain PRs were rejected or closed). To delete only those 261 (not all 999):
+     ```bash
+     # Step 1 — dry-run: confirm list is only cast-explain violation branches
+     git fetch --prune
+     git branch -r | grep 'origin/auto/' | grep 'cast-explain' | sed 's|origin/||'
+     # Step 2 — verify no open PRs: check GitHub → Pull Requests → filter by cast-explain branch names
+     # Step 3 — delete after review:
+     git push origin --delete $(git branch -r | grep 'origin/auto/' | grep 'cast-explain' | sed 's|origin/||')
+     ```
+     The remaining ~738 non-cast-explain `auto/` branches are idle run-log and workstream branches — also safe to bulk-delete, or enable "Automatically delete head branches" in GitHub Settings → Branches to prevent future accumulation.
   4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
   5. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend.
   6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
