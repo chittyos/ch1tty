@@ -297,3 +297,28 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
   8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
 - **Next run**: Idle. Last escalation at ~1033 (escalation #19); next escalation #20 at ~1038 (2 runs away).
 - **PushNotification**: NOT SENT — escalation #19 fired at run ~1033; #20 threshold at ~1038 (2 runs away).
+
+---
+
+### 2026-08-13 (run ~1037 — idle; all workstreams done; escalation #20 due next run)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; workstream F awaiting human decision)
+- **Branch/PR**: direct commit to main (run log only). 0 open PRs confirmed.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~42s)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1197/1198 enforce 56/87 fields). 0 violations on main.
+  - `git reset --hard origin/main` (5903065, run ~1036). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3 (1421 total, 51 suites, ~42s).
+  - 0 open PRs confirmed (GitHub MCP returned empty list). All workstreams A–E verified done.
+  - Local/origin divergence (50 vs 50 commits) resolved with `git reset --hard origin/main`.
+  - Notion board: unavailable (API 401). DRIVER-BOARD.md is durable board.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE. Tests: 1418/0/3. Build: clean. 0 vulns. **~1037th run. 0 open PRs.**
+- **Human-action items** (unchanged — 19 escalations sent; no reaction received):
+  1. **Disable or redirect hourly schedule** — 1037+ consecutive runs; all A–E exhausted; schedule burns compute with no productive work.
+  2. **Add workstream F** (McpAgent Phases 2–4) to DRIVER-BOARD.md — enables next productive work.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  5. **Stale branch cleanup** — 1081+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  7. **Major bumps pending human review**: typescript 5→7, @types/node 22→26, c8 11→12.
+  8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: Idle. Last escalation at ~1033 (escalation #19); **escalation #20 due at ~1038 (NEXT RUN)**.
+- **PushNotification**: NOT SENT — escalation #20 fires next run (~1038).
