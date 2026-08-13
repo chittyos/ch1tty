@@ -1528,3 +1528,30 @@
   7. **Major dep updates deferred**: typescript 5→7, @types/node 22→26, c8 11→12 — human review needed.
 - **PushNotification**: NOT sent (escalation #7 at ~998, post-escalation at ~999; nothing new; next escalation #8 at ~1008, 6 runs away).
 - **Next run**: Same idle state expected. Next escalation #8 at ~1008.
+
+---
+
+### 2026-08-13 — run ~1030 (idle — escalation #18; all workstreams done)
+
+- **Workstream advanced**: None (all A–E done — idle run)
+- **Branch/PR**: `auto/2026-08-13-run-log-escalation-18`
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (51 suites, 1421 total)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface fixed; `buildCastExplanation` metric freeze ACTIVE; freeze guard tests 1197/1198: 56 fields no-focus / 87 fields focus:code).
+  - `git fetch --all`; synced origin/main to `405b9df` (run ~1029 — post-escalation #17). 1 open PR: #1115 (idle run-log from 2026-08-12, "all workstreams done").
+  - `npm ci` clean, `npm run build` clean (tsc exit 0, 0 errors), `npm test` → **1418 pass / 0 fail / 3 skip** ✓
+  - Remote branch count: 999 `auto/` branches (261 are cast-explain metric-freeze guardrail violations, none merged to main).
+  - All workstreams: A ✓ B ✓ C ✓ D ✓ E ✓ (confirmed done).
+  - Notion board: unavailable (API 401 — token not resolvable in remote container).
+  - Run log gap bridged: entries ~1003–1029 recorded via git commit messages only (sessions wrote directly to main without updating this file).
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E ✓ (all done; no new workstreams authorized)
+- **Blockers** (all require human action):
+  1. **Disable or redirect hourly schedule** — ~1030 consecutive runs, 500+ idle; no new work to advance.
+  2. **Add workstream F** (McpAgent Phases 2–4, or any new goal — see DRIVER-BOARD.md).
+  3. **Stale branch cleanup** — 999 `auto/` branches (261 cast-explain metric-freeze violations). Delete with: `git push origin --delete $(git branch -r | grep 'origin/auto/' | grep 'cast-explain' | sed 's|origin/||')` or enable "Automatically delete head branches" in GitHub Settings → Branches.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  5. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect GitHub MCP backend.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  7. **Major dep updates deferred**: typescript 5→7, @types/node 22→26, c8 11→12 — human review needed.
+- **PushNotification**: Sent (escalation #18; 1030+ runs, 500+ idle; situation unchanged since #17; human action required).
+- **Next run**: Same idle state expected unless human acts on blockers or adds workstreams.
