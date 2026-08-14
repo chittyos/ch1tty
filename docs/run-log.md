@@ -9,7 +9,7 @@
 - **Action taken**: Verified all A-E complete; sent push notification (escalation #20) — schedule still firing hourly with no work to advance
 - **State check**:
   - A (Gateway/tests): green ✓
-  - B (GitHub MCP migration): done — github entry is remote at api.githubcopilot.com/mcp ✓
+  - B (GitHub MCP migration): done — GitHub entry is remote at api.githubcopilot.com/mcp ✓
   - C (Focus-profile layer): done — 6 profiles in focus-profiles.json, CH1TTY_FOCUS env var wired ✓
   - D (Scenario testing): done — scenario.test.ts + simulation.test.ts exist ✓
   - E (Alchemist brainstorm): done — focus-suggestions.json has 1750 combos across 6 profiles ✓
