@@ -659,3 +659,44 @@ _(Runs ~1038–1045 committed run-log git commits only; no DRIVER-BOARD.md edits
   8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
 - **Next run**: Idle. Last escalation at ~1050 (escalation #23); **next escalation #24 at ~1060 (1 run away — NEXT RUN fires notification)**.
 - **PushNotification**: NOT SENT — escalation #24 threshold at ~1060; 1 run away.
+
+---
+
+### 2026-08-14 (run ~1060 — ESCALATION #24 SENT; all workstreams done)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; workstream F awaiting human decision)
+- **Branch/PR**: direct commit to main (run log only). 0 open PRs confirmed.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~49s)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed. Build + tests green.
+  - 0 open PRs. All workstreams A–E verified done (RUNLOG.md has full detail).
+  - **ESCALATION #24 SENT** via PushNotification — 1060+ idle runs; no human response to #1–#23.
+  - 1088 total remote branches; ~1000 stale `auto/` branches (261 cast-explain metric-freeze violations, 739 other).
+  - Notion board: unavailable (NOTION_API_TOKEN not resolvable). DRIVER-BOARD.md + RUNLOG.md are durable fallback.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓. Tests: 1418/0/3. Build: clean. **~1060th run. 0 open PRs.**
+- **Human-action items** (unchanged — 24 escalations sent; no reaction received): see run ~1059 items above.
+- **Next run**: Idle. Escalation #24 sent at ~1060; **next escalation #25 at ~1070 (10 runs away)**.
+- **PushNotification**: SENT — escalation #24.
+
+---
+
+### 2026-08-14 (run ~1061 — idle; post-escalation #24)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; workstream F awaiting human decision)
+- **Branch/PR**: direct commit to main (run log only). 0 open PRs confirmed.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~42s)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1197/1198 enforce 56/87 fields).
+  - `git fetch --all`; synced to 2933598 (run ~1060). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3 ✓.
+  - 0 open PRs confirmed (GitHub MCP returned empty). All workstreams A–E verified done.
+  - Notion board: unavailable. DRIVER-BOARD.md + RUNLOG.md are durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓. Tests: 1418/0/3. Build: clean. **~1061st run. 0 open PRs.**
+- **Human-action items** (unchanged — 24 escalations sent; no reaction received):
+  1. **Disable or redirect hourly schedule** — 1061+ consecutive runs; all A–E exhausted; no new work.
+  2. **Add workstream F** — options: live gateway smoke tests, branch hygiene automation, McpAgent phases 2–4, cast chain multi-step scenarios, Ollama brain integration tests.
+  3. **Stale branch cleanup** — 1000+ remote `auto/` branches. Bulk-delete locally: `gh api repos/chittyos/ch1tty/git/refs --paginate | jq -r '.[].ref' | grep 'heads/auto/' | xargs -I{} gh api repos/chittyos/ch1tty/git/{} -X DELETE`
+  4. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend on live gateway.
+  5. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  7. **Major bumps pending human review**: typescript 5→7, @types/node 22→26, c8 11→12.
+  8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: Idle. Last escalation at ~1060 (escalation #24); next escalation #25 at ~1070 (9 runs away).
+- **PushNotification**: NOT SENT — escalation #24 fired at ~1060; #25 threshold at ~1070 (9 runs away).
