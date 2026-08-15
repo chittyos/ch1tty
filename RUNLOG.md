@@ -2211,3 +2211,30 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
 - **PushNotification**: NOT SENT — escalation #24 fired at ~1060; #25 threshold at ~1070 (9 runs away).
 - **Next most useful action for next run**: Idle. Escalation #25 at ~1070 (8 runs from next).
+
+---
+
+## Run ~1063 — 2026-08-15
+
+- **Workstream**: None (A–E done; workstream F awaiting human decision)
+- **Branch/PR**: direct commit to main (run log update only). 0 open PRs confirmed.
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~43s)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface fixed (search/execute/status/reload/cast); `buildCastExplanation` metric freeze ACTIVE (tests 1197/1198 enforce 56 fields no-focus / 87 fields focus:code). 0 violations on main.
+  - `git fetch --all` (synced to 91310ba, run ~1062). `git pull origin main` (fast-forwarded 25 commits, picked up DRIVER-BOARD.md + RUNLOG.md additions). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3 ✓ (51 suites, 1421 total, ~43s).
+  - 0 open PRs confirmed (GitHub MCP `list_pull_requests` returned empty).
+  - Verified all workstream deliverables in-place: A ✓ (build/tests green); B ✓ (`github` → `https://api.githubcopilot.com/mcp/` + envHeaders.Authorization); C ✓ (`focus-profiles.json`, 6 profiles); D ✓ (`test/scenario.test.ts` + `test/simulation.test.ts`, real FixtureBackend, no mocks); E ✓ (`focus-suggestions.json`, 1750 combos / 1759 prompts across 6 profiles).
+  - RUNLOG.md behind by one entry (run ~1062 only in DRIVER-BOARD.md, not RUNLOG.md); no attempt to back-fill prior session's log.
+  - Notion board: unavailable (NOTION_API_TOKEN not resolvable). DRIVER-BOARD.md + RUNLOG.md are durable fallback.
+- **Workstream status**: A ✓ B ✓ C ✓ D ✓ E ✓ (all done since ~run 369; 694+ consecutive idle runs)
+- **Blockers** (all require human action — 24 escalations sent; no response):
+  1. **Disable or redirect hourly schedule** — 1063+ consecutive runs; A–E exhausted; schedule burns compute with no productive work.
+  2. **Add workstream F** — options: live gateway smoke tests, branch hygiene automation, McpAgent phases 2–4, cast chain multi-step scenarios, Ollama brain integration tests.
+  3. **Stale branch cleanup** — 1000+ remote `auto/` branches (261 cast-explain metric-freeze violations, 739 other). Bulk-delete locally: `gh api repos/chittyos/ch1tty/git/refs --paginate | jq -r '.[].ref' | grep 'heads/auto/' | xargs -I{} gh api repos/chittyos/ch1tty/git/{} -X DELETE`
+  4. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend on live gateway.
+  5. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  7. **Major bumps pending human review**: typescript 5→7, @types/node 22→26, c8 11→12.
+  8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **PushNotification**: NOT SENT — escalation #24 fired at ~1060; #25 threshold at ~1070 (7 runs away).
+- **Next most useful action for next run**: Idle. Escalation #25 at ~1070 (6 runs from next).
