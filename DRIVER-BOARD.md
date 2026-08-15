@@ -822,3 +822,22 @@ _(Runs ~1038–1045 committed run-log git commits only; no DRIVER-BOARD.md edits
   8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
 - **Next run**: Idle. Last escalation at ~1060 (escalation #24); **escalation #25 due at ~1070 (NEXT RUN)**.
 - **PushNotification**: NOT SENT — escalation #25 fires next run (~1070).
+
+---
+
+### 2026-08-15 (run ~1070 — ESCALATION #25 SENT; all workstreams done)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; workstream F awaiting human decision)
+- **Branch/PR**: direct commit to main (run log only). 0 open PRs confirmed.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~50s)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1197/1198 enforce 56/87 fields). 0 violations on main.
+  - `git pull origin main` (ca00a08, run ~1069). `npm ci` clean. `npm run build` clean. `npm test`: 1418/0/3 ✓.
+  - 0 open PRs. All workstreams A–E verified done. 1000 stale `auto/` branches.
+  - **ESCALATION #25 SENT** — 1070+ idle runs; no human response to escalations #1–#24.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓. Tests: 1418/0/3. Build: clean. **~1070th run. 0 open PRs.**
+- **Human-action items** (25 escalations sent; no reaction received):
+  1. **Disable or redirect hourly schedule** — 1070+ runs; A–E exhausted.
+  2. **Add workstream F** to DRIVER-BOARD.md — enables next productive work.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod**, configure CF Access, rotate Notion token, review major bumps, resolve issues #1071/#1072.
+- **Next run**: Idle. Escalation #25 sent at ~1070; next escalation #26 at ~1080.
+- **PushNotification**: SENT — escalation #25.
