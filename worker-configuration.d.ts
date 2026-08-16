@@ -11,6 +11,7 @@ interface __BaseEnv_Env {
 	CH1TTY: DurableObjectNamespace<import("./src/index").Ch1ttyDO>;
 	MCP_OBJECT: DurableObjectNamespace /* Ch1ttyMcpAgent */;
 	API_OBJECT: DurableObjectNamespace /* Ch1ttyApiAgent */;
+	OAUTH_KV: KVNamespace;
 }
 declare namespace Cloudflare {
 	interface GlobalProps {

@@ -15,5 +15,7 @@ export interface Env extends Cloudflare.Env {
   CHITTYCONNECT_URL?: string;
   /** Service token for authenticating to the ChittyConnect broker (secret). */
   CHITTYCONNECT_SERVICE_TOKEN?: string;
+  /** KV namespace for OAuth 2.1 token storage (workers-oauth-provider). Bound as OAUTH_KV. */
+  OAUTH_KV?: KVNamespace;
   [key: string]: unknown;
 }
