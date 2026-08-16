@@ -1289,3 +1289,30 @@ _(Runs ~1096–1098 committed git-only run-log entries; no DRIVER-BOARD.md edits
   8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
 - **Next run**: Idle. Last escalation at ~1100 (escalation #28); next escalation #29 at ~1110 (10 runs away).
 - **PushNotification**: SENT — escalation #28 fired this run.
+
+---
+
+### 2026-08-16 (run ~1101 — workstream-f PR #1119 open; routing fix confirmed; awaiting human review)
+- **Workstream**: F (workstream-f-phase2 — Phase 2 already pushed by prior session; this run inspects + comments)
+- **Branch/PR**: `auto/workstream-f-phase2` → PR #1119 (open, `mergeable_state: blocked` — needs human review approval)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~51s)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1197/1198 enforce 56/87 fields). 0 violations on main.
+  - `git reset --hard origin/main` (c8102ef, run ~1100). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3 (1421 total, 51 suites, ~51s). 0 failures.
+  - Found PR #1119 open (`auto/workstream-f-phase2`, created 14:49 UTC by prior session). 3 commits: feat → docs → fix(routing).
+  - Investigated CodeRabbit "High Risk" routing flag: applies only to commit `1ab7805`; routing fix is in HEAD commit `2101078` (`core.callTool('ch1tty/execute', { tool, args }, sessionId)` wraps the backend dispatch correctly through `handleExecute`).
+  - All 3 CI checks green (CodeQL ✅, Analyze actions ✅, Analyze javascript-typescript ✅). `typecheck:worker` clean (pre-existing `@chittyos/schema-client` miss unchanged).
+  - Posted clarification comment on PR #1119 explaining the routing fix is in HEAD.
+  - Notion board: unavailable (API 401). DRIVER-BOARD.md is durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓. Workstream F Phase 2: PR #1119 open, routing fix confirmed, waiting human approval. Tests: 1418/0/3. Build: clean.
+- **Human-action items** (28 escalations sent; no reaction received):
+  1. **Review and merge PR #1119** — workstream F Phase 2 (`openApiMcpServer` typed surface at `/mcp-api`); routing fix confirmed in HEAD; CI green; only blocking factor is required review approval.
+  2. **Disable or redirect hourly schedule** — 1101+ consecutive runs; A–E exhausted; F waiting for merge; schedule burns compute.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  5. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  7. **Major bumps pending human review**: typescript 5→7, @types/node 22→26, c8 11→12.
+  8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: Once PR #1119 is merged, advance workstream F Phase 3 (OAuth cutover). If still blocked, idle.
+- **PushNotification**: TO BE SENT — PR #1119 is open and awaiting human review; escalation #28 already sent at ~1100.
