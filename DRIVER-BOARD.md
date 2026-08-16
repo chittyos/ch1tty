@@ -1289,3 +1289,30 @@ _(Runs ~1096–1098 committed git-only run-log entries; no DRIVER-BOARD.md edits
   8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
 - **Next run**: Idle. Last escalation at ~1100 (escalation #28); next escalation #29 at ~1110 (10 runs away).
 - **PushNotification**: SENT — escalation #28 fired this run.
+
+---
+
+### 2026-08-16 (run ~1101 — idle; all workstreams done; PR #1119 workstream F Phase 2 ready for review)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done). Workstream F Phase 2 is now in open PR #1119 — created by automated session after run ~1100 (post-ESCALATION #28).
+- **Branch/PR**: direct commit to main (run log + board update). 1 open PR: **#1119** (`auto/workstream-f-phase2` — openApiMcpServer typed API surface at `/mcp-api`; CI green; awaiting review).
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~41s)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1197/1198 enforce 56/87 fields). 0 violations on main.
+  - `git reset --hard origin/main` (c8102ef, run ~1100). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3 (1421 total, 51 suites, ~41s). 0 failures.
+  - **New development**: PR #1119 (`auto/workstream-f-phase2`) was created at 14:49 today by `chitcommit` — after ESCALATION #28 was sent. PR adds `openApiMcpServer` typed API surface at `/mcp-api` (Phase 2 of McpAgent migration). CI checks: all 3 green (CodeQL ✓, Analyze(actions) ✓, Analyze(javascript-typescript) ✓). `mergeable_state: blocked` — requires review/approval before merge.
+  - Verified all workstreams A–E artifacts: B ✓ (`github` → `https://api.githubcopilot.com/mcp/`); C ✓ (`focus-profiles.json` 6 profiles); D ✓ (`test/scenario.test.ts`); E ✓ (`focus-suggestions.json` 6 profiles, 1750 combos/1759 prompts).
+  - 261 stale `auto/*-cast-explain-*-ratio` branches on origin (guardrail violations — not merged). Bulk-delete requires human action.
+  - Notion board: unavailable (API 401). DRIVER-BOARD.md is durable board.
+  - PushNotification sent — PR #1119 is new and actionable (needs review to merge Phase 2).
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓. Tests: 1418/0/3. Build: clean. 0 vulns. **~1101st run. 1 open PR (#1119, CI green, needs review).**
+- **Human-action items**:
+  1. **Review and merge PR #1119** — workstream F Phase 2 (`openApiMcpServer` typed API at `/mcp-api`); CI green; 3 checks passing; needs approval. Deploy note in PR body.
+  2. **Disable or redirect hourly schedule** — 1101+ consecutive runs; all A–E exhausted; schedule burns compute with no productive work.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  5. **Stale branch cleanup** — 1000+ remote `auto/` branches + 261 guardrail-violating cast-explain branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  7. **Major bumps pending human review**: typescript 5→7, @types/node 22→26, c8 11→12.
+  8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: Idle. Last escalation at ~1100 (escalation #28); next escalation #29 at ~1110 (9 runs away). PR #1119 needs review — monitor for CI changes.
+- **PushNotification**: SENT — PR #1119 workstream F Phase 2 ready for review (notable new development since ESCALATION #28).
