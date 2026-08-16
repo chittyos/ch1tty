@@ -1443,3 +1443,27 @@ _(Runs ~1096–1098 committed git-only run-log entries; no DRIVER-BOARD.md edits
   8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
 - **Next run**: Idle. Last escalation at ~1100 (escalation #28); next escalation #29 at ~1110 (3 runs away). PR #1119 open.
 - **PushNotification**: NOT SENT — no new state changes; escalation #29 fires at ~1110.
+
+---
+## Run log — 2026-08-16 (~2350 UTC)
+
+- **Workstream advanced**: F (Phase 3 — OAuth 2.1 cutover)
+- **Branch**: `auto/workstream-f-phase3-oauth`
+- **PR**: #1120 (base: `auto/workstream-f-phase2`)
+- **Build**: clean (tsc)
+- **Tests**: 1430 pass / 0 fail / 3 skip (11 new oauth-authorize tests)
+- **Actions taken**:
+  - Enabled auto-merge on PR #1119 (Phase 2, CI green)
+  - Created `src/oauth-authorize.ts` — handleAuthorize GET/POST with duck-typed auth-error detection
+  - Updated `src/index.ts` — OAuthProvider as default export; /mcp2 is apiRoute; /authorize in defaultHandler
+  - Added `OAUTH_KV` KV binding to wrangler.jsonc + worker-configuration.d.ts
+  - Added `test/oauth-authorize.test.ts` — 11 tests, all green
+  - CodeRabbit skipped #1120 (targets non-default branch, by design)
+  - PR #1120 auto-merge status: all checks passed — direct-mergeable once approved
+- **Human-action items** (same as prior run plus):
+  1. **Review and merge PR #1119** (Phase 2, CI green, all CodeRabbit issues addressed)
+  2. **Review and merge PR #1120** (Phase 3, OAuth cutover; base #1119 — merge in order)
+  3. **Create OAUTH_KV namespace** before deploying Phase 3: `wrangler kv namespace create OAUTH_KV`, update placeholder ID in wrangler.jsonc
+  4. **Disable or redirect hourly schedule** — compute burning on idle runs
+  5. All prior blockers remain (branch cleanup, Notion token, GITHUB_MCP_AUTHORIZATION, CF Access creds)
+- **Next run**: Phase 4 (legacy /mcp DO decommission) when #1119 + #1120 are merged. Otherwise idle.
