@@ -1413,3 +1413,33 @@ _(Runs ~1096–1098 committed git-only run-log entries; no DRIVER-BOARD.md edits
   8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
 - **Next run**: Idle. Last escalation at ~1100 (escalation #28); next escalation #29 at ~1110 (4 runs away). PR #1119 open.
 - **PushNotification**: NOT SENT — no new state changes; escalation #29 fires at ~1110.
+
+---
+
+### 2026-08-16 (run ~1107 — idle; PR #1119 open; CodeRabbit issues all addressed; awaiting human review)
+- **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; workstream F Phase 2 in open PR #1119).
+- **Branch/PR**: direct commit to main (run log). 1 open PR: **#1119** (`auto/workstream-f-phase2`).
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~41s)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1197/1198 enforce 56/87 fields). 0 violations on main.
+  - `git reset --hard origin/main` (a0adc37, run ~1106). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3 (1421 total, 51 suites, ~41s). 0 failures.
+  - **PR #1119 review check**: Checked out `auto/workstream-f-phase2` (HEAD `2101078`). Verified all CodeRabbit issues are already addressed:
+    - Routing fix: `2101078` routes `/mcp-api` execute through `ch1tty/execute` — ✅ done.
+    - `operationId` deduplication: `seenOperationIds` Set + suffix loop already present in `src/openapi-spec.ts:24-32` — ✅ done.
+    - Error identifier typo: `src/index.ts:101` reads `POLICY_BLOCKED_MCPAPI_TOKEN_UNBOUND` (correct spelling) — ✅ done.
+    - `DRIVER-BOARD.md` status update: Workstream F marked active in the branch — ✅ done.
+  - CodeRabbit reviewed old commit `1ab78`; all flagged issues fixed in commits 2+3. No further code changes needed.
+  - CI: 3/3 checks green (CodeQL ✅, Analyze(actions) ✅, Analyze(javascript-typescript) ✅). `mergeable_state: blocked` — awaiting human review approval.
+  - Notion board: unavailable (API 401). DRIVER-BOARD.md is durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓. Tests: 1418/0/3. Build: clean. **~1107th run. 1 open PR (#1119, CI green, all review comments addressed, needs human approval).**
+- **Human-action items**:
+  1. **Review and merge PR #1119** — workstream F Phase 2 (`openApiMcpServer` typed API at `/mcp-api`); CI green; all CodeRabbit issues fixed (routing, operationId dedup, typo, board update); awaiting approval. Deploy note in PR body.
+  2. **Disable or redirect hourly schedule** — 1107+ consecutive runs; all A–E exhausted; schedule burns compute.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  5. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  7. **Major bumps pending human review**: typescript 5→7, @types/node 22→26, c8 11→12.
+  8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **Next run**: Idle. Last escalation at ~1100 (escalation #28); next escalation #29 at ~1110 (3 runs away). PR #1119 open.
+- **PushNotification**: NOT SENT — no new state changes; escalation #29 fires at ~1110.
