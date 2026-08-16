@@ -21,11 +21,15 @@ export function buildOpenApiSpec(
   version = '1.0.0',
 ): Record<string, unknown> {
   const paths: Record<string, unknown> = {};
+  const seenOperationIds = new Set<string>();
 
   for (const tool of tools) {
     // URL-safe path: namespacedName is already "serverId/toolName"
     const pathKey = `/tools/${tool.namespacedName}`;
-    const operationId = tool.namespacedName.replace(/[^a-zA-Z0-9_]/g, '_');
+    const baseOperationId = tool.namespacedName.replace(/[^a-zA-Z0-9_]/g, '_');
+    let operationId = baseOperationId;
+    for (let n = 2; seenOperationIds.has(operationId); n++) operationId = `${baseOperationId}_${n}`;
+    seenOperationIds.add(operationId);
 
     const properties = (tool.inputSchema.properties as Record<string, unknown> | undefined) ?? {};
     const required = (tool.inputSchema.required as string[] | undefined) ?? [];
@@ -35,16 +39,13 @@ export function buildOpenApiSpec(
         operationId,
         summary: tool.description || tool.namespacedName,
         tags: [tool.serverId],
+        // Use the full inputSchema to preserve $defs, allOf, oneOf, additionalProperties, etc.
         requestBody: Object.keys(properties).length > 0
           ? {
               required: required.length > 0,
               content: {
                 'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties,
-                    ...(required.length > 0 ? { required } : {}),
-                  },
+                  schema: tool.inputSchema,
                 },
               },
             }
@@ -53,9 +54,8 @@ export function buildOpenApiSpec(
           '200': {
             description: 'Tool result',
             content: {
-              'application/json': {
-                schema: { type: 'object' },
-              },
+              // Tools may return strings, arrays, or objects; use an open schema.
+              'application/json': { schema: {} },
             },
           },
           '400': { description: 'Tool returned an error' },

@@ -98,7 +98,7 @@ export default {
         ? env.CH1TTY_MCP_TOKEN : undefined;
       if (!tokenSecret) {
         return Response.json(
-          { error: 'POLICY_BLOCKED_MPCAPI_TOKEN_UNBOUND', message: 'CH1TTY_MCP_TOKEN is not configured; /mcp-api refuses to serve unauthenticated.' },
+          { error: 'POLICY_BLOCKED_MCPAPI_TOKEN_UNBOUND', message: 'CH1TTY_MCP_TOKEN is not configured; /mcp-api refuses to serve unauthenticated.' },
           { status: 503 },
         );
       }

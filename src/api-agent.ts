@@ -70,7 +70,9 @@ export class Ch1ttyApiAgent extends McpAgent<Env> {
           opts.body && typeof opts.body === 'object' && !Array.isArray(opts.body)
             ? (opts.body as Record<string, unknown>)
             : {};
-        const result = await core.callTool(namespacedTool, args, sessionId);
+        // Route through ch1tty/execute so handleExecute can dispatch to the
+        // correct backend via RemoteProxy. Direct callTool rejects non-meta serverIds.
+        const result = await core.callTool('ch1tty/execute', { tool: namespacedTool, args }, sessionId);
         if (result.isError) throw new Error(JSON.stringify(result.content));
         // Return the first text content item parsed as JSON, or the raw content.
         if (result.content.length === 1 && result.content[0]?.type === 'text') {
