@@ -336,6 +336,11 @@ export class Ch1ttyCore {
     return this.registry;
   }
 
+  /** Public snapshot of the tool registry for consumers (e.g. Ch1ttyApiAgent). */
+  async registrySnapshot(): Promise<NamespacedTool[]> {
+    return this.getRegistry();
+  }
+
   // ── Meta-tools ──────────────────────────────────────────────
 
   metaTools(): MetaToolDescriptor[] {

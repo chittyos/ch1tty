@@ -23,7 +23,8 @@
   "durable_objects": {
     "bindings": [
       { "name": "CH1TTY", "class_name": "Ch1ttyDO" },
-      { "name": "MCP_OBJECT", "class_name": "Ch1ttyMcpAgent" }
+      { "name": "MCP_OBJECT", "class_name": "Ch1ttyMcpAgent" },
+      { "name": "API_OBJECT", "class_name": "Ch1ttyApiAgent" }
     ]
   },
   "migrations": [
@@ -34,6 +35,10 @@
     {
       "tag": "v2",
       "new_sqlite_classes": ["Ch1ttyMcpAgent"]
+    },
+    {
+      "tag": "v3",
+      "new_sqlite_classes": ["Ch1ttyApiAgent"]
     }
   ],
   // Worker Loader binding for codemode DynamicWorkerExecutor sandbox.
