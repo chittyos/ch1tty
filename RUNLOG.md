@@ -2428,3 +2428,17 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
 - **PushNotification**: NOT SENT — escalation #26 fired at ~1080; next escalation #27 at ~1090 (5 runs away).
 - **Next most useful action for next run**: Idle. At run ~1090, send escalation #27 via PushNotification.
+
+---
+
+### 2026-08-17 (run ~1110 — escalation #29; both WF PRs open; awaiting human review)
+- **Workstream**: None (all A–E done; workstream F Phase 2 in #1119, Phase 3 in #1120)
+- **Branch/PR**: direct commit to main (run log only). 2 open PRs confirmed: #1119, #1120.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~41s)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1197/1198 enforce 56/87 field counts). 0 violations on main.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3. 0 failures.
+  - PR #1119 CI: 3/3 green. PR #1120: 0 CI runs (expected, non-default base). No new review comments.
+  - **Escalation #29 sent** via PushNotification.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓. Tests: 1418/0/3. Build: clean. **~1110th run. 2 open PRs.**
+- **Next most useful action for next run**: Idle. Next escalation #30 at ~1120.

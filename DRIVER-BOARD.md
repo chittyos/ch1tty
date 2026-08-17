@@ -1490,3 +1490,33 @@ _(Runs ~1096–1098 committed git-only run-log entries; no DRIVER-BOARD.md edits
   4. All prior blockers remain (branch cleanup, Notion token, GITHUB_MCP_AUTHORIZATION, CF Access creds).
 - **PushNotification**: NOT SENT — no new state changes; both PRs still awaiting human review, same as last run.
 - **Next run**: Idle (Phase 4 when #1119 + #1120 merge).
+
+---
+
+## Run log — 2026-08-17 (~0150 UTC) — escalation #29; both WF PRs open; awaiting human review
+
+- **Workstream advanced**: none (A–E done; F Phase 2 in #1119, Phase 3 in #1120 — both awaiting human approval)
+- **Branch/PR**: direct commit to main (run log only). 2 open PRs: #1119 and #1120.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0)
+- **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~41s)
+- **Guardrails**: 5-tool surface confirmed (search/execute/status/reload/cast). `buildCastExplanation` metric freeze tests 1197/1198 green (56 fields no-focus, 87 fields focus:code). 0 violations on main.
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; all guardrails confirmed.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3 (1421 total, 51 suites). 0 failures.
+  - Confirmed 2 open PRs: #1119 (Phase 2, `auto/workstream-f-phase2` → main) and #1120 (Phase 3, `auto/workstream-f-phase3-oauth` → phase2 branch).
+  - PR #1119 CI: 3/3 checks green (CodeQL ✅, Analyze(actions) ✅, Analyze(javascript-typescript) ✅). Awaiting human review approval.
+  - PR #1120: 0 CI runs (CodeRabbit skips non-default base; expected). Stacked on #1119.
+  - No new review comments on either PR since last run.
+  - **Escalation #29 sent** via PushNotification (run ~1110, 10-run cadence from #28 at ~1100).
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓. Tests: 1418/0/3. Build: clean. **~1110th run. 2 open PRs (#1119 CI green, #1120 stacked on #1119).**
+- **Human-action items**:
+  1. **Review and merge PR #1119** — Phase 2 (`openApiMcpServer` at `/mcp-api`); CI 3/3 green; all CodeRabbit issues fixed; awaiting approval. See deploy note in PR body.
+  2. **Review and merge PR #1120** — Phase 3 (OAuth 2.1 cutover for `/mcp2`); stacked on #1119 — merge in order. Create `OAUTH_KV` KV namespace before deploy.
+  3. **Disable or redirect hourly schedule** — 1110+ consecutive runs; A–E exhausted; compute burning with no productive work.
+  4. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  5. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  6. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings.
+  7. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **PushNotification**: SENT — escalation #29 (run ~1110; 10-run cadence from #28 at ~1100).
+- **Next run**: Idle. Phase 4 (legacy /mcp DO decommission) when #1119 + #1120 are merged. Next escalation #30 at ~1120.
