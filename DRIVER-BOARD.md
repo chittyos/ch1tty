@@ -1467,3 +1467,26 @@ _(Runs ~1096–1098 committed git-only run-log entries; no DRIVER-BOARD.md edits
   4. **Disable or redirect hourly schedule** — compute burning on idle runs
   5. All prior blockers remain (branch cleanup, Notion token, GITHUB_MCP_AUTHORIZATION, CF Access creds)
 - **Next run**: Phase 4 (legacy /mcp DO decommission) when #1119 + #1120 are merged. Otherwise idle.
+
+---
+
+## Run log — 2026-08-17 (~0050 UTC) — idle; both WF PRs open; awaiting human review
+
+- **Workstream advanced**: none (A–E done; F Phase 2 in #1119, Phase 3 in #1120 — both awaiting human approval)
+- **Branch/PR**: direct commit to main (run log only)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0)
+- **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites)
+- **Guardrails**: 5-tool surface confirmed; `buildCastExplanation` metric freeze tests 1197/1198 green (56 fields no-focus, 87 fields focus:code).
+- **Actions**:
+  - `npm ci` clean. `npm run build` clean. `npm test`: 1418/0/3.
+  - Checked open PRs: #1119 (Phase 2, `auto/workstream-f-phase2` → main) and #1120 (Phase 3, `auto/workstream-f-phase3-oauth` → phase2 branch). No new review comments. No new CI runs on #1120.
+  - PR #1119 CI: 3/3 checks green (CodeQL ✅, Analyze(actions) ✅, Analyze(javascript-typescript) ✅). All CodeRabbit issues confirmed fixed in commit 3. Blocked on human review approval.
+  - PR #1120: 0 CI runs (CodeRabbit skipped non-default-base; Codex hit usage limit). No blocking issues. Stacked on #1119.
+  - No code changes made — state unchanged from last run.
+- **Human-action items**:
+  1. **Review and merge PR #1119** — Phase 2 (`openApiMcpServer` at `/mcp-api`); CI green, all CodeRabbit issues fixed; awaiting approval.
+  2. **Review and merge PR #1120** — Phase 3 (OAuth 2.1 cutover); stacked on #1119; merge in order. Create `OAUTH_KV` KV namespace before deploy.
+  3. **Disable or redirect hourly schedule** — 1108+ consecutive runs; A–E exhausted; compute burning on idle.
+  4. All prior blockers remain (branch cleanup, Notion token, GITHUB_MCP_AUTHORIZATION, CF Access creds).
+- **PushNotification**: NOT SENT — no new state changes; both PRs still awaiting human review, same as last run.
+- **Next run**: Idle (Phase 4 when #1119 + #1120 merge).
