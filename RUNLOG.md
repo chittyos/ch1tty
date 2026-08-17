@@ -2442,3 +2442,29 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   - **Escalation #29 sent** via PushNotification.
 - **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓. Tests: 1418/0/3. Build: clean. **~1110th run. 2 open PRs.**
 - **Next most useful action for next run**: Idle. Next escalation #30 at ~1120.
+
+---
+
+### 2026-08-17 (run ~1125 — idle; all A-F done; 1438/0/3)
+- **Workstream**: None (all A–F done; no new workstream defined in schedule prompt)
+- **Branch/PR**: direct commit to main (run log only). 0 open PRs confirmed.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1438 pass / 0 fail / 3 skip (1441 total, 51 suites, ~48s)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED (search/execute/status/reload/cast); `buildCastExplanation` metric freeze ACTIVE (tests 1217/1218 enforce 56/87 field counts). 0 violations on main.
+  - `git reset --hard origin/main` (1a7b3b1) — local main was 50 commits behind origin (stale idle-run divergence); reset to origin/main.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1438/0/3 (1441 total, 51 suites, ~48s). 0 failures.
+  - 0 open PRs confirmed (list_pull_requests returned empty).
+  - All workstreams A–F confirmed done per git log: A ✓ (build+tests green), B ✓ (servers.json github→`https://api.githubcopilot.com/mcp/`), C ✓ (focus-profiles.json 6 profiles), D ✓ (scenario/simulation tests), E ✓ (focus-suggestions.json 6 profiles), F ✓ (PRs #1119/#1120/#1121 merged at run ~1122).
+  - Notion board: unavailable (API 401). DRIVER-BOARD.md + RUNLOG.md are durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ ALL DONE. Tests: 1438/0/3. Build: clean. **~1125th run. 0 open PRs.**
+- **PushNotification**: NOT SENT — no new state; escalation #30 fired at ~1121; escalation #31 due at ~1131 (6 runs away).
+- **Human-action items** (unchanged):
+  1. **Deploy Phase 2**: Create `Ch1ttyApiAgent` DO class (v3 SQLite migration) before `wrangler deploy`. Ensure `CH1TTY_MCP_TOKEN` set.
+  2. **Deploy Phase 3**: Run `wrangler kv namespace create OAUTH_KV`, replace `PLACEHOLDER_OAUTH_KV_ID` in `wrangler.jsonc`, ensure `CH1TTY_MCP_TOKEN` set.
+  3. **Deploy Phase 4**: Run `wrangler migrations apply` to drain `Ch1ttyDO` instances after confirming no in-flight sessions.
+  4. **Disable or redirect hourly schedule** — all A–F complete; schedule burns compute with no new work.
+  5. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  6. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  7. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings.
+  8. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+- **Next run**: Idle. Escalation #31 fires at ~1131 (6 runs away).
