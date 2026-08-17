@@ -54,6 +54,11 @@
   "vectorize": [
     { "binding": "VECTORIZE", "index_name": "ch1tty-tool-index" }
   ],
+  // KV namespace for OAuth 2.1 token storage (workers-oauth-provider).
+  // Must be created before deploy: wrangler kv namespace create OAUTH_KV
+  "kv_namespaces": [
+    { "binding": "OAUTH_KV", "id": "PLACEHOLDER_OAUTH_KV_ID" }
+  ],
   "observability": {
     "enabled": true,
     "logs": {
