@@ -1520,3 +1520,40 @@ _(Runs ~1096–1098 committed git-only run-log entries; no DRIVER-BOARD.md edits
   8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
 - **PushNotification**: SENT — escalation #29 (run ~1110; 10-run cadence from #28 at ~1100).
 - **Next run**: Idle. Phase 4 (legacy /mcp DO decommission) when #1119 + #1120 are merged. Next escalation #30 at ~1120.
+
+---
+
+## Run log — 2026-08-17 (~0431 UTC) — all 3 WF phase PRs open; #1119 comments all addressed; session-restart fix pushed
+
+- **Workstream advanced**: none (code complete; F Phases 2/3/4 in PRs #1119/#1120/#1121 — all awaiting human review)
+- **Branch/PR**: direct commit to main (run log + board). 3 open PRs: #1119, #1120, #1121.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0)
+- **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~36s)
+- **Guardrails**: 5-tool surface confirmed (search/execute/status/reload/cast). `buildCastExplanation` metric freeze tests 1197/1198 green (56 fields no-focus, 87 fields focus:code). 0 violations on main.
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; all guardrails confirmed.
+  - `git reset --hard origin/main` (f1cc44c). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3. 0 failures.
+  - Checked all 3 open PRs (GitHub MCP):
+    - **PR #1119** (Phase 2, `auto/workstream-f-phase2` → main): CI 3/3 green (CodeQL ✅, Analyze(actions) ✅, Analyze(javascript-typescript) ✅). `mergeable_state: blocked` (needs human approval). Review threads: 3 CodeRabbit threads resolved; 7 Codex threads — 4 are `is_outdated:true` (code changed underneath), 3 not-outdated each have prior-session replies: session-restart fix ("Fixed in commit 060407c2b554cb7a9741b642c7ba9a4f7616c331"), tool-name encoding ("Not an issue — registry only uses simple serverId/toolName"), spec refresh ("Known Phase 2 limitation — deferred"). All actionable items fully addressed.
+    - **PR #1120** (Phase 3, `auto/workstream-f-phase3-oauth` → phase2 branch): 0 CI runs (expected for non-default-base). No review comments. Stacked on #1119.
+    - **PR #1121** (Phase 4, `auto/workstream-f-phase4-mcp-decommission` → phase3 branch): 0 CI runs (expected). Codex usage-limit notice + CodeRabbit skip (non-default base). `mergeable_state: clean`. Created at 02:40 UTC by a session after escalation #29. Prior session at ~03:41 UTC pushed session-restart lifecycle fix to #1119 and replied to all open Codex/CodeRabbit threads.
+  - PR #1121 validates: 1438 pass / 0 fail / 3 skip (per its PR body) — +8 new Phase 4 tests.
+  - Notion board: unavailable (API 401). DRIVER-BOARD.md is durable board.
+  - **PushNotification sent** — meaningful new state since escalation #29: Phase 4 PR (#1121) created; all #1119 comments addressed; 3 phases now in PRs, all ready for sequential review.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓. Tests: 1418/0/3. Build: clean. **~1113th run est. 3 open PRs (all workstream F phases 2–4).**
+- **Workstream F status**:
+  - Phase 2 (#1119): CI green, all comments addressed → **READY FOR REVIEW** (merge first)
+  - Phase 3 (#1120): stacked on #1119 → **READY AFTER #1119**
+  - Phase 4 (#1121): stacked on #1120 → **READY AFTER #1119 + #1120** (note: PR body reports 1438/0/3 tests)
+- **Human-action items**:
+  1. **Review and merge PR #1119** — Phase 2 (`openApiMcpServer` at `/mcp-api`); CI 3/3 green; all CodeRabbit issues fixed; session-restart lifecycle fix in HEAD commit; awaiting approval.
+  2. **Review and merge PR #1120** — Phase 3 (OAuth 2.1 for `/mcp2`); stacked on #1119; merge in order. Create `OAUTH_KV` KV namespace before deploy.
+  3. **Review and merge PR #1121** — Phase 4 (legacy `/mcp` → 410 Gone); stacked on #1120; merge last. `Ch1ttyDO` kept exported until DO drain confirmed.
+  4. **Disable or redirect hourly schedule** — 1113+ consecutive runs; A–E exhausted; compute burning.
+  5. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  6. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  7. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings.
+  8. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+  9. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
+- **PushNotification**: SENT — new state since escalation #29: Phase 4 PR created; all PR #1119 comments addressed.
+- **Next run**: Idle. Next escalation #30 at ~1120 (~7 runs).
