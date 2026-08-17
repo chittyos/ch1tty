@@ -1,28 +1,25 @@
 // Worker entry. Routes to:
-//   /mcp2      — McpAgent (OAuth 2.1 protected, via OAuthProvider)
+//   /mcp2      — McpAgent (OAuth 2.1 protected, via OAuthProvider) — canonical endpoint
 //   /mcp-api   — ApiAgent (bearer-token protected, fail-closed)
-//   /mcp       — Legacy DO path (bearer-token, fail-open when unset)
+//   /mcp       — DECOMMISSIONED (Phase 4) — returns 410 Gone; migrate to /mcp2
 //   /authorize — OAuth consent form
 //   /health, /api/v1/* — operational endpoints (no auth)
 //
-// Phase 3: /mcp2 moved behind OAuthProvider. Clients get tokens via the
-// /authorize → /oauth/token flow instead of a static bearer secret.
-// The legacy /mcp path keeps its existing fail-open bearer semantics.
+// Phase 4: /mcp retired. All requests return 410 Gone with migration instructions.
+// Ch1ttyDO is kept exported so the Cloudflare migration chain (v1 tag) stays intact;
+// the CH1TTY binding remains in wrangler.jsonc until all DO instances are drained.
 import { OAuthProvider } from '@cloudflare/workers-oauth-provider';
 import { Ch1ttyDO } from './ch1tty-do.js';
 import { Ch1ttyMcpAgent } from './mcp-agent.js';
 import { Ch1ttyApiAgent } from './api-agent.js';
 import { handleAuthorize } from './oauth-authorize.js';
+import { handleMcpDeprecated } from './mcp-deprecated.js';
 import type { Env } from './types.js';
 import { VERSION } from './utils.js';
 
 export { Ch1ttyDO, Ch1ttyMcpAgent, Ch1ttyApiAgent };
 
-function mintSessionId(): string {
-  return crypto.randomUUID();
-}
-
-/** Bearer check for the LEGACY /mcp DO path and /mcp-api (static token). */
+/** Bearer check for /mcp-api (static token, fail-closed). */
 function checkAuth(req: Request, token?: string): boolean {
   if (!token) return true; // no token configured → open (warned at deploy)
   const auth = req.headers.get('authorization');
@@ -95,25 +92,9 @@ const defaultHandler = {
       return Ch1ttyApiAgent.serve('/mcp-api', { binding: 'API_OBJECT' }).fetch(req, env, ctx);
     }
 
-    // MCP endpoint (legacy JSON-RPC DO path — untouched; fail-open when no token).
+    // /mcp — DECOMMISSIONED (Phase 4). Returns 410 Gone for all methods.
     if (path === '/mcp') {
-      const tokenSecret = typeof env.CH1TTY_MCP_TOKEN === 'string' ? env.CH1TTY_MCP_TOKEN : undefined;
-      if (!checkAuth(req, tokenSecret)) {
-        return Response.json({ error: 'unauthorized' }, { status: 401 });
-      }
-      const sessionId = req.headers.get('mcp-session-id') ?? mintSessionId();
-      const id = env.CH1TTY.idFromName(sessionId);
-      const stub = env.CH1TTY.get(id);
-      const fwd = new Request('https://do/mcp', {
-        method: req.method,
-        headers: (() => {
-          const h = new Headers(req.headers);
-          h.set('mcp-session-id', sessionId);
-          return h;
-        })(),
-        body: req.method === 'POST' ? await req.text() : undefined,
-      });
-      return stub.fetch(fwd);
+      return handleMcpDeprecated(req);
     }
 
     return Response.json({ error: 'not found' }, { status: 404 });
@@ -127,7 +108,7 @@ export default new OAuthProvider<Env>({
   apiRoute: '/mcp2',
   apiHandler: mcp2Handler,
 
-  // All other routes (health, legacy /mcp, /mcp-api, /authorize, etc.).
+  // All other routes (health, /mcp 410 tombstone, /mcp-api, /authorize, etc.).
   defaultHandler,
 
   authorizeEndpoint: '/authorize',
