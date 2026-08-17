@@ -1729,3 +1729,31 @@ _(Runs ~1096–1098 committed git-only run-log entries; no DRIVER-BOARD.md edits
   7. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings.
   8. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
 - **Next run**: Idle. **Escalation #30 fires at ~1120 (NEXT RUN).**
+
+---
+
+## Run log — 2026-08-17 (~1121st run est.) — idle; 3 WF-f PRs open; **ESCALATION #30 sent**
+
+- **Workstream advanced**: none (all A–E done; workstream-f Phases 2/3/4 in PRs #1119/#1120/#1121 — awaiting human review)
+- **Branch/PR**: direct commit to main (run log only)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0)
+- **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~54s)
+- **Guardrails**: 5-tool surface confirmed (search/execute/status/reload/cast). `buildCastExplanation` metric freeze tests 1197/1198 green (56 fields no-focus, 87 fields focus:code). 0 violations on main.
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed.
+  - `git fetch --all && git reset --hard origin/main` (ef1a980). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3 (1421 total, 51 suites, ~54s). 0 failures.
+  - 3 open PRs confirmed: #1119 (Phase 2, CI 3/3 green: CodeQL ✅ Analyze(actions) ✅ Analyze(javascript-typescript) ✅, `mergeable_state: blocked` — awaiting human approval), #1120 (Phase 3 OAuth, `mergeable_state: clean`, stacked on phase2), #1121 (Phase 4 /mcp→410, `mergeable_state: clean`, stacked on phase3).
+  - All workstreams A–E confirmed done: B ✓ (github → api.githubcopilot.com/mcp/), C ✓ (focus-profiles.json 6 profiles), D ✓ (scenario/simulation tests), E ✓ (focus-suggestions.json 6 profiles, 276–305 combos + 278–304 prompts each).
+  - Notion board: unavailable (API 401). DRIVER-BOARD.md is durable board.
+  - **ESCALATION #30 sent** via PushNotification — escalation was due at ~1120; fired at ~1121. ~1121 idle runs total; 30 escalations sent with no human response received. 3 PRs awaiting review.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓. Tests: 1418/0/3. Build: clean. ~1121st run est. 3 open WF-f PRs; blocked pending human review.
+- **Human-action items** (unchanged):
+  1. **Review and merge PR #1119** — Phase 2 (`openApiMcpServer` at `/mcp-api`); CI 3/3 green; all review comments addressed; awaiting human approval.
+  2. **Review and merge PR #1120** — Phase 3 (OAuth 2.1 for `/mcp2`); stacked on #1119; merge after #1119. Create `OAUTH_KV` KV namespace before deploy.
+  3. **Review and merge PR #1121** — Phase 4 (legacy `/mcp` → 410 Gone); stacked on #1120; merge last.
+  4. **Disable or redirect hourly schedule** — 1121+ consecutive runs burning compute with no productive work.
+  5. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  6. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  7. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings.
+  8. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+- **Next run**: Idle. Last escalation at ~1121 (escalation #30); next escalation #31 at ~1131 (10 runs away).
