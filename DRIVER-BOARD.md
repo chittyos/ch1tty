@@ -1557,3 +1557,32 @@ _(Runs ~1096–1098 committed git-only run-log entries; no DRIVER-BOARD.md edits
   9. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
 - **PushNotification**: SENT — new state since escalation #29: Phase 4 PR created; all PR #1119 comments addressed.
 - **Next run**: Idle. Next escalation #30 at ~1120 (~7 runs).
+
+---
+
+## Run log — 2026-08-17 (~1114th run est.) — idle; 3 WF-f PRs still open; no state change
+
+- **Workstream advanced**: none (all A–E done; workstream-f Phases 2/3/4 in PRs #1119/#1120/#1121 — awaiting human review)
+- **Branch/PR**: direct commit to main (run log only)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0)
+- **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites)
+- **Guardrails**: 5-tool surface confirmed. `buildCastExplanation` metric freeze tests 1197/1198 green (56 fields no-focus, 87 fields focus:code). 0 violations on main.
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed.
+  - `npm ci` clean. `npm run build` clean. `npm test`: 1418/0/3. 0 failures.
+  - Confirmed 3 open PRs: #1119 (Phase 2, CI 3/3 green, `mergeable_state: blocked`), #1120 (Phase 3, 0 CI, stacked), #1121 (Phase 4, 0 CI, stacked).
+  - PR #1119 comments checked: 3 CodeRabbit threads resolved, all Codex threads addressed in prior session. No new comments since last run.
+  - 261 cast-explain guardrail-violation branches on remote; 0 open PRs for them.
+  - DRIVER-BOARD.md is durable board (Notion API 401).
+  - **PushNotification**: NOT sent — next escalation #30 due at ~1120 (~6 runs from here).
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓. Tests: 1418/0/3. Build: clean. ~1114th run est. 3 open WF-f PRs; all blocked pending human review.
+- **Human-action items** (unchanged):
+  1. **Review and merge PR #1119** — Phase 2 (`openApiMcpServer` at `/mcp-api`); CI 3/3 green; all comments addressed; awaiting approval.
+  2. **Review and merge PR #1120** — Phase 3 (OAuth 2.1 for `/mcp2`); stacked on #1119; merge after #1119.
+  3. **Review and merge PR #1121** — Phase 4 (legacy `/mcp` → 410 Gone); stacked on #1120; merge last.
+  4. **Disable or redirect hourly schedule** — 1114+ consecutive runs burning compute with no productive work.
+  5. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  6. **Configure CF Access on prod** — clears ledger DLQ.
+  7. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings.
+  8. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+- **Next run**: Idle. Next escalation #30 at ~1120 (~6 runs).
