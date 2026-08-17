@@ -1806,3 +1806,32 @@ _(Runs ~1096–1098 committed git-only run-log entries; no DRIVER-BOARD.md edits
   7. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings.
   8. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
 - **Next run**: All A–F done. Idle unless new workstream added. No escalation due (last was #30 at ~1121).
+
+---
+
+## Run log — 2026-08-17 (~1129th run est.) — idle; all A-F done; 4 stale branches detected
+
+- **Workstream advanced**: none (all A–F done; no new workstream added)
+- **Branch/PR**: direct commit to main (run log only). 0 open PRs confirmed.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0)
+- **Tests**: 1438 pass / 0 fail / 3 skip (1441 total, 51 suites)
+- **Guardrails**: 5-tool surface confirmed (search/execute/status/reload/cast). `buildCastExplanation` metric freeze tests 1197/1198 green (56 fields no-focus, 87 fields focus:code). 0 violations on main.
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1438/0/3 (1441 total, 51 suites). 0 failures.
+  - 0 open PRs confirmed (GitHub MCP returned empty list).
+  - 4 new remote branches detected from fetch: `fix/viewport-probe-namespacing`, `fix/worker-routes-and-deps`, `refactor/backend-interface`, `register-chittyconnect-mcp`. All are stale branches from pre-force-push history — their changes (viewport/* namespacing, ChittyConnect connect entry, Backend interface, wrangler route fixes) are ALL already present on current main. No action needed; these are historical artefacts.
+  - Runs ~1123–1128 committed run-log git commits only (no board update). Last board entry was run ~1122 (Workstream F completion).
+  - Notion board: unavailable (API 401). DRIVER-BOARD.md is durable board.
+  - **PushNotification**: NOT sent — no new state; last escalation #32 at ~1128; escalation #33 due at ~1138 (9 runs away).
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ ALL DONE. Tests: 1438/0/3. Build: clean. ~1129th run. 0 open PRs.
+- **Human-action items** (unchanged):
+  1. **Deploy Phase 2**: Create `Ch1ttyApiAgent` DO class (v3 SQLite migration) before `wrangler deploy`.
+  2. **Deploy Phase 3**: Run `wrangler kv namespace create OAUTH_KV`, replace `PLACEHOLDER_OAUTH_KV_ID` in `wrangler.jsonc`.
+  3. **Deploy Phase 4**: Run `wrangler migrations apply` to drain `Ch1ttyDO` instances after confirming no in-flight sessions.
+  4. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  5. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  6. **Disable or redirect hourly schedule** — all A–F complete; schedule burns compute with no new work.
+  7. **Stale branch cleanup** — 1000+ remote `auto/` branches + 4 stale fix/refactor branches; enable "Automatically delete head branches" in GitHub Settings.
+  8. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+- **Next run**: Idle. Last escalation #32 at ~1128; next escalation #33 at ~1138 (9 runs away).
