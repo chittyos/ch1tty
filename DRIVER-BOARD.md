@@ -1700,3 +1700,32 @@ _(Runs ~1096–1098 committed git-only run-log entries; no DRIVER-BOARD.md edits
   7. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings.
   8. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
 - **Next run**: Idle. Next escalation #30 at ~1120 (~2 runs).
+
+---
+
+## Run log — 2026-08-17 (~1119th run est.) — idle; 3 WF-f PRs open; no new state
+
+- **Workstream advanced**: none (all A–E done; workstream-f Phases 2/3/4 in PRs #1119/#1120/#1121 — awaiting human review)
+- **Branch/PR**: direct commit to main (run log only)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0)
+- **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~41s)
+- **Guardrails**: 5-tool surface confirmed (search/execute/status/reload/cast). `buildCastExplanation` metric freeze tests 1197/1198 green (56 fields no-focus, 87 fields focus:code). 0 violations on main.
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed.
+  - `git fetch --all && git reset --hard origin/main` (1a3bb8e). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1418/0/3 (1421 total, 51 suites, ~41s). 0 failures.
+  - 3 open PRs confirmed: #1119 (Phase 2, CI 3/3 green: CodeQL ✅ Analyze(actions) ✅ Analyze(javascript-typescript) ✅, `mergeable_state: blocked` — branch protection requires human approval), #1120 (Phase 3, `mergeable_state: clean`, stacked on phase2), #1121 (Phase 4, `mergeable_state: clean`, stacked on phase3).
+  - PR #1119 review state: Two CodeRabbit reviews total. Second review (03:39 UTC today): "Major" outside-diff flag — CodeRabbit read CLAUDE.md 5-tool guardrail and flagged that `/mcp-api` only exposes search+execute. Prior session replied at 03:41 UTC (3 chitcommit replies 4948239383/506/670). This flag applies to the workers endpoint, not the main gateway; CLAUDE.md 5-tool rule governs the gateway surface. PR remains blocked on human approval, not CI.
+  - Verified workstreams: B ✓ (`github` → `https://api.githubcopilot.com/mcp/` + envHeaders), C ✓ (focus-profiles.json 6 profiles), D ✓ (test/scenario.test.ts + test/simulation.test.ts), E ✓ (focus-suggestions.json 6 profiles).
+  - Notion board: unavailable (API 401). DRIVER-BOARD.md is durable board.
+  - **PushNotification**: NOT sent — no new state since escalation #29 (~1113); escalation #30 fires NEXT run (~1120).
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓. Tests: 1418/0/3. Build: clean. ~1119th run est. 3 open WF-f PRs; blocked pending human review.
+- **Human-action items** (unchanged):
+  1. **Review and merge PR #1119** — Phase 2 (`openApiMcpServer` at `/mcp-api`); CI 3/3 green; all addressable review comments responded to; awaiting human approval. (CodeRabbit 5-tool flag is about the worker adapter endpoint, not the main gateway — see replies.)
+  2. **Review and merge PR #1120** — Phase 3 (OAuth 2.1 for `/mcp2`); stacked on #1119; merge after #1119. Create `OAUTH_KV` KV namespace before deploy.
+  3. **Review and merge PR #1121** — Phase 4 (legacy `/mcp` → 410 Gone); stacked on #1120; merge last.
+  4. **Disable or redirect hourly schedule** — 1119+ consecutive runs burning compute with no productive work.
+  5. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  6. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  7. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings.
+  8. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+- **Next run**: Idle. **Escalation #30 fires at ~1120 (NEXT RUN).**
