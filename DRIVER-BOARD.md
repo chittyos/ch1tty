@@ -1755,3 +1755,32 @@ _(Runs ~1096–1098 committed git-only run-log entries; no DRIVER-BOARD.md edits
   7. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings.
   8. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
 - **Next run**: Idle. Last escalation at ~1121 (escalation #30); next escalation #31 at ~1131 (10 runs away).
+
+---
+
+### 2026-08-17 (post-merge — PR #1119 merged; workstream-F Phase 2 complete)
+- **Workstream**: F Phase 2 — MERGED (squash merge of `auto/workstream-f-phase2` → `main`)
+- **Branch/PR**: PR #1119 merged at 2026-08-17T13:38 UTC
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1418 pass / 0 fail / 3 skip (1421 total, 51 suites, ~54s)
+- **Actions**:
+  - Detected PR #1119 merge event. Synced local main to `813b926` (post-merge HEAD).
+  - Verified build + tests green on merged main.
+  - All CodeRabbit review threads were addressed during this stewardship session:
+    - Routing bug (commit 2101078) ✅
+    - Session restart on idle eviction (commit 060407c) ✅
+    - 5-tool surface concern: rebutted — rule applies to /mcp not /mcp-api ✅
+    - Spec hot-reload: deferred to Phase 3 as known limitation ✅
+    - Nested tool names: not applicable to this registry ✅
+- **Workstream F status**:
+  - [x] Phase 1 (PR #1047) — Ch1ttyCore extracted; /mcp2 McpAgent endpoint
+  - [x] **Phase 2 (PR #1119) — openApiMcpServer typed surface at /mcp-api — MERGED**
+  - [ ] Phase 3 — OAuth cutover via @cloudflare/workers-oauth-provider
+  - [ ] Phase 4 — Legacy /mcp DO decommission
+- **Human-action items**:
+  1. **Advance workstream F Phase 3** — OAuth cutover; next PR should branch from updated main.
+  2. **Deploy PR #1119 changes** — create `Ch1ttyApiAgent` DO class (v3 migration); ensure `CH1TTY_MCP_TOKEN` set; `wrangler deploy`.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** — clears ledger DLQ.
+  5. **Stale branch cleanup** — 1000+ remote `auto/` branches.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+- **Next run**: Advance workstream F Phase 3 (OAuth cutover). Branch from fresh main.
