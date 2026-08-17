@@ -10,11 +10,12 @@ interface __BaseEnv_Env {
 	ASSETS: Fetcher;
 	CH1TTY: DurableObjectNamespace<import("./src/index").Ch1ttyDO>;
 	MCP_OBJECT: DurableObjectNamespace /* Ch1ttyMcpAgent */;
+	API_OBJECT: DurableObjectNamespace /* Ch1ttyApiAgent */;
 }
 declare namespace Cloudflare {
 	interface GlobalProps {
 		mainModule: typeof import("./src/index");
-		durableNamespaces: "Ch1ttyDO" | "Ch1ttyMcpAgent";
+		durableNamespaces: "Ch1ttyDO" | "Ch1ttyMcpAgent" | "Ch1ttyApiAgent";
 	}
 	interface Env extends __BaseEnv_Env {}
 }

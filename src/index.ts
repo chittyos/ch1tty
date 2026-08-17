@@ -6,10 +6,11 @@
 // sessions; here each is its own isolate with its own SQLite + circuit state).
 import { Ch1ttyDO } from './ch1tty-do.js';
 import { Ch1ttyMcpAgent } from './mcp-agent.js';
+import { Ch1ttyApiAgent } from './api-agent.js';
 import type { Env } from './types.js';
 import { VERSION } from './utils.js';
 
-export { Ch1ttyDO, Ch1ttyMcpAgent };
+export { Ch1ttyDO, Ch1ttyMcpAgent, Ch1ttyApiAgent };
 
 function mintSessionId(): string {
   return crypto.randomUUID();
@@ -88,6 +89,23 @@ export default {
         return Response.json({ error: 'unauthorized' }, { status: 401 });
       }
       return Ch1ttyMcpAgent.serve('/mcp2', { binding: 'MCP_OBJECT' }).fetch(req, env, ctx);
+    }
+
+    // openApiMcpServer surface: typed search+execute over the ch1tty tool
+    // registry exposed as an OpenAPI 3.1 spec. Same fail-closed auth as /mcp2.
+    if (path === '/mcp-api' || path.startsWith('/mcp-api/')) {
+      const tokenSecret = typeof env.CH1TTY_MCP_TOKEN === 'string' && env.CH1TTY_MCP_TOKEN
+        ? env.CH1TTY_MCP_TOKEN : undefined;
+      if (!tokenSecret) {
+        return Response.json(
+          { error: 'POLICY_BLOCKED_MCPAPI_TOKEN_UNBOUND', message: 'CH1TTY_MCP_TOKEN is not configured; /mcp-api refuses to serve unauthenticated.' },
+          { status: 503 },
+        );
+      }
+      if (!checkAuth(req, tokenSecret)) {
+        return Response.json({ error: 'unauthorized' }, { status: 401 });
+      }
+      return Ch1ttyApiAgent.serve('/mcp-api', { binding: 'API_OBJECT' }).fetch(req, env, ctx);
     }
 
     // MCP endpoint (legacy JSON-RPC DO path — untouched).

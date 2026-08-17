@@ -7,7 +7,7 @@ NOTE: Board trimmed at run ~1007 (2026-08-11). Full history preserved in git. Pr
 
 ## Workstream Status
 
-All workstreams are DONE. Build clean, tests green, guardrails enforced.
+Workstreams A–E are DONE. Workstream F is ACTIVE (Phases 2–4 in progress). Build clean, tests green, guardrails enforced.
 
 - [x] **A** — Gateway up/refreshed/tested. Build clean, 5 meta-tools confirmed. DONE.
 - [x] **B** — GitHub MCP migration: `servers.json` github → `https://api.githubcopilot.com/mcp/` with envHeaders. DONE.
@@ -29,25 +29,23 @@ All workstreams are DONE. Build clean, tests green, guardrails enforced.
 - **CI (main ci.yml)** — 0-job-queue failure (non-CodeQL). Recurring, non-blocking.
 - **Ledger DLQ** — `ledger.chitty.cc` unreachable from remote container. Action: configure CF Access credentials (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) on prod.
 
-## Candidate Workstream F (McpAgent Phases 2–4) — Awaiting Human Decision
+## Workstream F (McpAgent Phases 2–4) — ACTIVE
 
 PR #1047 (merged run 642) completed Phases 0+1 of the Cloudflare McpAgent migration:
 - Phase 0: deps aligned (agents ^0.17.4, MCP SDK 1.29, zod v4, wrangler compat date)
 - Phase 1: `Ch1ttyCore` extracted; `/mcp2` McpAgent endpoint added; 9 tools registered (search, execute, code, cast, provision, status, memory_recall, memory_ingest, memory_summary)
 
-**Phases 2–4 (unscheduled):**
-- Phase 2: Code Mode — wire `openApiMcpServer`-based typed API surface for `ch1tty/code` so clients get schema-validated tool calls instead of raw code strings
-- Phase 3: OAuth cutover — migrate `/mcp` auth from bearer token to proper OAuth 2.0 via `@cloudflare/workers-oauth-provider`; unify auth with `/mcp2`
-- Phase 4: Legacy decommission — deprecate and remove the legacy JSON-RPC DO at `/mcp`, making `/mcp2` the canonical endpoint
-
-**Human action**: Add workstream F to enable Phase 2 work in the next run, or leave blank if phases 2–4 are not yet prioritized.
+**Status:**
+- [x] **Phase 2**: Code Mode — wire `openApiMcpServer`-based typed API surface for `ch1tty/code` so clients get schema-validated tool calls instead of raw code strings. Surfaces ch1tty's tool registry as an OpenAPI spec; clients use search+execute over the spec rather than raw TypeScript strings. New route `/mcp-api` served by `Ch1ttyApiAgent` (new McpAgent DO). Dep bump: tsx/wrangler/oauth-provider patches included. **DELIVERED: PR #1119.**
+- [ ] **Phase 3**: OAuth cutover — migrate `/mcp` auth from bearer token to proper OAuth 2.0 via `@cloudflare/workers-oauth-provider`; unify auth with `/mcp2`
+- [ ] **Phase 4**: Legacy decommission — deprecate and remove the legacy JSON-RPC DO at `/mcp`, making `/mcp2` the canonical endpoint
 
 Note: `ch1tty/reload` is intentionally absent from `/mcp2` — hot-reload is a stdio/process-lifetime concern, not a Durable Object one.
 
 ## Human Actions Required
 
 1. **Disable or redirect hourly schedule** — 1007+ idle runs with no new work; every run costs compute.
-2. **Add workstream F** (McpAgent Phases 2–4) to DRIVER-BOARD.md to give the driver new work to advance.
+2. ~~**Add workstream F**~~ — Workstream F is already present and Phase 2 is delivered (PR #1119).
 3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
 4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect ch1tty GitHub backend.
 5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
