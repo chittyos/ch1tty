@@ -2467,4 +2467,29 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   6. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
   7. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings.
   8. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+
+---
+
+### 2026-08-17 (run ~1127 — idle; all A-F done; 1438/0/3)
+- **Workstream**: None (all A–F done; no new workstream defined in schedule prompt)
+- **Branch/PR**: direct commit to main (run log only). 0 open PRs confirmed.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1438 pass / 0 fail / 3 skip (1441 total, 51 suites)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; all guardrails confirmed: 5-tool surface fixed (search/execute/status/reload/cast); `buildCastExplanation` metric freeze active (tests 1217/1218 enforce 56/87 field counts).
+  - `npm ci` clean. `npm run build` clean. `npm test`: 1438/0/3. 0 failures.
+  - 0 open PRs. All workstreams A–F confirmed done per git log + DRIVER-BOARD.md.
+  - Local main was 50 commits diverged (stale); stashed and reset to origin/main.
+  - Notion board: unavailable. DRIVER-BOARD.md + RUNLOG.md are durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ ALL DONE. Tests: 1438/0/3. Build: clean. **~1127th run. 0 open PRs.**
+- **PushNotification**: NOT SENT — no new state; escalation #30 fired at ~1121; escalation #31 due at ~1131 (4 runs away).
+- **Human-action items** (unchanged from run 1125):
+  1. **Deploy Phase 2**: Create `Ch1ttyApiAgent` DO class (v3 SQLite migration) before `wrangler deploy`. Ensure `CH1TTY_MCP_TOKEN` set.
+  2. **Deploy Phase 3**: Run `wrangler kv namespace create OAUTH_KV`, replace `PLACEHOLDER_OAUTH_KV_ID` in `wrangler.jsonc`, ensure `CH1TTY_MCP_TOKEN` set.
+  3. **Deploy Phase 4**: Run `wrangler migrations apply` to drain `Ch1ttyDO` instances after confirming no in-flight sessions.
+  4. **Disable or redirect hourly schedule** — all A–F complete; schedule burns compute with no new work.
+  5. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  6. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  7. **Stale branch cleanup** — 1005+ remote `auto/` branches (261 cast-explain guardrail violators); enable "Automatically delete head branches" in GitHub Settings.
+  8. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+- **Next run**: Idle. Escalation #31 fires at ~1131 (4 runs away).
 - **Next run**: Idle. Escalation #31 fires at ~1131 (6 runs away).
