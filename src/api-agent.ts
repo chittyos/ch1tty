@@ -70,6 +70,11 @@ export class Ch1ttyApiAgent extends McpAgent<Env> {
           opts.body && typeof opts.body === 'object' && !Array.isArray(opts.body)
             ? (opts.body as Record<string, unknown>)
             : {};
+        // Restart session tracking if evicted by idle cleanup; keep flush schedule live.
+        // Mirrors Ch1ttyMcpAgent's per-call pattern so ledger/coordinator affinity
+        // survives a DO instance that outlives SESSION_IDLE_MS between requests.
+        await core.startSession(sessionId);
+        await this.ensureFlushSchedule();
         // Route through ch1tty/execute so handleExecute can dispatch to the
         // correct backend via RemoteProxy. Direct callTool rejects non-meta serverIds.
         const result = await core.callTool('ch1tty/execute', { tool: namespacedTool, args }, sessionId);
