@@ -108,6 +108,27 @@ _(Prior run log entries archived to git history — runs 1–609 trimmed at run 
 
 ---
 
+### 2026-08-17 (~0240 UTC) — Workstream F Phase 4: /mcp decommission
+
+- **Workstream**: F — Phase 4 (legacy `/mcp` JSON-RPC DO retirement)
+- **Branch/PR**: `auto/workstream-f-phase4-mcp-decommission` → **PR #1121** (https://github.com/chittyos/ch1tty/pull/1121), stacked on Phase 3 (`auto/workstream-f-phase3-oauth`)
+- **Build**: clean (tsc exit 0) | **Tests**: 1438 pass / 0 fail / 3 skip (1441 total, 51 suites) — +8 new Phase 4 tests
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED, metric freeze ACTIVE.
+  - `npm ci` clean. `npm run build` clean. `npm test`: 1438/0/3.
+  - Found 2 open PRs: #1119 (Phase 2, CI green) and #1120 (Phase 3, stacked on Phase 2).
+  - Created `auto/workstream-f-phase4-mcp-decommission` from `origin/auto/workstream-f-phase3-oauth`.
+  - `src/mcp-deprecated.ts`: new `handleMcpDeprecated()` — returns 410 Gone + Sunset + Link headers.
+  - `src/index.ts`: replaced 18-line legacy DO routing block with 3-line 410 tombstone; removed `mintSessionId()`; updated comment.
+  - `test/worker-mcp-deprecated.test.ts`: 8 new tests (GET/POST/DELETE → 410, body fields, headers).
+  - Ch1ttyDO + CH1TTY binding preserved for Cloudflare migration continuity.
+  - Pushed branch, opened PR #1121 (not draft, stacked on Phase 3).
+  - CodeRabbit skipped review (non-default base branch — expected for stacked PR). Codex bot hit usage limit. No CI check runs yet (stacked PR, queued).
+- **State summary**: A DONE B DONE C DONE D DONE E DONE F-phase4 IN PROGRESS (PR #1121 open). Tests: 1438/0/3. Build: clean. Open PRs: #1119 (Phase 2), #1120 (Phase 3), #1121 (Phase 4).
+- **Next run**: Check if Phase 2 (#1119) merged; if so, rebase Phase 3 onto main and Phase 4 onto Phase 3. Once all 3 phases are merged, mark workstream F DONE. PushNotification sent this run.
+
+---
+
 ### 2026-08-11 (run ~1008 — idle; all workstreams done; ESCALATION #8 sent)
 - **Workstream**: None (all A–E + GUARDRAIL-CLEANUP done; workstream F awaiting human decision)
 - **Branch/PR**: direct commit to main (run log only). 0 open PRs.
