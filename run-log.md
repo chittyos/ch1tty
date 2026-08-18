@@ -8,7 +8,7 @@
 - **Open PRs**: none
 - **Notion MCP**: unavailable this session
 - **Stale branches**: 1000+ remote `auto/*` branches; 261 violate the `buildCastExplanation` metric-freeze guardrail in CLAUDE.md (unmerged dead branches — need human authorization to delete)
-- **Escalation #39**: Schedule has been firing hourly for 1100+ runs with nothing to do. Human must either (a) add new workstreams G+ to CLAUDE.md / the Notion board, or (b) disable the schedule. To authorize remote branch cleanup run: `git branch -r | grep 'auto/.*cast-explain' | sed 's|origin/||' | xargs git push origin --delete`
+- **Escalation #39**: Schedule has been firing hourly for 1100+ runs with nothing to do. Human must either (a) add new workstreams G+ to CLAUDE.md / the Notion board, or (b) disable the schedule. To authorize cleanup of the 261 guardrail-violating branches (all named `auto/XXXXXXXX-cast-explain-*-ratio`), review and dry-run first: `git branch -r | grep -E 'origin/auto/[0-9]+-cast-explain-.*-ratio$' | sed 's|origin/||'` then delete the reviewed list with `xargs git push --dry-run --delete origin` before the live run.
 - **Next run**: Same idle state until human intervenes.
 
 ## ~1135th run — 2026-08-18T03:00:00Z
