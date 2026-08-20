@@ -1947,7 +1947,7 @@ _(Runs ~1180–1184 committed run-log git messages only or via stale PRs; no boa
   - Found 3 open stale run-log PRs (#1126, #1127, #1128 from runs ~1182-1184): **closed** via GitHub MCP.
   - Gap: runs ~1180–1184 added to board as condensed summary above.
   - Notion board: unavailable (API 401). DRIVER-BOARD.md is durable board.
-- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ ALL DONE. Tests: 1438/0/3. Build: clean. **~1185th run. 0 open PRs. 88 escalations sent.**
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ ALL DONE. Tests: 1438/0/3. Build: clean. **~1185th run. 0 open PRs (as of 2026-08-20T22:34Z, before PR #1129 opened). 88 escalations sent.**
 - **Human-action items** (unchanged — 88 escalations; no reaction received):
   1. **Disable or redirect hourly schedule** — 1185+ consecutive idle runs; all A–F exhausted; schedule burns compute with no productive work.
   2. **Deploy Workstream F phases** (Cloudflare): Create `Ch1ttyApiAgent` DO class + `wrangler kv namespace create OAUTH_KV` + drain `Ch1ttyDO` instances.
