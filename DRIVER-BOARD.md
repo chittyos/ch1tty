@@ -1928,3 +1928,32 @@ _(Runs ~1096–1098 committed git-only run-log entries; no DRIVER-BOARD.md edits
   6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
 - **PushNotification**: SENT — escalation #82; 1179+ idle runs; human action required.
 - **Next run**: Idle. Continue escalating each run until human responds or adds workstreams.
+
+---
+
+### 2026-08-20 (runs ~1180–1184 gap — escalations #83–#87)
+
+_(Runs ~1180–1184 committed run-log git messages only or via stale PRs; no board updates. PRs #1125 merged (run ~1181), #1126/#1127/#1128 opened but not merged — closed by run ~1185. Escalations #83–#87 sent in those runs. Tests: 1438/0/3. Build: clean. State: A-F ALL DONE.)_
+
+---
+
+### 2026-08-20T22:00:00Z (run ~1185 — idle; all workstreams A-F done; **ESCALATION #88**)
+- **Workstream**: None (all A–F done; no new workstreams defined)
+- **Branch/PR**: `auto/2026-08-20-run-log-1185` → PR #1129
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1438 pass / 0 fail / 3 skip (1441 total, 51 suites)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (tests enforce 56 fields no-focus / 87 fields focus:code). 0 violations on main.
+  - `git reset --hard origin/main` (synced to d42d035, run ~1181). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1438/0/3 (1441 total, 51 suites). 0 failures.
+  - Found 3 open stale run-log PRs (#1126, #1127, #1128 from runs ~1182-1184): **closed** via GitHub MCP.
+  - Gap: runs ~1180–1184 added to board as condensed summary above.
+  - Notion board: unavailable (API 401). DRIVER-BOARD.md is durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ ALL DONE. Tests: 1438/0/3. Build: clean. **~1185th run. 0 open PRs. 88 escalations sent.**
+- **Human-action items** (unchanged — 88 escalations; no reaction received):
+  1. **Disable or redirect hourly schedule** — 1185+ consecutive idle runs; all A–F exhausted; schedule burns compute with no productive work.
+  2. **Deploy Workstream F phases** (Cloudflare): Create `Ch1ttyApiAgent` DO class + `wrangler kv namespace create OAUTH_KV` + drain `Ch1ttyDO` instances.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  5. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+- **PushNotification**: SENT — escalation #88; 1185+ idle runs; human action required.
+- **Next run**: Idle. Continue escalating each run until human responds or adds workstreams.
