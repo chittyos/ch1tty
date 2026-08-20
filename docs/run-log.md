@@ -1,4 +1,16 @@
 
+## Run ~1183 — 2026-08-20T20:35Z — escalation #86
+
+- **Workstream**: None (all A-E complete)
+- **Branch/PR**: `auto/2026-08-20-run-log-1183` → this PR
+- **Build**: Clean (tsc passes)
+- **Tests**: 1441 total / **1438 pass / 0 fail** / 3 skip — green, including `buildCastExplanation` field-count freeze guards (56 no-focus / 87 focus:code)
+- **Open PRs**: 1 (PR #1126 — escalation #85, idle since ~run 1097)
+- **Action taken**: Verified state from scratch. Confirmed all A-E done: A=build+tests green, B=GitHub migrated to `api.githubcopilot.com/mcp/`, C=`focus-profiles.json` present (6 profiles), D=scenario/simulation tests present, E=`focus-suggestions.json` + `src/suggestions.js` + `findCatalogCombo` integration present.
+- **Notion board**: Not reachable from this session (Notion MCP not available as a session tool). `docs/run-log.md` is the fallback log.
+- **Guardrail**: 261 `auto/*-cast-explain-*-ratio` branches on origin still violate CLAUDE.md metric freeze. No new ones added. Cleanup: `git for-each-ref --format='%(refname:strip=3)' 'refs/remotes/origin/auto/*cast-explain*ratio*' | xargs git push origin --delete`
+- **Next run**: Same idle state — 86 consecutive idle runs. Human must add workstream F or disable the hourly schedule to stop token burn.
+
 ## Run ~1123 — 2026-08-17
 
 - **Workstream**: None (all A-F done)
