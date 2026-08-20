@@ -1,4 +1,16 @@
 
+## Run ~1182 — 2026-08-20
+
+- **Workstream**: None (all A-E done; no F defined in prompt)
+- **Branch/PR**: auto/2026-08-20-run-log-1182
+- **Build**: Clean (tsc, 0 errors)
+- **Tests**: 1441 total / 1438 pass / 0 fail / 3 skip — green, including `buildCastExplanation` field-count freeze guards (56 no-focus / 87 focus:code)
+- **Open PRs**: 0
+- **Action taken**: Verified state from scratch. Confirmed: A=green build+tests; B=GitHub migrated to `api.githubcopilot.com/mcp/` with `envHeaders` auth (no deprecated `@modelcontextprotocol/server-github`); C=`focus-profiles.json` present; D=scenario + simulation tests exist; E=`focus-suggestions.json` + `src/suggestions.js` present. No new workstream to advance.
+- **Notion board**: Not reachable from this session (Notion MCP not available as a session tool). `docs/run-log.md` is the fallback log.
+- **Escalation**: #85 — schedule has been idle for 85+ runs (since ~run 1097). Human must add new workstreams (F, G, …) to the driver prompt or disable the hourly schedule to stop spending tokens on idle runs.
+- **Next run**: Same idle state unless human acts.
+
 ## Run ~1123 — 2026-08-17
 
 - **Workstream**: None (all A-F done)
