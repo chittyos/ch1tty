@@ -87,7 +87,7 @@
 | WS | Status | Evidence |
 |----|--------|---------|
 | A | ✅ Done | Build clean, tests green |
-| B | ✅ Done | `servers.json` github → `api.githubcopilot.com/mcp/` + GITHUB_MCP_AUTHORIZATION envHeader |
+| B | ✅ Done | `servers.json` GitHub → `api.githubcopilot.com/mcp/` + GITHUB_MCP_AUTHORIZATION envHeader |
 | C | ✅ Done | `focus-profiles.json`, CH1TTY_FOCUS env, `focus` param on search+cast, status reporting |
 | D | ✅ Done | `test/scenario.test.ts` + `test/simulation.test.ts` — real fixture harness |
 | E | ✅ Done | `focus-suggestions.json` catalog (29704 lines) present |
