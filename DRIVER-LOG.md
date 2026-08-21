@@ -3819,3 +3819,21 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 - **State summary**: A DONE B DONE C DONE D DONE E DONE F DONE. Tests: 1438/0/3. Build: clean. **~1203rd consecutive idle run. 0 open PRs.**
 - **PushNotification**: NOT SENT — escalation #104 sent 1 run ago (~15:00Z); no new state.
 - **Most useful thing for next run**: Add new workstreams to DRIVER-LOG.md or disable the schedule.
+
+---
+
+### 2026-08-21 (run ~1207 — idle; all workstreams done; no escalation)
+- **Workstream**: None (all A–F done; no new workstreams defined)
+- **Branch/PR**: `auto/2026-08-21-run-log-1207` — run log only.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1438 pass / 0 fail / 3 skip (1441 total, 51 suites)
+- **Actions**: `git fetch --all` + pull origin/main. `npm ci` clean. `npm run build` clean. `npm test`: 1438/0/3. All guardrails intact (metric-freeze field-count tests 1217/1218: 56/87 fields). 4 open run-log PRs (#1143, #1144, #1145, #1146). Notion MCP unavailable (no auth token in session). All workstreams A–F confirmed done.
+- **State summary**: A DONE B DONE C DONE D DONE E DONE F DONE. Tests: 1438/0/3. Build: clean. **~1207th consecutive idle run. 4 open run-log PRs (unmerged).**
+- **PushNotification**: NOT SENT — escalation #105 sent ~3 runs ago (~1204th run, 2026-08-21T18:00Z); no new state to surface.
+- **Human-action items** (unchanged):
+  1. **Disable or redirect hourly schedule** — 1207+ consecutive idle runs; all A–F exhausted; burning compute hourly.
+  2. **Add new workstreams** to DRIVER-LOG.md — e.g. McpAgent Phases 2–4, security audit, major dep bumps (TypeScript 5→7, @types/node 22→26, c8 11→12).
+  3. **Merge or close open run-log PRs** (#1143, #1144, #1145, #1146) and enable auto-delete on merge to clear stale `auto/` branches.
+  4. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  5. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears Ledger DLQ.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token` to restore durable board.
+- **Most useful thing for next run**: Add new workstreams or disable the schedule. Nothing new to do until then.
