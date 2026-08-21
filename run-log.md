@@ -76,3 +76,30 @@
 - Guardrail note: 261+ stale `auto/*-cast-explain-*-ratio` branches remain in remote; metric-freeze guards (tests 1217-1218) green on main
 - Action taken: run-log only; no code changes (nothing to do without new workstreams)
 - **ESCALATION #84**: Human must either (a) add workstreams G+ to CLAUDE.md / Notion board, (b) disable this hourly schedule via `/cron`, or (c) clean up the 1000+ stale `auto/*` remote branches. Hourly token spend continues to yield zero output.
+
+## 2026-08-21T11:00Z (~1197th run, escalation #100)
+
+**Build:** clean (tsc, 0 errors)  
+**Tests:** 1438 pass / 0 fail / 3 skip
+
+### Workstream status
+
+| WS | Status | Evidence |
+|----|--------|---------|
+| A | ✅ Done | Build clean, tests green |
+| B | ✅ Done | `servers.json` github → `api.githubcopilot.com/mcp/` + GITHUB_MCP_AUTHORIZATION envHeader |
+| C | ✅ Done | `focus-profiles.json`, CH1TTY_FOCUS env, `focus` param on search+cast, status reporting |
+| D | ✅ Done | `test/scenario.test.ts` + `test/simulation.test.ts` — real fixture harness |
+| E | ✅ Done | `focus-suggestions.json` catalog (29704 lines) present |
+
+### ⚠️ ESCALATION #100 — Milestone: 100 consecutive idle runs
+
+All workstreams A–E are complete. The schedule has run idle for **100 consecutive runs**, generating 100+ unmerged run-log PRs that clutter the repository. This is a hard stop — further idle runs add no value.
+
+**Human action required (pick one):**
+1. **Extend the schedule** — add new workstreams F, G, … to the goal-driver prompt
+2. **Disable the schedule** — run `/cron` in an interactive session and delete or pause the hourly trigger
+3. **Merge + close** the 100+ accumulated open run-log PRs (bulk-close is fine)
+
+Notion board: Notion MCP was not authenticated in this session — board could not be updated.
+
