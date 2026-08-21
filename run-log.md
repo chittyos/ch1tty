@@ -15,7 +15,7 @@
   - **Finding:** `mcp.ch1tty.com/mcp` IS provisioned → HTTP 401, Cloudflare Worker version `614b3a1a`, OAuth gate via `chittycorp.cloudflareaccess.com`.
   - **Finding:** `mcp.chitty.cc/mcp` is on the SAME Cloudflare Worker (same cf-worker-version) → also returns 401.
   - **Finding:** `mcp.chitty.cc/health` returns 404 — no health route registered on that worker.
-  - **Implication for P0.1:** The "transport hang" is likely an auth issue (immediate 401), not a real hang. Needs a Cloudflare Access service token to test further.
+  - **Implication for P0.1 (conditional):** The endpoint is live and returns an immediate 401, which rules out a simple network/provisioning gap. However, 401 does not confirm that authenticated MCP initialization or tool listing succeeds — a hang or deeper error could still manifest after auth. A Cloudflare Access service token is needed to probe the authenticated path and definitively close P0.1.
   - Posted detailed findings as a comment on issue #1071.
 - Notion board not updated (Notion MCP unavailable this session).
 
