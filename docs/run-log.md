@@ -1,15 +1,15 @@
 
-## Run ~1195 — 2026-08-21
+## Run ~1199 — 2026-08-21
 
 - **Workstream**: None (all A-F done)
-- **Branch/PR**: `auto/2026-08-21-run-log-1195` — idle run log only
+- **Branch/PR**: `auto/2026-08-21-run-log-1199` → PR #1143 — idle run log only
 - **Build**: Clean (tsc passes, no errors)
 - **Tests**: 1441 total / 1438 pass / 0 fail / 3 skip — green, including `buildCastExplanation` field-count freeze guards (56 no-focus / 87 focus:code)
 - **Open PRs**: 0
-- **Action taken**: Verified state from scratch. Confirmed: A=clean build+tests green, B=GitHub migrated to `api.githubcopilot.com/mcp/` with `envHeaders.Authorization`, C=`focus-profiles.json` with 6 profiles present, D=`test/` contains cast/focus/scenario/simulation tests, E=`focus-suggestions.json` catalog present. No work to advance.
+- **Action taken**: Verified state from scratch. Confirmed: A=clean build+tests green, B=GitHub migrated to `api.githubcopilot.com/mcp/` with `envHeaders.Authorization`, C=`focus-profiles.json` with 6 profiles present, D=`test/` contains cast/focus/scenario/simulation tests, E=`focus-suggestions.json` catalog present, F=all 3 phase PRs (#1119/#1120/#1121) merged. No work to advance.
 - **Escalation**: #101 — schedule has been idle for 75+ runs (since ~1123). No new workstreams added by human.
 - **Notion board**: Not reachable (Notion MCP not available as a session tool). `docs/run-log.md` is the fallback log.
-- **Guardrail violations on origin**: 261+ `auto/*-cast-explain-*-ratio` branches remain (violate `buildCastExplanation` metric freeze). Human cleanup: `git for-each-ref --format='%(refname:strip=3)' 'refs/remotes/origin/auto/*cast-explain*ratio*' | xargs git push origin --delete`
+- **Guardrail violations on origin**: 261+ `auto/*-cast-explain-*-ratio` branches remain (violate `buildCastExplanation` metric freeze). Human cleanup (review the list first, then delete): `git fetch --prune origin && git for-each-ref --format='%(refname:strip=3)' 'refs/remotes/origin/auto/*cast-explain*ratio*'` — then: `git for-each-ref --format='%(refname:strip=3)' 'refs/remotes/origin/auto/*cast-explain*ratio*' | xargs git push origin --delete`
 - **Next run**: Same idle state. Human must add a new workstream or disable the hourly schedule.
 
 ## Run ~1123 — 2026-08-17
