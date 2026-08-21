@@ -1,4 +1,17 @@
 
+## Run ~1188 — 2026-08-21T01:00Z
+
+- **Workstream**: None (all A-F done)
+- **Branch/PR**: `auto/2026-08-21-run-log-1188` → PR TBD
+- **Build**: Clean (tsc passes)
+- **Tests**: 1441 total / 1438 pass / 0 fail / 3 skip — green, including `buildCastExplanation` field-count freeze guards (56 no-focus / 87 focus:code)
+- **Open PRs**: 3 stale run-log PRs (#1129 escalation #88, #1130 escalation #89, #1131 escalation #90) — all open/unmerged, piling up
+- **Action taken**: Verified state from scratch (HEAD detached; branched from origin/main). Confirmed: A=build+tests green, B=GitHub migrated to `api.githubcopilot.com/mcp/`, C=`focus-profiles.json` present (6 profiles), D=`test/scenario.test.ts` + `test/simulation.test.ts` present, E=`focus-suggestions.json` + `src/suggestions.js` present, F=PRs #1119/#1120/#1121 merged. Logged this run entry.
+- **Escalation #91**: Schedule has been firing hourly with no work to advance since run ~1123 (2026-08-17). Run-log PRs are accumulating unreviewed. Human action needed: add workstream G with new direction, or disable the hourly schedule.
+- **Guardrail violations**: 261 `auto/*-cast-explain-*-ratio` branches remain on origin. Human cleanup: `git for-each-ref --format='%(refname:strip=3)' 'refs/remotes/origin/auto/*cast-explain*ratio*' | xargs git push origin --delete`
+- **Notion board**: Not reachable from this session. `docs/run-log.md` is the fallback log.
+- **Next run**: Same idle state — no new workstreams. Disable schedule or add workstream G.
+
 ## Run ~1123 — 2026-08-17
 
 - **Workstream**: None (all A-F done)
