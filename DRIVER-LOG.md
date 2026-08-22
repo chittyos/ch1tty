@@ -3819,3 +3819,22 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 - **State summary**: A DONE B DONE C DONE D DONE E DONE F DONE. Tests: 1438/0/3. Build: clean. **~1203rd consecutive idle run. 0 open PRs.**
 - **PushNotification**: NOT SENT — escalation #104 sent 1 run ago (~15:00Z); no new state.
 - **Most useful thing for next run**: Add new workstreams to DRIVER-LOG.md or disable the schedule.
+
+---
+
+### 2026-08-22 (run ~1209 — idle; all workstreams done; escalation #106)
+- **Workstream**: None (all A–F done; no new workstreams defined)
+- **Branch/PR**: auto/2026-08-22-run-log-1209
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1438 pass / 0 fail / 3 skip (1441 total, 51 suites)
+- **Actions**: `git fetch --all` + `git pull origin main` (5-commit fast-forward, now at a46d09f). `npm ci` clean. `npm run build` clean. `npm test`: 1438/0/3. 6 open run-log PRs confirmed (PRs 1143, 1144, 1145, 1146, 1147, 1148 for runs 1199, 1204–1208). All workstreams A–F confirmed done. Notion MCP unavailable (401). Guardrails intact (metric-freeze field-count guards: tests 1217/1218 enforce 56/87 fields).
+- **State summary**: A DONE B DONE C DONE D DONE E DONE F DONE. Tests: 1438/0/3. Build: clean. **~1209th consecutive idle run. 6 open run-log PRs accumulating (new worsening symptom). Escalation #106.**
+- **Human-action items** (updated — worsening):
+  1. **Disable or redirect hourly schedule** — 1209+ consecutive idle runs; all A–F exhausted; burning compute hourly with no useful output.
+  2. **Close or merge the 6 stale open run-log PRs** — PRs 1143–1148 are accumulating. Enable auto-delete-on-merge in GitHub repo Settings → General; consider closing stale run-log PRs manually.
+  3. **Add new workstreams** to DRIVER-LOG.md — e.g. McpAgent Phases 2–4 (dynamic MCP routing/composition), security audit pass, or major dep bumps (TypeScript 5→7, @types/node 22→26, c8 11→12).
+  4. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend in servers.json.
+  5. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears Ledger DLQ blocker.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token` to restore durable board.
+  7. **Major dep bumps pending review**: TypeScript 5→7, @types/node 22→26, c8 11→12.
+- **PushNotification**: SENT (escalation #106 — 6 open run-log PRs now accumulating; worsening situation).
+- **Most useful thing for next run**: Add new workstreams or disable the schedule. Close stale PRs.
