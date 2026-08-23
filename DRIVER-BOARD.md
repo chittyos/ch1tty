@@ -2359,3 +2359,15 @@ _(Runs ~1096–1098 committed git-only run-log entries; no DRIVER-BOARD.md edits
   6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
 - **PushNotification**: NOT SENT — next escalation #109 at run ~1240 (3 runs away).
 - **Next run**: Idle. Next escalation #109 at run ~1240 (3 runs away).
+
+### 2026-08-23T09:00Z (run ~1239 — idle; A-F done; PR #1151 security fix open)
+- **Workstream**: None (all A–F done; no new workstreams defined)
+- **Branch/PR**: `auto/run-2026-08-23-log-1239` (this PR). 2 open PRs:
+  - **PR #1150** (auto/run-2026-08-23-log): run-log from ~1238th run — blocked on human review
+  - **PR #1151** (fix/remote-proxy-connect-leak): security fix — stops logging credential prefixes to service journal; CI all green (CodeQL + 2 Analyze checks pass); blocked on human review only
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1438 pass / 0 fail / 3 skip (1441 total, 51 suites)
+- **Security note on PR #1151**: `doConnect()` was logging 8-char prefix of CF-Access client id, 4-char prefix of client secret, and 8-char prefix of bearer token to the service journal on every connect attempt. Those prefixes outlive the process and were used in a later audit to fingerprint which credentials were live. Fix: presence-only logging (`present`/`absent`). Also adds characterization test proving SDK closes client+transport on `connect()` failure (refuting an earlier leak hypothesis). CI green, no review comments, waiting for human approval to merge.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ ALL DONE. **~1239th consecutive idle run. 108 escalations sent.**
+- **Escalation #109**: Due at run ~1240 (NEXT RUN). Will notify then if schedule not disabled.
+- **PushNotification**: SENT — PR #1151 security fix needs human review (CI green, blocked on approval).
+- **Next run**: Escalation #109 fires (if schedule still active). Human should review/merge PR #1151.
