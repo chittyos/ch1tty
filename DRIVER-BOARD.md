@@ -2385,3 +2385,27 @@ _(Runs ~1096–1098 committed git-only run-log entries; no DRIVER-BOARD.md edits
   7. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
 - **PushNotification**: **SENT** — escalation #109 + PR #1151 security fix ready for review.
 - **Next run**: Next escalation #110 at run ~1250 (10 runs away).
+
+---
+### 2026-08-23T11:00Z (run ~1241 — **PR #1151 MERGED**; all workstreams A-F done)
+- **Workstream**: None (all A–F done). This run: drove PR #1151 to merge.
+- **Branch/PR**: Merged PR #1151 (`fix/remote-proxy-connect-leak`) via squash merge (SHA 22d608b6). 0 open PRs.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests** (post-merge): 1441 pass / 0 fail / 3 skip (1444 total, 51 suites, +3 from PR)
+- **Guardrails**: 5-tool surface confirmed. `buildCastExplanation` metric freeze ACTIVE (56/87 field counts). 0 violations.
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed.
+  - `npm ci` clean. `npm run build` clean. Pre-merge `npm test`: 1438/0/3.
+  - 1 open PR found: **#1151** (security fix, CI green — CodeQL + Analyze all pass; no blocking reviews — Codex: informational; CodeRabbit: rate-limited, no findings posted).
+  - **Merged PR #1151** — squash merge. Security fix now on main: `doConnect()` no longer logs 8/4-char credential prefixes (CF-Access client id/secret, bearer token). +3 regression + characterization tests.
+  - Post-merge build + test: 1441/0/3 (1444 total). All green.
+  - Notion board: unavailable (no API tool). DRIVER-BOARD.md is durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ ALL DONE. Build: clean. Tests: 1441/0/3. **~1241st run. 0 open PRs. 109 escalations sent.**
+- **Human-action items** (updated — PR #1151 merged):
+  1. **Disable or redirect hourly schedule** — 1241+ consecutive runs; all A–F exhausted; schedule burns compute hourly.
+  2. **Deploy Workstream F phases** (Cloudflare): Create `Ch1ttyApiAgent` DO class + `wrangler kv namespace create OAUTH_KV` + drain `Ch1ttyDO` instances.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  5. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+- **PushNotification**: SENT — PR #1151 merged; credential prefix logging fix now on main.
+- **Next run**: Next escalation #110 at run ~1250 (9 runs away).
