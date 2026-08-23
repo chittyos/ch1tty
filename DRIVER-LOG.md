@@ -4044,3 +4044,18 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
 - **PushNotification**: NOT SENT — escalation #108 fired at run ~1230; next escalation #109 at run ~1240 (6 runs away).
 - **Most useful thing for next run**: Idle. Next escalation #109 at run ~1240 (6 runs away).
+
+### 2026-08-23T06:00Z (run ~1237 — idle; all workstreams A-F done; no escalation)
+- **Workstream**: None (all A–F done; no new workstreams defined)
+- **Branch/PR**: direct commit to main (run log only). 0 open PRs confirmed (GitHub MCP returned empty list).
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1438 pass / 0 fail / 3 skip (1441 total, 51 suites)
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ ALL DONE. **~1237th consecutive idle run. 108 escalations sent.**
+- **Human-action items** (unchanged — 108 escalations sent; no reaction received):
+  1. **Disable or redirect hourly schedule** — 1237+ consecutive idle runs; all A–F exhausted; schedule burns compute hourly with no productive work.
+  2. **Deploy Workstream F phases** (Cloudflare): Create `Ch1ttyApiAgent` DO class + `wrangler kv namespace create OAUTH_KV` + drain `Ch1ttyDO` instances.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  5. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+- **PushNotification**: NOT SENT — next escalation #109 at run ~1240 (2 runs away).
+- **Next run**: Idle. Next escalation #109 at run ~1240 (2 runs away).
