@@ -147,7 +147,10 @@ export class RemoteProxy implements Backend {
       this.connections.set(serverId, conn);
       return conn;
     } catch (err) {
-      // On failure, ensure no stale connection is stored
+      // This delete is a no-op on the failure path — a connection is only stored
+      // above, after doConnect() resolves. Kept because a concurrent caller may
+      // have stored one. Releasing the failed attempt's client/transport is the
+      // SDK's job and it does it; see the note in doConnect().
       this.connections.delete(serverId);
       throw err;
     } finally {
@@ -193,12 +196,16 @@ export class RemoteProxy implements Backend {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    // Diagnostic logging - safe, only prints keys and lengths/prefixes
+    // Diagnostic logging: PRESENCE ONLY, never any part of a credential value.
+    // This previously logged 8- and 4-character prefixes of the CF-Access client id,
+    // client secret and bearer token. Those prefixes were readable in the service
+    // journal and are how a later audit fingerprinted which credentials were live.
+    // A prefix is a partial disclosure of a secret to a log that outlives the process.
     log.info(`[Diagnostic] Connecting to ${config.id} (${config.endpoint})`, config.id);
     log.info(`[Diagnostic] Header keys: ${Object.keys(headers).join(', ')}`, config.id);
-    log.info(`[Diagnostic] Client ID: ${headers['CF-Access-Client-Id'] ? 'set (' + headers['CF-Access-Client-Id'].slice(0, 8) + '...)' : 'not set'}`, config.id);
-    log.info(`[Diagnostic] Client Secret: ${headers['CF-Access-Client-Secret'] ? 'set (' + headers['CF-Access-Client-Secret'].slice(0, 4) + '...)' : 'not set'}`, config.id);
-    log.info(`[Diagnostic] Token: ${token ? 'set (' + token.slice(0, 8) + '...)' : 'not set'}`, config.id);
+    log.info(`[Diagnostic] CF-Access client id: ${headers['CF-Access-Client-Id'] ? 'present' : 'absent'}`, config.id);
+    log.info(`[Diagnostic] CF-Access client secret: ${headers['CF-Access-Client-Secret'] ? 'present' : 'absent'}`, config.id);
+    log.info(`[Diagnostic] Bearer token: ${token ? 'present' : 'absent'}`, config.id);
 
     const url = new URL(config.endpoint);
     const transport = new StreamableHTTPClientTransport(url, {
@@ -212,6 +219,12 @@ export class RemoteProxy implements Backend {
       { capabilities: {} },
     );
 
+    // NOTE: do NOT add cleanup here. Measured against SDK 1.x on 2026-08-23 with a
+    // local 401 fixture: a failed client.connect() already closes both the client
+    // and the transport exactly once (5 attempts -> 5 client closes, 5 transport
+    // closes). Adding an explicit close on the failure path double-closes and fixes
+    // nothing. A code-reading audit claimed a leak here; the repro refuted it.
+    // See test/remote-proxy-connect-failure-cleanup.test.ts.
     await client.connect(transport);
     return { client, transport, toolCache: null, resourceCache: null, promptCache: null };
   }
