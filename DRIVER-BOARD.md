@@ -2359,3 +2359,29 @@ _(Runs ~1096–1098 committed git-only run-log entries; no DRIVER-BOARD.md edits
   6. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
 - **PushNotification**: NOT SENT — next escalation #109 at run ~1240 (3 runs away).
 - **Next run**: Idle. Next escalation #109 at run ~1240 (3 runs away).
+
+---
+### 2026-08-23T10:00Z (run ~1240 — idle; all workstreams A-F done; **ESCALATION #109 SENT**; PR #1151 security fix ready)
+- **Workstream**: None (all A–F done; no new workstreams defined)
+- **Branch/PR**: direct commit to main (run log only). Closed stale run-log PRs #1150 and #1152. 1 substantive PR open: **#1151** (security fix).
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1438 pass / 0 fail / 3 skip (1441 total, 51 suites, ~42s)
+- **Guardrails**: 5-tool surface confirmed (search/execute/status/reload/cast). `buildCastExplanation` metric freeze ACTIVE (tests 1217/1218 enforce 56/87 field counts). 0 violations on main.
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed.
+  - `git pull origin main` (fast-forward, 34 commits). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1438/0/3 (1441 total, 51 suites, ~42s). 0 failures.
+  - Found 3 open PRs: #1150 (stale run-log) + #1152 (stale run-log) + **#1151** (security fix, opened by chitcommit at 08:18 UTC).
+  - Closed stale PRs #1150 and #1152 (both run-log-only, outdated).
+  - **PR #1151** (`fix/remote-proxy-connect-leak`): CI all green (3/3 checks: CodeQL + 2× Analyze). Blocked by required review only. Security fix: stops logging 8/4-char credential prefixes (CF-Access client id/secret, bearer token) in `doConnect()`. Also adds characterization test proving SDK already cleans up — the doConnect-leak hypothesis is refuted. Tests in PR: 1423 pass/0 fail (+3 new). Ready to merge.
+  - **ESCALATION #109 SENT** (PushNotification) — 1240+ idle runs; 109th notification. This run: surfaced security PR #1151 (CI green, needs human review/merge).
+  - Notion board: unavailable (API 401). DRIVER-BOARD.md is durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ ALL DONE. Tests: 1438/0/3. Build: clean. **~1240th run. 1 open substantive PR (#1151).**
+- **Human-action items**:
+  1. **Merge PR #1151** — security fix (stop logging credential prefixes); CI green; needs 1 reviewer approval.
+  2. **Disable or redirect hourly schedule** — 1240+ consecutive idle runs; all A–F exhausted; schedule burns compute hourly with no productive work.
+  3. **Deploy Workstream F phases** (Cloudflare): Create `Ch1ttyApiAgent` DO class + `wrangler kv namespace create OAUTH_KV` + drain `Ch1ttyDO` instances.
+  4. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  5. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  6. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  7. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+- **PushNotification**: **SENT** — escalation #109 + PR #1151 security fix ready for review.
+- **Next run**: Next escalation #110 at run ~1250 (10 runs away).
