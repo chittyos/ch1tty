@@ -2362,7 +2362,7 @@ _(Runs ~1096–1098 committed git-only run-log entries; no DRIVER-BOARD.md edits
 
 ### 2026-08-23T09:00Z (run ~1239 — idle; A-F done; PR #1151 security fix open)
 - **Workstream**: None (all A–F done; no new workstreams defined)
-- **Branch/PR**: `auto/run-2026-08-23-log-1239` (this PR). 2 open PRs:
+- **Branch/PR**: `auto/run-2026-08-23-log-1239` (this PR, #1152). 2 other open PRs:
   - **PR #1150** (auto/run-2026-08-23-log): run-log from ~1238th run — blocked on human review
   - **PR #1151** (fix/remote-proxy-connect-leak): security fix — stops logging credential prefixes to service journal; CI all green (CodeQL + 2 Analyze checks pass); blocked on human review only
 - **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1438 pass / 0 fail / 3 skip (1441 total, 51 suites)
