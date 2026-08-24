@@ -187,3 +187,65 @@ Runs ~1234–1239 were idle (same state: 1438/0/3, 0 open PRs). Run ~1240 raised
 - **Open PRs**: 0
 - **Action taken**: Ran npm ci + build + tests on latest main — clean; confirmed idle; all A-F workstreams checked off; 0 open PRs; fetched Notion board (board confirms idle)
 - **Next run**: Same idle state unless human adds a new workstream or disables the schedule
+
+## Run ~1250 — 2026-08-23T20:00Z
+
+- **Workstream**: None (all A-F done — idle run)
+- **Branch/PR**: n/a
+- **Build**: tsc clean (0 errors)
+- **Tests**: 1441 pass / 0 fail / 3 skip (buildCastExplanation freeze guards: 56 no-focus / 87 focus:code)
+- **Open PRs**: 0
+- **Action taken**: Ran npm ci + build + tests on latest main — clean; confirmed idle; all A-F done; 0 open PRs; fetched Notion board; appended log entry; pushed to main
+- **Next run**: Add new workstreams G+ or disable the hourly schedule
+
+## Run ~1251 — 2026-08-23T21:00Z
+
+- **Workstream**: None (idle — all A–E complete)
+- **Branch/PR**: n/a
+- **Build**: tsc clean (0 errors)
+- **Tests**: 1444 total — 1441 pass / 0 fail / 3 skip
+- **Open PRs**: 0
+- **Action taken**: npm ci + build + tests on latest main — all green; 0 open PRs; all workstreams A–E remain checked off; appended log entry; pushed to main
+- **Persistent human blocker**: PR #48 (Dependabot `qs` 6.15.2 — 1 high + 2 moderate vulns). Needs human approval on GitHub.
+- **Next run**: Add new workstreams G+ to board and CLAUDE.md prompt, or disable the hourly schedule
+
+## Run ~1252 — 2026-08-23T22:00Z
+
+- **Workstream**: None (idle — all A–E complete)
+- **Branch/PR**: n/a
+- **Build**: tsc clean (0 errors)
+- **Tests**: 1444 total — 1441 pass / 0 fail / 3 skip
+- **Open PRs**: 0
+- **Action taken**: npm ci + build + tests on latest main — all green; confirmed PR #48 (Dependabot `qs`) is merged (2026-06-05) — that long-standing blocker note is now cleared; appended log entry; pushed to main
+- **Next run**: Human must either add new workstreams (F+) to the board and CLAUDE.md prompt, or disable the hourly schedule to stop burning tokens on idle runs
+
+## Run ~1253 — 2026-08-23T23:00Z
+
+- **Workstream**: None (idle — A-E all complete)
+- **Branch/PR**: n/a
+- **Build**: tsc clean (0 errors)
+- **Tests**: 1441 pass / 0 fail / 3 skip (1444 total)
+- **Open PRs**: 0
+- **Notes**: 3 remote branches without PRs exist (fix/viewport-probe-namespacing, refactor/backend-interface, register-chittyconnect-mcp) but all have no merge base with current main — stale orphans, not actionable without human triage
+- **Action taken**: npm ci + build + tests on latest main — clean; fetched Notion board; appended log entry; pushed to main
+- **Next run**: Human must define new workstreams (F+) in the scheduled prompt or disable the hourly schedule
+
+## Run ~1254 — 2026-08-24T00:00Z
+
+- **Workstream**: None (idle — all A–E complete)
+- **Branch/PR**: n/a
+- **Build**: tsc clean (0 errors)
+- **Tests**: 1441 pass / 0 fail / 3 skip (1444 total)
+- **Open PRs**: 0
+- **Action taken**: npm ci + build + tests on latest main — all green; no new workstreams defined in the scheduled prompt; all A–E remain checked off; appended log entry; pushed to main
+- **Next run**: Human must either (a) add new workstreams F+ to the CLAUDE.md scheduled prompt or (b) disable the hourly schedule
+
+## Run ~1255 — 2026-08-24T01:00Z
+
+- **Workstream**: None (idle — all A–F complete)
+- **Branch/PR**: n/a
+- **Build**: tsc clean (0 errors)
+- **Tests**: 1444 total — 1441 pass / 0 fail / 3 skip (buildCastExplanation freeze guards: 56 no-focus / 87 focus:code)
+- **Open PRs**: 0
+- **Action taken**: Ran npm ci + build + tests on latest main — clean; fetched Notion board (confirmed idle, 5 consecutive idle runs prior); found run-log.md was missing entries for runs 1250–1254 (committed but file not updated by prior sessions); backfilled all missing entries; pushed to main; updated Notion board
+- **Next run**: All workstreams done and tests green. Human must add new workstreams G+ to the board/CLAUDE.md prompt or disable the hourly schedule to stop burning tokens on idle runs
