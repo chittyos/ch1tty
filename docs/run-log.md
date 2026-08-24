@@ -397,3 +397,21 @@ Runs ~1234–1239 were idle (same state: 1438/0/3, 0 open PRs). Run ~1240 raised
 - **Open PRs**: 0
 - **Action taken**: npm ci + build + tests on latest main — all green; Notion board confirmed all A–F done; 21st consecutive idle run; appended run-log entry and pushed to main
 - **Next run**: SCHEDULE EXHAUSTED — 21st consecutive idle run. Human must (a) add new workstreams G+ to scheduled prompt + Notion board, or (b) disable the hourly schedule.
+
+## Run ~1271 — 2026-08-24T17:00Z
+- **Workstream**: None (idle — all A–F complete, 22nd consecutive idle run)
+- **Branch/PR**: n/a
+- **Build**: tsc clean (0 errors)
+- **Tests**: 1444 total — 1441 pass / 0 fail / 3 skip (freeze guards: 56 no-focus / 87 focus:code)
+- **Open PRs**: 0
+- **Action taken**: npm ci + build + tests on latest main — all green; Notion board confirmed all A–F done; 22nd consecutive idle run; appended run-log entry and pushed to main
+- **Next run**: SCHEDULE EXHAUSTED — 22nd consecutive idle run. Human must (a) add new workstreams G+ to scheduled prompt + Notion board, or (b) disable the hourly schedule.
+
+## Run ~1272 — 2026-08-24T18:00Z
+- **Workstream**: None (idle — all A–F complete, 23rd consecutive idle run)
+- **Branch/PR**: n/a
+- **Build**: tsc clean (0 errors)
+- **Tests**: 1444 total — 1441 pass / 0 fail / 3 skip (freeze guards: 56 no-focus / 87 focus:code)
+- **Open PRs**: 0
+- **Action taken**: npm ci + build + tests on latest main — all green; Notion board confirmed all A–F done; 23rd consecutive idle run; appended run-log entry and pushed to main
+- **Next run**: SCHEDULE EXHAUSTED — 23rd consecutive idle run. Human must (a) add new workstreams G+ to scheduled prompt + Notion board, or (b) disable the hourly schedule to stop burning tokens on idle runs.
