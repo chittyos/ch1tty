@@ -1,4 +1,13 @@
 
+## Run ~1290 — 2026-08-25T~hourly (42nd+ consecutive idle)
+- **Workstream**: None — A–E all complete, no new workstreams defined
+- **Branch/PR**: n/a
+- **Build**: tsc clean (0 errors)
+- **Tests**: 1444 total — 1441 pass / 0 fail / 3 skip
+- **Open PRs**: 0
+- **Action taken**: npm ci + build + tests on latest main — all green. All A–E workstreams confirmed complete. No new work to do. Appended run-log entry and pushed to main.
+- **Next run**: SCHEDULE EXHAUSTED — Please either (a) add new workstreams F+ to the scheduled prompt + Notion board, or (b) disable the hourly cron to stop burning tokens.
+
 ## Run ~1288 — 2026-08-25T~hourly (38th consecutive idle)
 - **Workstream**: None — A–E all complete, no new workstreams defined
 - **Branch/PR**: n/a
