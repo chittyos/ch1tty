@@ -1,4 +1,14 @@
 
+## Run ~1288 — 2026-08-25T~hourly (38th consecutive idle)
+- **Workstream**: None — A–E all complete, no new workstreams defined
+- **Branch/PR**: n/a
+- **Build**: tsc clean (0 errors)
+- **Tests**: 1444 total — 1441 pass / 0 fail / 3 skip (freeze guards: 56 no-focus / 87 focus:code ✓)
+- **Open PRs**: 0
+- **Action**: run-log only (no branch, no PR, no code changes)
+- **ESCALATION (38th consecutive idle):** Schedule is exhausted. No productive work can be done without new directives. Human must: (a) add new workstreams F+ to the scheduled prompt and this board, or (b) disable the hourly cron via `/cron` to stop burning tokens on idle runs.
+- **Next**: Same idle state until human intervenes.
+
 ## Run ~1281 — 2026-08-25T06:00Z
 - **Workstream**: None (idle — all A–E complete, 31st consecutive idle run)
 - **Branch/PR**: n/a
