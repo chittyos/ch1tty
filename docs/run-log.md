@@ -622,6 +622,18 @@ Runs ~1234–1239 were idle (same state: 1438/0/3, 0 open PRs). Run ~1240 raised
 - **ESCALATION (67th+ consecutive idle):** All workstreams A–E are fully complete. The hourly cron continues burning tokens with nothing to do. Human must: **(a)** add new workstreams F+ to the scheduled prompt and this Notion board, or **(b)** disable the hourly cron via `/cron` to stop idle runs.
 - **Most useful thing for next run**: Human defines new workstreams F+ or disables the cron — every run will be identical until action is taken. Suggested F+ candidates: (1) Wire Alchemist/Ollama for semantic v2 cast brain; (2) Stand up `apps/tasks-mcp/` or `apps/ledger-mcp/` focused servers; (3) Expand scenario harness with live-backend fixtures; (4) Extend `focus-suggestions.json` with new cross-backend combos.
 
+## Run ~1313 — 2026-08-27T~hourly (70th+ consecutive idle)
+- **Workstream**: None — A–E all complete, no new workstreams defined
+- **Branch/PR**: n/a
+- **Build**: tsc clean (0 errors, ch1tty@4.1.0)
+- **Tests**: 1444 total — 1441 pass / 0 fail / 3 skip (freeze guards: 56 no-focus / 87 focus:code ✓)
+- **Open PRs**: 0
+- **Action taken**: npm ci + build + tests on latest main — all green; Notion board + docs/run-log.md confirmed all A–E done; 70th+ consecutive idle run; appended run-log entry and pushed to main.
+- **ESCALATION (70th+ consecutive idle):** All workstreams A–E are fully complete. The hourly cron continues burning tokens with nothing to do. Human must: **(a)** add new workstreams F+ to the scheduled prompt and this Notion board, or **(b)** disable the hourly cron via `/cron` to stop idle runs.
+- **Suggested F+ candidates**: (1) Wire Alchemist/Ollama for semantic v2 cast brain; (2) Stand up `apps/tasks-mcp/` or `apps/ledger-mcp/` focused servers; (3) Expand scenario harness with live-backend fixtures; (4) Extend `focus-suggestions.json` with new cross-backend combos.
+- **Outstanding blockers** (human action required): Set `GITHUB_MCP_AUTHORIZATION` on prod; configure CF Access credentials; stale branch cleanup; rotate Notion token.
+- **Most useful thing for next run**: Human defines new workstreams F+ or disables the cron — every run is identical until action is taken.
+
 ## Run ~1311 — 2026-08-27T~hourly (69th+ consecutive idle)
 - **Workstream**: None — A–E all complete, no new workstreams defined
 - **Branch/PR**: n/a
