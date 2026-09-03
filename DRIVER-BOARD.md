@@ -7,15 +7,16 @@ NOTE: Board trimmed at run ~1007 (2026-08-11). Full history preserved in git. Pr
 
 ## Workstream Status
 
-Workstreams A–F ALL DONE. Build clean, tests green (1438/0/3), guardrails enforced.
+Workstreams A–F ALL DONE. Build clean, tests green (1451/0/3), guardrails enforced.
 
 - [x] **A** — Gateway up/refreshed/tested. Build clean, 5 meta-tools confirmed. DONE.
 - [x] **B** — GitHub MCP migration: `servers.json` github → `https://api.githubcopilot.com/mcp/` with envHeaders. DONE.
-- [x] **C** — Focus-profile layer: `focus-profiles.json` (6 profiles), CH1TTY_FOCUS, per-call focus param, status reporting, tests. DONE.
+- [x] **C** — Focus-profile layer: `focus-profiles.json` (7 profiles), CH1TTY_FOCUS, per-call focus param, status reporting, tests. DONE.
 - [x] **D** — Scenario testing + simulation: `test/scenario.test.ts`, `test/simulation.test.ts`, `sim/scenarios.ts` harness. DONE.
-- [x] **E** — Alchemist catalog: `focus-suggestions.json` (6 focus profiles, full tool coverage). DONE.
+- [x] **E** — Alchemist catalog: `focus-suggestions.json` (7 focus profiles, full tool coverage). DONE.
 - [x] **Linear MCP** — `servers.json` + focus profiles + suggestions wired. DONE.
 - [x] **GUARDRAIL-CLEANUP** — 900+ rogue `auto/*-cast-explain-*-ratio` branches violating the metric freeze are stale (content never merged). Source clean; 0 violations on main.
+- [x] **tasks-mcp wire** — `apps/tasks-mcp` wired as first focused per-domain server; `tasks` focus profile + suggestions added; 10 new scenario tests. PR #1153 merged 2026-09-03.
 
 ## Guardrail: buildCastExplanation metric freeze
 
@@ -3036,3 +3037,29 @@ _(Runs ~1096–1098 committed git-only run-log entries; no DRIVER-BOARD.md edits
   6. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
 - **PushNotification**: NOT SENT — ~221st consecutive idle; next escalation ~#129 at run ~1484 (~7 runs away).
 - **Next run**: Idle. Next escalation ~#129 at run ~1484.
+
+---
+### 2026-09-03T~hourly (run ~1478 — ACTIVE: merged PR #1153 tasks-mcp wire)
+- **Workstream**: F (tasks-mcp wire / focused server / focus profile)
+- **Branch/PR**: `auto/f-tasks-mcp-wire` → **PR #1153 MERGED** (https://github.com/chittyos/ch1tty/pull/1153)
+- **Build** (main before merge): clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1441 pass / 0 fail / 3 skip (1444 total, 51 suites). After merge: +10 new tasks scenario tests → 1451/0/3 (1454 total).
+- **Guardrails**: 5-tool surface confirmed (search/execute/status/reload/cast). `buildCastExplanation` metric freeze ACTIVE (tests 1220/1221 enforce 56/87 fields). 0 violations.
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1441/0/3 (1444 total, 51 suites). 0 failures.
+  - Found 1 open PR: #1153 (`auto/f-tasks-mcp-wire` — tasks-mcp focused server wire).
+  - PR #1153 state: CI green (CodeQL + Analyze all success), 1 review thread (resolved — CodeRabbit `build:apps` failure propagation; fix applied in commit 9ad0bc4), mergeable: clean.
+  - **Merged PR #1153** (squash) → sha e4c72a8. Synced main to origin/main (e4c72a8).
+  - Updated DRIVER-BOARD.md header: test count 1438→1451, workstream status, tasks-mcp entry.
+  - Notion board: unavailable (API 401). DRIVER-BOARD.md is durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ + tasks-mcp ✓ ALL DONE. Build: clean. Tests (post-merge): 1451/0/3. **~1478th run. 0 open PRs.**
+- **Human-action items** (standing):
+  1. **Disable or redirect hourly schedule** — ~1478 runs; all workstreams exhausted; schedule burns compute hourly.
+  2. **Deploy Workstream F phases** (Cloudflare): Create `Ch1ttyApiAgent` DO + `wrangler kv namespace create OAUTH_KV` + drain `Ch1ttyDO`.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  5. **Set `CHITTY_TASKS_TOKEN` on prod** — new requirement from tasks-mcp wire (lazily refused at connect time without it).
+  6. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  7. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
+- **PushNotification**: SENT — merged PR #1153 (productive run after ~220 consecutive idle runs).
+- **Next run**: Idle (all done). No new workstreams defined. Next productive action: Cloudflare deploy (human action required).
