@@ -36,6 +36,12 @@
       "categories": ["ecosystem", "code"],
       "servers": ["cloudflare", "cloudflare-builds", "neon", "github", "orchestrator", "fs", "quality"],
       "boost": 0.5
+    },
+    "tasks": {
+      "description": "Task management — create, update, list, and complete ChittyAgent Tasks",
+      "categories": ["ecosystem"],
+      "servers": ["tasks"],
+      "boost": 0.6
     }
   }
 }

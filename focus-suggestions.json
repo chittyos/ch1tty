@@ -29699,6 +29699,91 @@
           "resolves_to": "ops-browser-cloudflare-triage-sequence"
         }
       ]
+    },
+    "tasks": {
+      "description": "Task management — create, update, list, and complete ChittyAgent Tasks (apps/tasks-mcp). Focused on the tasks backend for project and workflow tracking.",
+      "combos": [
+        {
+          "name": "list-and-triage-open-tasks",
+          "chain": [
+            "tasks/list_tasks",
+            "tasks/update_task"
+          ],
+          "accomplishes": "List all open tasks and update priority or status on the ones that need triage — a quick daily standup review loop.",
+          "verified": false,
+          "notes": "tasks backend enabled in servers.json; requires CHITTY_TASKS_TOKEN at runtime."
+        },
+        {
+          "name": "create-and-track-task",
+          "chain": [
+            "tasks/create_task",
+            "tasks/get_task"
+          ],
+          "accomplishes": "Create a new task and immediately fetch its full record to confirm it was persisted correctly and get its assigned ID.",
+          "verified": false,
+          "notes": "tasks backend enabled; requires CHITTY_TASKS_TOKEN."
+        },
+        {
+          "name": "complete-task-workflow",
+          "chain": [
+            "tasks/list_tasks",
+            "tasks/complete_task"
+          ],
+          "accomplishes": "List in-progress tasks then mark the finished ones as complete — a standard end-of-day task close-out.",
+          "verified": false,
+          "notes": "tasks backend enabled; requires CHITTY_TASKS_TOKEN."
+        },
+        {
+          "name": "project-task-report",
+          "chain": [
+            "tasks/list_tasks",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Pull all open tasks for a project then write a summary Notion page — a lightweight project status report from live task data.",
+          "verified": false,
+          "notes": "tasks not connected (token absent). notion/API-post-page verified live."
+        },
+        {
+          "name": "github-issue-to-task",
+          "chain": [
+            "github/list_issues",
+            "tasks/create_task"
+          ],
+          "accomplishes": "List open GitHub issues and create a corresponding ChittyAgent task for each — bridging code review work into the task tracker.",
+          "verified": false,
+          "notes": "github not connected (GITHUB_MCP_AUTHORIZATION absent). tasks not connected (token absent)."
+        }
+      ],
+      "prompts": [
+        {
+          "text": "List all my open tasks",
+          "resolves_to": "list-and-triage-open-tasks"
+        },
+        {
+          "text": "Show me what tasks are in progress",
+          "resolves_to": "list-and-triage-open-tasks"
+        },
+        {
+          "text": "Create a task to review the deployment",
+          "resolves_to": "create-and-track-task"
+        },
+        {
+          "text": "Add a new task for the team",
+          "resolves_to": "create-and-track-task"
+        },
+        {
+          "text": "Mark my tasks as done for today",
+          "resolves_to": "complete-task-workflow"
+        },
+        {
+          "text": "Generate a project status report from open tasks",
+          "resolves_to": "project-task-report"
+        },
+        {
+          "text": "Create tasks from open GitHub issues",
+          "resolves_to": "github-issue-to-task"
+        }
+      ]
     }
   }
 }

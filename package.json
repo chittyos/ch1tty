@@ -6,6 +6,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
+    "build:apps": "for app in apps/*/; do [ -f \"$app/package.json\" ] && (cd \"$app\" && npm run build); done",
     "start": "node dist/index.js",
     "dev": "tsc --watch",
     "typecheck:worker": "tsc -p tsconfig.worker.json",
