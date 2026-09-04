@@ -3192,3 +3192,27 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   8. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
 - **PushNotification**: NOT SENT — idle; next escalation ~#130 at run ~1486 (3 runs away).
 - **Next run**: Idle. Next escalation ~#130 at run ~1486.
+
+---
+### 2026-09-04T~hourly (run ~1484 — idle; all workstreams A-F done)
+- **Workstream**: None (all A–F done; no new workstreams defined)
+- **Branch/PR**: 1 open PR: #1155 (dependabot — qs + fast-uri bumps across apps/; same CVEs as root #1154 which is merged).
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1451 pass / 0 fail / 3 skip (1454 total, 51 suites, ~52s)
+- **Guardrails**: 5-tool surface confirmed (search/execute/status/reload/cast). `buildCastExplanation` metric freeze ACTIVE (tests 1230/1231 enforce 56/87 field counts). 0 violations on main.
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed.
+  - `git reset --hard origin/main` (28c8417, run ~1483). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1451/0/3 (1454 total, 51 suites, ~52s). 0 failures.
+  - 1 open PR confirmed: #1155 (dependabot qs + fast-uri bumps across apps/ and workers/).
+  - All workstreams A–F + tasks-mcp verified done. Notion board: unavailable (API 401). DRIVER-BOARD.md is durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ tasks-mcp ✓ ALL DONE. Build: clean. Tests: 1451/0/3. **~1484th run. 1 open PR (#1155 dependabot). ~129 escalations sent. Next escalation ~#130 at run ~1486 (2 runs away).**
+- **Human-action items** (unchanged — ~129 escalations sent; no reaction received):
+  1. **Disable or redirect hourly schedule** — 1484+ consecutive idle runs; all A–F exhausted; schedule burns compute hourly.
+  2. **Merge PR #1155** (dependabot) — qs + fast-uri security bumps in apps/ and workers/ subdirectories (same CVEs as root #1154).
+  3. **Deploy Workstream F phases** (Cloudflare): Create `Ch1ttyApiAgent` DO class + drain `Ch1ttyDO` instances.
+  4. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  5. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  6. **Set `CHITTY_TASKS_TOKEN` on prod** — new requirement from tasks-mcp wire.
+  7. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  8. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
+- **PushNotification**: NOT SENT — idle; next escalation ~#130 at run ~1486 (2 runs away).
+- **Next run**: Idle. Next escalation ~#130 at run ~1486.
