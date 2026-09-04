@@ -3166,4 +3166,4 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   - Pushed `auto/SEC-FIX-fast-uri-qs-sep2026`; opened PR #1154 (ready for review).
   - PushNotification sent (new security vulnerabilities found and fix PR opened).
 - **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ tasks-mcp ✓ ALL DONE. Security: PR #1154 open. Tests on main: 1451/0/3. **~1482nd run (security fix).**
-- **Next run**: Check PR #1154 — merge if CI green; otherwise diagnose. Next escalation ~#130 at run ~1486 (4 runs away).
+- **Next run**: PR #1154 **MERGED** (squash, SHA 69f46ad). Security fix is on main. Next escalation ~#130 at run ~1486 (4 runs away). Tests should run on new main to confirm 1451/0/3 still holds.
