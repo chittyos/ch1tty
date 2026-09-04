@@ -3146,3 +3146,24 @@ _(Runs ~1096–1098 committed git-only run-log entries; no DRIVER-BOARD.md edits
   7. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
 - **PushNotification**: NOT SENT — idle; escalation #130 due at run ~1486 (4 runs away).
 - **Next run**: Idle. Next escalation ~#130 at run ~1486.
+
+**AMENDMENT (same run ~1482):** `npm audit` revealed 2 new vulnerabilities not covered by existing overrides:
+- `fast-uri` 3.1.5 (high, 4 CVEs: GHSA-5jgf-p345-68v8, GHSA-f65p-4m7j-42xc, GHSA-fph4-wmhf-6fwf, GHSA-jqff-g426-hqxp) — chain: @modelcontextprotocol/sdk → ajv → fast-uri
+- `qs` 6.15.3 (moderate, 2 CVEs: GHSA-x5fp-wj9c-mxmx, GHSA-4mjr-xmp4-gh2g) — chain: @modelcontextprotocol/sdk → express → qs
+Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; lockfile pins fast-uri@4.1.4 and qs@6.16.0. Audit on patched branch: 0 vulnerabilities.
+**Branch/PR**: `auto/SEC-FIX-fast-uri-qs-sep2026` → **PR #1154** (https://github.com/chittyos/ch1tty/pull/1154)
+
+---
+### 2026-09-04T~hourly (run ~1482 amendment — security: PR #1154 fast-uri + qs overrides)
+- **Workstream**: Security (fast-uri SSRF/host-confusion + qs DoS CVEs)
+- **Branch/PR**: `auto/SEC-FIX-fast-uri-qs-sep2026` → **PR #1154** (https://github.com/chittyos/ch1tty/pull/1154)
+- **Build**: clean (tsc exit 0) | **Tests** (on main): 1451/0/3 (1454 total, 51 suites) — patch is lockfile-only, no test changes needed
+- **Actions**:
+  - `npm audit` found 2 new vulnerabilities (fast-uri high × 4 CVEs, qs moderate × 2 CVEs) — not covered by existing overrides.
+  - Added `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json overrides.
+  - `npm install --package-lock-only --no-audit` → lockfile pinned fast-uri@4.1.4, qs@6.16.0.
+  - `npm run build`: clean. `npm install` on patched branch: `found 0 vulnerabilities`.
+  - Pushed `auto/SEC-FIX-fast-uri-qs-sep2026`; opened PR #1154 (ready for review).
+  - PushNotification sent (new security vulnerabilities found and fix PR opened).
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ tasks-mcp ✓ ALL DONE. Security: PR #1154 open. Tests on main: 1451/0/3. **~1482nd run (security fix).**
+- **Next run**: Check PR #1154 — merge if CI green; otherwise diagnose. Next escalation ~#130 at run ~1486 (4 runs away).
