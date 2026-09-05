@@ -3344,3 +3344,29 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   8. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
 - **PushNotification**: NOT SENT — last escalation #132 at run ~1488; next escalation #133 at run ~1498.
 - **Next run**: Idle (all done). Next escalation ~#133 at run ~1498 (9 runs away).
+
+---
+### 2026-09-05T~hourly (run ~1490 — idle; workstream-H PR #1156 open)
+- **Workstream**: H (ledger-mcp focus) — PR #1156 open, CI-green, no action needed this run
+- **Branch/PR**: 2 open PRs: #1156 (auto/h-ledger-mcp-focus — workstream H ledger focus; CI all green, CodeRabbit thread resolved), #1155 (Dependabot qs + fast-uri bumps; left for human merge)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests** (main): 1451 pass / 0 fail / 3 skip; (PR branch): 1461 pass / 0 fail / 3 skip (+10 ledger scenarios)
+- **Guardrails**: 5-tool surface confirmed (search/execute/status/reload/cast). `buildCastExplanation` metric freeze ACTIVE (tests 1231/1232 enforce 56/87 field counts). 0 violations on main.
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed.
+  - `git pull origin main` (synced to 9ff83f5). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test` (main): 1451/0/3. 0 failures.
+  - Checked PR #1156 (auto/h-ledger-mcp-focus): CI 3/3 green, CodeRabbit inline thread resolved (fixed in 6cff5b4 — dynamic `created.id` used for get_entry; docstring warning declined per CLAUDE.md no-comments policy). mergeable_state: clean. No action needed.
+  - Confirmed PR #1155 (Dependabot) still open; left for human merge.
+  - No escalation this run — last escalation #132 at run ~1488; next escalation #133 at run ~1498 (8 runs away).
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H(PR open) tasks-mcp ✓. Build: clean. Tests: 1451/0/3. **~1490th run. 2 open PRs (#1155 dependabot, #1156 workstream-H).**
+- **Human-action items**:
+  1. **Merge PR #1156** (workstream-H) — ledger focus profile + scenario tests; CI green, CodeRabbit thread resolved; ready for merge.
+  2. **Merge PR #1155** (dependabot) — qs + fast-uri security bumps in apps/ and workers/ subdirectories.
+  3. **Disable or redirect hourly schedule** — 1490+ consecutive runs; all A–F exhausted; schedule burns compute hourly.
+  4. **Deploy Workstream F phases** (Cloudflare): Create `Ch1ttyApiAgent` DO class + drain `Ch1ttyDO` instances.
+  5. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  6. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  7. **Set `CHITTY_TASKS_TOKEN` on prod** — new requirement from tasks-mcp wire.
+  8. **Stale branch cleanup** — 1000+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  9. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
+- **PushNotification**: NOT SENT — next escalation #133 at run ~1498 (8 runs away).
+- **Next run**: Idle (all done, PR #1156 watching). Next escalation #133 at run ~1498 (8 runs away).
