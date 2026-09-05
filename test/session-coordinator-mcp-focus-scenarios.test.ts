@@ -123,7 +123,7 @@ test('session focus: cast "list active sessions" resolves to session/list_sessio
   assert.equal(parsed.cast, 'plan', `cast.cast should be 'plan', got: ${String(parsed.cast)}`);
   const resolved = parsed.resolved;
   assert.ok(resolved, 'cast should resolve a tool');
-  assert.ok(resolved.tool.startsWith('session/'), `cast should resolve to session/, got: ${resolved.tool}`);
+  assert.equal(resolved.tool, 'session/list_sessions', `cast should resolve to session/list_sessions, got: ${resolved.tool}`);
   assert.equal(parsed.focus, 'session', 'cast response should report active focus');
 });
 
@@ -140,17 +140,21 @@ test('session focus: cast "create a new session" resolves to session/create_sess
   assert.equal(parsed.cast, 'plan', `cast.cast should be 'plan', got: ${String(parsed.cast)}`);
   const resolved = parsed.resolved;
   assert.ok(resolved, 'cast should resolve a tool');
-  assert.ok(resolved.tool.startsWith('session/'), `cast should resolve to session/, got: ${resolved.tool}`);
+  assert.equal(resolved.tool, 'session/create_session', `cast should resolve to session/create_session, got: ${resolved.tool}`);
 });
 
 test('session focus: search with explicit focus:none ignores session boost', async () => {
   const { aggregator } = buildAggregator('session');
 
-  const result = await aggregator.callTool('ch1tty/search', { query: 'list sessions', limit: 10, focus: 'none' });
-  assert.equal(result.isError, undefined);
+  const focused = parseSearch(await aggregator.callTool('ch1tty/search', { query: 'list sessions', limit: 10 }));
+  const unfocused = parseSearch(await aggregator.callTool('ch1tty/search', { query: 'list sessions', limit: 10, focus: 'none' }));
 
-  const parsed = parseSearch(result);
-  assert.notEqual(parsed.focus, 'session', 'focus:none should override env focus');
+  assert.notEqual(unfocused.focus, 'session', 'focus:none should override env focus');
+
+  const focusedInFocusCount = (focused.tools ?? []).filter((t) => t.inFocus).length;
+  const unfocusedInFocusCount = (unfocused.tools ?? []).filter((t) => t.inFocus).length;
+  assert.equal(unfocusedInFocusCount, 0, 'focus:none should clear all inFocus markers');
+  assert.ok(focusedInFocusCount > 0, 'focused baseline should have at least one inFocus marker');
 });
 
 test('session focus: execute session/list_sessions returns fixture sessions', async () => {
@@ -184,14 +188,16 @@ test('session focus: execute session/create_session then get_session round-trip'
   assert.ok(created.id, 'created session should have an id');
   assert.equal(created.status, 'active', 'new session should be active');
 
+  const createdId = String(created.id);
   const getResult = await aggregator.callTool('ch1tty/execute', {
     tool: 'session/get_session',
-    args: { id: 'sess-1' },
+    args: { id: createdId },
   });
   assert.equal(getResult.isError, undefined, 'get_session should not error');
 
   const fetched = JSON.parse(getResult.content?.[0]?.text ?? '{}') as Record<string, unknown>;
   assert.ok(fetched.id, 'fetched session should have an id');
+  assert.equal(String(fetched.id), createdId, 'fetched session id should match created id');
 });
 
 test('session focus: execute session/list_events returns fixture events', async () => {

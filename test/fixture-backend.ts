@@ -361,7 +361,7 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
           },
           required: ['channel'],
         },
-        response: text(JSON.stringify({ id: 'sess-new', channel: 'claude-code', status: 'active', event_count: 0, created_at: '2026-09-05T00:00:00Z', updated_at: '2026-09-05T00:00:00Z' })),
+        response: text(JSON.stringify({ id: 'sess-1', channel: 'claude-code', status: 'active', event_count: 0, created_at: '2026-09-05T00:00:00Z', updated_at: '2026-09-05T00:00:00Z' })),
       },
       {
         name: 'update_session',
