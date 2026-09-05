@@ -176,7 +176,8 @@ test('session focus: execute session/list_sessions returns fixture sessions', as
 });
 
 test('session focus: execute session/create_session then get_session round-trip', async () => {
-  const { aggregator } = buildAggregator('session');
+  const { aggregator, fixture } = buildAggregator('session');
+  fixture.clearCallLog();
 
   const createResult = await aggregator.callTool('ch1tty/execute', {
     tool: 'session/create_session',
@@ -197,7 +198,14 @@ test('session focus: execute session/create_session then get_session round-trip'
 
   const fetched = JSON.parse(getResult.content?.[0]?.text ?? '{}') as Record<string, unknown>;
   assert.ok(fetched.id, 'fetched session should have an id');
-  assert.equal(String(fetched.id), createdId, 'fetched session id should match created id');
+
+  // Verify that get_session was actually called with the id returned by create_session,
+  // not a hard-coded constant — this catches broken ID propagation even when both
+  // fixture responses return the same static id.
+  const log = fixture.getCallLog();
+  const getCall = log.find((r) => r.tool === 'get_session' && r.serverId === 'session');
+  assert.ok(getCall, 'get_session should appear in the call log');
+  assert.equal(String(getCall.args['id']), createdId, 'get_session must be called with the created session id');
 });
 
 test('session focus: execute session/list_events returns fixture events', async () => {
