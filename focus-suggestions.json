@@ -29982,6 +29982,101 @@
           "resolves_to": "session-context-and-notion-report"
         }
       ]
+    },
+    "chittyevidence": {
+      "description": "Evidence corpus — ingest, search, and retrieve documents with canonical URIs via ChittyEvidence (apps/evidence-mcp). Focused on document lifecycle: ingest → index → search → retrieve.",
+      "combos": [
+        {
+          "name": "ingest-and-verify",
+          "chain": [
+            "chittyevidence/ingest_document",
+            "chittyevidence/get_document"
+          ],
+          "accomplishes": "Ingest a new document into the evidence corpus, then fetch its full record to confirm it was stored with the correct canonical URI and metadata.",
+          "verified": false,
+          "notes": "chittyevidence backend enabled in servers.json; requires CHITTY_EVIDENCE_TOKEN at runtime."
+        },
+        {
+          "name": "search-and-read",
+          "chain": [
+            "chittyevidence/search_documents",
+            "chittyevidence/get_document"
+          ],
+          "accomplishes": "Search the corpus for documents matching a keyword or phrase, then retrieve the full content of the most relevant match.",
+          "verified": false,
+          "notes": "chittyevidence backend enabled; requires CHITTY_EVIDENCE_TOKEN."
+        },
+        {
+          "name": "list-filter-and-read",
+          "chain": [
+            "chittyevidence/list_documents",
+            "chittyevidence/get_document"
+          ],
+          "accomplishes": "List documents filtered by kind or tag, then read the full content and metadata of the selected document.",
+          "verified": false,
+          "notes": "chittyevidence backend enabled; requires CHITTY_EVIDENCE_TOKEN."
+        },
+        {
+          "name": "ingest-and-resolve-uri",
+          "chain": [
+            "chittyevidence/ingest_document",
+            "chittyevidence/get_canonical_uri"
+          ],
+          "accomplishes": "Ingest a new document and resolve its stable canonical URI (chittycanon:// scheme) — for use in citations, cross-references, and canonical links.",
+          "verified": false,
+          "notes": "chittyevidence backend enabled; requires CHITTY_EVIDENCE_TOKEN."
+        },
+        {
+          "name": "search-and-annotate",
+          "chain": [
+            "chittyevidence/search_documents",
+            "chittyevidence/ingest_document"
+          ],
+          "accomplishes": "Search the corpus for prior documents on a topic, then ingest a new annotation or analysis document that references what was found.",
+          "verified": false,
+          "notes": "chittyevidence backend enabled; requires CHITTY_EVIDENCE_TOKEN."
+        },
+        {
+          "name": "list-and-export-uris",
+          "chain": [
+            "chittyevidence/list_documents",
+            "chittyevidence/get_canonical_uri"
+          ],
+          "accomplishes": "List documents in the corpus, then resolve canonical URIs for each — useful for building a reference manifest or exporting citations.",
+          "verified": false,
+          "notes": "chittyevidence backend enabled; requires CHITTY_EVIDENCE_TOKEN."
+        }
+      ],
+      "prompts": [
+        {
+          "text": "Ingest this document and return its canonical URI",
+          "resolves_to": "chittyevidence/ingest_document"
+        },
+        {
+          "text": "Search the evidence corpus for documents about X",
+          "resolves_to": "chittyevidence/search_documents"
+        },
+        {
+          "text": "List all evidence documents tagged with X",
+          "resolves_to": "chittyevidence/list_documents"
+        },
+        {
+          "text": "Get the full content and metadata for evidence document ID X",
+          "resolves_to": "chittyevidence/get_document"
+        },
+        {
+          "text": "Resolve the canonical URI for document ID X",
+          "resolves_to": "chittyevidence/get_canonical_uri"
+        },
+        {
+          "text": "Search the corpus for prior work on X then ingest a new analysis note",
+          "resolves_to": "chittyevidence/search_documents"
+        },
+        {
+          "text": "Ingest a new specification document and verify it was stored with the correct canonical URI",
+          "resolves_to": "chittyevidence/ingest_document"
+        }
+      ]
     }
   }
 }
