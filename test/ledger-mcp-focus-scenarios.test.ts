@@ -183,11 +183,11 @@ test('ledger focus: append then get entry via execute', async () => {
 
   const getResult = await aggregator.callTool('ch1tty/execute', {
     tool: 'ledger/get_entry',
-    args: { namespace: 'events', id: 'e1' },
+    args: { namespace: 'events', id: created.id },
   });
   assert.equal(getResult.isError, undefined, 'get_entry should succeed');
   const entry = JSON.parse(getResult.content[0].text as string) as { id: string };
-  assert.ok(entry.id, 'fetched entry should have an id');
+  assert.equal(entry.id, created.id, 'fetched entry id should match appended entry id');
 });
 
 test('ledger focus: status reports active focus as ledger', async () => {

@@ -893,7 +893,7 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
           required: ['namespace', 'id'],
         },
         response: text(JSON.stringify({
-          id: 'e1',
+          id: 'e-new',
           namespace: 'events',
           payload: { type: 'deploy', service: 'ch1tty' },
           sequence: 1,
