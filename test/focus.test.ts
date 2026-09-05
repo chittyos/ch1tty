@@ -75,7 +75,7 @@ test('loadFocusProfilesFromPath throws on a present-but-malformed file', () => {
   }
 });
 
-test('repo focus-profiles.json loads and defines finance/governance/design/code/communication/ops/tasks', () => {
+test('repo focus-profiles.json loads and defines finance/governance/design/code/communication/ops/tasks/ledger', () => {
   const profiles = loadFocusProfilesFromPath(join(import.meta.dirname, '..', 'focus-profiles.json'));
   assert.ok(profiles.profiles.finance);
   assert.ok(profiles.profiles.governance);
@@ -87,6 +87,10 @@ test('repo focus-profiles.json loads and defines finance/governance/design/code/
   assert.ok(profiles.profiles.tasks.servers.includes('tasks'), 'tasks profile includes tasks server');
   assert.ok(profiles.profiles.tasks.categories.includes('ecosystem'), 'tasks profile covers ecosystem category');
   assert.strictEqual(profiles.profiles.tasks.boost, 0.6, 'tasks boost is 0.6');
+  assert.ok(profiles.profiles.ledger, 'ledger focus profile present');
+  assert.ok(profiles.profiles.ledger.servers.includes('ledger'), 'ledger profile includes ledger server');
+  assert.ok(profiles.profiles.ledger.categories.includes('ecosystem'), 'ledger profile covers ecosystem category');
+  assert.strictEqual(profiles.profiles.ledger.boost, 0.6, 'ledger boost is 0.6');
   // Real server ids from servers.json
   assert.ok(profiles.profiles.finance.servers.includes('stripe'));
   assert.ok(profiles.profiles.design.servers.includes('playwright'));
