@@ -29869,6 +29869,119 @@
           "resolves_to": "ledger-to-notion-report"
         }
       ]
+    },
+    "session": {
+      "description": "Cross-channel session management — create, inspect, update, close, and replay ChittyOS sessions and their event logs (apps/session-coordinator-mcp). Focused on the session backend for lifecycle tracking and multi-channel context.",
+      "combos": [
+        {
+          "name": "list-active-sessions",
+          "chain": [
+            "session/list_sessions",
+            "session/get_session"
+          ],
+          "accomplishes": "List all active ChittyOS sessions then fetch the full context of the first active one — a quick health check of who is connected and in what state.",
+          "verified": false,
+          "notes": "session backend enabled in servers.json; requires CHITTY_SESSION_TOKEN at runtime."
+        },
+        {
+          "name": "create-and-track-session",
+          "chain": [
+            "session/create_session",
+            "session/get_session"
+          ],
+          "accomplishes": "Open a new cross-channel session and immediately fetch its full record to confirm it persisted and get its assigned ID.",
+          "verified": false,
+          "notes": "session backend enabled; requires CHITTY_SESSION_TOKEN."
+        },
+        {
+          "name": "update-session-metadata",
+          "chain": [
+            "session/get_session",
+            "session/update_session"
+          ],
+          "accomplishes": "Fetch a session's current metadata then patch it with updated fields — use to attach context (user_id, channel, tags) to an existing session without closing it.",
+          "verified": false,
+          "notes": "session backend enabled; requires CHITTY_SESSION_TOKEN."
+        },
+        {
+          "name": "session-append-and-replay",
+          "chain": [
+            "session/append_event",
+            "session/list_events"
+          ],
+          "accomplishes": "Append a structured event to a session's log then immediately replay the full event stream to verify the append and inspect surrounding context.",
+          "verified": false,
+          "notes": "session backend enabled; requires CHITTY_SESSION_TOKEN."
+        },
+        {
+          "name": "session-event-log-replay",
+          "chain": [
+            "session/list_sessions",
+            "session/list_events"
+          ],
+          "accomplishes": "List active sessions then replay the event log for a target session — reconstruct what happened in a session for debugging or audit.",
+          "verified": false,
+          "notes": "session backend enabled; requires CHITTY_SESSION_TOKEN."
+        },
+        {
+          "name": "session-lifecycle-close",
+          "chain": [
+            "session/list_sessions",
+            "session/close_session"
+          ],
+          "accomplishes": "List sessions filtered by status and close the ones that are stale or idle — a session housekeeping workflow.",
+          "verified": false,
+          "notes": "session backend enabled; requires CHITTY_SESSION_TOKEN."
+        },
+        {
+          "name": "session-context-and-notion-report",
+          "chain": [
+            "session/get_session",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Fetch a session's full context snapshot and write it into a Notion page for human review — bridge live session state into a durable document.",
+          "verified": false,
+          "notes": "session not connected (token absent). notion/API-post-page verified live."
+        }
+      ],
+      "prompts": [
+        {
+          "text": "List all active sessions",
+          "resolves_to": "list-active-sessions"
+        },
+        {
+          "text": "Show me what sessions are running",
+          "resolves_to": "list-active-sessions"
+        },
+        {
+          "text": "Create a new session for this channel",
+          "resolves_to": "create-and-track-session"
+        },
+        {
+          "text": "Open a session and confirm it was created",
+          "resolves_to": "create-and-track-session"
+        },
+        {
+          "text": "Update this session's metadata",
+          "resolves_to": "update-session-metadata"
+        },
+        {
+          "text": "Append an event and verify the log",
+          "resolves_to": "session-append-and-replay"
+        },
+        {
+          "text": "Replay the event log for a session",
+          "resolves_to": "session-event-log-replay"
+        },
+        {
+          "text": "Close all idle sessions",
+          "resolves_to": "session-lifecycle-close"
+        },
+        {
+          "text": "Write a session context snapshot to Notion",
+          "resolves_to": "session-context-and-notion-report"
+        }
+      ]
     }
   }
 }
