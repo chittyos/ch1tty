@@ -1007,6 +1007,67 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
     ],
   },
 
+  comms: {
+    tools: [
+      {
+        name: 'comms.recentLog',
+        description: 'Recent communications with person X — fuses late-bound message providers (quo/imessage/email) into one time-ordered UnifiedCommsEntry[] log',
+        inputSchema: {
+          type: 'object',
+          oneOf: [{ required: ['person'] }, { required: ['identifier'] }],
+          properties: {
+            person: { type: 'string' },
+            identifier: { type: 'string' },
+            channels: { type: 'array', items: { type: 'string', enum: ['quo', 'imessage', 'email', 'twilio', 'voice'] } },
+            days: { type: 'integer', minimum: 1, maximum: 365, default: 30 },
+            since: { type: 'string', format: 'date-time' },
+            until: { type: 'string', format: 'date-time' },
+            limit: { type: 'integer', minimum: 1, maximum: 1000, default: 100 },
+            order: { type: 'string', enum: ['desc', 'asc'], default: 'desc' },
+            includeBody: { type: 'boolean', default: false },
+          },
+        },
+        response: text(JSON.stringify({
+          ok: true,
+          entries: [
+            {
+              id: 'entry-001',
+              channel: 'quo',
+              direction: 'inbound',
+              self: false,
+              timestamp: '2026-09-04T18:32:00Z',
+              snippet: 'Deploy looked good — all green.',
+              parties: [{ identifier: '+13122186717', self: false, displayName: 'Nick' }],
+            },
+            {
+              id: 'entry-002',
+              channel: 'imessage',
+              direction: 'outbound',
+              self: true,
+              timestamp: '2026-09-04T18:30:00Z',
+              snippet: 'Just pushed the fix — checking CI now.',
+              parties: [{ identifier: '+13122186717', self: false, displayName: 'Nick' }],
+            },
+            {
+              id: 'entry-003',
+              channel: 'email',
+              direction: 'inbound',
+              self: false,
+              timestamp: '2026-09-04T09:15:00Z',
+              snippet: 'Re: Q3 planning — can we meet Thursday?',
+              parties: [{ identifier: 'nick@nevershitty.com', self: false, displayName: 'Nick' }],
+            },
+          ],
+          channelResults: [
+            { channel: 'quo', ok: true, count: 1 },
+            { channel: 'imessage', ok: true, count: 1 },
+            { channel: 'email', ok: true, count: 1 },
+          ],
+        })),
+      },
+    ],
+  },
+
   chittymac: {
     tools: [
       {

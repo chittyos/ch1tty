@@ -119,6 +119,7 @@ test('repo focus-profiles.json loads and defines finance/governance/design/code/
   assert.ok(profiles.profiles.communication.servers.includes('notion'), 'communication profile includes notion');
   assert.ok(profiles.profiles.communication.servers.includes('chittymac'), 'communication profile includes chittymac');
   assert.ok(profiles.profiles.communication.servers.includes('imessage'), 'communication profile includes imessage');
+  assert.ok(profiles.profiles.communication.servers.includes('comms'), 'communication profile includes comms');
   // ops profile contents
   assert.ok(profiles.profiles.ops.categories.includes('ecosystem'), 'ops profile covers ecosystem category');
   assert.ok(profiles.profiles.ops.categories.includes('code'), 'ops profile covers code category');
