@@ -30163,6 +30163,86 @@
           "resolves_to": "open-maintenance-requests-to-task"
         }
       ]
+    },
+    "google": {
+      "description": "Google Workspace productivity and admin \u2014 Gmail, Calendar, Drive, Docs, and org management",
+      "combos": [
+        {
+          "name": "calendar-event-to-task",
+          "chain": [
+            "google/list_events",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Lists upcoming calendar events then creates a follow-up task for the first action item",
+          "verified": false
+        },
+        {
+          "name": "drive-file-to-doc-summary",
+          "chain": [
+            "google/list_files",
+            "google/create_document"
+          ],
+          "accomplishes": "Finds a Drive file by query then creates a new Google Doc summarizing it",
+          "verified": false
+        },
+        {
+          "name": "org-user-audit",
+          "chain": [
+            "gam/list_users",
+            "gam/get_user"
+          ],
+          "accomplishes": "Lists all workspace users then fetches full details for a specific user",
+          "verified": false
+        },
+        {
+          "name": "send-meeting-followup-email",
+          "chain": [
+            "google/list_events",
+            "google/send_email"
+          ],
+          "accomplishes": "Retrieves recent calendar events then sends a follow-up email to attendees",
+          "verified": false
+        },
+        {
+          "name": "group-member-to-task",
+          "chain": [
+            "gam/list_groups",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Lists Google Groups to identify the right distribution list then creates an outreach task",
+          "verified": false
+        }
+      ],
+      "prompts": [
+        {
+          "text": "List my upcoming Google Calendar events this week",
+          "resolves_to": "google/list_events"
+        },
+        {
+          "text": "Find files in my Google Drive matching X",
+          "resolves_to": "google/list_files"
+        },
+        {
+          "text": "Send an email to X about Y",
+          "resolves_to": "google/send_email"
+        },
+        {
+          "text": "Create a Google Doc titled X with notes from the meeting",
+          "resolves_to": "google/create_document"
+        },
+        {
+          "text": "List all users in the Google Workspace org",
+          "resolves_to": "gam/list_users"
+        },
+        {
+          "text": "Get account details for user X",
+          "resolves_to": "gam/get_user"
+        },
+        {
+          "text": "List my calendar events then create follow-up tasks for each action item",
+          "resolves_to": "google/list_events"
+        }
+      ]
     }
   }
 }
