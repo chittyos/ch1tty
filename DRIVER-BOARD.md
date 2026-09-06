@@ -3450,3 +3450,29 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
 - **PushNotification**: NOT SENT — all workstreams done and idle; no new escalation threshold reached this run.
 - **Next run**: Idle (all workstreams done). 1 open PR (#1155 dependabot). Define new workstreams or idle.
 - **PushNotification**: SENT — merged 4 PRs, all workstreams H/J/K/L done, tests 1492/0/3.
+
+---
+### 2026-09-06T~hourly (run ~1506 — ACTIVE: merged PR #1161 workstream-M suggestions resource)
+- **Workstream**: M (expose focus-suggestions catalog as first-party MCP resources)
+- **Branch/PR**: `auto/workstream-M-suggestions-resource` → **PR #1161 MERGED** (https://github.com/chittyos/ch1tty/pull/1161, SHA c9eed79)
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1499 pass / 0 fail / 3 skip (1502 total, 51 suites, ~41s)
+- **Guardrails**: 5-tool surface confirmed (search/execute/status/reload/cast). `buildCastExplanation` metric freeze ACTIVE (tests enforce 56/87 field counts). 0 violations.
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed.
+  - `git pull origin main` (c9eed79 post-merge). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1499/0/3 (1502 total, 51 suites, ~41s). 0 failures.
+  - Found 2 open PRs: #1161 (workstream-M suggestions resource, CI green, mergeable: clean) and #1155 (dependabot qs+fast-uri bumps).
+  - PR #1161 review threads: 2 CodeRabbit threads, both resolved (commit b5ca783). Nitpick (dispatch-isolation test) already applied in the branch. CI: CodeQL + Analyze(js-ts) + Analyze(actions) all success. Merged (squash).
+  - PR #1155 (dependabot): still open; base is behind main — left for human review/merge.
+  - DRIVER-BOARD.md updated (3452 lines + this entry).
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ M ✓ ALL DONE. Build: clean. Tests: 1499/0/3. **~1506th run. 1 open PR (#1155 dependabot).**
+- **Human-action items**:
+  1. **Merge PR #1155** (dependabot) — qs + fast-uri security bumps in apps/ and workers/ subdirectories.
+  2. **Disable or redirect hourly schedule** — 1506+ consecutive runs; all workstreams exhausted; schedule burns compute hourly.
+  3. **Deploy Workstream F phases** (Cloudflare): Create `Ch1ttyApiAgent` DO class + drain `Ch1ttyDO` instances.
+  4. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  5. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  6. **Set `CHITTY_TASKS_TOKEN` on prod** — new requirement from tasks-mcp wire.
+  7. **Stale branch cleanup** — 1100+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  8. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
+- **PushNotification**: SENT — merged PR #1161 (workstream-M: focus-suggestions MCP resources). Tests: 1499/0/3.
+- **Next run**: Idle (all workstreams done). 1 open PR (#1155 dependabot — needs human merge).
