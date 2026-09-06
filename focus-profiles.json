@@ -48,6 +48,12 @@
       "categories": ["ecosystem"],
       "servers": ["ledger"],
       "boost": 0.6
+    },
+    "session": {
+      "description": "Cross-channel session management — create, inspect, and close ChittyOS sessions; append and replay session event logs",
+      "categories": ["ecosystem"],
+      "servers": ["session"],
+      "boost": 0.6
     }
   }
 }

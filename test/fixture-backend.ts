@@ -320,6 +320,111 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
     ],
   },
 
+  session: {
+    tools: [
+      {
+        name: 'list_sessions',
+        description: 'List sessions from ChittyOS Session Coordinator, with optional filtering by channel, user, or status.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            channel: { type: 'string' },
+            user_id: { type: 'string' },
+            status: { type: 'string', enum: ['active', 'idle', 'closed'] },
+            limit: { type: 'number' },
+          },
+        },
+        response: text(JSON.stringify([
+          { id: 'sess-1', channel: 'claude-code', user_id: 'u1', status: 'active', event_count: 5, created_at: '2026-01-01T10:00:00Z', updated_at: '2026-01-01T11:00:00Z' },
+          { id: 'sess-2', channel: 'slack', user_id: 'u2', status: 'idle', event_count: 0, created_at: '2026-01-02T08:00:00Z', updated_at: '2026-01-02T08:00:00Z' },
+        ])),
+      },
+      {
+        name: 'get_session',
+        description: 'Get full details of a session by ID, including context and event count.',
+        inputSchema: {
+          type: 'object',
+          properties: { id: { type: 'string' } },
+          required: ['id'],
+        },
+        response: text(JSON.stringify({ id: 'sess-1', channel: 'claude-code', user_id: 'u1', status: 'active', context: { project: 'ch1tty' }, event_count: 5, created_at: '2026-01-01T10:00:00Z', updated_at: '2026-01-01T11:00:00Z' })),
+      },
+      {
+        name: 'create_session',
+        description: 'Create a new cross-channel session in the Session Coordinator.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            channel: { type: 'string' },
+            user_id: { type: 'string' },
+            context: { type: 'object' },
+          },
+          required: ['channel'],
+        },
+        response: text(JSON.stringify({ id: 'sess-1', channel: 'claude-code', status: 'active', event_count: 0, created_at: '2026-09-05T00:00:00Z', updated_at: '2026-09-05T00:00:00Z' })),
+      },
+      {
+        name: 'update_session',
+        description: 'Update session status or context.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            status: { type: 'string', enum: ['active', 'idle', 'closed'] },
+            context: { type: 'object' },
+          },
+          required: ['id'],
+        },
+        response: text(JSON.stringify({ id: 'sess-1', status: 'idle', updated_at: '2026-09-05T01:00:00Z' })),
+      },
+      {
+        name: 'close_session',
+        description: 'Close a session. Sets status to "closed" and records closed_at timestamp.',
+        inputSchema: {
+          type: 'object',
+          properties: { id: { type: 'string' } },
+          required: ['id'],
+        },
+        response: text(JSON.stringify({ id: 'sess-1', status: 'closed', closed_at: '2026-09-05T02:00:00Z' })),
+      },
+      {
+        name: 'append_event',
+        description: 'Append a structured event to a session\'s event log.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            session_id: { type: 'string' },
+            type: { type: 'string' },
+            payload: { type: 'object' },
+            actor: { type: 'string' },
+          },
+          required: ['session_id', 'type'],
+        },
+        response: text(JSON.stringify({ id: 'ev-new', session_id: 'sess-1', type: 'agent.tool_call', created_at: '2026-09-05T00:05:00Z' })),
+      },
+      {
+        name: 'list_events',
+        description: 'List events in a session\'s event log, ordered by creation time.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            session_id: { type: 'string' },
+            limit: { type: 'number' },
+            after: { type: 'string' },
+          },
+          required: ['session_id'],
+        },
+        response: text(JSON.stringify({
+          events: [
+            { id: 'ev-1', session_id: 'sess-1', type: 'user.message', payload: { text: 'hello' }, actor: 'user:u1', created_at: '2026-01-01T10:05:00Z' },
+            { id: 'ev-2', session_id: 'sess-1', type: 'agent.tool_call', payload: { tool: 'search', query: 'neon' }, actor: 'agent:claude', created_at: '2026-01-01T10:06:00Z' },
+          ],
+          has_more: false,
+        })),
+      },
+    ],
+  },
+
   chittyos: {
     tools: [
       {
