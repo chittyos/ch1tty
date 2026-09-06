@@ -330,7 +330,7 @@
         "./apps/comms-mcp/dist/index.js"
       ],
       "lazy": true,
-      "enabled": false
+      "enabled": true
     },
     {
       "_comment": "── disabled: need local install or not yet ported ────────────"
