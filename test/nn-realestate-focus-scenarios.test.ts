@@ -78,11 +78,13 @@ test('realestate focus: search "list properties" ranks turbotenant/ tools first'
   assert.ok(tools.length > 0, 'should return results');
 
   const ttIdx = tools.findIndex((r) => r.tool.startsWith('turbotenant/'));
-  const otherIdx = tools.findIndex((r) => !r.tool.startsWith('turbotenant/'));
+  // Use inFocus === false to find a genuinely out-of-focus tool (ecosystem category
+  // boosts tasks/stripe/ledger too, so they can't serve as an out-of-focus baseline).
+  const outOfFocusIdx = tools.findIndex((r) => r.inFocus === false);
 
   assert.ok(ttIdx !== -1, 'turbotenant/ tools should appear in results');
-  if (otherIdx !== -1) {
-    assert.ok(ttIdx < otherIdx, 'turbotenant/ tools should rank above out-of-focus tools for property query');
+  if (outOfFocusIdx !== -1) {
+    assert.ok(ttIdx < outOfFocusIdx, 'turbotenant/ tools should rank above out-of-focus tools for property query');
   }
   assert.equal(parsed.focus, 'realestate', 'search response should report active focus');
 });
