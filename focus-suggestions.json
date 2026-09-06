@@ -29784,6 +29784,91 @@
           "resolves_to": "github-issue-to-task"
         }
       ]
+    },
+    "ledger": {
+      "description": "Append-only audit ledger — list namespaces, read and paginate entries, and append immutable records via ChittyLedger (apps/ledger-mcp). Focused on the ledger backend for audit trails, event logs, and immutable record keeping.",
+      "combos": [
+        {
+          "name": "list-and-read-ledger-entries",
+          "chain": [
+            "ledger/list_namespaces",
+            "ledger/list_entries"
+          ],
+          "accomplishes": "List all ledger namespaces then read the entries in a chosen namespace — a standard audit log review showing what has been recorded.",
+          "verified": false,
+          "notes": "ledger backend enabled in servers.json; requires CHITTY_LEDGER_TOKEN at runtime."
+        },
+        {
+          "name": "append-and-confirm-entry",
+          "chain": [
+            "ledger/append_entry",
+            "ledger/get_entry"
+          ],
+          "accomplishes": "Append an immutable entry to the ledger then fetch it back by ID to confirm it was persisted correctly — a write-then-verify pattern for critical audit events.",
+          "verified": false,
+          "notes": "ledger backend enabled; requires CHITTY_LEDGER_TOKEN."
+        },
+        {
+          "name": "paginate-ledger-history",
+          "chain": [
+            "ledger/list_entries",
+            "ledger/list_entries"
+          ],
+          "accomplishes": "Paginate through ledger history using cursor-based pagination — useful for scanning large namespaces entry by entry without loading everything at once.",
+          "verified": false,
+          "notes": "ledger backend enabled; requires CHITTY_LEDGER_TOKEN."
+        },
+        {
+          "name": "task-completion-audit-trail",
+          "chain": [
+            "tasks/complete_task",
+            "ledger/append_entry"
+          ],
+          "accomplishes": "Mark a task complete in ChittyAgent Tasks then append an immutable audit record to the ledger — linking task state changes to a permanent event log.",
+          "verified": false,
+          "notes": "tasks and ledger not connected (tokens absent)."
+        },
+        {
+          "name": "ledger-to-notion-report",
+          "chain": [
+            "ledger/list_entries",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Pull recent ledger entries for a namespace then write a Notion summary page — a lightweight audit report from live immutable data.",
+          "verified": false,
+          "notes": "ledger not connected (token absent). notion/API-post-page verified live."
+        }
+      ],
+      "prompts": [
+        {
+          "text": "List all ledger namespaces",
+          "resolves_to": "list-and-read-ledger-entries"
+        },
+        {
+          "text": "Show me recent audit log entries",
+          "resolves_to": "list-and-read-ledger-entries"
+        },
+        {
+          "text": "Append an immutable record to the ledger",
+          "resolves_to": "append-and-confirm-entry"
+        },
+        {
+          "text": "Record an event in the audit trail",
+          "resolves_to": "append-and-confirm-entry"
+        },
+        {
+          "text": "Page through ledger history",
+          "resolves_to": "paginate-ledger-history"
+        },
+        {
+          "text": "Log task completion to the audit ledger",
+          "resolves_to": "task-completion-audit-trail"
+        },
+        {
+          "text": "Generate an audit report from ledger entries",
+          "resolves_to": "ledger-to-notion-report"
+        }
+      ]
     }
   }
 }

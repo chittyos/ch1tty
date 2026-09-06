@@ -42,6 +42,12 @@
       "categories": ["ecosystem"],
       "servers": ["tasks"],
       "boost": 0.6
+    },
+    "ledger": {
+      "description": "Append-only audit ledger — list namespaces, read entries, and append immutable records via ChittyLedger (apps/ledger-mcp)",
+      "categories": ["ecosystem"],
+      "servers": ["ledger"],
+      "boost": 0.6
     }
   }
 }

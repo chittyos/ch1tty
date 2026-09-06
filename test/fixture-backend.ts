@@ -845,4 +845,81 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
       },
     ],
   },
+
+  ledger: {
+    tools: [
+      {
+        name: 'list_namespaces',
+        description: 'List all available ledger namespaces with entry counts and timestamps',
+        inputSchema: {
+          type: 'object',
+          properties: {},
+        },
+        response: text(JSON.stringify([
+          { name: 'events', entry_count: 42, created_at: '2026-01-01T00:00:00Z', last_entry_at: '2026-09-01T10:00:00Z' },
+          { name: 'audit', entry_count: 7, created_at: '2026-02-01T00:00:00Z', last_entry_at: '2026-08-30T09:00:00Z' },
+        ])),
+      },
+      {
+        name: 'list_entries',
+        description: 'List entries in a ledger namespace with optional cursor pagination and time-range filtering',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            namespace: { type: 'string' },
+            cursor: { type: 'string' },
+            limit: { type: 'number' },
+            since: { type: 'string' },
+          },
+          required: ['namespace'],
+        },
+        response: text(JSON.stringify({
+          entries: [
+            { id: 'e1', namespace: 'events', payload: { type: 'deploy', service: 'ch1tty' }, sequence: 1, created_at: '2026-09-01T10:00:00Z' },
+            { id: 'e2', namespace: 'events', payload: { type: 'config.reload', service: 'ch1tty' }, sequence: 2, created_at: '2026-09-01T10:05:00Z' },
+          ],
+          has_more: false,
+        })),
+      },
+      {
+        name: 'get_entry',
+        description: 'Get a single ledger entry by namespace and entry ID',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            namespace: { type: 'string' },
+            id: { type: 'string' },
+          },
+          required: ['namespace', 'id'],
+        },
+        response: text(JSON.stringify({
+          id: 'e-new',
+          namespace: 'events',
+          payload: { type: 'deploy', service: 'ch1tty' },
+          sequence: 1,
+          created_at: '2026-09-01T10:00:00Z',
+        })),
+      },
+      {
+        name: 'append_entry',
+        description: 'Append a new immutable entry to a ledger namespace',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            namespace: { type: 'string' },
+            payload: { type: 'object', additionalProperties: true },
+            metadata: { type: 'object', additionalProperties: true },
+          },
+          required: ['namespace', 'payload'],
+        },
+        response: text(JSON.stringify({
+          id: 'e-new',
+          namespace: 'events',
+          payload: { type: 'audit.record' },
+          sequence: 43,
+          created_at: '2026-09-05T12:00:00Z',
+        })),
+      },
+    ],
+  },
 };
