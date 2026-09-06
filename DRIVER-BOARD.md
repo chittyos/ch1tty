@@ -3372,6 +3372,26 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
 - **Next run**: Idle (all done, PR #1156 watching). Next escalation #133 at run ~1498 (8 runs away).
 
 ---
+### 2026-09-06T02:35Z (PR merge event — workstream H done)
+- **Event**: PR #1156 (auto/h-ledger-mcp-focus) **merged** at 2026-09-06T02:35Z.
+- **Workstream**: H ✓ — ledger focus profile, focus-suggestions.json entry, 10 ledger scenario tests now on main.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests** (main post-merge): 1461 pass / 0 fail / 3 skip (1464 total, 51 suites, ~42s)
+- **Actions**:
+  - `git pull origin main` (fast-forward to merged head). `npm run build` clean. `npm test`: 1461/0/3. 0 failures.
+  - Workstream H marked done.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H ✓ tasks-mcp ✓ ALL DONE. Build: clean. Tests: 1461/0/3. 1 open PR (#1155 dependabot).
+- **Human-action items** (updated):
+  1. **Merge PR #1155** (dependabot) — qs + fast-uri security bumps in apps/ and workers/ subdirectories.
+  2. **Disable or redirect hourly schedule** — 1490+ consecutive runs; all workstreams exhausted; schedule burns compute hourly.
+  3. **Deploy Workstream F phases** (Cloudflare): Create `Ch1ttyApiAgent` DO class + drain `Ch1ttyDO` instances.
+  4. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  5. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  6. **Set `CHITTY_TASKS_TOKEN` on prod** — new requirement from tasks-mcp wire.
+  7. **Stale branch cleanup** — 1000+ remote `auto/` branches.
+  8. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
+- **PushNotification**: SENT — PR #1156 merged; workstream H done; tests 1461/0/3.
+
+---
 ## Run log — 2026-09-06 ~01:00 UTC (automated, scheduled)
 - **Build**: ✅ tsc clean — ch1tty@4.1.0, 0 errors
 - **Tests**: ✅ 1451 pass / 0 fail / 3 skip (1454 total, 51 suites)
