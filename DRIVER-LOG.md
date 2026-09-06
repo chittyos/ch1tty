@@ -4224,4 +4224,4 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 - Note: PR #1153 (f-tasks-mcp-wire) not in open PRs — must have been merged or closed since run ~1478.
 - Blockers (unchanged): (1) GITHUB_MCP_AUTHORIZATION unset on prod; (2) CF Access creds unset → ledger DLQ backlog; (3) 1000+ stale auto/* branches; (4) No G+ workstreams defined.
 - PushNotification: SENT — escalation #131 (3 days since last log entry, all workstreams exhausted).
-- Next: Human should define new workstreams, merge Dependabot #1155, or disable the cron schedule.
+- Next: Human should (1) set GITHUB_MCP_AUTHORIZATION on prod, (2) configure CF Access creds (CHITTY_CF_ACCESS_CLIENT_ID/SECRET) to clear ledger DLQ, (3) clean up stale auto/* branches, (4) merge or dismiss Dependabot #1155, (5) define new workstreams in DRIVER-LOG.md, or (6) disable the cron schedule.
