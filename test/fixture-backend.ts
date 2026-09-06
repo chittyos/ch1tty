@@ -1111,6 +1111,110 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
     ],
   },
 
+  turbotenant: {
+    tools: [
+      {
+        name: 'list_properties',
+        description: 'List all managed rental properties in TurboTenant account',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            limit: { type: 'number' },
+            status: { type: 'string', enum: ['active', 'inactive', 'all'] },
+          },
+        },
+        response: text(JSON.stringify({
+          properties: [
+            { id: 'prop-001', address: '123 Main St, Chicago, IL 60601', units: 4, status: 'active', monthly_rent: 1400 },
+            { id: 'prop-002', address: '456 Oak Ave, Chicago, IL 60614', units: 1, status: 'active', monthly_rent: 1850 },
+          ],
+          total: 2,
+        })),
+      },
+      {
+        name: 'get_property',
+        description: 'Get details for a specific rental property by ID',
+        inputSchema: {
+          type: 'object',
+          properties: { property_id: { type: 'string' } },
+          required: ['property_id'],
+        },
+        response: text(JSON.stringify({
+          id: 'prop-001',
+          address: '123 Main St, Chicago, IL 60601',
+          units: 4,
+          status: 'active',
+          monthly_rent: 1400,
+          owner: 'nick@nevershitty.com',
+          created_at: '2025-01-15T00:00:00Z',
+        })),
+      },
+      {
+        name: 'list_tenants',
+        description: 'List tenants for a specific property with lease and contact details',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            property_id: { type: 'string' },
+            status: { type: 'string', enum: ['active', 'past', 'all'] },
+          },
+          required: ['property_id'],
+        },
+        response: text(JSON.stringify({
+          tenants: [
+            { id: 'ten-101', name: 'Alice Johnson', unit: '1A', lease_end: '2027-01-31', rent_status: 'current', email: 'alice@example.com' },
+            { id: 'ten-102', name: 'Bob Martinez', unit: '1B', lease_end: '2026-12-31', rent_status: 'current', email: 'bob@example.com' },
+          ],
+          total: 2,
+        })),
+      },
+      {
+        name: 'list_maintenance_requests',
+        description: 'List open and recent maintenance requests across managed properties',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            property_id: { type: 'string' },
+            status: { type: 'string', enum: ['open', 'in_progress', 'resolved', 'all'] },
+            limit: { type: 'number' },
+          },
+        },
+        response: text(JSON.stringify({
+          requests: [
+            { id: 'mr-201', property_id: 'prop-001', unit: '1A', category: 'plumbing', description: 'Leaking faucet in kitchen', status: 'open', priority: 'medium', reported_at: '2026-09-01T08:00:00Z' },
+            { id: 'mr-202', property_id: 'prop-001', unit: '1B', category: 'hvac', description: 'AC not cooling', status: 'in_progress', priority: 'high', reported_at: '2026-09-03T14:00:00Z' },
+          ],
+          total: 2,
+        })),
+      },
+      {
+        name: 'create_maintenance_request',
+        description: 'Create a new maintenance request for a rental property unit',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            property_id: { type: 'string' },
+            unit: { type: 'string' },
+            category: { type: 'string' },
+            description: { type: 'string' },
+            priority: { type: 'string', enum: ['low', 'medium', 'high', 'emergency'] },
+          },
+          required: ['property_id', 'unit', 'description'],
+        },
+        response: text(JSON.stringify({
+          id: 'mr-new',
+          property_id: 'prop-001',
+          unit: '2A',
+          category: 'electrical',
+          description: 'Outlet not working',
+          status: 'open',
+          priority: 'medium',
+          created_at: '2026-09-06T12:00:00Z',
+        })),
+      },
+    ],
+  },
+
   ledger: {
     tools: [
       {
