@@ -908,6 +908,105 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
     ],
   },
 
+  chittyevidence: {
+    tools: [
+      {
+        name: 'ingest_document',
+        description: 'Submit a document for indexing in ChittyEvidence. Returns the document record with its assigned canonical URI.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            content: { type: 'string' },
+            kind: { type: 'string' },
+            title: { type: 'string' },
+            tags: { type: 'array', items: { type: 'string' } },
+            metadata: { type: 'object', additionalProperties: true },
+          },
+          required: ['content', 'kind'],
+        },
+        response: text(JSON.stringify({
+          id: 'doc-1',
+          canonical_uri: 'chittycanon://evidence/doc-1',
+          kind: 'note',
+          title: 'Test Document',
+          content: 'Sample content',
+          tags: ['test'],
+          metadata: {},
+          created_at: '2026-09-05T00:00:00Z',
+        })),
+      },
+      {
+        name: 'list_documents',
+        description: 'List ingested documents with optional filtering by kind, tag, or creation time.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            kind: { type: 'string' },
+            tag: { type: 'string' },
+            since: { type: 'string' },
+            cursor: { type: 'string' },
+            limit: { type: 'number' },
+          },
+        },
+        response: text(JSON.stringify({
+          documents: [
+            { id: 'doc-1', canonical_uri: 'chittycanon://evidence/doc-1', kind: 'note', title: 'Architecture Decision', tags: ['architecture'], created_at: '2026-09-01T00:00:00Z' },
+            { id: 'doc-2', canonical_uri: 'chittycanon://evidence/doc-2', kind: 'report', title: 'Q3 Evidence Report', tags: ['report', 'q3'], created_at: '2026-09-02T00:00:00Z' },
+          ],
+          has_more: false,
+        })),
+      },
+      {
+        name: 'get_document',
+        description: 'Get a single document by its ID, including content, canonical URI, and metadata.',
+        inputSchema: {
+          type: 'object',
+          properties: { id: { type: 'string' } },
+          required: ['id'],
+        },
+        response: text(JSON.stringify({
+          id: 'doc-1',
+          canonical_uri: 'chittycanon://evidence/doc-1',
+          kind: 'note',
+          title: 'Architecture Decision',
+          content: 'We decided to use the slim-MCP pattern for all gateway surfaces.',
+          tags: ['architecture'],
+          metadata: { author: 'nick@nevershitty.com' },
+          created_at: '2026-09-01T00:00:00Z',
+        })),
+      },
+      {
+        name: 'search_documents',
+        description: 'Search the evidence corpus by keyword or phrase. Returns ranked matches.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: { type: 'string' },
+            kind: { type: 'string' },
+            limit: { type: 'number' },
+          },
+          required: ['query'],
+        },
+        response: text(JSON.stringify({
+          documents: [
+            { id: 'doc-1', canonical_uri: 'chittycanon://evidence/doc-1', kind: 'note', title: 'Architecture Decision', tags: ['architecture'], created_at: '2026-09-01T00:00:00Z' },
+          ],
+          total: 1,
+        })),
+      },
+      {
+        name: 'get_canonical_uri',
+        description: 'Resolve a document ID to its canonical URI (chittycanon:// scheme).',
+        inputSchema: {
+          type: 'object',
+          properties: { id: { type: 'string' } },
+          required: ['id'],
+        },
+        response: text(JSON.stringify({ id: 'doc-1', canonical_uri: 'chittycanon://evidence/doc-1' })),
+      },
+    ],
+  },
+
   chittymac: {
     tools: [
       {

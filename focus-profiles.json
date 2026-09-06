@@ -3,56 +3,135 @@
   "profiles": {
     "finance": {
       "description": "Billing, payments, ledger, and financial ecosystem tools",
-      "categories": ["ecosystem"],
-      "servers": ["stripe", "tasks", "ledger"],
+      "categories": [
+        "ecosystem"
+      ],
+      "servers": [
+        "stripe",
+        "tasks",
+        "ledger"
+      ],
       "boost": 0.5
     },
     "governance": {
       "description": "ChittyOS ecosystem governance, identity, evidence, persistent state, sessions, and ledger",
-      "categories": ["ecosystem", "documents"],
-      "servers": ["chittyos", "neon", "notion", "evidence", "chittyevidence", "orchestrator", "session", "ledger", "tasks", "linear"],
+      "categories": [
+        "ecosystem",
+        "documents"
+      ],
+      "servers": [
+        "chittyos",
+        "neon",
+        "notion",
+        "evidence",
+        "chittyevidence",
+        "orchestrator",
+        "session",
+        "ledger",
+        "tasks",
+        "linear"
+      ],
       "boost": 0.5
     },
     "design": {
       "description": "Browser rendering, automation, and desktop/visual work",
-      "categories": ["desktop"],
-      "servers": ["browser-rendering", "playwright", "cowork"],
+      "categories": [
+        "desktop"
+      ],
+      "servers": [
+        "browser-rendering",
+        "playwright",
+        "cowork"
+      ],
       "boost": 0.5
     },
     "code": {
       "description": "Software development — source control, issue tracking, deployment, library documentation, database, code quality, and technical documentation tools",
-      "categories": ["code"],
-      "servers": ["cloudflare", "context7", "neon", "fs", "quality", "serena", "notion", "linear"],
+      "categories": [
+        "code"
+      ],
+      "servers": [
+        "cloudflare",
+        "context7",
+        "neon",
+        "fs",
+        "quality",
+        "serena",
+        "notion",
+        "linear"
+      ],
       "boost": 0.5
     },
     "communication": {
       "description": "Cross-channel messaging, notes, team communication, and follow-up task creation",
-      "categories": ["communication"],
-      "servers": ["notion", "chittymac", "imessage", "tasks", "comms", "bluebubbles"],
+      "categories": [
+        "communication"
+      ],
+      "servers": [
+        "notion",
+        "chittymac",
+        "imessage",
+        "tasks",
+        "comms",
+        "bluebubbles"
+      ],
       "boost": 0.5
     },
     "ops": {
       "description": "Deployment, infrastructure monitoring, and DevOps tooling — Cloudflare Workers, database ops, source control, filesystem, and orchestration",
-      "categories": ["ecosystem", "code"],
-      "servers": ["cloudflare", "cloudflare-builds", "neon", "github", "orchestrator", "fs", "quality"],
+      "categories": [
+        "ecosystem",
+        "code"
+      ],
+      "servers": [
+        "cloudflare",
+        "cloudflare-builds",
+        "neon",
+        "github",
+        "orchestrator",
+        "fs",
+        "quality"
+      ],
       "boost": 0.5
     },
     "tasks": {
       "description": "Task management — create, update, list, and complete ChittyAgent Tasks",
-      "categories": ["ecosystem"],
-      "servers": ["tasks"],
+      "categories": [
+        "ecosystem"
+      ],
+      "servers": [
+        "tasks"
+      ],
       "boost": 0.6
     },
     "ledger": {
       "description": "Append-only audit ledger — list namespaces, read entries, and append immutable records via ChittyLedger (apps/ledger-mcp)",
-      "categories": ["ecosystem"],
-      "servers": ["ledger"],
+      "categories": [
+        "ecosystem"
+      ],
+      "servers": [
+        "ledger"
+      ],
       "boost": 0.6
     },
     "session": {
       "description": "Cross-channel session management — create, inspect, and close ChittyOS sessions; append and replay session event logs",
-      "categories": ["ecosystem"],
-      "servers": ["session"],
+      "categories": [
+        "ecosystem"
+      ],
+      "servers": [
+        "session"
+      ],
+      "boost": 0.6
+    },
+    "chittyevidence": {
+      "description": "Evidence corpus — ingest, search, and retrieve documents with canonical URIs via ChittyEvidence (apps/evidence-mcp)",
+      "categories": [
+        "ecosystem"
+      ],
+      "servers": [
+        "chittyevidence"
+      ],
       "boost": 0.6
     }
   }
