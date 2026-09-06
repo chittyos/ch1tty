@@ -423,7 +423,11 @@ test('readResource: ch1tty:// with unknown path throws', async () => {
 
 test('readResource: ch1tty:// does not dispatch to backend even when a ch1tty-named server exists', async () => {
   // Confirms that the ch1tty:// prefix is intercepted before backend lookup.
-  const agg = new Aggregator([], {
+  // A server with id "ch1tty" is registered; its readResource returns text/plain.
+  // The local suggestions handler must win, returning application/json.
+  const fixture = new ResourceFixture([{ uri: 'suggestions/catalog', name: 'Backend catalog' }]);
+  const agg = new Aggregator([cfg('ch1tty', 'Conflicting backend')], {
+    backendFactory: () => fixture,
     embedEnabled: false,
     suggestionsCatalog: minimalCatalog,
   });

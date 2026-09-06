@@ -37,6 +37,25 @@ const SEPARATOR = '/';
 const META_SERVER_ID = 'ch1tty';
 const META_TOOL_VERBS: ReadonlySet<string> = new Set(['search', 'execute', 'status', 'reload', 'cast']);
 
+/**
+ * Strip invalid profile keys from a suggestions catalog before storing it.
+ * Rejected: the reserved name "catalog" (would duplicate the index URI) and
+ * any key containing "/" (can't match the single-segment read path).
+ */
+function filterSuggestionsCatalog(
+  catalog: Record<string, FocusSuggestions>,
+): Record<string, FocusSuggestions> {
+  const out: Record<string, FocusSuggestions> = {};
+  for (const key of Object.keys(catalog)) {
+    if (key === 'catalog' || key.includes('/')) {
+      log.warn(`suggestions catalog: ignoring invalid profile name "${key}" (reserved or contains "/")`);
+      continue;
+    }
+    out[key] = catalog[key];
+  }
+  return out;
+}
+
 interface NamespacedTool {
   serverId: string;
   serverName: string;
@@ -124,11 +143,11 @@ export class Aggregator {
     this.focusProfiles = options?.focusProfiles
       ?? loadFocusProfilesFromPath(options?.focusProfilesPath ?? resolveFocusProfilesPath());
     if (options?.suggestionsCatalog !== undefined) {
-      this.suggestionsCatalog = options.suggestionsCatalog;
+      this.suggestionsCatalog = filterSuggestionsCatalog(options.suggestionsCatalog);
       // No disk path — reload will preserve the injected catalog.
     } else {
       this.suggestionsCatalogPath = options?.suggestionsCatalogPath ?? resolveSuggestionsCatalogPath();
-      this.suggestionsCatalog = loadSuggestionsCatalog(this.suggestionsCatalogPath);
+      this.suggestionsCatalog = filterSuggestionsCatalog(loadSuggestionsCatalog(this.suggestionsCatalogPath));
     }
     this.configs = configs;
     const embedConfig = options?.embedEnabled === false ? { enabled: false } : {};
@@ -1744,7 +1763,9 @@ export class Aggregator {
     const profileMatch = path.match(/^suggestions\/([^/]+)$/);
     if (profileMatch) {
       const profileName = profileMatch[1];
-      const entry = this.suggestionsCatalog[profileName];
+      const entry = Object.prototype.hasOwnProperty.call(this.suggestionsCatalog, profileName)
+        ? this.suggestionsCatalog[profileName]
+        : undefined;
       if (!entry) {
         throw new Error(`No suggestions profile "${profileName}" in catalog`);
       }
