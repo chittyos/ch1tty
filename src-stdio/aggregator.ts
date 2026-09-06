@@ -37,6 +37,25 @@ const SEPARATOR = '/';
 const META_SERVER_ID = 'ch1tty';
 const META_TOOL_VERBS: ReadonlySet<string> = new Set(['search', 'execute', 'status', 'reload', 'cast']);
 
+/**
+ * Strip invalid profile keys from a suggestions catalog before storing it.
+ * Rejected: the reserved name "catalog" (would duplicate the index URI) and
+ * any key containing "/" (can't match the single-segment read path).
+ */
+function filterSuggestionsCatalog(
+  catalog: Record<string, FocusSuggestions>,
+): Record<string, FocusSuggestions> {
+  const out: Record<string, FocusSuggestions> = {};
+  for (const key of Object.keys(catalog)) {
+    if (key === 'catalog' || key.includes('/')) {
+      log.warn(`suggestions catalog: ignoring invalid profile name "${key}" (reserved or contains "/")`);
+      continue;
+    }
+    out[key] = catalog[key];
+  }
+  return out;
+}
+
 interface NamespacedTool {
   serverId: string;
   serverName: string;
@@ -124,11 +143,11 @@ export class Aggregator {
     this.focusProfiles = options?.focusProfiles
       ?? loadFocusProfilesFromPath(options?.focusProfilesPath ?? resolveFocusProfilesPath());
     if (options?.suggestionsCatalog !== undefined) {
-      this.suggestionsCatalog = options.suggestionsCatalog;
+      this.suggestionsCatalog = filterSuggestionsCatalog(options.suggestionsCatalog);
       // No disk path — reload will preserve the injected catalog.
     } else {
       this.suggestionsCatalogPath = options?.suggestionsCatalogPath ?? resolveSuggestionsCatalogPath();
-      this.suggestionsCatalog = loadSuggestionsCatalog(this.suggestionsCatalogPath);
+      this.suggestionsCatalog = filterSuggestionsCatalog(loadSuggestionsCatalog(this.suggestionsCatalogPath));
     }
     this.configs = configs;
     const embedConfig = options?.embedEnabled === false ? { enabled: false } : {};
@@ -1699,6 +1718,67 @@ export class Aggregator {
 
   // ── Resources (passthrough — low cardinality, fine to expose) ─
 
+  /** First-party ch1tty suggestion resources — one per loaded profile + one catalog index. */
+  private listSuggestionResources(): Array<{ uri: string; name: string; description: string; mimeType: string }> {
+    const profiles = Object.entries(this.suggestionsCatalog);
+    if (profiles.length === 0) return [];
+
+    const profileResources = profiles.map(([name, entry]) => ({
+      uri: `ch1tty://suggestions/${name}`,
+      name: `[ch1tty] Suggestions: ${name}`,
+      description: `Focus-profile suggestions for "${name}" — ${entry.combos.length} combos, ${entry.prompts.length} prompts. ${entry.description}`,
+      mimeType: 'application/json',
+    }));
+
+    const totalCombos = profiles.reduce((n, [, e]) => n + e.combos.length, 0);
+    const totalPrompts = profiles.reduce((n, [, e]) => n + e.prompts.length, 0);
+    const indexResource = {
+      uri: 'ch1tty://suggestions/catalog',
+      name: '[ch1tty] Suggestions catalog index',
+      description: `Index of all focus-profile suggestions: ${profiles.length} profiles, ${totalCombos} combos, ${totalPrompts} prompts.`,
+      mimeType: 'application/json',
+    };
+
+    return [indexResource, ...profileResources];
+  }
+
+  private readSuggestionResource(path: string): { uri: string; mimeType: string; text: string } {
+    if (path === 'suggestions/catalog') {
+      const profiles = Object.entries(this.suggestionsCatalog);
+      const index = {
+        profiles: Object.fromEntries(
+          profiles.map(([name, entry]) => [
+            name,
+            {
+              description: entry.description,
+              combos: entry.combos.length,
+              prompts: entry.prompts.length,
+            },
+          ]),
+        ),
+      };
+      return { uri: `ch1tty://${path}`, mimeType: 'application/json', text: JSON.stringify(index, null, 2) };
+    }
+
+    const profileMatch = path.match(/^suggestions\/([^/]+)$/);
+    if (profileMatch) {
+      const profileName = profileMatch[1];
+      const entry = Object.prototype.hasOwnProperty.call(this.suggestionsCatalog, profileName)
+        ? this.suggestionsCatalog[profileName]
+        : undefined;
+      if (!entry) {
+        throw new Error(`No suggestions profile "${profileName}" in catalog`);
+      }
+      return {
+        uri: `ch1tty://${path}`,
+        mimeType: 'application/json',
+        text: JSON.stringify(entry, null, 2),
+      };
+    }
+
+    throw new Error(`Unknown ch1tty resource path: ${path}`);
+  }
+
   async listAllResources(): Promise<{
     resources: Array<{ uri: string; name: string; description?: string; mimeType?: string }>;
   }> {
@@ -1721,9 +1801,9 @@ export class Aggregator {
     });
 
     const results = await Promise.allSettled(resourcePromises);
+    const backendResources = results.flatMap((r) => r.status === 'fulfilled' ? r.value : []);
     return {
-      /* c8 ignore next -- each resourcePromise has its own try/catch, so rejected never occurs */
-      resources: results.flatMap((r) => r.status === 'fulfilled' ? r.value : []),
+      resources: [...this.listSuggestionResources(), ...backendResources],
     };
   }
 
@@ -1763,13 +1843,19 @@ export class Aggregator {
       throw new Error(`Invalid namespaced resource URI: ${uri}`);
     }
 
-    const [, serverId, originalUri] = match;
+    const [, serverId, path] = match;
+
+    // First-party ch1tty resources — served locally, not dispatched to a backend.
+    if (serverId === 'ch1tty') {
+      return { contents: [this.readSuggestionResource(path)] };
+    }
+
     const backend = this.backendFor(serverId);
     if (!backend) {
       throw new Error(`Unknown server "${serverId}" in resource URI: ${uri}`);
     }
 
-    return backend.readResource(serverId, originalUri);
+    return backend.readResource(serverId, path);
   }
 
   // ── Prompts (passthrough — low cardinality) ─────────────────

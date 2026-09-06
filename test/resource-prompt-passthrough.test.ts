@@ -80,6 +80,7 @@ test('listAllResources: URI prefixed with serverId:// and name with [ServerName]
   const agg = new Aggregator([cfg('notion', 'Notion')], {
     backendFactory: () => fixture,
     embedEnabled: false,
+    suggestionsCatalog: {},
   });
   try {
     const { resources } = await agg.listAllResources();
@@ -97,7 +98,7 @@ test('listAllResources: multiple servers are aggregated, each prefixed with its 
   const fixture = new ResourceFixture([{ uri: 'data', name: 'Data' }]);
   const agg = new Aggregator(
     [cfg('svrA', 'Server A'), cfg('svrB', 'Server B')],
-    { backendFactory: () => fixture, embedEnabled: false },
+    { backendFactory: () => fixture, embedEnabled: false, suggestionsCatalog: {} },
   );
   try {
     const { resources } = await agg.listAllResources();
@@ -130,7 +131,7 @@ test('listAllResources: per-backend error is swallowed; remaining servers still 
   };
   const agg = new Aggregator(
     [cfg('failing', 'Failing'), cfg('good', 'Good')],
-    { backendFactory: flakyFactory, embedEnabled: false },
+    { backendFactory: flakyFactory, embedEnabled: false, suggestionsCatalog: {} },
   );
   try {
     const { resources } = await agg.listAllResources();
@@ -292,6 +293,147 @@ test('getPrompt: throws when serverId from name is not a registered server', asy
       () => agg.getPrompt('unknown/prompt'),
       /Unknown server/,
     );
+  } finally {
+    await agg.shutdown();
+  }
+});
+
+// ── First-party ch1tty suggestion resources ──────────────────────────────────
+
+const minimalCatalog = {
+  finance: {
+    description: 'Finance tools',
+    combos: [{ name: 'invoice-tracker', chain: ['stripe/list_invoices', 'notion/API-post-page'], accomplishes: 'Track invoices', verified: false }],
+    prompts: [{ text: 'List unpaid invoices', resolves_to: 'stripe/list_invoices' }],
+  },
+  code: {
+    description: 'Code tools',
+    combos: [{ name: 'pr-review', chain: ['github/list_pull_requests'], accomplishes: 'Review PRs', verified: true }],
+    prompts: [{ text: 'Show open PRs', resolves_to: 'github/list_pull_requests' }],
+  },
+};
+
+test('listAllResources: suggestion resources appear before backend resources when catalog loaded', async () => {
+  const fixture = new ResourceFixture([{ uri: 'docs', name: 'Docs' }]);
+  const agg = new Aggregator([cfg('notion', 'Notion')], {
+    backendFactory: () => fixture,
+    embedEnabled: false,
+    suggestionsCatalog: minimalCatalog,
+  });
+  try {
+    const { resources } = await agg.listAllResources();
+    // 1 catalog index + 2 profiles + 1 backend = 4 total
+    assert.equal(resources.length, 4);
+    assert.equal(resources[0].uri, 'ch1tty://suggestions/catalog');
+    assert.equal(resources[0].mimeType, 'application/json');
+    assert.match(resources[1].uri, /^ch1tty:\/\/suggestions\//);
+    assert.match(resources[2].uri, /^ch1tty:\/\/suggestions\//);
+    assert.equal(resources[3].uri, 'notion://docs');
+  } finally {
+    await agg.shutdown();
+  }
+});
+
+test('listAllResources: no suggestion resources when catalog is empty', async () => {
+  const fixture = new ResourceFixture([{ uri: 'x', name: 'X' }]);
+  const agg = new Aggregator([cfg('svc', 'Service')], {
+    backendFactory: () => fixture,
+    embedEnabled: false,
+    suggestionsCatalog: {},
+  });
+  try {
+    const { resources } = await agg.listAllResources();
+    assert.equal(resources.length, 1);
+    assert.equal(resources[0].uri, 'svc://x');
+  } finally {
+    await agg.shutdown();
+  }
+});
+
+test('readResource: ch1tty://suggestions/catalog returns index JSON', async () => {
+  const agg = new Aggregator([], {
+    embedEnabled: false,
+    suggestionsCatalog: minimalCatalog,
+  });
+  try {
+    const result = await agg.readResource('ch1tty://suggestions/catalog');
+    assert.equal(result.contents.length, 1);
+    const content = result.contents[0];
+    assert.equal(content.uri, 'ch1tty://suggestions/catalog');
+    assert.equal(content.mimeType, 'application/json');
+    const parsed = JSON.parse(content.text ?? '');
+    assert.ok('profiles' in parsed);
+    assert.ok('finance' in parsed.profiles);
+    assert.ok('code' in parsed.profiles);
+    assert.equal(parsed.profiles.finance.combos, 1);
+    assert.equal(parsed.profiles.code.prompts, 1);
+  } finally {
+    await agg.shutdown();
+  }
+});
+
+test('readResource: ch1tty://suggestions/{profile} returns full profile JSON', async () => {
+  const agg = new Aggregator([], {
+    embedEnabled: false,
+    suggestionsCatalog: minimalCatalog,
+  });
+  try {
+    const result = await agg.readResource('ch1tty://suggestions/finance');
+    assert.equal(result.contents.length, 1);
+    const content = result.contents[0];
+    assert.equal(content.mimeType, 'application/json');
+    const parsed = JSON.parse(content.text ?? '');
+    assert.ok('combos' in parsed && Array.isArray(parsed.combos));
+    assert.equal(parsed.combos[0].name, 'invoice-tracker');
+    assert.ok('prompts' in parsed && Array.isArray(parsed.prompts));
+  } finally {
+    await agg.shutdown();
+  }
+});
+
+test('readResource: ch1tty://suggestions/{unknown} throws on missing profile', async () => {
+  const agg = new Aggregator([], {
+    embedEnabled: false,
+    suggestionsCatalog: minimalCatalog,
+  });
+  try {
+    await assert.rejects(
+      () => agg.readResource('ch1tty://suggestions/nonexistent'),
+      /No suggestions profile "nonexistent"/,
+    );
+  } finally {
+    await agg.shutdown();
+  }
+});
+
+test('readResource: ch1tty:// with unknown path throws', async () => {
+  const agg = new Aggregator([], {
+    embedEnabled: false,
+    suggestionsCatalog: minimalCatalog,
+  });
+  try {
+    await assert.rejects(
+      () => agg.readResource('ch1tty://unknown/path/here'),
+      /Unknown ch1tty resource path/,
+    );
+  } finally {
+    await agg.shutdown();
+  }
+});
+
+test('readResource: ch1tty:// does not dispatch to backend even when a ch1tty-named server exists', async () => {
+  // Confirms that the ch1tty:// prefix is intercepted before backend lookup.
+  // A server with id "ch1tty" is registered; its readResource returns text/plain.
+  // The local suggestions handler must win, returning application/json.
+  const fixture = new ResourceFixture([{ uri: 'suggestions/catalog', name: 'Backend catalog' }]);
+  const agg = new Aggregator([cfg('ch1tty', 'Conflicting backend')], {
+    backendFactory: () => fixture,
+    embedEnabled: false,
+    suggestionsCatalog: minimalCatalog,
+  });
+  try {
+    const result = await agg.readResource('ch1tty://suggestions/catalog');
+    assert.equal(result.contents[0].mimeType, 'application/json');
   } finally {
     await agg.shutdown();
   }

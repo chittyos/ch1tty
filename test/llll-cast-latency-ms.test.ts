@@ -182,7 +182,7 @@ test('LLLL-5: cast:no_match includes latencyMs ≥ 0', async () => {
   };
   const agg = new Aggregator(
     [{ id: 'empty', name: 'Empty', type: 'remote', access: 'read', category: 'reasoning', endpoint: 'https://e.test/mcp' }],
-    { backendFactory: () => emptyBackend, ledgerDlqPath: dlqPath('nomatch') },
+    { backendFactory: () => emptyBackend, ledgerDlqPath: dlqPath('nomatch'), suggestionsCatalog: {} },
   );
   try {
     const r = await agg.callTool('ch1tty/cast', { intent: 'this intent matches absolutely nothing at all' });
