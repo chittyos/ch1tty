@@ -30088,9 +30088,9 @@
             "auth/revoke_token",
             "auth/create_token"
           ],
-          "accomplishes": "List active tokens for an identity, revoke the oldest one, and issue a fresh replacement — a safe credential rotation workflow.",
+          "accomplishes": "List tokens for an identity, revoke a caller-selected one, and issue a fresh replacement — a credential rotation workflow.",
           "verified": false,
-          "notes": "auth backend not connected at generation time; tool names inferred from ChittyID auth surface. Caller must map args between steps: revoke_token requires token (from list_tokens result), create_token requires identity_id — auto-chain does not extract these automatically."
+          "notes": "auth backend not connected at generation time; tool names inferred from ChittyID auth surface. Caller must map args between steps: revoke_token requires token_id (selected from list_tokens result), create_token requires identity_id — auto-chain does not extract these automatically. Auto-chain does not select the oldest or expired token; caller must do so."
         },
         {
           "name": "identity-verification",
@@ -30119,9 +30119,9 @@
             "auth/list_tokens",
             "auth/revoke_token"
           ],
-          "accomplishes": "List all tokens for an identity and revoke any that are expired or near-expiry — a batch cleanup sweep.",
+          "accomplishes": "List tokens for an identity then revoke one caller-selected expired token — auto-chain calls each step once, not once per token.",
           "verified": false,
-          "notes": "auth backend not connected at generation time."
+          "notes": "auth backend not connected at generation time. Auto-chain calls revoke_token once; caller must select the expired token_id from the list_tokens result and pass it. Does not batch-revoke multiple tokens."
         }
       ],
       "prompts": [
