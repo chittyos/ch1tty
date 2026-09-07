@@ -3503,3 +3503,25 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   8. **Set `CHITTY_TASKS_TOKEN` on prod** — new requirement from tasks-mcp wire.
   9. **Stale branch cleanup** — 1100+ remote `auto/` branches.
   10. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
+
+---
+### 2026-09-07T~hourly (run ~1508 — ACTIVE: merged AB security focus, PR #1177)
+- **Workstream**: AB (security focus profile + 13 scenario tests) → **PR #1177 MERGED** ✓
+- **Branch**: `auto/ab-security-focus` rebased onto main, squash-merged as PR #1177
+- **Guardrails**: 5-tool surface confirmed. `buildCastExplanation` metric freeze ACTIVE. 0 violations.
+- **Actions**:
+  - Resumed mid-rebase of `auto/ab-security-focus` onto `origin/main` (conflict in `focus-suggestions.json` + `test/suggestions.test.ts`).
+  - Programmatic merge of `focus-suggestions.json`: added `security` profile from branch to main's 24 → 25 profiles.
+  - Fixed `test/suggestions.test.ts` conflict: count 24→25, sorted keys = ["analytics","auth","chittyevidence","cloud","code","communication","data","deploy","design","devops","documents","finance","google","governance","ledger","legal","market","monitoring","ops","realestate","search","security","session","tasks","workspace"].
+  - Rebase completed cleanly (2/2 commits).
+  - Build: clean (tsc). Tests: **1681 pass / 0 fail / 3 skipped**.
+  - Force-pushed branch, merged PR #1177 (squash).
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ M ✓ N ✓ O ✓ P ✓ Q-W ✓ X ✓ Y ✓ Z ✓ AA ✓ AB ✓. focus-profiles.json: 25 profiles. Tests: 1681/0/3.
+- **Human-action items** (unchanged from prior runs):
+  1. **Merge PR #1155** (dependabot) — qs + fast-uri security bumps.
+  2. **Deploy Workstream F phases** (Cloudflare): Create `Ch1ttyApiAgent` DO class + drain `Ch1ttyDO` instances.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  5. **Set `CHITTY_TASKS_TOKEN` on prod** — new requirement from tasks-mcp wire.
+  6. **Stale branch cleanup** — 1100+ remote `auto/` branches.
+  7. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
