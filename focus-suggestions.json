@@ -31024,6 +31024,56 @@
           "resolves_to": "deploy-pr-task"
         }
       ]
+    },
+    "workspace": {
+      "description": "Personal and team workspace productivity — notes, docs, calendar, messaging, and tasks across Notion, Google Workspace, and ChittyComms",
+      "combos": [
+        {
+          "name": "meeting-notes-to-notion",
+          "chain": ["google/list_events", "notion/create_page"],
+          "accomplishes": "Pull today's calendar events from Google and create a structured meeting-notes page in Notion for each — turning your schedule into a ready-to-fill notes workspace.",
+          "verified": false,
+          "notes": "google/list_events verified in fixture; notion/create_page verified."
+        },
+        {
+          "name": "drive-doc-to-notion-page",
+          "chain": ["google/list_files", "notion/create_page"],
+          "accomplishes": "List recent Google Drive documents and mirror each as a linked Notion page — bridging Drive and your Notion workspace for a unified document view.",
+          "verified": false,
+          "notes": "google fixture verified. notion fixture verified."
+        },
+        {
+          "name": "comms-thread-to-task",
+          "chain": ["comms/comms.recentLog", "tasks/create_task"],
+          "accomplishes": "Pull recent communications for a contact, then create a follow-up task from the thread — turning conversation context into an actionable work item.",
+          "verified": false,
+          "notes": "comms.recentLog fixture verified. tasks/create_task fixture verified."
+        },
+        {
+          "name": "email-and-document-followup",
+          "chain": ["google/send_email", "google/create_document"],
+          "accomplishes": "Send a follow-up email and simultaneously create a Google Doc to capture the discussion — keeping outreach and documentation in sync.",
+          "verified": false,
+          "notes": "Both google tools verified in fixture."
+        },
+        {
+          "name": "workspace-summary-to-notion",
+          "chain": ["google/list_events", "comms/comms.recentLog", "notion/create_page"],
+          "accomplishes": "Aggregate today's calendar events and recent comms log, then write a daily workspace summary page into Notion — a morning brief in one chain.",
+          "verified": false,
+          "notes": "Three-backend chain. All fixtures verified."
+        }
+      ],
+      "prompts": [
+        { "text": "Find my Notion pages about Q3 planning", "resolves_to": "notion-page-search" },
+        { "text": "List my upcoming Google Calendar events", "resolves_to": "google-calendar-events" },
+        { "text": "Create a Notion page for today's team meeting notes", "resolves_to": "meeting-notes-to-notion" },
+        { "text": "Search Google Drive for budget documents from last month", "resolves_to": "drive-doc-to-notion-page" },
+        { "text": "Send a follow-up email to alice@example.com about the project", "resolves_to": "email-and-document-followup" },
+        { "text": "Show recent communications from Nick", "resolves_to": "comms-thread-to-task" },
+        { "text": "Create a task to review the meeting notes", "resolves_to": "comms-thread-to-task" },
+        { "text": "Pull my calendar for this week and create a Notion planning page", "resolves_to": "workspace-summary-to-notion" }
+      ]
     }
   }
 }

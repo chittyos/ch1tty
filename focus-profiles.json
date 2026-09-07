@@ -277,6 +277,22 @@
         "tasks"
       ],
       "boost": 0.6
+    },
+    "workspace": {
+      "description": "Personal and team workspace productivity — notes, docs, calendar, messaging, and tasks across Notion, Google Workspace, and ChittyComms",
+      "categories": [
+        "documents",
+        "communication"
+      ],
+      "servers": [
+        "notion",
+        "google",
+        "comms",
+        "tasks",
+        "context7",
+        "notes"
+      ],
+      "boost": 0.5
     }
   }
 }
