@@ -1427,7 +1427,7 @@ export class Aggregator {
           } catch {
             // Not JSON — previousResult alone is sufficient
           }
-          stepArgs = { previousResult: previousStepOutput, ...extracted };
+          stepArgs = { previousResult: previousStepOutput, ...extracted, ...toolArgs };
         } else {
           stepArgs = {};
         }

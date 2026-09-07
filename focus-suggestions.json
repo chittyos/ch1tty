@@ -31008,7 +31008,7 @@
           "resolves_to": "build-then-check-deploy"
         },
         {
-          "text": "Why did my last Cloudflare build fail? Pull the build logs",
+          "text": "Pull build logs for a specific Cloudflare build run (supply a buildUUID) and correlate with its build details",
           "resolves_to": "build-logs-debug"
         },
         {

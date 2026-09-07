@@ -153,6 +153,17 @@ export const REMOTE_SERVERS: ServerConfig[] = [
     lazy: false,
     enabled: true,
   },
+  {
+    id: 'ship',
+    name: 'Ship (Deploy)',
+    type: 'remote',
+    access: 'readwrite',
+    category: 'ecosystem',
+    endpoint: 'https://ship.chitty.cc/mcp',
+    authTokenKey: 'chittymcp',
+    lazy: true,
+    enabled: true,
+  },
 ];
 
 /** Focus profiles — embedded verbatim from focus-profiles.json (profiles only). */
