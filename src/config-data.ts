@@ -158,22 +158,28 @@ export const REMOTE_SERVERS: ServerConfig[] = [
 /** Focus profiles — embedded verbatim from focus-profiles.json (profiles only). */
 export const FOCUS_PROFILES_RAW = {
   profiles: {
-    finance: {
-      description: 'Billing, payments, ledger, and financial ecosystem tools',
+    analytics: {
+      description: 'Data analytics — query metrics, aggregate events, and export reports via the analytics backend.',
+      categories: [] as string[],
+      servers: ['analytics'],
+      boost: 0.6,
+    },
+    auth: {
+      description: 'Identity and access management — verify tokens, issue credentials, manage sessions, and trace auth flows across ChittyID',
       categories: ['ecosystem'],
-      servers: ['stripe', 'tasks', 'ledger'],
-      boost: 0.5,
+      servers: ['auth', 'session', 'chittyos'],
+      boost: 0.6,
     },
-    governance: {
-      description: 'ChittyOS ecosystem governance, identity, evidence, persistent state, sessions, and ledger',
-      categories: ['ecosystem', 'documents'],
-      servers: ['chittyos', 'neon', 'notion', 'evidence', 'chittyevidence', 'orchestrator', 'session', 'ledger', 'tasks', 'linear'],
-      boost: 0.5,
+    chittyevidence: {
+      description: 'Evidence corpus — ingest, search, and retrieve documents with canonical URIs via ChittyEvidence (apps/evidence-mcp)',
+      categories: ['ecosystem'],
+      servers: ['chittyevidence'],
+      boost: 0.6,
     },
-    design: {
-      description: 'Browser rendering, automation, and desktop/visual work',
-      categories: ['desktop'],
-      servers: ['browser-rendering', 'playwright', 'cowork'],
+    cloud: {
+      description: 'Cloudflare platform — deploy, build, and manage Workers in production and staging environments',
+      categories: ['ecosystem'],
+      servers: ['cloudflare', 'cloudflare-builds', 'ship'],
       boost: 0.5,
     },
     code: {
@@ -188,11 +194,89 @@ export const FOCUS_PROFILES_RAW = {
       servers: ['notion', 'chittymac', 'imessage', 'tasks', 'comms', 'bluebubbles'],
       boost: 0.5,
     },
+    data: {
+      description: 'Database, storage, and filesystem tooling — Neon SQL queries, schema inspection, R2 object storage, and local filesystem operations',
+      categories: ['ecosystem'],
+      servers: ['neon', 'storage', 'fs'],
+      boost: 0.6,
+    },
+    design: {
+      description: 'Browser rendering, automation, and desktop/visual work',
+      categories: ['desktop'],
+      servers: ['browser-rendering', 'playwright', 'cowork'],
+      boost: 0.5,
+    },
+    finance: {
+      description: 'Billing, payments, ledger, and financial ecosystem tools',
+      categories: ['ecosystem'],
+      servers: ['stripe', 'tasks', 'ledger'],
+      boost: 0.5,
+    },
+    google: {
+      description: 'Google Workspace productivity and administration — Gmail, Google Calendar, Drive, Docs, and org-wide user/group management via Google Admin (GAM)',
+      categories: ['ecosystem', 'documents'],
+      servers: ['google', 'gam', 'notion', 'tasks'],
+      boost: 0.6,
+    },
+    governance: {
+      description: 'ChittyOS ecosystem governance, identity, evidence, persistent state, sessions, and ledger',
+      categories: ['ecosystem', 'documents'],
+      servers: ['chittyos', 'neon', 'notion', 'evidence', 'chittyevidence', 'orchestrator', 'session', 'ledger', 'tasks', 'linear'],
+      boost: 0.5,
+    },
+    ledger: {
+      description: 'Append-only audit ledger — list namespaces, read entries, and append immutable records via ChittyLedger (apps/ledger-mcp)',
+      categories: ['ecosystem'],
+      servers: ['ledger'],
+      boost: 0.6,
+    },
+    legal: {
+      description: 'Legal operations — dispute management, resolution workflows, evidence retrieval, and audit-trail recording',
+      categories: ['ecosystem'],
+      servers: ['dispute', 'resolve', 'chittyevidence', 'ledger', 'tasks', 'notion'],
+      boost: 0.6,
+    },
+    market: {
+      description: 'Market research and pricing intelligence — search listings, track price history, compare offers, and summarise market conditions',
+      categories: ['ecosystem'],
+      servers: ['market', 'neon', 'notion'],
+      boost: 0.5,
+    },
+    monitoring: {
+      description: 'Service health, alerting, and observability — check endpoint health, query alert rules, and inspect uptime metrics across ChittyOS services',
+      categories: [] as string[],
+      servers: ['monitor'],
+      boost: 0.6,
+    },
     ops: {
       description: 'Deployment, infrastructure monitoring, and DevOps tooling — Cloudflare Workers, database ops, source control, filesystem, and orchestration',
       categories: ['ecosystem', 'code'],
       servers: ['cloudflare', 'cloudflare-builds', 'neon', 'github', 'orchestrator', 'fs', 'quality'],
       boost: 0.5,
+    },
+    realestate: {
+      description: 'Property management — list and inspect rental properties, tenants, leases, and maintenance requests via TurboTenant',
+      categories: ['ecosystem'],
+      servers: ['turbotenant', 'market', 'finance', 'tasks'],
+      boost: 0.6,
+    },
+    search: {
+      description: 'Web and document search — query the evidence index, scrape pages, extract content, and surface research findings',
+      categories: ['search'],
+      servers: ['evidence', 'scrape', 'contextual'],
+      boost: 0.6,
+    },
+    session: {
+      description: 'Cross-channel session management — create, inspect, and close ChittyOS sessions; append and replay session event logs',
+      categories: ['ecosystem'],
+      servers: ['session'],
+      boost: 0.6,
+    },
+    tasks: {
+      description: 'Task management — create, update, list, and complete ChittyAgent Tasks',
+      categories: ['ecosystem'],
+      servers: ['tasks'],
+      boost: 0.6,
     },
   },
 } as const;

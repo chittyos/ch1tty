@@ -96,15 +96,15 @@ test('market focus: search "price history" includes market/get_price_history', a
   assert.ok(toolNames.some((t) => t === 'market/get_price_history'), 'market/get_price_history must appear in results');
 });
 
-test('market focus: out-of-focus tools (neon) remain reachable via search', async () => {
+test('market focus: out-of-focus tools (github) remain reachable via search', async () => {
   const { aggregator } = buildAggregator('market');
 
-  const result = await aggregator.callTool('ch1tty/search', { query: 'database query', limit: 20 });
+  const result = await aggregator.callTool('ch1tty/search', { query: 'pull requests', limit: 20 });
   assert.equal(result.isError, undefined);
 
   const parsed = parseSearch(result);
   const toolNames = (parsed.tools ?? []).map((r) => r.tool);
-  assert.ok(toolNames.some((t) => t.startsWith('neon/')), 'neon/ tools must remain reachable with market focus active');
+  assert.ok(toolNames.some((t) => t.startsWith('github/')), 'github/ tools must remain reachable with market focus active');
 });
 
 test('market focus: no focus — market tools still accessible (lens not gate)', async () => {

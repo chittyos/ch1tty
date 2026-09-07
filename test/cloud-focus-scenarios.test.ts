@@ -276,9 +276,6 @@ test('cloud focus: cast "deploy a worker to production" with confirm resolves to
   assert.equal(cast.cast, 'plan', `cast.cast should be 'plan', got: ${String(cast.cast)}`);
   const resolved = cast.resolved as { tool: string; score: number } | undefined;
   assert.ok(resolved, 'cast should resolve a tool');
-  assert.ok(
-    resolved.tool.startsWith('cloudflare/') || resolved.tool.startsWith('cloudflare-builds/'),
-    `cast should resolve to a cloud tool, got: ${resolved.tool}`,
-  );
+  assert.equal(resolved.tool, 'cloudflare/deploy_worker', `cast should resolve to cloudflare/deploy_worker, got: ${resolved.tool}`);
   assert.equal(cast.focus, 'cloud', 'cast response should report active focus');
 });
