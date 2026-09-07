@@ -30864,6 +30864,81 @@
           "resolves_to": "github-issue-to-task"
         }
       ]
+    },
+    "documents": {
+      "description": "Document creation, search, and knowledge management \u2014 Notion pages/databases, library docs via Context7, PDF processing, and collaborative notes",
+      "combos": [
+        {
+          "name": "notion-search-to-get-page",
+          "chain": [
+            "notion/API-search",
+            "notion/API-retrieve-a-page"
+          ],
+          "accomplishes": "Search the Notion workspace for pages matching a query, then retrieve the full content of the top result \u2014 combining discovery and retrieval in two calls.",
+          "verified": false,
+          "notes": "notion is a remote documents backend (registered names: notion/API-search, notion/API-retrieve-a-page). NOT auto-chainable: API-retrieve-a-page requires a page_id arg that cannot be forwarded from the raw JSON output of API-search without extracting results[0].id. Use as a manual two-step pattern."
+        },
+        {
+          "name": "resolve-library-then-query-docs",
+          "chain": [
+            "context7/resolve-library-id",
+            "context7/query-docs"
+          ],
+          "accomplishes": "Resolve a package name to its Context7 library ID, then query that library for documentation snippets \u2014 a two-step pattern for looking up unfamiliar dependencies.",
+          "verified": false,
+          "notes": "context7 backends: resolve-library-id (local) \u2192 query-docs (local). NOT auto-chainable: query-docs requires named args (libraryId + query) that cannot be forwarded from the raw text output of resolve-library-id without an adapter. Use this as a manual two-step pattern: call resolve-library-id, extract libraryId from the result, then pass it as an explicit arg to query-docs."
+        },
+        {
+          "name": "search-notion-then-create-follow-up",
+          "chain": [
+            "notion/API-search",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search Notion for existing pages on a topic, then create a new page to capture new findings or decisions \u2014 combining search and write in one workflow.",
+          "verified": false,
+          "notes": "Both tools on the notion backend (registered names: notion/API-search, notion/API-post-page). NOT auto-chainable: API-post-page requires title and content args that cannot be forwarded from the JSON output of API-search. Use as a manual two-step pattern."
+        },
+        {
+          "name": "query-library-docs-and-document-findings",
+          "chain": [
+            "context7/query-docs",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Pull documentation snippets for a library from Context7 and record the key findings in a new Notion page \u2014 cross-backend knowledge capture.",
+          "verified": false,
+          "notes": "Cross-backend: context7 (local) \u2192 notion (remote, registered name: notion/API-post-page). NOT auto-chainable: API-post-page requires title and content args that cannot be forwarded from the snippets array returned by query-docs. Use as a manual two-step pattern."
+        }
+      ],
+      "prompts": [
+        {
+          "text": "Search my Notion workspace for pages about MCP server setup",
+          "resolves_to": "notion-search-to-get-page"
+        },
+        {
+          "text": "Find the Notion page titled 'Architecture Decisions' and show me its content",
+          "resolves_to": "notion-search-to-get-page"
+        },
+        {
+          "text": "Look up the documentation for @modelcontextprotocol/sdk and show me how to create a server",
+          "resolves_to": "resolve-library-then-query-docs"
+        },
+        {
+          "text": "What npm package is context7 library /modelcontextprotocol/typescript-sdk and get its docs",
+          "resolves_to": "resolve-library-then-query-docs"
+        },
+        {
+          "text": "Search Notion for existing ADRs then create a new architecture decision record",
+          "resolves_to": "search-notion-then-create-follow-up"
+        },
+        {
+          "text": "Look up React hooks documentation and save a summary to Notion",
+          "resolves_to": "query-library-docs-and-document-findings"
+        },
+        {
+          "text": "Get the TypeScript SDK docs for streaming and create a Notion page with notes",
+          "resolves_to": "query-library-docs-and-document-findings"
+        }
+      ]
     }
   }
 }

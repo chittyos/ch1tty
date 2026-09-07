@@ -251,6 +251,19 @@
         "tasks"
       ],
       "boost": 0.6
+    },
+    "documents": {
+      "description": "Document creation, search, and knowledge management — Notion pages/databases, library docs via Context7, PDF processing, and collaborative notes",
+      "categories": [
+        "documents"
+      ],
+      "servers": [
+        "notion",
+        "context7",
+        "pdf",
+        "notes"
+      ],
+      "boost": 0.6
     }
   }
 }
