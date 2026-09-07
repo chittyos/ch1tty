@@ -133,6 +133,17 @@
         "chittyevidence"
       ],
       "boost": 0.6
+    },
+    "monitoring": {
+      "description": "Service health, alerting, and observability — check endpoint health, query alert rules, and inspect uptime metrics across ChittyOS services",
+      "categories": [
+        "ecosystem"
+      ],
+      "servers": [
+        "monitoring",
+        "health"
+      ],
+      "boost": 0.6
     }
   }
 }
