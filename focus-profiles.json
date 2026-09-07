@@ -1,5 +1,5 @@
 {
-  "_comment": "Focus profiles — a soft lens over the tool registry, not a gate. Selecting a focus boosts in-focus tools (by category and/or server id) in search + cast ranking; out-of-focus tools stay reachable. Select via env CH1TTY_FOCUS=<name> or the per-call `focus` param on ch1tty/search and ch1tty/cast. Server ids and categories reference servers.json — profiles may name disabled/future servers (they simply won't match until present).",
+  "_comment": "Focus profiles \u2014 a soft lens over the tool registry, not a gate. Selecting a focus boosts in-focus tools (by category and/or server id) in search + cast ranking; out-of-focus tools stay reachable. Select via env CH1TTY_FOCUS=<name> or the per-call `focus` param on ch1tty/search and ch1tty/cast. Server ids and categories reference servers.json \u2014 profiles may name disabled/future servers (they simply won't match until present).",
   "profiles": {
     "finance": {
       "description": "Billing, payments, ledger, and financial ecosystem tools",
@@ -46,7 +46,7 @@
       "boost": 0.5
     },
     "code": {
-      "description": "Software development — source control, issue tracking, deployment, library documentation, database, code quality, and technical documentation tools",
+      "description": "Software development \u2014 source control, issue tracking, deployment, library documentation, database, code quality, and technical documentation tools",
       "categories": [
         "code"
       ],
@@ -78,7 +78,7 @@
       "boost": 0.5
     },
     "ops": {
-      "description": "Deployment, infrastructure monitoring, and DevOps tooling — Cloudflare Workers, database ops, source control, filesystem, and orchestration",
+      "description": "Deployment, infrastructure monitoring, and DevOps tooling \u2014 Cloudflare Workers, database ops, source control, filesystem, and orchestration",
       "categories": [
         "ecosystem",
         "code"
@@ -95,7 +95,7 @@
       "boost": 0.5
     },
     "tasks": {
-      "description": "Task management — create, update, list, and complete ChittyAgent Tasks",
+      "description": "Task management \u2014 create, update, list, and complete ChittyAgent Tasks",
       "categories": [
         "ecosystem"
       ],
@@ -105,7 +105,7 @@
       "boost": 0.6
     },
     "ledger": {
-      "description": "Append-only audit ledger — list namespaces, read entries, and append immutable records via ChittyLedger (apps/ledger-mcp)",
+      "description": "Append-only audit ledger \u2014 list namespaces, read entries, and append immutable records via ChittyLedger (apps/ledger-mcp)",
       "categories": [
         "ecosystem"
       ],
@@ -115,7 +115,7 @@
       "boost": 0.6
     },
     "session": {
-      "description": "Cross-channel session management — create, inspect, and close ChittyOS sessions; append and replay session event logs",
+      "description": "Cross-channel session management \u2014 create, inspect, and close ChittyOS sessions; append and replay session event logs",
       "categories": [
         "ecosystem"
       ],
@@ -125,12 +125,22 @@
       "boost": 0.6
     },
     "chittyevidence": {
-      "description": "Evidence corpus — ingest, search, and retrieve documents with canonical URIs via ChittyEvidence (apps/evidence-mcp)",
+      "description": "Evidence corpus \u2014 ingest, search, and retrieve documents with canonical URIs via ChittyEvidence (apps/evidence-mcp)",
       "categories": [
         "ecosystem"
       ],
       "servers": [
         "chittyevidence"
+      ],
+      "boost": 0.6
+    },
+    "analytics": {
+      "description": "Data analytics \u2014 query metrics, aggregate events, and export reports via the analytics backend.",
+      "categories": [
+        "ecosystem"
+      ],
+      "servers": [
+        "analytics"
       ],
       "boost": 0.6
     }

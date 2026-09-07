@@ -1187,4 +1187,126 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
       },
     ],
   },
+
+  analytics: {
+    tools: [
+      {
+        name: 'query_metrics',
+        description: 'Query time-series metrics for a given metric name and time window. Returns data points with timestamps and values.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            metric: { type: 'string' },
+            from: { type: 'string', description: 'ISO 8601 start timestamp' },
+            to: { type: 'string', description: 'ISO 8601 end timestamp' },
+            resolution: { type: 'string', enum: ['1m', '5m', '1h', '1d'], default: '1h' },
+          },
+          required: ['metric', 'from', 'to'],
+        },
+        response: text(JSON.stringify({
+          metric: 'page_views',
+          from: '2026-09-01T00:00:00Z',
+          to: '2026-09-07T00:00:00Z',
+          resolution: '1h',
+          points: [
+            { ts: '2026-09-01T00:00:00Z', value: 142 },
+            { ts: '2026-09-01T01:00:00Z', value: 98 },
+            { ts: '2026-09-01T02:00:00Z', value: 76 },
+          ],
+          total: 3,
+        })),
+      },
+      {
+        name: 'get_dashboard',
+        description: 'Retrieve a named analytics dashboard including its panels and current metric summaries.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', description: 'Dashboard name or slug' },
+          },
+          required: ['name'],
+        },
+        response: text(JSON.stringify({
+          name: 'main',
+          title: 'Main Application Dashboard',
+          panels: [
+            { id: 'p1', title: 'Page Views', metric: 'page_views', value: 8420, trend: 'up' },
+            { id: 'p2', title: 'Error Rate', metric: 'error_rate', value: 0.012, trend: 'stable' },
+            { id: 'p3', title: 'Active Users', metric: 'active_users', value: 317, trend: 'up' },
+          ],
+          updated_at: '2026-09-07T04:00:00Z',
+        })),
+      },
+      {
+        name: 'list_events',
+        description: 'List tracked analytics events with optional filtering by event type, source, or time range.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            type: { type: 'string', description: 'Filter by event type (e.g. page_view, error, click)' },
+            source: { type: 'string', description: 'Filter by source application or service' },
+            from: { type: 'string' },
+            to: { type: 'string' },
+            limit: { type: 'number', default: 50 },
+          },
+        },
+        response: text(JSON.stringify({
+          events: [
+            { id: 'ev-1', type: 'page_view', source: 'web', user_id: 'u-101', ts: '2026-09-07T03:55:00Z', properties: { path: '/dashboard' } },
+            { id: 'ev-2', type: 'error', source: 'api', user_id: 'u-102', ts: '2026-09-07T03:56:00Z', properties: { code: 500, endpoint: '/api/v1/status' } },
+            { id: 'ev-3', type: 'page_view', source: 'web', user_id: 'u-103', ts: '2026-09-07T03:57:00Z', properties: { path: '/settings' } },
+          ],
+          has_more: false,
+        })),
+      },
+      {
+        name: 'aggregate_events',
+        description: 'Aggregate tracked events by a chosen dimension (user, type, source) and return counts with breakdowns.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            dimension: { type: 'string', enum: ['user', 'type', 'source', 'hour'] },
+            event_type: { type: 'string', description: 'Filter to a specific event type before aggregating' },
+            from: { type: 'string' },
+            to: { type: 'string' },
+          },
+          required: ['dimension'],
+        },
+        response: text(JSON.stringify({
+          dimension: 'type',
+          from: '2026-09-07T00:00:00Z',
+          to: '2026-09-07T04:00:00Z',
+          buckets: [
+            { key: 'page_view', count: 1842 },
+            { key: 'error', count: 37 },
+            { key: 'click', count: 589 },
+          ],
+          total_events: 2468,
+        })),
+      },
+      {
+        name: 'export_report',
+        description: 'Export an analytics report as structured JSON or CSV. Returns the report payload and a download reference.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            title: { type: 'string' },
+            metric: { type: 'string' },
+            from: { type: 'string' },
+            to: { type: 'string' },
+            format: { type: 'string', enum: ['json', 'csv'], default: 'json' },
+          },
+          required: ['title', 'from', 'to'],
+        },
+        response: text(JSON.stringify({
+          report_id: 'rpt-001',
+          title: 'Q3 Analytics Export',
+          format: 'json',
+          rows: 142,
+          download_ref: 'analytics://exports/rpt-001',
+          created_at: '2026-09-07T04:00:00Z',
+        })),
+      },
+    ],
+  },
 };
