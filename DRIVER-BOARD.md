@@ -3476,3 +3476,30 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   8. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
 - **PushNotification**: SENT — merged PR #1161 (workstream-M: focus-suggestions MCP resources). Tests: 1499/0/3.
 - **Next run**: Idle (all workstreams done). 1 open PR (#1155 dependabot — needs human merge).
+
+---
+### 2026-09-07T~hourly (run ~1507 — ACTIVE: merged workstreams N/O/P prior run; now Q-W combined in PR #1172)
+- **Workstreams**: N(realestate) ✓ O(google) ✓ P(legal) ✓ [merged prior run, PRs #1162-#1164]; Q(cloud) R(data) S(auth) T(market) U(analytics) V(monitoring) W(search) → **PR #1172 OPEN** (https://github.com/chittyos/ch1tty/pull/1172)
+- **Branch/PR**: `auto/qw-focus-profiles-q-through-w` → PR #1172 open, CI pending
+- **Guardrails**: 5-tool surface confirmed (search/execute/status/reload/cast). `buildCastExplanation` metric freeze ACTIVE. 0 violations.
+- **Actions**:
+  - Resumed from previous run which had applied N/O/P (PRs #1162-#1164 merged, main at dd7669c with 13 profiles).
+  - Read current state: main clean, 13 profiles (chittyevidence, code, communication, design, finance, google, governance, ledger, legal, ops, realestate, session, tasks).
+  - Fixed batch script to dynamically discover test files from each PR branch (previous run crashed on hardcoded test file name).
+  - Applied 7 profiles sequentially (Q→R→S→T→U→V→W): each round added profile to focus-profiles.json, suggestions to focus-suggestions.json, fixture servers to test/fixture-backend.ts, scenario test file, updated suggestions.test.ts count; ran build+test after each profile — all clean.
+  - New fixture servers added: `storage` (data), `auth` (auth), `market` (market), `analytics` (analytics), `evidence`+`scrape` (search).
+  - Final test count after all 7 applied: all passing (npm test exit 0).
+  - focus-profiles.json: 13 → 20 profiles; suggestions.test.ts updated to expect 20 profiles.
+  - Committed as single squash, pushed branch `auto/qw-focus-profiles-q-through-w`, created PR #1172 (closes #1165-#1171).
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ M ✓ N ✓ O ✓ P ✓ Q-W in PR #1172. Build: clean. Tests: all pass. **~1507th run. 1 combined PR open (#1172), 1 dependabot PR open (#1155).**
+- **Human-action items**:
+  1. **Review + merge PR #1172** (workstreams Q-W: 7 focus profiles). Closes PRs #1165-#1171 once merged.
+  2. **Close PRs #1165-#1171** (superseded by #1172 once it merges).
+  3. **Merge PR #1155** (dependabot) — qs + fast-uri security bumps.
+  4. **Disable or redirect hourly schedule** — 1507+ consecutive runs; all workstreams Q-W in one PR.
+  5. **Deploy Workstream F phases** (Cloudflare): Create `Ch1ttyApiAgent` DO class + drain `Ch1ttyDO` instances.
+  6. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  7. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  8. **Set `CHITTY_TASKS_TOKEN` on prod** — new requirement from tasks-mcp wire.
+  9. **Stale branch cleanup** — 1100+ remote `auto/` branches.
+  10. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
