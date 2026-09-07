@@ -30996,11 +30996,11 @@
       ],
       "prompts": [
         {
-          "text": "List all deployed Cloudflare Workers and their current status",
+          "text": "List all deployed Cloudflare Workers and check logs for a specific worker (supply worker_name)",
           "resolves_to": "worker-health-check"
         },
         {
-          "text": "Deploy the ch1tty-gateway worker and verify it appears active in the worker list",
+          "text": "Deploy a Cloudflare Worker (supply script_name and script) and verify it appears active in the worker list",
           "resolves_to": "deploy-pr-task"
         },
         {
@@ -31012,15 +31012,15 @@
           "resolves_to": "build-logs-debug"
         },
         {
-          "text": "Inspect the latest build for ch1tty-gateway and pull its build logs to verify the output",
+          "text": "Inspect a specific build (supply buildUUID) and pull its build logs to verify the output",
           "resolves_to": "deploy-and-validate"
         },
         {
-          "text": "What workers are currently deployed and are any of them erroring?",
+          "text": "Check which workers are deployed and pull logs for a specific worker (supply worker_name)",
           "resolves_to": "worker-health-check"
         },
         {
-          "text": "Deploy a Cloudflare Worker and confirm the deployment is active in the worker list",
+          "text": "Deploy a Cloudflare Worker (supply script_name and script) and confirm the deployment is active in the worker list",
           "resolves_to": "deploy-pr-task"
         }
       ]
