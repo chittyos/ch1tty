@@ -3514,7 +3514,7 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   - Read CLAUDE.md + CHITTY.md; guardrails confirmed.
   - `git pull origin main` (+27 commits). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1681/0/3 — all pass.
   - Fetched Notion board (working — Notion token valid): all workstreams A–AB confirmed ✓. 25 profiles in focus-profiles.json.
-  - Checked open PRs (#1166, #1167, #1179, #1180, #1181): all CI green (CodeQL + Analyze(actions) + Analyze(js-ts) all success).
+  - Checked open PRs (#1166, #1167, #1179, #1180, #1181): all CI green (CodeQL + Analyze(actions) + Analyze(js-ts) all success). PR #1155 (dependabot) not re-checked this run; CI from Sep 4: CodeQL neutral only (no Analyze jobs ran — dependabot PRs receive reduced CI coverage).
   - Verified git log: workstreams X (#1173), Y (#1174), Z (#1175), AA (#1176), AB (#1177) all merged to main — board entry corrected.
   - PR #1172 (Q-W) confirmed merged: R(data) and S(auth) already on main — PRs #1166/#1167 are superseded (should be closed, not merged).
   - Codex review findings on PR #1182 applied: corrected N–W→N–AB, corrected #1166/#1167 action, removed stale Notion token blocker.
