@@ -3531,3 +3531,19 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   7. **Set `CHITTY_TASKS_TOKEN` on prod** — new requirement from tasks-mcp wire.
   8. **Stale branch cleanup** — 1100+ remote `auto/` branches.
   9. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
+
+---
+### 2026-09-07T~hourly (run ~1509 — ACTIVE: workstreams X/Y/Z/AB — PR #1178 review fixes pushed)
+- **Workstreams**: X/Y/Z/AB → **PR #1178 OPEN** (https://github.com/chittyos/ch1tty/pull/1178)
+- **Branch**: `auto/xzab-focus-profiles-x-through-ab` (commit d07e433)
+- **Build**: clean (tsc exit 0) | **Tests**: 1666 pass / 0 fail / 3 skip
+- **Guardrails**: 5-tool surface confirmed. `buildCastExplanation` metric freeze ACTIVE. 0 violations.
+- **Actions**:
+  - CodeRabbit/Codex review fixes (3 applied, built, tested, committed, pushed as d07e433):
+    1. `focus-suggestions.json`: scan-secrets-to-task prompt → "Scan the repository for exposed secrets and create a remediation task for any findings" (matches combo: scan_secrets + create_task)
+    2. `test/ab-security-focus-scenarios.test.ts`: `priority: 'critical'` → `priority: 'high'` (tasks enum: low/medium/high only)
+    3. `test/ab-security-focus-scenarios.test.ts`: cast assertion now verifies `resolved.tool.startsWith('security/')` when cast === 'plan'
+  - Replied to all 12 review threads (CodeRabbit × 5, Codex × 7). Resolved 3 fixed threads.
+  - 9 threads explained and left open (7 by-design per CLAUDE.md / enhancement-level / known limitations).
+- **State summary**: PR #1178 green, all review threads addressed. Waiting on human merge.
+- **Human-action items**: Same as prior run.
