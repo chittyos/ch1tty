@@ -8,6 +8,8 @@
  *  - multi-step deploy + build-log workflows execute correctly via the fixture backend
  */
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import test from 'node:test';
 import { Aggregator } from '../src/aggregator.js';
 import type { ServerConfig } from '../src/types.js';
@@ -64,6 +66,18 @@ function buildAggregator(focus?: string): { aggregator: Aggregator; fixture: Fix
   });
   return { aggregator, fixture };
 }
+
+test('cloud focus: shipped profile contract — categories, servers, and boost match expected values', () => {
+  const raw = readFileSync(resolve(process.cwd(), 'focus-profiles.json'), 'utf-8');
+  const profiles = (JSON.parse(raw) as { profiles: Record<string, { categories: string[]; servers: string[]; boost: number }> }).profiles;
+  const cloud = profiles['cloud'];
+  assert.ok(cloud, 'cloud profile must exist in focus-profiles.json');
+  assert.ok(cloud.categories.includes('ecosystem'), 'cloud profile must include ecosystem category');
+  assert.ok(cloud.servers.includes('cloudflare'), 'cloud profile must include cloudflare server');
+  assert.ok(cloud.servers.includes('cloudflare-builds'), 'cloud profile must include cloudflare-builds server');
+  assert.ok(cloud.servers.includes('ship'), 'cloud profile must include ship server');
+  assert.equal(cloud.boost, 0.5, 'cloud profile boost must be 0.5');
+});
 
 test('cloud focus: search "deploy worker" ranks cloudflare/ tools first', async () => {
   const { aggregator } = buildAggregator('cloud');
@@ -232,6 +246,11 @@ test('cloud focus: multi-step — list builds, get failed build, fetch its logs'
   assert.ok(toolNames.includes('cloudflare-builds/workers_builds_list_builds'), 'list_builds must appear in call log');
   assert.ok(toolNames.includes('cloudflare-builds/workers_builds_get_build'), 'get_build must appear in call log');
   assert.ok(toolNames.includes('cloudflare-builds/workers_builds_get_build_logs'), 'get_build_logs must appear in call log');
+
+  const getBuildCall = calls.find((c) => c.serverId === 'cloudflare-builds' && c.tool === 'workers_builds_get_build');
+  const getLogsCall = calls.find((c) => c.serverId === 'cloudflare-builds' && c.tool === 'workers_builds_get_build_logs');
+  assert.equal(getBuildCall?.args.buildUUID, failedBuild.buildUUID, 'get_build must forward the failed buildUUID');
+  assert.equal(getLogsCall?.args.buildUUID, failedBuild.buildUUID, 'get_build_logs must forward the failed buildUUID');
 });
 
 test('cloud focus: status reports active focus as cloud', async () => {
