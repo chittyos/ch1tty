@@ -279,7 +279,7 @@
       "boost": 0.6
     },
     "workspace": {
-      "description": "Personal and team workspace productivity — notes, docs, calendar, messaging, and tasks across Notion, Google Workspace, and ChittyComms",
+      "description": "Personal and team workspace productivity \u2014 notes, docs, calendar, messaging, and tasks across Notion, Google Workspace, and ChittyComms",
       "categories": [
         "documents",
         "communication"
@@ -293,6 +293,21 @@
         "notes"
       ],
       "boost": 0.5
+    },
+    "devops": {
+      "description": "DevOps and infrastructure \u2014 deploy, build, monitor, and manage Cloudflare Workers, GitHub repositories, and Neon databases",
+      "categories": [
+        "code"
+      ],
+      "servers": [
+        "cloudflare",
+        "cloudflare-builds",
+        "github",
+        "neon",
+        "tasks",
+        "linear"
+      ],
+      "boost": 0.6
     }
   }
 }

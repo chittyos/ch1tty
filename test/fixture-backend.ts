@@ -1533,6 +1533,48 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
     ],
   },
 
+  linear: {
+    tools: [
+      {
+        name: 'list_issues',
+        description: 'List issues and tasks in Linear project management',
+        inputSchema: {
+          type: 'object',
+          properties: { teamId: { type: 'string' }, status: { type: 'string', enum: ['open', 'in_progress', 'done'] } },
+        },
+        response: text(JSON.stringify([
+          { id: 'lin-1', title: 'Fix CI pipeline timeout', status: 'open', team: 'ch1tty', priority: 'urgent' },
+          { id: 'lin-2', title: 'Add integration tests for deploy flow', status: 'in_progress', team: 'ch1tty', priority: 'high' },
+        ])),
+      },
+      {
+        name: 'create_issue',
+        description: 'Create a new Linear issue for tracking engineering work',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            teamId: { type: 'string' },
+            title: { type: 'string' },
+            description: { type: 'string' },
+            priority: { type: 'string', enum: ['urgent', 'high', 'medium', 'low'] },
+          },
+          required: ['teamId', 'title'],
+        },
+        response: text(JSON.stringify({ id: 'lin-new', title: 'New issue', status: 'open', team: 'ch1tty' })),
+      },
+      {
+        name: 'get_issue',
+        description: 'Get details of a specific Linear issue by ID',
+        inputSchema: {
+          type: 'object',
+          properties: { id: { type: 'string' } },
+          required: ['id'],
+        },
+        response: text(JSON.stringify({ id: 'lin-1', title: 'Fix CI pipeline timeout', status: 'open', team: 'ch1tty', priority: 'urgent', description: 'CI jobs are timing out on large test suites' })),
+      },
+    ],
+  },
+
   resolve: {
     tools: [
       {
