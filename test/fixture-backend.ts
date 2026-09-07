@@ -1607,4 +1607,551 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
       },
     ],
   },
+  storage: {
+    tools: [
+      {
+        name: 'list_objects',
+        description: 'List objects in an R2 storage bucket',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            bucket: { type: 'string' },
+            prefix: { type: 'string' },
+            limit: { type: 'number' },
+          },
+          required: ['bucket'],
+        },
+        response: text(JSON.stringify({
+          objects: [
+            { key: 'exports/events-2026-09-01.json', size: 4096, last_modified: '2026-09-01T10:00:00Z', etag: 'abc123' },
+            { key: 'exports/events-2026-09-05.json', size: 8192, last_modified: '2026-09-05T12:00:00Z', etag: 'def456' },
+            { key: 'snapshots/ch1tty-config-2026-09-06.json', size: 2048, last_modified: '2026-09-06T08:00:00Z', etag: 'ghi789' },
+          ],
+          truncated: false,
+        })),
+      },
+      {
+        name: 'get_object',
+        description: 'Retrieve an object from R2 storage by key',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            bucket: { type: 'string' },
+            key: { type: 'string' },
+          },
+          required: ['bucket', 'key'],
+        },
+        response: text(JSON.stringify({
+          key: 'exports/events-2026-09-05.json',
+          bucket: 'ch1tty-exports',
+          size: 8192,
+          content_type: 'application/json',
+          body: '[{"id":"e1","type":"deploy"},{"id":"e2","type":"config.reload"}]',
+          last_modified: '2026-09-05T12:00:00Z',
+        })),
+      },
+      {
+        name: 'put_object',
+        description: 'Upload or overwrite an object in R2 storage',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            bucket: { type: 'string' },
+            key: { type: 'string' },
+            body: { type: 'string' },
+            content_type: { type: 'string' },
+          },
+          required: ['bucket', 'key', 'body'],
+        },
+        response: text(JSON.stringify({
+          key: 'exports/new-export.json',
+          bucket: 'ch1tty-exports',
+          etag: 'newetag123',
+          size: 512,
+          ok: true,
+        })),
+      },
+      {
+        name: 'delete_object',
+        description: 'Delete an object from R2 storage by key',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            bucket: { type: 'string' },
+            key: { type: 'string' },
+          },
+          required: ['bucket', 'key'],
+        },
+        response: text(JSON.stringify({ ok: true, key: 'exports/old-export.json', deleted: true })),
+      },
+    ],
+  },
+  auth: {
+    tools: [
+      {
+        name: 'verify_token',
+        description: 'Verify an API token or JWT and return its validity status and claims',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            token: { type: 'string' },
+          },
+          required: ['token'],
+        },
+        response: text(JSON.stringify({
+          valid: true,
+          identity_id: 'chittyid-nick-001',
+          scope: ['read', 'write'],
+          issued_at: '2026-09-01T00:00:00Z',
+          expires_at: '2026-10-01T00:00:00Z',
+        })),
+      },
+      {
+        name: 'create_token',
+        description: 'Issue a new API token for an identity with a specified scope and TTL',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            identity_id: { type: 'string' },
+            scope: { type: 'array', items: { type: 'string' } },
+            ttl_seconds: { type: 'number' },
+          },
+          required: ['identity_id'],
+        },
+        response: text(JSON.stringify({
+          token: 'tok_fixture_new_abc123',
+          identity_id: 'chittyid-nick-001',
+          scope: ['read', 'write'],
+          issued_at: '2026-09-07T00:00:00Z',
+          expires_at: '2026-10-07T00:00:00Z',
+        })),
+      },
+      {
+        name: 'revoke_token',
+        description: 'Revoke an API token immediately, invalidating all future uses',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            token_id: { type: 'string' },
+          },
+          required: ['token_id'],
+        },
+        response: text(JSON.stringify({
+          revoked: true,
+          token_id: 'tid-002',
+          revoked_at: '2026-09-07T00:05:00Z',
+        })),
+      },
+      {
+        name: 'list_tokens',
+        description: 'List all active API tokens for a given identity',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            identity_id: { type: 'string' },
+            include_expired: { type: 'boolean' },
+          },
+          required: ['identity_id'],
+        },
+        response: text(JSON.stringify([
+          { token_id: 'tid-001', scope: ['read', 'write'], issued_at: '2026-09-01T00:00:00Z', expires_at: '2026-10-01T00:00:00Z', status: 'active' },
+          { token_id: 'tid-002', scope: ['read'], issued_at: '2026-08-01T00:00:00Z', expires_at: '2026-09-01T00:00:00Z', status: 'expired' },
+        ])),
+      },
+      {
+        name: 'get_identity',
+        description: 'Get the identity record for a ChittyID, including display name, email, and linked services',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            identity_id: { type: 'string' },
+          },
+          required: ['identity_id'],
+        },
+        response: text(JSON.stringify({
+          identity_id: 'chittyid-nick-001',
+          display_name: 'Nick',
+          email: 'nick@nevershitty.com',
+          linked_services: ['ch1tty', 'chittyagent', 'chittyos'],
+          created_at: '2026-01-01T00:00:00Z',
+        })),
+      },
+    ],
+  },
+  market: {
+    tools: [
+      {
+        name: 'search_listings',
+        description: 'Search market listings by keyword, category, or price range',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: { type: 'string' },
+            category: { type: 'string' },
+            max_price: { type: 'number' },
+            limit: { type: 'number' },
+          },
+          required: ['query'],
+        },
+        response: text(JSON.stringify([
+          { listing_id: 'lst-001', title: 'Widget Pro X', category: 'hardware', price: 49.99, currency: 'USD', source: 'vendor-a' },
+          { listing_id: 'lst-002', title: 'Widget Pro X (refurb)', category: 'hardware', price: 29.99, currency: 'USD', source: 'vendor-b' },
+        ])),
+      },
+      {
+        name: 'get_listing',
+        description: 'Get full details for a specific market listing by ID',
+        inputSchema: {
+          type: 'object',
+          properties: { listing_id: { type: 'string' } },
+          required: ['listing_id'],
+        },
+        response: text(JSON.stringify({
+          listing_id: 'lst-001',
+          title: 'Widget Pro X',
+          category: 'hardware',
+          price: 49.99,
+          currency: 'USD',
+          source: 'vendor-a',
+          description: 'Professional-grade widget with extended warranty',
+          in_stock: true,
+          updated_at: '2026-09-07T00:00:00Z',
+        })),
+      },
+      {
+        name: 'get_price_history',
+        description: 'Get price history for a market listing',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            listing_id: { type: 'string' },
+            days: { type: 'number' },
+          },
+          required: ['listing_id'],
+        },
+        response: text(JSON.stringify({
+          listing_id: 'lst-001',
+          history: [
+            { date: '2026-09-01', price: 54.99 },
+            { date: '2026-09-04', price: 49.99 },
+            { date: '2026-09-07', price: 49.99 },
+          ],
+        })),
+      },
+      {
+        name: 'compare_prices',
+        description: 'Compare current prices for a product across multiple listing sources',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: { type: 'string' },
+            listing_ids: { type: 'array', items: { type: 'string' } },
+          },
+        },
+        response: text(JSON.stringify({
+          query: 'Widget Pro X',
+          results: [
+            { listing_id: 'lst-001', source: 'vendor-a', price: 49.99, currency: 'USD' },
+            { listing_id: 'lst-002', source: 'vendor-b', price: 29.99, currency: 'USD' },
+          ],
+          lowest: { listing_id: 'lst-002', price: 29.99, source: 'vendor-b' },
+        })),
+      },
+      {
+        name: 'get_market_summary',
+        description: 'Get a summary of current market conditions for a category',
+        inputSchema: {
+          type: 'object',
+          properties: { category: { type: 'string' } },
+          required: ['category'],
+        },
+        response: text(JSON.stringify({
+          category: 'hardware',
+          listing_count: 142,
+          avg_price: 44.50,
+          min_price: 9.99,
+          max_price: 299.99,
+          currency: 'USD',
+          as_of: '2026-09-07T00:00:00Z',
+        })),
+      },
+    ],
+  },
+  analytics: {
+    tools: [
+      {
+        name: 'query_metrics',
+        description: 'Query time-series metrics for a given metric name and time window. Returns data points with timestamps and values.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            metric: { type: 'string' },
+            from: { type: 'string', description: 'ISO 8601 start timestamp' },
+            to: { type: 'string', description: 'ISO 8601 end timestamp' },
+            resolution: { type: 'string', enum: ['1m', '5m', '1h', '1d'], default: '1h' },
+          },
+          required: ['metric', 'from', 'to'],
+        },
+        response: text(JSON.stringify({
+          metric: 'page_views',
+          from: '2026-09-01T00:00:00Z',
+          to: '2026-09-07T00:00:00Z',
+          resolution: '1h',
+          points: [
+            { ts: '2026-09-01T00:00:00Z', value: 142 },
+            { ts: '2026-09-01T01:00:00Z', value: 98 },
+            { ts: '2026-09-01T02:00:00Z', value: 76 },
+          ],
+          total: 3,
+        })),
+      },
+      {
+        name: 'get_dashboard',
+        description: 'Retrieve a named analytics dashboard including its panels and current metric summaries.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', description: 'Dashboard name or slug' },
+          },
+          required: ['name'],
+        },
+        response: text(JSON.stringify({
+          name: 'main',
+          title: 'Main Application Dashboard',
+          panels: [
+            { id: 'p1', title: 'Page Views', metric: 'page_views', value: 8420, trend: 'up' },
+            { id: 'p2', title: 'Error Rate', metric: 'error_rate', value: 0.012, trend: 'stable' },
+            { id: 'p3', title: 'Active Users', metric: 'active_users', value: 317, trend: 'up' },
+          ],
+          updated_at: '2026-09-07T04:00:00Z',
+        })),
+      },
+      {
+        name: 'list_events',
+        description: 'List tracked analytics events with optional filtering by event type, source, or time range.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            type: { type: 'string', description: 'Filter by event type (e.g. page_view, error, click)' },
+            source: { type: 'string', description: 'Filter by source application or service' },
+            from: { type: 'string' },
+            to: { type: 'string' },
+            limit: { type: 'number', default: 50 },
+          },
+        },
+        response: text(JSON.stringify({
+          events: [
+            { id: 'ev-1', type: 'page_view', source: 'web', user_id: 'u-101', ts: '2026-09-07T03:55:00Z', properties: { path: '/dashboard' } },
+            { id: 'ev-2', type: 'error', source: 'api', user_id: 'u-102', ts: '2026-09-07T03:56:00Z', properties: { code: 500, endpoint: '/api/v1/status' } },
+            { id: 'ev-3', type: 'page_view', source: 'web', user_id: 'u-103', ts: '2026-09-07T03:57:00Z', properties: { path: '/settings' } },
+          ],
+          has_more: false,
+        })),
+      },
+      {
+        name: 'aggregate_events',
+        description: 'Aggregate tracked events by a chosen dimension (user, type, source) and return counts with breakdowns.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            dimension: { type: 'string', enum: ['user', 'type', 'source', 'hour'] },
+            event_type: { type: 'string', description: 'Filter to a specific event type before aggregating' },
+            from: { type: 'string' },
+            to: { type: 'string' },
+          },
+          required: ['dimension'],
+        },
+        response: text(JSON.stringify({
+          dimension: 'type',
+          from: '2026-09-07T00:00:00Z',
+          to: '2026-09-07T04:00:00Z',
+          buckets: [
+            { key: 'page_view', count: 1842 },
+            { key: 'error', count: 37 },
+            { key: 'click', count: 589 },
+          ],
+          total_events: 2468,
+        })),
+      },
+      {
+        name: 'export_report',
+        description: 'Export an analytics report as structured JSON or CSV. Returns the report payload and a download reference.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            title: { type: 'string' },
+            metric: { type: 'string' },
+            from: { type: 'string' },
+            to: { type: 'string' },
+            format: { type: 'string', enum: ['json', 'csv'], default: 'json' },
+          },
+          required: ['title', 'from', 'to'],
+        },
+        response: text(JSON.stringify({
+          report_id: 'rpt-001',
+          title: 'Q3 Analytics Export',
+          format: 'json',
+          rows: 142,
+          download_ref: 'analytics://exports/rpt-001',
+          created_at: '2026-09-07T04:00:00Z',
+        })),
+      },
+    ],
+  },
+  scrape: {
+    tools: [
+      {
+        name: 'scrape_page',
+        description: 'Scrape a web page and return its structured content.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            url: { type: 'string' },
+            include_links: { type: 'boolean' },
+          },
+          required: ['url'],
+        },
+        response: text(JSON.stringify({
+          url: 'https://example.com/article-1',
+          title: 'MCP Gateway Architecture',
+          text: 'A slim-MCP gateway that aggregates backends behind 5 meta-tools.',
+          links: ['https://example.com/related', 'https://docs.example.com/mcp'],
+          status: 200,
+        })),
+      },
+      {
+        name: 'extract_links',
+        description: 'Extract all hyperlinks from a web page.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            url: { type: 'string' },
+          },
+          required: ['url'],
+        },
+        response: text(JSON.stringify({
+          url: 'https://example.com/article-1',
+          links: [
+            { href: 'https://example.com/related', text: 'Related Article', rel: 'noopener' },
+            { href: 'https://docs.example.com/mcp', text: 'MCP Docs', rel: '' },
+            { href: 'https://github.com/example/repo', text: 'Source', rel: 'noopener' },
+          ],
+          total: 3,
+        })),
+      },
+      {
+        name: 'get_content',
+        description: 'Get the plain text content of a URL.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            url: { type: 'string' },
+          },
+          required: ['url'],
+        },
+        response: text(JSON.stringify({
+          url: 'https://example.com/article-1',
+          content: 'A slim-MCP gateway that aggregates backends behind 5 meta-tools: search, execute, status, reload, cast.',
+          content_type: 'text/html',
+          word_count: 17,
+        })),
+      },
+      {
+        name: 'screenshot',
+        description: 'Take a screenshot of a web page.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            url: { type: 'string' },
+            width: { type: 'number' },
+            height: { type: 'number' },
+          },
+          required: ['url'],
+        },
+        response: text(JSON.stringify({
+          url: 'https://example.com/article-1',
+          format: 'png',
+          width: 1280,
+          height: 800,
+          data_uri: 'data:image/png;base64,iVBORw0KGgo=',
+        })),
+      },
+    ],
+  },
+  evidence: {
+    tools: [
+      {
+        name: 'search_web',
+        description: 'Search the web via the evidence AutoRAG index and return ranked results.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: { type: 'string' },
+            limit: { type: 'number' },
+          },
+          required: ['query'],
+        },
+        response: text(JSON.stringify({
+          results: [
+            { url: 'https://example.com/article-1', title: 'MCP Gateway Architecture', snippet: 'A slim-MCP gateway exposing 5 meta-tools...', score: 0.92 },
+            { url: 'https://example.com/article-2', title: 'Building MCP Servers', snippet: 'Guide to building Model Context Protocol servers...', score: 0.87 },
+          ],
+          total: 2,
+          query: 'MCP gateway',
+        })),
+      },
+      {
+        name: 'find_similar',
+        description: 'Find documents semantically similar to a given query or document snippet.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: { type: 'string' },
+            limit: { type: 'number' },
+          },
+          required: ['query'],
+        },
+        response: text(JSON.stringify({
+          results: [
+            { url: 'https://example.com/similar-1', title: 'Related: MCP Protocol Design', score: 0.85 },
+            { url: 'https://example.com/similar-2', title: 'Related: Tool Aggregation Patterns', score: 0.78 },
+          ],
+          total: 2,
+        })),
+      },
+      {
+        name: 'summarize',
+        description: 'Summarize text content using the evidence pipeline.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            content: { type: 'string' },
+            max_length: { type: 'number' },
+          },
+          required: ['content'],
+        },
+        response: text(JSON.stringify({
+          summary: 'This document describes a slim-MCP gateway that aggregates multiple backends behind 5 meta-tools.',
+          word_count: 22,
+        })),
+      },
+      {
+        name: 'get_page',
+        description: 'Fetch and parse a web page, returning its text content.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            url: { type: 'string' },
+          },
+          required: ['url'],
+        },
+        response: text(JSON.stringify({
+          url: 'https://example.com/article-1',
+          title: 'MCP Gateway Architecture',
+          content: 'A slim-MCP gateway that aggregates backends behind 5 meta-tools: search, execute, status, reload, cast.',
+          fetched_at: '2026-09-07T06:00:00Z',
+        })),
+      },
+    ],
+  },
 };

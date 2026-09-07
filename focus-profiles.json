@@ -1,52 +1,50 @@
 {
-  "_comment": "Focus profiles — a soft lens over the tool registry, not a gate. Selecting a focus boosts in-focus tools (by category and/or server id) in search + cast ranking; out-of-focus tools stay reachable. Select via env CH1TTY_FOCUS=<name> or the per-call `focus` param on ch1tty/search and ch1tty/cast. Server ids and categories reference servers.json — profiles may name disabled/future servers (they simply won't match until present).",
+  "_comment": "Focus profiles \u2014 a soft lens over the tool registry, not a gate. Selecting a focus boosts in-focus tools (by category and/or server id) in search + cast ranking; out-of-focus tools stay reachable. Select via env CH1TTY_FOCUS=<name> or the per-call `focus` param on ch1tty/search and ch1tty/cast. Server ids and categories reference servers.json \u2014 profiles may name disabled/future servers (they simply won't match until present).",
   "profiles": {
-    "finance": {
-      "description": "Billing, payments, ledger, and financial ecosystem tools",
+    "analytics": {
+      "description": "Data analytics \u2014 query metrics, aggregate events, and export reports via the analytics backend.",
+      "categories": [],
+      "servers": [
+        "analytics"
+      ],
+      "boost": 0.6
+    },
+    "auth": {
+      "description": "Identity and access management \u2014 verify tokens, issue credentials, manage sessions, and trace auth flows across ChittyID",
       "categories": [
         "ecosystem"
       ],
       "servers": [
-        "stripe",
-        "tasks",
-        "ledger"
-      ],
-      "boost": 0.5
-    },
-    "governance": {
-      "description": "ChittyOS ecosystem governance, identity, evidence, persistent state, sessions, and ledger",
-      "categories": [
-        "ecosystem",
-        "documents"
-      ],
-      "servers": [
-        "chittyos",
-        "neon",
-        "notion",
-        "evidence",
-        "chittyevidence",
-        "orchestrator",
+        "auth",
         "session",
-        "ledger",
-        "tasks",
-        "linear"
+        "chittyos"
       ],
-      "boost": 0.5
+      "boost": 0.6
     },
-    "design": {
-      "description": "Browser rendering, automation, and desktop/visual work",
+    "chittyevidence": {
+      "description": "Evidence corpus \u2014 ingest, search, and retrieve documents with canonical URIs via ChittyEvidence (apps/evidence-mcp)",
       "categories": [
-        "desktop"
+        "ecosystem"
       ],
       "servers": [
-        "browser-rendering",
-        "playwright",
-        "cowork"
+        "chittyevidence"
+      ],
+      "boost": 0.6
+    },
+    "cloud": {
+      "description": "Cloudflare platform \u2014 deploy, build, and manage Workers in production and staging environments",
+      "categories": [
+        "ecosystem"
+      ],
+      "servers": [
+        "cloudflare",
+        "cloudflare-builds",
+        "ship"
       ],
       "boost": 0.5
     },
     "code": {
-      "description": "Software development — source control, issue tracking, deployment, library documentation, database, code quality, and technical documentation tools",
+      "description": "Software development \u2014 source control, issue tracking, deployment, library documentation, database, code quality, and technical documentation tools",
       "categories": [
         "code"
       ],
@@ -77,8 +75,123 @@
       ],
       "boost": 0.5
     },
+    "data": {
+      "description": "Database, storage, and filesystem tooling \u2014 Neon SQL queries, schema inspection, R2 object storage, and local filesystem operations",
+      "categories": [
+        "ecosystem"
+      ],
+      "servers": [
+        "neon",
+        "storage",
+        "fs"
+      ],
+      "boost": 0.6
+    },
+    "design": {
+      "description": "Browser rendering, automation, and desktop/visual work",
+      "categories": [
+        "desktop"
+      ],
+      "servers": [
+        "browser-rendering",
+        "playwright",
+        "cowork"
+      ],
+      "boost": 0.5
+    },
+    "finance": {
+      "description": "Billing, payments, ledger, and financial ecosystem tools",
+      "categories": [
+        "ecosystem"
+      ],
+      "servers": [
+        "stripe",
+        "tasks",
+        "ledger"
+      ],
+      "boost": 0.5
+    },
+    "google": {
+      "description": "Google Workspace productivity and administration \u2014 Gmail, Google Calendar, Drive, Docs, and org-wide user/group management via Google Admin (GAM)",
+      "categories": [
+        "ecosystem",
+        "documents"
+      ],
+      "servers": [
+        "google",
+        "gam",
+        "notion",
+        "tasks"
+      ],
+      "boost": 0.6
+    },
+    "governance": {
+      "description": "ChittyOS ecosystem governance, identity, evidence, persistent state, sessions, and ledger",
+      "categories": [
+        "ecosystem",
+        "documents"
+      ],
+      "servers": [
+        "chittyos",
+        "neon",
+        "notion",
+        "evidence",
+        "chittyevidence",
+        "orchestrator",
+        "session",
+        "ledger",
+        "tasks",
+        "linear"
+      ],
+      "boost": 0.5
+    },
+    "ledger": {
+      "description": "Append-only audit ledger \u2014 list namespaces, read entries, and append immutable records via ChittyLedger (apps/ledger-mcp)",
+      "categories": [
+        "ecosystem"
+      ],
+      "servers": [
+        "ledger"
+      ],
+      "boost": 0.6
+    },
+    "legal": {
+      "description": "Legal operations \u2014 dispute management, resolution workflows, evidence retrieval, and audit-trail recording",
+      "categories": [
+        "ecosystem"
+      ],
+      "servers": [
+        "dispute",
+        "resolve",
+        "chittyevidence",
+        "ledger",
+        "tasks",
+        "notion"
+      ],
+      "boost": 0.6
+    },
+    "market": {
+      "description": "Market research and pricing intelligence \u2014 search listings, track price history, compare offers, and summarise market conditions",
+      "categories": [
+        "ecosystem"
+      ],
+      "servers": [
+        "market",
+        "neon",
+        "notion"
+      ],
+      "boost": 0.5
+    },
+    "monitoring": {
+      "description": "Service health, alerting, and observability \u2014 check endpoint health, query alert rules, and inspect uptime metrics across ChittyOS services",
+      "categories": [],
+      "servers": [
+        "monitor"
+      ],
+      "boost": 0.6
+    },
     "ops": {
-      "description": "Deployment, infrastructure monitoring, and DevOps tooling — Cloudflare Workers, database ops, source control, filesystem, and orchestration",
+      "description": "Deployment, infrastructure monitoring, and DevOps tooling \u2014 Cloudflare Workers, database ops, source control, filesystem, and orchestration",
       "categories": [
         "ecosystem",
         "code"
@@ -94,48 +207,8 @@
       ],
       "boost": 0.5
     },
-    "tasks": {
-      "description": "Task management — create, update, list, and complete ChittyAgent Tasks",
-      "categories": [
-        "ecosystem"
-      ],
-      "servers": [
-        "tasks"
-      ],
-      "boost": 0.6
-    },
-    "ledger": {
-      "description": "Append-only audit ledger — list namespaces, read entries, and append immutable records via ChittyLedger (apps/ledger-mcp)",
-      "categories": [
-        "ecosystem"
-      ],
-      "servers": [
-        "ledger"
-      ],
-      "boost": 0.6
-    },
-    "session": {
-      "description": "Cross-channel session management — create, inspect, and close ChittyOS sessions; append and replay session event logs",
-      "categories": [
-        "ecosystem"
-      ],
-      "servers": [
-        "session"
-      ],
-      "boost": 0.6
-    },
-    "chittyevidence": {
-      "description": "Evidence corpus — ingest, search, and retrieve documents with canonical URIs via ChittyEvidence (apps/evidence-mcp)",
-      "categories": [
-        "ecosystem"
-      ],
-      "servers": [
-        "chittyevidence"
-      ],
-      "boost": 0.6
-    },
     "realestate": {
-      "description": "Property management — list and inspect rental properties, tenants, leases, and maintenance requests via TurboTenant",
+      "description": "Property management \u2014 list and inspect rental properties, tenants, leases, and maintenance requests via TurboTenant",
       "categories": [
         "ecosystem"
       ],
@@ -147,32 +220,35 @@
       ],
       "boost": 0.6
     },
-    "google": {
-      "description": "Google Workspace productivity and administration — Gmail, Google Calendar, Drive, Docs, and org-wide user/group management via Google Admin (GAM)",
+    "search": {
+      "description": "Web and document search \u2014 query the evidence index, scrape pages, extract content, and surface research findings",
       "categories": [
-        "ecosystem",
-        "documents"
+        "search"
       ],
       "servers": [
-        "google",
-        "gam",
-        "notion",
-        "tasks"
+        "evidence",
+        "scrape",
+        "contextual"
       ],
       "boost": 0.6
     },
-    "legal": {
-      "description": "Legal operations — dispute management, resolution workflows, evidence retrieval, and audit-trail recording",
+    "session": {
+      "description": "Cross-channel session management \u2014 create, inspect, and close ChittyOS sessions; append and replay session event logs",
       "categories": [
         "ecosystem"
       ],
       "servers": [
-        "dispute",
-        "resolve",
-        "chittyevidence",
-        "ledger",
-        "tasks",
-        "notion"
+        "session"
+      ],
+      "boost": 0.6
+    },
+    "tasks": {
+      "description": "Task management \u2014 create, update, list, and complete ChittyAgent Tasks",
+      "categories": [
+        "ecosystem"
+      ],
+      "servers": [
+        "tasks"
       ],
       "boost": 0.6
     }
