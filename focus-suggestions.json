@@ -30077,6 +30077,83 @@
           "resolves_to": "chittyevidence/ingest_document"
         }
       ]
+    },
+    "auth": {
+      "description": "Identity and access management — verify tokens, issue credentials, manage sessions, and trace auth flows across ChittyID",
+      "combos": [
+        {
+          "name": "token-rotation",
+          "chain": [
+            "auth/list_tokens",
+            "auth/revoke_token",
+            "auth/create_token"
+          ],
+          "accomplishes": "List active tokens for an identity, revoke the oldest one, and issue a fresh replacement — a safe credential rotation workflow.",
+          "verified": false,
+          "notes": "auth backend not connected on live gateway at generation time; tool names inferred from ChittyID auth surface."
+        },
+        {
+          "name": "identity-verification",
+          "chain": [
+            "auth/verify_token",
+            "auth/get_identity"
+          ],
+          "accomplishes": "Verify an inbound token and then fetch the full identity record it belongs to — useful for onboarding validation or incident triage.",
+          "verified": false,
+          "notes": "auth backend not connected at generation time."
+        },
+        {
+          "name": "session-auth-check",
+          "chain": [
+            "auth/verify_token",
+            "session/get_session",
+            "chittyos/status"
+          ],
+          "accomplishes": "Verify a token, load the session it belongs to, then check the ChittyOS service health — a full auth-to-service readiness check.",
+          "verified": false,
+          "notes": "auth and session backends not connected; chittyos/status is a remote proxy."
+        },
+        {
+          "name": "revoke-all-expired",
+          "chain": [
+            "auth/list_tokens",
+            "auth/revoke_token"
+          ],
+          "accomplishes": "List all tokens for an identity and revoke any that are expired or near-expiry — a batch cleanup sweep.",
+          "verified": false,
+          "notes": "auth backend not connected at generation time."
+        }
+      ],
+      "prompts": [
+        {
+          "text": "Verify token X and return the identity it belongs to",
+          "resolves_to": "auth/verify_token"
+        },
+        {
+          "text": "List all active tokens for identity Y",
+          "resolves_to": "auth/list_tokens"
+        },
+        {
+          "text": "Issue a new API token for identity Y with scope Z",
+          "resolves_to": "auth/create_token"
+        },
+        {
+          "text": "Revoke token X immediately",
+          "resolves_to": "auth/revoke_token"
+        },
+        {
+          "text": "Rotate credentials: revoke the oldest token and issue a fresh one for identity Y",
+          "resolves_to": "auth/create_token"
+        },
+        {
+          "text": "Check whether the auth service is healthy and accepting token requests",
+          "resolves_to": "chittyos/status"
+        },
+        {
+          "text": "Verify token X then load the session associated with it",
+          "resolves_to": "auth/verify_token"
+        }
+      ]
     }
   }
 }

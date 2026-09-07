@@ -133,6 +133,18 @@
         "chittyevidence"
       ],
       "boost": 0.6
+    },
+    "auth": {
+      "description": "Identity and access management — verify tokens, issue credentials, manage sessions, and trace auth flows across ChittyID",
+      "categories": [
+        "ecosystem"
+      ],
+      "servers": [
+        "auth",
+        "session",
+        "chittyos"
+      ],
+      "boost": 0.6
     }
   }
 }

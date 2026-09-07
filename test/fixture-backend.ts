@@ -1187,4 +1187,96 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
       },
     ],
   },
+  auth: {
+    tools: [
+      {
+        name: 'verify_token',
+        description: 'Verify an API token or JWT and return its validity status and claims',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            token: { type: 'string' },
+          },
+          required: ['token'],
+        },
+        response: text(JSON.stringify({
+          valid: true,
+          identity_id: 'chittyid-nick-001',
+          scope: ['read', 'write'],
+          issued_at: '2026-09-01T00:00:00Z',
+          expires_at: '2026-10-01T00:00:00Z',
+        })),
+      },
+      {
+        name: 'create_token',
+        description: 'Issue a new API token for an identity with a specified scope and TTL',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            identity_id: { type: 'string' },
+            scope: { type: 'array', items: { type: 'string' } },
+            ttl_seconds: { type: 'number' },
+          },
+          required: ['identity_id'],
+        },
+        response: text(JSON.stringify({
+          token: 'tok_fixture_new_abc123',
+          identity_id: 'chittyid-nick-001',
+          scope: ['read', 'write'],
+          issued_at: '2026-09-07T00:00:00Z',
+          expires_at: '2026-10-07T00:00:00Z',
+        })),
+      },
+      {
+        name: 'revoke_token',
+        description: 'Revoke an API token immediately, invalidating all future uses',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            token: { type: 'string' },
+          },
+          required: ['token'],
+        },
+        response: text(JSON.stringify({
+          revoked: true,
+          token: 'tok_fixture_old_xyz987',
+          revoked_at: '2026-09-07T00:05:00Z',
+        })),
+      },
+      {
+        name: 'list_tokens',
+        description: 'List all active API tokens for a given identity',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            identity_id: { type: 'string' },
+            include_expired: { type: 'boolean' },
+          },
+          required: ['identity_id'],
+        },
+        response: text(JSON.stringify([
+          { token_id: 'tid-001', scope: ['read', 'write'], issued_at: '2026-09-01T00:00:00Z', expires_at: '2026-10-01T00:00:00Z', status: 'active' },
+          { token_id: 'tid-002', scope: ['read'], issued_at: '2026-08-01T00:00:00Z', expires_at: '2026-09-01T00:00:00Z', status: 'expired' },
+        ])),
+      },
+      {
+        name: 'get_identity',
+        description: 'Get the identity record for a ChittyID, including display name, email, and linked services',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            identity_id: { type: 'string' },
+          },
+          required: ['identity_id'],
+        },
+        response: text(JSON.stringify({
+          identity_id: 'chittyid-nick-001',
+          display_name: 'Nick',
+          email: 'nick@nevershitty.com',
+          linked_services: ['ch1tty', 'chittyagent', 'chittyos'],
+          created_at: '2026-01-01T00:00:00Z',
+        })),
+      },
+    ],
+  },
 };
