@@ -194,6 +194,12 @@ export const FOCUS_PROFILES_RAW = {
       servers: ['cloudflare', 'cloudflare-builds', 'neon', 'github', 'orchestrator', 'fs', 'quality'],
       boost: 0.5,
     },
+    auth: {
+      description: 'Identity and access management — verify tokens, issue credentials, manage sessions, and trace auth flows across ChittyID',
+      categories: ['ecosystem'],
+      servers: ['auth', 'session', 'chittyos'],
+      boost: 0.6,
+    },
   },
 } as const;
 

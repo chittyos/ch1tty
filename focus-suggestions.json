@@ -30090,7 +30090,7 @@
           ],
           "accomplishes": "List active tokens for an identity, revoke the oldest one, and issue a fresh replacement — a safe credential rotation workflow.",
           "verified": false,
-          "notes": "auth backend not connected on live gateway at generation time; tool names inferred from ChittyID auth surface."
+          "notes": "auth backend not connected at generation time; tool names inferred from ChittyID auth surface. Caller must map args between steps: revoke_token requires token (from list_tokens result), create_token requires identity_id — auto-chain does not extract these automatically."
         },
         {
           "name": "identity-verification",
@@ -30107,11 +30107,11 @@
           "chain": [
             "auth/verify_token",
             "session/get_session",
-            "chittyos/status"
+            "chittyos/get_health"
           ],
           "accomplishes": "Verify a token, load the session it belongs to, then check the ChittyOS service health — a full auth-to-service readiness check.",
           "verified": false,
-          "notes": "auth and session backends not connected; chittyos/status is a remote proxy."
+          "notes": "auth and session backends not connected; chittyos/get_health requires a service_id arg supplied by the caller."
         },
         {
           "name": "revoke-all-expired",
@@ -30147,7 +30147,7 @@
         },
         {
           "text": "Check whether the auth service is healthy and accepting token requests",
-          "resolves_to": "chittyos/status"
+          "resolves_to": "chittyos/get_health"
         },
         {
           "text": "Verify token X then load the session associated with it",
