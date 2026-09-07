@@ -30142,15 +30142,15 @@
           "resolves_to": "auth/revoke_token"
         },
         {
-          "text": "Rotate credentials: revoke the oldest token and issue a fresh one for identity Y",
+          "text": "Issue a new API token for identity Y to replace an existing one",
           "resolves_to": "auth/create_token"
         },
         {
-          "text": "Check whether the auth service is healthy and accepting token requests",
+          "text": "Check the health of the ChittyOS auth service by service ID",
           "resolves_to": "chittyos/get_health"
         },
         {
-          "text": "Verify token X then load the session associated with it",
+          "text": "Verify token X",
           "resolves_to": "auth/verify_token"
         }
       ]

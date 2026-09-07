@@ -1233,13 +1233,13 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
         inputSchema: {
           type: 'object',
           properties: {
-            token: { type: 'string' },
+            token_id: { type: 'string' },
           },
-          required: ['token'],
+          required: ['token_id'],
         },
         response: text(JSON.stringify({
           revoked: true,
-          token: 'tok_fixture_old_xyz987',
+          token_id: 'tid-002',
           revoked_at: '2026-09-07T00:05:00Z',
         })),
       },

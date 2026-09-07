@@ -163,15 +163,16 @@ test('auth focus: multi-step — list tokens then revoke expired one', async () 
   }, sessionId);
   assert.equal(listResult.isError, undefined, 'list_tokens should succeed');
   const tokens = JSON.parse(listResult.content[0].text as string) as Array<{ token_id: string; status: string }>;
-  assert.ok(tokens.some((t) => t.status === 'expired'), 'fixture should include an expired token');
+  const expiredToken = tokens.find((t) => t.status === 'expired');
+  assert.ok(expiredToken, 'fixture should include an expired token');
 
-  // Step 2: revoke a token
+  // Step 2: revoke the expired token using its token_id from the list
   const revokeResult = await aggregator.callTool('ch1tty/execute', {
     tool: 'auth/revoke_token',
-    args: { token: 'tok_fixture_old_xyz987' },
+    args: { token_id: expiredToken.token_id },
   }, sessionId);
   assert.equal(revokeResult.isError, undefined, 'revoke_token should succeed');
-  const revoked = JSON.parse(revokeResult.content[0].text as string) as { revoked: boolean };
+  const revoked = JSON.parse(revokeResult.content[0].text as string) as { revoked: boolean; token_id: string };
   assert.equal(revoked.revoked, true, 'revoke response should confirm revoked:true');
 
   const calls = fixture.getCallLog();
