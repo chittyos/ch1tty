@@ -254,6 +254,12 @@ export const FOCUS_PROFILES_RAW = {
       servers: ['cloudflare', 'cloudflare-builds', 'neon', 'github', 'orchestrator', 'fs', 'quality'],
       boost: 0.5,
     },
+    deploy: {
+      description: 'Deployment and shipping — build, deploy, and monitor Cloudflare Workers; create and review PRs on GitHub; track deployment tasks',
+      categories: [],
+      servers: ['cloudflare', 'cloudflare-builds', 'github', 'ship', 'linear', 'tasks'],
+      boost: 0.6,
+    },
     documents: {
       description: 'Document creation, search, and knowledge management — Notion pages/databases, library docs via Context7, PDF processing, and collaborative notes',
       categories: ['documents'],

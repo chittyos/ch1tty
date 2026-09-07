@@ -140,7 +140,7 @@ test('deploy focus: execute cloudflare/deploy_worker returns deployment result',
 
   const result = await aggregator.callTool('ch1tty/execute', {
     tool: 'cloudflare/deploy_worker',
-    args: { worker_name: 'my-worker', script: 'export default { fetch() {} }' },
+    args: { script_name: 'my-worker', script: 'export default { fetch() {} }' },
   });
   assert.equal(result.isError, undefined, 'execute should succeed');
 
@@ -197,27 +197,28 @@ test('deploy focus: multi-step — list builds, check status, set active worker'
   const sessionId = 'deploy-scenario-001';
   fixture.clearCallLog();
 
-  // Step 1: list recent builds
+  // Step 1: list recent builds to find the latest successful one
   const listResult = await aggregator.callTool('ch1tty/execute', {
     tool: 'cloudflare-builds/workers_builds_list_builds',
-    args: { worker_name: 'ch1tty-gateway' },
+    args: { workerId: 'ch1tty-gateway' },
   }, sessionId);
   assert.equal(listResult.isError, undefined, 'list_builds should succeed');
-  const builds = JSON.parse(listResult.content[0].text as string) as Array<{ id: string; status: string }>;
+  const builds = JSON.parse(listResult.content[0].text as string) as Array<{ buildUUID: string; worker: string; status: string }>;
   assert.ok(builds.length > 0, 'should return builds');
 
-  // Step 2: get details of the first build
-  const buildId = builds[0]?.id ?? 'build-001';
+  // Step 2: get details of the first build using its buildUUID
+  const buildUUID = builds[0]?.buildUUID ?? 'uuid-abc';
   const getResult = await aggregator.callTool('ch1tty/execute', {
     tool: 'cloudflare-builds/workers_builds_get_build',
-    args: { build_id: buildId },
+    args: { buildUUID },
   }, sessionId);
   assert.equal(getResult.isError, undefined, 'get_build should succeed');
 
-  // Step 3: set the built version as active
+  // Step 3: set the session context to this worker for subsequent build API calls
+  const workerName = builds[0]?.worker ?? 'ch1tty-gateway';
   const activateResult = await aggregator.callTool('ch1tty/execute', {
     tool: 'cloudflare-builds/workers_builds_set_active_worker',
-    args: { worker_name: 'ch1tty-gateway', build_id: buildId },
+    args: { workerId: workerName },
   }, sessionId);
   assert.equal(activateResult.isError, undefined, 'set_active_worker should succeed');
 
@@ -236,7 +237,7 @@ test('deploy focus: multi-step — deploy worker, open PR, create task', async (
   // Step 1: deploy worker
   const deployResult = await aggregator.callTool('ch1tty/execute', {
     tool: 'cloudflare/deploy_worker',
-    args: { worker_name: 'feature-worker', script: 'export default { fetch() {} }' },
+    args: { script_name: 'feature-worker', script: 'export default { fetch() {} }' },
   }, sessionId);
   assert.equal(deployResult.isError, undefined, 'deploy_worker should succeed');
   const deployment = JSON.parse(deployResult.content[0].text as string) as { id: string; name: string; status: string };
@@ -245,7 +246,7 @@ test('deploy focus: multi-step — deploy worker, open PR, create task', async (
   // Step 2: open a PR to track the deployment
   const prResult = await aggregator.callTool('ch1tty/execute', {
     tool: 'github/create_pull_request',
-    args: { title: `Deploy ${deployment.name}`, body: `Worker deployed: ${deployment.id}`, head: 'feature/deploy', base: 'main' },
+    args: { owner: 'chittyos', repo: 'ch1tty', title: `Deploy ${deployment.name}`, body: `Worker deployed: ${deployment.id}`, head: 'feature/deploy', base: 'main' },
   }, sessionId);
   assert.equal(prResult.isError, undefined, 'create_pull_request should succeed');
   const pr = JSON.parse(prResult.content[0].text as string) as { number: number; state: string };
