@@ -16,10 +16,10 @@ function freshCatalog() {
 }
 
 describe('suggestions catalog', () => {
-  it('loads all 21 focus profiles', () => {
+  it('loads all 22 focus profiles', () => {
     const catalog = freshCatalog();
     const keys = Object.keys(catalog).sort();
-    assert.deepEqual(keys, ["analytics", "auth", "chittyevidence", "cloud", "code", "communication", "data", "design", "documents", "finance", "google", "governance", "ledger", "legal", "market", "monitoring", "ops", "realestate", "search", "session", "tasks"]);
+    assert.deepEqual(keys, ["analytics", "auth", "chittyevidence", "cloud", "code", "communication", "data", "deploy", "design", "documents", "finance", "google", "governance", "ledger", "legal", "market", "monitoring", "ops", "realestate", "search", "session", "tasks"]);
   });
 
   it('every profile has at least 3 combos and 3 prompts', () => {

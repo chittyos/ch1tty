@@ -30939,6 +30939,91 @@
           "resolves_to": "query-library-docs-and-document-findings"
         }
       ]
+    },
+    "deploy": {
+      "description": "Deployment and shipping \u2014 build, deploy, and monitor Cloudflare Workers; create and review PRs on GitHub; track deployment tasks",
+      "combos": [
+        {
+          "name": "deploy-pr-task",
+          "chain": [
+            "cloudflare/deploy_worker",
+            "cloudflare/list_workers"
+          ],
+          "accomplishes": "Deploy a Cloudflare Worker and immediately verify it appears as active in the Workers list.",
+          "verified": false,
+          "notes": "Same-backend 2-step: deploy_worker (script_name + script) \u2192 list_workers to confirm the new version is live. Opening a PR and task are manual follow-up; create_pull_request requires owner/repo/title/head not in deploy_worker output."
+        },
+        {
+          "name": "build-then-check-deploy",
+          "chain": [
+            "cloudflare-builds/workers_builds_list_builds",
+            "cloudflare-builds/workers_builds_get_build"
+          ],
+          "accomplishes": "List recent build runs and inspect the latest build details \u2014 confirming a build is sound before promoting it to production.",
+          "verified": false,
+          "notes": "Same-backend 2-step: list_builds returns buildUUID; get_build requires buildUUID. Third step (deploy_worker) omitted \u2014 it requires script_name + script not present in get_build output."
+        },
+        {
+          "name": "build-logs-debug",
+          "chain": [
+            "cloudflare-builds/workers_builds_get_build_logs",
+            "cloudflare-builds/workers_builds_get_build"
+          ],
+          "accomplishes": "Pull build logs from a failed run, then fetch the build details to correlate log output with build metadata.",
+          "verified": false,
+          "notes": "Same-backend 2-step: both on cloudflare-builds. get_build_logs requires buildUUID; get_build requires the same buildUUID \u2014 the caller supplies it once and both steps use it."
+        },
+        {
+          "name": "worker-health-check",
+          "chain": [
+            "cloudflare/list_workers",
+            "cloudflare/get_worker_logs"
+          ],
+          "accomplishes": "List all deployed Workers and fetch live logs for a specific one \u2014 confirming a deployment is healthy and catching runtime errors.",
+          "verified": false,
+          "notes": "Same-backend 2-step on cloudflare. get_worker_logs requires explicit worker_name; with chain:true, previousResult carries list_workers output but callers should supply worker_name directly."
+        },
+        {
+          "name": "deploy-and-validate",
+          "chain": [
+            "cloudflare-builds/workers_builds_get_build",
+            "cloudflare-builds/workers_builds_get_build_logs"
+          ],
+          "accomplishes": "Inspect a specific build to confirm it succeeded, then pull its logs to verify the build output in detail.",
+          "verified": false,
+          "notes": "Same-backend 2-step on cloudflare-builds. Both steps require buildUUID \u2014 the caller supplies it once."
+        }
+      ],
+      "prompts": [
+        {
+          "text": "List all deployed Cloudflare Workers and check logs for a specific worker (supply worker_name)",
+          "resolves_to": "worker-health-check"
+        },
+        {
+          "text": "Deploy a Cloudflare Worker (supply script_name and script) and verify it appears active in the worker list",
+          "resolves_to": "deploy-pr-task"
+        },
+        {
+          "text": "Show recent build runs for my-worker and inspect the latest one",
+          "resolves_to": "build-then-check-deploy"
+        },
+        {
+          "text": "Pull build logs for a specific Cloudflare build run (supply a buildUUID) and correlate with its build details",
+          "resolves_to": "build-logs-debug"
+        },
+        {
+          "text": "Inspect a specific build (supply buildUUID) and pull its build logs to verify the output",
+          "resolves_to": "deploy-and-validate"
+        },
+        {
+          "text": "Check which workers are deployed and pull logs for a specific worker (supply worker_name)",
+          "resolves_to": "worker-health-check"
+        },
+        {
+          "text": "Deploy a Cloudflare Worker (supply script_name and script) and confirm the deployment is active in the worker list",
+          "resolves_to": "deploy-pr-task"
+        }
+      ]
     }
   }
 }
