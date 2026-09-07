@@ -153,6 +153,17 @@ export const REMOTE_SERVERS: ServerConfig[] = [
     lazy: false,
     enabled: true,
   },
+  {
+    id: 'market',
+    name: 'Market Intelligence',
+    type: 'remote',
+    access: 'read',
+    category: 'ecosystem',
+    endpoint: 'https://market.chitty.cc/mcp',
+    authTokenKey: 'chittymcp',
+    lazy: true,
+    enabled: true,
+  },
 ];
 
 /** Focus profiles — embedded verbatim from focus-profiles.json (profiles only). */
