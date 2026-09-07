@@ -17,7 +17,7 @@ const DEPLOY_FOCUS_PROFILES = {
   profiles: {
     deploy: {
       description: 'Deployment and shipping — build, deploy, and monitor Cloudflare Workers; create and review PRs on GitHub; track deployment tasks',
-      categories: ['code' as const, 'ecosystem' as const],
+      categories: [],
       servers: ['cloudflare', 'cloudflare-builds', 'github', 'ship', 'linear', 'tasks'],
       boost: 0.6,
     },
@@ -177,7 +177,7 @@ test('deploy focus: execute cloudflare-builds/workers_builds_list_builds returns
 
   const result = await aggregator.callTool('ch1tty/execute', {
     tool: 'cloudflare-builds/workers_builds_list_builds',
-    args: { worker_name: 'my-worker' },
+    args: { workerId: 'my-worker' },
   });
   assert.equal(result.isError, undefined, 'execute should succeed');
 

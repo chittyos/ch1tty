@@ -30947,33 +30947,31 @@
           "name": "deploy-pr-task",
           "chain": [
             "cloudflare/deploy_worker",
-            "github/create_pull_request",
-            "tasks/create_task"
+            "cloudflare/list_workers"
           ],
-          "accomplishes": "Deploy a Cloudflare Worker, open a tracking PR on GitHub, and create a post-deploy validation task \u2014 the full ship-it loop in three calls.",
+          "accomplishes": "Deploy a Cloudflare Worker and immediately verify it appears as active in the Workers list.",
           "verified": false,
-          "notes": "Crosses cloudflare, github (code), and tasks (ecosystem) backends. deploy_worker requires script_name + script."
+          "notes": "Same-backend 2-step: deploy_worker (script_name + script) \u2192 list_workers to confirm the new version is live. Opening a PR and task are manual follow-up; create_pull_request requires owner/repo/title/head not in deploy_worker output."
         },
         {
           "name": "build-then-check-deploy",
           "chain": [
             "cloudflare-builds/workers_builds_list_builds",
-            "cloudflare-builds/workers_builds_get_build",
-            "cloudflare/deploy_worker"
+            "cloudflare-builds/workers_builds_get_build"
           ],
-          "accomplishes": "List recent build runs, inspect the latest successful build, then deploy the Worker script \u2014 confirming the build is sound before promoting it.",
+          "accomplishes": "List recent build runs and inspect the latest build details \u2014 confirming a build is sound before promoting it to production.",
           "verified": false,
-          "notes": "workers_builds_list_builds returns buildUUID; workers_builds_get_build requires buildUUID; cloudflare-builds and cloudflare are separate backends."
+          "notes": "Same-backend 2-step: list_builds returns buildUUID; get_build requires buildUUID. Third step (deploy_worker) omitted \u2014 it requires script_name + script not present in get_build output."
         },
         {
           "name": "build-logs-debug",
           "chain": [
             "cloudflare-builds/workers_builds_get_build_logs",
-            "cloudflare/get_worker_logs"
+            "cloudflare-builds/workers_builds_get_build"
           ],
-          "accomplishes": "Pull build logs from a failed Cloudflare Workers Builds run, then fetch live runtime logs from the deployed Worker \u2014 covering both build-time and runtime failure modes.",
+          "accomplishes": "Pull build logs from a failed run, then fetch the build details to correlate log output with build metadata.",
           "verified": false,
-          "notes": "Two backends: cloudflare-builds (build logs) and cloudflare (live worker logs). Requires buildUUID and worker_name respectively."
+          "notes": "Same-backend 2-step: both on cloudflare-builds. get_build_logs requires buildUUID; get_build requires the same buildUUID \u2014 the caller supplies it once and both steps use it."
         },
         {
           "name": "worker-health-check",
@@ -30983,18 +30981,17 @@
           ],
           "accomplishes": "List all deployed Workers and fetch live logs for a specific one \u2014 confirming a deployment is healthy and catching runtime errors.",
           "verified": false,
-          "notes": "Both tools on cloudflare backend; get_worker_logs requires worker_name."
+          "notes": "Same-backend 2-step on cloudflare. get_worker_logs requires explicit worker_name; with chain:true, previousResult carries list_workers output but callers should supply worker_name directly."
         },
         {
           "name": "deploy-and-validate",
           "chain": [
             "cloudflare-builds/workers_builds_get_build",
-            "cloudflare/deploy_worker",
-            "cloudflare/list_workers"
+            "cloudflare-builds/workers_builds_get_build_logs"
           ],
-          "accomplishes": "Inspect a specific build to confirm it succeeded, deploy the Worker, then list all Workers to verify the new version appears as active.",
+          "accomplishes": "Inspect a specific build to confirm it succeeded, then pull its logs to verify the build output in detail.",
           "verified": false,
-          "notes": "Starts from a known buildUUID; deploy_worker requires script_name + script; list_workers verifies post-deploy state."
+          "notes": "Same-backend 2-step on cloudflare-builds. Both steps require buildUUID \u2014 the caller supplies it once."
         }
       ],
       "prompts": [
@@ -31007,8 +31004,8 @@
           "resolves_to": "deploy-pr-task"
         },
         {
-          "text": "Show recent build runs for my-worker and activate the latest successful one",
-          "resolves_to": "build-then-activate"
+          "text": "Show recent build runs for my-worker and inspect the latest one",
+          "resolves_to": "build-then-check-deploy"
         },
         {
           "text": "Why did my last Cloudflare build fail? Pull the build logs",
