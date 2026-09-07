@@ -1187,4 +1187,160 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
       },
     ],
   },
+  evidence: {
+    tools: [
+      {
+        name: 'search_web',
+        description: 'Search the web via the evidence AutoRAG index and return ranked results.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: { type: 'string' },
+            limit: { type: 'number' },
+          },
+          required: ['query'],
+        },
+        response: text(JSON.stringify({
+          results: [
+            { url: 'https://example.com/article-1', title: 'MCP Gateway Architecture', snippet: 'A slim-MCP gateway exposing 5 meta-tools...', score: 0.92 },
+            { url: 'https://example.com/article-2', title: 'Building MCP Servers', snippet: 'Guide to building Model Context Protocol servers...', score: 0.87 },
+          ],
+          total: 2,
+          query: 'MCP gateway',
+        })),
+      },
+      {
+        name: 'find_similar',
+        description: 'Find documents semantically similar to a given query or document snippet.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: { type: 'string' },
+            limit: { type: 'number' },
+          },
+          required: ['query'],
+        },
+        response: text(JSON.stringify({
+          results: [
+            { url: 'https://example.com/similar-1', title: 'Related: MCP Protocol Design', score: 0.85 },
+            { url: 'https://example.com/similar-2', title: 'Related: Tool Aggregation Patterns', score: 0.78 },
+          ],
+          total: 2,
+        })),
+      },
+      {
+        name: 'summarize',
+        description: 'Summarize text content using the evidence pipeline.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            content: { type: 'string' },
+            max_length: { type: 'number' },
+          },
+          required: ['content'],
+        },
+        response: text(JSON.stringify({
+          summary: 'This document describes a slim-MCP gateway that aggregates multiple backends behind 5 meta-tools.',
+          word_count: 22,
+        })),
+      },
+      {
+        name: 'get_page',
+        description: 'Fetch and parse a web page, returning its text content.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            url: { type: 'string' },
+          },
+          required: ['url'],
+        },
+        response: text(JSON.stringify({
+          url: 'https://example.com/article-1',
+          title: 'MCP Gateway Architecture',
+          content: 'A slim-MCP gateway that aggregates backends behind 5 meta-tools: search, execute, status, reload, cast.',
+          fetched_at: '2026-09-07T06:00:00Z',
+        })),
+      },
+    ],
+  },
+  scrape: {
+    tools: [
+      {
+        name: 'scrape_page',
+        description: 'Scrape a web page and return its structured content.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            url: { type: 'string' },
+            include_links: { type: 'boolean' },
+          },
+          required: ['url'],
+        },
+        response: text(JSON.stringify({
+          url: 'https://example.com/article-1',
+          title: 'MCP Gateway Architecture',
+          text: 'A slim-MCP gateway that aggregates backends behind 5 meta-tools.',
+          links: ['https://example.com/related', 'https://docs.example.com/mcp'],
+          status: 200,
+        })),
+      },
+      {
+        name: 'extract_links',
+        description: 'Extract all hyperlinks from a web page.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            url: { type: 'string' },
+          },
+          required: ['url'],
+        },
+        response: text(JSON.stringify({
+          url: 'https://example.com/article-1',
+          links: [
+            { href: 'https://example.com/related', text: 'Related Article', rel: 'noopener' },
+            { href: 'https://docs.example.com/mcp', text: 'MCP Docs', rel: '' },
+            { href: 'https://github.com/example/repo', text: 'Source', rel: 'noopener' },
+          ],
+          total: 3,
+        })),
+      },
+      {
+        name: 'get_content',
+        description: 'Get the plain text content of a URL.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            url: { type: 'string' },
+          },
+          required: ['url'],
+        },
+        response: text(JSON.stringify({
+          url: 'https://example.com/article-1',
+          content: 'A slim-MCP gateway that aggregates backends behind 5 meta-tools: search, execute, status, reload, cast.',
+          content_type: 'text/html',
+          word_count: 17,
+        })),
+      },
+      {
+        name: 'screenshot',
+        description: 'Take a screenshot of a web page.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            url: { type: 'string' },
+            width: { type: 'number' },
+            height: { type: 'number' },
+          },
+          required: ['url'],
+        },
+        response: text(JSON.stringify({
+          url: 'https://example.com/article-1',
+          format: 'png',
+          width: 1280,
+          height: 800,
+          data_uri: 'data:image/png;base64,iVBORw0KGgo=',
+        })),
+      },
+    ],
+  },
 };

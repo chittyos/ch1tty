@@ -30077,6 +30077,76 @@
           "resolves_to": "chittyevidence/ingest_document"
         }
       ]
+    },
+    "search": {
+      "description": "Web and document search — query the evidence index, scrape pages, extract content, and surface research findings",
+      "combos": [
+        {
+          "name": "web-search-and-save",
+          "chain": ["evidence/search_web", "fs/write_file"],
+          "accomplishes": "Run a web search via the evidence index and write the top results to a local file for offline reference.",
+          "verified": false,
+          "notes": "evidence server (autorag endpoint) may require CHITTYEVIDENCE_SEARCH_TOKEN; fs/write_file is verified via the local fs backend."
+        },
+        {
+          "name": "scrape-and-summarize",
+          "chain": ["scrape/scrape_page", "evidence/summarize"],
+          "accomplishes": "Fetch a page via the scrape backend and summarize its content through the evidence search pipeline.",
+          "verified": false,
+          "notes": "scrape backend is a local stdio child; evidence/summarize is inferred from AutoRAG surface."
+        },
+        {
+          "name": "research-report",
+          "chain": ["evidence/search_web", "evidence/find_similar", "notion/API-post-page"],
+          "accomplishes": "Search the web, find semantically related documents in the evidence index, and write a research report page to Notion.",
+          "verified": false,
+          "notes": "evidence endpoints inferred from AutoRAG; notion/API-post-page is verified."
+        },
+        {
+          "name": "link-extraction-and-index",
+          "chain": ["scrape/extract_links", "evidence/search_web"],
+          "accomplishes": "Extract all outbound links from a page and run a search against the evidence index for each domain found.",
+          "verified": false,
+          "notes": "scrape/extract_links inferred from scrape backend surface."
+        },
+        {
+          "name": "full-research-pipeline",
+          "chain": ["evidence/search_web", "scrape/get_content", "fs/write_file"],
+          "accomplishes": "Search for a topic, fetch the full content of the top result, and save it as a local file for analysis.",
+          "verified": false,
+          "notes": "evidence/search_web and scrape/get_content are inferred from their respective server surfaces."
+        }
+      ],
+      "prompts": [
+        {
+          "text": "Search the web for information about X",
+          "resolves_to": "evidence/search_web"
+        },
+        {
+          "text": "Scrape and extract the content of a URL",
+          "resolves_to": "scrape/scrape_page"
+        },
+        {
+          "text": "Find similar documents to the one I just read",
+          "resolves_to": "evidence/find_similar"
+        },
+        {
+          "text": "Extract all links from a web page",
+          "resolves_to": "scrape/extract_links"
+        },
+        {
+          "text": "Search for background research on topic X and summarize findings",
+          "resolves_to": "evidence/search_web"
+        },
+        {
+          "text": "Get the full text content of a specific URL",
+          "resolves_to": "scrape/get_content"
+        },
+        {
+          "text": "Run a targeted web search and write the results to a file",
+          "resolves_to": "evidence/search_web"
+        }
+      ]
     }
   }
 }

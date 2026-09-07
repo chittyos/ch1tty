@@ -133,6 +133,18 @@
         "chittyevidence"
       ],
       "boost": 0.6
+    },
+    "search": {
+      "description": "Web and document search — query the evidence index, scrape pages, extract content, and surface research findings",
+      "categories": [
+        "search"
+      ],
+      "servers": [
+        "evidence",
+        "scrape",
+        "contextual"
+      ],
+      "boost": 0.6
     }
   }
 }
