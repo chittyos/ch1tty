@@ -253,7 +253,7 @@
       "boost": 0.6
     },
     "documents": {
-      "description": "Document creation, search, and knowledge management — Notion pages/databases, library docs via Context7, PDF processing, and collaborative notes",
+      "description": "Document creation, search, and knowledge management \u2014 Notion pages/databases, library docs via Context7, PDF processing, and collaborative notes",
       "categories": [
         "documents"
       ],
@@ -262,6 +262,19 @@
         "context7",
         "pdf",
         "notes"
+      ],
+      "boost": 0.6
+    },
+    "deploy": {
+      "description": "Deployment and shipping \u2014 build, deploy, and monitor Cloudflare Workers; create and review PRs on GitHub; track deployment tasks",
+      "categories": [],
+      "servers": [
+        "cloudflare",
+        "cloudflare-builds",
+        "github",
+        "ship",
+        "linear",
+        "tasks"
       ],
       "boost": 0.6
     }

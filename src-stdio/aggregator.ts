@@ -1410,7 +1410,24 @@ export class Aggregator {
         if (i === 0) {
           stepArgs = toolArgs;
         } else if (previousStepOutput !== null) {
-          stepArgs = { previousResult: previousStepOutput };
+          // Attempt to extract scalar fields from the previous step's JSON output so
+          // backends that require specific named args (e.g. buildUUID) can receive them.
+          // If the output is a JSON array, the first element is used as the source.
+          let extracted: Record<string, unknown> = {};
+          try {
+            const parsed: unknown = JSON.parse(previousStepOutput);
+            const src = Array.isArray(parsed) ? parsed[0] : parsed;
+            if (src !== null && typeof src === 'object') {
+              for (const [k, v] of Object.entries(src as Record<string, unknown>)) {
+                if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') {
+                  extracted[k] = v;
+                }
+              }
+            }
+          } catch {
+            // Not JSON — previousResult alone is sufficient
+          }
+          stepArgs = { previousResult: previousStepOutput, ...extracted };
         } else {
           stepArgs = {};
         }
