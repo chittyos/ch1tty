@@ -299,6 +299,10 @@ test('security focus: cast "scan repository for secrets" returns a plan', async 
   assert.ok(typeof parsed === 'object' && parsed !== null, 'cast should return a valid response object');
   const castField = parsed.cast as string | undefined;
   assert.ok(castField === 'plan' || castField === 'executed', `cast field should be plan or executed, got: ${castField}`);
+  if (castField === 'plan') {
+    const resolved = parsed.resolved as { tool: string } | undefined;
+    assert.ok(resolved?.tool.startsWith('security/'), `plan should resolve to a security/ tool, got: ${resolved?.tool}`);
+  }
 });
 
 test('security focus: multi-step — scan secrets, triage critical finding, create task', async () => {
@@ -327,7 +331,7 @@ test('security focus: multi-step — scan secrets, triage critical finding, crea
   // Step 3: create a remediation task
   const taskResult = await aggregator.callTool('ch1tty/execute', {
     tool: 'tasks/create_task',
-    args: { entity_id: incident.id, title: 'Rotate exposed API key — critical', priority: 'critical' },
+    args: { entity_id: incident.id, title: 'Rotate exposed API key — critical', priority: 'high' },
   }, sessionId);
   assert.equal(taskResult.isError, undefined, 'create_task should succeed');
 
