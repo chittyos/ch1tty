@@ -138,8 +138,7 @@
       "description": "Service health, alerting, and observability — check endpoint health, query alert rules, and inspect uptime metrics across ChittyOS services",
       "categories": [],
       "servers": [
-        "monitoring",
-        "health"
+        "monitor"
       ],
       "boost": 0.6
     }
