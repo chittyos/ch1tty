@@ -30077,6 +30077,70 @@
           "resolves_to": "chittyevidence/ingest_document"
         }
       ]
+    },
+    "cloud": {
+      "description": "Cloudflare platform — deploy, build, and manage Workers in production and staging environments",
+      "combos": [
+        {
+          "name": "deploy-and-tail-logs",
+          "chain": [
+            "cloudflare/deploy_worker",
+            "cloudflare/get_worker_logs"
+          ],
+          "accomplishes": "Deploy a Cloudflare Worker to production then immediately fetch its runtime logs to confirm the deployment is healthy and the Worker is responding.",
+          "verified": false,
+          "notes": "cloudflare not connected at generation time; combo structure validated against fixture tools."
+        },
+        {
+          "name": "build-failure-triage",
+          "chain": [
+            "cloudflare-builds/workers_builds_list_builds",
+            "cloudflare-builds/workers_builds_get_build",
+            "cloudflare-builds/workers_builds_get_build_logs"
+          ],
+          "accomplishes": "List recent Workers Builds runs, identify any failed build, retrieve its details, then fetch the raw build logs to diagnose the root cause of the failure.",
+          "verified": false,
+          "notes": "cloudflare-builds not connected at generation time; combo structure validated against fixture tools."
+        },
+        {
+          "name": "debug-worker-errors",
+          "chain": [
+            "cloudflare/get_worker_logs",
+            "cloudflare/list_workers"
+          ],
+          "accomplishes": "Pull recent error logs from a named Cloudflare Worker then list all active Workers to identify which services are affected and which are healthy.",
+          "verified": false,
+          "notes": "cloudflare not connected at generation time; combo structure validated against fixture tools."
+        },
+        {
+          "name": "set-worker-and-list-builds",
+          "chain": [
+            "cloudflare-builds/workers_builds_set_active_worker",
+            "cloudflare-builds/workers_builds_list_builds"
+          ],
+          "accomplishes": "Set the active Worker context for the session then list its recent build history to get a CI/CD status overview without repeated worker ID arguments.",
+          "verified": false,
+          "notes": "cloudflare-builds not connected at generation time; combo structure validated against fixture tools."
+        }
+      ],
+      "prompts": [
+        {
+          "text": "Deploy a Worker to Cloudflare production and tail its logs to verify the release is healthy",
+          "resolves_to": "deploy-and-tail-logs"
+        },
+        {
+          "text": "List recent build runs and fetch logs from the last failed Workers Build to diagnose the error",
+          "resolves_to": "build-failure-triage"
+        },
+        {
+          "text": "Check Cloudflare Worker error logs and list all active Workers to identify what is affected",
+          "resolves_to": "debug-worker-errors"
+        },
+        {
+          "text": "Set the active Worker context and list its recent build history for a CI/CD status overview",
+          "resolves_to": "set-worker-and-list-builds"
+        }
+      ]
     }
   }
 }

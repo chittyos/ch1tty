@@ -133,6 +133,18 @@
         "chittyevidence"
       ],
       "boost": 0.6
+    },
+    "cloud": {
+      "description": "Cloudflare platform — deploy, build, and manage Workers in production and staging environments",
+      "categories": [
+        "ecosystem"
+      ],
+      "servers": [
+        "cloudflare",
+        "cloudflare-builds",
+        "ship"
+      ],
+      "boost": 0.5
     }
   }
 }
