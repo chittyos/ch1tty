@@ -1291,4 +1291,159 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
       },
     ],
   },
+  google: {
+    tools: [
+      {
+        name: 'list_events',
+        description: 'List upcoming Google Calendar events for the authenticated user',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            calendar_id: { type: 'string' },
+            max_results: { type: 'number' },
+            time_min: { type: 'string', description: 'ISO 8601 start bound' },
+          },
+        },
+        response: text(JSON.stringify({
+          events: [
+            { id: 'evt-001', summary: 'Weekly Standup', start: '2026-09-08T09:00:00Z', end: '2026-09-08T09:30:00Z', attendees: ['alice@example.com', 'bob@example.com'] },
+            { id: 'evt-002', summary: 'Product Review', start: '2026-09-08T14:00:00Z', end: '2026-09-08T15:00:00Z', attendees: ['nick@nevershitty.com'] },
+          ],
+          total: 2,
+        })),
+      },
+      {
+        name: 'list_files',
+        description: 'List files in Google Drive matching a query',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: { type: 'string' },
+            page_size: { type: 'number' },
+            folder_id: { type: 'string' },
+          },
+        },
+        response: text(JSON.stringify({
+          files: [
+            { id: 'file-001', name: 'Q3 Report.docx', mimeType: 'application/vnd.google-apps.document', modifiedTime: '2026-08-30T10:00:00Z' },
+            { id: 'file-002', name: 'Budget 2026.xlsx', mimeType: 'application/vnd.google-apps.spreadsheet', modifiedTime: '2026-09-01T08:00:00Z' },
+          ],
+          total: 2,
+        })),
+      },
+      {
+        name: 'send_email',
+        description: 'Send an email via Gmail on behalf of the authenticated user',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            to: { type: 'string' },
+            subject: { type: 'string' },
+            body: { type: 'string' },
+            cc: { type: 'string' },
+          },
+          required: ['to', 'subject', 'body'],
+        },
+        response: text(JSON.stringify({
+          message_id: 'msg-001',
+          thread_id: 'thread-001',
+          status: 'sent',
+          to: 'alice@example.com',
+        })),
+      },
+      {
+        name: 'create_document',
+        description: 'Create a new Google Doc with given title and optional initial content',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            title: { type: 'string' },
+            content: { type: 'string' },
+            folder_id: { type: 'string' },
+          },
+          required: ['title'],
+        },
+        response: text(JSON.stringify({
+          document_id: 'doc-001',
+          title: 'Meeting Notes — 2026-09-08',
+          url: 'https://docs.google.com/document/d/doc-001/edit',
+          created_at: '2026-09-08T09:30:00Z',
+        })),
+      },
+    ],
+  },
+  gam: {
+    tools: [
+      {
+        name: 'list_users',
+        description: 'List all users in the Google Workspace organization via GAM',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            domain: { type: 'string' },
+            max_results: { type: 'number' },
+            query: { type: 'string' },
+          },
+        },
+        response: text(JSON.stringify({
+          users: [
+            { id: 'usr-001', email: 'alice@example.com', name: 'Alice Johnson', suspended: false, admin: false },
+            { id: 'usr-002', email: 'bob@example.com', name: 'Bob Martinez', suspended: false, admin: false },
+            { id: 'usr-003', email: 'nick@nevershitty.com', name: 'Nick', suspended: false, admin: true },
+          ],
+          total: 3,
+        })),
+      },
+      {
+        name: 'get_user',
+        description: 'Get details for a specific Google Workspace user by email or user ID',
+        inputSchema: {
+          type: 'object',
+          properties: { user_key: { type: 'string' } },
+          required: ['user_key'],
+        },
+        response: text(JSON.stringify({
+          id: 'usr-001',
+          email: 'alice@example.com',
+          name: 'Alice Johnson',
+          suspended: false,
+          admin: false,
+          last_login: '2026-09-05T08:00:00Z',
+          org_unit: '/Engineering',
+        })),
+      },
+      {
+        name: 'list_groups',
+        description: 'List Google Groups in the organization',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            domain: { type: 'string' },
+            user_key: { type: 'string' },
+          },
+        },
+        response: text(JSON.stringify({
+          groups: [
+            { id: 'grp-001', email: 'eng@example.com', name: 'Engineering', direct_members_count: 8 },
+            { id: 'grp-002', email: 'all@example.com', name: 'All Staff', direct_members_count: 25 },
+          ],
+          total: 2,
+        })),
+      },
+      {
+        name: 'suspend_user',
+        description: 'Suspend a Google Workspace user account via GAM',
+        inputSchema: {
+          type: 'object',
+          properties: { user_key: { type: 'string' }, reason: { type: 'string' } },
+          required: ['user_key'],
+        },
+        response: text(JSON.stringify({
+          user_key: 'alice@example.com',
+          suspended: true,
+          updated_at: '2026-09-08T10:00:00Z',
+        })),
+      },
+    ],
+  },
 };

@@ -135,7 +135,7 @@
       "boost": 0.6
     },
     "realestate": {
-      "description": "Property management — list and inspect rental properties, tenants, leases, and maintenance requests via TurboTenant",
+      "description": "Property management \u2014 list and inspect rental properties, tenants, leases, and maintenance requests via TurboTenant",
       "categories": [
         "ecosystem"
       ],
@@ -143,6 +143,20 @@
         "turbotenant",
         "market",
         "finance",
+        "tasks"
+      ],
+      "boost": 0.6
+    },
+    "google": {
+      "description": "Google Workspace productivity and administration \u2014 Gmail, Google Calendar, Drive, Docs, and org-wide user/group management via Google Admin (GAM)",
+      "categories": [
+        "ecosystem",
+        "documents"
+      ],
+      "servers": [
+        "google",
+        "gam",
+        "notion",
         "tasks"
       ],
       "boost": 0.6
