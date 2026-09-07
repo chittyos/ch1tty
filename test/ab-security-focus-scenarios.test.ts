@@ -37,6 +37,7 @@ const FIXTURE_CONFIGS: ServerConfig[] = [
   { id: 'tasks', name: 'ChittyAgent Tasks', type: 'local', access: 'readwrite', category: 'ecosystem', command: 'node', args: ['./apps/tasks-mcp/dist/index.js'] },
   { id: 'neon', name: 'Neon', type: 'remote', access: 'readwrite', category: 'code', endpoint: 'https://fixture.neon' },
   { id: 'github', name: 'GitHub', type: 'remote', access: 'readwrite', category: 'code', endpoint: 'https://fixture.github' },
+  { id: 'playwright', name: 'Playwright', type: 'local', access: 'readwrite', category: 'desktop', command: 'node', args: ['./apps/playwright-mcp/dist/index.js'] },
 ];
 
 const SECURITY_FIXTURE_SERVER = {
@@ -148,6 +149,7 @@ function buildAggregator(focus?: string): { aggregator: Aggregator; fixture: Fix
     fixture.defineServer(id, def);
   }
   fixture.defineServer('security', SECURITY_FIXTURE_SERVER);
+  fixture.defineServer('playwright', FIXTURE_SERVERS.playwright);
   const aggregator = new Aggregator(FIXTURE_CONFIGS, {
     focusProfiles: SECURITY_FOCUS_PROFILES,
     focus,
@@ -171,7 +173,7 @@ test('security focus: search "security events" ranks security/ tools first', asy
   assert.ok(tools.length > 0, 'should return results');
 
   const secIdx = tools.findIndex((r) => r.tool.startsWith('security/'));
-  const outIdx = tools.findIndex((r) => !['security/', 'chittyevidence/', 'ledger/', 'tasks/'].some((p) => r.tool.startsWith(p)));
+  const outIdx = tools.findIndex((r) => r.inFocus !== true);
 
   assert.ok(secIdx !== -1, 'security/ tools should appear in results');
   if (outIdx !== -1) {
@@ -202,15 +204,17 @@ test('security focus: search "audit access log" includes security/get_access_aud
   assert.ok(toolNames.some((t) => t === 'security/get_access_audit'), 'security/get_access_audit must appear');
 });
 
-test('security focus: out-of-focus tools (neon) remain reachable via search', async () => {
+test('security focus: out-of-focus tools (playwright) remain reachable via search', async () => {
   const { aggregator } = buildAggregator('security');
 
-  const result = await aggregator.callTool('ch1tty/search', { query: 'neon database sql query', limit: 10 });
+  const result = await aggregator.callTool('ch1tty/search', { query: 'playwright browser navigate page', limit: 10 });
   assert.equal(result.isError, undefined);
 
   const parsed = parseSearch(result);
   const toolNames = (parsed.tools ?? []).map((r) => r.tool);
-  assert.ok(toolNames.some((t) => t.startsWith('neon/')), 'neon/ tools must remain reachable when security focus is active');
+  assert.ok(toolNames.some((t) => t.startsWith('playwright/')), 'playwright/ tools (category: desktop, not in security profile) must remain reachable when security focus is active');
+  const playwrightTools = (parsed.tools ?? []).filter((r) => r.tool.startsWith('playwright/'));
+  assert.ok(playwrightTools.every((r) => r.inFocus !== true), 'playwright/ tools must not be marked inFocus when security focus is active');
 });
 
 test('security focus: no focus — security tools still accessible (lens not gate)', async () => {
@@ -311,13 +315,14 @@ test('security focus: multi-step — scan secrets, triage critical finding, crea
   const scan = JSON.parse(scanResult.content[0].text as string) as { findings: Array<{ file: string; risk: string }> };
   assert.ok(scan.findings.length > 0, 'should find at least one secret');
 
-  // Step 2: triage the critical finding as an incident
+  // Step 2: triage the critical finding as an incident — use sec-001, the event the fixture returns
   const triageResult = await aggregator.callTool('ch1tty/execute', {
     tool: 'security/triage_incident',
-    args: { event_id: 'sec-002', severity: 'critical', owner: 'nick@nevershitty.com', notes: `Exposed key in ${scan.findings[0].file}` },
+    args: { event_id: 'sec-001', severity: 'critical', owner: 'nick@nevershitty.com', notes: `Exposed key in ${scan.findings[0].file}` },
   }, sessionId);
   assert.equal(triageResult.isError, undefined, 'triage_incident should succeed');
-  const incident = JSON.parse(triageResult.content[0].text as string) as { id: string };
+  const incident = JSON.parse(triageResult.content[0].text as string) as { id: string; event_id: string };
+  assert.equal(incident.event_id, 'sec-001', 'triaged incident should reference sec-001');
 
   // Step 3: create a remediation task
   const taskResult = await aggregator.callTool('ch1tty/execute', {
@@ -377,12 +382,26 @@ test('security focus: status reports available focus profiles including security
   assert.ok(parsed.availableFocusProfiles?.includes('security'), 'status should include security in availableFocusProfiles');
 });
 
-test('security focus: focus:none disables boost for security tools', async () => {
+test('security focus: focus:none per-call override removes security boost vs focused search', async () => {
   const { aggregator } = buildAggregator('security');
+  const query = 'list security events incidents';
 
-  const result = await aggregator.callTool('ch1tty/search', { query: 'list security events incidents', limit: 10, focus: 'none' });
-  assert.equal(result.isError, undefined);
+  const focusedResult = await aggregator.callTool('ch1tty/search', { query, limit: 10 });
+  assert.equal(focusedResult.isError, undefined, 'focused search should not error');
+  const focused = parseSearch(focusedResult);
+  const focusedTools = focused.tools ?? [];
 
-  const parsed = parseSearch(result);
-  assert.ok(parsed.focus === undefined || parsed.focus === 'none' || parsed.focus === null || parsed.focus === '', 'focus:none should disable active focus');
+  const unfocusedResult = await aggregator.callTool('ch1tty/search', { query, limit: 10, focus: 'none' });
+  assert.equal(unfocusedResult.isError, undefined, 'focus:none search should not error');
+  const unfocused = parseSearch(unfocusedResult);
+  const unfocusedTools = unfocused.tools ?? [];
+
+  assert.ok(focusedTools.some((r) => r.inFocus === true), 'focused search must mark at least one tool inFocus');
+  assert.ok(!unfocusedTools.some((r) => r.inFocus === true), 'focus:none search must not mark any tool inFocus');
+
+  const focusedSecIdx = focusedTools.findIndex((r) => r.tool.startsWith('security/'));
+  const unfocusedSecIdx = unfocusedTools.findIndex((r) => r.tool.startsWith('security/'));
+  if (focusedSecIdx !== -1 && unfocusedSecIdx !== -1) {
+    assert.ok(focusedSecIdx <= unfocusedSecIdx, 'security/ tools should rank higher (or equal) in focused search vs focus:none');
+  }
 });
