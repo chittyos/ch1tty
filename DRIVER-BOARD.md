@@ -3506,28 +3506,30 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
 
 ---
 ### 2026-09-07T~19:30Z (run ~1522 — IDLE: all workstreams done; build+tests green)
-- **Workstream**: None — all workstreams A–F + M + N–W done. Idle maintenance check.
-- **Branch/PR**: No new branch — all workstreams complete; open PRs #1179/#1180/#1181 have green CI (3/3 checks pass).
+- **Workstream**: None — all workstreams A–F + M + N–AB done (25 focus profiles on main). Idle maintenance check.
+- **Branch/PR**: PR #1182 (`auto/run-log-1522`) — run log only; CI 3/3 green.
 - **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1681 pass / 0 fail / 3 skip (51 suites, ~57s)
 - **Guardrails**: 5-tool surface confirmed (search/execute/status/reload/cast). `buildCastExplanation` metric freeze ACTIVE (56/87 field count tests pass). 0 violations.
 - **Actions**:
   - Read CLAUDE.md + CHITTY.md; guardrails confirmed.
   - `git pull origin main` (+27 commits). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1681/0/3 — all pass.
-  - Fetched Notion board: all workstreams A–E (+ F, M, N-W) confirmed ✓.
+  - Fetched Notion board (working — Notion token valid): all workstreams A–AB confirmed ✓. 25 profiles in focus-profiles.json.
   - Checked open PRs (#1166, #1167, #1179, #1180, #1181): all CI green (CodeQL + Analyze(actions) + Analyze(js-ts) all success).
-  - No regressions. No workstream to advance.
+  - Verified git log: workstreams X (#1173), Y (#1174), Z (#1175), AA (#1176), AB (#1177) all merged to main — board entry corrected.
+  - PR #1172 (Q-W) confirmed merged: R(data) and S(auth) already on main — PRs #1166/#1167 are superseded (should be closed, not merged).
+  - Codex review findings on PR #1182 applied: corrected N–W→N–AB, corrected #1166/#1167 action, removed stale Notion token blocker.
   - Updated DRIVER-BOARD.md (this entry). Updated Notion board run log.
-- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ M ✓ N–W ✓ ALL DONE. Build: clean. Tests: 1681/0/3. **~1522nd run. 5 open PRs awaiting human merge.**
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ M ✓ N ✓ O ✓ P ✓ Q ✓ R ✓ S ✓ T ✓ U ✓ V ✓ W ✓ X ✓ Y ✓ Z ✓ AA ✓ AB ✓ ALL DONE. 25 focus profiles. Build: clean. Tests: 1681/0/3. **~1522nd run. 4 open PRs awaiting human merge.**
 - **Human-action items**:
   1. **Merge PR #1179** (`auto/ab-review-fixes`) — security scan/cast fixes; CI green.
   2. **Merge PR #1180** (`auto/suggestions-catalog-populate`) — focus-suggestions.json with 25 profiles; CI green.
   3. **Merge PR #1181** (`auto/run-log-20260907`) — maintenance run log; CI green.
-  4. **Merge PR #1166/1167** (R/S focus profiles: data + auth); CI green.
+  4. **Close PRs #1166 and #1167** (R/S: data + auth) — superseded by PR #1172 (Q-W) which is already merged; do NOT merge these.
   5. **Merge PR #1155** (dependabot: qs + fast-uri security bumps).
   6. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
   7. **Configure CF Access** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
   8. **Set `CHITTY_TASKS_TOKEN` on prod** — tasks backend auth.
   9. **Stale branch cleanup** — 1100+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings.
   10. **Disable or redirect hourly schedule** — all workstreams exhausted; 1522+ consecutive runs burn compute.
-- **PushNotification**: NOT SENT — fully idle; all green; no new escalation.
-- **Next run**: Idle (all workstreams done). Merge the 5 open PRs then confirm no regressions.
+- **PushNotification**: NOT SENT — fully idle; all green; Codex review findings corrected.
+- **Next run**: Idle (all workstreams done). Close superseded PRs #1166/#1167; merge the 4 remaining open PRs then confirm no regressions.
