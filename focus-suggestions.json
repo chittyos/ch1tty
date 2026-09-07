@@ -30077,6 +30077,61 @@
           "resolves_to": "chittyevidence/ingest_document"
         }
       ]
+    },
+    "market": {
+      "combos": [
+        {
+          "name": "price-research",
+          "accomplishes": "Find listings matching a product keyword then retrieve full price history for a chosen listing",
+          "chain": ["market/search_listings", "market/get_price_history"],
+          "verified": false,
+          "notes": "Step 1 returns listing_id; step 2 requires listing_id — caller must extract and pass it. Auto-chain does not map args between steps."
+        },
+        {
+          "name": "listing-comparison",
+          "accomplishes": "Search for listings then compare current prices across all sources to find the lowest offer",
+          "chain": ["market/search_listings", "market/compare_prices"],
+          "verified": false,
+          "notes": "Step 1 returns listing IDs; step 2 requires listing_ids array — caller must collect and pass them. Auto-chain does not map args between steps."
+        },
+        {
+          "name": "listing-detail-and-history",
+          "accomplishes": "Get full listing details for a known listing ID then retrieve its price history",
+          "chain": ["market/get_listing", "market/get_price_history"],
+          "verified": false,
+          "notes": "Both steps share listing_id — caller must pass the same listing_id to each. Auto-chain does not map args between steps."
+        }
+      ],
+      "prompts": [
+        {
+          "text": "Search for listings matching product X",
+          "resolves_to": "market/search_listings"
+        },
+        {
+          "text": "Get the price history for listing ID X",
+          "resolves_to": "market/get_price_history"
+        },
+        {
+          "text": "Compare current prices for product X across all sources",
+          "resolves_to": "market/compare_prices"
+        },
+        {
+          "text": "Get the full details for market listing ID X",
+          "resolves_to": "market/get_listing"
+        },
+        {
+          "text": "Get a summary of current market conditions for category X",
+          "resolves_to": "market/get_market_summary"
+        },
+        {
+          "text": "Find the lowest-priced listings for product X",
+          "resolves_to": "market/search_listings"
+        },
+        {
+          "text": "Look up price history for listing ID X",
+          "resolves_to": "market/get_price_history"
+        }
+      ]
     }
   }
 }

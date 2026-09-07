@@ -1187,4 +1187,104 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
       },
     ],
   },
+
+  market: {
+    tools: [
+      {
+        name: 'search_listings',
+        description: 'Search market listings by keyword, category, or price range',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: { type: 'string' },
+            category: { type: 'string' },
+            max_price: { type: 'number' },
+            limit: { type: 'number' },
+          },
+          required: ['query'],
+        },
+        response: text(JSON.stringify([
+          { listing_id: 'lst-001', title: 'Widget Pro X', category: 'hardware', price: 49.99, currency: 'USD', source: 'vendor-a' },
+          { listing_id: 'lst-002', title: 'Widget Pro X (refurb)', category: 'hardware', price: 29.99, currency: 'USD', source: 'vendor-b' },
+        ])),
+      },
+      {
+        name: 'get_listing',
+        description: 'Get full details for a specific market listing by ID',
+        inputSchema: {
+          type: 'object',
+          properties: { listing_id: { type: 'string' } },
+          required: ['listing_id'],
+        },
+        response: text(JSON.stringify({
+          listing_id: 'lst-001',
+          title: 'Widget Pro X',
+          category: 'hardware',
+          price: 49.99,
+          currency: 'USD',
+          source: 'vendor-a',
+          description: 'Professional-grade widget with extended warranty',
+          in_stock: true,
+          updated_at: '2026-09-07T00:00:00Z',
+        })),
+      },
+      {
+        name: 'get_price_history',
+        description: 'Get price history for a market listing',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            listing_id: { type: 'string' },
+            days: { type: 'number' },
+          },
+          required: ['listing_id'],
+        },
+        response: text(JSON.stringify({
+          listing_id: 'lst-001',
+          history: [
+            { date: '2026-09-01', price: 54.99 },
+            { date: '2026-09-04', price: 49.99 },
+            { date: '2026-09-07', price: 49.99 },
+          ],
+        })),
+      },
+      {
+        name: 'compare_prices',
+        description: 'Compare current prices for a product across multiple listing sources',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: { type: 'string' },
+            listing_ids: { type: 'array', items: { type: 'string' } },
+          },
+        },
+        response: text(JSON.stringify({
+          query: 'Widget Pro X',
+          results: [
+            { listing_id: 'lst-001', source: 'vendor-a', price: 49.99, currency: 'USD' },
+            { listing_id: 'lst-002', source: 'vendor-b', price: 29.99, currency: 'USD' },
+          ],
+          lowest: { listing_id: 'lst-002', price: 29.99, source: 'vendor-b' },
+        })),
+      },
+      {
+        name: 'get_market_summary',
+        description: 'Get a summary of current market conditions for a category',
+        inputSchema: {
+          type: 'object',
+          properties: { category: { type: 'string' } },
+          required: ['category'],
+        },
+        response: text(JSON.stringify({
+          category: 'hardware',
+          listing_count: 142,
+          avg_price: 44.50,
+          min_price: 9.99,
+          max_price: 299.99,
+          currency: 'USD',
+          as_of: '2026-09-07T00:00:00Z',
+        })),
+      },
+    ],
+  },
 };

@@ -133,6 +133,18 @@
         "chittyevidence"
       ],
       "boost": 0.6
+    },
+    "market": {
+      "description": "Market research and pricing intelligence — search listings, track price history, compare offers, and summarise market conditions",
+      "categories": [
+        "ecosystem"
+      ],
+      "servers": [
+        "market",
+        "neon",
+        "notion"
+      ],
+      "boost": 0.5
     }
   }
 }

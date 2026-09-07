@@ -194,6 +194,12 @@ export const FOCUS_PROFILES_RAW = {
       servers: ['cloudflare', 'cloudflare-builds', 'neon', 'github', 'orchestrator', 'fs', 'quality'],
       boost: 0.5,
     },
+    market: {
+      description: 'Market research and pricing intelligence — search listings, track price history, compare offers, and summarise market conditions',
+      categories: ['ecosystem'],
+      servers: ['market', 'neon', 'notion'],
+      boost: 0.5,
+    },
   },
 } as const;
 
