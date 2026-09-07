@@ -17,7 +17,7 @@ const ANALYTICS_FOCUS_PROFILES = {
   profiles: {
     analytics: {
       description: 'Data analytics — query metrics, aggregate events, and export reports.',
-      categories: ['ecosystem' as const],
+      categories: [],
       servers: ['analytics'],
       boost: 0.6,
     },
