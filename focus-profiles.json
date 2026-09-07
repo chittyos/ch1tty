@@ -133,6 +133,18 @@
         "chittyevidence"
       ],
       "boost": 0.6
+    },
+    "data": {
+      "description": "Database, storage, and filesystem tooling — Neon SQL queries, schema inspection, R2 object storage, and local filesystem operations",
+      "categories": [
+        "ecosystem"
+      ],
+      "servers": [
+        "neon",
+        "storage",
+        "fs"
+      ],
+      "boost": 0.6
     }
   }
 }

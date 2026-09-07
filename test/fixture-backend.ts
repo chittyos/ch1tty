@@ -1187,4 +1187,84 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
       },
     ],
   },
+
+  storage: {
+    tools: [
+      {
+        name: 'list_objects',
+        description: 'List objects in an R2 storage bucket',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            bucket: { type: 'string' },
+            prefix: { type: 'string' },
+            limit: { type: 'number' },
+          },
+          required: ['bucket'],
+        },
+        response: text(JSON.stringify({
+          objects: [
+            { key: 'exports/events-2026-09-01.json', size: 4096, last_modified: '2026-09-01T10:00:00Z', etag: 'abc123' },
+            { key: 'exports/events-2026-09-05.json', size: 8192, last_modified: '2026-09-05T12:00:00Z', etag: 'def456' },
+            { key: 'snapshots/ch1tty-config-2026-09-06.json', size: 2048, last_modified: '2026-09-06T08:00:00Z', etag: 'ghi789' },
+          ],
+          truncated: false,
+        })),
+      },
+      {
+        name: 'get_object',
+        description: 'Retrieve an object from R2 storage by key',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            bucket: { type: 'string' },
+            key: { type: 'string' },
+          },
+          required: ['bucket', 'key'],
+        },
+        response: text(JSON.stringify({
+          key: 'exports/events-2026-09-05.json',
+          bucket: 'ch1tty-exports',
+          size: 8192,
+          content_type: 'application/json',
+          body: '[{"id":"e1","type":"deploy"},{"id":"e2","type":"config.reload"}]',
+          last_modified: '2026-09-05T12:00:00Z',
+        })),
+      },
+      {
+        name: 'put_object',
+        description: 'Upload or overwrite an object in R2 storage',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            bucket: { type: 'string' },
+            key: { type: 'string' },
+            body: { type: 'string' },
+            content_type: { type: 'string' },
+          },
+          required: ['bucket', 'key', 'body'],
+        },
+        response: text(JSON.stringify({
+          key: 'exports/new-export.json',
+          bucket: 'ch1tty-exports',
+          etag: 'newetag123',
+          size: 512,
+          ok: true,
+        })),
+      },
+      {
+        name: 'delete_object',
+        description: 'Delete an object from R2 storage by key',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            bucket: { type: 'string' },
+            key: { type: 'string' },
+          },
+          required: ['bucket', 'key'],
+        },
+        response: text(JSON.stringify({ ok: true, key: 'exports/old-export.json', deleted: true })),
+      },
+    ],
+  },
 };

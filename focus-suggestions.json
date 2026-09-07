@@ -30077,6 +30077,76 @@
           "resolves_to": "chittyevidence/ingest_document"
         }
       ]
+    },
+    "data": {
+      "description": "Database, storage, and filesystem tooling — Neon SQL queries, schema inspection, R2 object storage, and local filesystem operations",
+      "combos": [
+        {
+          "name": "schema-inspect-and-query",
+          "chain": ["neon/describe_table_schema", "neon/run_sql"],
+          "accomplishes": "Inspect the schema of a Neon database table, then run a targeted SQL query to extract relevant rows.",
+          "verified": false,
+          "notes": "Requires Neon backend connected via CHITTY_CF_ACCESS_CLIENT_ID/SECRET."
+        },
+        {
+          "name": "project-list-and-query",
+          "chain": ["neon/list_projects", "neon/run_sql"],
+          "accomplishes": "List Neon database projects, then run a SQL query against a specific project to inspect or aggregate data.",
+          "verified": false,
+          "notes": "Requires Neon backend."
+        },
+        {
+          "name": "upload-and-verify",
+          "chain": ["storage/put_object", "storage/get_object"],
+          "accomplishes": "Upload a file or object to R2 storage, then retrieve it to confirm correct storage and metadata.",
+          "verified": false,
+          "notes": "Requires storage backend at storage.chitty.cc."
+        },
+        {
+          "name": "list-and-read-object",
+          "chain": ["storage/list_objects", "storage/get_object"],
+          "accomplishes": "List objects in a storage bucket, then read the most relevant one for inspection or processing.",
+          "verified": false,
+          "notes": "Requires storage backend."
+        },
+        {
+          "name": "neon-to-storage-export",
+          "chain": ["neon/run_sql", "storage/put_object"],
+          "accomplishes": "Query a Neon database for a result set, then store the output as a file object in R2 storage — data pipeline pattern.",
+          "verified": false,
+          "notes": "Requires both Neon and storage backends."
+        }
+      ],
+      "prompts": [
+        {
+          "text": "List all Neon database projects in the account",
+          "resolves_to": "neon/list_projects"
+        },
+        {
+          "text": "Run a SQL query against a Neon project to count rows in a table",
+          "resolves_to": "neon/run_sql"
+        },
+        {
+          "text": "Describe the schema of the sessions table in the ch1tty-prod Neon project",
+          "resolves_to": "neon/describe_table_schema"
+        },
+        {
+          "text": "Upload a JSON file to R2 object storage",
+          "resolves_to": "storage/put_object"
+        },
+        {
+          "text": "List all objects in a storage bucket",
+          "resolves_to": "storage/list_objects"
+        },
+        {
+          "text": "Download and inspect a file from R2 storage",
+          "resolves_to": "storage/get_object"
+        },
+        {
+          "text": "Query the Neon database for recent events, then export results to R2 storage",
+          "resolves_to": "neon/run_sql"
+        }
+      ]
     }
   }
 }
