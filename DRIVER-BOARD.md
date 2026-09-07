@@ -28,7 +28,7 @@ Workstreams A–F ALL DONE. Build clean, tests green (1492/0/3), guardrails enfo
 
 ## Blockers
 
-- **Notion API token** — Invalid (401). Human action: rotate `NOTION_API_TOKEN` in 1Password (`op://ChittyOS-Integrations/notion/api_token`).
+- **Notion API token** — ~~Invalid (401)~~ **RESOLVED** (token valid as of 2026-09-07; Notion board active). No action needed.
 - **ch1tty github backend** — `GITHUB_MCP_AUTHORIZATION` unset on prod. Set env var to reconnect the `github` backend in `servers.json`.
 - **Branch cleanup** — 1081+ stale `auto/` branches (including 261 cast-explain violations). Git push --delete fails in this container. Human action: enable "Automatically delete head branches" in GitHub Settings → General, or run bulk-delete locally.
 - **CI (main ci.yml)** — 0-job-queue failure (non-CodeQL). Recurring, non-blocking.
@@ -53,7 +53,7 @@ Note: `ch1tty/reload` is intentionally absent from `/mcp2` — hot-reload is a s
 2. ~~**Add workstream F**~~ — Workstream F is already present and Phase 2 is delivered (PR #1119).
 3. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
 4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod to reconnect ch1tty GitHub backend.
-5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+5. ~~**Rotate Notion token**~~ — token is valid; Notion board active as of 2026-09-07.
 6. **Stale branch cleanup** — 1081+ rogue `auto/` branches; enable auto-delete in GitHub Settings → General or bulk-delete locally.
 7. **Major bumps pending human review**: typescript 5→7, @types/node 22→26, c8 11→12.
 8. **Open issues #1071/#1072** — extensibility rebuild and 1Password retirement require human decisions.
@@ -3513,14 +3513,15 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
 - **Open PRs** (5 total):
   - #1180 (auto/suggestions-catalog-populate): `ci.yml` run showed `conclusion:failure` but 0 jobs recorded — runner fluke. All 3 CodeQL check_runs ✅. Tests pass locally on branch (1681/0/3). `rerun_failed_jobs` blocked (403). Awaits human merge.
   - #1179 (auto/ab-review-fixes): all 3 CodeQL checks ✅. Awaits human merge.
-  - #1167 (auto/s-auth-focus): all 3 CodeQL checks ✅. Awaits human merge.
-  - #1166 (auto/r-data-focus): open. Awaits human merge.
+  - #1167 (auto/s-auth-focus): open but **superseded by PR #1172** (Q-W batch, already merged). Should be closed, not merged.
+  - #1166 (auto/r-data-focus): open but **superseded by PR #1172** (Q-W batch, already merged). Should be closed, not merged.
   - #1155 (dependabot): open. Awaits human merge.
 - **Notion board**: ACTIVE — updated successfully at ~2026-09-07T19:00Z. Primary board: https://app.notion.com/p/36e94de435798159ac8dea3480f13530
 - **`test/suggestions.test.ts`**: already has disk-load integration test for `focus-suggestions.json` (line 84). No gap.
 - **State summary**: All workstreams done. Tests: 1681/0/3. Build: clean. 5 open PRs awaiting human merge.
 - **Human-action items**:
-  1. **Review + merge open PRs** (#1180, #1179, #1167, #1166, #1155 dependabot) — all CodeQL ✅; #1180 needs CI re-trigger from GitHub UI (runner fluke, not a code failure).
+  1. **Review + merge open PRs** (#1180, #1179, #1155 dependabot) — all CodeQL ✅; #1180 needs CI re-trigger from GitHub UI (runner fluke, not a code failure).
+  1a. **Close superseded PRs** #1166 and #1167 — both were included in the Q-W batch PR #1172 which is already merged; closing them avoids duplicate application.
   2. **Enable "Automatically delete head branches"** in GitHub Settings → General — clears 1100+ stale `auto/` branches.
   3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
   4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
