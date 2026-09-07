@@ -20,7 +20,7 @@ const MONITORING_FOCUS_PROFILES = {
     monitoring: {
       description: 'Service health, alerting, and observability',
       categories: [],
-      servers: ['monitoring', 'health'],
+      servers: ['monitor'],
       boost: 0.6,
     },
     code: {
@@ -111,8 +111,7 @@ const MONITORING_FIXTURE_SERVER = {
 };
 
 const FIXTURE_CONFIGS: ServerConfig[] = [
-  { id: 'monitoring', name: 'Monitoring', type: 'remote', access: 'read', category: 'ecosystem', endpoint: 'https://fixture.monitoring' },
-  { id: 'health', name: 'Health', type: 'remote', access: 'read', category: 'ecosystem', endpoint: 'https://fixture.health' },
+  { id: 'monitor', name: 'Monitor', type: 'remote', access: 'read', category: 'ecosystem', endpoint: 'https://fixture.monitor' },
   { id: 'neon', name: 'Neon', type: 'remote', access: 'readwrite', category: 'code', endpoint: 'https://fixture.neon' },
   { id: 'stripe', name: 'Stripe', type: 'remote', access: 'read', category: 'ecosystem', endpoint: 'https://fixture.stripe' },
   { id: 'notion', name: 'Notion', type: 'remote', access: 'readwrite', category: 'documents', endpoint: 'https://fixture.notion' },
@@ -134,8 +133,7 @@ function buildAggregator(focus?: string): { aggregator: Aggregator; fixture: Fix
   for (const [id, def] of Object.entries(FIXTURE_SERVERS)) {
     fixture.defineServer(id, def);
   }
-  fixture.defineServer('monitoring', MONITORING_FIXTURE_SERVER);
-  fixture.defineServer('health', MONITORING_FIXTURE_SERVER);
+  fixture.defineServer('monitor', MONITORING_FIXTURE_SERVER);
   const aggregator = new Aggregator(FIXTURE_CONFIGS, {
     focusProfiles: MONITORING_FOCUS_PROFILES,
     focus,
@@ -158,12 +156,12 @@ test('monitoring focus: search "health check" ranks monitoring/ tools first', as
   const tools = parsed.tools ?? [];
   assert.ok(tools.length > 0, 'should return results');
 
-  const monitoringIdx = tools.findIndex((r) => r.tool.startsWith('monitoring/'));
-  const otherIdx = tools.findIndex((r) => !r.tool.startsWith('monitoring/') && !r.tool.startsWith('health/'));
+  const monitoringIdx = tools.findIndex((r) => r.tool.startsWith('monitor/'));
+  const otherIdx = tools.findIndex((r) => !r.tool.startsWith('monitor/'));
 
-  assert.ok(monitoringIdx !== -1, 'monitoring/ tools should appear in results');
+  assert.ok(monitoringIdx !== -1, 'monitor/ tools should appear in results');
   if (otherIdx !== -1) {
-    assert.ok(monitoringIdx < otherIdx, 'monitoring/ tools should rank above out-of-focus tools for health query');
+    assert.ok(monitoringIdx < otherIdx, 'monitor/ tools should rank above out-of-focus tools for health query');
   }
   assert.equal(parsed.focus, 'monitoring', 'search response should report active focus');
 });
@@ -176,7 +174,7 @@ test('monitoring focus: search "alerts" includes monitoring/list_alerts', async 
 
   const parsed = parseSearch(result);
   const toolNames = (parsed.tools ?? []).map((r) => r.tool);
-  assert.ok(toolNames.some((t) => t === 'monitoring/list_alerts'), 'monitoring/list_alerts must appear in results');
+  assert.ok(toolNames.some((t) => t === 'monitor/list_alerts'), 'monitor/list_alerts must appear in results');
 });
 
 test('monitoring focus: search "uptime" includes monitoring/get_uptime_metrics', async () => {
@@ -187,7 +185,7 @@ test('monitoring focus: search "uptime" includes monitoring/get_uptime_metrics',
 
   const parsed = parseSearch(result);
   const toolNames = (parsed.tools ?? []).map((r) => r.tool);
-  assert.ok(toolNames.some((t) => t === 'monitoring/get_uptime_metrics'), 'monitoring/get_uptime_metrics must appear in results');
+  assert.ok(toolNames.some((t) => t === 'monitor/get_uptime_metrics'), 'monitor/get_uptime_metrics must appear in results');
 });
 
 test('monitoring focus: out-of-focus tools (neon) remain reachable via search', async () => {
@@ -209,7 +207,7 @@ test('monitoring focus: no focus — monitoring tools still accessible (lens not
 
   const parsed = parseSearch(result);
   const toolNames = (parsed.tools ?? []).map((r) => r.tool);
-  assert.ok(toolNames.some((t) => t.startsWith('monitoring/')), 'monitoring/ tools must be reachable without any focus');
+  assert.ok(toolNames.some((t) => t.startsWith('monitor/')), 'monitor/ tools must be reachable without any focus');
 });
 
 test('monitoring focus: execute check_health returns service status', async () => {
@@ -217,7 +215,7 @@ test('monitoring focus: execute check_health returns service status', async () =
   fixture.clearCallLog();
 
   const result = await aggregator.callTool('ch1tty/execute', {
-    tool: 'monitoring/check_health',
+    tool: 'monitor/check_health',
     args: {},
   });
   assert.equal(result.isError, undefined, 'check_health should succeed');
@@ -228,7 +226,7 @@ test('monitoring focus: execute check_health returns service status', async () =
   assert.ok(typeof status.summary.total === 'number', 'should include summary.total');
 
   const calls = fixture.getCallLog();
-  assert.ok(calls.some((c) => c.serverId === 'monitoring' && c.tool === 'check_health'), 'check_health must be in call log');
+  assert.ok(calls.some((c) => c.serverId === 'monitor' && c.tool === 'check_health'), 'check_health must be in call log');
 });
 
 test('monitoring focus: execute list_alerts returns active alerts', async () => {
@@ -236,7 +234,7 @@ test('monitoring focus: execute list_alerts returns active alerts', async () => 
   fixture.clearCallLog();
 
   const result = await aggregator.callTool('ch1tty/execute', {
-    tool: 'monitoring/list_alerts',
+    tool: 'monitor/list_alerts',
     args: {},
   });
   assert.equal(result.isError, undefined, 'list_alerts should succeed');
@@ -253,7 +251,7 @@ test('monitoring focus: multi-step — check health then list active alerts', as
 
   // Step 1: check health
   const healthResult = await aggregator.callTool('ch1tty/execute', {
-    tool: 'monitoring/check_health',
+    tool: 'monitor/check_health',
     args: {},
   }, sessionId);
   assert.equal(healthResult.isError, undefined, 'check_health should succeed');
@@ -262,7 +260,7 @@ test('monitoring focus: multi-step — check health then list active alerts', as
 
   // Step 2: list alerts for context
   const alertResult = await aggregator.callTool('ch1tty/execute', {
-    tool: 'monitoring/list_alerts',
+    tool: 'monitor/list_alerts',
     args: {},
   }, sessionId);
   assert.equal(alertResult.isError, undefined, 'list_alerts should succeed');
@@ -272,15 +270,15 @@ test('monitoring focus: multi-step — check health then list active alerts', as
   // Both calls should appear in the log
   const calls = fixture.getCallLog();
   const toolNames = calls.map((c) => `${c.serverId}/${c.tool}`);
-  assert.ok(toolNames.includes('monitoring/check_health'), 'check_health must be in call log');
-  assert.ok(toolNames.includes('monitoring/list_alerts'), 'list_alerts must be in call log');
+  assert.ok(toolNames.includes('monitor/check_health'), 'check_health must be in call log');
+  assert.ok(toolNames.includes('monitor/list_alerts'), 'list_alerts must be in call log');
 });
 
 test('monitoring focus: probe endpoint returns latency and status', async () => {
   const { aggregator } = buildAggregator('monitoring');
 
   const result = await aggregator.callTool('ch1tty/execute', {
-    tool: 'monitoring/probe_endpoint',
+    tool: 'monitor/probe_endpoint',
     args: { url: 'https://ch1tty.chitty.cc/health', expected_status: 200 },
   });
   assert.equal(result.isError, undefined, 'probe_endpoint should succeed');
@@ -305,14 +303,14 @@ test('monitoring focus: cast resolves health intent to monitoring tools', async 
   assert.ok(cast.plan !== undefined || cast.tool !== undefined || cast.resolved !== undefined,
     'cast should return a plan or resolved tool');
   const str = JSON.stringify(cast);
-  assert.ok(str.includes('monitoring'), 'cast should resolve toward monitoring tools');
+  assert.ok(str.includes('monitor'), 'cast should resolve toward monitor tools');
 });
 
 test('monitoring focus: get_uptime_metrics returns availability data', async () => {
   const { aggregator } = buildAggregator('monitoring');
 
   const result = await aggregator.callTool('ch1tty/execute', {
-    tool: 'monitoring/get_uptime_metrics',
+    tool: 'monitor/get_uptime_metrics',
     args: { service_id: 'chittyos', window_hours: 24 },
   });
   assert.equal(result.isError, undefined, 'get_uptime_metrics should succeed');

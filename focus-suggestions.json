@@ -30084,52 +30084,32 @@
         {
           "name": "health-check-and-alert",
           "chain": [
-            "monitoring/check_health",
-            "monitoring/list_alerts"
+            "monitor/check_health",
+            "monitor/list_alerts"
           ],
-          "accomplishes": "Run a health check across registered services and surface any active alert rules so on-call engineers see both current status and pending notifications in one pass.",
+          "accomplishes": "Run a health check across registered services and surface any active alerts so on-call engineers see both current status and pending notifications in one pass.",
           "verified": false,
-          "notes": "monitoring backend is planned (apps/monitoring-mcp); tools inferred from health/alerting surface shape."
+          "notes": "Both chain steps are zero-required-arg and chain-safe via previousResult."
         },
         {
-          "name": "uptime-report-and-incident-create",
+          "name": "alert-rule-inspect",
           "chain": [
-            "monitoring/check_health",
-            "monitoring/list_alert_rules"
-          ],
-          "accomplishes": "Check health across registered services to identify degraded ones, then list configured alert rules to understand which rules apply to the degraded service. Creating a ChittyAgent task is a follow-up step the operator performs after reviewing the results \u2014 tasks/create_task requires a title argument that must be derived from the health result.",
-          "verified": false,
-          "notes": "Both chain steps are zero-required-arg and chain-safe via previousResult. tasks/create_task is intentionally excluded from the chain because it requires \"title\" which cannot be auto-synthesised; call it separately with an explicit title."
-        },
-        {
-          "name": "alert-rule-inspect-and-silence",
-          "chain": [
-            "monitoring/list_alert_rules",
-            "monitoring/list_alerts"
+            "monitor/list_alert_rules",
+            "monitor/list_alerts"
           ],
           "accomplishes": "List all configured alert rules, then list currently active alert notifications to cross-reference which rules are firing. An operator uses this pair to identify the exact rule IDs to silence \u2014 silencing is a separate explicit action requiring a rule_id derived from these results.",
           "verified": false,
-          "notes": "Both chain steps are zero-required-arg and chain-safe via previousResult. monitoring/silence_alert is intentionally excluded from the chain because it requires a rule_id that must be selected by the operator from the rule list."
+          "notes": "Both chain steps are zero-required-arg and chain-safe via previousResult. Unique entry point: list_alert_rules."
         },
         {
-          "name": "endpoint-probe-and-ledger-audit",
+          "name": "alerts-and-health-overview",
           "chain": [
-            "monitoring/check_health",
-            "monitoring/list_alerts"
+            "monitor/list_alerts",
+            "monitor/check_health"
           ],
-          "accomplishes": "Check service health and list active alerts to build a combined observability snapshot suitable for a ledger audit entry. Writing to the ledger is a follow-up step \u2014 ledger/append_entry requires namespace and payload arguments that must be composed from these results by the operator or LLM.",
+          "accomplishes": "List active alert notifications first, then run a full health check across all services \u2014 the canonical triage order for on-call responders: understand what is firing before inspecting the underlying service health.",
           "verified": false,
-          "notes": "Both chain steps are zero-required-arg and chain-safe via previousResult. monitoring/probe_endpoint (requires url) and ledger/append_entry (requires namespace + payload) are excluded from the chain; call them separately with explicit arguments derived from the health/alert results."
-        },
-        {
-          "name": "service-status-summary",
-          "chain": [
-            "monitoring/check_health",
-            "monitoring/list_alerts"
-          ],
-          "accomplishes": "Assemble a quick service status briefing: current health across all registered services and any active alerts \u2014 the canonical on-call snapshot in one two-step chain. Both tools require no mandatory arguments and chain safely via previousResult.",
-          "verified": false,
-          "notes": "Both chain steps are zero-required-arg and verified via fixture. get_uptime_metrics (requires service_id) is intentionally excluded from the chain to keep it chain-safe; call it separately with an explicit service_id."
+          "notes": "Both chain steps are zero-required-arg and chain-safe via previousResult. Unique entry point: list_alerts."
         }
       ],
       "prompts": [
@@ -30142,40 +30122,40 @@
           "resolves_to": "health-check-and-alert"
         },
         {
-          "text": "Show me active alerts across the system",
+          "text": "Show me the health status and any active alerts",
           "resolves_to": "health-check-and-alert"
         },
         {
-          "text": "What is the uptime for the last 24 hours?",
-          "resolves_to": "uptime-report-and-incident-create"
+          "text": "Run a health check and list any active alerts",
+          "resolves_to": "health-check-and-alert"
         },
         {
-          "text": "Pull uptime metrics and open a task if availability is low",
-          "resolves_to": "uptime-report-and-incident-create"
-        },
-        {
-          "text": "Create an incident task when uptime drops below 99.9%",
-          "resolves_to": "uptime-report-and-incident-create"
-        },
-        {
-          "text": "List all alert rules and silence the ones being handled",
-          "resolves_to": "alert-rule-inspect-and-silence"
+          "text": "List all alert rules and cross-reference with active notifications",
+          "resolves_to": "alert-rule-inspect"
         },
         {
           "text": "Which alert rules are currently firing?",
-          "resolves_to": "alert-rule-inspect-and-silence"
+          "resolves_to": "alert-rule-inspect"
+        },
+        {
+          "text": "Show me all configured alert rules and which are active",
+          "resolves_to": "alert-rule-inspect"
         },
         {
           "text": "Silence the on-call alert for this service",
-          "resolves_to": "alert-rule-inspect-and-silence"
+          "resolves_to": "alert-rule-inspect"
         },
         {
-          "text": "Probe the MCP endpoint and log the result to the ledger",
-          "resolves_to": "endpoint-probe-and-ledger-audit"
+          "text": "Show me active alerts across the system",
+          "resolves_to": "alerts-and-health-overview"
         },
         {
-          "text": "Give me a full status briefing \u2014 health, uptime, and alerts",
-          "resolves_to": "service-status-summary"
+          "text": "Give me a full service status briefing",
+          "resolves_to": "alerts-and-health-overview"
+        },
+        {
+          "text": "What alerts are firing and what is the current service health?",
+          "resolves_to": "alerts-and-health-overview"
         }
       ]
     }

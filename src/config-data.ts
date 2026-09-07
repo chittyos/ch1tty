@@ -197,7 +197,7 @@ export const FOCUS_PROFILES_RAW = {
     monitoring: {
       description: 'Service health, alerting, and observability — check endpoint health, query alert rules, and inspect uptime metrics across ChittyOS services',
       categories: [],
-      servers: ['monitoring', 'health'],
+      servers: ['monitor'],
       boost: 0.6,
     },
   },
