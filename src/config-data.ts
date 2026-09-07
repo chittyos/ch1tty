@@ -153,6 +153,17 @@ export const REMOTE_SERVERS: ServerConfig[] = [
     lazy: false,
     enabled: true,
   },
+  {
+    id: 'monitor',
+    name: 'Monitor',
+    type: 'remote',
+    access: 'read',
+    category: 'ecosystem',
+    endpoint: 'https://monitor.chitty.cc/mcp',
+    authTokenKey: 'chittymcp',
+    lazy: true,
+    enabled: true,
+  },
 ];
 
 /** Focus profiles — embedded verbatim from focus-profiles.json (profiles only). */

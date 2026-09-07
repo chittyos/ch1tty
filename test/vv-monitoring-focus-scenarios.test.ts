@@ -303,7 +303,7 @@ test('monitoring focus: cast resolves health intent to monitoring tools', async 
   assert.ok(cast.plan !== undefined || cast.tool !== undefined || cast.resolved !== undefined,
     'cast should return a plan or resolved tool');
   const str = JSON.stringify(cast);
-  assert.ok(str.includes('monitor'), 'cast should resolve toward monitor tools');
+  assert.ok(str.includes('monitor/'), 'cast should resolve toward monitor/ tools');
 });
 
 test('monitoring focus: get_uptime_metrics returns availability data', async () => {

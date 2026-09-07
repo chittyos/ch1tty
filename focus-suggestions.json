@@ -30142,7 +30142,7 @@
           "resolves_to": "alert-rule-inspect"
         },
         {
-          "text": "Silence the on-call alert for this service",
+          "text": "Which alert rules are configured for this service?",
           "resolves_to": "alert-rule-inspect"
         },
         {
