@@ -70,7 +70,7 @@ function buildAggregator(focus?: string): { aggregator: Aggregator; fixture: Fix
 test('documents focus: search "search" ranks notion/ tools above github/ (in-focus before out-of-focus)', async () => {
   const { aggregator } = buildAggregator('documents');
 
-  // "search" matches both notion/search (in-focus, documents) and github/search_code (out-of-focus, code),
+  // "search" matches both notion/API-search (in-focus, documents) and github/search_code (out-of-focus, code),
   // guaranteeing a mix that exercises the ranking assertion.
   const result = await aggregator.callTool('ch1tty/search', { query: 'search', limit: 20 });
   assert.equal(result.isError, undefined, 'search should not error');
@@ -100,7 +100,7 @@ test('documents focus: search "library documentation" includes context7/query-do
   assert.ok(toolNames.some((t) => t === 'context7/query-docs'), 'context7/query-docs must appear in results');
 });
 
-test('documents focus: search "create page" includes notion/create_page', async () => {
+test('documents focus: search "create page" includes notion/API-post-page', async () => {
   const { aggregator } = buildAggregator('documents');
 
   const result = await aggregator.callTool('ch1tty/search', { query: 'create page', limit: 10 });
@@ -108,10 +108,10 @@ test('documents focus: search "create page" includes notion/create_page', async 
 
   const parsed = parseSearch(result);
   const toolNames = (parsed.tools ?? []).map((r) => r.tool);
-  assert.ok(toolNames.some((t) => t === 'notion/create_page'), 'notion/create_page must appear in results');
+  assert.ok(toolNames.some((t) => t === 'notion/API-post-page'), 'notion/API-post-page must appear in results');
 });
 
-test('documents focus: search "search notes" includes notion/search', async () => {
+test('documents focus: search "search notes" includes notion/API-search', async () => {
   const { aggregator } = buildAggregator('documents');
 
   const result = await aggregator.callTool('ch1tty/search', { query: 'search notes', limit: 10 });
@@ -119,7 +119,7 @@ test('documents focus: search "search notes" includes notion/search', async () =
 
   const parsed = parseSearch(result);
   const toolNames = (parsed.tools ?? []).map((r) => r.tool);
-  assert.ok(toolNames.some((t) => t === 'notion/search'), 'notion/search must appear in results');
+  assert.ok(toolNames.some((t) => t === 'notion/API-search'), 'notion/API-search must appear in results');
 });
 
 test('documents focus: out-of-focus tools (github) remain reachable via search', async () => {
@@ -144,12 +144,12 @@ test('documents focus: no focus — notion tools still accessible (lens not gate
   assert.ok(toolNames.some((t) => t.startsWith('notion/')), 'notion/ tools must be reachable without any focus');
 });
 
-test('documents focus: execute notion/search returns fixture page results', async () => {
+test('documents focus: execute notion/API-search returns fixture page results', async () => {
   const { aggregator, fixture } = buildAggregator('documents');
   fixture.clearCallLog();
 
   const result = await aggregator.callTool('ch1tty/execute', {
-    tool: 'notion/search',
+    tool: 'notion/API-search',
     args: { query: 'architecture' },
   });
   assert.equal(result.isError, undefined, 'execute should succeed');
@@ -160,7 +160,7 @@ test('documents focus: execute notion/search returns fixture page results', asyn
   assert.ok(body.results[0]?.id, 'each result should have an id');
 
   const calls = fixture.getCallLog();
-  assert.ok(calls.some((c) => c.serverId === 'notion' && c.tool === 'search'), 'notion/search must be in call log');
+  assert.ok(calls.some((c) => c.serverId === 'notion' && c.tool === 'API-search'), 'notion/API-search must be in call log');
 });
 
 test('documents focus: execute context7/query-docs returns documentation snippets', async () => {
@@ -211,14 +211,14 @@ test('documents focus: multi-step — resolve library id then query docs', async
   assert.ok(toolNames.includes('context7/query-docs'), 'query-docs must be in call log');
 });
 
-test('documents focus: execute notion/create_page returns new page id and url', async () => {
+test('documents focus: execute notion/API-post-page returns new page id and url', async () => {
   const { aggregator } = buildAggregator('documents');
 
   const result = await aggregator.callTool('ch1tty/execute', {
-    tool: 'notion/create_page',
+    tool: 'notion/API-post-page',
     args: { title: 'Architecture Decision Record 001', content: 'We chose the slim-MCP pattern.' },
   });
-  assert.equal(result.isError, undefined, 'create_page should succeed');
+  assert.equal(result.isError, undefined, 'API-post-page should succeed');
 
   const created = JSON.parse(result.content[0].text as string) as { id: string; url: string };
   assert.ok(created.id, 'created page should have an id');
