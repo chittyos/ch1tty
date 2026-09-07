@@ -31026,53 +31026,179 @@
       ]
     },
     "workspace": {
-      "description": "Personal and team workspace productivity — notes, docs, calendar, messaging, and tasks across Notion, Google Workspace, and ChittyComms",
+      "description": "Personal and team workspace productivity \u2014 notes, docs, calendar, messaging, and tasks across Notion, Google Workspace, and ChittyComms",
       "combos": [
         {
           "name": "meeting-notes-to-notion",
-          "chain": ["google/list_events", "notion/create_page"],
-          "accomplishes": "Pull today's calendar events from Google and create a structured meeting-notes page in Notion for each — turning your schedule into a ready-to-fill notes workspace.",
+          "chain": [
+            "google/list_events",
+            "notion/create_page"
+          ],
+          "accomplishes": "Pull today's calendar events from Google and create a structured meeting-notes page in Notion for each \u2014 turning your schedule into a ready-to-fill notes workspace.",
           "verified": false,
           "notes": "google/list_events verified in fixture; notion/create_page verified."
         },
         {
           "name": "drive-doc-to-notion-page",
-          "chain": ["google/list_files", "notion/create_page"],
-          "accomplishes": "List recent Google Drive documents and mirror each as a linked Notion page — bridging Drive and your Notion workspace for a unified document view.",
+          "chain": [
+            "google/list_files",
+            "notion/create_page"
+          ],
+          "accomplishes": "List recent Google Drive documents and mirror each as a linked Notion page \u2014 bridging Drive and your Notion workspace for a unified document view.",
           "verified": false,
           "notes": "google fixture verified. notion fixture verified."
         },
         {
           "name": "comms-thread-to-task",
-          "chain": ["comms/comms.recentLog", "tasks/create_task"],
-          "accomplishes": "Pull recent communications for a contact, then create a follow-up task from the thread — turning conversation context into an actionable work item.",
+          "chain": [
+            "comms/comms.recentLog",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Pull recent communications for a contact, then create a follow-up task from the thread \u2014 turning conversation context into an actionable work item.",
           "verified": false,
           "notes": "comms.recentLog fixture verified. tasks/create_task fixture verified."
         },
         {
           "name": "email-and-document-followup",
-          "chain": ["google/send_email", "google/create_document"],
-          "accomplishes": "Send a follow-up email and simultaneously create a Google Doc to capture the discussion — keeping outreach and documentation in sync.",
+          "chain": [
+            "google/send_email",
+            "google/create_document"
+          ],
+          "accomplishes": "Send a follow-up email and simultaneously create a Google Doc to capture the discussion \u2014 keeping outreach and documentation in sync.",
           "verified": false,
           "notes": "Both google tools verified in fixture."
         },
         {
           "name": "workspace-summary-to-notion",
-          "chain": ["google/list_events", "comms/comms.recentLog", "notion/create_page"],
-          "accomplishes": "Aggregate today's calendar events and recent comms log, then write a daily workspace summary page into Notion — a morning brief in one chain.",
+          "chain": [
+            "google/list_events",
+            "comms/comms.recentLog",
+            "notion/create_page"
+          ],
+          "accomplishes": "Aggregate today's calendar events and recent comms log, then write a daily workspace summary page into Notion \u2014 a morning brief in one chain.",
           "verified": false,
           "notes": "Three-backend chain. All fixtures verified."
         }
       ],
       "prompts": [
-        { "text": "Find my Notion pages about Q3 planning", "resolves_to": "notion-page-search" },
-        { "text": "List my upcoming Google Calendar events", "resolves_to": "google-calendar-events" },
-        { "text": "Create a Notion page for today's team meeting notes", "resolves_to": "meeting-notes-to-notion" },
-        { "text": "Search Google Drive for budget documents from last month", "resolves_to": "drive-doc-to-notion-page" },
-        { "text": "Send a follow-up email to alice@example.com about the project", "resolves_to": "email-and-document-followup" },
-        { "text": "Show recent communications from Nick", "resolves_to": "comms-thread-to-task" },
-        { "text": "Create a task to review the meeting notes", "resolves_to": "comms-thread-to-task" },
-        { "text": "Pull my calendar for this week and create a Notion planning page", "resolves_to": "workspace-summary-to-notion" }
+        {
+          "text": "Find my Notion pages about Q3 planning",
+          "resolves_to": "notion-page-search"
+        },
+        {
+          "text": "List my upcoming Google Calendar events",
+          "resolves_to": "google-calendar-events"
+        },
+        {
+          "text": "Create a Notion page for today's team meeting notes",
+          "resolves_to": "meeting-notes-to-notion"
+        },
+        {
+          "text": "Search Google Drive for budget documents from last month",
+          "resolves_to": "drive-doc-to-notion-page"
+        },
+        {
+          "text": "Send a follow-up email to alice@example.com about the project",
+          "resolves_to": "email-and-document-followup"
+        },
+        {
+          "text": "Show recent communications from Nick",
+          "resolves_to": "comms-thread-to-task"
+        },
+        {
+          "text": "Create a task to review the meeting notes",
+          "resolves_to": "comms-thread-to-task"
+        },
+        {
+          "text": "Pull my calendar for this week and create a Notion planning page",
+          "resolves_to": "workspace-summary-to-notion"
+        }
+      ]
+    },
+    "devops": {
+      "description": "DevOps and infrastructure \u2014 deploy, build, monitor, and manage Cloudflare Workers, GitHub repositories, and Neon databases",
+      "combos": [
+        {
+          "name": "deploy-and-pr",
+          "chain": [
+            "cloudflare/deploy_worker",
+            "github/create_pull_request"
+          ],
+          "accomplishes": "Deploy a Cloudflare Worker to staging and open a GitHub PR to track the change \u2014 connecting infrastructure state to the code review workflow.",
+          "verified": false,
+          "notes": "cloudflare and github are remote backends; tool shapes confirmed from fixture-backend.ts"
+        },
+        {
+          "name": "build-failure-issue",
+          "chain": [
+            "cloudflare-builds/workers_builds_list_builds",
+            "cloudflare-builds/workers_builds_get_build",
+            "github/create_issue"
+          ],
+          "accomplishes": "List recent builds, fetch the failed build details, and open a GitHub issue capturing the error \u2014 turning a CI failure into a tracked work item.",
+          "verified": false,
+          "notes": "cloudflare-builds is a remote backend; github fixture verified"
+        },
+        {
+          "name": "worker-logs-to-db-query",
+          "chain": [
+            "cloudflare/get_worker_logs",
+            "neon/run_sql"
+          ],
+          "accomplishes": "Fetch recent Worker error logs and cross-reference the affected session IDs against the Neon database \u2014 correlating production errors with database state.",
+          "verified": false,
+          "notes": "cloudflare and neon are remote backends; both tool shapes confirmed from fixture"
+        },
+        {
+          "name": "deploy-task-track",
+          "chain": [
+            "cloudflare/deploy_worker",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Deploy a Worker and immediately create a follow-up task to verify the deployment in production \u2014 closing the loop between deploy and validation.",
+          "verified": false,
+          "notes": "tasks is wired via apps/tasks-mcp; create_task confirmed from fixture"
+        },
+        {
+          "name": "db-schema-review",
+          "chain": [
+            "neon/describe_table_schema",
+            "github/create_issue"
+          ],
+          "accomplishes": "Describe a Neon table schema and open a GitHub issue with schema notes \u2014 useful for schema review cycles and migration planning.",
+          "verified": false,
+          "notes": "neon and github are remote backends; tool shapes confirmed from fixture"
+        }
+      ],
+      "prompts": [
+        {
+          "text": "List all deployed Cloudflare Workers and their current status",
+          "resolves_to": "deploy-and-pr"
+        },
+        {
+          "text": "Show recent build failures for the ch1tty-gateway worker",
+          "resolves_to": "build-failure-issue"
+        },
+        {
+          "text": "Get the latest error logs from the ch1tty-gateway worker",
+          "resolves_to": "worker-logs-to-db-query"
+        },
+        {
+          "text": "Deploy a Cloudflare Worker to staging and open a PR",
+          "resolves_to": "deploy-and-pr"
+        },
+        {
+          "text": "Find the failed build and create a GitHub issue to track it",
+          "resolves_to": "build-failure-issue"
+        },
+        {
+          "text": "Describe the sessions table schema in the Neon database",
+          "resolves_to": "db-schema-review"
+        },
+        {
+          "text": "Deploy the worker and create a follow-up task to validate in production",
+          "resolves_to": "deploy-task-track"
+        }
       ]
     }
   }
