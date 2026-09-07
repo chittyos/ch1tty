@@ -1,7 +1,7 @@
 # ch1tty goal-driver board
 
-Fallback board — Notion API token invalid (401). This file is the cross-run durable state.
-Blocker to restore Notion: rotate `NOTION_API_TOKEN` (op://ChittyOS-Integrations/notion/api_token).
+Fallback board. Notion board is **ACTIVE** (updated 2026-09-07T19:00Z — Notion API token valid).
+Primary board: https://app.notion.com/p/36e94de435798159ac8dea3480f13530
 
 NOTE: Board trimmed at run ~1007 (2026-08-11). Full history preserved in git. Prior trims at runs 126, 201, 245, 349, 411, 484, 610, 723.
 
@@ -3503,3 +3503,26 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   8. **Set `CHITTY_TASKS_TOKEN` on prod** — new requirement from tasks-mcp wire.
   9. **Stale branch cleanup** — 1100+ remote `auto/` branches.
   10. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
+
+---
+### 2026-09-07T~19:00Z (run ~1508 — maintenance/verification; all workstreams done)
+- **Workstream**: None (all A–F + all focus-profile workstreams done). Maintenance run.
+- **Branch/PR**: `auto/run-log-20260907` (this commit — run log + Notion status fix only)
+- **Build**: clean (tsc, 0 errors, ch1tty@4.1.0) | **Tests (main HEAD)**: 1681 pass / 0 fail / 3 skip (51 suites, ~44s)
+- **Guardrails**: 5-tool surface confirmed (search/execute/status/reload/cast). `buildCastExplanation` metric freeze ACTIVE (56 fields no-focus / 87 fields focus:code — tests 1460/1461 enforce). 0 violations on main.
+- **Open PRs** (5 total):
+  - #1180 (auto/suggestions-catalog-populate): `ci.yml` run showed `conclusion:failure` but 0 jobs recorded — runner fluke. All 3 CodeQL check_runs ✅. Tests pass locally on branch (1681/0/3). `rerun_failed_jobs` blocked (403). Awaits human merge.
+  - #1179 (auto/ab-review-fixes): all 3 CodeQL checks ✅. Awaits human merge.
+  - #1167 (auto/s-auth-focus): all 3 CodeQL checks ✅. Awaits human merge.
+  - #1166 (auto/r-data-focus): open. Awaits human merge.
+  - #1155 (dependabot): open. Awaits human merge.
+- **Notion board**: ACTIVE — updated successfully at 2026-09-07T~19:00Z. Primary board: https://app.notion.com/p/36e94de435798159ac8dea3480f13530
+- **`test/suggestions.test.ts`**: already has disk-load integration test for `focus-suggestions.json` (line 84). No gap.
+- **State summary**: All workstreams done. Tests: 1681/0/3. Build: clean. 5 open PRs awaiting human merge.
+- **Human-action items**:
+  1. **Review + merge open PRs** (#1180, #1179, #1167, #1166, #1155 dependabot) — all CodeQL ✅; #1180 needs CI re-trigger from GitHub UI (runner fluke, not a code failure).
+  2. **Enable "Automatically delete head branches"** in GitHub Settings → General — clears 1100+ stale `auto/` branches.
+  3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  5. **Set `CHITTY_TASKS_TOKEN` on prod** — tasks backend requires it.
+- **PushNotification**: NOT SENT — nothing changed materially; all healthy; open PRs are known and documented.
