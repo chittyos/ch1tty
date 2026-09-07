@@ -3503,3 +3503,31 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   8. **Set `CHITTY_TASKS_TOKEN` on prod** — new requirement from tasks-mcp wire.
   9. **Stale branch cleanup** — 1100+ remote `auto/` branches.
   10. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
+
+---
+### 2026-09-07T~hourly (run ~1508 — ACTIVE: workstreams X/Y/Z/AB — PR #1178 open)
+- **Workstreams**: X (documents) Y (deploy) Z (workspace) AB (security) → **PR #1178 OPEN** (https://github.com/chittyos/ch1tty/pull/1178)
+- **Branch**: `auto/xzab-focus-profiles-x-through-ab`
+- **Build**: clean (tsc exit 0) | **Tests**: 1666 pass / 0 fail / 3 skip (1669 total, 55 suites)
+- **Guardrails**: 5-tool surface confirmed (search/execute/status/reload/cast). `buildCastExplanation` metric freeze ACTIVE (56/87 field counts). 0 violations.
+- **Actions**:
+  - Pulled main (9c58706 — post Q-W merge). npm ci clean. npm run build clean. npm test: 1615/0/3 baseline.
+  - Found 4 new auto/ branches: x-documents-focus, y-deploy-focus, z-workspace-focus, ab-security-focus.
+  - Applied X (documents): no new fixture servers. New test file xx-documents-focus-scenarios.test.ts. Tests failed (4): notion/API-search and notion/API-post-page not in fixture. Added those 2 tools to notion fixture (real Notion MCP uses API-prefixed names). Tests: 1627/0/3.
+  - Applied Y (deploy): no new fixture servers. New test file yy-deploy-focus-scenarios.test.ts. Tests: 1640/0/3.
+  - Applied Z (workspace): no new fixture servers. New test file zz-workspace-focus-scenarios.test.ts. Tests: 1653/0/3.
+  - Applied AB (security): no new fixture servers. New test file ab-security-focus-scenarios.test.ts. Tests: 1666/0/3.
+  - Synced FOCUS_PROFILES_RAW in src/config-data.ts to all 24 profiles (added deploy, documents, security, workspace).
+  - Final build + test: tsc exit 0, 1666/0/3.
+  - Committed as single squash, pushed branch, created PR #1178. Subscribed to PR activity.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ M ✓ N ✓ O ✓ P ✓ Q-W ✓ X-AB in PR #1178. Build: clean. Tests: 1666/0/3. **~1508th run. focus-profiles.json: 20 → 24 profiles.**
+- **Human-action items**:
+  1. **Review + merge PR #1178** (workstreams X-AB: 4 focus profiles — documents, deploy, workspace, security).
+  2. **Merge PR #1155** (dependabot) — qs + fast-uri security bumps.
+  3. **Disable or redirect hourly schedule** — 1508+ consecutive runs; all known workstreams in PR.
+  4. **Deploy Workstream F phases** (Cloudflare): Create `Ch1ttyApiAgent` DO class + drain `Ch1ttyDO` instances.
+  5. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  6. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  7. **Set `CHITTY_TASKS_TOKEN` on prod** — new requirement from tasks-mcp wire.
+  8. **Stale branch cleanup** — 1100+ remote `auto/` branches.
+  9. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
