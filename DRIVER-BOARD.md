@@ -3505,7 +3505,7 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   10. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
 
 ---
-### 2026-09-07T~19:00Z (run ~1508 — maintenance/verification; all workstreams done)
+### ~2026-09-07T19:00Z (run ~1508 — maintenance/verification; all workstreams done)
 - **Workstream**: None (all A–F + all focus-profile workstreams done). Maintenance run.
 - **Branch/PR**: `auto/run-log-20260907` (this commit — run log + Notion status fix only)
 - **Build**: clean (tsc, 0 errors, ch1tty@4.1.0) | **Tests (main HEAD)**: 1681 pass / 0 fail / 3 skip (51 suites, ~44s)
@@ -3516,7 +3516,7 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   - #1167 (auto/s-auth-focus): all 3 CodeQL checks ✅. Awaits human merge.
   - #1166 (auto/r-data-focus): open. Awaits human merge.
   - #1155 (dependabot): open. Awaits human merge.
-- **Notion board**: ACTIVE — updated successfully at 2026-09-07T~19:00Z. Primary board: https://app.notion.com/p/36e94de435798159ac8dea3480f13530
+- **Notion board**: ACTIVE — updated successfully at ~2026-09-07T19:00Z. Primary board: https://app.notion.com/p/36e94de435798159ac8dea3480f13530
 - **`test/suggestions.test.ts`**: already has disk-load integration test for `focus-suggestions.json` (line 84). No gap.
 - **State summary**: All workstreams done. Tests: 1681/0/3. Build: clean. 5 open PRs awaiting human merge.
 - **Human-action items**:
