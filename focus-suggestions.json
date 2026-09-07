@@ -31000,7 +31000,7 @@
           "resolves_to": "worker-health-check"
         },
         {
-          "text": "Deploy the ch1tty-gateway worker and open a PR to track the release",
+          "text": "Deploy the ch1tty-gateway worker and verify it appears active in the worker list",
           "resolves_to": "deploy-pr-task"
         },
         {
@@ -31012,7 +31012,7 @@
           "resolves_to": "build-logs-debug"
         },
         {
-          "text": "Deploy a new version of ch1tty-gateway, verify it is live, and check for runtime errors",
+          "text": "Inspect the latest build for ch1tty-gateway and pull its build logs to verify the output",
           "resolves_to": "deploy-and-validate"
         },
         {
@@ -31020,7 +31020,7 @@
           "resolves_to": "worker-health-check"
         },
         {
-          "text": "Ship the feature branch to Cloudflare and create a validation task for QA",
+          "text": "Deploy a Cloudflare Worker and confirm the deployment is active in the worker list",
           "resolves_to": "deploy-pr-task"
         }
       ]
