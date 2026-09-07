@@ -254,6 +254,12 @@ export const FOCUS_PROFILES_RAW = {
       servers: ['cloudflare', 'cloudflare-builds', 'neon', 'github', 'orchestrator', 'fs', 'quality'],
       boost: 0.5,
     },
+    documents: {
+      description: 'Document creation, search, and knowledge management — Notion pages/databases, library docs via Context7, PDF processing, and collaborative notes',
+      categories: ['documents'],
+      servers: ['notion', 'context7', 'pdf', 'notes'],
+      boost: 0.6,
+    },
     realestate: {
       description: 'Property management — list and inspect rental properties, tenants, leases, and maintenance requests via TurboTenant',
       categories: ['ecosystem'],

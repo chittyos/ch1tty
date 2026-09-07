@@ -509,7 +509,7 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
   notion: {
     tools: [
       {
-        name: 'search',
+        name: 'API-search',
         description: 'Search pages and databases in the Notion workspace for documents',
         inputSchema: {
           type: 'object',
@@ -519,7 +519,7 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
         response: text(JSON.stringify({ results: [{ id: 'page-abc', title: 'Architecture Notes' }] })),
       },
       {
-        name: 'create_page',
+        name: 'API-post-page',
         description: 'Create a new page in a Notion workspace for documentation',
         inputSchema: {
           type: 'object',
@@ -533,8 +533,8 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
         response: text(JSON.stringify({ id: 'page-new', url: 'https://notion.so/page-new' })),
       },
       {
-        name: 'get_page',
-        description: 'Get the content of a Notion page document by ID',
+        name: 'API-retrieve-a-page',
+        description: 'Retrieve the content of a Notion page by page ID',
         inputSchema: {
           type: 'object',
           properties: { page_id: { type: 'string' } },

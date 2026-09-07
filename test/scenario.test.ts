@@ -259,7 +259,7 @@ test('scenario: multi-step — neon project list → table schema → notion pag
 
   // Step 4: create a notion page to document the schema
   const notionResult = await aggregator.callTool('ch1tty/execute', {
-    tool: 'notion/create_page',
+    tool: 'notion/API-post-page',
     args: { title: 'sessions schema', content: schemaResult.content[0].text },
   }, sessionId);
   assert.equal(notionResult.isError, undefined);
@@ -271,7 +271,7 @@ test('scenario: multi-step — neon project list → table schema → notion pag
   const toolNames = calls.map((c) => `${c.serverId}/${c.tool}`);
   assert.ok(toolNames.includes('neon/list_projects'));
   assert.ok(toolNames.includes('neon/describe_table_schema'));
-  assert.ok(toolNames.includes('notion/create_page'));
+  assert.ok(toolNames.includes('notion/API-post-page'));
 });
 
 // ── Scenario 4: Mis-resolution detection ─────────────────────────────────────
@@ -326,7 +326,7 @@ test('scenario: mis-resolution — "search documents" resolves to notion', async
   const cast = parseCast(result);
   assert.equal(cast.cast, 'plan');
   const resolved = cast.resolved as { tool: string };
-  assert.equal(resolved.tool, 'notion/search', `expected notion/search, got ${resolved.tool}`);
+  assert.equal(resolved.tool, 'notion/API-search', `expected notion/API-search, got ${resolved.tool}`);
 });
 
 // ── Scenario 5: Focus is a lens, not a gate ───────────────────────────────────
@@ -707,7 +707,7 @@ test('scenario: code focus — multi-step: search library docs → execute → d
 
   // Step 3: create a notion page to document findings
   const notionResult = await aggregator.callTool('ch1tty/execute', {
-    tool: 'notion/create_page',
+    tool: 'notion/API-post-page',
     args: { title: 'MCP SDK: server setup', content: docsResult.content[0].text },
   }, sessionId);
   assert.equal(notionResult.isError, undefined);
@@ -717,7 +717,7 @@ test('scenario: code focus — multi-step: search library docs → execute → d
   // Verify call log shows both backend invocations
   const toolNames = fixture.getCallLog().map((c) => `${c.serverId}/${c.tool}`);
   assert.ok(toolNames.includes('context7/query-docs'), 'context7 should have been called');
-  assert.ok(toolNames.includes('notion/create_page'), 'notion should have been called');
+  assert.ok(toolNames.includes('notion/API-post-page'), 'notion should have been called');
 });
 
 // ── Scenario 11: Communication focus ─────────────────────────────────────────
@@ -1034,7 +1034,7 @@ test('scenario: ops focus — multi-step: list workers, inspect logs, document i
 
   // Step 3: create a Notion incident page documenting the issue
   const incidentResult = await aggregator.callTool('ch1tty/execute', {
-    tool: 'notion/create_page',
+    tool: 'notion/API-post-page',
     args: {
       title: `Incident: ${logData.worker} backend timeout`,
       content: JSON.stringify({ errors, worker: logData.worker }),
@@ -1048,7 +1048,7 @@ test('scenario: ops focus — multi-step: list workers, inspect logs, document i
   const toolNames = fixture.getCallLog().map((c) => `${c.serverId}/${c.tool}`);
   assert.ok(toolNames.includes('cloudflare/list_workers'), 'cloudflare/list_workers must have been called');
   assert.ok(toolNames.includes('cloudflare/get_worker_logs'), 'cloudflare/get_worker_logs must have been called');
-  assert.ok(toolNames.includes('notion/create_page'), 'notion/create_page must have been called');
+  assert.ok(toolNames.includes('notion/API-post-page'), 'notion/API-post-page must have been called');
 });
 
 // ── Scenario 14: Ops REORDER probe ───────────────────────────────────────────

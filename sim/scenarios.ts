@@ -223,7 +223,7 @@ export const SCENARIOS: Scenario[] = [
     focus: 'code',
     intent: 'create a pull request to merge my feature branch',
     expect: 'github/create_pull_request',
-    note: 'near-miss: tasks/create_task (create keyword), notion/create_page (create keyword)',
+    note: 'near-miss: tasks/create_task (create keyword), notion/API-post-page (create keyword)',
   },
   {
     id: 'code.create-issue',
@@ -280,7 +280,7 @@ export const SCENARIOS: Scenario[] = [
     id: 'comm.create-doc',
     focus: 'communication',
     intent: 'create a new Notion page to document the team meeting',
-    expect: 'notion/create_page',
+    expect: 'notion/API-post-page',
     note: 'near-miss: chittymac/create_note (create + note keyword, same focus); Notion specificity wins',
   },
   {
@@ -288,7 +288,7 @@ export const SCENARIOS: Scenario[] = [
     focus: 'communication',
     intent: 'create a follow-up task to track the deployment issue from the team message',
     expect: 'tasks/create_task',
-    note: 'near-miss: imessage/send_message (message keyword), notion/create_page (create keyword); tasks in communication profile via servers list',
+    note: 'near-miss: imessage/send_message (message keyword), notion/API-post-page (create keyword); tasks in communication profile via servers list',
   },
   {
     id: 'comm.create-note',

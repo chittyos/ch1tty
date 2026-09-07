@@ -140,7 +140,7 @@ test('out-of-focus tools stay reachable via search (lens, not gate)', async () =
       'imessage tool unreachable under ops focus',
     );
     assert.ok(
-      await outOfFocusReachable(aggregator, 'create page', 'ops', 'notion/create_page'),
+      await outOfFocusReachable(aggregator, 'create page', 'ops', 'notion/API-post-page'),
       'notion tool unreachable under ops focus',
     );
   } finally {
