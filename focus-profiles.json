@@ -136,9 +136,7 @@
     },
     "monitoring": {
       "description": "Service health, alerting, and observability — check endpoint health, query alert rules, and inspect uptime metrics across ChittyOS services",
-      "categories": [
-        "ecosystem"
-      ],
+      "categories": [],
       "servers": [
         "monitoring",
         "health"

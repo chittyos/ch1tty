@@ -30094,43 +30094,42 @@
         {
           "name": "uptime-report-and-incident-create",
           "chain": [
-            "monitoring/get_uptime_metrics",
-            "tasks/create_task"
+            "monitoring/check_health",
+            "monitoring/list_alert_rules"
           ],
-          "accomplishes": "Pull uptime metrics for a service window and, when availability drops below threshold, create a ChittyAgent task to track the incident to resolution.",
+          "accomplishes": "Check health across registered services to identify degraded ones, then list configured alert rules to understand which rules apply to the degraded service. Creating a ChittyAgent task is a follow-up step the operator performs after reviewing the results \u2014 tasks/create_task requires a title argument that must be derived from the health result.",
           "verified": false,
-          "notes": "tasks backend is connected; monitoring/get_uptime_metrics inferred from monitoring surface."
+          "notes": "Both chain steps are zero-required-arg and chain-safe via previousResult. tasks/create_task is intentionally excluded from the chain because it requires \"title\" which cannot be auto-synthesised; call it separately with an explicit title."
         },
         {
           "name": "alert-rule-inspect-and-silence",
           "chain": [
             "monitoring/list_alert_rules",
-            "monitoring/silence_alert"
+            "monitoring/list_alerts"
           ],
-          "accomplishes": "List all active alert rules for a service, inspect the firing ones, and silence rules that are already being handled to reduce noise during an active incident.",
+          "accomplishes": "List all configured alert rules, then list currently active alert notifications to cross-reference which rules are firing. An operator uses this pair to identify the exact rule IDs to silence \u2014 silencing is a separate explicit action requiring a rule_id derived from these results.",
           "verified": false,
-          "notes": "monitoring backend is planned; both tools inferred from alerting surface shape."
+          "notes": "Both chain steps are zero-required-arg and chain-safe via previousResult. monitoring/silence_alert is intentionally excluded from the chain because it requires a rule_id that must be selected by the operator from the rule list."
         },
         {
           "name": "endpoint-probe-and-ledger-audit",
           "chain": [
-            "monitoring/probe_endpoint",
-            "ledger/append_entry"
+            "monitoring/check_health",
+            "monitoring/list_alerts"
           ],
-          "accomplishes": "Probe an HTTP endpoint for availability and latency, then append the result as an immutable ledger audit entry \u2014 building a queryable compliance-grade uptime log.",
+          "accomplishes": "Check service health and list active alerts to build a combined observability snapshot suitable for a ledger audit entry. Writing to the ledger is a follow-up step \u2014 ledger/append_entry requires namespace and payload arguments that must be composed from these results by the operator or LLM.",
           "verified": false,
-          "notes": "ledger backend is connected; monitoring/probe_endpoint inferred from monitoring surface."
+          "notes": "Both chain steps are zero-required-arg and chain-safe via previousResult. monitoring/probe_endpoint (requires url) and ledger/append_entry (requires namespace + payload) are excluded from the chain; call them separately with explicit arguments derived from the health/alert results."
         },
         {
           "name": "service-status-summary",
           "chain": [
             "monitoring/check_health",
-            "monitoring/get_uptime_metrics",
             "monitoring/list_alerts"
           ],
-          "accomplishes": "Assemble a full service status summary: current health, uptime over the past 24h, and any active alerts \u2014 the canonical on-call briefing in one chained call.",
+          "accomplishes": "Assemble a quick service status briefing: current health across all registered services and any active alerts \u2014 the canonical on-call snapshot in one two-step chain. Both tools require no mandatory arguments and chain safely via previousResult.",
           "verified": false,
-          "notes": "Combines three monitoring tools for a complete status view."
+          "notes": "Both chain steps are zero-required-arg and verified via fixture. get_uptime_metrics (requires service_id) is intentionally excluded from the chain to keep it chain-safe; call it separately with an explicit service_id."
         }
       ],
       "prompts": [

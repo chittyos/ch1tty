@@ -19,7 +19,7 @@ const MONITORING_FOCUS_PROFILES = {
   profiles: {
     monitoring: {
       description: 'Service health, alerting, and observability',
-      categories: ['ecosystem' as const],
+      categories: [],
       servers: ['monitoring', 'health'],
       boost: 0.6,
     },

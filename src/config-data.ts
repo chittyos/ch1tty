@@ -194,6 +194,12 @@ export const FOCUS_PROFILES_RAW = {
       servers: ['cloudflare', 'cloudflare-builds', 'neon', 'github', 'orchestrator', 'fs', 'quality'],
       boost: 0.5,
     },
+    monitoring: {
+      description: 'Service health, alerting, and observability — check endpoint health, query alert rules, and inspect uptime metrics across ChittyOS services',
+      categories: [],
+      servers: ['monitoring', 'health'],
+      boost: 0.6,
+    },
   },
 } as const;
 
