@@ -133,6 +133,19 @@
         "chittyevidence"
       ],
       "boost": 0.6
+    },
+    "realestate": {
+      "description": "Property management — list and inspect rental properties, tenants, leases, and maintenance requests via TurboTenant",
+      "categories": [
+        "ecosystem"
+      ],
+      "servers": [
+        "turbotenant",
+        "market",
+        "finance",
+        "tasks"
+      ],
+      "boost": 0.6
     }
   }
 }
