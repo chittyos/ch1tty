@@ -308,6 +308,22 @@
         "linear"
       ],
       "boost": 0.6
+    },
+    "security": {
+      "description": "Security operations — access auditing, secret scanning, incident triage, evidence preservation, and immutable audit-trail recording",
+      "categories": [
+        "ecosystem",
+        "code"
+      ],
+      "servers": [
+        "security",
+        "chittyevidence",
+        "ledger",
+        "neon",
+        "tasks",
+        "linear"
+      ],
+      "boost": 0.6
     }
   }
 }
