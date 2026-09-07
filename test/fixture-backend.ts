@@ -1446,4 +1446,165 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
       },
     ],
   },
+  dispute: {
+    tools: [
+      {
+        name: 'list_disputes',
+        description: 'List disputes with optional status filter',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            status: { type: 'string', enum: ['open', 'pending', 'resolved', 'closed'] },
+            limit: { type: 'number' },
+          },
+        },
+        response: text(JSON.stringify([
+          { id: 'dsp-001', subject: 'Unpaid invoice #INV-2026-042', status: 'open', filed_at: '2026-08-15T09:00:00Z', party: 'Acme Corp' },
+          { id: 'dsp-002', subject: 'Contract breach — delivery delay', status: 'pending', filed_at: '2026-08-20T14:00:00Z', party: 'Beta LLC' },
+        ])),
+      },
+      {
+        name: 'get_dispute',
+        description: 'Get details of a specific dispute by ID',
+        inputSchema: {
+          type: 'object',
+          properties: { id: { type: 'string' } },
+          required: ['id'],
+        },
+        response: text(JSON.stringify({
+          id: 'dsp-001',
+          subject: 'Unpaid invoice #INV-2026-042',
+          status: 'open',
+          filed_at: '2026-08-15T09:00:00Z',
+          party: 'Acme Corp',
+          description: 'Invoice #INV-2026-042 for $12,500 remains unpaid 45 days past due.',
+          evidence_ids: ['ev-abc', 'ev-def'],
+        })),
+      },
+      {
+        name: 'file_dispute',
+        description: 'File a new dispute against a party',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            subject: { type: 'string' },
+            party: { type: 'string' },
+            description: { type: 'string' },
+            evidence_ids: { type: 'array', items: { type: 'string' } },
+          },
+          required: ['subject', 'party', 'description'],
+        },
+        response: text(JSON.stringify({
+          id: 'dsp-new',
+          subject: 'New dispute',
+          status: 'open',
+          filed_at: '2026-09-07T00:00:00Z',
+          party: 'Respondent',
+        })),
+      },
+      {
+        name: 'update_dispute_status',
+        description: 'Update the status of an existing dispute',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            status: { type: 'string', enum: ['open', 'pending', 'resolved', 'closed'] },
+            note: { type: 'string' },
+          },
+          required: ['id', 'status'],
+        },
+        response: text(JSON.stringify({ id: 'dsp-001', status: 'resolved', updated_at: '2026-09-07T01:00:00Z' })),
+      },
+      {
+        name: 'close_dispute',
+        description: 'Close a dispute and record the outcome',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            outcome: { type: 'string', enum: ['settled', 'dismissed', 'withdrawn', 'decided'] },
+            summary: { type: 'string' },
+          },
+          required: ['id', 'outcome'],
+        },
+        response: text(JSON.stringify({ id: 'dsp-001', status: 'closed', outcome: 'settled', closed_at: '2026-09-07T01:00:00Z' })),
+      },
+    ],
+  },
+
+  resolve: {
+    tools: [
+      {
+        name: 'list_resolutions',
+        description: 'List resolution records, optionally filtered by dispute or status',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            dispute_id: { type: 'string' },
+            status: { type: 'string', enum: ['draft', 'proposed', 'accepted', 'rejected'] },
+          },
+        },
+        response: text(JSON.stringify([
+          { id: 'res-001', dispute_id: 'dsp-001', status: 'proposed', proposed_at: '2026-08-25T10:00:00Z', terms: 'Payment of $12,500 within 10 business days' },
+          { id: 'res-002', dispute_id: 'dsp-002', status: 'draft', proposed_at: '2026-08-28T11:00:00Z', terms: 'Extension of delivery deadline by 30 days' },
+        ])),
+      },
+      {
+        name: 'create_resolution',
+        description: 'Create a resolution proposal for a dispute',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            dispute_id: { type: 'string' },
+            terms: { type: 'string' },
+            deadline: { type: 'string' },
+          },
+          required: ['dispute_id', 'terms'],
+        },
+        response: text(JSON.stringify({
+          id: 'res-new',
+          dispute_id: 'dsp-001',
+          status: 'draft',
+          terms: 'Proposed terms',
+          proposed_at: '2026-09-07T00:00:00Z',
+        })),
+      },
+      {
+        name: 'get_resolution',
+        description: 'Get details of a specific resolution by ID',
+        inputSchema: {
+          type: 'object',
+          properties: { id: { type: 'string' } },
+          required: ['id'],
+        },
+        response: text(JSON.stringify({
+          id: 'res-001',
+          dispute_id: 'dsp-001',
+          status: 'proposed',
+          terms: 'Payment of $12,500 within 10 business days',
+          proposed_at: '2026-08-25T10:00:00Z',
+        })),
+      },
+      {
+        name: 'apply_resolution',
+        description: 'Apply (accept and execute) an agreed resolution for a dispute',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            accepted_by: { type: 'string' },
+            notes: { type: 'string' },
+          },
+          required: ['id', 'accepted_by'],
+        },
+        response: text(JSON.stringify({
+          id: 'res-001',
+          status: 'accepted',
+          applied_at: '2026-09-07T01:00:00Z',
+          accepted_by: 'nick@nevershitty.com',
+        })),
+      },
+    ],
+  },
 };
