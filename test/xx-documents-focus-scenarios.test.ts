@@ -67,10 +67,12 @@ function buildAggregator(focus?: string): { aggregator: Aggregator; fixture: Fix
   return { aggregator, fixture };
 }
 
-test('documents focus: search "search workspace pages" ranks notion/ tools first', async () => {
+test('documents focus: search "search" ranks notion/ tools above github/ (in-focus before out-of-focus)', async () => {
   const { aggregator } = buildAggregator('documents');
 
-  const result = await aggregator.callTool('ch1tty/search', { query: 'search workspace pages', limit: 10 });
+  // "search" matches both notion/search (in-focus, documents) and github/search_code (out-of-focus, code),
+  // guaranteeing a mix that exercises the ranking assertion.
+  const result = await aggregator.callTool('ch1tty/search', { query: 'search', limit: 20 });
   assert.equal(result.isError, undefined, 'search should not error');
 
   const parsed = parseSearch(result);
@@ -78,12 +80,12 @@ test('documents focus: search "search workspace pages" ranks notion/ tools first
   assert.ok(tools.length > 0, 'should return results');
 
   const notionIdx = tools.findIndex((r) => r.tool.startsWith('notion/'));
-  const outOfFocusIdx = tools.findIndex((r) => r.inFocus === false);
+  // Out-of-focus tools have inFocus omitted (undefined), not set to false — use !== true.
+  const outOfFocusIdx = tools.findIndex((r) => r.inFocus !== true);
 
   assert.ok(notionIdx !== -1, 'notion/ tools should appear in results');
-  if (outOfFocusIdx !== -1) {
-    assert.ok(notionIdx < outOfFocusIdx, 'notion/ tools should rank above out-of-focus tools for workspace query');
-  }
+  assert.ok(outOfFocusIdx !== -1, 'at least one out-of-focus tool should be present (github/search_code matches "search")');
+  assert.ok(notionIdx < outOfFocusIdx, 'notion/ tools should rank above out-of-focus tools when documents focus is active');
   assert.equal(parsed.focus, 'documents', 'search response should report active focus');
 });
 
