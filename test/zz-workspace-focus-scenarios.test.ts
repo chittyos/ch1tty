@@ -114,7 +114,7 @@ test('workspace focus: out-of-focus tools remain reachable', async () => {
   assert.ok(neonTool, 'neon/ tools must remain reachable even when workspace focus is active (lens, not gate)');
 });
 
-test('workspace focus: cast "search Notion workspace for Q3 planning" resolves to notion/search', async () => {
+test('workspace focus: cast "search Notion workspace for Q3 planning" resolves to notion/API-search', async () => {
   const { aggregator } = buildAggregator('workspace');
 
   const result = await aggregator.callTool('ch1tty/cast', {
@@ -128,8 +128,8 @@ test('workspace focus: cast "search Notion workspace for Q3 planning" resolves t
   const resolved = cast.resolved as { tool: string; score: number } | undefined;
   assert.ok(resolved, 'cast should resolve a tool');
   assert.ok(
-    resolved.tool === 'notion/search',
-    `cast should resolve to notion/search, got: ${resolved.tool}`,
+    resolved.tool === 'notion/API-search',
+    `cast should resolve to notion/API-search, got: ${resolved.tool}`,
   );
   assert.equal(cast.focus, 'workspace', 'cast response should report active focus');
 });
@@ -193,14 +193,14 @@ test('workspace focus: search without focus returns unbiased results', async () 
   assert.ok((parsed.tools ?? []).length > 0, 'should still return results without focus');
 });
 
-test('workspace focus: execute notion/search returns fixture results', async () => {
+test('workspace focus: execute notion/API-search returns fixture results', async () => {
   const { aggregator } = buildAggregator('workspace');
 
   const result = await aggregator.callTool('ch1tty/execute', {
-    tool: 'notion/search',
+    tool: 'notion/API-search',
     args: { query: 'Q3 planning' },
   });
-  assert.equal(result.isError, undefined, 'notion/search should succeed');
+  assert.equal(result.isError, undefined, 'notion/API-search should succeed');
 
   const data = JSON.parse(result.content[0].text as string) as { results?: unknown[] };
   assert.ok(Array.isArray(data.results) && data.results.length > 0, 'should return results');
@@ -235,20 +235,20 @@ test('workspace focus: multi-step — pull calendar then create Notion meeting-n
 
   // Step 2: create meeting-notes page in Notion for the first event
   const pageResult = await aggregator.callTool('ch1tty/execute', {
-    tool: 'notion/create_page',
+    tool: 'notion/API-post-page',
     args: {
       title: `Meeting Notes — ${cal.events[0].summary}`,
       parent_id: 'meetings-db',
     },
   }, sessionId);
-  assert.equal(pageResult.isError, undefined, 'notion/create_page should succeed');
+  assert.equal(pageResult.isError, undefined, 'notion/API-post-page should succeed');
   const page = JSON.parse(pageResult.content[0].text as string) as { id: string };
   assert.ok(page.id, 'should return a page id');
 
   const calls = fixture.getCallLog();
   const keys = calls.map((c) => `${c.serverId}/${c.tool}`);
   assert.ok(keys.includes('google/list_events'), 'google/list_events must be in call log');
-  assert.ok(keys.includes('notion/create_page'), 'notion/create_page must be in call log');
+  assert.ok(keys.includes('notion/API-post-page'), 'notion/API-post-page must be in call log');
 });
 
 test('workspace focus: multi-step — read comms log then create follow-up task', async () => {
