@@ -42,14 +42,17 @@ const FIXTURE_CONFIGS: ServerConfig[] = [
 type SearchResult = { tools?: Array<{ tool: string; score?: number; inFocus?: boolean }>; focus?: string };
 type CastResult = Record<string, unknown>;
 
+/** Extract JSON from a search tool result. */
 function parseSearch(result: { content: Array<{ type: string; text?: string }> }): SearchResult {
   return JSON.parse(result.content[0]?.text ?? '{}') as SearchResult;
 }
 
+/** Extract JSON from a cast tool result. */
 function parseCast(result: { content: Array<{ type: string; text?: string }> }): CastResult {
   return JSON.parse(result.content[0]?.text ?? '{}') as CastResult;
 }
 
+/** Build a fixture-backed Aggregator wired with the devops focus profile. */
 function buildAggregator(focus?: string): { aggregator: Aggregator; fixture: FixtureBackend } {
   const fixture = new FixtureBackend();
   for (const [id, def] of Object.entries(FIXTURE_SERVERS)) {
