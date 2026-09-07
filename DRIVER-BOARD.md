@@ -1,7 +1,6 @@
 # ch1tty goal-driver board
 
-Fallback board — Notion API token invalid (401). This file is the cross-run durable state.
-Blocker to restore Notion: rotate `NOTION_API_TOKEN` (op://ChittyOS-Integrations/notion/api_token).
+Notion token valid (confirmed 2026-09-07). This file is kept in sync with the Notion board as cross-run durable state.
 
 NOTE: Board trimmed at run ~1007 (2026-08-11). Full history preserved in git. Prior trims at runs 126, 201, 245, 349, 411, 484, 610, 723.
 
@@ -28,7 +27,6 @@ Workstreams A–F ALL DONE. Build clean, tests green (1492/0/3), guardrails enfo
 
 ## Blockers
 
-- **Notion API token** — Invalid (401). Human action: rotate `NOTION_API_TOKEN` in 1Password (`op://ChittyOS-Integrations/notion/api_token`).
 - **ch1tty github backend** — `GITHUB_MCP_AUTHORIZATION` unset on prod. Set env var to reconnect the `github` backend in `servers.json`.
 - **Branch cleanup** — 1081+ stale `auto/` branches (including 261 cast-explain violations). Git push --delete fails in this container. Human action: enable "Automatically delete head branches" in GitHub Settings → General, or run bulk-delete locally.
 - **CI (main ci.yml)** — 0-job-queue failure (non-CodeQL). Recurring, non-blocking.
@@ -3518,8 +3516,8 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   - Verified git log: workstreams X (#1173), Y (#1174), Z (#1175), AA (#1176), AB (#1177) all merged to main — board entry corrected.
   - PR #1172 (Q-W) confirmed merged: R(data) and S(auth) already on main — PRs #1166/#1167 are superseded (should be closed, not merged).
   - Codex review findings on PR #1182 applied: corrected N–W→N–AB, corrected #1166/#1167 action, removed stale Notion token blocker.
-  - Updated DRIVER-BOARD.md (this entry). Updated Notion board run log.
-- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ M ✓ N ✓ O ✓ P ✓ Q ✓ R ✓ S ✓ T ✓ U ✓ V ✓ W ✓ X ✓ Y ✓ Z ✓ AA ✓ AB ✓ ALL DONE. 25 focus profiles. Build: clean. Tests: 1681/0/3. **~1522nd run. 4 open PRs awaiting human merge.**
+  - Updated DRIVER-BOARD.md (this entry; corrected global header Notion token status → valid, removed stale Notion blocker from Blockers section, added H ✓ J ✓ K ✓ L ✓ tasks-mcp ✓ to state summary). Updated Notion board run log.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H ✓ J ✓ K ✓ L ✓ tasks-mcp ✓ M ✓ N ✓ O ✓ P ✓ Q ✓ R ✓ S ✓ T ✓ U ✓ V ✓ W ✓ X ✓ Y ✓ Z ✓ AA ✓ AB ✓ ALL DONE. 25 focus profiles. Build: clean. Tests: 1681/0/3. **~1522nd run. 4 open PRs awaiting human merge.**
 - **Human-action items**:
   1. **Merge PR #1179** (`auto/ab-review-fixes`) — security scan/cast fixes; CI green.
   2. **Merge PR #1180** (`auto/suggestions-catalog-populate`) — focus-suggestions.json with 25 profiles; CI green.
