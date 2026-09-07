@@ -8,22 +8,31 @@
  *  - multi-step deploy + PR and build-failure + issue workflows execute via fixture backends
  */
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import test from 'node:test';
 import { Aggregator } from '../src/aggregator.js';
 import type { ServerConfig } from '../src/types.js';
 import { FixtureBackend, FIXTURE_SERVERS } from './fixture-backend.js';
 
+// Load the production devops profile from focus-profiles.json so tests catch real profile drift.
+const _focusProfilesFile = JSON.parse(
+  readFileSync(resolve(process.cwd(), 'focus-profiles.json'), 'utf-8'),
+) as {
+  profiles: Record<string, {
+    description: string;
+    categories: Array<'code' | 'documents' | 'ecosystem' | 'design' | 'communication'>;
+    servers: string[];
+    boost: number;
+  }>;
+};
+
 const DEVOPS_FOCUS_PROFILES = {
   profiles: {
-    devops: {
-      description: 'DevOps and infrastructure — deploy, build, monitor, and manage Cloudflare Workers, GitHub repositories, and Neon databases',
-      categories: ['code' as const],
-      servers: ['cloudflare', 'cloudflare-builds', 'github', 'neon', 'tasks', 'linear'],
-      boost: 0.6,
-    },
+    devops: _focusProfilesFile.profiles['devops']!,
     finance: {
       description: 'Billing, payments, and financial ecosystem tools',
-      categories: ['ecosystem' as const],
+      categories: ['ecosystem' as const] as Array<'ecosystem'>,
       servers: ['stripe', 'tasks', 'ledger'],
       boost: 0.5,
     },
@@ -37,6 +46,7 @@ const FIXTURE_CONFIGS: ServerConfig[] = [
   { id: 'neon', name: 'Neon', type: 'remote', access: 'readwrite', category: 'code', endpoint: 'https://fixture.neon' },
   { id: 'tasks', name: 'ChittyAgent Tasks', type: 'local', access: 'readwrite', category: 'ecosystem', command: 'node', args: ['./apps/tasks-mcp/dist/index.js'] },
   { id: 'stripe', name: 'Stripe', type: 'remote', access: 'readwrite', category: 'ecosystem', endpoint: 'https://fixture.stripe' },
+  { id: 'linear', name: 'Linear', type: 'remote', access: 'readwrite', category: 'ecosystem', endpoint: 'https://fixture.linear' },
 ];
 
 type SearchResult = { tools?: Array<{ tool: string; score?: number; inFocus?: boolean }>; focus?: string };
@@ -292,4 +302,29 @@ test('devops focus: neon database tools are reachable and boosted under devops f
 
   const neonTool = (parsed.tools ?? []).find((r) => r.tool.startsWith('neon/'));
   assert.ok(neonTool?.inFocus === true, 'neon/ tools should be marked inFocus under devops profile');
+});
+
+test('devops focus: linear project tools are reachable (explicit devops profile member)', async () => {
+  const { aggregator } = buildAggregator('devops');
+
+  // linear is an explicit member of the production devops profile (servers list in focus-profiles.json)
+  const result = await aggregator.callTool('ch1tty/search', { query: 'linear issues project tasks', limit: 15 });
+  assert.equal(result.isError, undefined);
+
+  const parsed = parseSearch(result);
+  const toolNames = (parsed.tools ?? []).map((r) => r.tool);
+  assert.ok(toolNames.some((t) => t.startsWith('linear/')), 'linear/ tools must be reachable under devops focus (profile member)');
+});
+
+test('devops focus: production profile servers list includes expected devops backends', () => {
+  // Validate that the production focus-profiles.json devops entry contains the expected servers.
+  // If the production profile changes, this test catches the drift rather than silently diverging.
+  const devops = _focusProfilesFile.profiles['devops'];
+  assert.ok(devops, 'devops profile must exist in focus-profiles.json');
+  const servers = devops.servers;
+  for (const expected of ['cloudflare', 'cloudflare-builds', 'github', 'neon']) {
+    assert.ok(servers.includes(expected), `devops profile must include server '${expected}' in focus-profiles.json`);
+  }
+  assert.ok(servers.includes('linear'), 'devops profile must include linear in focus-profiles.json');
+  assert.ok(devops.boost >= 0.5, 'devops boost must be at least 0.5');
 });
