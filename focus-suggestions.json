@@ -31200,6 +31200,92 @@
           "resolves_to": "deploy-task-track"
         }
       ]
+    },
+    "security": {
+      "description": "Security operations \u2014 access auditing, secret scanning, incident triage, evidence preservation, and immutable audit-trail recording",
+      "combos": [
+        {
+          "name": "scan-secrets-to-task",
+          "chain": [
+            "security/scan_secrets",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Scan a repository for exposed secrets and immediately create a remediation task \u2014 ensuring every critical finding gets a tracked owner and deadline.",
+          "verified": false,
+          "notes": "security is a remote ecosystem backend; tasks wired via apps/tasks-mcp."
+        },
+        {
+          "name": "audit-access-to-evidence",
+          "chain": [
+            "security/get_access_audit",
+            "chittyevidence/ingest_document"
+          ],
+          "accomplishes": "Pull the access audit log for a sensitive resource and preserve it as an immutable evidence document \u2014 creating a tamper-proof record for compliance or incident investigation.",
+          "verified": false,
+          "notes": "chittyevidence wired via apps/evidence-mcp; ingest_document confirmed from fixture-backend.ts."
+        },
+        {
+          "name": "event-triage-to-ledger",
+          "chain": [
+            "security/list_security_events",
+            "security/triage_incident",
+            "ledger/append_entry"
+          ],
+          "accomplishes": "List unresolved security events, triage the most critical one, and write an immutable ledger entry \u2014 completing the first-response workflow for a security incident.",
+          "verified": false,
+          "notes": "Three-step chain across security and ledger backends."
+        },
+        {
+          "name": "incident-to-db-query",
+          "chain": [
+            "security/triage_incident",
+            "neon/run_sql"
+          ],
+          "accomplishes": "Triage a security incident and query the database for correlated access records \u2014 correlating application logs with the infrastructure view.",
+          "verified": false,
+          "notes": "neon is a remote code backend."
+        },
+        {
+          "name": "secrets-scan-to-ledger",
+          "chain": [
+            "security/scan_secrets",
+            "ledger/append_entry"
+          ],
+          "accomplishes": "Run a secrets scan and immediately record the findings as an immutable ledger entry \u2014 creating an audit-ready timestamp of when the scan ran and what it found.",
+          "verified": false,
+          "notes": "Combines security and ledger backends for compliance reporting."
+        }
+      ],
+      "prompts": [
+        {
+          "text": "Scan the chittyos/ch1tty repo on main for exposed API keys and credentials",
+          "resolves_to": "scan-secrets-to-task"
+        },
+        {
+          "text": "List all unresolved security events from the last 24 hours",
+          "resolves_to": "event-triage-to-ledger"
+        },
+        {
+          "text": "Triage the critical secret-exposure incident and create a remediation task",
+          "resolves_to": "scan-secrets-to-task"
+        },
+        {
+          "text": "Get the access audit log for the ch1tty service and preserve it as evidence",
+          "resolves_to": "audit-access-to-evidence"
+        },
+        {
+          "text": "Record a security scan completion in the audit ledger",
+          "resolves_to": "secrets-scan-to-ledger"
+        },
+        {
+          "text": "Who accessed the ch1tty canonical resource in the last hour?",
+          "resolves_to": "audit-access-to-evidence"
+        },
+        {
+          "text": "What critical security events need triage right now?",
+          "resolves_to": "event-triage-to-ledger"
+        }
+      ]
     }
   }
 }
