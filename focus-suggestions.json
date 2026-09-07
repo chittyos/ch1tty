@@ -10338,6 +10338,91 @@
         }
       ]
     },
+    "deploy": {
+      "description": "Deployment and shipping \u2014 build, deploy, and monitor Cloudflare Workers; create and review PRs on GitHub; track deployment tasks",
+      "combos": [
+        {
+          "name": "deploy-pr-task",
+          "chain": [
+            "cloudflare/deploy_worker",
+            "cloudflare/list_workers"
+          ],
+          "accomplishes": "Deploy a Cloudflare Worker and immediately verify it appears as active in the Workers list.",
+          "verified": false,
+          "notes": "Same-backend 2-step: deploy_worker (script_name + script) \u2192 list_workers to confirm the new version is live. Opening a PR and task are manual follow-up; create_pull_request requires owner/repo/title/head not in deploy_worker output."
+        },
+        {
+          "name": "build-then-check-deploy",
+          "chain": [
+            "cloudflare-builds/workers_builds_list_builds",
+            "cloudflare-builds/workers_builds_get_build"
+          ],
+          "accomplishes": "List recent build runs and inspect the latest build details \u2014 confirming a build is sound before promoting it to production.",
+          "verified": false,
+          "notes": "Same-backend 2-step: list_builds returns buildUUID; get_build requires buildUUID. Third step (deploy_worker) omitted \u2014 it requires script_name + script not present in get_build output."
+        },
+        {
+          "name": "build-logs-debug",
+          "chain": [
+            "cloudflare-builds/workers_builds_get_build_logs",
+            "cloudflare-builds/workers_builds_get_build"
+          ],
+          "accomplishes": "Pull build logs from a failed run, then fetch the build details to correlate log output with build metadata.",
+          "verified": false,
+          "notes": "Same-backend 2-step: both on cloudflare-builds. get_build_logs requires buildUUID; get_build requires the same buildUUID \u2014 the caller supplies it once and both steps use it."
+        },
+        {
+          "name": "worker-health-check",
+          "chain": [
+            "cloudflare/list_workers",
+            "cloudflare/get_worker_logs"
+          ],
+          "accomplishes": "List all deployed Workers and fetch live logs for a specific one \u2014 confirming a deployment is healthy and catching runtime errors.",
+          "verified": false,
+          "notes": "Same-backend 2-step on cloudflare. get_worker_logs requires explicit worker_name; with chain:true, previousResult carries list_workers output but callers should supply worker_name directly."
+        },
+        {
+          "name": "deploy-and-validate",
+          "chain": [
+            "cloudflare-builds/workers_builds_get_build",
+            "cloudflare-builds/workers_builds_get_build_logs"
+          ],
+          "accomplishes": "Inspect a specific build to confirm it succeeded, then pull its logs to verify the build output in detail.",
+          "verified": false,
+          "notes": "Same-backend 2-step on cloudflare-builds. Both steps require buildUUID \u2014 the caller supplies it once."
+        }
+      ],
+      "prompts": [
+        {
+          "text": "List all deployed Cloudflare Workers and check logs for a specific worker (supply worker_name)",
+          "resolves_to": "worker-health-check"
+        },
+        {
+          "text": "Deploy a Cloudflare Worker (supply script_name and script) and verify it appears active in the worker list",
+          "resolves_to": "deploy-pr-task"
+        },
+        {
+          "text": "Show recent build runs for my-worker and inspect the latest one",
+          "resolves_to": "build-then-check-deploy"
+        },
+        {
+          "text": "Pull build logs for a specific Cloudflare build run (supply a buildUUID) and correlate with its build details",
+          "resolves_to": "build-logs-debug"
+        },
+        {
+          "text": "Inspect a specific build (supply buildUUID) and pull its build logs to verify the output",
+          "resolves_to": "deploy-and-validate"
+        },
+        {
+          "text": "Check which workers are deployed and pull logs for a specific worker (supply worker_name)",
+          "resolves_to": "worker-health-check"
+        },
+        {
+          "text": "Deploy a Cloudflare Worker (supply script_name and script) and confirm the deployment is active in the worker list",
+          "resolves_to": "deploy-pr-task"
+        }
+      ]
+    },
     "design": {
       "description": "Browser rendering, automation, and desktop/visual work \u2014 extended with ChittyEvidence (chittyevidence) for canonical archival of visual artifacts, and ChittyAgent Tasks (tasks-mcp) for turning design findings into tracked work items. github NOT connected. Notion API returning 401 (invalid token) in remote container \u2014 Notion-write combos are verified:false. See individual combo verified flags.",
       "combos": [
@@ -15154,6 +15239,81 @@
         {
           "text": "Find scrape agents for design reference gathering, navigate service architecture with chittyhelper, invoke the Claude frontend-design skill, and write the design output",
           "resolves_to": "design-scrape-chittyhelper-frontend-build"
+        }
+      ]
+    },
+    "documents": {
+      "description": "Document creation, search, and knowledge management \u2014 Notion pages/databases, library docs via Context7, PDF processing, and collaborative notes",
+      "combos": [
+        {
+          "name": "notion-search-to-get-page",
+          "chain": [
+            "notion/API-search",
+            "notion/API-retrieve-a-page"
+          ],
+          "accomplishes": "Search the Notion workspace for pages matching a query, then retrieve the full content of the top result \u2014 combining discovery and retrieval in two calls.",
+          "verified": false,
+          "notes": "notion is a remote documents backend (registered names: notion/API-search, notion/API-retrieve-a-page). NOT auto-chainable: API-retrieve-a-page requires a page_id arg that cannot be forwarded from the raw JSON output of API-search without extracting results[0].id. Use as a manual two-step pattern."
+        },
+        {
+          "name": "resolve-library-then-query-docs",
+          "chain": [
+            "context7/resolve-library-id",
+            "context7/query-docs"
+          ],
+          "accomplishes": "Resolve a package name to its Context7 library ID, then query that library for documentation snippets \u2014 a two-step pattern for looking up unfamiliar dependencies.",
+          "verified": false,
+          "notes": "context7 backends: resolve-library-id (local) \u2192 query-docs (local). NOT auto-chainable: query-docs requires named args (libraryId + query) that cannot be forwarded from the raw text output of resolve-library-id without an adapter. Use this as a manual two-step pattern: call resolve-library-id, extract libraryId from the result, then pass it as an explicit arg to query-docs."
+        },
+        {
+          "name": "search-notion-then-create-follow-up",
+          "chain": [
+            "notion/API-search",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search Notion for existing pages on a topic, then create a new page to capture new findings or decisions \u2014 combining search and write in one workflow.",
+          "verified": false,
+          "notes": "Both tools on the notion backend (registered names: notion/API-search, notion/API-post-page). NOT auto-chainable: API-post-page requires title and content args that cannot be forwarded from the JSON output of API-search. Use as a manual two-step pattern."
+        },
+        {
+          "name": "query-library-docs-and-document-findings",
+          "chain": [
+            "context7/query-docs",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Pull documentation snippets for a library from Context7 and record the key findings in a new Notion page \u2014 cross-backend knowledge capture.",
+          "verified": false,
+          "notes": "Cross-backend: context7 (local) \u2192 notion (remote, registered name: notion/API-post-page). NOT auto-chainable: API-post-page requires title and content args that cannot be forwarded from the snippets array returned by query-docs. Use as a manual two-step pattern."
+        }
+      ],
+      "prompts": [
+        {
+          "text": "Search my Notion workspace for pages about MCP server setup",
+          "resolves_to": "notion-search-to-get-page"
+        },
+        {
+          "text": "Find the Notion page titled 'Architecture Decisions' and show me its content",
+          "resolves_to": "notion-search-to-get-page"
+        },
+        {
+          "text": "Look up the documentation for @modelcontextprotocol/sdk and show me how to create a server",
+          "resolves_to": "resolve-library-then-query-docs"
+        },
+        {
+          "text": "What npm package is context7 library /modelcontextprotocol/typescript-sdk and get its docs",
+          "resolves_to": "resolve-library-then-query-docs"
+        },
+        {
+          "text": "Search Notion for existing ADRs then create a new architecture decision record",
+          "resolves_to": "search-notion-then-create-follow-up"
+        },
+        {
+          "text": "Look up React hooks documentation and save a summary to Notion",
+          "resolves_to": "query-library-docs-and-document-findings"
+        },
+        {
+          "text": "Get the TypeScript SDK docs for streaming and create a Notion page with notes",
+          "resolves_to": "query-library-docs-and-document-findings"
         }
       ]
     },
@@ -30667,6 +30827,92 @@
         }
       ]
     },
+    "security": {
+      "description": "Security operations \u2014 access auditing, secret scanning, incident triage, evidence preservation, and immutable audit-trail recording",
+      "combos": [
+        {
+          "name": "scan-secrets-to-task",
+          "chain": [
+            "security/scan_secrets",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Scan a repository for exposed secrets and immediately create a remediation task \u2014 ensuring every critical finding gets a tracked owner and deadline.",
+          "verified": false,
+          "notes": "security is a remote ecosystem backend; tasks wired via apps/tasks-mcp."
+        },
+        {
+          "name": "audit-access-to-evidence",
+          "chain": [
+            "security/get_access_audit",
+            "chittyevidence/ingest_document"
+          ],
+          "accomplishes": "Pull the access audit log for a sensitive resource and preserve it as an immutable evidence document \u2014 creating a tamper-proof record for compliance or incident investigation.",
+          "verified": false,
+          "notes": "chittyevidence wired via apps/evidence-mcp; ingest_document confirmed from fixture-backend.ts."
+        },
+        {
+          "name": "event-triage-to-ledger",
+          "chain": [
+            "security/list_security_events",
+            "security/triage_incident",
+            "ledger/append_entry"
+          ],
+          "accomplishes": "List unresolved security events, triage the most critical one, and write an immutable ledger entry \u2014 completing the first-response workflow for a security incident.",
+          "verified": false,
+          "notes": "Three-step chain across security and ledger backends."
+        },
+        {
+          "name": "incident-to-db-query",
+          "chain": [
+            "security/triage_incident",
+            "neon/run_sql"
+          ],
+          "accomplishes": "Triage a security incident and query the database for correlated access records \u2014 correlating application logs with the infrastructure view.",
+          "verified": false,
+          "notes": "neon is a remote code backend."
+        },
+        {
+          "name": "secrets-scan-to-ledger",
+          "chain": [
+            "security/scan_secrets",
+            "ledger/append_entry"
+          ],
+          "accomplishes": "Run a secrets scan and immediately record the findings as an immutable ledger entry \u2014 creating an audit-ready timestamp of when the scan ran and what it found.",
+          "verified": false,
+          "notes": "Combines security and ledger backends for compliance reporting."
+        }
+      ],
+      "prompts": [
+        {
+          "text": "Scan the chittyos/ch1tty repo on main for exposed API keys and credentials",
+          "resolves_to": "scan-secrets-to-task"
+        },
+        {
+          "text": "List all unresolved security events from the last 24 hours",
+          "resolves_to": "event-triage-to-ledger"
+        },
+        {
+          "text": "Triage the critical secret-exposure incident and create a remediation task",
+          "resolves_to": "scan-secrets-to-task"
+        },
+        {
+          "text": "Get the access audit log for the ch1tty service and preserve it as evidence",
+          "resolves_to": "audit-access-to-evidence"
+        },
+        {
+          "text": "Record a security scan completion in the audit ledger",
+          "resolves_to": "secrets-scan-to-ledger"
+        },
+        {
+          "text": "Who accessed the ch1tty canonical resource in the last hour?",
+          "resolves_to": "audit-access-to-evidence"
+        },
+        {
+          "text": "What critical security events need triage right now?",
+          "resolves_to": "event-triage-to-ledger"
+        }
+      ]
+    },
     "session": {
       "description": "Cross-channel session management \u2014 create, inspect, update, close, and replay ChittyOS sessions and their event logs (apps/session-coordinator-mcp). Focused on the session backend for lifecycle tracking and multi-channel context.",
       "combos": [
@@ -30862,6 +31108,96 @@
         {
           "text": "Create tasks from open GitHub issues",
           "resolves_to": "github-issue-to-task"
+        }
+      ]
+    },
+    "workspace": {
+      "description": "Personal and team workspace productivity \u2014 notes, docs, calendar, messaging, and tasks across Notion, Google Workspace, and ChittyComms",
+      "combos": [
+        {
+          "name": "meeting-notes-to-notion",
+          "chain": [
+            "google/list_events",
+            "notion/create_page"
+          ],
+          "accomplishes": "Pull today's calendar events from Google and create a structured meeting-notes page in Notion for each \u2014 turning your schedule into a ready-to-fill notes workspace.",
+          "verified": false,
+          "notes": "google/list_events verified in fixture; notion/create_page verified."
+        },
+        {
+          "name": "drive-doc-to-notion-page",
+          "chain": [
+            "google/list_files",
+            "notion/create_page"
+          ],
+          "accomplishes": "List recent Google Drive documents and mirror each as a linked Notion page \u2014 bridging Drive and your Notion workspace for a unified document view.",
+          "verified": false,
+          "notes": "google fixture verified. notion fixture verified."
+        },
+        {
+          "name": "comms-thread-to-task",
+          "chain": [
+            "comms/comms.recentLog",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Pull recent communications for a contact, then create a follow-up task from the thread \u2014 turning conversation context into an actionable work item.",
+          "verified": false,
+          "notes": "comms.recentLog fixture verified. tasks/create_task fixture verified."
+        },
+        {
+          "name": "email-and-document-followup",
+          "chain": [
+            "google/send_email",
+            "google/create_document"
+          ],
+          "accomplishes": "Send a follow-up email and simultaneously create a Google Doc to capture the discussion \u2014 keeping outreach and documentation in sync.",
+          "verified": false,
+          "notes": "Both google tools verified in fixture."
+        },
+        {
+          "name": "workspace-summary-to-notion",
+          "chain": [
+            "google/list_events",
+            "comms/comms.recentLog",
+            "notion/create_page"
+          ],
+          "accomplishes": "Aggregate today's calendar events and recent comms log, then write a daily workspace summary page into Notion \u2014 a morning brief in one chain.",
+          "verified": false,
+          "notes": "Three-backend chain. All fixtures verified."
+        }
+      ],
+      "prompts": [
+        {
+          "text": "Find my Notion pages about Q3 planning",
+          "resolves_to": "notion-page-search"
+        },
+        {
+          "text": "List my upcoming Google Calendar events",
+          "resolves_to": "google-calendar-events"
+        },
+        {
+          "text": "Create a Notion page for today's team meeting notes",
+          "resolves_to": "meeting-notes-to-notion"
+        },
+        {
+          "text": "Search Google Drive for budget documents from last month",
+          "resolves_to": "drive-doc-to-notion-page"
+        },
+        {
+          "text": "Send a follow-up email to alice@example.com about the project",
+          "resolves_to": "email-and-document-followup"
+        },
+        {
+          "text": "Show recent communications from Nick",
+          "resolves_to": "comms-thread-to-task"
+        },
+        {
+          "text": "Create a task to review the meeting notes",
+          "resolves_to": "comms-thread-to-task"
+        },
+        {
+          "text": "Pull my calendar for this week and create a Notion planning page",
+          "resolves_to": "workspace-summary-to-notion"
         }
       ]
     }

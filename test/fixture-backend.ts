@@ -542,6 +542,29 @@ export const FIXTURE_SERVERS: Record<string, FixtureServerDef> = {
         },
         response: text(JSON.stringify({ id: 'page-abc', title: 'Architecture Notes', blocks: [] })),
       },
+      {
+        name: 'API-search',
+        description: 'Search pages and databases in Notion using the API for documents and notes',
+        inputSchema: {
+          type: 'object',
+          properties: { query: { type: 'string' } },
+          required: ['query'],
+        },
+        response: text(JSON.stringify({ results: [{ id: 'page-abc', title: 'Architecture Notes' }] })),
+      },
+      {
+        name: 'API-post-page',
+        description: 'Create a new page in Notion using the API for document creation',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            title: { type: 'string' },
+            content: { type: 'string' },
+          },
+          required: ['title'],
+        },
+        response: text(JSON.stringify({ id: 'page-new', url: 'https://notion.so/page-new' })),
+      },
     ],
     resources: [
       { uri: 'notion://workspace', name: 'Notion Workspace', description: 'Full Notion workspace access' },

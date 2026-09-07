@@ -87,6 +87,19 @@
       ],
       "boost": 0.6
     },
+    "deploy": {
+      "description": "Deployment and shipping \u2014 build, deploy, and monitor Cloudflare Workers; create and review PRs on GitHub; track deployment tasks",
+      "categories": [],
+      "servers": [
+        "cloudflare",
+        "cloudflare-builds",
+        "github",
+        "ship",
+        "linear",
+        "tasks"
+      ],
+      "boost": 0.6
+    },
     "design": {
       "description": "Browser rendering, automation, and desktop/visual work",
       "categories": [
@@ -98,6 +111,19 @@
         "cowork"
       ],
       "boost": 0.5
+    },
+    "documents": {
+      "description": "Document creation, search, and knowledge management \u2014 Notion pages/databases, library docs via Context7, PDF processing, and collaborative notes",
+      "categories": [
+        "documents"
+      ],
+      "servers": [
+        "notion",
+        "context7",
+        "pdf",
+        "notes"
+      ],
+      "boost": 0.6
     },
     "finance": {
       "description": "Billing, payments, ledger, and financial ecosystem tools",
@@ -232,6 +258,22 @@
       ],
       "boost": 0.6
     },
+    "security": {
+      "description": "Security operations \u2014 access auditing, secret scanning, incident triage, evidence preservation, and immutable audit-trail recording",
+      "categories": [
+        "ecosystem",
+        "code"
+      ],
+      "servers": [
+        "security",
+        "chittyevidence",
+        "ledger",
+        "neon",
+        "tasks",
+        "linear"
+      ],
+      "boost": 0.6
+    },
     "session": {
       "description": "Cross-channel session management \u2014 create, inspect, and close ChittyOS sessions; append and replay session event logs",
       "categories": [
@@ -251,6 +293,22 @@
         "tasks"
       ],
       "boost": 0.6
+    },
+    "workspace": {
+      "description": "Personal and team workspace productivity \u2014 notes, docs, calendar, messaging, and tasks across Notion, Google Workspace, and ChittyComms",
+      "categories": [
+        "documents",
+        "communication"
+      ],
+      "servers": [
+        "notion",
+        "google",
+        "comms",
+        "tasks",
+        "context7",
+        "notes"
+      ],
+      "boost": 0.5
     }
   }
 }

@@ -200,11 +200,23 @@ export const FOCUS_PROFILES_RAW = {
       servers: ['neon', 'storage', 'fs'],
       boost: 0.6,
     },
+    deploy: {
+      description: 'Deployment and release management — push Workers to Cloudflare, open PRs, trigger builds, track issues, and create tasks across the release pipeline',
+      categories: [] as string[],
+      servers: ['cloudflare', 'cloudflare-builds', 'github', 'ship', 'linear', 'tasks'],
+      boost: 0.6,
+    },
     design: {
       description: 'Browser rendering, automation, and desktop/visual work',
       categories: ['desktop'],
       servers: ['browser-rendering', 'playwright', 'cowork'],
       boost: 0.5,
+    },
+    documents: {
+      description: 'Document creation, search, and management — Notion pages, library docs, PDF handling, and note-taking across the workspace',
+      categories: ['documents'],
+      servers: ['notion', 'context7', 'pdf', 'notes'],
+      boost: 0.6,
     },
     finance: {
       description: 'Billing, payments, ledger, and financial ecosystem tools',
@@ -266,6 +278,12 @@ export const FOCUS_PROFILES_RAW = {
       servers: ['evidence', 'scrape', 'contextual'],
       boost: 0.6,
     },
+    security: {
+      description: 'Security operations — audit access, scan for vulnerabilities, review credentials, query ledger records, and track remediation tasks',
+      categories: ['ecosystem', 'code'],
+      servers: ['security', 'chittyevidence', 'ledger', 'neon', 'tasks', 'linear'],
+      boost: 0.6,
+    },
     session: {
       description: 'Cross-channel session management — create, inspect, and close ChittyOS sessions; append and replay session event logs',
       categories: ['ecosystem'],
@@ -277,6 +295,12 @@ export const FOCUS_PROFILES_RAW = {
       categories: ['ecosystem'],
       servers: ['tasks'],
       boost: 0.6,
+    },
+    workspace: {
+      description: 'Workspace productivity — manage documents, calendars, email, tasks, and team communication across Notion, Google, and messaging tools',
+      categories: ['documents', 'communication'],
+      servers: ['notion', 'google', 'comms', 'tasks', 'context7', 'notes'],
+      boost: 0.5,
     },
   },
 } as const;
