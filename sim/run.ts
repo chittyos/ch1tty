@@ -68,7 +68,7 @@ async function main(): Promise<void> {
     // ops focus (ecosystem+code) — communication/desktop/documents tools still reachable
     imessageUnderOps: await outOfFocusReachable(aggregator, 'message', 'ops', 'imessage/send_message'),
     browserRenderingUnderOps: await outOfFocusReachable(aggregator, 'html content', 'ops', 'browser-rendering/get_url_html_content'),
-    notionUnderOps: await outOfFocusReachable(aggregator, 'page', 'ops', 'notion/create_page'),
+    notionUnderOps: await outOfFocusReachable(aggregator, 'page', 'ops', 'notion/API-post-page'),
   };
 
   // 5) Failure scenarios: execute-level error propagation + degraded-backend graceful degradation.

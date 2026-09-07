@@ -94,7 +94,7 @@ export const FIXTURE_TOOLS: Record<string, FixtureTool[]> = {
   ],
   notion: [
     { name: 'query_database', description: 'Query a Notion database view with filters and sorts' },
-    { name: 'create_page', description: 'Create a Notion page in a database or workspace' },
+    { name: 'API-post-page', description: 'Create a Notion page in a database or workspace' },
     // near-miss: a notion "invoice"-shaped page tool to compete with stripe/create_invoice
     { name: 'create_invoice_page', description: 'Create a Notion page documenting an invoice record' },
   ],
