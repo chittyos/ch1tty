@@ -58,6 +58,39 @@ test('missingEnvVars: unset envHeaders vars appear in server status', async () =
   }
 });
 
+test('missingEnvVars: empty-string envHeaders vars appear in server status (matches doConnect behavior)', async () => {
+  const dir = tempDir();
+  const EMPTY_VAR = 'CH1TTY_TEST_EMPTY_ENV_VAR_XYZ_12345';
+  process.env[EMPTY_VAR] = '';
+
+  const configs: ServerConfig[] = [
+    {
+      id: 'testremote-empty',
+      name: 'Test Remote Empty',
+      type: 'remote',
+      access: 'read',
+      category: 'ecosystem',
+      endpoint: 'https://example.invalid/mcp',
+      envHeaders: {
+        'X-Test-Header': EMPTY_VAR,
+      },
+    },
+  ];
+
+  const instance = agg(configs, dir);
+  try {
+    const snap = instance.getStatusSnapshot();
+    const serverStatus = snap.servers.find((s) => s.id === 'testremote-empty');
+    assert.ok(serverStatus);
+    // Empty string is falsy → header won't be sent by doConnect → should appear as missing
+    assert.deepEqual(serverStatus.missingEnvVars, [EMPTY_VAR]);
+  } finally {
+    delete process.env[EMPTY_VAR];
+    await instance.shutdown();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('missingEnvVars: set envHeaders vars do NOT appear in server status', async () => {
   const dir = tempDir();
   const SET_VAR = 'CH1TTY_TEST_SET_ENV_VAR_XYZ_12345';
