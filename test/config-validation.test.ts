@@ -164,6 +164,48 @@ describe('validateServersConfig — header interpolation', () => {
   });
 });
 
+describe('validateServersConfig — envHeaders value validation', () => {
+  test('accepts envHeaders with non-empty env var names', () => {
+    const result = validateServersConfig({
+      servers: [remoteServer({ envHeaders: { 'X-Auth': 'MY_AUTH_TOKEN', 'X-Key': 'MY_KEY' } })],
+    });
+    const server = result.servers[0];
+    assert.equal(server.type, 'remote');
+    if (server.type === 'remote') {
+      assert.deepEqual(server.envHeaders, { 'X-Auth': 'MY_AUTH_TOKEN', 'X-Key': 'MY_KEY' });
+    }
+  });
+
+  test('throws when envHeaders has an empty env var name', () => {
+    assert.throws(
+      () => validateServersConfig({
+        servers: [remoteServer({ envHeaders: { 'X-Auth': '' } })],
+      }),
+      /servers\[0\]\.envHeaders\.X-Auth: env var name must not be empty/,
+    );
+  });
+
+  test('throws for the specific header with the empty var name (not a different one)', () => {
+    assert.throws(
+      () => validateServersConfig({
+        servers: [remoteServer({ envHeaders: { 'CF-Access-Client-Id': 'SET_VAR', 'CF-Access-Client-Secret': '' } })],
+      }),
+      /servers\[0\]\.envHeaders\.CF-Access-Client-Secret: env var name must not be empty/,
+    );
+  });
+
+  test('accepts envHeaders when the object is omitted', () => {
+    const result = validateServersConfig({
+      servers: [remoteServer()],
+    });
+    const server = result.servers[0];
+    assert.equal(server.type, 'remote');
+    if (server.type === 'remote') {
+      assert.equal(server.envHeaders, undefined);
+    }
+  });
+});
+
 describe('loadConfigFromPath — file error paths', () => {
   test('throws with path in message when file does not exist', () => {
     const missingPath = join(tempDir, 'does-not-exist.json');
