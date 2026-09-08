@@ -31266,7 +31266,7 @@
           "resolves_to": "event-triage-to-ledger"
         },
         {
-          "text": "Triage the critical secret-exposure incident and create a remediation task",
+          "text": "Scan the repository for exposed secrets and create a remediation task for any findings",
           "resolves_to": "scan-secrets-to-task"
         },
         {

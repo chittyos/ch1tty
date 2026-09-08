@@ -3503,3 +3503,28 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   8. **Set `CHITTY_TASKS_TOKEN` on prod** — new requirement from tasks-mcp wire.
   9. **Stale branch cleanup** — 1100+ remote `auto/` branches.
   10. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
+
+---
+### 2026-09-07T~hourly (run ~1510 — PR #1179 open — ab-review-fixes patch)
+- **Workstreams**: AB security fixes only → **PR #1179 OPEN** (https://github.com/chittyos/ch1tty/pull/1179)
+- **Branch**: `auto/ab-review-fixes` (commit 4651467)
+- **Build**: clean (tsc exit 0) | **Tests**: 1681 pass / 0 fail / 3 skip
+- **Guardrails**: 5-tool surface confirmed. `buildCastExplanation` metric freeze ACTIVE. 0 violations.
+- **Actions**:
+  - Observed 28 PR notifications: echoes of our replies, CodeRabbit rate-limited, 2 threads auto-resolved by CodeRabbit (cast assertion + security ranking). CodeRabbit flagged merge conflict on #1178.
+  - Verified conflict cause: individual workstream PRs (#1173-#1176 + AB) all merged to main before our combined PR #1178 could land. PR #1178 had unresolvable add/add conflicts.
+  - Confirmed 3 review fixes were NOT in main's merged versions — net-new.
+  - Created `auto/ab-review-fixes` from origin/main. Applied 3 fixes: scan-secrets prompt alignment, priority 'critical'→'high', cast assertion strengthening.
+  - Built and tested: tsc exit 0, 1681/0/3. Created PR #1179. Closed PR #1178 with explanation.
+  - Subscribed to #1179, unsubscribed from #1178.
+- **State summary**: All workstreams (X-AA-AB) now on main via individual PRs. #1179 = 3 targeted correctness fixes. Build: clean. Tests: 1681/0/3.
+- **Human-action items**:
+  1. **Review + merge PR #1179** (3 security fixes for ab-security profile).
+  2. **Merge PR #1155** (dependabot) — qs + fast-uri security bumps.
+  3. **Disable or redirect hourly schedule** — 1510+ consecutive runs; all workstreams merged.
+  4. **Deploy Workstream F phases** (Cloudflare): Create `Ch1ttyApiAgent` DO class + drain `Ch1ttyDO` instances.
+  5. **Set `GITHUB_MCP_AUTHORIZATION` on prod**.
+  6. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`).
+  7. **Set `CHITTY_TASKS_TOKEN` on prod**.
+  8. **Stale branch cleanup** — 1100+ remote `auto/` branches.
+  9. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
