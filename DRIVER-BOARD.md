@@ -3528,3 +3528,31 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   7. **Set `CHITTY_TASKS_TOKEN` on prod**.
   8. **Stale branch cleanup** — 1100+ remote `auto/` branches.
   9. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
+
+---
+### 2026-09-08T~hourly (run ~1523 — PRODUCTIVE: merged PRs #1179 + #1180; closed 4 stale PRs)
+- **Workstream**: suggestions catalog + ab-security fix — PRs #1179 (fix) and #1180 (25-profile suggestions) merged
+- **Branch/PR**: Merged: #1179 (auto/ab-review-fixes — fix priority enum, prompt text, cast assertion), #1180 (auto/suggestions-catalog-populate — focus-suggestions.json 25 profiles). Closed: #1181, #1182 (stale run logs), #1166 (workstream-R, dirty/superseded), #1167 (workstream-S, dirty/superseded).
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1681 pass / 0 fail / 3 skip (1684 total, 51 suites, ~44s)
+- **Guardrails**: 5-tool surface confirmed (search/execute/status/reload/cast). `buildCastExplanation` metric freeze ACTIVE. 0 violations on main.
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed.
+  - `git reset --hard origin/main` (9f2be5f). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1681/0/3 (1684 total, 51 suites). 0 failures.
+  - Found 7 open PRs: #1155 (dependabot), #1166 (R-data, dirty), #1167 (S-auth, dirty), #1179 (ab-security fix, clean, CI green), #1180 (25-profile suggestions, clean, CI green), #1181 (stale run log), #1182 (stale run log).
+  - **Closed** #1181 + #1182 (stale run logs) and #1166 + #1167 (dirty/superseded — data+auth profiles already on main via prior combined PR #1172).
+  - **Merged #1179** (squash) — 3 correctness fixes: scan-secrets prompt text, priority enum 'critical'→'high', cast assertion strengthened.
+  - Pulled updated main (85e367f). Checked out `auto/suggestions-catalog-populate` (PR #1180), rebased onto new main — conflict in focus-suggestions.json resolved by taking theirs (full replacement is the intent). Validated JSON: 25 profiles, correct security scan text, JSON valid. Build+tests clean.
+  - Force-pushed rebased branch. **Merged #1180** (squash) — focus-suggestions.json replaced with canonical 25-profile file (75 combos + 75 prompts, 545 lines replacing 31K).
+  - Pulled final merged main (d7df839). Build clean. Tests 1681/0/3. 0 failures.
+  - Notion board: unavailable (API 401). DRIVER-BOARD.md is durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H ✓ J ✓ K ✓ L ✓ M ✓ + all focus profiles (N-through-AB). Build: clean. Tests: 1681/0/3. **~1523rd run. 1 open PR (#1155 dependabot).**
+- **Human-action items**:
+  1. **Merge PR #1155** (dependabot) — qs + fast-uri security bumps in apps/ and workers/ subdirectories.
+  2. **Disable or redirect hourly schedule** — 1523+ consecutive runs; all defined workstreams exhausted; schedule burns compute hourly.
+  3. **Deploy Workstream F phases** (Cloudflare): Create `Ch1ttyApiAgent` DO class + drain `Ch1ttyDO` instances.
+  4. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  5. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  6. **Stale branch cleanup** — 1100+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings → General.
+  7. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
+- **Next run**: All workstreams done. 1 open PR (#1155 dependabot). focus-suggestions.json now canonical (25 profiles, 75 combos, 75 prompts).
+- **PushNotification**: SENT — merged 2 PRs (#1179 security fix, #1180 25-profile suggestions catalog); closed 4 stale PRs; tests 1681/0/3.
