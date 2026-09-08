@@ -3709,3 +3709,17 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
 - **State summary**: PR #1183 — all bot findings addressed, 0 vulnerabilities, CI should be green. Human merge decision pending.
 - **PushNotification**: NOT SENT — same merge-pending state as run ~1528; human already notified.
 - **Next run**: Watch for PR #1183/#1155 merge or new CI/review events.
+
+---
+### 2026-09-08T~hourly (run ~1531 — PR #1183: nanoid 5.x restored for agents/partyserver)
+- **Workstream**: Security (monitoring PR #1183)
+- **Branch/PR**: PR #1183 — commit 39fccb4
+- **Actions**:
+  - Codex posted new review on 737b05e with one finding: "Restore Nano ID 5 for runtime consumers" — same nanoid issue, but with new claim that the pre-PR worker lockfile already had nanoid@5.x via a valid layout.
+  - Verified claim: pre-PR lockfile (2287c03) DID have `node_modules/nanoid: 5.1.16` (global) + `node_modules/postcss/node_modules/nanoid: 3.3.16` (nested). The valid layout WAS achievable.
+  - Fix implemented: changed `"postcss": ">=8.5.18"` string override to `"postcss": { "nanoid": ">=3.3.18 <4" }` nested override. Restored pre-PR lockfile, ran npm install — postcss's nested nanoid bumped 3.3.16 → 3.3.18, global nanoid stays 5.1.16.
+  - Result: agents/partyserver get nanoid@5.1.16 (satisfies ^5.1.16 / ^5.1.9), postcss gets 3.3.18 nested (patches GHSA-2v37). npm ls → no ELSPROBLEMS. npm audit → 0 vulnerabilities.
+  - Committed (39fccb4) and pushed. Replied to Codex finding.
+- **State summary**: PR #1183 — nanoid semver mismatch fully resolved. All bot findings addressed. 0 vulnerabilities. CI running on 39fccb4.
+- **PushNotification**: SENT — nanoid 5.x now valid in lockfile; PR #1183 ready to merge.
+- **Next run**: Watch for PR #1183 merge or new CI/bot events.
