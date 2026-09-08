@@ -27,12 +27,25 @@ function agg(configs: ServerConfig[], dir: string): Aggregator {
   });
 }
 
+/** Snapshot env vars before mutation; returns a restore function for use in finally. */
+function saveEnv(...keys: string[]): () => void {
+  const snapshot: Record<string, string | undefined> = {};
+  for (const k of keys) snapshot[k] = process.env[k];
+  return () => {
+    for (const [k, v] of Object.entries(snapshot)) {
+      if (v === undefined) delete process.env[k];
+      else process.env[k] = v;
+    }
+  };
+}
+
 const ABSENT = 'CH1TTY_TEST_G_ABSENT_XYZ_99999';
 const EMPTY = 'CH1TTY_TEST_G_EMPTY_XYZ_99999';
 const SET = 'CH1TTY_TEST_G_SET_XYZ_99999';
 
 test('getMissingEnvVarDiagnostics: returns entry for remote server with unset envHeaders var', async () => {
   const dir = tempDir();
+  const restore = saveEnv(ABSENT);
   delete process.env[ABSENT];
 
   const instance = agg(
@@ -56,6 +69,7 @@ test('getMissingEnvVarDiagnostics: returns entry for remote server with unset en
     assert.equal(diags[0].serverName, 'Remote Absent');
     assert.deepEqual(diags[0].vars, [ABSENT]);
   } finally {
+    restore();
     await instance.shutdown();
     rmSync(dir, { recursive: true, force: true });
   }
@@ -63,6 +77,7 @@ test('getMissingEnvVarDiagnostics: returns entry for remote server with unset en
 
 test('getMissingEnvVarDiagnostics: treats empty-string env var as missing (matches doConnect)', async () => {
   const dir = tempDir();
+  const restore = saveEnv(EMPTY);
   process.env[EMPTY] = '';
 
   const instance = agg(
@@ -84,7 +99,7 @@ test('getMissingEnvVarDiagnostics: treats empty-string env var as missing (match
     assert.equal(diags.length, 1);
     assert.deepEqual(diags[0].vars, [EMPTY]);
   } finally {
-    delete process.env[EMPTY];
+    restore();
     await instance.shutdown();
     rmSync(dir, { recursive: true, force: true });
   }
@@ -92,6 +107,7 @@ test('getMissingEnvVarDiagnostics: treats empty-string env var as missing (match
 
 test('getMissingEnvVarDiagnostics: returns empty array when all envHeaders vars are set', async () => {
   const dir = tempDir();
+  const restore = saveEnv(SET);
   process.env[SET] = 'live-value';
 
   const instance = agg(
@@ -112,7 +128,7 @@ test('getMissingEnvVarDiagnostics: returns empty array when all envHeaders vars 
     const diags = instance.getMissingEnvVarDiagnostics();
     assert.equal(diags.length, 0);
   } finally {
-    delete process.env[SET];
+    restore();
     await instance.shutdown();
     rmSync(dir, { recursive: true, force: true });
   }
@@ -120,6 +136,7 @@ test('getMissingEnvVarDiagnostics: returns empty array when all envHeaders vars 
 
 test('getMissingEnvVarDiagnostics: mixed envHeaders — only unset var names returned', async () => {
   const dir = tempDir();
+  const restore = saveEnv(SET, ABSENT);
   process.env[SET] = 'live-value';
   delete process.env[ABSENT];
 
@@ -142,7 +159,7 @@ test('getMissingEnvVarDiagnostics: mixed envHeaders — only unset var names ret
     assert.equal(diags.length, 1);
     assert.deepEqual(diags[0].vars, [ABSENT]);
   } finally {
-    delete process.env[SET];
+    restore();
     await instance.shutdown();
     rmSync(dir, { recursive: true, force: true });
   }
@@ -150,6 +167,7 @@ test('getMissingEnvVarDiagnostics: mixed envHeaders — only unset var names ret
 
 test('getMissingEnvVarDiagnostics: deduplicates var names when the same var is used for multiple headers', async () => {
   const dir = tempDir();
+  const restore = saveEnv(ABSENT);
   delete process.env[ABSENT];
 
   const instance = agg(
@@ -172,6 +190,7 @@ test('getMissingEnvVarDiagnostics: deduplicates var names when the same var is u
     // same var referenced twice — deduplicated to one entry
     assert.deepEqual(diags[0].vars, [ABSENT]);
   } finally {
+    restore();
     await instance.shutdown();
     rmSync(dir, { recursive: true, force: true });
   }
@@ -229,6 +248,7 @@ test('getMissingEnvVarDiagnostics: remote server with no envHeaders returns empt
 
 test('getMissingEnvVarDiagnostics: header already in config.headers is not a false positive', async () => {
   const dir = tempDir();
+  const restore = saveEnv(ABSENT);
   delete process.env[ABSENT];
 
   const instance = agg(
@@ -251,6 +271,7 @@ test('getMissingEnvVarDiagnostics: header already in config.headers is not a fal
     const diags = instance.getMissingEnvVarDiagnostics();
     assert.equal(diags.length, 0, 'should not warn when header has a static fallback');
   } finally {
+    restore();
     await instance.shutdown();
     rmSync(dir, { recursive: true, force: true });
   }
@@ -258,6 +279,7 @@ test('getMissingEnvVarDiagnostics: header already in config.headers is not a fal
 
 test('getMissingEnvVarDiagnostics: Authorization covered by authTokenKey is not a false positive', async () => {
   const dir = tempDir();
+  const restore = saveEnv(ABSENT);
   delete process.env[ABSENT];
 
   const instance = agg(
@@ -280,6 +302,7 @@ test('getMissingEnvVarDiagnostics: Authorization covered by authTokenKey is not 
     const diags = instance.getMissingEnvVarDiagnostics();
     assert.equal(diags.length, 0, 'should not warn when Authorization has authTokenKey fallback');
   } finally {
+    restore();
     await instance.shutdown();
     rmSync(dir, { recursive: true, force: true });
   }
@@ -287,6 +310,7 @@ test('getMissingEnvVarDiagnostics: Authorization covered by authTokenKey is not 
 
 test('getMissingEnvVarDiagnostics: multiple servers — only those with missing vars appear', async () => {
   const dir = tempDir();
+  const restore = saveEnv(SET, ABSENT);
   process.env[SET] = 'live-value';
   delete process.env[ABSENT];
 
@@ -318,7 +342,7 @@ test('getMissingEnvVarDiagnostics: multiple servers — only those with missing 
     assert.equal(diags.length, 1);
     assert.equal(diags[0].serverId, 'server-broken');
   } finally {
-    delete process.env[SET];
+    restore();
     await instance.shutdown();
     rmSync(dir, { recursive: true, force: true });
   }
