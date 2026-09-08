@@ -259,6 +259,36 @@ export class Aggregator {
     }
   }
 
+  /**
+   * Returns remote servers whose envHeaders reference env vars that are unset (or empty)
+   * at the time of the call. Uses the same falsy predicate as RemoteProxy.doConnect() so
+   * the diagnostic accurately predicts which headers will be omitted at connect time.
+   */
+  getMissingEnvVarDiagnostics(): { serverId: string; serverName: string; vars: string[] }[] {
+    const results: { serverId: string; serverName: string; vars: string[] }[] = [];
+    for (const config of this.activeConfigs()) {
+      if (config.type !== 'remote' || !config.envHeaders) continue;
+      const vars = [...new Set(Object.values(config.envHeaders).filter((v) => !process.env[v]))];
+      if (vars.length > 0) {
+        results.push({ serverId: config.id, serverName: config.name, vars });
+      }
+    }
+    return results;
+  }
+
+  /**
+   * Logs a startup warning to stderr for every remote server whose envHeaders reference
+   * unset env vars. Call immediately after construction so operators see missing config
+   * in the process log rather than discovering it via ch1tty/status after the fact.
+   */
+  logStartupEnvWarnings(): void {
+    for (const { serverId, serverName, vars } of this.getMissingEnvVarDiagnostics()) {
+      log.warn(
+        `[startup] ${serverId} (${serverName}): missing envHeaders env vars: ${vars.join(', ')} — server will connect without these headers`,
+      );
+    }
+  }
+
   // ── Internal tool registry ───────────────────────────────────
 
   private async refreshRegistry(): Promise<void> {
