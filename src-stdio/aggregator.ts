@@ -278,6 +278,7 @@ export class Aggregator {
         ...new Set(
           Object.entries(config.envHeaders)
             .filter(([headerName, varName]) => {
+              if (!varName) return false;
               if (process.env[varName]) return false;
               // Header already provided by config.headers — doConnect() will send it.
               // HTTP header names are case-insensitive; compare lowercase.

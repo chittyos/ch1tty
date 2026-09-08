@@ -221,6 +221,34 @@ test('getMissingEnvVarDiagnostics: local server never included even if type is l
   }
 });
 
+test('getMissingEnvVarDiagnostics: empty-string var name in envHeaders is silently skipped', async () => {
+  const dir = tempDir();
+
+  const instance = agg(
+    [
+      {
+        id: 'remote-empty-varname',
+        name: 'Remote Empty Varname',
+        type: 'remote',
+        access: 'read',
+        category: 'ecosystem',
+        endpoint: 'https://example.invalid/mcp',
+        envHeaders: { 'X-Auth': '' },
+      },
+    ],
+    dir,
+  );
+  try {
+    // An empty-string var name is not a valid env var; skip it rather than emitting a
+    // confusing "missing envHeaders env vars: " message with no var name.
+    const diags = instance.getMissingEnvVarDiagnostics();
+    assert.equal(diags.length, 0);
+  } finally {
+    await instance.shutdown();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('getMissingEnvVarDiagnostics: remote server with no envHeaders returns empty', async () => {
   const dir = tempDir();
 
