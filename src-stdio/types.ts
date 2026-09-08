@@ -90,6 +90,8 @@ export interface ServerStatus extends BackendStatus {
   type: 'local' | 'remote';
   enabled: boolean;
   error?: string;
+  /** Names of env vars referenced in envHeaders that are unset at status time. */
+  missingEnvVars?: string[];
 }
 
 export interface ToolEntry {

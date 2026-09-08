@@ -928,11 +928,17 @@ export class Aggregator {
       const backend = this.backendFor(config.id);
       const status = backend?.getStatus(config.id) ?? { connected: false, toolCount: 0, toolCacheAge: null };
 
+      const missingEnvVars: string[] =
+        config.type === 'remote' && config.envHeaders
+          ? Object.values(config.envHeaders).filter((varName) => process.env[varName] === undefined)
+          : [];
+
       return {
         id: config.id,
         name: config.name,
         type: config.type,
         enabled: config.enabled !== false,
+        ...(missingEnvVars.length > 0 ? { missingEnvVars } : {}),
         ...status,
       };
     });
