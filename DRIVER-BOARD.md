@@ -3694,3 +3694,18 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
 - **State summary**: PR #1183 fully documented. Issue #1184 created for agents upgrade tracking. 0 vulnerabilities. CI green. Human merge decision pending.
 - **PushNotification**: NOT SENT — no new actionable state; human already notified at run ~1528.
 - **Next run**: Watch for PR #1183 merge or new Codex findings on 322e627.
+
+---
+### 2026-09-08T~hourly (run ~1530 — PR #1183: qs cap fixed; all 3 Codex findings replied)
+- **Workstream**: Security (monitoring PR #1183)
+- **Branch/PR**: PR #1183 — commit 7b5c036
+- **Actions**:
+  - Applied Codex Finding 3: capped `qs` override at `<7` (changed `">=6.16.0"` → `">=6.16.0 <7"` in `workers/chittyagent-ch1tty/package.json`). Lockfile unchanged (installed version already within bound). 0 vulnerabilities.
+  - Committed (7b5c036) and pushed to origin.
+  - Replied to all 3 Codex findings on PR #1183:
+    - Finding 3 (qs cap): fixed in 7b5c036.
+    - Finding 1 (nanoid 5.x): explained root lock uses agents@0.20.0 (not 0.19.0) — that's why it shows 5.x; worker pins 0.19.0 which has the irresolvable internal conflict. Tracked in #1184.
+    - Finding 2 (platform packages): Cloudflare Workers deploys to Linux x64 only; local dev uses npm install (not ci) which re-fetches correct platform entry. Acceptable for this project.
+- **State summary**: PR #1183 — all bot findings addressed, 0 vulnerabilities, CI should be green. Human merge decision pending.
+- **PushNotification**: NOT SENT — same merge-pending state as run ~1528; human already notified.
+- **Next run**: Watch for PR #1183/#1155 merge or new CI/review events.
