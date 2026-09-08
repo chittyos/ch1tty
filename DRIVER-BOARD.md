@@ -3629,3 +3629,28 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   7. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
 - **PushNotification**: NOT SENT — idle; no new work this run; last notification at run ~1523 (productive merge).
 - **Next run**: Idle (all workstreams done). 1 open PR (#1155 dependabot — needs human merge). Suggest disabling/repurposing this hourly schedule.
+
+---
+### 2026-09-08T~hourly (run ~1527 — PRODUCTIVE: security override fixes on PR #1183)
+- **Workstream**: Security (CodeRabbit + Codex review responses on PR #1183 `auto/security-deps-apps-worker-sep2026`)
+- **Branch/PR**: PR #1183 open — addressed 2 review findings
+- **Build**: n/a (this run focused on PR #1183 worker package fixups; main unchanged)
+- **Tests**: n/a
+- **Guardrails**: 5-tool surface unchanged. `buildCastExplanation` freeze ACTIVE. 0 violations.
+- **Actions**:
+  - Continued from previous run's deferred work on PR #1183.
+  - **CodeRabbit finding (Major, line 36)**: Global `"nanoid": ">=3.3.18 <4"` was overriding agents/partyserver to v3. Removed the global override. Attempted per-package nested overrides (`"agents": { "nanoid": "^5.0.0" }`) but npm resolution still puts 3.3.18 in agents/partyserver due to agents@0.19.0's own internal v3/v5 conflict (it depends on both nanoid@^5.x directly and vite→postcss→nanoid@^3.x transitively). Final state: no global nanoid override; all three at 3.3.18 (patched for GHSA-2v37); 0 vulnerabilities. Replied to CodeRabbit thread explaining resolution.
+  - **Codex finding (P2)**: `"fast-uri": ">=3.1.7"` had resolved to 4.1.4, outside Ajv 8's `^3.0.1` range. Changed to `">=3.1.7 <4"`. Lock regenerated: fast-uri now 3.1.7. 0 vulnerabilities. Replied to Codex thread.
+  - Commits: 015b807 (nanoid override removal), c03820a (fast-uri bound fix). Pushed both to PR #1183.
+- **State summary**: PR #1183 updated with 2 review fixes. 0 vulnerabilities confirmed. Awaiting CI + human review/merge. PR #1155 (Dependabot) still needs human merge.
+- **Human-action items**:
+  1. **Review + merge PR #1183** — security deps fix for 4 apps + chittyagent-ch1tty worker.
+  2. **Review + merge PR #1155** (dependabot) — no conflicts with #1183 (covers separate files).
+  3. **Disable or redirect hourly schedule** — compute burning; all defined workstreams exhausted.
+  4. **Deploy Workstream F phases** (Cloudflare).
+  5. **Set `GITHUB_MCP_AUTHORIZATION` on prod**.
+  6. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`).
+  7. **Stale branch cleanup** — 1100+ remote `auto/` branches.
+  8. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
+- **PushNotification**: SENT — PR #1183 updated with 2 review fixes (nanoid override + fast-uri bound); 0 vulns confirmed.
+- **Next run**: Watch PR #1183 CI. If CI green and no new review findings, idle until human merges.
