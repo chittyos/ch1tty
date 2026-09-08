@@ -170,7 +170,7 @@ function validateServerConfig(raw: unknown, index: number): ServerConfig {
   const envHeaders = assertOptionalEnv(raw.envHeaders, `${prefix}.envHeaders`);
   if (envHeaders) {
     for (const [headerName, varName] of Object.entries(envHeaders)) {
-      if (!varName) {
+      if (!varName.trim()) {
         throw new Error(`${prefix}.envHeaders.${headerName}: env var name must not be empty`);
       }
     }

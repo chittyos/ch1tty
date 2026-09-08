@@ -194,6 +194,15 @@ describe('validateServersConfig — envHeaders value validation', () => {
     );
   });
 
+  test('throws when envHeaders has a whitespace-only env var name', () => {
+    assert.throws(
+      () => validateServersConfig({
+        servers: [remoteServer({ envHeaders: { Authorization: '   ' } })],
+      }),
+      /servers\[0\]\.envHeaders\.Authorization: env var name must not be empty/,
+    );
+  });
+
   test('accepts envHeaders when the object is omitted', () => {
     const result = validateServersConfig({
       servers: [remoteServer()],
