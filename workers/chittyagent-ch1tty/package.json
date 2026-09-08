@@ -32,7 +32,7 @@
     "sharp": ">=0.35.0",
     "postcss": ">=8.5.18",
     "fast-uri": ">=3.1.7 <4",
-    "qs": ">=6.16.0",
+    "qs": ">=6.16.0 <7",
     "agents": {
       "@modelcontextprotocol/sdk": "^1.30.0"
     }
