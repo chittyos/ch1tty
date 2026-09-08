@@ -930,7 +930,7 @@ export class Aggregator {
 
       const missingEnvVars: string[] =
         config.type === 'remote' && config.envHeaders
-          ? Object.values(config.envHeaders).filter((varName) => !process.env[varName])
+          ? [...new Set(Object.values(config.envHeaders).filter((varName) => !process.env[varName]))]
           : [];
 
       return {

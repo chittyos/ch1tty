@@ -819,7 +819,7 @@ export class Ch1ttyCore {
       const status = this.proxy.getStatus(config.id);
       const missingEnvVars: string[] =
         config.type === 'remote' && config.envHeaders
-          ? Object.values(config.envHeaders).filter((varName) => !this.env[varName])
+          ? [...new Set(Object.values(config.envHeaders).filter((varName) => !this.env[varName]))]
           : [];
       return {
         id: config.id,
