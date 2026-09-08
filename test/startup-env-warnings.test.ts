@@ -227,6 +227,64 @@ test('getMissingEnvVarDiagnostics: remote server with no envHeaders returns empt
   }
 });
 
+test('getMissingEnvVarDiagnostics: header already in config.headers is not a false positive', async () => {
+  const dir = tempDir();
+  delete process.env[ABSENT];
+
+  const instance = agg(
+    [
+      {
+        id: 'remote-static-fallback',
+        name: 'Remote Static Fallback',
+        type: 'remote',
+        access: 'read',
+        category: 'ecosystem',
+        endpoint: 'https://example.invalid/mcp',
+        headers: { 'X-Auth': 'static-literal-value' },
+        envHeaders: { 'X-Auth': ABSENT },
+      },
+    ],
+    dir,
+  );
+  try {
+    // config.headers already provides X-Auth; doConnect() will send it regardless of env var
+    const diags = instance.getMissingEnvVarDiagnostics();
+    assert.equal(diags.length, 0, 'should not warn when header has a static fallback');
+  } finally {
+    await instance.shutdown();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('getMissingEnvVarDiagnostics: Authorization covered by authTokenKey is not a false positive', async () => {
+  const dir = tempDir();
+  delete process.env[ABSENT];
+
+  const instance = agg(
+    [
+      {
+        id: 'remote-auth-key',
+        name: 'Remote Auth Key',
+        type: 'remote',
+        access: 'read',
+        category: 'ecosystem',
+        endpoint: 'https://example.invalid/mcp',
+        authTokenKey: 'some-token-key',
+        envHeaders: { Authorization: ABSENT },
+      },
+    ],
+    dir,
+  );
+  try {
+    // authTokenKey is a fallback for Authorization in doConnect(); env var being unset is not fatal
+    const diags = instance.getMissingEnvVarDiagnostics();
+    assert.equal(diags.length, 0, 'should not warn when Authorization has authTokenKey fallback');
+  } finally {
+    await instance.shutdown();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('getMissingEnvVarDiagnostics: multiple servers — only those with missing vars appear', async () => {
   const dir = tempDir();
   process.env[SET] = 'live-value';

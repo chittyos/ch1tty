@@ -261,14 +261,32 @@ export class Aggregator {
 
   /**
    * Returns remote servers whose envHeaders reference env vars that are unset (or empty)
-   * at the time of the call. Uses the same falsy predicate as RemoteProxy.doConnect() so
-   * the diagnostic accurately predicts which headers will be omitted at connect time.
+   * at the time of the call, and whose resulting header has no fallback at connect time.
+   *
+   * Mirrors doConnect() fallback precedence so the diagnostic doesn't produce false
+   * positives for headers that will genuinely be sent anyway:
+   *   1. config.headers already provides the header (static or interpolated at load time)
+   *   2. The header is Authorization and authTokenKey is configured (token source fallback)
    */
   getMissingEnvVarDiagnostics(): { serverId: string; serverName: string; vars: string[] }[] {
     const results: { serverId: string; serverName: string; vars: string[] }[] = [];
     for (const config of this.activeConfigs()) {
       if (config.type !== 'remote' || !config.envHeaders) continue;
-      const vars = [...new Set(Object.values(config.envHeaders).filter((v) => !process.env[v]))];
+      const staticHeaders = config.headers ?? {};
+      const vars = [
+        ...new Set(
+          Object.entries(config.envHeaders)
+            .filter(([headerName, varName]) => {
+              if (process.env[varName]) return false;
+              // Header already provided by config.headers — doConnect() will send it
+              if (staticHeaders[headerName]) return false;
+              // Authorization is covered by authTokenKey when the token source is configured
+              if (headerName === 'Authorization' && config.authTokenKey) return false;
+              return true;
+            })
+            .map(([, varName]) => varName),
+        ),
+      ];
       if (vars.length > 0) {
         results.push({ serverId: config.id, serverName: config.name, vars });
       }
@@ -278,8 +296,9 @@ export class Aggregator {
 
   /**
    * Logs a startup warning to stderr for every remote server whose envHeaders reference
-   * unset env vars. Call immediately after construction so operators see missing config
-   * in the process log rather than discovering it via ch1tty/status after the fact.
+   * unset env vars with no fallback at connect time. Call immediately after construction
+   * so operators see missing config in the process log rather than discovering it via
+   * ch1tty/status after the fact.
    */
   logStartupEnvWarnings(): void {
     for (const { serverId, serverName, vars } of this.getMissingEnvVarDiagnostics()) {
