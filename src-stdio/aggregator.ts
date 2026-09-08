@@ -273,15 +273,18 @@ export class Aggregator {
     for (const config of this.activeConfigs()) {
       if (config.type !== 'remote' || !config.envHeaders) continue;
       const staticHeaders = config.headers ?? {};
+      const staticHeadersLower = new Set(Object.keys(staticHeaders).map((k) => k.toLowerCase()));
       const vars = [
         ...new Set(
           Object.entries(config.envHeaders)
             .filter(([headerName, varName]) => {
               if (process.env[varName]) return false;
-              // Header already provided by config.headers — doConnect() will send it
-              if (staticHeaders[headerName]) return false;
-              // Authorization is covered by authTokenKey when the token source is configured
-              if (headerName === 'Authorization' && config.authTokenKey) return false;
+              // Header already provided by config.headers — doConnect() will send it.
+              // HTTP header names are case-insensitive; compare lowercase.
+              if (staticHeadersLower.has(headerName.toLowerCase())) return false;
+              // Authorization is covered by authTokenKey when the token source is configured.
+              // Match case-insensitively (lowercase 'authorization' is equivalent).
+              if (headerName.toLowerCase() === 'authorization' && config.authTokenKey) return false;
               return true;
             })
             .map(([, varName]) => varName),

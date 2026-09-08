@@ -308,6 +308,68 @@ test('getMissingEnvVarDiagnostics: Authorization covered by authTokenKey is not 
   }
 });
 
+test('getMissingEnvVarDiagnostics: config.headers fallback matched case-insensitively', async () => {
+  const dir = tempDir();
+  const restore = saveEnv(ABSENT);
+  delete process.env[ABSENT];
+
+  const instance = agg(
+    [
+      {
+        id: 'remote-ci-fallback',
+        name: 'Remote CI Fallback',
+        type: 'remote',
+        access: 'read',
+        category: 'ecosystem',
+        endpoint: 'https://example.invalid/mcp',
+        // lowercase key in headers, mixed-case key in envHeaders — same header per HTTP spec
+        headers: { authorization: 'Bearer static-token' },
+        envHeaders: { Authorization: ABSENT },
+      },
+    ],
+    dir,
+  );
+  try {
+    const diags = instance.getMissingEnvVarDiagnostics();
+    assert.equal(diags.length, 0, 'should not warn when header is covered by differently-cased config.headers key');
+  } finally {
+    restore();
+    await instance.shutdown();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('getMissingEnvVarDiagnostics: authTokenKey fallback matched case-insensitively for authorization header', async () => {
+  const dir = tempDir();
+  const restore = saveEnv(ABSENT);
+  delete process.env[ABSENT];
+
+  const instance = agg(
+    [
+      {
+        id: 'remote-auth-key-lc',
+        name: 'Remote Auth Key LC',
+        type: 'remote',
+        access: 'read',
+        category: 'ecosystem',
+        endpoint: 'https://example.invalid/mcp',
+        authTokenKey: 'some-token-key',
+        // lowercase 'authorization' — same header as 'Authorization' per HTTP spec
+        envHeaders: { authorization: ABSENT },
+      },
+    ],
+    dir,
+  );
+  try {
+    const diags = instance.getMissingEnvVarDiagnostics();
+    assert.equal(diags.length, 0, 'should not warn when lowercase authorization has authTokenKey fallback');
+  } finally {
+    restore();
+    await instance.shutdown();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('getMissingEnvVarDiagnostics: multiple servers — only those with missing vars appear', async () => {
   const dir = tempDir();
   const restore = saveEnv(SET, ABSENT);
