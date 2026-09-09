@@ -5,6 +5,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import { TasksClient, type CreateTaskInput, type UpdateTaskInput, type ListTasksFilter } from './tasks-client.js';
 
+/** Create and configure a tasks-mcp MCP Server backed by the given TasksClient. */
 export function createTaskServer(client: TasksClient): Server {
   const server = new Server(
     { name: 'tasks-mcp', version: '1.0.0' },

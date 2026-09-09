@@ -46,6 +46,7 @@ interface MockOverrides {
   deleteTask?: (id: string) => Promise<void>;
 }
 
+/** Build a TasksClient stub. Each method defaults to a fixture response unless overridden. */
 function makeMockClient(overrides: MockOverrides = {}): TasksClient {
   return {
     listTasks: overrides.listTasks ?? (async () => [TASK_1, TASK_2]),
@@ -58,6 +59,7 @@ function makeMockClient(overrides: MockOverrides = {}): TasksClient {
 
 // ── Test harness ──────────────────────────────────────────────────────────────
 
+/** Wire a real MCP Client+Server pair in-process via InMemoryTransport for a single test. */
 async function setup(overrides?: MockOverrides): Promise<{ client: Client; cleanup: () => Promise<void> }> {
   const mockClient = makeMockClient(overrides);
   const server = createTaskServer(mockClient);
