@@ -82,12 +82,29 @@ test('WorkersAiBrain: maxCandidates and topK clamped to >= 1', () => {
   assert.equal(b.config.topK, 1);
 });
 
+test('route(): maxCandidates prunes candidate batch passed to AI', async () => {
+  const batchSizes: number[] = [];
+  const ai = makeAi(async (_m, { text }) => {
+    batchSizes.push(text.length);
+    return { data: text.map(() => unitVec(2, 0)) };
+  });
+  const brain = new WorkersAiBrain(ai, undefined, { maxCandidates: 2, minSimilarity: 0 });
+  const cands = Array.from({ length: 5 }, (_, i) => candidate(`svc/t${i}`, `desc ${i}`));
+  await brain.route('q', cands);
+  // First batch = query embed (1 item); second batch = candidate embed (≤ maxCandidates=2 items).
+  const candidateBatch = batchSizes.find(n => n > 1) ?? batchSizes[1] ?? 0;
+  assert.ok(candidateBatch <= 2, `Expected candidate batch ≤ maxCandidates=2, got ${candidateBatch}`);
+});
+
 // ── 2. route() early-returns ──────────────────────────────────────────────────
 
-test('route(): disabled config returns null', async () => {
-  const brain = new WorkersAiBrain(makeEmbedAi(), undefined, { enabled: false });
+test('route(): disabled config returns null without invoking Workers AI', async () => {
+  let aiCalls = 0;
+  const countingAi = makeAi(async (_m, { text }) => { aiCalls++; return { data: text.map(() => unitVec(2, 0)) }; });
+  const brain = new WorkersAiBrain(countingAi, undefined, { enabled: false });
   const result = await brain.route('find me a tool', [candidate('a/b', 'desc')]);
   assert.equal(result, null);
+  assert.equal(aiCalls, 0, 'AI.run() must not be called when enabled=false');
 });
 
 test('route(): empty query returns null', async () => {
@@ -103,49 +120,37 @@ test('route(): empty candidates list returns null', async () => {
 
 // ── 3. Cosine path: successful routing ───────────────────────────────────────
 
-test('route(): cosine path returns sorted results with confidence in [0,1]', async () => {
-  // Use an Ai that returns orthogonal unit vectors. query gets unit[0].
-  // candidate 'a' gets unit[0] (similarity=1), candidate 'b' gets unit[1] (sim=0 → below default 0.5).
-  let callCount = 0;
-  const ai = makeAi(async (_m, { text }) => {
-    const data = text.map((_, i) => {
-      const slot = callCount === 0 ? 0 : (callCount * 10 + i) % 4;
-      callCount++;
-      return unitVec(4, slot % 4);
-    });
-    callCount = callCount === 0 ? 1 : callCount;
-    return { data };
+test('route(): cosine path returns correctly sorted results with distinct confidences', async () => {
+  // embedSingle (query) and ensureCandidateVectors (candidates) are two separate AI calls.
+  // We use a call counter to assign non-orthogonal vectors so similarities are distinct:
+  //   query  = [1, 0, 0, 0]
+  //   tool-a = [0.8, 0.6, 0, 0] → dot(query, tool-a) = 0.8
+  //   tool-b = [0.6, 0.8, 0, 0] → dot(query, tool-b) = 0.6
+  // After normalizeInPlace these are already unit vectors. Sort must put tool-a before tool-b.
+  let callNum = 0;
+  const sortAi = makeAi(async (_m, { text }) => {
+    const isQuery = callNum++ === 0;
+    return {
+      data: isQuery
+        ? [[1, 0, 0, 0]]
+        : text.map((_, i) => (i === 0 ? [0.8, 0.6, 0, 0] : [0.6, 0.8, 0, 0])),
+    };
   });
 
-  // Simpler approach: use a deterministic Ai that maps by input index
-  let globalIdx = 0;
-  const deterministicAi = makeAi(async (_m, { text }) => ({
-    data: text.map(() => unitVec(4, globalIdx++ % 4)),
-  }));
-
-  const brain = new WorkersAiBrain(deterministicAi, undefined, {
-    minSimilarity: 0.0, // accept everything so we can control which match
-    topK: 3,
-  });
-
-  const candidates = [
-    candidate('svc/tool-a', 'alpha'),
-    candidate('svc/tool-b', 'beta'),
-  ];
+  const brain = new WorkersAiBrain(sortAi, undefined, { minSimilarity: 0.0, topK: 3 });
+  const candidates = [candidate('svc/tool-a', 'alpha'), candidate('svc/tool-b', 'beta')];
 
   const results = await brain.route('query', candidates);
-  // minSimilarity=0.0 accepts any non-negative dot product, so results must be non-null.
-  assert.ok(results !== null, 'cosine path with minSimilarity=0.0 must return results');
-  assert.ok(Array.isArray(results));
+  assert.ok(results !== null, 'cosine path must return results');
+  assert.equal(results!.length, 2);
   for (const r of results!) {
     assert.ok(typeof r.tool.namespacedName === 'string');
     assert.ok(r.confidence >= 0 && r.confidence <= 1);
     assert.equal(r.reason, 'embedding similarity');
   }
-  // Must be sorted descending by confidence.
-  for (let i = 1; i < results!.length; i++) {
-    assert.ok(results![i]!.confidence <= results![i - 1]!.confidence, 'sorted descending');
-  }
+  // tool-a has higher similarity → must be first.
+  assert.equal(results![0]!.tool.namespacedName, 'svc/tool-a', 'higher-similarity tool must be first');
+  assert.ok(results![0]!.confidence > results![1]!.confidence, 'results must be strictly sorted descending');
 });
 
 test('route(): clips results to topK', async () => {
@@ -247,7 +252,7 @@ test('circuit breaker: success resets consecutive failure count', async () => {
 test('circuit breaker: half-open probe — only one concurrent probe allowed', async () => {
   const brain = new WorkersAiBrain(makeFailAi(), undefined, {
     circuitBreakerThreshold: 1,
-    circuitBreakerCooldownMs: 1,
+    circuitBreakerCooldownMs: 100,
   });
   const cands = [candidate('s/t', 'desc')];
 
@@ -255,8 +260,8 @@ test('circuit breaker: half-open probe — only one concurrent probe allowed', a
   await brain.route('q', cands);
   assert.equal(brain.getStats().circuitOpen, true, 'circuit must open after threshold=1 failure');
 
-  // Wait for cooldown to expire.
-  await new Promise<void>((resolve) => setTimeout(resolve, 5));
+  // Wait for cooldown to expire (150ms > 100ms cooldown).
+  await new Promise<void>((resolve) => setTimeout(resolve, 150));
   assert.equal(brain.getStats().circuitOpen, false, 'cooldown expired → circuit in half-open state');
 
   // Launch two concurrent probes. route() sets this.probing = true synchronously before
@@ -291,7 +296,7 @@ test('candidate cache: second route() call uses cached vectors (cacheHits > 0)',
   // Second call with same candidates — should hit cache.
   await brain.route('q2', cands);
   const afterSecond = brain.getStats();
-  assert.ok(afterSecond.cacheHits > 0, `Expected cacheHits > 0, got ${afterSecond.cacheHits}`);
+  assert.equal(afterSecond.cacheHits, cands.length, `Expected cacheHits === ${cands.length} (every candidate served from cache), got ${afterSecond.cacheHits}`);
 });
 
 // ── 6. getStats() ─────────────────────────────────────────────────────────────
@@ -350,15 +355,19 @@ test('route() Vectorize path: returns matches above minSimilarity', async () => 
   assert.equal(results![0]!.reason, 'vectorize similarity');
 });
 
-test('route() Vectorize path: empty matches → null (emptyResults)', async () => {
+test('route() Vectorize path: empty matches → null (emptyResults) and does NOT trip circuit', async () => {
   const ai = makeAi(async (_m, { text }) => ({
     data: text.map(() => unitVec(4, 0)),
   }));
   const vz = makeVectorize(async () => ({ matches: [] }));
-  const brain = new WorkersAiBrain(ai, vz, { minSimilarity: 0.5 });
+  const brain = new WorkersAiBrain(ai, vz, { minSimilarity: 0.5, circuitBreakerThreshold: 2 });
   const result = await brain.route('q', [candidate('s/t', 'd')]);
   assert.equal(result, null);
   assert.equal(brain.getStats().emptyResults, 1);
+  // A second empty-match call reaches threshold=2 but must NOT open the circuit —
+  // empty results are not failures; the circuit only opens on embed/AI errors.
+  await brain.route('q', [candidate('s/t', 'd')]);
+  assert.equal(brain.getStats().circuitOpen, false, 'empty Vectorize results must not trip circuit breaker');
 });
 
 test('route() Vectorize path: AI embed failure → null + circuit failure', async () => {
