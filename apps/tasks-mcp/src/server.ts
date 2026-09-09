@@ -116,6 +116,12 @@ export function createTaskServer(client: TasksClient): Server {
     const { name, arguments: args = {} } = req.params;
     const a = args as Record<string, unknown>;
 
+    const requireString = (key: string): string => {
+      const value = a[key];
+      if (typeof value !== 'string') throw new Error(`Missing required argument: ${key}`);
+      return value;
+    };
+
     try {
       let result: unknown;
 
@@ -130,12 +136,12 @@ export function createTaskServer(client: TasksClient): Server {
           break;
 
         case 'get_task':
-          result = await client.getTask(a['id'] as string);
+          result = await client.getTask(requireString('id'));
           break;
 
         case 'create_task':
           result = await client.createTask({
-            title: a['title'] as string,
+            title: requireString('title'),
             description: a['description'] as string | undefined,
             status: a['status'] as CreateTaskInput['status'],
             priority: a['priority'] as CreateTaskInput['priority'],
@@ -147,7 +153,7 @@ export function createTaskServer(client: TasksClient): Server {
           break;
 
         case 'update_task':
-          result = await client.updateTask(a['id'] as string, {
+          result = await client.updateTask(requireString('id'), {
             title: a['title'] as string | undefined,
             description: a['description'] as string | undefined,
             status: a['status'] as UpdateTaskInput['status'],
@@ -160,13 +166,15 @@ export function createTaskServer(client: TasksClient): Server {
           break;
 
         case 'complete_task':
-          result = await client.updateTask(a['id'] as string, { status: 'done' });
+          result = await client.updateTask(requireString('id'), { status: 'done' });
           break;
 
-        case 'delete_task':
-          await client.deleteTask(a['id'] as string);
-          result = { deleted: true, id: a['id'] };
+        case 'delete_task': {
+          const id = requireString('id');
+          await client.deleteTask(id);
+          result = { deleted: true, id };
           break;
+        }
 
         default:
           return {

@@ -371,3 +371,77 @@ test('create_task error: surfaces in isError response', async () => {
     await cleanup();
   }
 });
+
+// ── Required argument validation ──────────────────────────────────────────────
+
+test('get_task: missing id returns isError with "Missing required argument"', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.callTool({ name: 'get_task', arguments: {} });
+    assert.equal(result.isError, true);
+    const content = result.content as Array<{ type: string; text: string }>;
+    assert.ok(content[0].text.includes('Missing required argument'));
+  } finally {
+    await cleanup();
+  }
+});
+
+test('create_task: missing title returns isError with "Missing required argument"', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.callTool({ name: 'create_task', arguments: {} });
+    assert.equal(result.isError, true);
+    const content = result.content as Array<{ type: string; text: string }>;
+    assert.ok(content[0].text.includes('Missing required argument'));
+  } finally {
+    await cleanup();
+  }
+});
+
+test('delete_task: missing id returns isError before reaching client', async () => {
+  let deleteWasCalled = false;
+  const { client, cleanup } = await setup({
+    deleteTask: async () => { deleteWasCalled = true; },
+  });
+  try {
+    const result = await client.callTool({ name: 'delete_task', arguments: {} });
+    assert.equal(result.isError, true);
+    assert.equal(deleteWasCalled, false);
+    const content = result.content as Array<{ type: string; text: string }>;
+    assert.ok(content[0].text.includes('Missing required argument'));
+  } finally {
+    await cleanup();
+  }
+});
+
+test('update_task: missing id returns isError before reaching client', async () => {
+  let updateWasCalled = false;
+  const { client, cleanup } = await setup({
+    updateTask: async () => { updateWasCalled = true; return TASK_1; },
+  });
+  try {
+    const result = await client.callTool({ name: 'update_task', arguments: { status: 'done' } });
+    assert.equal(result.isError, true);
+    assert.equal(updateWasCalled, false);
+    const content = result.content as Array<{ type: string; text: string }>;
+    assert.ok(content[0].text.includes('Missing required argument'));
+  } finally {
+    await cleanup();
+  }
+});
+
+test('complete_task: missing id returns isError before reaching client', async () => {
+  let updateWasCalled = false;
+  const { client, cleanup } = await setup({
+    updateTask: async () => { updateWasCalled = true; return TASK_1; },
+  });
+  try {
+    const result = await client.callTool({ name: 'complete_task', arguments: {} });
+    assert.equal(result.isError, true);
+    assert.equal(updateWasCalled, false);
+    const content = result.content as Array<{ type: string; text: string }>;
+    assert.ok(content[0].text.includes('Missing required argument'));
+  } finally {
+    await cleanup();
+  }
+});
