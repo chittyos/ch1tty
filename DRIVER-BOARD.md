@@ -3778,7 +3778,7 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
 - **Actions**:
   - Startup: read CLAUDE.md, CHITTY.md; npm ci + build (clean, 0 errors); tests 1709 pass / 0 fail / 3 skip.
   - Read Notion board: all A-E workstreams confirmed done; F (branch cleanup) + G (hono security in apps) PRs open from today's earlier runs.
-  - Listed open PRs: #1191 (security: sharp/hono/vitest root), #1192 (weekly auto/* cleanup workflow), #1193 (hono security in apps/*). All CI green (3/3 checks).
+  - Listed open PRs: `#1191` (security: sharp/hono/vitest root), `#1192` (weekly `auto/*` cleanup workflow), `#1193` (hono security in `apps/*`). All CI green (3/3 checks).
   - Checked out PR #1192 branch (head `8e33e04`) and audited all 24 review threads.
   - Review audit result: ALL 24 threads addressed in prior commits. Key fixes:
     - Squash-merge detection via pre-fetch (10 pages, 1,000 PRs) + targeted fallback with SHA match
