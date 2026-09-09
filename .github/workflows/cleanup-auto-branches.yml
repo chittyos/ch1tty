@@ -68,7 +68,7 @@ jobs:
             // Only PRs merged directly into main are considered (stacked PRs merged into a
             // feature branch don't bring commits to main and must not be treated as safe).
             // Rate cost: up to 10 requests for ~1,000 closed PRs.
-            const mergedHeads = new Map(); // ref → head.sha at merge time
+            const mergedHeads = new Map(); // ref → { sha, mergedAt } — most-recently-merged wins
             for (let page = 1; page <= 10; page++) {
               const { data } = await github.rest.pulls.list({
                 owner, repo, state: 'closed', sort: 'updated', direction: 'desc',
@@ -78,15 +78,19 @@ jobs:
                 if (
                   pr.merged_at !== null &&
                   pr.base.ref === 'main' &&                          // must reach main
-                  pr.head.repo?.full_name === `${owner}/${repo}` &&  // not a fork
-                  !mergedHeads.has(pr.head.ref)                      // most-recent merge wins
+                  pr.head.repo?.full_name === `${owner}/${repo}`     // not a fork
                 ) {
-                  mergedHeads.set(pr.head.ref, pr.head.sha);
+                  const existing = mergedHeads.get(pr.head.ref);
+                  // Keep the most-recently-merged entry; sort:updated doesn't guarantee
+                  // merge order (a later comment can bump an older PR's updated_at).
+                  if (!existing || pr.merged_at > existing.mergedAt) {
+                    mergedHeads.set(pr.head.ref, { sha: pr.head.sha, mergedAt: pr.merged_at });
+                  }
                 }
               }
               if (data.length < 100) break;
             }
-            core.info(`${mergedHeads.size} recently merged PR head refs collected (squash-merge detection, up to 1,000 closed PRs scanned)`);
+            core.info(`${mergedHeads.size} recently merged PR head refs collected (squash-merge detection, most-recently-merged SHA wins, up to 1,000 closed PRs scanned)`);
 
             // Candidates: not an open head, not an open base.
             const candidates = autoBranches.filter(
@@ -149,7 +153,7 @@ jobs:
                   ? cmp.commits[cmp.commits.length - 1].sha
                   : null;
 
-                const mergedSha = mergedHeads.get(branch.name);
+                const mergedSha = mergedHeads.get(branch.name)?.sha;
                 let squashMerged = false;
 
                 if (mergedSha === branch.commit.sha) {
@@ -197,6 +201,8 @@ jobs:
                     );
                   } catch (err) {
                     core.warning(`Could not check merged PRs for ${branch.name}: ${err.message}`);
+                    skippedError++;
+                    continue;
                   }
                   if (!squashMerged) {
                     core.info(`SKIP  ${branch.name} (${aheadBy} unmerged commits, no merged PR into main found)`);
