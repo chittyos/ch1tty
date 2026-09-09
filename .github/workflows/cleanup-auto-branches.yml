@@ -1,0 +1,74 @@
+name: Cleanup stale auto/* branches
+
+on:
+  schedule:
+    # Run weekly on Sunday at 06:00 UTC
+    - cron: '0 6 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  cleanup:
+    name: Delete merged auto/* branches
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete stale auto/* branches
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo  = context.repo.repo;
+
+            // Collect all auto/* branches (paginated, up to 1000).
+            let autoBranches = [];
+            for (let page = 1; ; page++) {
+              const { data } = await github.rest.repos.listBranches({
+                owner, repo, per_page: 100, page,
+              });
+              autoBranches = autoBranches.concat(
+                data.filter(b => b.name.startsWith('auto/'))
+              );
+              if (data.length < 100) break;
+            }
+            core.info(`Found ${autoBranches.length} auto/* branches`);
+
+            // Collect all OPEN PR head refs so we never delete an active branch.
+            const openHeads = new Set();
+            for (let page = 1; ; page++) {
+              const { data } = await github.rest.pulls.list({
+                owner, repo, state: 'open', per_page: 100, page,
+              });
+              for (const pr of data) openHeads.add(pr.head.ref);
+              if (data.length < 100) break;
+            }
+            core.info(`${openHeads.size} open PR head refs protected`);
+
+            let deleted = 0;
+            let skipped = 0;
+            for (const branch of autoBranches) {
+              if (openHeads.has(branch.name)) {
+                core.info(`SKIP  ${branch.name} (open PR)`);
+                skipped++;
+                continue;
+              }
+              try {
+                await github.rest.git.deleteRef({
+                  owner, repo, ref: `heads/${branch.name}`,
+                });
+                core.info(`DEL   ${branch.name}`);
+                deleted++;
+              } catch (err) {
+                core.warning(`Could not delete ${branch.name}: ${err.message}`);
+              }
+            }
+
+            core.info(`Done — deleted ${deleted}, skipped ${skipped} (open PRs)`);
+            core.summary.addRaw(
+              `## auto/* branch cleanup\n` +
+              `- **Deleted:** ${deleted}\n` +
+              `- **Skipped (open PR):** ${skipped}\n`
+            );
+            await core.summary.write();
