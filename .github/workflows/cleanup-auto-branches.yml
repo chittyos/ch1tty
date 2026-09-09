@@ -26,9 +26,14 @@ jobs:
             const owner = context.repo.owner;
             const repo  = context.repo.repo;
 
+            // Track API requests consumed during listing so we can derive the
+            // per-branch processing budget from what's actually left.
+            let listRequests = 0;
+
             // Collect all auto/* branches (paginated, up to 10,000).
             let autoBranches = [];
             for (let page = 1; ; page++) {
+              listRequests++;
               const { data } = await github.rest.repos.listBranches({
                 owner, repo, per_page: 100, page,
               });
@@ -46,6 +51,7 @@ jobs:
             const openHeads = new Set();
             const openBases = new Set();
             for (let page = 1; ; page++) {
+              listRequests++;
               const { data } = await github.rest.pulls.list({
                 owner, repo, state: 'open', per_page: 100, page,
               });
@@ -70,6 +76,7 @@ jobs:
             // Rate cost: up to 10 requests for ~1,000 closed PRs.
             const mergedHeads = new Map(); // ref → { sha, mergedAt } — most-recently-merged wins
             for (let page = 1; page <= 10; page++) {
+              listRequests++;
               const { data } = await github.rest.pulls.list({
                 owner, repo, state: 'closed', sort: 'updated', direction: 'desc',
                 per_page: 100, page,
@@ -98,13 +105,11 @@ jobs:
             );
             core.info(`${candidates.length} candidates after open-PR filter`);
 
-            // Budget guard: leave room for compare + getRef/targeted + delete calls within
-            // the 1,000 req/hr GITHUB_TOKEN limit (~22 req used for listing).
-            // aheadBy===0 branches need 3 req each (compare + getRef + delete).
-            // aheadBy>0 squash branches in pre-fetch window: 2 req (compare + delete).
-            // aheadBy>0 squash branches needing targeted lookup: 3 req (compare + targeted + delete).
-            // Worst case: 22 + 320×3 = 982 total requests — within the 1,000 req/hr limit.
-            const MAX_PROCESS = 320;
+            // Budget guard: derive batch size from remaining capacity after listing.
+            // Each candidate costs at most 3 requests: compare + getRef/targeted + delete.
+            // Cap at 320 to bound worst-case processing time (a full 320×3 = 960 req batch).
+            core.info(`Listing consumed ${listRequests} requests`);
+            const MAX_PROCESS = Math.min(320, Math.floor((1000 - listRequests) / 3));
 
             // Rotate the batch window by week epoch so persistent non-deletable
             // branches don't block later candidates indefinitely across runs.
