@@ -84,7 +84,7 @@ jobs:
         run: npm ci
 
       - name: Audit dependencies
-        run: npm audit --omit=dev || true
+        run: npm audit --omit=dev
 
       - name: Audit apps/tasks-mcp
         working-directory: apps/tasks-mcp
