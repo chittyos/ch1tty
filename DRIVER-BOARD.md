@@ -3770,3 +3770,25 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
 - **State summary**: PR #1183 — ALL bot findings fully addressed. CI green. 0 vulnerabilities. Awaiting human merge.
 - **PushNotification**: NOT SENT — merge-pending state unchanged; human already notified in run ~1531.
 - **Next run**: Watch for PR #1183 merge or new events.
+
+---
+### 2026-09-09T~hourly (run ~1533 — PR #1192 review triage; all 3 PRs CI-green)
+- **Workstream**: F (branch cleanup workflow monitoring) + state audit
+- **Branch/PR**: `auto/F-cleanup-stale-branches` → PR #1192
+- **Actions**:
+  - Startup: read CLAUDE.md, CHITTY.md; npm ci + build (clean, 0 errors); tests 1709 pass / 0 fail / 3 skip.
+  - Read Notion board: all A-E workstreams confirmed done; F (branch cleanup) + G (hono security in apps) PRs open from today's earlier runs.
+  - Listed open PRs: #1191 (security: sharp/hono/vitest root), #1192 (weekly auto/* cleanup workflow), #1193 (hono security in apps/*). All CI green (3/3 checks).
+  - Checked out PR #1192 branch (head `8e33e04`) and audited all 24 review threads.
+  - Review audit result: ALL 24 threads addressed in prior commits. Key fixes:
+    - Squash-merge detection via pre-fetch (10 pages, 1,000 PRs) + targeted fallback with SHA match
+    - `base.ref === 'main'` requirement in both pre-fetch and targeted paths
+    - TOCTOU guards: liveTipSha from compare response (squash path) + `getRef` before delete (regular merge) + `getRef` after targeted pulls.list (targeted path)
+    - Dynamic rate budget: `MAX_PROCESS = max(0, min(320, floor((1000 - listRequests) / 4)))` using actual listing request count
+    - Weekly batch rotation via `weekEpoch` offset to prevent candidate starvation
+    - CI flood guard: `if: github.event.deleted != true` on ALL 3 ci.yml jobs (build-and-test, apps-build-and-test, security)
+  - Codex review threads have chitcommit replies; cannot resolve (not activated for Claude).
+  - CodeRabbit threads `giXKh` and `giXKp` resolved by CodeRabbit ✓.
+- **State summary**: PR #1192 fully reviewed, all findings addressed, CI green. PRs #1191 and #1193 also CI-green. All 3 waiting for human merge.
+- **PushNotification**: SENT — 3 PRs ready for human review (all CI green, all findings addressed).
+- **Next run**: Watch for PR merges or new bot findings. If no merges, consider H workstream: v2 brain routing (3-layer cast pipeline keyword→OllamaBrain→Alchemist, per CHITTY.md §Alchemical Self-Composition).
