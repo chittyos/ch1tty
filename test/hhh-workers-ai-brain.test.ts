@@ -192,22 +192,29 @@ test('route(): clips results to topK', async () => {
 
 test('route(): below minSimilarity → null (emptyResults++)', async () => {
   // embedSingle (query) and ensureCandidateVectors (candidates) are separate AI calls made
-  // in sequence via Promise.all. We track call number so query gets slot 0 and candidates
-  // get slot 1 — producing orthogonal unit vectors → dot=0 < minSimilarity=0.99 → null.
+  // in sequence via Promise.all. We assign slot 0 to all queries and slot 2 to the candidate
+  // so they are always orthogonal (dot=0 < minSimilarity=0.99 → null) — including in repeated
+  // loop calls where the candidate is already cached and only the query is re-embedded.
   let callNum = 0;
   const orthoAi = makeAi(async (_m, { text }) => {
-    const slot = callNum++;
-    return { data: text.map(() => unitVec(3, slot % 2)) };
+    // Call 0 = query (embedSingle), call 1 = candidate (ensureCandidateVectors, first route only).
+    // Subsequent calls are always query-only (candidate cached); all get slot 0.
+    const slot = callNum === 1 ? 2 : 0;
+    callNum++;
+    return { data: text.map(() => unitVec(3, slot)) };
   });
   const brain = new WorkersAiBrain(orthoAi, undefined, { minSimilarity: 0.99 });
   const result = await brain.route('q', [candidate('s/t', 'desc')]);
   assert.equal(result, null, 'orthogonal vectors must be below minSimilarity=0.99 → null');
   assert.equal(brain.getStats().emptyResults, 1, 'emptyResults must be 1 after below-threshold route');
-  // Repeat through configured threshold — empty/low-similarity results must never trip the circuit breaker.
+  // Repeat through configured threshold — every repeated call must also return null (orthogonal
+  // query vs cached candidate), and empty/low-similarity results must never trip the circuit breaker.
   const threshold = brain.config.circuitBreakerThreshold;
+  const loopResults: unknown[] = [];
   for (let i = 0; i < threshold; i++) {
-    await brain.route('q', [candidate('s/t', 'desc')]);
+    loopResults.push(await brain.route('q', [candidate('s/t', 'desc')]));
   }
+  assert.ok(loopResults.every(r => r === null), 'all repeated queries must be null (always orthogonal to cached candidate)');
   assert.equal(brain.getStats().circuitOpen, false, 'cosine empty results must not trip circuit breaker');
 });
 
@@ -311,9 +318,11 @@ test('circuit breaker: half-open probe — only one concurrent probe allowed', a
 // ── 5. Candidate vector cache ─────────────────────────────────────────────────
 
 test('candidate cache: second route() call uses cached vectors (cacheHits > 0)', async () => {
-  const ai = makeAi(async (_m, { text }) => ({
-    data: text.map(() => unitVec(4, 0)),
-  }));
+  let totalAiCalls = 0;
+  const ai = makeAi(async (_m, { text }) => {
+    totalAiCalls++;
+    return { data: text.map(() => unitVec(4, 0)) };
+  });
   const brain = new WorkersAiBrain(ai, undefined, { minSimilarity: 0 });
   const cands = [candidate('svc/tool-a', 'alpha'), candidate('svc/tool-b', 'beta')];
 
@@ -324,9 +333,12 @@ test('candidate cache: second route() call uses cached vectors (cacheHits > 0)',
   assert.equal(afterFirst.cacheSize, cands.length, 'cache populated');
 
   // Second call with same candidates — should hit cache.
+  const aiCallsAfterFirst = totalAiCalls;
   await brain.route('q2', cands);
   const afterSecond = brain.getStats();
   assert.equal(afterSecond.cacheHits, cands.length, `Expected cacheHits === ${cands.length} (every candidate served from cache), got ${afterSecond.cacheHits}`);
+  // Cache hits must skip re-embedding candidates: second route must call AI exactly once (query only).
+  assert.equal(totalAiCalls - aiCallsAfterFirst, 1, 'second route must embed only the query (1 AI call); cached candidates must not be re-embedded');
 
   // Third call with a candidate whose content has changed — must be a cache miss and trigger re-embed.
   const changedCands = [
@@ -473,8 +485,10 @@ test('indexCandidates(): no-op with empty candidates — no Vectorize request', 
 });
 
 test('indexCandidates(): upserts correct count when Vectorize bound', async () => {
+  // Return distinct unit vectors per batch position so a regression that swaps
+  // candidate embeddings would cause a values mismatch assertion below.
   const ai = makeAi(async (_m, { text }) => ({
-    data: text.map(() => unitVec(4, 0)),
+    data: text.map((_, i) => unitVec(4, i % 4)),
   }));
   const upserted: unknown[] = [];
   const vz = {
@@ -482,21 +496,23 @@ test('indexCandidates(): upserts correct count when Vectorize bound', async () =
     upsert: async (items: unknown[]) => { upserted.push(...items); return { count: (items as unknown[]).length }; },
   } as unknown as VectorizeIndex;
   const brain = new WorkersAiBrain(ai, vz);
+  // Candidates in alphabetical name order so sort below is a no-op (stable index mapping).
   const cands = [
-    candidate('svc/a', 'alpha'),
-    candidate('svc/b', 'beta'),
-    candidate('svc/c', 'gamma'),
+    candidate('svc/a', 'alpha'),   // batch index 0 → unitVec(4, 0) = [1,0,0,0]
+    candidate('svc/b', 'beta'),    // batch index 1 → unitVec(4, 1) = [0,1,0,0]
+    candidate('svc/c', 'gamma'),   // batch index 2 → unitVec(4, 2) = [0,0,1,0]
   ];
   const n = await brain.indexCandidates(cands);
   assert.equal(n, 3);
   assert.equal(upserted.length, 3);
-  // Each upserted item must match its candidate: id === namespacedName, non-empty values vector.
+  // Each upserted item must match its candidate: id, distinct values vector, and metadata.
   const sorted = (upserted as Array<{ id: string; values: number[]; metadata: Record<string, string> }>)
     .sort((a, b) => a.id.localeCompare(b.id));
   const sortedCands = [...cands].sort((a, b) => a.namespacedName.localeCompare(b.namespacedName));
   for (let i = 0; i < sortedCands.length; i++) {
     assert.equal(sorted[i]!.id, sortedCands[i]!.namespacedName, `upserted id must match candidate namespacedName`);
     assert.ok(Array.isArray(sorted[i]!.values) && sorted[i]!.values.length > 0, 'values must be non-empty');
+    assert.deepEqual(sorted[i]!.values, unitVec(4, i), `upserted values for ${sortedCands[i]!.namespacedName} must match its distinct embedding`);
     assert.equal(sorted[i]!.metadata.namespacedName, sortedCands[i]!.namespacedName, 'metadata.namespacedName must match');
   }
 });
