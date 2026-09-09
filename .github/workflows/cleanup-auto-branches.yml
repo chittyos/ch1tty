@@ -61,6 +61,26 @@ jobs:
             }
             core.info(`${openHeads.size} open PR head refs protected (same-repo), ${openBases.size} base refs protected`);
 
+            // Pre-collect recently merged PR head refs to detect squash-merged branches.
+            // Squash merges produce a single commit on main that is not an ancestor of the
+            // branch tip, so compareCommitsWithBasehead reports ahead_by > 0 even though
+            // the PR was merged. Fetch the last 300 closed+merged PRs to cover them.
+            // Rate cost: 3 requests (fits within the budget below).
+            const mergedHeads = new Set();
+            for (let page = 1; page <= 3; page++) {
+              const { data } = await github.rest.pulls.list({
+                owner, repo, state: 'closed', sort: 'updated', direction: 'desc',
+                per_page: 100, page,
+              });
+              for (const pr of data) {
+                if (pr.merged_at !== null && pr.head.repo?.full_name === `${owner}/${repo}`) {
+                  mergedHeads.add(pr.head.ref);
+                }
+              }
+              if (data.length < 100) break;
+            }
+            core.info(`${mergedHeads.size} recently merged PR head refs collected (squash-merge detection)`);
+
             // Candidates: not an open head, not an open base.
             const candidates = autoBranches.filter(
               b => !openHeads.has(b.name) && !openBases.has(b.name)
@@ -68,22 +88,34 @@ jobs:
             core.info(`${candidates.length} candidates after open-PR filter`);
 
             // Budget guard: leave room for compare + delete calls within the
-            // 1,000 req/hr GITHUB_TOKEN limit (12 req already used for listing).
+            // 1,000 req/hr GITHUB_TOKEN limit (~15 req already used for listing).
             // Each candidate needs one compare call; each delete is one more.
-            // Cap at 400 candidates processed per run → ≤ 812 total requests.
+            // Cap at 400 candidates processed per run → ≤ 815 total requests.
             const MAX_PROCESS = 400;
-            const batch = candidates.slice(0, MAX_PROCESS);
+
+            // Rotate the batch window by week epoch so persistent non-deletable
+            // branches (truly unmerged) don't block later candidates indefinitely.
+            // Each run processes a different slice of the candidate list — over
+            // enough weeks every candidate is inspected without persistent state.
+            const weekEpoch = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
+            const rotateBy = candidates.length > 0
+              ? (weekEpoch * MAX_PROCESS) % candidates.length
+              : 0;
+            const rotated = [...candidates.slice(rotateBy), ...candidates.slice(0, rotateBy)];
+            const batch = rotated.slice(0, MAX_PROCESS);
             const deferred = candidates.length - batch.length;
             if (deferred > 0) {
-              core.info(`Rate-limit cap: processing ${batch.length} of ${candidates.length} candidates; ${deferred} deferred to next run`);
+              core.info(`Rate-limit cap: processing ${batch.length} of ${candidates.length} candidates; ${deferred} deferred to next run (rotation offset: ${rotateBy})`);
             }
 
             let deleted = 0;
             let skippedUnmerged = 0;
             let skippedError = 0;
             for (const branch of batch) {
-              // Only delete branches whose commits are fully merged into main.
-              // compare main...branch: ahead_by = 0 means branch adds nothing new.
+              // Determine whether the branch is safe to delete:
+              //   1. ahead_by === 0: commits are ancestors of main (regular merge).
+              //   2. ahead_by > 0 but branch is in mergedHeads: squash-merged PR.
+              // Both cases are safe to delete; skip only when truly unmerged.
               let aheadBy;
               try {
                 const { data: cmp } = await github.rest.repos.compareCommitsWithBasehead({
@@ -95,8 +127,8 @@ jobs:
                 skippedError++;
                 continue;
               }
-              if (aheadBy > 0) {
-                core.info(`SKIP  ${branch.name} (${aheadBy} unmerged commits)`);
+              if (aheadBy > 0 && !mergedHeads.has(branch.name)) {
+                core.info(`SKIP  ${branch.name} (${aheadBy} unmerged commits, no merged PR found)`);
                 skippedUnmerged++;
                 continue;
               }
@@ -104,7 +136,8 @@ jobs:
                 await github.rest.git.deleteRef({
                   owner, repo, ref: `heads/${branch.name}`,
                 });
-                core.info(`DEL   ${branch.name}`);
+                const reason = aheadBy > 0 ? 'squash-merged' : 'merged';
+                core.info(`DEL   ${branch.name} (${reason})`);
                 deleted++;
               } catch (err) {
                 core.warning(`Could not delete ${branch.name}: ${err.message}`);
@@ -115,9 +148,9 @@ jobs:
             const summary =
               `## auto/* branch cleanup\n` +
               `| | Count |\n|---|---|\n` +
-              `| Deleted (merged) | **${deleted}** |\n` +
+              `| Deleted (merged or squash-merged) | **${deleted}** |\n` +
               `| Skipped (open PR — head or base) | ${autoBranches.length - candidates.length} |\n` +
-              `| Skipped (unmerged commits) | ${skippedUnmerged} |\n` +
+              `| Skipped (unmerged commits, no merged PR) | ${skippedUnmerged} |\n` +
               `| Skipped (compare/delete error) | ${skippedError} |\n` +
               `| Deferred to next run (rate-limit cap) | ${deferred} |\n`;
             core.summary.addRaw(summary);
