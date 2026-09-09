@@ -168,6 +168,13 @@ function validateServerConfig(raw: unknown, index: number): ServerConfig {
   const authTokenKey = assertOptionalString(raw.authTokenKey, `${prefix}.authTokenKey`);
   const headers = assertOptionalEnv(raw.headers, `${prefix}.headers`);
   const envHeaders = assertOptionalEnv(raw.envHeaders, `${prefix}.envHeaders`);
+  if (envHeaders) {
+    for (const [headerName, varName] of Object.entries(envHeaders)) {
+      if (!varName.trim()) {
+        throw new Error(`${prefix}.envHeaders.${headerName}: env var name must not be empty`);
+      }
+    }
+  }
   const lazy = assertOptionalBoolean(raw.lazy, `${prefix}.lazy`);
   const enabled = assertOptionalBoolean(raw.enabled, `${prefix}.enabled`);
   const env = assertOptionalEnv(raw.env, `${prefix}.env`);
