@@ -85,20 +85,20 @@ jobs:
 
       - name: Audit apps/tasks-mcp
         working-directory: apps/tasks-mcp
-        run: npm ci --ignore-scripts && npm audit --omit=dev || true
+        run: npm ci --ignore-scripts && npm audit --omit=dev
 
       - name: Audit apps/ledger-mcp
         working-directory: apps/ledger-mcp
-        run: npm ci --ignore-scripts && npm audit --omit=dev || true
+        run: npm ci --ignore-scripts && npm audit --omit=dev
 
       - name: Audit apps/session-coordinator-mcp
         working-directory: apps/session-coordinator-mcp
-        run: npm ci --ignore-scripts && npm audit --omit=dev || true
+        run: npm ci --ignore-scripts && npm audit --omit=dev
 
       - name: Audit apps/evidence-mcp
         working-directory: apps/evidence-mcp
-        run: npm ci --ignore-scripts && npm audit --omit=dev || true
+        run: npm ci --ignore-scripts && npm audit --omit=dev
 
       - name: Audit apps/comms-mcp
         working-directory: apps/comms-mcp
-        run: npm ci --ignore-scripts && npm audit --omit=dev || true
+        run: npm ci --ignore-scripts && npm audit --omit=dev
