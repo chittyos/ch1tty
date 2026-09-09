@@ -94,10 +94,12 @@ jobs:
             );
             core.info(`${candidates.length} candidates after open-PR filter`);
 
-            // Budget guard: leave room for compare + targeted + delete calls within the
-            // 1,000 req/hr GITHUB_TOKEN limit (~34 req already used for listing).
-            // MAX_PROCESS=400, MAX_TARGETED=100 → worst-case 934 total requests.
-            const MAX_PROCESS = 400;
+            // Budget guard: leave room for compare + getRef + targeted + delete calls within
+            // the 1,000 req/hr GITHUB_TOKEN limit (~22 req used for listing).
+            // aheadBy===0 branches need 3 req each (compare + getRef + delete).
+            // aheadBy>0 squash branches need 2 req each (live tip from cmp.commits, no getRef).
+            // MAX_PROCESS=320, MAX_TARGETED=100 → worst-case 22 + 320×3 = 982 total requests.
+            const MAX_PROCESS = 320;
             const MAX_TARGETED = 100; // per-branch PR lookups for older squash-merged branches
 
             // Rotate the batch window by week epoch so persistent non-deletable
@@ -120,6 +122,7 @@ jobs:
             for (const branch of batch) {
               // Determine whether the branch is safe to delete:
               //   1. ahead_by === 0: commits are ancestors of main (regular merge).
+              //      Live-tip revalidated via getRef before deleteRef (TOCTOU guard).
               //   2. ahead_by > 0 but branch SHA matched a merged PR into main:
               //      squash-merged — SHA check prevents false positives for reused names.
               //      Live-tip check (from cmp.commits) prevents TOCTOU data loss when
@@ -203,6 +206,29 @@ jobs:
                 } else {
                   // Targeted-lookup budget exhausted; conservatively skip.
                   core.info(`SKIP  ${branch.name} (${aheadBy} unmerged commits, targeted-lookup budget exhausted)`);
+                  skippedUnmerged++;
+                  continue;
+                }
+              }
+
+              // TOCTOU guard for regular merges (aheadBy === 0).
+              // For squash-merged branches (aheadBy > 0), the live tip was already
+              // verified via cmp.commits above. When aheadBy === 0, cmp.commits is
+              // empty, so a getRef is needed to detect commits pushed between the
+              // compareCommitsWithBasehead call and the deleteRef.
+              if (aheadBy === 0) {
+                let liveRef;
+                try {
+                  ({ data: liveRef } = await github.rest.git.getRef({
+                    owner, repo, ref: `heads/${branch.name}`,
+                  }));
+                } catch (err) {
+                  core.warning(`Could not verify live tip for ${branch.name}: ${err.message}`);
+                  skippedError++;
+                  continue;
+                }
+                if (liveRef.object.sha !== branch.commit.sha) {
+                  core.info(`SKIP  ${branch.name} (branch moved during run: live=${liveRef.object.sha.slice(0,7)} vs snapshot=${branch.commit.sha.slice(0,7)})`);
                   skippedUnmerged++;
                   continue;
                 }
