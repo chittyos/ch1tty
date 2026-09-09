@@ -817,7 +817,18 @@ export class Ch1ttyCore {
   getStatusSnapshot() {
     const statuses: ServerStatus[] = this.activeConfigs().map((config) => {
       const status = this.proxy.getStatus(config.id);
-      return { id: config.id, name: config.name, type: config.type, enabled: config.enabled !== false, ...status };
+      const missingEnvVars: string[] =
+        config.type === 'remote' && config.envHeaders
+          ? [...new Set(Object.values(config.envHeaders).filter((varName) => !this.env[varName]))]
+          : [];
+      return {
+        id: config.id,
+        name: config.name,
+        type: config.type,
+        enabled: config.enabled !== false,
+        ...(missingEnvVars.length > 0 ? { missingEnvVars } : {}),
+        ...status,
+      };
     });
 
     const coordinatorSnap = this.coordinator.getSnapshot();
