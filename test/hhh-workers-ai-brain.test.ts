@@ -134,22 +134,18 @@ test('route(): cosine path returns sorted results with confidence in [0,1]', asy
   ];
 
   const results = await brain.route('query', candidates);
-  // We can't guarantee cosine values precisely with the simple mock,
-  // but we CAN guarantee structural correctness.
-  if (results !== null) {
-    assert.ok(Array.isArray(results));
-    for (const r of results) {
-      assert.ok(typeof r.tool.namespacedName === 'string');
-      assert.ok(r.confidence >= 0 && r.confidence <= 1);
-      assert.equal(r.reason, 'embedding similarity');
-    }
-    // Must be sorted descending by confidence.
-    for (let i = 1; i < results.length; i++) {
-      assert.ok(results[i]!.confidence <= results[i - 1]!.confidence, 'sorted descending');
-    }
+  // minSimilarity=0.0 accepts any non-negative dot product, so results must be non-null.
+  assert.ok(results !== null, 'cosine path with minSimilarity=0.0 must return results');
+  assert.ok(Array.isArray(results));
+  for (const r of results!) {
+    assert.ok(typeof r.tool.namespacedName === 'string');
+    assert.ok(r.confidence >= 0 && r.confidence <= 1);
+    assert.equal(r.reason, 'embedding similarity');
   }
-  // Either null (all below minSimilarity due to orthogonal vectors) or sorted results.
-  // Both are valid — the test verifies structure, not vector math.
+  // Must be sorted descending by confidence.
+  for (let i = 1; i < results!.length; i++) {
+    assert.ok(results![i]!.confidence <= results![i - 1]!.confidence, 'sorted descending');
+  }
 });
 
 test('route(): clips results to topK', async () => {
@@ -165,25 +161,18 @@ test('route(): clips results to topK', async () => {
 });
 
 test('route(): below minSimilarity → null (emptyResults++)', async () => {
-  // Query gets unit[0]; each candidate gets unit[1] → dot=0 < minSimilarity=0.5.
-  let qi = 0;
-  const ai = makeAi(async (_m, { text }) => ({
-    data: text.map(() => unitVec(2, qi++ === 0 ? 0 : 1)),
-  }));
-  // Reset qi per route() call — two separate embed() calls: one for query, one for candidates.
-  // Actually both are called in parallel with Promise.all, so we can't rely on call order.
-  // Use a high minSimilarity with all orthogonal vectors instead.
-  const orthoAi = makeAi(async (_m, { text }) => ({
-    data: text.map((_, i) => unitVec(3, i % 3)),  // all distinct unit vectors
-  }));
+  // embedSingle (query) and ensureCandidateVectors (candidates) are separate AI calls made
+  // in sequence via Promise.all. We track call number so query gets slot 0 and candidates
+  // get slot 1 — producing orthogonal unit vectors → dot=0 < minSimilarity=0.99 → null.
+  let callNum = 0;
+  const orthoAi = makeAi(async (_m, { text }) => {
+    const slot = callNum++;
+    return { data: text.map(() => unitVec(3, slot % 2)) };
+  });
   const brain = new WorkersAiBrain(orthoAi, undefined, { minSimilarity: 0.99 });
   const result = await brain.route('q', [candidate('s/t', 'desc')]);
-  // With orthogonal vectors between query and candidate, similarity ≈ 0 < 0.99 → null
-  const stats = brain.getStats();
-  // Either null result with emptyResults, or a match if vectors happened to align.
-  // Both are valid given the mock's non-determinism; just verify stats coherence.
-  assert.ok(stats.calls >= 1);
-  assert.ok(stats.successes + stats.emptyResults <= stats.calls);
+  assert.equal(result, null, 'orthogonal vectors must be below minSimilarity=0.99 → null');
+  assert.equal(brain.getStats().emptyResults, 1, 'emptyResults must be 1 after below-threshold route');
 });
 
 // ── 4. Circuit breaker ────────────────────────────────────────────────────────
@@ -257,14 +246,30 @@ test('circuit breaker: success resets consecutive failure count', async () => {
 test('circuit breaker: half-open probe — only one concurrent probe allowed', async () => {
   const brain = new WorkersAiBrain(makeFailAi(), undefined, {
     circuitBreakerThreshold: 1,
-    circuitBreakerCooldownMs: 0,  // expires immediately
+    circuitBreakerCooldownMs: 1,
   });
   const cands = [candidate('s/t', 'desc')];
 
-  // Trip the circuit.
+  // Trip the circuit (1 failure at threshold=1).
   await brain.route('q', cands);
-  assert.equal(brain.getStats().circuitOpen, false, 'cooldown=0 means already expired');
-  // With cooldown=0 the circuit expires immediately after the open, so next call probes.
+  assert.equal(brain.getStats().circuitOpen, true, 'circuit must open after threshold=1 failure');
+
+  // Wait for cooldown to expire.
+  await new Promise<void>((resolve) => setTimeout(resolve, 5));
+  assert.equal(brain.getStats().circuitOpen, false, 'cooldown expired → circuit in half-open state');
+
+  // Launch two concurrent probes. route() sets this.probing = true synchronously before
+  // the first await, so the second call sees probing=true and returns null immediately.
+  const [r1, r2] = await Promise.all([
+    brain.route('q', cands),
+    brain.route('q', cands),
+  ]);
+
+  assert.equal(r1, null, 'probe 1 returns null (makeFailAi causes failure)');
+  assert.equal(r2, null, 'probe 2 blocked by probing=true → null immediately');
+
+  // Trip call increments calls once; only probe 1 reaches AI (probe 2 is blocked).
+  assert.equal(brain.getStats().calls, 2, 'exactly one probe attempt must reach AI');
 });
 
 // ── 5. Candidate vector cache ─────────────────────────────────────────────────
@@ -379,11 +384,10 @@ test('route() Vectorize path: match not in live candidates reconstructed from me
   const brain = new WorkersAiBrain(ai, vz, { minSimilarity: 0.5 });
   // 'svc/ghost' is NOT in the live candidates list.
   const results = await brain.route('q', [candidate('svc/tool-a', 'alpha')]);
-  // Should reconstruct from metadata and still surface the match.
-  if (results !== null) {
-    assert.equal(results[0]!.tool.namespacedName, 'svc/ghost');
-    assert.equal(results[0]!.tool.description, 'ghost tool');
-  }
+  // score=0.95 > minSimilarity=0.5, so match is guaranteed.
+  assert.ok(results !== null, 'vectorize match with score 0.95 > minSimilarity 0.5 must be non-null');
+  assert.equal(results![0]!.tool.namespacedName, 'svc/ghost');
+  assert.equal(results![0]!.tool.description, 'ghost tool');
 });
 
 // ── 8. indexCandidates() ──────────────────────────────────────────────────────
@@ -442,14 +446,8 @@ test('route(): AI returns wrong-length data array → null', async () => {
   // Two candidates → embed called with text.length >= 2; data.length=1 is wrong.
   const brain = new WorkersAiBrain(ai, undefined, { circuitBreakerThreshold: 100 });
   const result = await brain.route('q', [candidate('s/a', 'd'), candidate('s/b', 'd')]);
-  // embedSingle for query returns a 1-item batch; ensureCandidateVectors returns 1 item for 2 inputs → null.
-  // The exact null-return path depends on which embed() call fails first.
-  // Just assert: null or valid array with confidence in range.
-  if (result !== null) {
-    for (const r of result) {
-      assert.ok(r.confidence >= 0 && r.confidence <= 1);
-    }
-  }
+  // ensureCandidateVectors gets 2 inputs but AI returns only 1 vector → length mismatch → embed() → null.
+  assert.equal(result, null, 'wrong-length data array must produce null');
 });
 
 test('route(): AI returns data with non-finite vector value → null', async () => {
