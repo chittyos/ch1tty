@@ -98,13 +98,13 @@ jobs:
             );
             core.info(`${candidates.length} candidates after open-PR filter`);
 
-            // Budget guard: leave room for compare + getRef + targeted + delete calls within
+            // Budget guard: leave room for compare + getRef/targeted + delete calls within
             // the 1,000 req/hr GITHUB_TOKEN limit (~22 req used for listing).
             // aheadBy===0 branches need 3 req each (compare + getRef + delete).
-            // aheadBy>0 squash branches need 2 req each (live tip from cmp.commits, no getRef).
-            // MAX_PROCESS=320, MAX_TARGETED=100 → worst-case 22 + 320×3 = 982 total requests.
+            // aheadBy>0 squash branches in pre-fetch window: 2 req (compare + delete).
+            // aheadBy>0 squash branches needing targeted lookup: 3 req (compare + targeted + delete).
+            // Worst case: 22 + 320×3 = 982 total requests — within the 1,000 req/hr limit.
             const MAX_PROCESS = 320;
-            const MAX_TARGETED = 100; // per-branch PR lookups for older squash-merged branches
 
             // Rotate the batch window by week epoch so persistent non-deletable
             // branches don't block later candidates indefinitely across runs.
@@ -122,7 +122,6 @@ jobs:
             let deleted = 0;
             let skippedUnmerged = 0;
             let skippedError = 0;
-            let targeted = 0;
             for (const branch of batch) {
               // Determine whether the branch is safe to delete:
               //   1. ahead_by === 0: commits are ancestors of main (regular merge).
@@ -170,7 +169,7 @@ jobs:
                     continue;
                   }
                   squashMerged = true;
-                } else if (targeted < MAX_TARGETED) {
+                } else {
                   // Not in pre-fetch window (or SHA mismatch). Try a targeted lookup
                   // for older squash-merged branches beyond the ~1,000-PR window.
                   // Reuse the same live-tip guard: if the branch moved, skip.
@@ -184,7 +183,6 @@ jobs:
                     skippedUnmerged++;
                     continue;
                   }
-                  targeted++;
                   try {
                     // Check up to 10 closed PRs for this branch; any one merged into
                     // main with matching SHA qualifies (handles multiple closed PRs).
@@ -209,11 +207,6 @@ jobs:
                     skippedUnmerged++;
                     continue;
                   }
-                } else {
-                  // Targeted-lookup budget exhausted; conservatively skip.
-                  core.info(`SKIP  ${branch.name} (${aheadBy} unmerged commits, targeted-lookup budget exhausted)`);
-                  skippedUnmerged++;
-                  continue;
                 }
               }
 
@@ -263,4 +256,4 @@ jobs:
               `| Deferred to next run (rate-limit cap) | ${deferred} |\n`;
             core.summary.addRaw(summary);
             await core.summary.write();
-            core.info(`Done — deleted ${deleted}, unmerged-skip ${skippedUnmerged}, error-skip ${skippedError}, deferred ${deferred}, targeted-lookups ${targeted}`);
+            core.info(`Done — deleted ${deleted}, unmerged-skip ${skippedUnmerged}, error-skip ${skippedError}, deferred ${deferred}`);
