@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   build-and-test:
+    if: github.event.deleted != true
     runs-on: ubuntu-latest
     strategy:
       matrix:

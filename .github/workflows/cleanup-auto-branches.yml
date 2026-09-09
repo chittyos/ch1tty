@@ -212,6 +212,24 @@ jobs:
                     skippedUnmerged++;
                     continue;
                   }
+                  // TOCTOU guard for targeted path: a push during the pulls.list call above
+                  // is not caught by the earlier liveTipSha check (which predates the call).
+                  // Revalidate the live tip before deleting.
+                  let liveRefTargeted;
+                  try {
+                    ({ data: liveRefTargeted } = await github.rest.git.getRef({
+                      owner, repo, ref: `heads/${branch.name}`,
+                    }));
+                  } catch (err) {
+                    core.warning(`Could not verify live tip for ${branch.name}: ${err.message}`);
+                    skippedError++;
+                    continue;
+                  }
+                  if (liveRefTargeted.object.sha !== branch.commit.sha) {
+                    core.info(`SKIP  ${branch.name} (branch moved during targeted lookup: live=${liveRefTargeted.object.sha.slice(0,7)} vs snapshot=${branch.commit.sha.slice(0,7)})`);
+                    skippedUnmerged++;
+                    continue;
+                  }
                 }
               }
 
