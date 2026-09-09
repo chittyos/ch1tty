@@ -9,7 +9,7 @@
 
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { WorkersAiBrain, type ToolCandidate } from '../src/workers-ai-brain.js';
+import { WorkersAiBrain, EMBED_MODEL, type ToolCandidate } from '../src/workers-ai-brain.js';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -116,9 +116,26 @@ test('route(): empty query returns null without invoking Workers AI', async () =
   assert.equal(aiCalls, 0, 'AI.run() must not be called for blank queries');
 });
 
-test('route(): empty candidates list returns null', async () => {
-  const brain = new WorkersAiBrain(makeEmbedAi());
+test('route(): empty candidates list returns null without invoking Workers AI', async () => {
+  let aiCalls = 0;
+  const countingAi = makeAi(async (_m, { text }) => { aiCalls++; return { data: text.map(() => unitVec(2, 0)) }; });
+  const brain = new WorkersAiBrain(countingAi);
   assert.equal(await brain.route('something', []), null);
+  assert.equal(aiCalls, 0, 'AI.run() must not be called for empty candidates');
+});
+
+test('route(): Workers AI is invoked with EMBED_MODEL model identifier', async () => {
+  const capturedModels: string[] = [];
+  const modelCheckAi = makeAi(async (model, { text }) => {
+    capturedModels.push(model as string);
+    return { data: text.map(() => unitVec(4, 0)) };
+  });
+  const brain = new WorkersAiBrain(modelCheckAi, undefined, { minSimilarity: 0 });
+  await brain.route('test query', [candidate('svc/t', 'desc')]);
+  assert.ok(capturedModels.length > 0, 'AI.run() must be called at least once');
+  for (const m of capturedModels) {
+    assert.equal(m, EMBED_MODEL, `Workers AI must be called with EMBED_MODEL="${EMBED_MODEL}", got "${m}"`);
+  }
 });
 
 // ── 3. Cosine path: successful routing ───────────────────────────────────────
@@ -182,6 +199,10 @@ test('route(): below minSimilarity → null (emptyResults++)', async () => {
   const result = await brain.route('q', [candidate('s/t', 'desc')]);
   assert.equal(result, null, 'orthogonal vectors must be below minSimilarity=0.99 → null');
   assert.equal(brain.getStats().emptyResults, 1, 'emptyResults must be 1 after below-threshold route');
+  // Repeat through threshold — empty/below-threshold results must NOT trip the circuit breaker.
+  await brain.route('q', [candidate('s/t', 'desc')]);
+  await brain.route('q', [candidate('s/t', 'desc')]);
+  assert.equal(brain.getStats().circuitOpen, false, 'cosine no-match must not trip circuit breaker');
 });
 
 // ── 4. Circuit breaker ────────────────────────────────────────────────────────
@@ -300,6 +321,17 @@ test('candidate cache: second route() call uses cached vectors (cacheHits > 0)',
   await brain.route('q2', cands);
   const afterSecond = brain.getStats();
   assert.equal(afterSecond.cacheHits, cands.length, `Expected cacheHits === ${cands.length} (every candidate served from cache), got ${afterSecond.cacheHits}`);
+
+  // Third call with a candidate whose content has changed — must be a cache miss and trigger re-embed.
+  const changedCands = [
+    { ...cands[0]!, description: 'updated description' },
+    cands[1]!,
+  ];
+  await brain.route('q3', changedCands);
+  const afterThird = brain.getStats();
+  // The changed candidate must produce a new miss; unchanged candidate must hit.
+  assert.ok(afterThird.cacheMisses > afterSecond.cacheMisses, 'changed candidate description must invalidate cache (cache miss)');
+  assert.ok(afterThird.cacheHits > afterSecond.cacheHits, 'unchanged candidate must still hit cache');
 });
 
 // ── 6. getStats() ─────────────────────────────────────────────────────────────
@@ -407,6 +439,8 @@ test('route() Vectorize path: match not in live candidates reconstructed from me
   assert.equal(results![0]!.tool.description, 'ghost tool');
   // Production code must request metadata so ghost-tool reconstruction works.
   assert.equal(capturedQueryOptions?.returnMetadata, true, 'Vectorize query must include returnMetadata: true');
+  // topK must be at least the configured final topK so enough candidates can be returned.
+  assert.ok((capturedQueryOptions?.topK ?? 0) >= brain.config.topK, `Vectorize topK must be >= config.topK=${brain.config.topK}`);
 });
 
 // ── 8. indexCandidates() ──────────────────────────────────────────────────────
@@ -420,11 +454,16 @@ test('indexCandidates(): no-op without Vectorize binding and does not invoke Wor
   assert.equal(aiCalls, 0, 'AI.run() must not be called when there is no Vectorize binding');
 });
 
-test('indexCandidates(): no-op with empty candidates', async () => {
-  const vz = makeVectorize(async () => ({ matches: [] }));
+test('indexCandidates(): no-op with empty candidates and does not call Vectorize upsert', async () => {
+  let upsertCalls = 0;
+  const vz = {
+    query: async () => ({ matches: [] }),
+    upsert: async (items: unknown[]) => { upsertCalls++; return { count: (items as unknown[]).length }; },
+  } as unknown as VectorizeIndex;
   const brain = new WorkersAiBrain(makeEmbedAi(), vz);
   const n = await brain.indexCandidates([]);
   assert.equal(n, 0);
+  assert.equal(upsertCalls, 0, 'Vectorize.upsert() must not be called for empty candidates');
 });
 
 test('indexCandidates(): upserts correct count when Vectorize bound', async () => {
