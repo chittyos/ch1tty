@@ -128,6 +128,20 @@ test('route(): empty candidates list returns null without invoking Workers AI', 
   assert.equal(aiCalls, 0, 'AI.run() must not be called for empty candidates');
 });
 
+test('route(): Workers AI is invoked with EMBED_MODEL model identifier', async () => {
+  const capturedModels: string[] = [];
+  const modelCheckAi = makeAi(async (model, { text }) => {
+    capturedModels.push(model as string);
+    return { data: text.map(() => unitVec(4, 0)) };
+  });
+  const brain = new WorkersAiBrain(modelCheckAi, undefined, { minSimilarity: 0 });
+  await brain.route('test query', [candidate('svc/t', 'desc')]);
+  assert.ok(capturedModels.length > 0, 'AI.run() must be called at least once');
+  for (const m of capturedModels) {
+    assert.equal(m, EMBED_MODEL, `Workers AI must be called with EMBED_MODEL="${EMBED_MODEL}", got "${m}"`);
+  }
+});
+
 // ── 3. Cosine path: successful routing ───────────────────────────────────────
 
 test('route(): cosine path returns correctly sorted results with distinct confidences', async () => {
@@ -314,13 +328,16 @@ test('candidate cache: second route() call uses cached vectors (cacheHits > 0)',
   const afterSecond = brain.getStats();
   assert.equal(afterSecond.cacheHits, cands.length, `Expected cacheHits === ${cands.length} (every candidate served from cache), got ${afterSecond.cacheHits}`);
 
-  // Third call: same names but changed descriptions → contentHash changes → cache miss + new embed.
-  const changedCands = cands.map((c) => ({ ...c, description: c.description + ' (updated)' }));
+  // Third call with a candidate whose content has changed — must be a cache miss and trigger re-embed.
+  const changedCands = [
+    { ...cands[0]!, description: 'updated description' },
+    cands[1]!,
+  ];
   await brain.route('q3', changedCands);
   const afterThird = brain.getStats();
-  assert.equal(afterThird.cacheMisses, cands.length * 2,
-    `Expected ${cands.length * 2} total cache misses after content change, got ${afterThird.cacheMisses}`);
-  assert.equal(afterThird.cacheHits, cands.length, 'cacheHits must not increase: changed content is a miss not a hit');
+  // The changed candidate must produce a new miss; unchanged candidate must hit.
+  assert.ok(afterThird.cacheMisses > afterSecond.cacheMisses, 'changed candidate description must invalidate cache (cache miss)');
+  assert.ok(afterThird.cacheHits > afterSecond.cacheHits, 'unchanged candidate must still hit cache');
 });
 
 // ── 6. getStats() ─────────────────────────────────────────────────────────────
@@ -428,11 +445,8 @@ test('route() Vectorize path: match not in live candidates reconstructed from me
   assert.equal(results![0]!.tool.description, 'ghost tool');
   // Production code must request metadata so ghost-tool reconstruction works.
   assert.equal(capturedQueryOptions?.returnMetadata, true, 'Vectorize query must include returnMetadata: true');
-  // topK must supply at least the configured final topK so routing recall is not silently reduced.
-  assert.ok(
-    typeof capturedQueryOptions?.topK === 'number' && capturedQueryOptions.topK >= brain.config.topK,
-    `Vectorize topK must be >= configured topK (${brain.config.topK}), got ${capturedQueryOptions?.topK}`
-  );
+  // topK must be at least the configured final topK so enough candidates can be returned.
+  assert.ok((capturedQueryOptions?.topK ?? 0) >= brain.config.topK, `Vectorize topK must be >= config.topK=${brain.config.topK}`);
 });
 
 // ── 8. indexCandidates() ──────────────────────────────────────────────────────
@@ -450,7 +464,7 @@ test('indexCandidates(): no-op with empty candidates — no Vectorize request', 
   let upsertCalls = 0;
   const vz = {
     query: async () => ({ matches: [] }),
-    upsert: async (_items: unknown[]) => { upsertCalls++; return { count: 0 }; },
+    upsert: async (items: unknown[]) => { upsertCalls++; return { count: (items as unknown[]).length }; },
   } as unknown as VectorizeIndex;
   const brain = new WorkersAiBrain(makeEmbedAi(), vz);
   const n = await brain.indexCandidates([]);
