@@ -1107,6 +1107,7 @@ export class Aggregator {
       const oldBackends = new Map(this.backends);
       this.configs = newConfig.servers;
       this.rebuildBackends();
+      this.logStartupEnvWarnings();
       this.preWarmNonLazy();
 
       // Now shut down the old backends — log any rejected shutdowns (C5).
@@ -1125,12 +1126,14 @@ export class Aggregator {
       }
 
       const freshness = this.catalogFreshnessCheck();
+      const missingEnvVars = this.getMissingEnvVarDiagnostics();
       const result = {
         reloaded: true,
         added: added.map((c) => c.id),
         removed: removed.map((c) => c.id),
         totalServers: this.activeConfigs().length,
         catalog: freshness,
+        missingEnvVars: missingEnvVars.map(({ serverId, vars }) => ({ serverId, vars })),
         latencyMs: Date.now() - reloadStartMs,
       };
 
