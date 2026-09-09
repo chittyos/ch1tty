@@ -3742,3 +3742,13 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
 - **State summary**: PR #1183 — ALL bot findings fully addressed. CI green. 0 vulnerabilities. Awaiting human merge.
 - **PushNotification**: NOT SENT — merge-pending state unchanged; human already notified in run ~1531.
 - **Next run**: Watch for PR #1183 merge or new events.
+
+---
+### 2026-09-09T03:35 (run ~1533 — PR #1183 MERGED)
+- **Workstream**: Security (monitoring PR #1183)
+- **Outcome**: PR #1183 (`auto/security-deps-apps-worker-sep2026`) **MERGED** to main.
+- **Summary**: Security dependency update landed — fast-uri `>=3.1.7 <4`, qs `>=6.16.0 <7`, nanoid patched via `"postcss": { "nanoid": ">=3.3.18 <4" }` nested override. Final lockfile: nanoid@5.1.16 global (agents/partyserver), nanoid@3.3.18 nested (postcss). 0 vulnerabilities. GHSA-2v37 closed.
+- **Follow-up open**: Issue #1184 (agents@0.19.0 upgrade, low priority — 0 vulnerability impact).
+- **PR #1155** (Dependabot): still open, no conflict with #1183; human merge pending.
+- **PushNotification**: SENT — PR #1183 merged.
+- **Next run**: Resume normal monitoring cadence.
