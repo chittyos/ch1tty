@@ -3856,3 +3856,29 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   8. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
 - **PushNotification**: NOT SENT — PR #1196 is clean and ready; no new emergency or regression; human already aware of pending PRs from run ~1534 notification.
 - **Next run**: Watch PR #1196 for CI or review events. If merged, run `npm audit` to confirm clean main. All other workstreams done.
+
+---
+
+### 2026-09-09T~17:36 UTC (run ~1536 — PR #1196 MERGED; post-merge state clean)
+- **Workstream**: None — PR #1196 merge event received
+- **Branch/PR**: PR #1196 (`auto/H-workers-ai-brain-tests`) **MERGED** at ~17:35 UTC
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1836 pass / 0 fail / 3 skip (1839 total, 52 suites, ~59s) — +127 vs pre-merge (+26 from #1196 WorkersAiBrain + others merged concurrently)
+- **Guardrails**: 5-tool surface confirmed. `buildCastExplanation` metric freeze ACTIVE. 0 violations.
+- **Actions**:
+  - Received PR merged notification for #1196.
+  - `git pull origin main` — fast-forwarded (5 files: test/hhh-workers-ai-brain.test.ts + 3 other new test files merged simultaneously).
+  - `npm run build`: clean (tsc exit 0).
+  - `npm test`: 1836/0/3 (1839 total, 52 suites, ~59s). 0 failures. +127 tests vs run ~1535.
+  - `npm audit --omit=dev`: 0 vulnerabilities. All root + worker security overrides intact.
+  - PR #1196 is merged and unsubscribed automatically.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ + Security ✓ + WorkersAiBrain tests ✓ ALL DONE. Build: clean. Tests: 1836/0/3. **~1536th run. 0 open PRs tracked by this session.**
+- **Human-action items**:
+  1. **Disable or redirect hourly schedule** — 1536+ consecutive runs; all defined workstreams exhausted; schedule burns compute hourly.
+  2. **Deploy Workstream F phases** (Cloudflare): Create `Ch1ttyApiAgent` DO class + drain `Ch1ttyDO` instances.
+  3. **Review + merge PR #1155/#1190** (Dependabot — if still open).
+  4. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  5. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  6. **Stale branch cleanup** — automated weekly via `.github/workflows/cleanup-auto-branches.yml` (next Sunday 06:00 UTC).
+  7. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
+- **PushNotification**: SENT — PR #1196 merged; tests 1836/0/3 (+127); build clean; 0 vulns.
+- **Next run**: All workstreams done. Idle unless new PRs open or new workstreams defined.
