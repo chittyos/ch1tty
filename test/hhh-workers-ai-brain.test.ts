@@ -107,10 +107,13 @@ test('route(): disabled config returns null without invoking Workers AI', async 
   assert.equal(aiCalls, 0, 'AI.run() must not be called when enabled=false');
 });
 
-test('route(): empty query returns null', async () => {
-  const brain = new WorkersAiBrain(makeEmbedAi());
+test('route(): empty query returns null without invoking Workers AI', async () => {
+  let aiCalls = 0;
+  const countingAi = makeAi(async (_m, { text }) => { aiCalls++; return { data: text.map(() => unitVec(2, 0)) }; });
+  const brain = new WorkersAiBrain(countingAi);
   assert.equal(await brain.route('', [candidate('a/b', 'desc')]), null);
   assert.equal(await brain.route('   ', [candidate('a/b', 'desc')]), null);
+  assert.equal(aiCalls, 0, 'AI.run() must not be called for blank queries');
 });
 
 test('route(): empty candidates list returns null', async () => {
@@ -386,11 +389,15 @@ test('route() Vectorize path: match not in live candidates reconstructed from me
   const ai = makeAi(async (_m, { text }) => ({
     data: text.map(() => unitVec(4, 0)),
   }));
-  const vz = makeVectorize(async () => ({
-    matches: [
-      { id: 'svc/ghost', score: 0.95, metadata: { namespacedName: 'svc/ghost', description: 'ghost tool', category: 'other', serverName: 'svc' } },
-    ],
-  }));
+  let capturedQueryOptions: { topK?: number; returnMetadata?: boolean } | undefined;
+  const vz = makeVectorize(async (_vec, opts) => {
+    capturedQueryOptions = opts;
+    return {
+      matches: [
+        { id: 'svc/ghost', score: 0.95, metadata: { namespacedName: 'svc/ghost', description: 'ghost tool', category: 'other', serverName: 'svc' } },
+      ],
+    };
+  });
   const brain = new WorkersAiBrain(ai, vz, { minSimilarity: 0.5 });
   // 'svc/ghost' is NOT in the live candidates list.
   const results = await brain.route('q', [candidate('svc/tool-a', 'alpha')]);
@@ -398,14 +405,19 @@ test('route() Vectorize path: match not in live candidates reconstructed from me
   assert.ok(results !== null, 'vectorize match with score 0.95 > minSimilarity 0.5 must be non-null');
   assert.equal(results![0]!.tool.namespacedName, 'svc/ghost');
   assert.equal(results![0]!.tool.description, 'ghost tool');
+  // Production code must request metadata so ghost-tool reconstruction works.
+  assert.equal(capturedQueryOptions?.returnMetadata, true, 'Vectorize query must include returnMetadata: true');
 });
 
 // ── 8. indexCandidates() ──────────────────────────────────────────────────────
 
-test('indexCandidates(): no-op without Vectorize binding', async () => {
-  const brain = new WorkersAiBrain(makeEmbedAi());
+test('indexCandidates(): no-op without Vectorize binding and does not invoke Workers AI', async () => {
+  let aiCalls = 0;
+  const countingAi = makeAi(async (_m, { text }) => { aiCalls++; return { data: text.map(() => unitVec(2, 0)) }; });
+  const brain = new WorkersAiBrain(countingAi);
   const n = await brain.indexCandidates([candidate('s/t', 'd')]);
   assert.equal(n, 0);
+  assert.equal(aiCalls, 0, 'AI.run() must not be called when there is no Vectorize binding');
 });
 
 test('indexCandidates(): no-op with empty candidates', async () => {
