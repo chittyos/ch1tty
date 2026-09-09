@@ -3770,3 +3770,31 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
 - **State summary**: PR #1183 — ALL bot findings fully addressed. CI green. 0 vulnerabilities. Awaiting human merge.
 - **PushNotification**: NOT SENT — merge-pending state unchanged; human already notified in run ~1531.
 - **Next run**: Watch for PR #1183 merge or new events.
+
+---
+### 2026-09-09T~hourly (run ~1533 — Security: sharp 0.35.4, hono 4.13.5, vitest 4.1.11)
+- **Workstream**: Security (new vulnerabilities in wrangler→miniflare→sharp chain)
+- **Branch/PR**: `auto/security-sharp-0.35.4` → **PR #1191** (https://github.com/chittyos/ch1tty/pull/1191)
+- **Build**: clean (tsc exit 0) | **Tests**: 1709 pass / 0 fail / 3 skip (1712 total, 52 suites)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1709/0/3 (1712 total, 52 suites).
+  - Open PRs: #1190 (Dependabot comms-mcp), #1155 (Dependabot 6 dirs). PR #1183 confirmed merged.
+  - Found 3 high vulns in root: sharp@0.35.3 < 0.35.4 (GHSA-g89c-p67h-r497, GHSA-2jg2-4ch7-h545 via wrangler→miniflare→sharp).
+  - Found 3 moderate vulns in worker: hono@4.13.0 (3 CVEs, need >=4.13.5), vitest@4.1.10 (GHSA-82fw-gwwq-j7x9, need >=4.1.11).
+  - Fix: sharp override >=0.35.0 → >=0.35.4 in root + worker; hono ^4.12.34 → ^4.13.5; vitest ^4.1.8 → ^4.1.11 in worker.
+  - Worker lockfile regenerated with --legacy-peer-deps (npm arborist bug resolving vitest@4.1.11 peer deps).
+  - Result: npm audit 0 vulnerabilities in root AND worker. Tests unchanged: 1709/0/3.
+  - Committed c96ce59, pushed, opened PR #1191, subscribed to PR activity.
+- **State summary**: PR #1191 open (security fix, 0 vulns). Build clean. Tests 1709/0/3. All workstreams A–F+extensions DONE.
+- **Human-action items**:
+  1. **Review + merge PR #1191** — security fix, 0 vulns, tests green.
+  2. **Review + merge PR #1155/#1190** (Dependabot).
+  3. **Disable or redirect hourly schedule** — all workstreams exhausted.
+  4. **Deploy Workstream F phases** (Cloudflare).
+  5. **Set `GITHUB_MCP_AUTHORIZATION` on prod**.
+  6. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`).
+  7. **Stale branch cleanup** — 1100+ remote `auto/` branches.
+  8. **Rotate Notion token** if needed.
+- **PushNotification**: SENT — 3 high + 3 moderate vulns fixed; PR #1191 ready for review.
+- **Next run**: Watch for PR #1191 CI + review events. If merged, run audit to confirm clean main.
