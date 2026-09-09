@@ -1,0 +1,283 @@
+name: Cleanup stale auto/* branches
+
+on:
+  schedule:
+    # Run weekly on Sunday at 06:00 UTC
+    - cron: '0 6 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  cleanup:
+    name: Delete merged auto/* branches
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: cleanup-auto-branches
+      cancel-in-progress: false
+    steps:
+      - name: Delete stale auto/* branches
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo  = context.repo.repo;
+
+            // Track API requests consumed during listing so we can derive the
+            // per-branch processing budget from what's actually left.
+            let listRequests = 0;
+
+            // Collect all auto/* branches (paginated, up to 10,000).
+            let autoBranches = [];
+            for (let page = 1; ; page++) {
+              listRequests++;
+              const { data } = await github.rest.repos.listBranches({
+                owner, repo, per_page: 100, page,
+              });
+              autoBranches = autoBranches.concat(
+                data.filter(b => b.name.startsWith('auto/'))
+              );
+              if (data.length < 100) break;
+            }
+            core.info(`Found ${autoBranches.length} auto/* branches`);
+
+            // Collect all OPEN PR head AND base refs so we never delete an active branch.
+            // Only same-repo PRs: fork PRs share head-ref names but are unrelated to
+            // this repo's branches, so filter by head.repo.full_name to avoid shielding
+            // arbitrary branch names via a fork contributor's open PR.
+            const openHeads = new Set();
+            const openBases = new Set();
+            for (let page = 1; ; page++) {
+              listRequests++;
+              const { data } = await github.rest.pulls.list({
+                owner, repo, state: 'open', per_page: 100, page,
+              });
+              for (const pr of data) {
+                // Protect base branches unconditionally (stacked-PR safety).
+                openBases.add(pr.base.ref);
+                // Protect head branches only from this repo, not forks.
+                if (pr.head.repo?.full_name === `${owner}/${repo}`) {
+                  openHeads.add(pr.head.ref);
+                }
+              }
+              if (data.length < 100) break;
+            }
+            core.info(`${openHeads.size} open PR head refs protected (same-repo), ${openBases.size} base refs protected`);
+
+            // Pre-collect recently merged PR head refs + SHAs to detect squash-merged branches.
+            // Squash merges leave the branch ahead of main by commit ancestry, but the PR
+            // itself is merged. We store ref → sha (most-recent-merge-wins) to match the
+            // exact branch tip — avoiding false positives for reused names or re-pushed branches.
+            // Only PRs merged directly into main are considered (stacked PRs merged into a
+            // feature branch don't bring commits to main and must not be treated as safe).
+            // Rate cost: up to 10 requests for ~1,000 closed PRs.
+            const mergedHeads = new Map(); // ref → { sha, mergedAt } — most-recently-merged wins
+            for (let page = 1; page <= 10; page++) {
+              listRequests++;
+              const { data } = await github.rest.pulls.list({
+                owner, repo, state: 'closed', sort: 'updated', direction: 'desc',
+                per_page: 100, page,
+              });
+              for (const pr of data) {
+                if (
+                  pr.merged_at !== null &&
+                  pr.base.ref === 'main' &&                          // must reach main
+                  pr.head.repo?.full_name === `${owner}/${repo}`     // not a fork
+                ) {
+                  const existing = mergedHeads.get(pr.head.ref);
+                  // Keep the most-recently-merged entry; sort:updated doesn't guarantee
+                  // merge order (a later comment can bump an older PR's updated_at).
+                  if (!existing || pr.merged_at > existing.mergedAt) {
+                    mergedHeads.set(pr.head.ref, { sha: pr.head.sha, mergedAt: pr.merged_at });
+                  }
+                }
+              }
+              if (data.length < 100) break;
+            }
+            core.info(`${mergedHeads.size} recently merged PR head refs collected (squash-merge detection, most-recently-merged SHA wins, up to 1,000 closed PRs scanned)`);
+
+            // Candidates: not an open head, not an open base.
+            const candidates = autoBranches.filter(
+              b => !openHeads.has(b.name) && !openBases.has(b.name)
+            );
+            core.info(`${candidates.length} candidates after open-PR filter`);
+
+            // Budget guard: derive batch size from remaining capacity after listing.
+            // Each candidate costs at most 3 requests: compare + getRef/targeted + delete.
+            // Cap at 320 to bound worst-case processing time (a full 320×3 = 960 req batch).
+            core.info(`Listing consumed ${listRequests} requests`);
+            // Per-branch worst-case: compare + pulls.list (targeted path) + getRef + delete = 4 requests.
+            const MAX_PROCESS = Math.max(0, Math.min(320, Math.floor((1000 - listRequests) / 4)));
+
+            // Rotate the batch window by week epoch so persistent non-deletable
+            // branches don't block later candidates indefinitely across runs.
+            const weekEpoch = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
+            const rotateBy = candidates.length > 0
+              ? (weekEpoch * MAX_PROCESS) % candidates.length
+              : 0;
+            const rotated = [...candidates.slice(rotateBy), ...candidates.slice(0, rotateBy)];
+            const batch = rotated.slice(0, MAX_PROCESS);
+            const deferred = candidates.length - batch.length;
+            if (deferred > 0) {
+              core.info(`Rate-limit cap: processing ${batch.length} of ${candidates.length} candidates; ${deferred} deferred to next run (rotation offset: ${rotateBy})`);
+            }
+
+            let deleted = 0;
+            let skippedUnmerged = 0;
+            let skippedError = 0;
+            for (const branch of batch) {
+              // Determine whether the branch is safe to delete:
+              //   1. ahead_by === 0: commits are ancestors of main (regular merge).
+              //      Live-tip revalidated via getRef before deleteRef (TOCTOU guard).
+              //   2. ahead_by > 0 but branch SHA matched a merged PR into main:
+              //      squash-merged — SHA check prevents false positives for reused names.
+              //      Live-tip check (from cmp.commits) prevents TOCTOU data loss when
+              //      commits are pushed to a squash-merged branch during this run.
+              //   3. ahead_by > 0, not in pre-fetch window: targeted per-branch lookup.
+              let aheadBy;
+              let cmp;
+              try {
+                ({ data: cmp } = await github.rest.repos.compareCommitsWithBasehead({
+                  owner, repo, basehead: `main...${branch.name}`,
+                }));
+                aheadBy = cmp.ahead_by;
+              } catch (err) {
+                core.warning(`Could not compare ${branch.name}: ${err.message}`);
+                skippedError++;
+                continue;
+              }
+
+              if (aheadBy > 0) {
+                // Extract the live branch tip from the comparison's commit list.
+                // cmp.commits is complete (not truncated) when its length equals ahead_by.
+                // When truncated (>250 ahead), liveTipSha is null → conservative skip.
+                const liveTipSha = cmp.commits.length > 0 && cmp.commits.length === aheadBy
+                  ? cmp.commits[cmp.commits.length - 1].sha
+                  : null;
+
+                const mergedSha = mergedHeads.get(branch.name)?.sha;
+                let squashMerged = false;
+
+                if (mergedSha === branch.commit.sha) {
+                  // SHA-matched squash merge in pre-fetch window.
+                  // Verify the live tip hasn't drifted since listBranches (TOCTOU guard).
+                  if (liveTipSha === null) {
+                    core.info(`SKIP  ${branch.name} (squash-merge matched but >250 ahead commits, cannot verify live tip)`);
+                    skippedUnmerged++;
+                    continue;
+                  }
+                  if (liveTipSha !== branch.commit.sha) {
+                    core.info(`SKIP  ${branch.name} (branch moved during run: live=${liveTipSha.slice(0,7)} vs snapshot=${branch.commit.sha.slice(0,7)})`);
+                    skippedUnmerged++;
+                    continue;
+                  }
+                  squashMerged = true;
+                } else {
+                  // Not in pre-fetch window (or SHA mismatch). Try a targeted lookup
+                  // for older squash-merged branches beyond the ~1,000-PR window.
+                  // Reuse the same live-tip guard: if the branch moved, skip.
+                  if (liveTipSha === null) {
+                    core.info(`SKIP  ${branch.name} (${aheadBy} commits ahead, >250 ahead — skipping targeted lookup)`);
+                    skippedUnmerged++;
+                    continue;
+                  }
+                  if (liveTipSha !== branch.commit.sha) {
+                    core.info(`SKIP  ${branch.name} (branch moved during run: live=${liveTipSha.slice(0,7)} vs snapshot=${branch.commit.sha.slice(0,7)})`);
+                    skippedUnmerged++;
+                    continue;
+                  }
+                  try {
+                    // Check up to 10 closed PRs for this branch; any one merged into
+                    // main with matching SHA qualifies (handles multiple closed PRs).
+                    const { data: closedPRs } = await github.rest.pulls.list({
+                      owner, repo, state: 'closed',
+                      head: `${owner}:${branch.name}`,
+                      per_page: 10,
+                    });
+                    squashMerged = closedPRs.some(
+                      pr =>
+                        pr.merged_at !== null &&
+                        pr.base.ref === 'main' &&           // must have reached main
+                        pr.head.sha === branch.commit.sha   // exact SHA match
+                    );
+                  } catch (err) {
+                    core.warning(`Could not check merged PRs for ${branch.name}: ${err.message}`);
+                    skippedError++;
+                    continue;
+                  }
+                  if (!squashMerged) {
+                    core.info(`SKIP  ${branch.name} (${aheadBy} unmerged commits, no merged PR into main found)`);
+                    skippedUnmerged++;
+                    continue;
+                  }
+                  // TOCTOU guard for targeted path: a push during the pulls.list call above
+                  // is not caught by the earlier liveTipSha check (which predates the call).
+                  // Revalidate the live tip before deleting.
+                  let liveRefTargeted;
+                  try {
+                    ({ data: liveRefTargeted } = await github.rest.git.getRef({
+                      owner, repo, ref: `heads/${branch.name}`,
+                    }));
+                  } catch (err) {
+                    core.warning(`Could not verify live tip for ${branch.name}: ${err.message}`);
+                    skippedError++;
+                    continue;
+                  }
+                  if (liveRefTargeted.object.sha !== branch.commit.sha) {
+                    core.info(`SKIP  ${branch.name} (branch moved during targeted lookup: live=${liveRefTargeted.object.sha.slice(0,7)} vs snapshot=${branch.commit.sha.slice(0,7)})`);
+                    skippedUnmerged++;
+                    continue;
+                  }
+                }
+              }
+
+              // TOCTOU guard for regular merges (aheadBy === 0).
+              // For squash-merged branches (aheadBy > 0), the live tip was already
+              // verified via cmp.commits above. When aheadBy === 0, cmp.commits is
+              // empty, so a getRef is needed to detect commits pushed between the
+              // compareCommitsWithBasehead call and the deleteRef.
+              if (aheadBy === 0) {
+                let liveRef;
+                try {
+                  ({ data: liveRef } = await github.rest.git.getRef({
+                    owner, repo, ref: `heads/${branch.name}`,
+                  }));
+                } catch (err) {
+                  core.warning(`Could not verify live tip for ${branch.name}: ${err.message}`);
+                  skippedError++;
+                  continue;
+                }
+                if (liveRef.object.sha !== branch.commit.sha) {
+                  core.info(`SKIP  ${branch.name} (branch moved during run: live=${liveRef.object.sha.slice(0,7)} vs snapshot=${branch.commit.sha.slice(0,7)})`);
+                  skippedUnmerged++;
+                  continue;
+                }
+              }
+
+              try {
+                await github.rest.git.deleteRef({
+                  owner, repo, ref: `heads/${branch.name}`,
+                });
+                const reason = aheadBy > 0 ? 'squash-merged' : 'merged';
+                core.info(`DEL   ${branch.name} (${reason})`);
+                deleted++;
+              } catch (err) {
+                core.warning(`Could not delete ${branch.name}: ${err.message}`);
+                skippedError++;
+              }
+            }
+
+            const summary =
+              `## auto/* branch cleanup\n` +
+              `| | Count |\n|---|---|\n` +
+              `| Deleted (merged or squash-merged into main) | **${deleted}** |\n` +
+              `| Skipped (open PR — head or base) | ${autoBranches.length - candidates.length} |\n` +
+              `| Skipped (unmerged commits, no merged PR into main) | ${skippedUnmerged} |\n` +
+              `| Skipped (compare/delete error) | ${skippedError} |\n` +
+              `| Deferred to next run (rate-limit cap) | ${deferred} |\n`;
+            core.summary.addRaw(summary);
+            await core.summary.write();
+            core.info(`Done — deleted ${deleted}, unmerged-skip ${skippedUnmerged}, error-skip ${skippedError}, deferred ${deferred}`);
