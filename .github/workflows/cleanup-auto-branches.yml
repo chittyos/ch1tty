@@ -22,7 +22,7 @@ jobs:
             const owner = context.repo.owner;
             const repo  = context.repo.repo;
 
-            // Collect all auto/* branches (paginated, up to 1000).
+            // Collect all auto/* branches (paginated, up to 10,000).
             let autoBranches = [];
             for (let page = 1; ; page++) {
               const { data } = await github.rest.repos.listBranches({
@@ -35,23 +35,65 @@ jobs:
             }
             core.info(`Found ${autoBranches.length} auto/* branches`);
 
-            // Collect all OPEN PR head refs so we never delete an active branch.
+            // Collect all OPEN PR head AND base refs so we never delete an active branch.
+            // Only same-repo PRs: fork PRs share head-ref names but are unrelated to
+            // this repo's branches, so filter by head.repo.full_name to avoid shielding
+            // arbitrary branch names via a fork contributor's open PR.
             const openHeads = new Set();
+            const openBases = new Set();
             for (let page = 1; ; page++) {
               const { data } = await github.rest.pulls.list({
                 owner, repo, state: 'open', per_page: 100, page,
               });
-              for (const pr of data) openHeads.add(pr.head.ref);
+              for (const pr of data) {
+                // Protect base branches unconditionally (stacked-PR safety).
+                openBases.add(pr.base.ref);
+                // Protect head branches only from this repo, not forks.
+                if (pr.head.repo?.full_name === `${owner}/${repo}`) {
+                  openHeads.add(pr.head.ref);
+                }
+              }
               if (data.length < 100) break;
             }
-            core.info(`${openHeads.size} open PR head refs protected`);
+            core.info(`${openHeads.size} open PR head refs protected (same-repo), ${openBases.size} base refs protected`);
+
+            // Candidates: not an open head, not an open base.
+            const candidates = autoBranches.filter(
+              b => !openHeads.has(b.name) && !openBases.has(b.name)
+            );
+            core.info(`${candidates.length} candidates after open-PR filter`);
+
+            // Budget guard: leave room for compare + delete calls within the
+            // 1,000 req/hr GITHUB_TOKEN limit (12 req already used for listing).
+            // Each candidate needs one compare call; each delete is one more.
+            // Cap at 400 candidates processed per run → ≤ 812 total requests.
+            const MAX_PROCESS = 400;
+            const batch = candidates.slice(0, MAX_PROCESS);
+            const deferred = candidates.length - batch.length;
+            if (deferred > 0) {
+              core.info(`Rate-limit cap: processing ${batch.length} of ${candidates.length} candidates; ${deferred} deferred to next run`);
+            }
 
             let deleted = 0;
-            let skipped = 0;
-            for (const branch of autoBranches) {
-              if (openHeads.has(branch.name)) {
-                core.info(`SKIP  ${branch.name} (open PR)`);
-                skipped++;
+            let skippedUnmerged = 0;
+            let skippedError = 0;
+            for (const branch of batch) {
+              // Only delete branches whose commits are fully merged into main.
+              // compare main...branch: ahead_by = 0 means branch adds nothing new.
+              let aheadBy;
+              try {
+                const { data: cmp } = await github.rest.repos.compareCommitsWithBasehead({
+                  owner, repo, basehead: `main...${branch.name}`,
+                });
+                aheadBy = cmp.ahead_by;
+              } catch (err) {
+                core.warning(`Could not compare ${branch.name}: ${err.message}`);
+                skippedError++;
+                continue;
+              }
+              if (aheadBy > 0) {
+                core.info(`SKIP  ${branch.name} (${aheadBy} unmerged commits)`);
+                skippedUnmerged++;
                 continue;
               }
               try {
@@ -62,13 +104,18 @@ jobs:
                 deleted++;
               } catch (err) {
                 core.warning(`Could not delete ${branch.name}: ${err.message}`);
+                skippedError++;
               }
             }
 
-            core.info(`Done — deleted ${deleted}, skipped ${skipped} (open PRs)`);
-            core.summary.addRaw(
+            const summary =
               `## auto/* branch cleanup\n` +
-              `- **Deleted:** ${deleted}\n` +
-              `- **Skipped (open PR):** ${skipped}\n`
-            );
+              `| | Count |\n|---|---|\n` +
+              `| Deleted (merged) | **${deleted}** |\n` +
+              `| Skipped (open PR — head or base) | ${autoBranches.length - candidates.length} |\n` +
+              `| Skipped (unmerged commits) | ${skippedUnmerged} |\n` +
+              `| Skipped (compare/delete error) | ${skippedError} |\n` +
+              `| Deferred to next run (rate-limit cap) | ${deferred} |\n`;
+            core.summary.addRaw(summary);
             await core.summary.write();
+            core.info(`Done — deleted ${deleted}, unmerged-skip ${skippedUnmerged}, error-skip ${skippedError}, deferred ${deferred}`);
