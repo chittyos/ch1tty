@@ -22,7 +22,13 @@ import { Evaluator } from '../src/evaluator.js';
 type SqlCursor<T> = { toArray(): T[] };
 type SqlValue = string | number | null | boolean | bigint | ArrayBuffer;
 
-function makeSqlStorage(): { exec<T>(sql: string, ...v: SqlValue[]): SqlCursor<T> } {
+type Shim = {
+  exec<T>(sql: string, ...v: SqlValue[]): SqlCursor<T>;
+  /** Direct SELECT for test assertions — bypasses the SqlStorage cast. */
+  query<T>(sql: string, ...v: SqlValue[]): T[];
+};
+
+function makeSqlStorage(): Shim {
   const db = new DatabaseSync(':memory:');
   return {
     exec<T>(sql: string, ...values: SqlValue[]): SqlCursor<T> {
@@ -41,6 +47,10 @@ function makeSqlStorage(): { exec<T>(sql: string, ...v: SqlValue[]): SqlCursor<T
       }
       db.prepare(trimmed).run(...values);
       return { toArray: () => [] as T[] };
+    },
+    query<T>(sql: string, ...values: SqlValue[]): T[] {
+      const stmt = db.prepare(sql);
+      return (values.length > 0 ? stmt.all(...values) : stmt.all()) as T[];
     },
   };
 }
@@ -378,8 +388,12 @@ test('Evaluator: measure() records ok=true when fn resolves normally', async () 
   const sql = makeSqlStorage();
   const ev = new Evaluator(sql as unknown as SqlStorage);
   await ev.measure('search', async () => 42);
-  // buffered = 1 → record was called
   assert.equal(ev.getStats().buffered, 1);
+  // verify the persisted ok flag
+  const rows = sql.query<{ ok: number; route: string }>('SELECT ok, route FROM evaluator WHERE flushed = 0');
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].ok, 1, 'ok should be 1 (true) when fn resolves');
+  assert.equal(rows[0].route, 'search');
 });
 
 test('Evaluator: measure() records even when fn throws (finally block)', async () => {
@@ -395,6 +409,10 @@ test('Evaluator: measure() uses isOk callback to determine ok flag', async () =>
   const ev = new Evaluator(sql as unknown as SqlStorage);
   // isOk returns false → record with ok=false
   await ev.measure('cast', async () => ({ isError: true }), undefined, (v) => !v.isError);
+  // verify ok=0 before flushing
+  const rows = sql.query<{ ok: number }>('SELECT ok FROM evaluator WHERE flushed = 0');
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].ok, 0, 'ok should be 0 (false) when isOk returns false');
   const n = await ev.flush();
   assert.equal(n, 1);
 });
@@ -403,7 +421,14 @@ test('Evaluator: measure() passes server/capability meta to record', async () =>
   const sql = makeSqlStorage();
   const ev = new Evaluator(sql as unknown as SqlStorage);
   await ev.measure('execute', async () => 'ok', { server: 'neon', capability: 'run_sql' });
-  // verify we can flush the row (proves it was stored)
+  // verify server and capability are persisted
+  const rows = sql.query<{ server: string | null; capability: string | null; ok: number }>(
+    'SELECT server, capability, ok FROM evaluator WHERE flushed = 0',
+  );
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].server, 'neon');
+  assert.equal(rows[0].capability, 'run_sql');
+  assert.equal(rows[0].ok, 1);
   const n = await ev.flush();
   assert.equal(n, 1);
 });
@@ -420,7 +445,10 @@ test('Evaluator: latency_ms is rounded to nearest int by record()', async () => 
   const sql = makeSqlStorage();
   const ev = new Evaluator(sql as unknown as SqlStorage);
   ev.record({ ts: 1000, route: 'search', latency_ms: 4.7, ok: true });
-  // flush reads it back and emits it via console.log — just verify it doesn't throw
+  // verify latency_ms stored as 5 (rounded from 4.7) before flushing
+  const rows = sql.query<{ latency_ms: number }>('SELECT latency_ms FROM evaluator WHERE flushed = 0');
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].latency_ms, 5, 'latency_ms 4.7 should round to 5');
   const n = await ev.flush();
   assert.equal(n, 1);
 });
