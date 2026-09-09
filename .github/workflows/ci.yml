@@ -39,6 +39,7 @@ jobs:
         run: node -e "JSON.parse(require(\"fs\").readFileSync(\"servers.json\",\"utf8\")); console.log(\"servers.json: valid\")"
 
   apps-build-and-test:
+    if: github.event.deleted != true
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -68,6 +69,7 @@ jobs:
         run: npm test
 
   security:
+    if: github.event.deleted != true
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

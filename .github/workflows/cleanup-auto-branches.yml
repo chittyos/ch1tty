@@ -109,7 +109,8 @@ jobs:
             // Each candidate costs at most 3 requests: compare + getRef/targeted + delete.
             // Cap at 320 to bound worst-case processing time (a full 320×3 = 960 req batch).
             core.info(`Listing consumed ${listRequests} requests`);
-            const MAX_PROCESS = Math.max(0, Math.min(320, Math.floor((1000 - listRequests) / 3)));
+            // Per-branch worst-case: compare + pulls.list (targeted path) + getRef + delete = 4 requests.
+            const MAX_PROCESS = Math.max(0, Math.min(320, Math.floor((1000 - listRequests) / 4)));
 
             // Rotate the batch window by week epoch so persistent non-deletable
             // branches don't block later candidates indefinitely across runs.
