@@ -157,7 +157,8 @@ test('route(): clips results to topK', async () => {
   const candidates = Array.from({ length: 5 }, (_, i) => candidate(`svc/tool-${i}`, `desc ${i}`));
   const results = await brain.route('query', candidates);
   assert.ok(results !== null);
-  assert.ok(results!.length <= 2, `Expected <= topK=2, got ${results!.length}`);
+  // All 5 candidates match (sim=1 ≥ minSimilarity=0); topK=2 clips to exactly 2.
+  assert.equal(results!.length, 2, `Expected exactly topK=2, got ${results!.length}`);
 });
 
 test('route(): below minSimilarity → null (emptyResults++)', async () => {
@@ -423,11 +424,14 @@ test('indexCandidates(): upserts correct count when Vectorize bound', async () =
   const n = await brain.indexCandidates(cands);
   assert.equal(n, 3);
   assert.equal(upserted.length, 3);
-  // Each upserted item should have id=namespacedName and metadata.
-  for (const item of upserted as Array<{ id: string; values: number[]; metadata: Record<string, string> }>) {
-    assert.ok(typeof item.id === 'string');
-    assert.ok(Array.isArray(item.values));
-    assert.ok(typeof item.metadata.namespacedName === 'string');
+  // Each upserted item must match its candidate: id === namespacedName, non-empty values vector.
+  const sorted = (upserted as Array<{ id: string; values: number[]; metadata: Record<string, string> }>)
+    .sort((a, b) => a.id.localeCompare(b.id));
+  const sortedCands = [...cands].sort((a, b) => a.namespacedName.localeCompare(b.namespacedName));
+  for (let i = 0; i < sortedCands.length; i++) {
+    assert.equal(sorted[i]!.id, sortedCands[i]!.namespacedName, `upserted id must match candidate namespacedName`);
+    assert.ok(Array.isArray(sorted[i]!.values) && sorted[i]!.values.length > 0, 'values must be non-empty');
+    assert.equal(sorted[i]!.metadata.namespacedName, sortedCands[i]!.namespacedName, 'metadata.namespacedName must match');
   }
 });
 
