@@ -62,11 +62,11 @@ jobs:
             core.info(`${openHeads.size} open PR head refs protected (same-repo), ${openBases.size} base refs protected`);
 
             // Pre-collect recently merged PR head refs + SHAs to detect squash-merged branches.
-            // Squash merges produce a single commit on main that is not an ancestor of the
-            // branch tip, so compareCommitsWithBasehead reports ahead_by > 0 even though
-            // the PR was merged. We store ref → sha (most-recent merge wins via first-seen)
-            // so we can match the exact branch tip SHA, avoiding false positives when a
-            // branch is later reused or receives new commits after its squash merge.
+            // Squash merges leave the branch ahead of main by commit ancestry, but the PR
+            // itself is merged. We store ref → sha (most-recent-merge-wins) to match the
+            // exact branch tip — avoiding false positives for reused names or re-pushed branches.
+            // Only PRs merged directly into main are considered (stacked PRs merged into a
+            // feature branch don't bring commits to main and must not be treated as safe).
             // Rate cost: up to 10 requests for ~1,000 closed PRs.
             const mergedHeads = new Map(); // ref → head.sha at merge time
             for (let page = 1; page <= 10; page++) {
@@ -77,8 +77,9 @@ jobs:
               for (const pr of data) {
                 if (
                   pr.merged_at !== null &&
-                  pr.head.repo?.full_name === `${owner}/${repo}` &&
-                  !mergedHeads.has(pr.head.ref) // first-seen = most recent merge
+                  pr.base.ref === 'main' &&                          // must reach main
+                  pr.head.repo?.full_name === `${owner}/${repo}` &&  // not a fork
+                  !mergedHeads.has(pr.head.ref)                      // most-recent merge wins
                 ) {
                   mergedHeads.set(pr.head.ref, pr.head.sha);
                 }
@@ -95,15 +96,12 @@ jobs:
 
             // Budget guard: leave room for compare + targeted + delete calls within the
             // 1,000 req/hr GITHUB_TOKEN limit (~34 req already used for listing).
-            // Each candidate: one compare; each targeted lookup: one; each delete: one.
             // MAX_PROCESS=400, MAX_TARGETED=100 → worst-case 934 total requests.
             const MAX_PROCESS = 400;
             const MAX_TARGETED = 100; // per-branch PR lookups for older squash-merged branches
 
             // Rotate the batch window by week epoch so persistent non-deletable
-            // branches (truly unmerged) don't block later candidates indefinitely.
-            // Each run processes a different slice of the candidate list — over
-            // enough weeks every candidate is inspected without persistent state.
+            // branches don't block later candidates indefinitely across runs.
             const weekEpoch = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
             const rotateBy = candidates.length > 0
               ? (weekEpoch * MAX_PROCESS) % candidates.length
@@ -122,16 +120,17 @@ jobs:
             for (const branch of batch) {
               // Determine whether the branch is safe to delete:
               //   1. ahead_by === 0: commits are ancestors of main (regular merge).
-              //   2. ahead_by > 0 but branch.commit.sha matches the recorded merge SHA:
-              //      squash-merged PR — SHA check prevents false positives when the branch
-              //      is reused or receives new commits after its PR was squash-merged.
-              //   3. ahead_by > 0, not in pre-fetch window: targeted per-branch PR lookup
-              //      (catches squash-merged branches older than the ~1,000-PR window).
+              //   2. ahead_by > 0 but branch SHA matched a merged PR into main:
+              //      squash-merged — SHA check prevents false positives for reused names.
+              //      Live-tip check (from cmp.commits) prevents TOCTOU data loss when
+              //      commits are pushed to a squash-merged branch during this run.
+              //   3. ahead_by > 0, not in pre-fetch window: targeted per-branch lookup.
               let aheadBy;
+              let cmp;
               try {
-                const { data: cmp } = await github.rest.repos.compareCommitsWithBasehead({
+                ({ data: cmp } = await github.rest.repos.compareCommitsWithBasehead({
                   owner, repo, basehead: `main...${branch.name}`,
-                });
+                }));
                 aheadBy = cmp.ahead_by;
               } catch (err) {
                 core.warning(`Could not compare ${branch.name}: ${err.message}`);
@@ -140,32 +139,67 @@ jobs:
               }
 
               if (aheadBy > 0) {
+                // Extract the live branch tip from the comparison's commit list.
+                // cmp.commits is complete (not truncated) when its length equals ahead_by.
+                // When truncated (>250 ahead), liveTipSha is null → conservative skip.
+                const liveTipSha = cmp.commits.length > 0 && cmp.commits.length === aheadBy
+                  ? cmp.commits[cmp.commits.length - 1].sha
+                  : null;
+
                 const mergedSha = mergedHeads.get(branch.name);
+                let squashMerged = false;
+
                 if (mergedSha === branch.commit.sha) {
-                  // SHA-matched squash merge in pre-fetch window — safe to delete.
+                  // SHA-matched squash merge in pre-fetch window.
+                  // Verify the live tip hasn't drifted since listBranches (TOCTOU guard).
+                  if (liveTipSha === null) {
+                    core.info(`SKIP  ${branch.name} (squash-merge matched but >250 ahead commits, cannot verify live tip)`);
+                    skippedUnmerged++;
+                    continue;
+                  }
+                  if (liveTipSha !== branch.commit.sha) {
+                    core.info(`SKIP  ${branch.name} (branch moved during run: live=${liveTipSha.slice(0,7)} vs snapshot=${branch.commit.sha.slice(0,7)})`);
+                    skippedUnmerged++;
+                    continue;
+                  }
+                  squashMerged = true;
                 } else if (targeted < MAX_TARGETED) {
                   // Not in pre-fetch window (or SHA mismatch). Try a targeted lookup
-                  // to catch older squash-merged branches beyond the ~1,000-PR window.
+                  // for older squash-merged branches beyond the ~1,000-PR window.
+                  // Reuse the same live-tip guard: if the branch moved, skip.
+                  if (liveTipSha === null) {
+                    core.info(`SKIP  ${branch.name} (${aheadBy} commits ahead, >250 ahead — skipping targeted lookup)`);
+                    skippedUnmerged++;
+                    continue;
+                  }
+                  if (liveTipSha !== branch.commit.sha) {
+                    core.info(`SKIP  ${branch.name} (branch moved during run: live=${liveTipSha.slice(0,7)} vs snapshot=${branch.commit.sha.slice(0,7)})`);
+                    skippedUnmerged++;
+                    continue;
+                  }
                   targeted++;
-                  let squashMerged = false;
                   try {
+                    // Check up to 10 closed PRs for this branch; any one merged into
+                    // main with matching SHA qualifies (handles multiple closed PRs).
                     const { data: closedPRs } = await github.rest.pulls.list({
                       owner, repo, state: 'closed',
                       head: `${owner}:${branch.name}`,
-                      per_page: 1,
+                      per_page: 10,
                     });
                     squashMerged = closedPRs.some(
-                      pr => pr.merged_at !== null && pr.head.sha === branch.commit.sha
+                      pr =>
+                        pr.merged_at !== null &&
+                        pr.base.ref === 'main' &&           // must have reached main
+                        pr.head.sha === branch.commit.sha   // exact SHA match
                     );
                   } catch (err) {
                     core.warning(`Could not check merged PRs for ${branch.name}: ${err.message}`);
                   }
                   if (!squashMerged) {
-                    core.info(`SKIP  ${branch.name} (${aheadBy} unmerged commits, no merged PR found)`);
+                    core.info(`SKIP  ${branch.name} (${aheadBy} unmerged commits, no merged PR into main found)`);
                     skippedUnmerged++;
                     continue;
                   }
-                  // squashMerged === true — fall through to delete.
                 } else {
                   // Targeted-lookup budget exhausted; conservatively skip.
                   core.info(`SKIP  ${branch.name} (${aheadBy} unmerged commits, targeted-lookup budget exhausted)`);
@@ -190,9 +224,9 @@ jobs:
             const summary =
               `## auto/* branch cleanup\n` +
               `| | Count |\n|---|---|\n` +
-              `| Deleted (merged or squash-merged) | **${deleted}** |\n` +
+              `| Deleted (merged or squash-merged into main) | **${deleted}** |\n` +
               `| Skipped (open PR — head or base) | ${autoBranches.length - candidates.length} |\n` +
-              `| Skipped (unmerged commits, no merged PR) | ${skippedUnmerged} |\n` +
+              `| Skipped (unmerged commits, no merged PR into main) | ${skippedUnmerged} |\n` +
               `| Skipped (compare/delete error) | ${skippedError} |\n` +
               `| Deferred to next run (rate-limit cap) | ${deferred} |\n`;
             core.summary.addRaw(summary);
