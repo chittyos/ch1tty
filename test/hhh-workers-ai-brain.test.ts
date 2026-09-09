@@ -192,20 +192,20 @@ test('route(): clips results to topK', async () => {
 
 test('route(): below minSimilarity → null (emptyResults++)', async () => {
   // embedSingle (query) and ensureCandidateVectors (candidates) are separate AI calls made
-  // in sequence via Promise.all. We assign slot 0 to all queries and slot 2 to the candidate
-  // so they are always orthogonal (dot=0 < minSimilarity=0.99 → null) — including in repeated
-  // loop calls where the candidate is already cached and only the query is re-embedded.
+  // in sequence via Promise.all. We track call number so query gets slot 0 and candidates
+  // get slot 1 — producing orthogonal unit vectors → dot=0 < minSimilarity=0.99 → null.
+  // Call 0 = query → slot 0 = unitVec(3,0). Call 1 = candidate → slot 1 = unitVec(3,1). Orthogonal.
+  // Subsequent routes only embed the query (candidate is cached); we pin those to slot 0
+  // so every query stays orthogonal to the cached candidate (unitVec(3,1)).
   let callNum = 0;
   const orthoAi = makeAi(async (_m, { text }) => {
-    // Call 0 = query (embedSingle), call 1 = candidate (ensureCandidateVectors, first route only).
-    // Subsequent calls are always query-only (candidate cached); all get slot 0.
-    const slot = callNum === 1 ? 2 : 0;
+    const slot = callNum < 2 ? callNum : 0;
     callNum++;
     return { data: text.map(() => unitVec(3, slot)) };
   });
   const brain = new WorkersAiBrain(orthoAi, undefined, { minSimilarity: 0.99 });
-  const result = await brain.route('q', [candidate('s/t', 'desc')]);
-  assert.equal(result, null, 'orthogonal vectors must be below minSimilarity=0.99 → null');
+  const r1 = await brain.route('q', [candidate('s/t', 'desc')]);
+  assert.equal(r1, null, 'orthogonal vectors must be below minSimilarity=0.99 → null');
   assert.equal(brain.getStats().emptyResults, 1, 'emptyResults must be 1 after below-threshold route');
   // Repeat through configured threshold — every repeated call must also return null (orthogonal
   // query vs cached candidate), and empty/low-similarity results must never trip the circuit breaker.
@@ -318,9 +318,9 @@ test('circuit breaker: half-open probe — only one concurrent probe allowed', a
 // ── 5. Candidate vector cache ─────────────────────────────────────────────────
 
 test('candidate cache: second route() call uses cached vectors (cacheHits > 0)', async () => {
-  let totalAiCalls = 0;
+  const batchSizes: number[] = [];
   const ai = makeAi(async (_m, { text }) => {
-    totalAiCalls++;
+    batchSizes.push(text.length);
     return { data: text.map(() => unitVec(4, 0)) };
   });
   const brain = new WorkersAiBrain(ai, undefined, { minSimilarity: 0 });
@@ -331,14 +331,17 @@ test('candidate cache: second route() call uses cached vectors (cacheHits > 0)',
   const afterFirst = brain.getStats();
   assert.equal(afterFirst.cacheMisses, cands.length, 'all candidates are cache misses on first call');
   assert.equal(afterFirst.cacheSize, cands.length, 'cache populated');
+  // First route must make exactly 2 AI.run() calls: one for the query (batch 1) and one for the candidates.
+  assert.equal(batchSizes.length, 2, 'first route() must trigger 2 AI.run() calls (query + candidates)');
+  assert.ok(batchSizes.includes(1) && batchSizes.includes(cands.length), 'first route AI calls must include a query batch (size 1) and a candidate batch');
 
   // Second call with same candidates — should hit cache.
-  const aiCallsAfterFirst = totalAiCalls;
   await brain.route('q2', cands);
   const afterSecond = brain.getStats();
   assert.equal(afterSecond.cacheHits, cands.length, `Expected cacheHits === ${cands.length} (every candidate served from cache), got ${afterSecond.cacheHits}`);
-  // Cache hits must skip re-embedding candidates: second route must call AI exactly once (query only).
-  assert.equal(totalAiCalls - aiCallsAfterFirst, 1, 'second route must embed only the query (1 AI call); cached candidates must not be re-embedded');
+  // Second route must trigger exactly 1 more AI.run() call — only the query; candidates are cached.
+  assert.equal(batchSizes.length, 3, 'second route() must trigger exactly 1 more AI.run() call (query only)');
+  assert.equal(batchSizes[2], 1, 'second route AI call must embed only the query — candidates served from cache (no re-embed)');
 
   // Third call with a candidate whose content has changed — must be a cache miss and trigger re-embed.
   const changedCands = [
@@ -514,6 +517,15 @@ test('indexCandidates(): upserts correct count when Vectorize bound', async () =
     assert.ok(Array.isArray(sorted[i]!.values) && sorted[i]!.values.length > 0, 'values must be non-empty');
     assert.deepEqual(sorted[i]!.values, unitVec(4, i), `upserted values for ${sortedCands[i]!.namespacedName} must match its distinct embedding`);
     assert.equal(sorted[i]!.metadata.namespacedName, sortedCands[i]!.namespacedName, 'metadata.namespacedName must match');
+  }
+  // Each consecutive pair must have distinct vectors — not all candidates share the same embedding.
+  for (let i = 1; i < sorted.length; i++) {
+    const prev = sorted[i - 1]!.values;
+    const curr = sorted[i]!.values;
+    assert.ok(
+      prev.some((v, k) => v !== curr[k]),
+      `candidates at index ${i - 1} and ${i} must have distinct embedding vectors`,
+    );
   }
 });
 
