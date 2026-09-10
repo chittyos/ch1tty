@@ -22,6 +22,8 @@ Workstreams A–F ALL DONE. Build clean, tests green (1492/0/3), guardrails enfo
 - [x] **GUARDRAIL-CLEANUP** — 900+ rogue `auto/*-cast-explain-*-ratio` branches violating the metric freeze are stale (content never merged). Source clean; 0 violations on main.
 - [x] **tasks-mcp wire** — `apps/tasks-mcp` wired as first focused per-domain server; `tasks` focus profile + suggestions added; 10 new scenario tests. PR #1153 merged 2026-09-03.
 - [x] **Q** — session-coordinator-mcp MCP tool-layer tests via InMemoryTransport: extracted `createSessionCoordinatorServer()` factory, 22 tests (18 happy-path/required-arg + 4 runtime-validation negative tests). PR #1205 merged 2026-09-10.
+- [x] **R** — comms-mcp MCP tool-layer tests via InMemoryTransport: extracted `createCommsMcpServer()` factory, 11 tests (identifier/person happy-paths, channel filtering, degradation, ordering, truncation, metadata). PR #1206 merged 2026-09-10.
+- [ ] **S** — dep refresh: bump `zod` 4.5.4 → 4.6.1 (patch pin). PR #1207 open (CI pending).
 
 ## Guardrail: buildCastExplanation metric freeze
 
@@ -4118,3 +4120,19 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
 - **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–L ✓ Q ✓ **DONE**. Tests: 1953/0/3. Build: clean. 0 open PRs.
 - **Next workstream candidate**: R — `apps/comms-mcp` tool-layer tests (1 tool: `comms.recentLog`; `McpClientDispatch` complicates mocking — needs investigation before committing).
 - **PushNotification**: NOT SENT — merge is the happy path; no urgent signal needed.
+
+---
+
+### 2026-09-10T~09:00 UTC (scheduled run — R merged; S branch opened)
+- **Workstream**: R (merged) → S (opened)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED, buildCastExplanation metric freeze ACTIVE.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1953 pass / 0 fail / 3 skip (52 suites).
+  - **Merged PR #1206** (R — comms-mcp tool-layer tests, 11 tests, CI green / mergeable_state:clean). All 5 apps (tasks, ledger, evidence, session-coordinator, comms) now have InMemoryTransport tool-layer tests.
+  - `npm outdated`: agents 0.20→0.22 (minor), zod 4.5.4→4.6.1 (patch), typescript/c8 major (board: human review). Bumped zod 4.5.4 → 4.6.1 (patch, exact pin).
+  - Build + tests confirmed green on S branch: 1965 pass / 0 fail / 3 skip (1968 total, 52 suites).
+  - Pushed `auto/S-dep-refresh-zod-461`, opened **PR #1207** (https://github.com/chittyos/ch1tty/pull/1207). Subscribed to PR activity.
+  - Updated DRIVER-BOARD.md: R marked done, S added.
+- **Build**: tsc clean | **Tests**: 1965 pass / 0 fail / 3 skip (1968 total, 52 suites)
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–L ✓ Q ✓ R ✓ S open (PR #1207). 0 vulns.
+- **Next run**: Check PR #1207 CI; merge when green. Then evaluate `agents` 0.20→0.22 minor bump as workstream T.
