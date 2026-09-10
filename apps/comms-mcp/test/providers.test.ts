@@ -24,11 +24,11 @@ describe('quoProvider', () => {
     assert.equal(quoProvider.binding?.mcpServerId, 'chittyagent-quo');
   });
 
-  it('binding.tools has all three abstract ops', () => {
+  it('binding.tools has all three abstract ops with correct tool names', () => {
     const tools = quoProvider.binding?.tools ?? {};
-    assert.ok(tools['resolveContact'], 'resolveContact tool must be bound');
-    assert.ok(tools['listMessages'], 'listMessages tool must be bound');
-    assert.ok(tools['getMessage'], 'getMessage tool must be bound');
+    assert.equal(tools['resolveContact'], 'quo_lookup_contact_context');
+    assert.equal(tools['listMessages'], 'quo_recent_messages_local');
+    assert.equal(tools['getMessage'], 'quo_get_message');
   });
 
   it('listMessages uses the local-cache op (not the live-API op)', () => {
