@@ -3995,3 +3995,28 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   7. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
 - **PushNotification**: SENT — merged 3 PRs (L/M/N test coverage: 41 new tests); tests 1882/0/3 (+46 total); build clean.
 - **Next run**: All workstreams done. 0 open PRs. Consider disabling hourly schedule.
+
+---
+
+### 2026-09-10T~09:15 UTC (run ~1542 — PRODUCTIVE: merged PRs #1203/#1204 — 49 new tests)
+- **Workstream**: Test coverage (O/P) — evidence-mcp InMemoryTransport (25 tests) + ledger-mcp InMemoryTransport (24 tests)
+- **Branch/PR**: Merged: #1203 (`auto/O-evidence-mcp-tool-layer-tests` — 25 tests), #1204 (`auto/P-ledger-mcp-tool-layer-tests` — 24 tests). Both CI 3/3 green (CodeQL + Analyze ×2). Both `mergeable_state: clean`.
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1931 pass / 0 fail / 3 skip (1934 total, 52 suites, ~45s) — up from 1882 (+49 tests from 2 merged PRs)
+- **Guardrails**: 5-tool surface confirmed (search/execute/status/reload/cast). `buildCastExplanation` metric freeze ACTIVE. 0 violations.
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed.
+  - `git pull origin main` (be13427 → eb90fa8). `npm run build` clean (tsc exit 0). `npm test`: 1931/0/3 (1934 total, 52 suites). 0 failures.
+  - Found 2 open PRs: #1203 (O: evidence-mcp InMemoryTransport) + #1204 (P: ledger-mcp InMemoryTransport). All CI green. Both `mergeable_state: clean`. 0 review threads each.
+  - Merged #1203 (squash) → b35ad0b. Merged #1204 (squash) → eb90fa8.
+  - Post-merge test run: 1931/0/3. 0 regressions.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ + H/I/J/K/L/M/N/O/P ✓ ALL DONE. Build: clean. Tests: 1931/0/3. **~1542nd run. 0 open PRs.**
+- **Human-action items**:
+  1. **Disable or redirect hourly schedule** — 1542+ consecutive runs; all defined workstreams exhausted; schedule burns compute hourly.
+  2. **Major dep bumps pending human review**: typescript 5→7, @types/node 22→26, c8 11→12, agents 0.20→0.22.
+  3. **Deploy Workstream F phases** (Cloudflare): Create `Ch1ttyApiAgent` DO class + drain `Ch1ttyDO` instances.
+  4. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  5. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  6. **Stale branch cleanup** — automated weekly via `.github/workflows/cleanup-auto-branches.yml`.
+  7. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
+- **PushNotification**: SENT — merged PRs #1203/#1204 (O/P test coverage: 49 new tests); tests 1931/0/3 (+49 total); build clean.
+- **Next run**: All workstreams done. 0 open PRs. Consider disabling hourly schedule.
