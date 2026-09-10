@@ -21,6 +21,7 @@ Workstreams A–F ALL DONE. Build clean, tests green (1492/0/3), guardrails enfo
 - [x] **Linear MCP** — `servers.json` + focus profiles + suggestions wired. DONE.
 - [x] **GUARDRAIL-CLEANUP** — 900+ rogue `auto/*-cast-explain-*-ratio` branches violating the metric freeze are stale (content never merged). Source clean; 0 violations on main.
 - [x] **tasks-mcp wire** — `apps/tasks-mcp` wired as first focused per-domain server; `tasks` focus profile + suggestions added; 10 new scenario tests. PR #1153 merged 2026-09-03.
+- [x] **Q** — session-coordinator-mcp MCP tool-layer tests via InMemoryTransport: extracted `createSessionCoordinatorServer()` factory, 22 tests (18 happy-path/required-arg + 4 runtime-validation negative tests). PR #1205 merged 2026-09-10.
 
 ## Guardrail: buildCastExplanation metric freeze
 
@@ -4105,3 +4106,15 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
 - **Review state**: CodeRabbit finding acknowledged "✅ Addressed". 0 open threads. Docstring warning (not a blocker per CLAUDE.md comment policy). No human reviews yet.
 - **State summary**: Q IN PROGRESS — PR #1205 CI green, finding addressed, 0 open threads. **Human approve + merge is the only remaining step.**
 - **PushNotification**: SENT — PR #1205 is 3/3 CI green and ready to merge (workstream Q).
+
+---
+
+### 2026-09-10T~08:35 UTC (run ~1544e — PR #1205 MERGED; workstream Q DONE)
+- **Workstream**: Q — **COMPLETED** (PR #1205 merged to main as c2c7953)
+- **Actions**:
+  - PR #1205 merged by human. Auto-unsubscribed from PR activity.
+  - `git reset --hard origin/main` → now at c2c7953. Build clean. Tests: 1953/0/3.
+  - Workstream Q added to DONE list in status section.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–L ✓ Q ✓ **DONE**. Tests: 1953/0/3. Build: clean. 0 open PRs.
+- **Next workstream candidate**: R — `apps/comms-mcp` tool-layer tests (1 tool: `comms.recentLog`; `McpClientDispatch` complicates mocking — needs investigation before committing).
+- **PushNotification**: NOT SENT — merge is the happy path; no urgent signal needed.
