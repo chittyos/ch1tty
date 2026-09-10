@@ -31,7 +31,7 @@
     "wrangler": "4.130.0"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=20.19.0"
   },
   "overrides": {
     "hono": ">=4.13.5",
