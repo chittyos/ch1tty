@@ -4148,3 +4148,29 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   - CodeRabbit finding (lockfile/manifest spec mismatch) was valid — fixed in commit 2 (`--package-lock-only` re-sync). CodeRabbit skipped the lockfile-only commit as expected.
 - **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–L ✓ Q ✓ R ✓ S ✓ — ALL DONE. 0 open PRs.
 - **Next workstream candidate**: T — `agents` 0.20 → 0.22 minor bump (one use: `routeAgentRequest` in workers/chittyagent-ch1tty; check changelog before bumping).
+
+---
+
+### 2026-09-10 ~16:00 UTC (run ~1552 — U thread resolved; all 3 PRs CI-green)
+- **Workstream**: U (PR #1209 — CodeRabbit thread resolved)
+- **Build**: tsc clean (0 errors) | **Tests**: 1965 pass / 0 fail / 3 skip (1968 total, 52 suites, ~48s)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface, metric freeze active).
+  - npm ci clean. npm run build clean. npm test: 1965/0/3 — no regressions on main (1c2f79f).
+  - Checked 3 open PRs: U (#1209), V (#1210), W (#1211) — all 3/3 CI green.
+  - PR #1209 (U: @types/node + c8 bump): had 1 unresolved CodeRabbit thread — "align engines.node with c8 12 requirement". Fix was already in commit 407e162 (pushed at 12:47Z; thread posted at 12:46Z). Replied and resolved thread PRRT_kwDORhsD_s6hE3YQ.
+  - PR #1210 (V: sdk bump to ^1.30.0 in all apps): 0 review threads, 3/3 CI green. Clean.
+  - PR #1211 (W: focus scenario tests for code/communication/design/finance/governance/ops, +35 tests): 2 threads, both resolved (7a23fa3). 3/3 CI green. mergeable_state: clean. Total would be 2000/0/3 once merged.
+  - Inspected K-dep-refresh-sep2026 branch: stale (zod 4.5.4 < current 4.6.1). Skip.
+  - Inspected P0-workers-ai-timeout branch: orphan; fix already incorporated in main (WorkersAiBrain timeout at workers-ai-brain.ts:326-370). Skip.
+  - Notion board update failed: workspace out of free blocks (upgrade required).
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H ✓ I ✓ J ✓ K ✓ L ✓ M ✓ N ✓ O ✓ P ✓ Q ✓ R ✓ S ✓ T ✓ U(PR #1209) V(PR #1210) W(PR #1211). Build clean. Tests 1965/0/3.
+- **Human-action items**:
+  1. **Merge PR #1209** (U: @types/node + c8 bump, engines.node >=20.19.0) — 3/3 CI green, 0 open threads
+  2. **Merge PR #1210** (V: @modelcontextprotocol/sdk ^1.30.0 in all apps) — 3/3 CI green, 0 threads
+  3. **Merge PR #1211** (W: focus scenarios for 6 profiles, +35 tests → 2000 total) — 3/3 CI green, 0 open threads
+  4. **GitHub Actions ci.yml** disabled at org level — Settings → Actions → General → "Allow all actions"
+  5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  6. **Notion workspace** out of free blocks — upgrade plan or clear blocks to restore board updates
+  7. **Disable/redirect hourly cron** — ~1552 runs; all workstreams exhausted; idle-burning ~50k tokens/run
+- **Next run**: Monitor U/V/W for merge. Once merged, confirm test count = 2000 on new main. Identify workstream X if any gap found.
