@@ -20,7 +20,7 @@
     "@cloudflare/codemode": "^0.5.1",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "agents": "^0.20.0",
-    "zod": "4.5.4"
+    "zod": "4.6.1"
   },
   "devDependencies": {
     "@cloudflare/workers-oauth-provider": "^0.10.3",
