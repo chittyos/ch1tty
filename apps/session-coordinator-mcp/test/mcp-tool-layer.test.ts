@@ -363,3 +363,65 @@ test('unknown tool returns isError', async () => {
     await cleanup();
   }
 });
+
+// ── Runtime validation (invalid optional args) ────────────────────────────────
+
+test('update_session — invalid status "closed" returns error without calling client', async () => {
+  let called = false;
+  const { client, cleanup } = await setup({
+    updateSession: async () => { called = true; return SESSION_1; },
+  });
+  try {
+    const res = await client.callTool({ name: 'update_session', arguments: { id: 'sess-1', status: 'closed' } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /status/);
+    assert.equal(called, false);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('update_session — scalar context returns error without calling client', async () => {
+  let called = false;
+  const { client, cleanup } = await setup({
+    updateSession: async () => { called = true; return SESSION_1; },
+  });
+  try {
+    const res = await client.callTool({ name: 'update_session', arguments: { id: 'sess-1', context: 'not-an-object' } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /context/);
+    assert.equal(called, false);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_sessions — non-numeric limit returns error without calling client', async () => {
+  let called = false;
+  const { client, cleanup } = await setup({
+    listSessions: async () => { called = true; return []; },
+  });
+  try {
+    const res = await client.callTool({ name: 'list_sessions', arguments: { limit: '10' } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /limit/);
+    assert.equal(called, false);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_sessions — invalid status enum returns error without calling client', async () => {
+  let called = false;
+  const { client, cleanup } = await setup({
+    listSessions: async () => { called = true; return []; },
+  });
+  try {
+    const res = await client.callTool({ name: 'list_sessions', arguments: { status: 'unknown' } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /status/);
+    assert.equal(called, false);
+  } finally {
+    await cleanup();
+  }
+});

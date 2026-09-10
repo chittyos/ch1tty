@@ -18,6 +18,17 @@ function missingArg(tool: string, field: string) {
   };
 }
 
+function invalidArg(tool: string, field: string, reason: string) {
+  return {
+    content: [{ type: 'text' as const, text: `${tool}: argument "${field}" is invalid — ${reason}` }],
+    isError: true,
+  };
+}
+
+function isPlainObject(v: unknown): v is Record<string, unknown> {
+  return typeof v === 'object' && v !== null && !Array.isArray(v);
+}
+
 /** Create and configure a session-coordinator-mcp MCP Server backed by the given SessionClient. */
 export function createSessionCoordinatorServer(client: SessionClient): Server {
   const server = new Server(
@@ -146,14 +157,20 @@ export function createSessionCoordinatorServer(client: SessionClient): Server {
       let result: unknown;
 
       switch (name) {
-        case 'list_sessions':
+        case 'list_sessions': {
+          const lsStatus = a['status'];
+          if (lsStatus !== undefined && lsStatus !== 'active' && lsStatus !== 'idle' && lsStatus !== 'closed')
+            return invalidArg('list_sessions', 'status', 'must be "active", "idle", or "closed"');
+          if (a['limit'] !== undefined && typeof a['limit'] !== 'number')
+            return invalidArg('list_sessions', 'limit', 'must be a number');
           result = await client.listSessions({
             channel: a['channel'] as string | undefined,
             user_id: a['user_id'] as string | undefined,
-            status: a['status'] as ListSessionsFilter['status'],
+            status: lsStatus as ListSessionsFilter['status'],
             limit: a['limit'] as number | undefined,
           });
           break;
+        }
 
         case 'get_session':
           if (typeof a['id'] !== 'string' || !a['id']) return missingArg('get_session', 'id');
@@ -162,6 +179,8 @@ export function createSessionCoordinatorServer(client: SessionClient): Server {
 
         case 'create_session':
           if (typeof a['channel'] !== 'string' || !a['channel']) return missingArg('create_session', 'channel');
+          if (a['context'] !== undefined && !isPlainObject(a['context']))
+            return invalidArg('create_session', 'context', 'must be a plain object');
           result = await client.createSession({
             channel: a['channel'],
             user_id: a['user_id'] as string | undefined,
@@ -169,13 +188,19 @@ export function createSessionCoordinatorServer(client: SessionClient): Server {
           });
           break;
 
-        case 'update_session':
+        case 'update_session': {
           if (typeof a['id'] !== 'string' || !a['id']) return missingArg('update_session', 'id');
+          const usStatus = a['status'];
+          if (usStatus !== undefined && usStatus !== 'active' && usStatus !== 'idle')
+            return invalidArg('update_session', 'status', 'must be "active" or "idle"');
+          if (a['context'] !== undefined && !isPlainObject(a['context']))
+            return invalidArg('update_session', 'context', 'must be a plain object');
           result = await client.updateSession(a['id'], {
-            status: a['status'] as UpdateSessionInput['status'],
+            status: usStatus as UpdateSessionInput['status'],
             context: a['context'] as UpdateSessionInput['context'],
           });
           break;
+        }
 
         case 'close_session':
           if (typeof a['id'] !== 'string' || !a['id']) return missingArg('close_session', 'id');
@@ -185,6 +210,8 @@ export function createSessionCoordinatorServer(client: SessionClient): Server {
         case 'append_event':
           if (typeof a['session_id'] !== 'string' || !a['session_id']) return missingArg('append_event', 'session_id');
           if (typeof a['type'] !== 'string' || !a['type']) return missingArg('append_event', 'type');
+          if (a['payload'] !== undefined && !isPlainObject(a['payload']))
+            return invalidArg('append_event', 'payload', 'must be a plain object');
           result = await client.appendEvent(a['session_id'], {
             type: a['type'],
             payload: a['payload'] as AppendEventInput['payload'],
@@ -194,6 +221,8 @@ export function createSessionCoordinatorServer(client: SessionClient): Server {
 
         case 'list_events':
           if (typeof a['session_id'] !== 'string' || !a['session_id']) return missingArg('list_events', 'session_id');
+          if (a['limit'] !== undefined && typeof a['limit'] !== 'number')
+            return invalidArg('list_events', 'limit', 'must be a number');
           result = await client.listEvents(a['session_id'], {
             limit: a['limit'] as number | undefined,
             cursor: a['cursor'] as string | undefined,
