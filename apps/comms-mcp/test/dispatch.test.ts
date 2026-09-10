@@ -17,11 +17,14 @@ process.env.CH1TTY_REMOTE_TIMEOUT_MS = '200';
 
 // ── Env helpers ───────────────────────────────────────────────────────────────
 
-function withEnv(vars: Record<string, string>, fn: () => void): void {
+function withEnv(vars: Record<string, string | undefined>, fn: () => void): void {
   const saved: Record<string, string | undefined> = {};
   for (const k of Object.keys(vars)) saved[k] = process.env[k];
   try {
-    for (const [k, v] of Object.entries(vars)) process.env[k] = v;
+    for (const [k, v] of Object.entries(vars)) {
+      if (v === undefined) delete process.env[k];
+      else process.env[k] = v;
+    }
     fn();
   } finally {
     for (const [k, v] of Object.entries(saved)) {
@@ -83,7 +86,7 @@ test('backendConfig: throws when ENDPOINT env var missing', () => {
 
 test('backendConfig: returns endpoint from env', () => {
   const id = 'test-backend-z2';
-  withEnv({ [`${envPrefix(id)}_ENDPOINT`]: 'https://mcp.example.com/mcp' }, () => {
+  withEnv({ [`${envPrefix(id)}_ENDPOINT`]: 'https://mcp.example.com/mcp', CF_ACCESS_CLIENT_ID: undefined, CF_ACCESS_CLIENT_SECRET: undefined }, () => {
     const cfg = backendConfig(id);
     assert.equal(cfg.endpoint, 'https://mcp.example.com/mcp');
     assert.equal(cfg.token, undefined);
