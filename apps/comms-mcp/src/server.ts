@@ -66,7 +66,7 @@ export function createCommsMcpServer(dispatch: CommsDispatch, owner: OwnerIdenti
       }
 
       const a = args as Record<string, unknown>;
-      if (!a['person'] && !a['identifier']) {
+      if (Boolean(a['person']) === Boolean(a['identifier'])) {
         throw new Error('comms.recentLog requires exactly one of: person, identifier');
       }
 

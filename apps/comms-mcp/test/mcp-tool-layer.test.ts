@@ -251,6 +251,22 @@ test('comms.recentLog without person or identifier returns isError', async () =>
   }
 });
 
+// ── Error: both person AND identifier provided (XOR violation) ────────────────
+
+test('comms.recentLog with both person and identifier returns isError', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.callTool({
+      name: 'comms.recentLog',
+      arguments: { person: 'CH-1-ABC-1234-P-US-1-A1', identifier: '+15555550001' },
+    });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /person|identifier/);
+  } finally {
+    await cleanup();
+  }
+});
+
 // ── Error: unknown tool ───────────────────────────────────────────────────────
 
 test('unknown tool returns isError', async () => {
