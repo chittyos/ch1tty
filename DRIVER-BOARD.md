@@ -23,7 +23,7 @@ Workstreams A–F ALL DONE. Build clean, tests green (1492/0/3), guardrails enfo
 - [x] **tasks-mcp wire** — `apps/tasks-mcp` wired as first focused per-domain server; `tasks` focus profile + suggestions added; 10 new scenario tests. PR #1153 merged 2026-09-03.
 - [x] **Q** — session-coordinator-mcp MCP tool-layer tests via InMemoryTransport: extracted `createSessionCoordinatorServer()` factory, 22 tests (18 happy-path/required-arg + 4 runtime-validation negative tests). PR #1205 merged 2026-09-10.
 - [x] **R** — comms-mcp MCP tool-layer tests via InMemoryTransport: extracted `createCommsMcpServer()` factory, 11 tests (identifier/person happy-paths, channel filtering, degradation, ordering, truncation, metadata). PR #1206 merged 2026-09-10.
-- [ ] **S** — dep refresh: bump `zod` 4.5.4 → 4.6.1 (patch pin). PR #1207 open (CI pending).
+- [x] **S** — dep refresh: bump `zod` 4.5.4 → 4.6.1 (patch, exact pin). PR #1207 merged 2026-09-10.
 
 ## Guardrail: buildCastExplanation metric freeze
 
@@ -4136,3 +4136,15 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
 - **Build**: tsc clean | **Tests**: 1965 pass / 0 fail / 3 skip (1968 total, 52 suites)
 - **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–L ✓ Q ✓ R ✓ S open (PR #1207). 0 vulns.
 - **Next run**: Check PR #1207 CI; merge when green. Then evaluate `agents` 0.20→0.22 minor bump as workstream T.
+
+---
+
+### 2026-09-10T~09:51 UTC (CI-wake — PR #1207 all-green; merged)
+- **Workstream**: S — **COMPLETED** (PR #1207 merged as ab69ffe)
+- **Actions**:
+  - CI completed: CodeQL ✓, Analyze(actions) ✓, Analyze(javascript-typescript) ✓ — all green on head a7980db.
+  - Squash-merged PR #1207.
+  - Synced main → ab69ffe. Updated DRIVER-BOARD.md: S marked done.
+  - CodeRabbit finding (lockfile/manifest spec mismatch) was valid — fixed in commit 2 (`--package-lock-only` re-sync). CodeRabbit skipped the lockfile-only commit as expected.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–L ✓ Q ✓ R ✓ S ✓ — ALL DONE. 0 open PRs.
+- **Next workstream candidate**: T — `agents` 0.20 → 0.22 minor bump (one use: `routeAgentRequest` in workers/chittyagent-ch1tty; check changelog before bumping).
