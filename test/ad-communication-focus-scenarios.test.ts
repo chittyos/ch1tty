@@ -90,6 +90,15 @@ test('communication focus: search "send message" ranks comms/ and imessage/ tool
     assert.ok(commIdx < outIdx, 'communication tools should rank above out-of-focus tools');
   }
   assert.equal(parsed.focus, 'communication', 'search response should report communication focus');
+
+  const { aggregator: noFocusAgg } = buildAggregator();
+  const noFocusResult = await noFocusAgg.callTool('ch1tty/search', { query: 'send message contact', limit: 10 });
+  const commIdxNoFocus = (parseSearch(noFocusResult).tools ?? []).findIndex((r) =>
+    ['comms/', 'imessage/', 'chittymac/'].some((p) => r.tool.startsWith(p)),
+  );
+  assert.ok(commIdxNoFocus >= 0, 'comms/imessage/chittymac tools should appear even without focus');
+  assert.ok(commIdx <= commIdxNoFocus,
+    `focus should rank comms/imessage tools at least as high as no-focus (focused: pos ${commIdx}, no-focus: pos ${commIdxNoFocus})`);
 });
 
 test('communication focus: out-of-focus tools (github) remain reachable', async () => {
@@ -107,7 +116,7 @@ test('communication focus: cast "read recent messages" resolves to comms/ tool',
   const { aggregator } = buildAggregator('communication');
 
   const result = await aggregator.callTool('ch1tty/cast', {
-    intent: 'read recent messages across channels to catch up on conversations',
+    intent: 'get the unified communications log fusing all channels into one time-ordered view',
     confirm: true,
   });
   assert.equal(result.isError, undefined, 'cast should not error');
@@ -117,8 +126,8 @@ test('communication focus: cast "read recent messages" resolves to comms/ tool',
   const resolved = cast.resolved as { tool: string } | undefined;
   assert.ok(resolved, 'cast should resolve a tool');
   assert.ok(
-    ['comms/', 'imessage/', 'chittymac/', 'notion/', 'tasks/'].some((p) => resolved.tool.startsWith(p)),
-    `cast should resolve to a communication-focus tool, got: ${resolved.tool}`,
+    resolved.tool.startsWith('comms/'),
+    `cast should resolve to comms/ for recent messages intent, got: ${resolved.tool}`,
   );
   assert.equal(cast.focus, 'communication', 'cast response should report active focus');
 });

@@ -86,6 +86,13 @@ test('design focus: search "screenshot page" ranks playwright/ tools first', asy
     assert.ok(pwIdx < outIdx, 'playwright/ tools should rank above out-of-focus tools');
   }
   assert.equal(parsed.focus, 'design', 'search response should report design focus');
+
+  const { aggregator: noFocusAgg } = buildAggregator();
+  const noFocusResult = await noFocusAgg.callTool('ch1tty/search', { query: 'screenshot page browser', limit: 10 });
+  const pwIdxNoFocus = (parseSearch(noFocusResult).tools ?? []).findIndex((r) => r.tool.startsWith('playwright/'));
+  assert.ok(pwIdxNoFocus >= 0, 'playwright/ tools should appear even without focus');
+  assert.ok(pwIdx <= pwIdxNoFocus,
+    `focus should rank playwright/ at least as high as no-focus (focused: pos ${pwIdx}, no-focus: pos ${pwIdxNoFocus})`);
 });
 
 test('design focus: out-of-focus tools (github) remain reachable', async () => {

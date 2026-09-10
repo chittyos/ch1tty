@@ -86,6 +86,15 @@ test('ops focus: search "deploy worker infrastructure" ranks cloudflare/ tools f
     assert.ok(opsIdx < outIdx, 'ops tools should rank above out-of-focus tools');
   }
   assert.equal(parsed.focus, 'ops', 'search response should report ops focus');
+
+  const { aggregator: noFocusAgg } = buildAggregator();
+  const noFocusResult = await noFocusAgg.callTool('ch1tty/search', { query: 'deploy worker infrastructure', limit: 10 });
+  const opsIdxNoFocus = (parseSearch(noFocusResult).tools ?? []).findIndex((r) =>
+    opsPrefixes.some((p) => r.tool.startsWith(p)),
+  );
+  assert.ok(opsIdxNoFocus >= 0, 'ops tools should appear even without focus');
+  assert.ok(opsIdx <= opsIdxNoFocus,
+    `focus should rank ops tools at least as high as no-focus (focused: pos ${opsIdx}, no-focus: pos ${opsIdxNoFocus})`);
 });
 
 test('ops focus: out-of-focus tools (imessage) remain reachable', async () => {
@@ -113,8 +122,8 @@ test('ops focus: cast "deploy a Cloudflare Worker" resolves to cloudflare/ tool'
   const resolved = cast.resolved as { tool: string } | undefined;
   assert.ok(resolved, 'cast should resolve a tool');
   assert.ok(
-    ['cloudflare/', 'neon/', 'github/', 'orchestrator/', 'fs/'].some((p) => resolved.tool.startsWith(p)),
-    `cast should resolve to ops-focus tool, got: ${resolved.tool}`,
+    resolved.tool.startsWith('cloudflare/'),
+    `cast should resolve to cloudflare/ for Cloudflare Worker deploy intent, got: ${resolved.tool}`,
   );
   assert.equal(cast.focus, 'ops', 'cast response should report active focus');
 });
@@ -163,6 +172,13 @@ test('ops focus: per-call focus=ops boosts cloudflare/ tools without default foc
 
   const parsed = parseSearch(result);
   assert.equal(parsed.focus, 'ops', 'search response should report ops focus set via per-call param');
-  const toolNames = (parsed.tools ?? []).map((r) => r.tool);
-  assert.ok(toolNames.some((t) => t.startsWith('cloudflare/')), 'cloudflare/ tools should appear with per-call focus=ops');
+  const tools = parsed.tools ?? [];
+  const cfIdx = tools.findIndex((r) => r.tool.startsWith('cloudflare/'));
+  assert.ok(cfIdx !== -1, 'cloudflare/ tools should appear with per-call focus=ops');
+
+  const noFocusResult = await aggregator.callTool('ch1tty/search', { query: 'workers deploy infrastructure', limit: 10 });
+  const cfIdxNoFocus = (parseSearch(noFocusResult).tools ?? []).findIndex((r) => r.tool.startsWith('cloudflare/'));
+  assert.ok(cfIdxNoFocus >= 0, 'cloudflare/ tools should appear without focus too');
+  assert.ok(cfIdx <= cfIdxNoFocus,
+    `per-call focus=ops should rank cloudflare/ at least as high as no-focus (focused: pos ${cfIdx}, no-focus: pos ${cfIdxNoFocus})`);
 });

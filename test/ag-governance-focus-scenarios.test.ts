@@ -89,6 +89,15 @@ test('governance focus: search "audit evidence compliance" ranks governance tool
     assert.ok(govIdx < outIdx, 'governance tools should rank above out-of-focus tools');
   }
   assert.equal(parsed.focus, 'governance', 'search response should report governance focus');
+
+  const { aggregator: noFocusAgg } = buildAggregator();
+  const noFocusResult = await noFocusAgg.callTool('ch1tty/search', { query: 'audit evidence compliance record', limit: 10 });
+  const govIdxNoFocus = (parseSearch(noFocusResult).tools ?? []).findIndex((r) =>
+    govPrefixes.some((p) => r.tool.startsWith(p)),
+  );
+  assert.ok(govIdxNoFocus >= 0, 'governance tools should appear even without focus');
+  assert.ok(govIdx <= govIdxNoFocus,
+    `focus should rank governance tools at least as high as no-focus (focused: pos ${govIdx}, no-focus: pos ${govIdxNoFocus})`);
 });
 
 test('governance focus: out-of-focus tools (github) remain reachable', async () => {
@@ -115,10 +124,9 @@ test('governance focus: cast "ingest compliance document" resolves to chittyevid
   assert.equal(cast.cast, 'plan', `cast.cast should be 'plan', got: ${String(cast.cast)}`);
   const resolved = cast.resolved as { tool: string } | undefined;
   assert.ok(resolved, 'cast should resolve a tool');
-  const govPrefixes = ['chittyevidence/', 'session/', 'ledger/', 'orchestrator/', 'chittyos/', 'notion/'];
   assert.ok(
-    govPrefixes.some((p) => resolved.tool.startsWith(p)),
-    `cast should resolve to governance-focus tool, got: ${resolved.tool}`,
+    resolved.tool.startsWith('chittyevidence/'),
+    `cast should resolve to chittyevidence/ for document ingest intent, got: ${resolved.tool}`,
   );
   assert.equal(cast.focus, 'governance', 'cast response should report active focus');
 });

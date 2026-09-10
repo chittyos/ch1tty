@@ -84,6 +84,15 @@ test('finance focus: search "payment billing" ranks stripe/ tools first', async 
     assert.ok(financeIdx < outIdx, 'finance tools should rank above out-of-focus tools for payment query');
   }
   assert.equal(parsed.focus, 'finance', 'search response should report active focus');
+
+  const { aggregator: noFocusAgg } = buildAggregator();
+  const noFocusResult = await noFocusAgg.callTool('ch1tty/search', { query: 'payment billing invoice', limit: 10 });
+  const financeIdxNoFocus = (parseSearch(noFocusResult).tools ?? []).findIndex((r) =>
+    ['stripe/', 'ledger/', 'tasks/'].some((p) => r.tool.startsWith(p)),
+  );
+  assert.ok(financeIdxNoFocus >= 0, 'stripe/ledger/tasks tools should appear even without focus');
+  assert.ok(financeIdx <= financeIdxNoFocus,
+    `focus should rank finance tools at least as high as no-focus (focused: pos ${financeIdx}, no-focus: pos ${financeIdxNoFocus})`);
 });
 
 test('finance focus: out-of-focus tools (github) remain reachable', async () => {
@@ -111,8 +120,8 @@ test('finance focus: cast "check account balance" resolves to stripe/ tool', asy
   const resolved = cast.resolved as { tool: string } | undefined;
   assert.ok(resolved, 'cast should resolve a tool');
   assert.ok(
-    ['stripe/', 'ledger/', 'tasks/'].some((p) => resolved.tool.startsWith(p)),
-    `cast should resolve to finance-focus tool, got: ${resolved.tool}`,
+    resolved.tool.startsWith('stripe/'),
+    `cast should resolve to stripe/ for Stripe balance intent, got: ${resolved.tool}`,
   );
   assert.equal(cast.focus, 'finance', 'cast response should report active focus');
 });
