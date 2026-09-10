@@ -4199,3 +4199,32 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   6. **Notion workspace** out of free blocks — upgrade plan or clear blocks
 - **PushNotification**: NOT SENT — same state as run ~1552; no new info
 - **Next run**: Idle unless a PR merges. Once U/V/W merged, test count ~2000; identify workstream X.
+
+---
+
+### 2026-09-10T~hourly (run ~1554 — workstream Y: TypeScript 7 upgrade)
+- **Workstream**: Y — `typescript` 5.7 → 7.0.2 (major version upgrade)
+- **Branch/PR**: `auto/Y-typescript-7-upgrade` → **PR #1213** (https://github.com/chittyos/ch1tty/pull/1213)
+- **Build**: tsc clean (0 errors) | **Tests**: 1965 pass / 0 fail / 3 skip (1968 total, 52 suites, ~48s)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface, metric freeze active).
+  - `git fetch && git reset --hard origin/main` (bfd97cf). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1965/0/3 (52 suites). 0 failures.
+  - Checked open PRs: U #1209, V #1210, W #1211 (all from run ~1552/1553) + X #1212 (wrangler patch 4.131.0, created after run ~1553) — all 4 CI 3/3 green.
+  - `npm outdated` found `typescript 5.9.3 → 7.0.2` (major) not yet in any open PR. Attempted TypeScript 7 upgrade.
+  - Initial build with TypeScript 7 produced TS2591 errors across all `src-stdio/` files (`process`, `Buffer`, `node:*` not found). Root cause: TypeScript 7 no longer auto-injects Node.js globals; requires explicit `"types": ["node"]` in `compilerOptions`.
+  - Fix: added `"types": ["node"]` to `tsconfig.json` (`tsconfig.worker.json` already had it).
+  - Rebuild: clean (tsc exit 0, 0 errors). Tests: 1965/0/3. 0 regressions.
+  - Pushed `auto/Y-typescript-7-upgrade`; opened PR #1213 (https://github.com/chittyos/ch1tty/pull/1213). Subscribed to PR activity.
+  - Notion board: workspace out of free blocks — DRIVER-BOARD.md is durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–L ✓ M–T ✓ U(#1209 open) V(#1210 open) W(#1211 open) X(#1212 open) Y(#1213 open). Tests: 1965/0/3.
+- **Human-action items**:
+  1. **Merge PR #1209** (U: @types/node + c8 bump) — 3/3 CI green, 0 open threads
+  2. **Merge PR #1210** (V: @modelcontextprotocol/sdk ^1.30.0 in all apps) — 3/3 CI green, 0 threads
+  3. **Merge PR #1211** (W: focus scenarios for 6 profiles, +35 tests → ~2000 total) — 3/3 CI green, 0 threads
+  4. **Merge PR #1212** (X: wrangler 4.130.0 → 4.131.0 patch) — 3/3 CI green
+  5. **Merge PR #1213** (Y: TypeScript 5.7 → 7.0.2 + `"types":["node"]` in tsconfig.json) — awaiting CI
+  6. **Disable/redirect hourly cron** — ~1554 runs; primary workstreams exhausted; idle-burning tokens
+  7. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  8. **Notion workspace** out of free blocks — upgrade plan or clear blocks
+- **PushNotification**: NOT SENT — workstream Y is additive/routine; no urgent blocker found.
+- **Next run**: Monitor PR #1213 CI. Once U/V/W/X/Y merged, test count should reach ~2000. Identify next gap or go idle.
