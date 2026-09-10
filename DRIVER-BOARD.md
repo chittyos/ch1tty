@@ -4020,3 +4020,33 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   7. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
 - **PushNotification**: SENT — merged PRs #1203/#1204 (O/P test coverage: 49 new tests); tests 1931/0/3 (+49 total); build clean.
 - **Next run**: All workstreams done. 0 open PRs. Consider disabling hourly schedule.
+
+---
+
+### 2026-09-10T~06:45 UTC (run ~1543 — PRODUCTIVE: PR #1205 opened — session-coordinator-mcp tool-layer tests)
+- **Workstream**: Q — session-coordinator-mcp MCP tool-layer tests via InMemoryTransport
+- **Branch/PR**: `auto/Q-session-coordinator-mcp-tool-layer-tests` → **PR #1205** (https://github.com/chittyos/ch1tty/pull/1205), open, CI pending
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1949 pass / 0 fail / 3 skip (1952 total, 52 suites, ~43s) — +18 vs main (1931/0/3)
+- **Guardrails**: 5-tool surface confirmed (search/execute/status/reload/cast). `buildCastExplanation` metric freeze ACTIVE (tests 1724/1725 enforce 56-field/87-field limits). 0 violations.
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1931/0/3 (1934 total, 52 suites). 0 failures (baseline on main).
+  - 0 open PRs (confirmed via GitHub MCP). State matches run ~1542 (last productive run that merged #1203/#1204).
+  - Identified `apps/session-coordinator-mcp` as lacking `mcp-tool-layer.test.ts` (unlike evidence-mcp, ledger-mcp, tasks-mcp which all have it). `apps/comms-mcp` also lacks it but uses `McpClientDispatch` (complex external dep — deferred).
+  - Created `apps/session-coordinator-mcp/src/server.ts`: extracted `createSessionCoordinatorServer(client)` factory (7 tools: list_sessions, get_session, create_session, update_session, close_session, append_event, list_events).
+  - Slimmed `apps/session-coordinator-mcp/src/index.ts` to 5-line entrypoint using factory (no behaviour change).
+  - Created `apps/session-coordinator-mcp/test/mcp-tool-layer.test.ts`: 18 tests via InMemoryTransport.
+  - Post-change `npm run build`: clean. `npm test`: 1949/0/3 (+18 tests). 0 failures.
+  - Committed `a9efe7e`, pushed, opened PR #1205. Subscribed to PR #1205 CI events.
+  - Notion board: API 401 (unavailable). DRIVER-BOARD.md is durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ + H/I/J/K/L/M/N/O/P/Q IN PROGRESS (PR #1205 open). Build: clean. Tests: 1949/0/3 on PR branch. **~1543rd run. 1 open PR (#1205).**
+- **Human-action items**:
+  1. **Disable or redirect hourly schedule** — 1543+ consecutive runs; all defined workstreams exhausted; schedule burns compute hourly.
+  2. **Major dep bumps pending human review**: typescript 5→7, @types/node 22→26, c8 11→12, agents 0.20→0.22.
+  3. **Deploy Workstream F phases** (Cloudflare): Create `Ch1ttyApiAgent` DO class + drain `Ch1ttyDO` instances.
+  4. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+  5. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  6. **Stale branch cleanup** — automated weekly via `.github/workflows/cleanup-auto-branches.yml`.
+  7. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
+- **PushNotification**: SENT — PR #1205 opened; session-coordinator-mcp tool-layer tests (+18 tests); tests 1949/0/3.
+- **Next run**: Watch PR #1205 for CI events. If CI green + no review blockers, merge and mark Q done. `comms-mcp` is a candidate for a follow-on workstream R (1 tool: `comms.recentLog`; `McpClientDispatch` is the complication).
