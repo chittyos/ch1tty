@@ -13,6 +13,7 @@
 //   ch1tty.execute(namespacedTool,args)-> run any tool by serverId/toolName
 import { DynamicWorkerExecutor } from '@cloudflare/codemode';
 import { log } from './logger.js';
+import { describeNamespaces as _describeNamespaces } from './codemode-describe.js';
 
 /** Minimal contract the bridge needs from the aggregator/DO core. */
 export interface CodemodeHost {
@@ -88,15 +89,6 @@ export class CodemodeBridge {
    * description so the model knows which namespaces exist.
    */
   static describeNamespaces(serverIds: string[]): string {
-    const lines = serverIds.map(
-      (id) => `  ${id}.execute(toolName: string, args?: object): Promise<unknown>; ${id}.search(query: string): Promise<ToolDescriptor[]>;`,
-    );
-    return [
-      'Available namespaces inside the code sandbox (call via Workers RPC):',
-      '  ch1tty.search(query: string): Promise<ToolDescriptor[]>;',
-      '  ch1tty.execute(namespacedTool: string, args?: object): Promise<unknown>;',
-      ...lines,
-      'Write an async function body that returns the final value. No internet fetch — only these namespaces.',
-    ].join('\n');
+    return _describeNamespaces(serverIds);
   }
 }
