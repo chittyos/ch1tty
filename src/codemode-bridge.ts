@@ -13,6 +13,7 @@
 //   ch1tty.execute(namespacedTool,args)-> run any tool by serverId/toolName
 import { DynamicWorkerExecutor } from '@cloudflare/codemode';
 import { log } from './logger.js';
+import { buildFnTable, marshalResult } from './codemode-fns.js';
 
 /** Minimal contract the bridge needs from the aggregator/DO core. */
 export interface CodemodeHost {
@@ -49,32 +50,10 @@ export class CodemodeBridge {
    * or captured logs — never throws (executor contract).
    */
   async run(code: string, host: CodemodeHost, sessionId?: string): Promise<CodemodeResult> {
-    const fns: Record<string, (...args: unknown[]) => Promise<unknown>> = {};
-
-    // Per-upstream namespaces: <serverId>__execute / <serverId>__search.
-    // DynamicWorkerExecutor exposes a flat fn record under a single namespace;
-    // we name functions `<serverId>.<verb>` so sandbox code reads naturally.
-    for (const serverId of host.remoteServerIds()) {
-      fns[`${serverId}.execute`] = async (tool: unknown, args: unknown) => {
-        const toolName = String(tool);
-        const a = (args && typeof args === 'object' && !Array.isArray(args)) ? (args as Record<string, unknown>) : {};
-        return host.runTool(`${serverId}/${toolName}`, a, sessionId);
-      };
-      fns[`${serverId}.search`] = async (query: unknown) => {
-        return host.searchTools(String(query ?? ''), serverId);
-      };
-    }
-
-    // Cross-server ch1tty namespace.
-    fns['ch1tty.search'] = async (query: unknown) => host.searchTools(String(query ?? ''));
-    fns['ch1tty.execute'] = async (tool: unknown, args: unknown) => {
-      const a = (args && typeof args === 'object' && !Array.isArray(args)) ? (args as Record<string, unknown>) : {};
-      return host.runTool(String(tool), a, sessionId);
-    };
-
+    const fns = buildFnTable(host, sessionId);
     try {
       const out = await this.executor.execute(code, fns);
-      return { result: out.result, error: out.error, logs: out.logs };
+      return marshalResult(out);
     } catch (err) {
       // Defensive — execute() is contracted not to throw, but never let a
       // bridge bug crash the DO request.
