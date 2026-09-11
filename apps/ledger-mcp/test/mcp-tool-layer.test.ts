@@ -234,6 +234,18 @@ test('list_entries: missing namespace → isError', async () => {
   }
 });
 
+test('list_entries: empty string namespace → isError', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.callTool({ name: 'list_entries', arguments: { namespace: '' } });
+    assert.equal(result.isError, true);
+    const content = result.content as Array<{ type: string; text: string }>;
+    assert.ok(content[0].text.includes('"namespace"'));
+  } finally {
+    await cleanup();
+  }
+});
+
 // ── get_entry ─────────────────────────────────────────────────────────────────
 
 test('get_entry: passes namespace and id to client', async () => {
@@ -278,10 +290,34 @@ test('get_entry: missing namespace → isError', async () => {
   }
 });
 
+test('get_entry: empty string namespace → isError', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.callTool({ name: 'get_entry', arguments: { namespace: '', id: 'e1' } });
+    assert.equal(result.isError, true);
+    const content = result.content as Array<{ type: string; text: string }>;
+    assert.ok(content[0].text.includes('"namespace"'));
+  } finally {
+    await cleanup();
+  }
+});
+
 test('get_entry: missing id → isError', async () => {
   const { client, cleanup } = await setup();
   try {
     const result = await client.callTool({ name: 'get_entry', arguments: { namespace: 'events' } });
+    assert.equal(result.isError, true);
+    const content = result.content as Array<{ type: string; text: string }>;
+    assert.ok(content[0].text.includes('"id"'));
+  } finally {
+    await cleanup();
+  }
+});
+
+test('get_entry: empty string id → isError', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.callTool({ name: 'get_entry', arguments: { namespace: 'events', id: '' } });
     assert.equal(result.isError, true);
     const content = result.content as Array<{ type: string; text: string }>;
     assert.ok(content[0].text.includes('"id"'));
@@ -386,12 +422,42 @@ test('append_entry: missing namespace → isError', async () => {
   }
 });
 
+test('append_entry: empty string namespace → isError', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.callTool({
+      name: 'append_entry',
+      arguments: { namespace: '', payload: { type: 'test.event' } },
+    });
+    assert.equal(result.isError, true);
+    const content = result.content as Array<{ type: string; text: string }>;
+    assert.ok(content[0].text.includes('"namespace"'));
+  } finally {
+    await cleanup();
+  }
+});
+
 test('append_entry: missing payload → isError', async () => {
   const { client, cleanup } = await setup();
   try {
     const result = await client.callTool({
       name: 'append_entry',
       arguments: { namespace: 'events' },
+    });
+    assert.equal(result.isError, true);
+    const content = result.content as Array<{ type: string; text: string }>;
+    assert.ok(content[0].text.includes('"payload"'));
+  } finally {
+    await cleanup();
+  }
+});
+
+test('append_entry: null payload → isError', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.callTool({
+      name: 'append_entry',
+      arguments: { namespace: 'events', payload: null },
     });
     assert.equal(result.isError, true);
     const content = result.content as Array<{ type: string; text: string }>;
