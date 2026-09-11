@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        app: [tasks-mcp, ledger-mcp, session-coordinator-mcp, evidence-mcp]
+        app: [tasks-mcp, ledger-mcp, session-coordinator-mcp, evidence-mcp, comms-mcp]
         node-version: [20, 22]
 
     steps:
