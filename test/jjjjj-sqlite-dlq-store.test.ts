@@ -307,3 +307,41 @@ test('SqliteDlqStore: rewrite() assigns fresh droppedAt to re-written entries', 
   const writtenAt = Date.parse(rows[0].dropped_at);
   assert.ok(writtenAt >= before, 'dropped_at should be >= before rewrite');
 });
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 7. Error-path coverage — catch blocks in append/readEntries/rewrite/count
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// A SqlStorage shim that succeeds on the constructor's CREATE TABLE call, then
+// throws on every subsequent exec() — exercising the catch blocks in each method.
+function makeFailAfterInitSql(): SqlStorage {
+  let calls = 0;
+  return {
+    exec(..._args: unknown[]) {
+      calls++;
+      if (calls === 1) return { toArray: () => [] } as ReturnType<SqlStorage['exec']>;
+      throw new Error('simulated SQLite I/O error');
+    },
+  } as unknown as SqlStorage;
+}
+
+test('SqliteDlqStore: append() SQL error is caught — must not throw', () => {
+  const store = new SqliteDlqStore(makeFailAfterInitSql());
+  assert.doesNotThrow(() => store.append([entry({ session_id: 'err-test' })]));
+});
+
+test('SqliteDlqStore: readEntries() SQL error is caught — returns empty array', () => {
+  const store = new SqliteDlqStore(makeFailAfterInitSql());
+  const result = store.readEntries();
+  assert.deepEqual(result, []);
+});
+
+test('SqliteDlqStore: rewrite() SQL error is caught — must not throw', () => {
+  const store = new SqliteDlqStore(makeFailAfterInitSql());
+  assert.doesNotThrow(() => store.rewrite([{ session_id: 'x' }]));
+});
+
+test('SqliteDlqStore: count() SQL error is caught — returns 0', () => {
+  const store = new SqliteDlqStore(makeFailAfterInitSql());
+  assert.equal(store.count(), 0);
+});
