@@ -2563,3 +2563,29 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   6. **Stale branch cleanup** — 1100+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings.
   7. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
 - **Next run**: Idle. Merge open PRs to enable meaningful follow-on work.
+
+---
+
+### 2026-09-11T~21:00Z (run ~1575 — AP: ledger-mcp empty-arg validation branches; PR #1230)
+- **Workstream**: AP — ledger-mcp: 5 uncovered empty-arg validation branches
+- **Branch/PR**: `auto/AP-ledger-mcp-empty-arg-branches` → https://github.com/chittyos/ch1tty/pull/1230
+- **Build**: clean (`npm run build` exit 0) | **Tests**: 1970 pass / 0 fail / 3 skip (+5 vs prior 1965)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; 5-tool surface + `buildCastExplanation` metric freeze guardrails confirmed.
+  - `npm ci` clean. `npm run build` clean. `npm test`: 1965/0/3, 0 failures (baseline on main).
+  - Read Notion board (36e94de4): A–E + F–AO all ✓ done; last run was idle (~1574). Notion update blocked — workspace out of free blocks.
+  - Checked all 21 open PRs (#1210–#1229): all open, awaiting human merge. None touch ledger-mcp validation branches.
+  - Coverage analysis: `apps/ledger-mcp/src/server.ts` guards `namespace`/`id` with `typeof !=='string' || !value` — the `!value` (empty string) branch is never triggered by existing tests that pass `undefined`. Similarly `payload === null` was untested (only `payload === undefined` was covered).
+  - Added 5 tests to `apps/ledger-mcp/test/mcp-tool-layer.test.ts`: empty-string namespace for list_entries, get_entry, append_entry; empty-string id for get_entry; null payload for append_entry.
+  - All 5 new tests pass; full suite 1970/0/3.
+  - Opened PR #1230; subscribed for CI/review events.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F–AP ✓ ALL DONE. Tests: 1970/0/3. Build: clean. **~1575th run.**
+- **Human-action items** (unchanged):
+  1. **Merge 22 open PRs** (#1210–#1230) — all CI-green test improvements + chore bumps.
+  2. **Disable or redirect hourly schedule** — coverage saturated; idle runs burn ~50k tokens.
+  3. **Notion plan upgrade** — workspace out of free blocks; board cannot be updated via MCP.
+  4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod — reconnects GitHub MCP backend.
+  5. **Configure CF Access on prod** — clears ledger DLQ.
+  6. **Stale branch cleanup** — 1100+ remote `auto/` branches.
+  7. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+- **Next run**: Candidate AQ — check remaining apps for similar empty-arg or null-branch gaps; otherwise idle if none found.
