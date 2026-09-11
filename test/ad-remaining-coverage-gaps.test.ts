@@ -105,25 +105,87 @@ test('Logger.setLevel: valid level "debug" is accepted (lines 35-36 covered)', (
   }
 });
 
-test('Logger.setLevel: case-insensitive — "WARN" is treated as warn', () => {
+test('Logger.setLevel: case-insensitive — "WARN"/"INFO"/"ERROR" each update the threshold', () => {
   const logger = new Logger();
-  // Just verify it doesn't throw and the path is exercised (lines 35-36 covered via setLevel('WARN'))
-  assert.doesNotThrow(() => logger.setLevel('WARN'));
-  assert.doesNotThrow(() => logger.setLevel('INFO'));
-  assert.doesNotThrow(() => logger.setLevel('ERROR'));
+  const captured: string[] = [];
+  const origWrite = process.stderr.write.bind(process.stderr);
+  (process.stderr as { write: typeof process.stderr.write }).write = (chunk: string | Uint8Array, ..._r: unknown[]) => {
+    captured.push(typeof chunk === 'string' ? chunk : Buffer.from(chunk as Uint8Array).toString());
+    return true;
+  };
+  try {
+    // setLevel('WARN') → info must be suppressed, warn must appear
+    logger.setLevel('WARN');
+    const beforeWarn = captured.length;
+    logger.info('should be suppressed at WARN');
+    assert.equal(captured.length, beforeWarn, 'info must be suppressed after setLevel("WARN")');
+    logger.warn('should appear at WARN');
+    assert.ok(captured.length > beforeWarn, 'warn must appear after setLevel("WARN")');
+
+    // setLevel('INFO') → info must now appear
+    logger.setLevel('INFO');
+    const beforeInfo = captured.length;
+    logger.info('should appear at INFO');
+    assert.ok(captured.length > beforeInfo, 'info must appear after setLevel("INFO")');
+
+    // setLevel('ERROR') → warn must be suppressed
+    logger.setLevel('ERROR');
+    const beforeError = captured.length;
+    logger.warn('should be suppressed at ERROR');
+    assert.equal(captured.length, beforeError, 'warn must be suppressed after setLevel("ERROR")');
+    logger.error('should appear at ERROR');
+    assert.ok(captured.length > beforeError, 'error must appear after setLevel("ERROR")');
+  } finally {
+    process.stderr.write = origWrite;
+  }
 });
 
-test('Logger.setLevel: unknown level string is silently ignored', () => {
+test('Logger.setLevel: unknown level string is silently ignored — baseline preserved', () => {
   const logger = new Logger();
-  assert.doesNotThrow(() => logger.setLevel('verbose'));
-  assert.doesNotThrow(() => logger.setLevel('trace'));
-  assert.doesNotThrow(() => logger.setLevel('SILLY'));
+  // Establish a known baseline: ERROR level (only errors appear)
+  logger.setLevel('error');
+  const captured: string[] = [];
+  const origWrite = process.stderr.write.bind(process.stderr);
+  (process.stderr as { write: typeof process.stderr.write }).write = (chunk: string | Uint8Array, ..._r: unknown[]) => {
+    captured.push(typeof chunk === 'string' ? chunk : Buffer.from(chunk as Uint8Array).toString());
+    return true;
+  };
+  try {
+    // Unknown levels must leave the ERROR baseline untouched
+    logger.setLevel('verbose');
+    logger.setLevel('trace');
+    logger.setLevel('SILLY');
+    const afterUnknown = captured.length;
+    logger.warn('warn must still be suppressed after unknown setLevel calls');
+    assert.equal(captured.length, afterUnknown, 'warn must remain suppressed — unknown level must not change threshold');
+    logger.error('error must still appear');
+    assert.ok(captured.length > afterUnknown, 'error must still appear after unknown setLevel calls');
+  } finally {
+    process.stderr.write = origWrite;
+  }
 });
 
-test('Logger.setLevel: undefined/empty does not throw (early-return path)', () => {
+test('Logger.setLevel: undefined/empty does not change threshold (early-return path)', () => {
   const logger = new Logger();
-  assert.doesNotThrow(() => logger.setLevel(undefined));
-  assert.doesNotThrow(() => logger.setLevel(''));
+  // Establish a known baseline: ERROR level
+  logger.setLevel('error');
+  const captured: string[] = [];
+  const origWrite = process.stderr.write.bind(process.stderr);
+  (process.stderr as { write: typeof process.stderr.write }).write = (chunk: string | Uint8Array, ..._r: unknown[]) => {
+    captured.push(typeof chunk === 'string' ? chunk : Buffer.from(chunk as Uint8Array).toString());
+    return true;
+  };
+  try {
+    logger.setLevel(undefined);
+    logger.setLevel('');
+    const afterEarlyReturn = captured.length;
+    logger.info('info must remain suppressed after undefined/empty setLevel');
+    assert.equal(captured.length, afterEarlyReturn, 'threshold must not change on undefined/empty setLevel');
+    logger.error('error must still appear');
+    assert.ok(captured.length > afterEarlyReturn, 'error must still appear after undefined/empty setLevel');
+  } finally {
+    process.stderr.write = origWrite;
+  }
 });
 
 // ─── 3. LedgerClient constructor: DlqStore instance path (ledger.ts:167) ─────
