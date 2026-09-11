@@ -4282,3 +4282,28 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   5. **Notion workspace** out of free blocks — upgrade plan or clear blocks
 - **PushNotification**: NOT SENT — workstream AL is additive coverage; no urgent blocker.
 - **Next run**: Check PR #1226 CI. Next coverage gap candidates: `src/workers-ai-brain.ts` (85.58% branches, lines 182-186, 350-353); `src/openapi-spec.ts` (84.61% branches, lines 34, 88); `src/codemode-fns.ts` (85.71% branches, lines 27, 29).
+
+---
+
+### 2026-09-11 — run ~1572 — workstream AM: workers/chittyagent-ch1tty agents 0.19→0.22
+
+- **Workstream**: AM — bump `agents ^0.19.0 → ^0.22.0` in `workers/chittyagent-ch1tty/package.json` (aligns worker with main package which is at `^0.22.0`)
+- **Branch/PR**: `auto/AM-worker-agents-0.22` → PR opened this run
+- **Build**: clean (tsc exit 0, ch1tty@4.1.0) | **Tests**: 1965 pass / 0 fail / 3 skip (main branch; worker has no testable Node.js tests — vitest/cloudflare-workers runtime)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE. 0 violations on main.
+  - `git reset --hard origin/main`. `npm ci` clean. `npm run build` clean. `npm test`: 1965/0/3 (52 suites).
+  - Checked 18 open PRs (#1209–#1226 = U through AL): all 3/3 CI green (CodeQL; main CI still 0-job-queue flake, non-blocking).
+  - Identified version drift in `workers/chittyagent-ch1tty/package.json`: `agents ^0.19.0` vs main `^0.22.0` (3 minor versions behind). Worker runtime is Cloudflare; cannot run tsc or npm test locally in this container.
+  - Updated `workers/chittyagent-ch1tty/package.json`: `agents ^0.19.0 → ^0.22.0`.
+  - Ran `npm install` in worker dir — lock file updated; `agents@0.22.0` resolved; `npm audit --omit=dev`: 0 vulnerabilities.
+  - Main build re-confirmed clean (worker change is isolated — no shared TypeScript compilation).
+  - Notion board: workspace out of free blocks — DRIVER-BOARD.md is durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–L ✓ M–S ✓ T–Y ✓ Z ✓ AA–AL (PRs #1209–#1226 open) AM (PR #1227 open, CI green). Tests: 1965/0/3 on main. **19 PRs open after this run.**
+- **Human-action items**:
+  1. **Merge PRs #1209–#1226** (U through AL) — all 3/3 CI green; 18 queued
+  2. **Merge PR #1227** (AM: agents 0.22 worker bump) — open, CI green, CodeRabbit ✅
+  3. **Disable/redirect hourly cron** — ~1572 runs; primary workstreams A–E + F exhausted
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks
+- **Next run**: Coverage gap targets from prior run: `src/workers-ai-brain.ts` uncovered branches 182-186, 350-353; `src/openapi-spec.ts` lines 34, 88; (worker agents bump is AM). Worker `wrangler` is also at `^4.79.0` vs main's `4.130.0` — consider AN for wrangler bump in worker.
