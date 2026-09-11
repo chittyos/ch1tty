@@ -2539,3 +2539,27 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token` (ch1tty gateway's own token).
   6. **Stale branch cleanup** — 1081+ rogue `auto/` branches; enable auto-delete in GitHub Settings.
 - **Next run**: Idle. No workstream to advance.
+
+---
+
+### 2026-09-11T~20:00Z (run ~1574 — idle; all workstreams done; 1965/0/3)
+- **Workstream**: None (all A–E + extended F–AO done; no remaining Node.js-testable gaps found)
+- **Branch/PR**: None opened this run (direct commit to main for run log only)
+- **Build**: clean (`npm run build` exit 0) | **Tests**: 1965 pass / 0 fail / 3 skip (52 suites)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; 5-tool surface + `buildCastExplanation` metric freeze guardrails confirmed.
+  - `npm ci` clean. `npm run build` clean. `npm test`: 1965/0/3, 0 failures.
+  - Read Notion board (36e94de4): A–E all ✓ done; extended F–AO ✓ done. Notion update blocked — workspace out of free blocks (plan upgrade required).
+  - Checked all 21 open PRs (#1210–#1229): all CI-green (CodeQL ✓, Analyze ✓), awaiting human merge.
+  - Coverage sweep: systematically checked every `src/*.ts` file. `api-agent.ts` and `mcp-agent.ts` have 0 test-file references but require the CF Workers `McpAgent`/`DurableObject` runtime — not unit-testable in Node.js. PR #1216 (open, CI-green) already extracts `toMcpResult()` from `mcp-agent.ts` to testable `src/mcp-content.ts`. No remaining gap found.
+  - 3 skipped tests legitimately require external services (real MCP backend, Ollama daemon).
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F–AO ✓ ALL DONE. Tests: 1965/0/3. Build: clean. **~1574th run.**
+- **Human-action items** (updated):
+  1. **Merge 21 open PRs** (#1210–#1229) — all CI-green, test improvements, chore bumps. Merge unblocks meaningful subsequent runs.
+  2. **Disable or redirect hourly schedule** — 1574+ runs; test coverage is saturated; idle runs burn ~50k tokens each with no new work.
+  3. **Notion plan upgrade** — workspace out of free blocks; board can no longer be updated via MCP.
+  4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod — reconnects GitHub MCP backend.
+  5. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  6. **Stale branch cleanup** — 1100+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings.
+  7. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
+- **Next run**: Idle. Merge open PRs to enable meaningful follow-on work.
