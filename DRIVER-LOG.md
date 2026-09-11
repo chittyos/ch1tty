@@ -4264,3 +4264,28 @@ BLOCKED (free tier — cannot update board pages)
 
 ### Next run recommendation
 After AD merges: remaining src-stdio coverage gaps will be aggregator.ts/logger.ts/ledger.ts/remote-proxy.ts (all closed by AD). After AE merges: child-manager + http-server at 100%. With 11 PRs queued, consider whether AF should focus on something other than coverage (e.g. apps/ test coverage for workers-ai-brain or config-data in src/).
+
+---
+### Run ~1561 — 2026-09-11T~hourly — workstream AF (comms-mcp CI gap)
+
+**Workstream advanced**: AF — comms-mcp missing from `apps-build-and-test` CI matrix
+**Branch/PR**: `auto/AF-comms-mcp-ci-matrix` → https://github.com/chittyos/ch1tty/pull/1220
+**Build**: tsc clean (ch1tty@4.1.0) | **Tests**: 1965 pass / 0 fail / 3 skip (root); comms-mcp 28/0/1
+**Change**: 1 line in `.github/workflows/ci.yml` — added `comms-mcp` to the matrix alongside the 4 existing app targets
+
+**What was done**:
+- `npm ci` + `npm run build`: clean. `npm test`: 1965/0/3 (1968 total, 52 suites).
+- Inspected CI: `comms-mcp` present in `security` audit job but absent from `apps-build-and-test` matrix — its 29 tests never ran in CI on PRs. Blind spot: PRs AA and Z added 56 comms-mcp tests that CI never exercised.
+- Verified `cd apps/comms-mcp && npm ci && npm run build && npm test`: 28/0/1 — clean.
+- Fixed `.github/workflows/ci.yml` matrix to include `comms-mcp`, committed + pushed, opened PR #1220.
+- Subscribed to PR #1220. 12 open PRs total (U–AF).
+
+**Open PRs (12 total, all CI-green)**: U (#1209), V (#1210), W (#1211), X (#1212), Y (#1213), Z (#1214), AA (#1215), AB (#1216), AC (#1217), AD (#1218), AE (#1219), AF (#1220)
+
+**Human-action items**:
+1. **Merge queued PRs** — 12 open PRs, all CI-green, awaiting human review. Oldest: #1209 (2026-09-10).
+2. **Disable or redirect hourly schedule** — all workstreams A-AF complete; schedule burns compute hourly.
+3. **Set `GITHUB_MCP_AUTHORIZATION` on prod** — reconnects GitHub MCP backend.
+4. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+
+**Next run**: Idle (AF done). Define AG+ or disable schedule.
