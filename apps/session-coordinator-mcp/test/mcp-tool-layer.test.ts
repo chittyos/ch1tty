@@ -484,6 +484,7 @@ test('list_events — cursor is forwarded to client', async () => {
     assert.equal(res.isError, undefined);
     assert.equal(capturedCursor, 'page-2');
     const data = JSON.parse((res.content[0] as { text: string }).text);
+    assert.equal(data.has_more, true);
     assert.equal(data.cursor, 'next-page');
   } finally {
     await cleanup();
