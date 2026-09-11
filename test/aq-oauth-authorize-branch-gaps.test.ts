@@ -21,6 +21,7 @@ function makeAuthErrLike(opts: { code: string; description: string; redirectUri?
 function makeProvider(opts: {
   parseThrows?: Error;
   parseReturns?: AuthRequest;
+  onParse?: (req: Request) => void;
 } = {}): OAuthHelpers {
   const staticReq: AuthRequest = opts.parseReturns ?? ({
     responseType: 'code',
@@ -33,7 +34,8 @@ function makeProvider(opts: {
   } as AuthRequest);
 
   return {
-    async parseAuthRequest(_req: Request): Promise<AuthRequest> {
+    async parseAuthRequest(req: Request): Promise<AuthRequest> {
+      opts.onParse?.(req);
       if (opts.parseThrows) throw opts.parseThrows;
       return staticReq;
     },
@@ -100,29 +102,43 @@ test('handleAuthorize POST: formData() parse fails → 400 plain text', async ()
 
 // 4. POST synthetic re-parse: auth-error WITHOUT redirectUri → 400 plain text
 test('handleAuthorize POST: synthetic re-parse auth-error without redirectUri → 400 plain text', async () => {
-  // First call (GET to parse the synthetic URL) throws an auth-error with no redirectUri.
   const err = makeAuthErrLike({ code: 'invalid_client', description: 'Client not found' });
+  let capturedReq: Request | undefined;
   const req = new Request(`${BASE}/authorize`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({ oauth_params: OAUTH_QS, token: 'secret' }).toString(),
   });
-  const res = await handleAuthorize(req, makeEnv('secret', makeProvider({ parseThrows: err })));
+  const res = await handleAuthorize(
+    req,
+    makeEnv('secret', makeProvider({ parseThrows: err, onParse: (r) => { capturedReq = r; } })),
+  );
   assert.equal(res.status, 400);
   const body = await res.text();
   assert.ok(body.includes('Client not found'), `body: ${body}`);
+  // Verify the synthetic GET request was correctly reconstructed from oauth_params.
+  assert.equal(capturedReq?.method, 'GET', 'synthetic re-parse must use GET');
+  assert.equal(capturedReq?.url, `${BASE}/authorize${OAUTH_QS}`, 'synthetic URL must match oauth_params');
 });
 
 // 5. POST synthetic re-parse: non-auth error → rethrows
 test('handleAuthorize POST: synthetic re-parse throws non-auth error → rethrows', async () => {
   const err = new Error('network failure');
+  let capturedReq: Request | undefined;
   const req = new Request(`${BASE}/authorize`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({ oauth_params: OAUTH_QS, token: 'secret' }).toString(),
   });
   await assert.rejects(
-    () => handleAuthorize(req, makeEnv('secret', makeProvider({ parseThrows: err }))),
+    () =>
+      handleAuthorize(
+        req,
+        makeEnv('secret', makeProvider({ parseThrows: err, onParse: (r) => { capturedReq = r; } })),
+      ),
     (e: Error) => e.message === 'network failure',
   );
+  // Verify the synthetic GET request was correctly reconstructed.
+  assert.equal(capturedReq?.method, 'GET', 'synthetic re-parse must use GET');
+  assert.equal(capturedReq?.url, `${BASE}/authorize${OAUTH_QS}`, 'synthetic URL must match oauth_params');
 });
