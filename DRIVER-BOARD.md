@@ -4299,10 +4299,10 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   - Ran `npm install` in worker dir — lock file updated; `agents@0.22.0` resolved; `npm audit --omit=dev`: 0 vulnerabilities.
   - Main build re-confirmed clean (worker change is isolated — no shared TypeScript compilation).
   - Notion board: workspace out of free blocks — DRIVER-BOARD.md is durable board.
-- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–L ✓ M–S ✓ T–Y ✓ Z ✓ AA–AL (PRs #1209–#1226 open) AM(branch pushed). Tests: 1965/0/3 on main. **19 PRs open after this run.**
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–L ✓ M–S ✓ T–Y ✓ Z ✓ AA–AL (PRs #1209–#1226 open) AM (PR #1227 open, CI green). Tests: 1965/0/3 on main. **19 PRs open after this run.**
 - **Human-action items**:
   1. **Merge PRs #1209–#1226** (U through AL) — all 3/3 CI green; 18 queued
-  2. **Merge PR AM** (agents 0.22 worker bump) — once opened
+  2. **Merge PR #1227** (AM: agents 0.22 worker bump) — open, CI green, CodeRabbit ✅
   3. **Disable/redirect hourly cron** — ~1572 runs; primary workstreams A–E + F exhausted
   4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
   5. **Notion workspace** out of free blocks
