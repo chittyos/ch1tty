@@ -2589,3 +2589,29 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   6. **Stale branch cleanup** — 1100+ remote `auto/` branches.
   7. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
 - **Next run**: Candidate AQ — check remaining apps for similar empty-arg or null-branch gaps; otherwise idle if none found.
+
+---
+## Run ~1576 — 2026-09-11T~UTC — Workstream AQ
+
+- **Workstream advanced**: AQ — oauth-authorize.ts uncovered branch gaps
+- **Branch/PR**: `auto/AQ-oauth-authorize-branch-gaps` → https://github.com/chittyos/ch1tty/pull/1231
+- **Build**: tsc clean (0 errors)
+- **Tests**: 1970 pass / 0 fail / 3 skip (was 1965/0/3, +5)
+- **What was done**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed. npm ci clean. Build clean. Tests 1965/0/3.
+  - Read Notion board: all A–AP workstreams confirmed complete; 22 open PRs before this run.
+  - Identified 5 uncovered branches in `src/oauth-authorize.ts` not reached by `test/oauth-authorize.test.ts`:
+    1. `oauthErrorRedirect`: redirectUri present, state absent (false branch of `if (err.state)`)
+    2. `oauthErrorRedirect`: issuer set (true branch of `if (err.issuer)`)
+    3. POST: `req.formData()` throws → 400 "Bad request: invalid form body"
+    4. POST synthetic re-parse: auth-error without redirectUri → 400 plain text
+    5. POST synthetic re-parse: non-auth error → rethrows
+  - Added `test/aq-oauth-authorize-branch-gaps.test.ts` — 5 tests, all pass.
+  - Full suite: 1970/0/3 (+5 vs 1965 baseline). No regressions.
+- **Open PRs**: 23 (#1209–#1231; #1231 just opened)
+- **Blockers (unchanged — require human action)**:
+  1. GitHub Actions ci.yml disabled at org level.
+  2. Env vars missing: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN.
+  3. Hourly cron idle-burning ~50k tokens/run — disable or extend with new workstreams.
+  4. Stale branch cleanup — 1100+ remote auto/ branches.
+- **Next run**: Candidate AR — check `src/mcp-agent.ts` or `src/workers-ai-brain.ts` for uncovered branches; alternatively `src/api-agent.ts` (114 lines, no dedicated test file found).
