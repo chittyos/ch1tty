@@ -4238,3 +4238,29 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
   6. **Rotate Notion token** if needed — `op://ChittyOS-Integrations/notion/api_token`.
 - **PushNotification**: SENT — escalation: 4 PRs merged today (H/I/J/K, +395 tests), schedule now fully idle.
 - **Next run**: Idle. Define new workstreams or disable schedule.
+
+---
+## Run ~1560 — 2026-09-11T04:xx UTC
+
+**Workstream advanced:** AE — remaining branch gaps (child-manager/http-server)
+**Branch/PR:** auto/AE-remaining-branch-gaps → https://github.com/chittyos/ch1tty/pull/1219
+**Build:** tsc clean
+**Tests:** 1968 pass / 0 fail / 3 skip (was 1965/0/3, +3 new tests)
+**Coverage delta:** child-manager.ts branch 98.73%→100%; http-server.ts branch 99.15%→100%; all-files branch 98.41%→98.52%
+
+### What was done
+- Identified 3 uncovered branches in src-stdio/ via c8 report on current main:
+  - child-manager.ts:137 — `errJson.reason || "no reason"` fallback (error body without reason field)
+  - child-manager.ts:139 — `catch {}` when `res.json()` throws on non-OK response  
+  - http-server.ts:168 — `isClosing` guard (transport.onclose called twice, second returns early)
+- Added test/ae-remaining-branch-gaps.test.ts with 3 focused tests; all pass
+- PR #1219 opened and subscribed
+
+### Open PRs (11 total, all CI-green)
+U (#1209), V (#1210), W (#1211), X (#1212), Y (#1213), Z (#1214), AA (#1215), AB (#1216), AC (#1217), AD (#1218), AE (#1219)
+
+### Notion board status
+BLOCKED (free tier — cannot update board pages)
+
+### Next run recommendation
+After AD merges: remaining src-stdio coverage gaps will be aggregator.ts/logger.ts/ledger.ts/remote-proxy.ts (all closed by AD). After AE merges: child-manager + http-server at 100%. With 11 PRs queued, consider whether AF should focus on something other than coverage (e.g. apps/ test coverage for workers-ai-brain or config-data in src/).
