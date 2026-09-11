@@ -425,3 +425,68 @@ test('list_sessions — invalid status enum returns error without calling client
     await cleanup();
   }
 });
+
+test('create_session — non-object context returns error without calling client', async () => {
+  let called = false;
+  const { client, cleanup } = await setup({
+    createSession: async () => { called = true; return SESSION_1; },
+  });
+  try {
+    const res = await client.callTool({ name: 'create_session', arguments: { channel: 'claude-code', context: 'not-an-object' } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /context/);
+    assert.equal(called, false);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('append_event — non-object payload returns error without calling client', async () => {
+  let called = false;
+  const { client, cleanup } = await setup({
+    appendEvent: async () => { called = true; return EVENT_1; },
+  });
+  try {
+    const res = await client.callTool({ name: 'append_event', arguments: { session_id: 'sess-1', type: 'test', payload: 'not-an-object' } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /payload/);
+    assert.equal(called, false);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_events — non-numeric limit returns error without calling client', async () => {
+  let called = false;
+  const { client, cleanup } = await setup({
+    listEvents: async () => { called = true; return { events: [], has_more: false }; },
+  });
+  try {
+    const res = await client.callTool({ name: 'list_events', arguments: { session_id: 'sess-1', limit: 'ten' } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /limit/);
+    assert.equal(called, false);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_events — cursor is forwarded to client', async () => {
+  let capturedCursor: string | undefined;
+  const { client, cleanup } = await setup({
+    listEvents: async (_id, opts) => {
+      capturedCursor = (opts as { cursor?: string } | undefined)?.cursor;
+      return { events: [EVENT_1], has_more: true, cursor: 'next-page' };
+    },
+  });
+  try {
+    const res = await client.callTool({ name: 'list_events', arguments: { session_id: 'sess-1', cursor: 'page-2' } });
+    assert.equal(res.isError, undefined);
+    assert.equal(capturedCursor, 'page-2');
+    const data = JSON.parse((res.content[0] as { text: string }).text);
+    assert.equal(data.has_more, true);
+    assert.equal(data.cursor, 'next-page');
+  } finally {
+    await cleanup();
+  }
+});
