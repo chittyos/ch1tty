@@ -4253,3 +4253,32 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   5. **Notion workspace** out of free blocks — upgrade plan or clear blocks
 - **PushNotification**: NOT SENT — workstream AI is additive; no urgent blocker.
 - **Next run**: Check PR #1223 CI. If all 15 PRs green, consider workstream AJ or idle.
+
+---
+
+### 2026-09-11T~15:00 UTC (run ~1571 — workstream AL: dlq-store error-path catch branches)
+- **Workstream**: AL — cover 4 catch blocks in `src/dlq-store.ts` (78% branch coverage → covered)
+- **Branch/PR**: `auto/AL-dlq-store-error-paths` → **PR #1226** (https://github.com/chittyos/ch1tty/pull/1226)
+- **Build**: tsc clean (0 errors) | **Tests**: 1969 pass / 0 fail / 3 skip (1972 total, 52 suites, ~49s)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1740/1741 enforce 56/87 fields). 0 violations on main.
+  - `git reset --hard origin/main` (1491e12, run ~1570). `npm ci` clean. `npm run build` clean. `npm test`: 1965/0/3 — baseline confirmed.
+  - Checked 17 open PRs (#1209–#1225 = U through AK): all 3/3 CI green. No blocking threads on any.
+  - Ran `npx c8` coverage report: `src/dlq-store.ts` at 78.26% branches (lines 40, 57-59, 74-75, 82-83 uncovered — all error catch paths). No open PR covered this file.
+  - Added `makeFailAfterInitSql()` shim + 4 tests to `test/jjjjj-sqlite-dlq-store.test.ts`:
+    - `append()` SQL error is caught — must not throw
+    - `readEntries()` SQL error is caught — returns `[]`
+    - `rewrite()` SQL error is caught — must not throw
+    - `count()` SQL error is caught — returns `0`
+  - Full test suite: 1969/0/3 (1972 total) — +4 tests, 0 regressions.
+  - Pushed `auto/AL-dlq-store-error-paths`; opened **PR #1226**. Subscribed to PR activity.
+  - Notion board: workspace out of free blocks — DRIVER-BOARD.md is durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–L ✓ M–S ✓ T–Y ✓ Z ✓ AA–AK (PRs #1209–#1225 open) AL(#1226 open). Tests: 1969/0/3. **18 PRs open total.**
+- **Human-action items**:
+  1. **Merge PRs #1209–#1225** (U through AK) — all 3/3 CI green; queuing up; once merged tests reach ~2100+
+  2. **Merge PR #1226** (AL: dlq-store error-path catch branches — +4 tests) — awaiting CI
+  3. **Disable/redirect hourly cron** — ~1571 runs; primary workstreams A–E + F exhausted; idle-burning tokens
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks — upgrade plan or clear blocks
+- **PushNotification**: NOT SENT — workstream AL is additive coverage; no urgent blocker.
+- **Next run**: Check PR #1226 CI. Next coverage gap candidates: `src/workers-ai-brain.ts` (85.58% branches, lines 182-186, 350-353); `src/openapi-spec.ts` (84.61% branches, lines 34, 88); `src/codemode-fns.ts` (85.71% branches, lines 27, 29).
