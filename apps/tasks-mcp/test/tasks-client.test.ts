@@ -27,11 +27,13 @@ const FIXTURE_TASKS = [
 let fixtureServer: http.Server;
 let baseUrl: string;
 let lastAuthHeader: string | undefined;
+let lastRequestUrl: URL | undefined;
 
 before(async () => {
   fixtureServer = http.createServer((req, res) => {
     lastAuthHeader = req.headers['authorization'];
     const url = new URL(req.url!, 'http://localhost');
+    lastRequestUrl = url;
     res.setHeader('Content-Type', 'application/json');
 
     const readBody = (): Promise<string> =>
@@ -45,10 +47,12 @@ before(async () => {
       if (req.method === 'GET' && url.pathname === '/api/tasks') {
         const statusFilter = url.searchParams.get('status');
         const assigneeFilter = url.searchParams.get('assignee');
+        const projectFilter = url.searchParams.get('project');
         const limitParam = url.searchParams.get('limit');
         let tasks = [...FIXTURE_TASKS];
         if (statusFilter) tasks = tasks.filter(t => t.status === statusFilter);
         if (assigneeFilter) tasks = tasks.filter(t => (t as Record<string, unknown>)['assignee'] === assigneeFilter);
+        if (projectFilter) tasks = tasks.filter(t => (t as Record<string, unknown>)['project'] === projectFilter);
         if (limitParam) tasks = tasks.slice(0, Number(limitParam));
         res.end(JSON.stringify(tasks));
 
@@ -236,6 +240,8 @@ describe('TasksClient', () => {
   it('filters tasks by project', async () => {
     const client = new TasksClient(baseUrl, 'test-token');
     const tasks = await client.listTasks({ project: 'infra' });
-    assert.ok(Array.isArray(tasks));
+    assert.equal(tasks.length, 1);
+    assert.equal(tasks[0].id, 't1');
+    assert.equal(lastRequestUrl?.searchParams.get('project'), 'infra');
   });
 });
