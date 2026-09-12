@@ -4467,3 +4467,26 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   5. **Notion workspace** out of free blocks
 - **PushNotification**: NOT SENT — no new blocker; notification last sent at run ~1580.
 - **Next run**: Once queue drops below ~20, advance AY: `workers-ai-brain.ts` lines 182-186 (catch block / circuit failure) and 350-353 (embed vector validation) — 85.58% branches.
+
+---
+
+### 2026-09-12T~20:30Z (run ~1596 — BA Codex fixes; all 3 P2 review threads resolved on PR #1241)
+- **Workstream**: BA (continued from run ~1595) — `auto/BA-client-url-filter-branches` PR #1241
+- **Build**: tsc clean | **Tests**: 1972/0/3 (1975 total, 52 suites) — green on branch
+- **Actions**:
+  - Applied remaining Codex P2 fixes to `apps/evidence-mcp/test/evidence-client.test.ts`:
+    - Added `let lastRequestUrl: URL | undefined;` module-level variable
+    - Set `lastRequestUrl = url;` in fixture request handler
+    - Strengthened cursor test: asserts `lastRequestUrl?.searchParams.get('cursor') === 'tok_abc123'`
+    - Strengthened search-limit test: asserts `lastRequestUrl?.searchParams.get('limit') === '5'`
+  - Committed as b680256, pushed to `auto/BA-client-url-filter-branches`
+  - Replied to all 3 Codex review threads on PR #1241 explaining fixes; all 3 threads resolved
+  - Full test suite: 1972/0/3 — no regressions
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BA(open). **31 PRs open total** (#1211–#1241). Tests: 1972/0/3.
+- **Human-action items** (unchanged):
+  1. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions"
+  2. **Merge queued PRs #1211–#1241** (W through BA) — 31 PRs ready
+  3. **Disable/redirect hourly cron** — all primary coverage workstreams exhausted
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks
+- **PushNotification**: NOT SENT — no new blocker; run completed cleanly.
