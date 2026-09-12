@@ -15,8 +15,9 @@
  *   4. CallToolRequestSchema: neither person nor identifier (server.ts:69-71):
  *      Boolean(undefined) === Boolean(undefined) → true → throws → catch → {isError:true}
  *
- *   5. CallToolRequestSchema: dispatch.call throws (server.ts:90-96):
- *      recentLog propagates the dispatch error → catch block → {isError:true, text:'Error: ...'}
+ *   5. fetchChannel degradation (recent-log.ts:155-160):
+ *      dispatch.call throws → fetchChannel catches internally → ok:false in metadata.channelsQueried
+ *      The server.ts success branch fires normally; the outer response is not isError.
  *
  * Uses the MCP SDK InMemoryTransport to wire a real Client ↔ Server pair without
  * any network, keeping the test deterministic and self-contained.
@@ -121,17 +122,16 @@ test('createCommsMcpServer: neither person nor identifier → error response wit
   });
 });
 
-// ── 5. Happy path → recentLog succeeds → not isError, parseable JSON ─────────
+// ── 5. fetchChannel degradation → dispatch throws → ok:false in channelsQueried ─
 //
-// fetchChannel's internal try/catch degrades channel failures to ok:false rather
-// than rethrowing, so the server.ts catch block (server.ts:90-96) is reached only
-// via the person/identifier throw (covered by tests 3+4) or an unexpected outer
-// error. This test validates the success branch (server.ts:87-89): when dispatch
-// returns an empty rows array, recentLog completes and the response is not isError.
+// fetchChannel's internal try/catch (recent-log.ts:155-160) catches dispatch.call
+// failures and returns ok:false in the queried record rather than rethrowing.
+// The server.ts success branch (server.ts:87-89) fires normally; the outer
+// response is NOT isError. metadata.channelsQueried surfaces the per-channel result.
 
-test('createCommsMcpServer: identifier only + dispatch returns [] → success JSON response', async () => {
-  // Return an empty rows array — quo channel degrades gracefully with ok:true,count:0.
-  const stubD = makeDispatch(async () => []);
+test('createCommsMcpServer: dispatch throws → fetchChannel degrades quo to ok:false in channelsQueried', async () => {
+  const REJECTION = 'stub-dispatch-rejection-xyz';
+  const stubD = makeDispatch(async () => { throw new Error(REJECTION); });
 
   await withClient(stubD, async (client) => {
     const result = await client.callTool({
@@ -142,11 +142,20 @@ test('createCommsMcpServer: identifier only + dispatch returns [] → success JS
         days: 1,
       },
     });
-    assert.ok(!result.isError, `expected success but got isError; text=${(result.content[0] as { text: string }).text}`);
+    // fetchChannel catches internally: outer response must NOT be isError.
+    assert.ok(!result.isError, `dispatch error is degraded; expected no isError, got: ${(result.content[0] as { text: string }).text}`);
     const text = (result.content[0] as { text: string }).text;
-    // The response must be parseable JSON with entries + metadata.
-    const parsed = JSON.parse(text) as Record<string, unknown>;
+    const parsed = JSON.parse(text) as {
+      entries: unknown[];
+      metadata: { channelsQueried: Array<{ channel: string; ok: boolean; error?: string | null }> };
+    };
     assert.ok(Array.isArray(parsed.entries), 'entries must be an array');
-    assert.ok(parsed.metadata, 'metadata must be present');
+    const quoResult = parsed.metadata.channelsQueried.find((r) => r.channel === 'quo');
+    assert.ok(quoResult, 'quo must appear in channelsQueried');
+    assert.equal(quoResult.ok, false, 'quo must report ok:false on dispatch error');
+    assert.ok(
+      quoResult.error?.includes(REJECTION),
+      `channelsQueried[quo].error must include rejection message; got: ${String(quoResult.error)}`,
+    );
   });
 });
