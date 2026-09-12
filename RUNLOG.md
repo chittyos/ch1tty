@@ -2,6 +2,18 @@
 
 ---
 
+## Run ~1586 — 2026-09-12T07:00Z — Idle (27 PRs queued, CI org-disabled)
+
+- **Workstream advanced**: None — all A–E complete; 27 open PRs (#1209–#1235) cover every remaining coverage gap (aggregator/ledger/logger/remote-proxy/child-manager/http-server); CI disabled at org level prevents any from merging
+- **Branch/PR**: direct commit to main (run log only)
+- **Build**: tsc clean (0 errors)
+- **Tests**: 1965 pass / 0 fail / 3 skip (1968 total, 52 suites)
+- **Coverage**: Stmts 99.82% / Branches 98.41% / Funcs 99.58% / Lines 99.82% — exit 0
+- **Blocker**: GitHub Actions disabled at org level. All 27 PRs are locally-validated but cannot auto-merge. Human action required: re-enable CI in GitHub org settings → Actions → Policies, then review/merge queued PRs.
+- **Next run**: Same idle state unless CI is re-enabled or human merges PRs.
+
+---
+
 ## Run ~1583 — 2026-09-12T~UTC — Idle (25 PRs queued, CI org-disabled)
 
 - **Workstream advanced**: None — queue at 25 open PRs (#1211–#1235); threshold for "too large" is 25; CI disabled at org level
