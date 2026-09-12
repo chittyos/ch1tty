@@ -4418,3 +4418,32 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
 - **Build**: tsc clean | **Tests**: 1965/0/3 (1968 total, 52 suites)
 - **State**: A ✓ B ✓ C ✓ D ✓ E ✓ H–AU ✓. **27 PRs open** (#1209–#1235). GitHub Actions disabled at org level. Notification sent at ~1580 (still unacted).
 - **Human-action items**: Enable GitHub Actions; merge PRs #1209–#1235; disable cron; set prod env vars; upgrade Notion plan.
+
+---
+
+### 2026-09-12T~16:35Z (run ~1591 — workstream AX: codemode-fns + evaluator branch gaps)
+- **Workstream**: AX — cover 3 uncovered branches in `src/codemode-fns.ts` (lines 27,29) and `src/evaluator.ts` (line 92)
+- **Branch/PR**: `auto/AX-codemode-evaluator-null-branches` → **PR #1238** (https://github.com/chittyos/ch1tty/pull/1238)
+- **Build**: tsc clean (0 errors) | **Tests**: 1968 pass / 0 fail / 3 skip (1971 total, 52 suites, +3 new tests)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1740/1741 enforce 56/87 fields). 0 violations on main.
+  - `git pull origin main` (synced to 2364a78, run ~1590). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1965/0/3 — baseline confirmed.
+  - Checked 20 open PRs (#1218–#1237 = AD through AW): all open; GitHub Actions still disabled at org level.
+  - Ran `npx c8 report` to identify gaps not covered by any open PR: `codemode-fns.ts:27,29` (ch1tty.search null query + ch1tty.execute array args) and `evaluator.ts:92` (getStats() ?? 0 when exec returns []).
+  - Created `test/ax-codemode-evaluator-null-branches.test.ts` with 3 tests:
+    1. `codemode-fns.ts:27` — ch1tty.search(null) → `query ?? ''` fires → calls searchTools with `''`
+    2. `codemode-fns.ts:29` — ch1tty.execute with array args → ternary false branch → `{}` coercion
+    3. `evaluator.ts:92` — mock SqlStorage returning `[]` → `toArray()[0]?.c ?? 0` fallback fires
+  - Full suite: 1968/0/3 (1971 total) — +3 tests, 0 regressions, metric freeze guards pass.
+  - Coverage delta: branches 95.51% → 95.60% (3240→3244/3393); `codemode-fns.ts` 85.71%→100%, `evaluator.ts` 96.15%→100%.
+  - Pushed branch; opened **PR #1238** (not draft).
+  - Notion board: workspace out of free blocks — DRIVER-BOARD.md is durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–AW ✓ AX(#1238 open). **21 PRs open total** (#1218–#1238). Tests: 1968/0/3.
+- **Human-action items**:
+  1. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions" (all PRs show 0 jobs / conclusion:failure)
+  2. **Merge queued PRs #1218–#1238** (AD through AX) — 21 PRs ready; queue growing since 2026-09-10
+  3. **Disable/redirect hourly cron** — ~1591 runs; primary workstreams A–E exhausted; coverage PRs accumulating
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks — upgrade plan or clear blocks
+- **PushNotification**: NOT SENT — workstream AX is additive coverage; no urgent blocker; notification already sent at run ~1580.
+- **Next run**: Next uncovered gaps (not covered by any open PR): `workers-ai-brain.ts` (85.58% branches, lines 182-186,350-353), `ajv-harness.ts` (75% branches, lines 34-35), `evaluator.ts` (now 100%), `codemode-fns.ts` (now 100%). Also: `tasks-client.ts` (93.54%), `session-client.ts` (94.73%), `ledger-client.ts` (96.15%), `evidence-client.ts` (90.62%). Advance AY when queue allows.
