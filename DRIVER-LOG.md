@@ -4339,3 +4339,34 @@ AE (#1219 branch-gaps), AF (#1220 CI-matrix), AG (#1221 suggestions), AH (#1222 
 **Actions this run**: npm ci → build clean → 1965/0/3 tests → all CI green on PRs 1221-1222 → no new work added (queue already full).
 
 **Next run**: Idle. Human must merge queued PRs or add new workstream definition.
+
+---
+
+## Run ~1577 — 2026-09-12T~hourly — workstream AR (aggregator/ledger/logger gaps)
+
+**Workstream advanced**: AR — 3 uncovered branch/statement gaps in core gateway files
+**Branch/PR**: `auto/AR-aggregator-ledger-logger-gaps` → https://github.com/chittyos/ch1tty/pull/1232
+**Build**: tsc clean (ch1tty@4.1.0, 0 errors) | **Tests**: 1973 pass / 0 fail / 3 skip (+8 vs 1965/0/3 baseline)
+
+### What was done
+- Startup: `npm ci` clean, `npm run build` clean, `npm test`: 1965/0/3 (52 suites). Confirmed all A-E workstreams done.
+- Ran `npx c8 --include='src-stdio/**'` coverage — 3 uncovered paths identified on main:
+  1. `aggregator.ts:51-53` — `filterSuggestionsCatalog()` warn-and-skip when key is `'catalog'` (reserved) or contains `'/'`
+  2. `ledger.ts:167` — `LedgerClient` constructor `typeof dlqPathOrStore !== 'string'` branch (Worker/DO explicit DlqStore path)
+  3. `logger.ts:34-37` — `Logger.setLevel()` never called in any test
+- Created `test/ar-aggregator-ledger-logger-gaps.test.ts` with 8 tests covering all 3 gaps
+- Coverage after: `aggregator.ts` statements 99.87%→100%; `ledger.ts` branch 97.36%→98.26%; `logger.ts` ALL 100%
+- Full test suite: 1973/0/3. No regressions.
+- Opened PR #1232, subscribed to activity.
+
+### Open PRs (11 total)
+AH (#1222), AI (#1223), AJ (#1224), AK (#1225), AL (#1226), AM (#1227), AN (#1228), AO (#1229), AP (#1230), AQ (#1231), AR (#1232)
+
+### Blockers (unchanged)
+1. GITHUB_MCP_AUTHORIZATION unset on prod — GitHub MCP backend disconnected
+2. CF Access creds unset → ledger DLQ backlog
+3. 1000+ stale `auto/` branches; enable auto-delete on GitHub
+4. Notion board free-tier 401 — cannot update board pages
+
+### Next run recommendation
+Remaining coverage gaps: `aggregator.ts` branch still 97.3% — many branches in complex cast/search logic remain uncovered. `child-manager.ts:137-139` and `http-server.ts:168` still show (covered by AE PR #1219, not yet merged). After PRs merge, run AS workstream targeting remaining `aggregator.ts` branch gaps (lines ~372, 1484, 1883, 2204, 2341-2342, 2347). Human action needed: merge the 11 queued PRs.
