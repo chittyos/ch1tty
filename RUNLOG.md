@@ -2,6 +2,32 @@
 
 ---
 
+### 2026-09-12T~15:00Z (run ~1589 — AV: createCommsMcpServer branch coverage, PR #1236)
+- **Workstream**: AV — `apps/comms-mcp/src/server.ts` branch coverage
+- **Build**: tsc clean (0 errors) | **Tests**: 1970 pass / 0 fail / 3 skip (+5 vs 1965 baseline)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE.
+  - `git pull origin main` (18 new commits). `npm ci` clean. `npm run build` clean. `npm test`: 1965/0/3 baseline.
+  - Checked open PRs: 20 open (#1216–#1235), down from 27 on last idle run. Queue below ~20+1 threshold — proceeded with new PR.
+  - Read Notion board (durable board found at `36e94de4…`): all workstreams A–E + F–O + AA–AU confirmed done.
+  - Previous run log suggested AV targeting `apps/comms-mcp/src/server.ts` — executed that plan.
+  - Created `test/av-comms-server-branch-gaps.test.ts` (5 tests using `InMemoryTransport` for real Client↔Server in-process testing):
+    1. `ListToolsRequestSchema` → returns `[comms.recentLog]` descriptor
+    2. Unknown tool name → `{isError:true}`
+    3. Both `person`+`identifier` → catch → `{isError:true}`
+    4. Neither `person` nor `identifier` → catch → `{isError:true}`
+    5. Happy path: `identifier` only, dispatch→`[]` → success JSON
+  - Pushed branch `auto/AV-comms-server-branch-gaps`, opened PR #1236.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–AV ✓. **21 PRs open total** (#1216–#1236). Tests: 1970/0/3.
+- **Human-action items** (unchanged from ~1580):
+  1. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions"
+  2. **Merge queued PRs #1216–#1236** — all ready; queue at 21
+  3. **Disable/redirect hourly cron** once all desired workstreams complete
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+- **Next run**: Queue at 21. If still ≥20, idle. If <20 after merges, advance workstream AW: look at `apps/comms-mcp/src/recent-log.ts` remaining branch gaps (e.g. `String(err)` fallback in `fetchChannel` catch, or `imessage` channel path at line 189-196).
+
+---
+
 ## Run ~1586 — 2026-09-12T07:00Z — Idle (27 PRs queued, CI org-disabled)
 
 - **Workstream advanced**: None — all A–E complete; 27 open PRs (#1209–#1235) cover every remaining coverage gap (aggregator/ledger/logger/remote-proxy/child-manager/http-server); CI disabled at org level prevents any from merging
