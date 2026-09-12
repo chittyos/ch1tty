@@ -4467,3 +4467,32 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   5. **Notion workspace** out of free blocks
 - **PushNotification**: NOT SENT — no new blocker; notification last sent at run ~1580.
 - **Next run**: Once queue drops below ~20, advance AY: `workers-ai-brain.ts` lines 182-186 (catch block / circuit failure) and 350-353 (embed vector validation) — 85.58% branches.
+
+---
+
+### 2026-09-12T~19:30Z (run ~1595 — BA: tasks-client + evidence-client branch gaps — 7 tests, both to 100%)
+- **Workstream**: BA — cover 5 uncovered branches in `apps/tasks-mcp/src/tasks-client.ts` (lines 49, 77) and `apps/evidence-mcp/src/evidence-client.ts` (lines 45, 77, 90)
+- **Branch/PR**: `auto/BA-client-url-filter-branches` → **PR #1241** (https://github.com/chittyos/ch1tty/pull/1241)
+- **Build**: tsc clean (0 errors) | **Tests**: 1972 pass / 0 fail / 3 skip (1975 total, 52 suites, +7 new tests)
+- **Guardrails**: 5-tool surface confirmed (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1740/1741 enforce 56/87 fields). 0 violations on main.
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed.
+  - `git pull origin main` (synced from detached HEAD to up-to-date main after 24 new commits). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1965/0/3 (1968 total) — baseline confirmed.
+  - Found 30 open PRs (#1211–#1240 = W through AZ) via GitHub MCP. GitHub Actions still disabled at org level.
+  - Ran `npx c8 --all` coverage report across `src-stdio/` + `apps/*/src/` to identify uncovered branches not in any open PR.
+  - Identified gaps not covered by any open PR: `tasks-client.ts` (lines 49, 77 — default URL fallback, project filter) and `evidence-client.ts` (lines 45, 77, 90 — default URL fallback, cursor filter, search limit).
+  - Added 3 tests to `apps/tasks-mcp/test/tasks-client.test.ts`: default URL, trailing-slash trim, project filter.
+  - Added 4 tests to `apps/evidence-mcp/test/evidence-client.test.ts`: default URL, trailing-slash trim, cursor filter, search limit.
+  - Both files now at 100% stmts/branches/funcs/lines (up from 93.54%/90.62% branch coverage).
+  - Full suite: 1972/0/3 (1975 total) — +7 tests, 0 regressions. Metric freeze guards pass.
+  - Pushed branch; opened **PR #1241** (not draft).
+  - Notion board: workspace out of free blocks (API 401) — DRIVER-BOARD.md is durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–AZ(open) BA(#1241 open). **31 PRs open total** (#1211–#1241 = W through BA). Tests: 1972/0/3.
+- **Human-action items**:
+  1. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions" (all PRs show 0 jobs / conclusion:failure)
+  2. **Merge queued PRs #1211–#1241** (W through BA) — 31 PRs ready; queue growing since 2026-09-10
+  3. **Disable/redirect hourly cron** — ~1595 runs; primary workstreams A–E exhausted; coverage PRs accumulating
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks — upgrade plan or clear blocks
+- **PushNotification**: NOT SENT — BA is additive coverage; no new urgent blocker; last notification sent at run ~1580.
+- **Next run**: Remaining uncovered branches not in any open PR: `src-stdio/aggregator.ts` lines 51-53 (already in AR PR #1232), `apps/session-coordinator-mcp/src/session-client.ts` lines 59/116 (AO PR #1229 may cover), `apps/comms-mcp/src/dispatch.ts` (AU PR #1235 + Z PR #1214 cover). If queue stays above 20, stand down on new PRs.
