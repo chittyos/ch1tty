@@ -556,3 +556,34 @@ test('route(): AI returns data with non-finite vector value → null', async () 
   const result = await brain.route('q', [candidate('s/t', 'd')]);
   assert.equal(result, null);
 });
+
+// ── 10. Branch-gap coverage ──────────────────────────────────────────────────
+
+test('route(): Vectorize query() throws → route() catch block fires, errors++ and circuit opens', async () => {
+  // routeVectorize() does NOT swallow query() errors, so they propagate to route()'s catch block.
+  const throwingVz = {
+    query: async () => { throw new Error('Vectorize unavailable'); },
+    upsert: async () => ({ count: 0 }),
+  } as unknown as VectorizeIndex;
+  const brain = new WorkersAiBrain(makeEmbedAi(4), throwingVz, {
+    circuitBreakerThreshold: 1,  // one failure opens circuit immediately
+    circuitBreakerCooldownMs: 60_000,
+    minSimilarity: 0,
+  });
+  const result = await brain.route('test query', [candidate('s/t', 'desc')]);
+  assert.equal(result, null, 'exception in Vectorize.query must produce null');
+  const stats = brain.getStats();
+  assert.equal(stats.errors, 1, 'errors counter must have incremented');
+  assert.equal(stats.circuitOpen, true, 'circuit must have opened after the caught exception');
+});
+
+test('embed(): data item is empty array → malformed vector branch returns null', async () => {
+  // AI returns a correct-length data array but each sub-array is empty → raw.length === 0 branch.
+  const ai = makeAi(async (_m, { text }) => ({
+    data: text.map(() => [] as number[]),
+  }));
+  const brain = new WorkersAiBrain(ai, undefined, { circuitBreakerThreshold: 100 });
+  const result = await brain.route('any query', [candidate('s/t', 'desc')]);
+  assert.equal(result, null, 'empty sub-array vector must produce null');
+  assert.ok(brain.getStats().errors >= 1, 'errors must increment on malformed empty vector');
+});
