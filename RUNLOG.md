@@ -2695,3 +2695,24 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 **All workstreams A–E**: Done ✓
 **Standing blocker**: GitHub Actions disabled; 27 PRs await merge; push notification sent at run ~1580.
 **Next run**: Idle unless queue clears or CI is re-enabled. AV target: `server.ts:91` + `recent-log.ts` gaps.
+
+---
+
+### 2026-09-12T~13:32Z (run ~1588 — idle; 27 PRs awaiting human merge)
+- **Workstream**: None — queue at 27 open PRs (#1209–#1235 = U through AU); no merges since run ~1582; above ~20 threshold for new PR work
+- **Build**: tsc clean (0 errors) | **Tests**: 1965 pass / 0 fail / 3 skip (1968 total, 52 suites, ~50s)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1740/1741 enforce 56/87 fields). 0 violations on main.
+  - `git pull origin main` (17 new commits). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1965/0/3 (1968 total, 52 suites, ~50s). 0 failures.
+  - Checked 27 open PRs (#1209–#1235): all still open. GitHub Actions still disabled at org level (CI shows conclusion:failure, 0 actual jobs on all PRs). No merges since run ~1582.
+  - Notion board: workspace out of free blocks — DRIVER-BOARD.md remains durable board.
+  - Queue at 27 PRs (exceeds ~20 threshold): standing down, no new PR created this run.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–AU ✓. **27 PRs open total** (#1209–#1235). Tests: 1965/0/3.
+- **Human-action items** (unchanged from ~1580):
+  1. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions" (CI shows 0 jobs / conclusion:failure on all PRs)
+  2. **Merge queued PRs #1209–#1235** (U through AU) — all ready; queue growing since 2026-09-10
+  3. **Disable/redirect hourly cron** — ~1588 runs; primary workstreams A–E exhausted; idle-burning tokens
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks — upgrade plan or clear blocks
+- **PushNotification**: NOT SENT — same state as run ~1580 (notification already sent ~8 runs ago); no new information requiring escalation.
+- **Next run**: Idle unless PRs merge or CI is re-enabled. Once queue drops below ~20, advance workstream AV: `apps/comms-mcp/src/server.ts` line 91 (String(err) fallback) + `recent-log.ts` remaining branch gaps.
