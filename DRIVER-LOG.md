@@ -4370,3 +4370,31 @@ AH (#1222), AI (#1223), AJ (#1224), AK (#1225), AL (#1226), AM (#1227), AN (#122
 
 ### Next run recommendation
 Remaining coverage gaps: `aggregator.ts` branch still 97.3% — many branches in complex cast/search logic remain uncovered. `child-manager.ts:137-139` and `http-server.ts:168` still show (covered by AE PR #1219, not yet merged). After PRs merge, run AS workstream targeting remaining `aggregator.ts` branch gaps (lines ~372, 1484, 1883, 2204, 2341-2342, 2347). Human action needed: merge the 11 queued PRs.
+
+---
+
+## Run ~1581 — 2026-09-12T (UTC) — IDLE
+
+**Workstream advanced**: None — all workstreams A–E and extended F–AS complete; PR queue saturated
+**Branch/PR**: None opened this run
+**Build**: tsc clean (ch1tty@4.1.0, 0 errors) | **Tests**: 1965 pass / 0 fail / 3 skip (1968 total)
+
+### What was done
+- Startup: `npm ci` clean, `npm run build` clean, `npm test`: 1965/0/3 (52 suites, 1968 total). Confirmed all A–AS workstreams done.
+- Read Notion board (36e94de4): blocked — workspace out of free blocks (cannot update). Appended run log here instead.
+- GitHub state: 25 open PRs (#1209–#1233); all accumulated from automated runs; CI disabled at org level; PRs cannot auto-merge.
+- No new work opened: queue already at 25 PRs, prior idle runs (~1579, ~1580) established the cap.
+
+### Open PRs (25 total, all stuck — CI disabled)
+#1209 (U), #1210 (V), #1211 (W), #1212 (X), #1213 (Y), #1214 (Z), #1215 (AA), #1216 (AB), #1217 (AC), #1218 (AD), #1219 (AE), #1220 (AF), #1221 (AG), #1222 (AH), #1223 (AI), #1224 (AJ), #1225 (AK), #1226 (AL), #1227 (AM), #1228 (AN), #1229 (AO), #1230 (AP), #1231 (AQ), #1232 (AR), #1233 (AS)
+
+### Blockers (require human action)
+1. **GitHub Actions `ci.yml` disabled at org level** — Settings → Actions → General → "Allow all actions"; 25 PRs cannot merge or verify
+2. **Hourly cron burning ~50k tokens/run with no work** — all workstreams exhausted; disable the schedule or define new workstreams
+3. **Notion workspace out of free blocks** — board MCP updates blocked; run log falls back to this file
+4. **`GITHUB_MCP_AUTHORIZATION` unset on prod** — GitHub MCP backend disconnected
+5. **CF Access creds unset** — `CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`; ledger DLQ backlog
+6. **1100+ stale `auto/` branches** — enable "Automatically delete head branches" in GitHub repo settings
+
+### Next run recommendation
+Same as ~1579 and ~1580: idle unless CI is re-enabled (allows PRs to merge) or new workstreams are added to the scheduled prompt. Priority human action: enable GitHub Actions.
