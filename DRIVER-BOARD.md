@@ -4282,3 +4282,28 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   5. **Notion workspace** out of free blocks — upgrade plan or clear blocks
 - **PushNotification**: NOT SENT — workstream AL is additive coverage; no urgent blocker.
 - **Next run**: Check PR #1226 CI. Next coverage gap candidates: `src/workers-ai-brain.ts` (85.58% branches, lines 182-186, 350-353); `src/openapi-spec.ts` (84.61% branches, lines 34, 88); `src/codemode-fns.ts` (85.71% branches, lines 27, 29).
+
+---
+
+### 2026-09-12T~hourly (run ~1578 — workstream AS: remote-proxy empty-token guard)
+- **Workstream**: AS — cover `remote-proxy.ts:113-114` (`if (!token)` guard when `TokenSource.getToken()` returns `""`)
+- **Branch/PR**: `auto/AS-remote-proxy-empty-token` → **PR #1233** (https://github.com/chittyos/ch1tty/pull/1233)
+- **Build**: tsc clean (0 errors) | **Tests**: 1966 pass / 0 fail / 3 skip (1969 total, 52 suites, ~56s)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE. 0 violations on main.
+  - `npm ci` clean. `npm run build` clean. `npm test`: 1965/0/3 — baseline confirmed.
+  - Checked 24 open PRs (#1209–#1232 = U through AR): all previously CI-green per log. No new merges since run ~1577 (only run-log commits).
+  - Ran `npx c8 --per-file --include='src-stdio/**'`: identified `remote-proxy.ts:113-114` (2 lines, `if (!token)` branch) as the sole uncovered gap not already addressed by an open PR. `ledger.ts:97-98` has `/* c8 ignore next 2 */` comment — intentionally excluded. All other gaps (aggregator:51-53, child-manager:137-139, http-server:168, ledger:167, logger:34-37) covered by pending PRs AR/AE (not yet merged).
+  - Added 1 test to `test/as-remote-proxy-empty-token.test.ts`: injects `TokenSource` returning `""` → verifies `auth_token_unavailable` surfaces.
+  - Coverage delta: `remote-proxy.ts` branch 99.48% → **100%**; all-files branch 98.41% → 98.44%.
+  - Full suite: 1966/0/3 (+1 test, 0 regressions). Metric freeze guards pass (tests 1740/1741: 56/87 fields).
+  - Pushed `auto/AS-remote-proxy-empty-token`; opened **PR #1233**. Subscribed to PR activity.
+  - Notion board: workspace out of free blocks — DRIVER-BOARD.md is durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–L ✓ M–AR ✓ AS(#1233 open). **25 PRs open total** (#1209–#1233). Tests: 1966/0/3.
+- **Human-action items**:
+  1. **Merge queued PRs #1209–#1233** (U through AS) — all ready; queue has been growing since 2026-09-10; once merged tests reach ~2100+
+  2. **Disable/redirect hourly cron** — ~1578 runs; primary workstreams A–E exhausted; coverage PRs accumulating
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Notion workspace** out of free blocks — upgrade plan or clear blocks
+- **PushNotification**: NOT SENT — workstream AS is additive coverage; no urgent blocker.
+- **Next run**: With all `src-stdio/` coverage gaps addressed (pending merges of AE/AR/AS), next targets are in `src/` — `workers-ai-brain.ts` (85.58% branches), `openapi-spec.ts` (84.61%), `codemode-fns.ts` (85.71%). Or idle if queue is too large.
