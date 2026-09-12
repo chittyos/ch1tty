@@ -2742,3 +2742,27 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   5. **Notion workspace** out of free blocks — upgrade plan or clear blocks
 - **PushNotification**: NOT SENT — same state as run ~1580 (notification already sent ~8 runs ago); no new information requiring escalation.
 - **Next run**: Idle unless PRs merge or CI is re-enabled. Once queue drops below ~20, advance workstream AV: `apps/comms-mcp/src/server.ts` line 91 (String(err) fallback) + `recent-log.ts` remaining branch gaps.
+
+---
+
+### 2026-09-12T~UTC (run ~1590 — productive: AW: comms-mcp providers.ts unit tests PR #1237)
+- **Workstream**: AW — comms-mcp providers.ts unit tests (23 tests, 0 previously covered)
+- **Build**: tsc clean (0 errors) | **Tests**: 1988 pass / 0 fail / 3 skip (was 1965/0/3, +23)
+- **Branch/PR**: `auto/AW-comms-providers-unit-tests` → [PR #1237](https://github.com/chittyos/ch1tty/pull/1237)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5 meta-tools, buildCastExplanation metric freeze).
+  - `npm ci` clean. `npm run build` clean. `npm test`: 1965/0/3 (baseline on main).
+  - Checked Notion board (page 36e94de4, last edit 2026-09-10T03:39Z) — all A–E done. 20 open PRs (#1217–#1236 = AC through AV).
+  - Identified AW: `apps/comms-mcp/src/providers.ts` had zero direct unit test coverage; `defaultBoundProviders()` and provider descriptors are binding contracts that should fail loudly if they drift.
+  - Added `apps/comms-mcp/test/providers.test.ts` — 23 tests: `defaultBoundProviders()` Map size/keys/identity, `quoProvider` channel/provider/mcpServerId/3 tool names/2 supports flags, `gmailProvider` same, `imessageProviderUnbound` bound===false/reason/channel.
+  - All 23 pass in isolation; full suite 1988/0/3 (+23, no regressions).
+  - Pushed `auto/AW-comms-providers-unit-tests` and opened PR #1237.
+- **Open PRs**: 21 total (#1217–#1237 = AC through AW).
+- **State**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–AW in PR queue. Tests: 1988/0/3.
+- **Human-action items** (unchanged from ~1588):
+  1. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions"
+  2. **Merge queued PRs #1217–#1237** — all CI-pending, all ready
+  3. **Disable/redirect hourly cron** — ~1590 runs; A–E exhausted; idle-burning tokens
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks — upgrade plan or clear blocks
+- **Next run**: Workstream AX candidate — `apps/comms-mcp/src/recent-log.ts` remaining branch gaps (channels empty-array path, since/until window override, order:asc sort) or `apps/comms-mcp/src/server.ts` String(err) catch branch (line 91).
