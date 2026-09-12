@@ -2,6 +2,31 @@
 
 ---
 
+### 2026-09-12T~19:00Z (run ~1594 — AZ: workers-ai-brain branch coverage 87.71% → 92.37%, PR #1240)
+- **Workstream**: AZ — `src/workers-ai-brain.ts` remaining branch coverage (+4 tests)
+- **Branch/PR**: `auto/AZ-workers-ai-brain-branch-gaps` → https://github.com/chittyos/ch1tty/pull/1240 (stacked on AY #1239)
+- **Build**: tsc clean (0 errors) | **Tests**: 1782 pass / 0 fail / 2 skip (full suite)
+- **Coverage**: `src/workers-ai-brain.ts` branch: **87.71% → 92.37%** (+4.66pp; exceeds 90% target)
+- **What was done**:
+  - Received bot reviews on AY PR #1239: Codex ✅ no findings; CodeRabbit 🎉 no actionable comments, ⚪ minimal merge risk. PR ready.
+  - Created AZ branch from AY (stacked) to build on AY's coverage improvements.
+  - Added section 11 (4 tests) to `test/hhh-workers-ai-brain.test.ts`:
+    1. `embed()`: AI returns non-array `data` field → `'not-array'` log branch (line 343)
+    2. `routeVectorize()`: match absent from candidates + no `serverName` in metadata → `undefined` branch (line 271)
+    3. `describeForEmbed()`: empty description + no category → both `||` and ternary false branches (lines 379–380)
+    4. `normalizeInPlace()`: all-zero vector → `norm===0` early return (line 396)
+  - Remaining uncovered branches (280, 324, 401) are dead code: `res[0] ?? null` in embedSingle (unreachable), `embed([])` guard (never called with empty), `dot()` length-mismatch (both always same dim).
+  - 30 → 34 tests in hhh-workers-ai-brain.test.ts. Full suite: 0 failures. Metric freeze guard passes.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F–AZ ✓. **~33 PRs open** (#1209–#1240). Tests: 1782/0/2. Build: clean.
+- **Human-action items**:
+  1. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions"
+  2. **Merge queued PRs** — all locally validated; CI disabled at org level prevents auto-merge
+  3. **Disable/redirect hourly cron** — coverage goals largely saturated
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+- **Next run**: Queue at ~33. If still ≥20, idle. Otherwise consider BA: remaining dead-branch annotation comments in workers-ai-brain.ts, or targeting other src/ files for coverage.
+
+---
+
 ### 2026-09-12T~15:00Z (run ~1589 — AV: createCommsMcpServer branch coverage, PR #1236)
 - **Workstream**: AV — `apps/comms-mcp/src/server.ts` branch coverage
 - **Build**: tsc clean (0 errors) | **Tests**: 1970 pass / 0 fail / 3 skip (+5 vs 1965 baseline)
