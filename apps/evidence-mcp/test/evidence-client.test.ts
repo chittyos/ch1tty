@@ -259,4 +259,30 @@ describe('EvidenceClient', () => {
     assert.equal(lastAuthHeader, 'Bearer env-evidence-token');
     delete process.env['CHITTY_EVIDENCE_TOKEN'];
   });
+
+  it('uses https://evidence.chitty.cc default when no baseUrl or env var', () => {
+    const saved = process.env['CHITTY_EVIDENCE_URL'];
+    delete process.env['CHITTY_EVIDENCE_URL'];
+    const client = new EvidenceClient(undefined, undefined);
+    assert.equal((client as unknown as { baseUrl: string }).baseUrl, 'https://evidence.chitty.cc');
+    if (saved !== undefined) process.env['CHITTY_EVIDENCE_URL'] = saved;
+  });
+
+  it('strips trailing slash from baseUrl', () => {
+    const client = new EvidenceClient('http://host.local/', undefined);
+    assert.equal((client as unknown as { baseUrl: string }).baseUrl, 'http://host.local');
+  });
+
+  it('filters list by cursor pagination token', async () => {
+    const client = new EvidenceClient(baseUrl, 'test-token');
+    const result = await client.listDocuments({ cursor: 'tok_abc123' });
+    assert.ok(Array.isArray(result.documents));
+  });
+
+  it('search with limit sends limit param', async () => {
+    const client = new EvidenceClient(baseUrl, 'test-token');
+    const result = await client.searchDocuments('Revenue', undefined, 5);
+    assert.equal(result.documents.length, 1);
+    assert.equal(result.total, 1);
+  });
 });
