@@ -11,12 +11,12 @@ import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/
 import type { CommsDispatch } from './types.js';
 
 /** Per-backend connection env. mcpServerId → env var prefix. */
-function envPrefix(mcpServerId: string): string {
+export function envPrefix(mcpServerId: string): string {
   // chittyagent-quo → COMMS_MCP_CHITTYAGENT_QUO_*
   return `COMMS_MCP_${mcpServerId.toUpperCase().replace(/[^A-Z0-9]+/g, '_')}`;
 }
 
-function backendConfig(mcpServerId: string): { endpoint: string; token?: string; cfId?: string; cfSecret?: string } {
+export function backendConfig(mcpServerId: string): { endpoint: string; token?: string; cfId?: string; cfSecret?: string } {
   const p = envPrefix(mcpServerId);
   const endpoint = process.env[`${p}_ENDPOINT`];
   if (!endpoint) {
@@ -32,13 +32,33 @@ function backendConfig(mcpServerId: string): { endpoint: string; token?: string;
   };
 }
 
-function getTimeoutMs(): number {
+export function getTimeoutMs(): number {
   const v = parseInt(process.env.CH1TTY_REMOTE_TIMEOUT_MS ?? '', 10);
   return Number.isFinite(v) && v > 0 ? v : 120_000;
 }
 
+/** Injectable factory: given resolved endpoint+headers, returns a connected Client. */
+export type ConnectFn = (endpoint: string, headers: Record<string, string>) => Promise<Client>;
+
+async function defaultConnect(endpoint: string, headers: Record<string, string>): Promise<Client> {
+  const transport = new StreamableHTTPClientTransport(new URL(endpoint), {
+    requestInit: { headers },
+  });
+  const client = new Client(
+    { name: 'comms-mcp-dispatch', version: '1.0.0' },
+    { capabilities: {} },
+  );
+  await client.connect(transport);
+  return client;
+}
+
 export class McpClientDispatch implements CommsDispatch {
   private clients = new Map<string, Promise<Client>>();
+  private readonly connectFn: ConnectFn;
+
+  constructor(connectFn: ConnectFn = defaultConnect) {
+    this.connectFn = connectFn;
+  }
 
   private connect(mcpServerId: string): Promise<Client> {
     const existing = this.clients.get(mcpServerId);
@@ -50,16 +70,7 @@ export class McpClientDispatch implements CommsDispatch {
       if (cfg.token) headers['Authorization'] = `Bearer ${cfg.token}`;
       if (cfg.cfId) headers['CF-Access-Client-Id'] = cfg.cfId;
       if (cfg.cfSecret) headers['CF-Access-Client-Secret'] = cfg.cfSecret;
-
-      const transport = new StreamableHTTPClientTransport(new URL(cfg.endpoint), {
-        requestInit: { headers },
-      });
-      const client = new Client(
-        { name: `comms-mcp-dispatch-${mcpServerId}`, version: '1.0.0' },
-        { capabilities: {} },
-      );
-      await client.connect(transport);
-      return client;
+      return this.connectFn(cfg.endpoint, headers);
     })();
 
     this.clients.set(mcpServerId, promise);
