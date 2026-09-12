@@ -29,11 +29,13 @@ let fixtureServer: http.Server;
 let baseUrl: string;
 let lastAuthHeader: string | undefined;
 let lastRequestBody: string | undefined;
+let lastRequestUrl: URL | undefined;
 
 before(async () => {
   fixtureServer = http.createServer((req, res) => {
     lastAuthHeader = req.headers['authorization'];
     const url = new URL(req.url!, 'http://localhost');
+    lastRequestUrl = url;
     res.setHeader('Content-Type', 'application/json');
 
     const readBody = (): Promise<string> =>
@@ -277,6 +279,7 @@ describe('EvidenceClient', () => {
     const client = new EvidenceClient(baseUrl, 'test-token');
     const result = await client.listDocuments({ cursor: 'tok_abc123' });
     assert.ok(Array.isArray(result.documents));
+    assert.equal(lastRequestUrl?.searchParams.get('cursor'), 'tok_abc123');
   });
 
   it('search with limit sends limit param', async () => {
@@ -284,5 +287,6 @@ describe('EvidenceClient', () => {
     const result = await client.searchDocuments('Revenue', undefined, 5);
     assert.equal(result.documents.length, 1);
     assert.equal(result.total, 1);
+    assert.equal(lastRequestUrl?.searchParams.get('limit'), '5');
   });
 });
