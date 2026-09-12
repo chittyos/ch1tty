@@ -4326,3 +4326,23 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   4. **Notion workspace** out of free blocks — upgrade plan or clear blocks
 - **PushNotification**: NOT SENT — same state as run ~1578; 25 PRs open but no new information requiring escalation.
 - **Next run**: Idle unless PRs merge. Once queue clears, next coverage targets: `src/workers-ai-brain.ts` (85.58% branches), `src/openapi-spec.ts` (84.61%), `src/codemode-fns.ts` (85.71%).
+
+---
+
+### 2026-09-12T~hourly (run ~1580 — idle; 25 PRs awaiting human merge)
+- **Workstream**: None — queue at 25 open PRs (#1209–#1233 = U through AS); no merges since run ~1577; too large to add more this run
+- **Build**: tsc clean (0 errors) | **Tests**: 1965 pass / 0 fail / 3 skip (1968 total, 52 suites, ~49s)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE. 0 violations on main.
+  - `git pull origin main` (9 commits ahead, fast-forward clean to latest). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1965/0/3 (1968 total, 52 suites, ~49s). 0 failures.
+  - Checked 25 open PRs (#1209–#1233): all still open. Verified CI via `actions_list`: both oldest PR (#1209 / branch U) and newest PR (#1233 / branch AS) show `conclusion: failure` with 0 actual jobs — consistent with GitHub Actions disabled at org level (standing blocker). No actionable CI failures to fix.
+  - Notion board: workspace out of free blocks — DRIVER-BOARD.md is durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–AS ✓. **25 PRs open total** (#1209–#1233). Tests: 1965/0/3.
+- **Human-action items** (unchanged):
+  1. **Merge queued PRs #1209–#1233** (U through AS) — all ready; queue growing since 2026-09-10
+  2. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions" (CI shows 0 jobs / conclusion:failure on all PRs)
+  3. **Disable/redirect hourly cron** — ~1580 runs; primary workstreams A–E exhausted; idle-burning tokens
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks — upgrade plan or clear blocks
+- **PushNotification**: SENT — escalating: 3 consecutive idle runs (~1578/1579/1580), 25 PRs stacked with no merges, GitHub Actions disabled, cron at ~1580 runs.
+- **Next run**: Idle unless PRs merge. Once queue clears, next coverage targets: `src/workers-ai-brain.ts` (85.58% branches), `src/openapi-spec.ts` (84.61%), `src/codemode-fns.ts` (85.71%).
