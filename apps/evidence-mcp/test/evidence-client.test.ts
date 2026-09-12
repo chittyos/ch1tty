@@ -29,11 +29,13 @@ let fixtureServer: http.Server;
 let baseUrl: string;
 let lastAuthHeader: string | undefined;
 let lastRequestBody: string | undefined;
+let lastRequestUrl: URL | undefined;
 
 before(async () => {
   fixtureServer = http.createServer((req, res) => {
     lastAuthHeader = req.headers['authorization'];
     const url = new URL(req.url!, 'http://localhost');
+    lastRequestUrl = url;
     res.setHeader('Content-Type', 'application/json');
 
     const readBody = (): Promise<string> =>
@@ -258,5 +260,33 @@ describe('EvidenceClient', () => {
     await client.listDocuments();
     assert.equal(lastAuthHeader, 'Bearer env-evidence-token');
     delete process.env['CHITTY_EVIDENCE_TOKEN'];
+  });
+
+  it('uses https://evidence.chitty.cc default when no baseUrl or env var', () => {
+    const saved = process.env['CHITTY_EVIDENCE_URL'];
+    delete process.env['CHITTY_EVIDENCE_URL'];
+    const client = new EvidenceClient(undefined, undefined);
+    assert.equal((client as unknown as { baseUrl: string }).baseUrl, 'https://evidence.chitty.cc');
+    if (saved !== undefined) process.env['CHITTY_EVIDENCE_URL'] = saved;
+  });
+
+  it('strips trailing slash from baseUrl', () => {
+    const client = new EvidenceClient('http://host.local/', undefined);
+    assert.equal((client as unknown as { baseUrl: string }).baseUrl, 'http://host.local');
+  });
+
+  it('filters list by cursor pagination token', async () => {
+    const client = new EvidenceClient(baseUrl, 'test-token');
+    const result = await client.listDocuments({ cursor: 'tok_abc123' });
+    assert.ok(Array.isArray(result.documents));
+    assert.equal(lastRequestUrl?.searchParams.get('cursor'), 'tok_abc123');
+  });
+
+  it('search with limit sends limit param', async () => {
+    const client = new EvidenceClient(baseUrl, 'test-token');
+    const result = await client.searchDocuments('Revenue', undefined, 5);
+    assert.equal(result.documents.length, 1);
+    assert.equal(result.total, 1);
+    assert.equal(lastRequestUrl?.searchParams.get('limit'), '5');
   });
 });

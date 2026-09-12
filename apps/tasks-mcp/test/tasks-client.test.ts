@@ -219,4 +219,23 @@ describe('TasksClient', () => {
     assert.equal(lastAuthHeader, 'Bearer env-token');
     delete process.env['CHITTY_TASKS_TOKEN'];
   });
+
+  it('uses https://tasks.chitty.cc default when no baseUrl or env var', () => {
+    const saved = process.env['CHITTY_TASKS_URL'];
+    delete process.env['CHITTY_TASKS_URL'];
+    const client = new TasksClient(undefined, undefined);
+    assert.equal((client as unknown as { baseUrl: string }).baseUrl, 'https://tasks.chitty.cc');
+    if (saved !== undefined) process.env['CHITTY_TASKS_URL'] = saved;
+  });
+
+  it('strips trailing slash from baseUrl', () => {
+    const client = new TasksClient('http://host.local/', undefined);
+    assert.equal((client as unknown as { baseUrl: string }).baseUrl, 'http://host.local');
+  });
+
+  it('filters tasks by project', async () => {
+    const client = new TasksClient(baseUrl, 'test-token');
+    const tasks = await client.listTasks({ project: 'infra' });
+    assert.ok(Array.isArray(tasks));
+  });
 });
