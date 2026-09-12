@@ -2,6 +2,32 @@
 
 ---
 
+## Run ~1583 — 2026-09-12T~UTC — Idle (25 PRs queued, CI org-disabled)
+
+- **Workstream advanced**: None — queue at 25 open PRs (#1211–#1235); threshold for "too large" is 25; CI disabled at org level
+- **Branch/PR**: direct commit to main (run log only)
+- **Build**: tsc clean (0 errors)
+- **Tests**: 1965 pass / 0 fail / 3 skip (1968 total, 52 suites)
+- **What was done**:
+  - Read CLAUDE.md + CHITTY.md; 5-tool surface + `buildCastExplanation` metric freeze guardrails confirmed.
+  - `git pull origin main` (fast-forward, 12 commits). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1965/0/3. 0 failures.
+  - Checked open PRs: 25 open (#1211–#1235 = W through AU). No merges since run ~1582.
+  - Coverage check: `dispatch.ts` 17.7% stmts (PR #1235 / AU pending), `recent-log.ts` 80% branches, `reshape.ts` 69.44% branches (PR #1225 / AK pending), `server.ts` 90% branches (line 91 — String(err) fallback), `providers.ts` 100%.
+  - Queue too large (25 PRs) to add workstream AV this run. Standing down per idle policy.
+  - Notion board: workspace out of free blocks — DRIVER-BOARD.md is durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F–AU ✓ ALL DONE. **25 PRs open** (#1211–#1235). Tests: 1965/0/3. Build: clean. **~1583rd run.**
+- **Blockers (require human action)**:
+  1. **Merge 25 open PRs** (#1211–#1235) — all CI-green per earlier runs; awaiting human merge (GitHub Actions disabled = only cosmetic failure)
+  2. **Enable GitHub Actions** at org level (Settings → Actions → General → "Allow all actions")
+  3. **Disable hourly schedule** — coverage effectively saturated; each idle run burns tokens with no output
+  4. `GITHUB_MCP_AUTHORIZATION` unset on prod — GitHub MCP backend disconnected
+  5. CF Access env vars missing — ledger DLQ builds up
+  6. Notion workspace out of free blocks
+  7. 1100+ stale `auto/` branches
+- **Next run**: Idle unless PRs merge. Once queue drops below ~20, advance workstream AV: `server.ts` line 91 (`String(err)` fallback, 1 test) + `recent-log.ts` branch gaps (lines 46-62, 104-108, 135-140, 192).
+
+---
+
 ## Run ~1582 — 2026-09-12T~UTC — Workstream AU
 
 - **Workstream advanced**: AU — McpClientDispatch unit tests (dispatch.ts)

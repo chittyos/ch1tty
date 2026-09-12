@@ -4346,3 +4346,25 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
   5. **Notion workspace** out of free blocks — upgrade plan or clear blocks
 - **PushNotification**: SENT — escalating: 3 consecutive idle runs (~1578/1579/1580), 25 PRs stacked with no merges, GitHub Actions disabled, cron at ~1580 runs.
 - **Next run**: Idle unless PRs merge. Once queue clears, next coverage targets: `src/workers-ai-brain.ts` (85.58% branches), `src/openapi-spec.ts` (84.61%), `src/codemode-fns.ts` (85.71%).
+
+---
+
+### 2026-09-12T~hourly (run ~1583 — idle; 25 PRs awaiting human merge)
+- **Workstream**: None — queue at 25 open PRs (#1211–#1235 = W through AU); no merges since run ~1582; too large to add more this run
+- **Build**: tsc clean (0 errors) | **Tests**: 1965 pass / 0 fail / 3 skip (1968 total, 52 suites)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE. 0 violations on main.
+  - `git pull origin main` (12 commits, fast-forward). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1965/0/3. 0 failures.
+  - Checked 25 open PRs (#1211–#1235): all still open. GitHub Actions disabled at org level (standing blocker).
+  - Coverage check: `dispatch.ts` 17.7% stmts (PR #1235 pending), `recent-log.ts` 80% branches (uncovered: 46-62, 104-108, 135-140, 192), `reshape.ts` 69.44% branches (PR #1225 pending), `server.ts` 90% branches (line 91 only), `providers.ts` 100%.
+  - Queue too large (25 PRs) to add workstream AV. Standing down.
+  - Notion board: workspace out of free blocks — DRIVER-BOARD.md is durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–AU ✓. **25 PRs open total** (#1211–#1235). Tests: 1965/0/3.
+- **Human-action items** (unchanged):
+  1. **Merge queued PRs #1211–#1235** (W through AU) — all ready; queue growing since 2026-09-10
+  2. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions"
+  3. **Disable/redirect hourly cron** — ~1583 runs; primary workstreams A–E exhausted
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks
+- **PushNotification**: NOT SENT — same state as run ~1582; notification already sent at run ~1580.
+- **Next run**: Idle unless PRs merge. Once queue drops below ~20, advance workstream AV: `server.ts` line 91 (String(err) fallback, 1 test) + `recent-log.ts` branch gaps.
