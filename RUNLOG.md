@@ -2766,3 +2766,30 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
   5. **Notion workspace** out of free blocks — upgrade plan or clear blocks
 - **Next run**: Workstream AX candidate — `apps/comms-mcp/src/recent-log.ts` remaining branch gaps (channels empty-array path, since/until window override, order:asc sort) or `apps/comms-mcp/src/server.ts` String(err) catch branch (line 91).
+
+---
+
+### 2026-09-12T~UTC (run ~1593 — productive: AY: workers-ai-brain catch block + malformed vector branch gaps)
+- **Workstream**: AY — `src/workers-ai-brain.ts` branch coverage: catch block + malformed vector guard
+- **Build**: tsc clean (0 errors) | **Tests**: 1967 pass / 0 fail / 3 skip (was 1965/0/3 on main, +2)
+- **Branch/PR**: `auto/AY-tasks-client-branch-gaps` → [PR #1239](https://github.com/chittyos/ch1tty/pull/1239)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5 meta-tools, buildCastExplanation metric freeze).
+  - `npm ci` clean. `npm run build` clean. `npm test`: 1965/0/3 (baseline on main).
+  - Found Notion board (page 36e94de4). Read DRIVER-BOARD.md / RUNLOG.md from main.
+  - Confirmed: 22 commits behind origin/main; ~30 open PRs (AE through AX = #1219–#1238).
+  - Board-specified AY target: `workers-ai-brain.ts` lines 182-186 (catch block) and 350-353 (malformed vector).
+  - Verified targets: `npm run coverage` (src-stdio/) unchanged; ran `npx c8 --include=src/workers-ai-brain.ts` — confirmed 85.58% → 87.71% with 2 new tests.
+  - **Test 1**: Vectorize.query() throws → propagates to route()'s outer catch block (not caught by embed()'s own catch). Uses threshold=1; asserts result===null, errors===1, circuitOpen===true.
+  - **Test 2**: AI returns correct-count but empty sub-array vectors → `raw.length === 0` guard fires in embed(). Asserts result===null and errors>=1.
+  - Full suite: 1967/0/3 (+2, no regressions). Metric freeze guards pass (56/87 fields).
+  - Pushed `auto/AY-tasks-client-branch-gaps` and opened PR #1239; subscribed for CI/review events.
+- **Open PRs**: ~31 total (#1219–#1239 = AE through AY). CI still disabled at org level.
+- **State**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–AY in PR queue. Tests: 1967/0/3 on AY branch (1965 on main).
+- **Human-action items** (unchanged):
+  1. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions"
+  2. **Merge queued PRs #1219–#1239** — all CI-pending, all ready (AE through AY)
+  3. **Disable/redirect hourly cron** — ~1593 runs; coverage PRs accumulating without merges
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks
+- **Next run**: Workstream AZ candidate — remaining uncovered branches in `src/workers-ai-brain.ts` (lines 271, 280, 324, 343, 379-380, 396, 401 from c8 output) or `apps/comms-mcp/src/server.ts` String(err) catch branch (line 91). Branch coverage now at 87.71% for workers-ai-brain.ts; next 3pp would reach ~90%.
