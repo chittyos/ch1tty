@@ -138,7 +138,7 @@ test('handleReload pre-warms lazy:false backends after reload', async () => {
 
 // ─── filterSuggestionsCatalog — invalid key warn branch ──────────────────────
 
-test('filterSuggestionsCatalog: keys "catalog" and "/" emit warn and are dropped from catalog', async () => {
+test('filterSuggestionsCatalog: invalid keys "catalog" and keys with "/" are dropped from the catalog', async () => {
   // Primary assertion: verify the filtering result via the public readResource API.
   // This is log-level-independent — it checks the actual catalog state, not stderr.
   const aggregator = new Aggregator([], {
