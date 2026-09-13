@@ -2,6 +2,27 @@
 
 ---
 
+### 2026-09-13T~10:50Z (run ~1608 — BD: logger setLevel + aggregator filterSuggestionsCatalog gaps, PR #1247)
+- **Workstream**: BD — `src-stdio/logger.ts` `setLevel` (90% func coverage) + `aggregator.ts` `filterSuggestionsCatalog` warn branch (lines 51–53)
+- **Branch/PR**: `auto/BD-logger-aggregator-branch-gaps` → https://github.com/chittyos/ch1tty/pull/1247
+- **Build**: tsc clean (0 errors) | **Tests**: 1971 pass / 0 fail / 3 skip (was 1965, +6)
+- **Coverage delta**:
+  - `logger.ts`: 95.18%/90% stmt/func → **100%/100%** across all 4 metrics
+  - `aggregator.ts` stmts/funcs: 99.87%/100% → **100%/100%**; lines 51–53 now covered
+  - All files funcs: 99.58% → **100%**
+- **What was done**:
+  - Added 5 `setLevel` tests to `test/logger.test.ts`: `setLevel(undefined)` early-return, `setLevel('')` falsy early-return, `setLevel('warn')` valid level change, `setLevel('debug')` lowers floor, `setLevel('unknown-level')` lookup returns undefined (minLevel unchanged)
+  - Added 1 `filterSuggestionsCatalog` test to `test/aggregator.test.ts`: passes catalog with reserved key `'catalog'` and slash key `'finance/sub'`; captures stderr and asserts 2 warn logs emitted + keys absent in output
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F–BC ✓ BD ✓. **~38 PRs open** (#1209–#1247). Tests: 1971/0/3. Build: clean.
+- **Human-action items** (unchanged):
+  1. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions"
+  2. **Merge queued PRs** — all locally validated; CI disabled at org level prevents auto-merge
+  3. **Disable/redirect hourly cron** — coverage goals largely saturated; overall functions now 100%
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+- **Next run**: Queue at ~38. If still ≥20, idle. Otherwise consider BE: remaining `aggregator.ts` branch gaps (lines 372, 1484, 1883, 2204, 2341–2342, 2347) or `child-manager.ts` lines 137–139.
+
+---
+
 ### 2026-09-12T~19:00Z (run ~1594 — AZ: workers-ai-brain branch coverage 87.71% → 92.37%, PR #1240)
 - **Workstream**: AZ — `src/workers-ai-brain.ts` remaining branch coverage (+4 tests)
 - **Branch/PR**: `auto/AZ-workers-ai-brain-branch-gaps` → https://github.com/chittyos/ch1tty/pull/1240 (stacked on AY #1239)
