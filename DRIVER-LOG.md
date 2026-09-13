@@ -4514,3 +4514,32 @@ Check if any of the 36 open PRs merged (if CI was re-enabled). Next coverage gap
 
 ### Next run recommendation
 BC target done. Next (BD): check `apps/tasks-mcp/src/server.ts` for similar empty-string branch gaps in namespace/id validation, or check `apps/evidence-mcp/src/server.ts`. **Priority human action: enable GitHub Actions CI to unblock 37 queued PRs.**
+
+---
+
+## Run ~1607 — 2026-09-13T10:33 UTC
+
+**Trigger**: Scheduled hourly run.
+
+**Workstream**: None — standdown; 37 open PRs (#1209–#1245 = U through BC); ≥ 20 standdown threshold.
+
+**Build**: tsc clean (ch1tty@4.1.0, 0 errors) | **Tests**: 1965 pass / 0 fail / 3 skip (1968 total, 52 suites)
+
+**Actions**:
+- Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE. 0 violations on main.
+- `git checkout main && git pull origin main` (fast-forward to ea92d0c — 35 commits, DRIVER-BOARD.md + DRIVER-LOG.md + RUNLOG.md updates).
+- `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1965/0/3 (1968 total, 52 suites). 0 failures.
+- Verified via GitHub API: **37 open PRs** (#1209–#1245 = U through BC). No merges since run ~1606. CI (ci.yml) still disabled at org level.
+- No new coverage gaps outside existing open PRs. Standing down per ≥ 20 PR cap. No new PR opened.
+- PushNotification NOT SENT — no change from run ~1606; same blocked state; last notification sent at ~1597; queue unchanged at 37.
+
+**State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BC(open). **37 PRs open total** (#1209–#1245 = U through BC). Tests: 1965/0/3.
+
+**Persistent blockers** (unchanged — require human action):
+1. **GitHub Actions `ci.yml` disabled at org level** — Settings → Actions → General → "Allow all actions"; all 37 PRs queued with 0-job CI failure
+2. **Notion workspace out of free blocks** — board MCP updates blocked; run log falls back to DRIVER-LOG.md
+3. **`GITHUB_MCP_AUTHORIZATION` unset on prod** — GitHub MCP backend disconnected
+4. **CF Access creds unset** — `CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`
+5. **1100+ stale `auto/` branches** — enable "Automatically delete head branches" in GitHub repo settings
+
+**Next run recommendation**: Idle until PR queue drops below 20 or CI is re-enabled. When queue < 20, next coverage candidate (BD): `apps/tasks-mcp/src/server.ts` — similar empty-string namespace/id validation branch gaps as BC (ledger-mcp). **Priority human action: enable GitHub Actions CI.**
