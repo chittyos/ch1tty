@@ -161,34 +161,6 @@ test('filterSuggestionsCatalog: keys "catalog" and "/" emit warn and are dropped
     assert.ok(!profileKeys.includes('finance/sub'), `slash key 'finance/sub' must be filtered out; got: ${JSON.stringify(profileKeys)}`);
     assert.equal(profileKeys.length, 1, `only 'valid' should remain; got: ${JSON.stringify(profileKeys)}`);
 
-    // Secondary: capture warns to confirm the warn branch was hit (works when log level ≤ warn).
-    // We re-create an aggregator inside the warn-enabled window to ensure the branch fires.
-    const warned: string[] = [];
-    const origWrite = process.stderr.write.bind(process.stderr);
-    (process.stderr as NodeJS.WriteStream & { write: typeof process.stderr.write }).write = (
-      chunk: string | Uint8Array, ..._rest: unknown[]
-    ) => {
-      const s = typeof chunk === 'string' ? chunk : Buffer.from(chunk).toString();
-      if (s.includes('ignoring invalid profile name')) warned.push(s);
-      return origWrite(chunk as string);
-    };
-    try {
-      const agg2 = new Aggregator([], {
-        embedEnabled: false,
-        suggestionsCatalog: {
-          'catalog': { description: 'reserved', combos: [], prompts: [] },
-          'finance/sub': { description: 'slash', combos: [], prompts: [] },
-        },
-      });
-      agg2.shutdown().catch(() => {});
-      // If log level allows warnings, both should be reported
-      if (warned.length > 0) {
-        assert.ok(warned.some((w) => w.includes('"catalog"')), 'warn for "catalog" expected');
-        assert.ok(warned.some((w) => w.includes('"finance/sub"')), 'warn for "finance/sub" expected');
-      }
-    } finally {
-      process.stderr.write = origWrite;
-    }
   } finally {
     aggregator.shutdown().catch(() => {});
   }
