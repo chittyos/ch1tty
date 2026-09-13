@@ -110,6 +110,62 @@ describe('quoRawToUnified', () => {
   });
 });
 
+describe('quoRawToUnified — branch gaps', () => {
+  it('throws when external_id is missing', () => {
+    const row = { ...QUO_ROW_INBOUND, external_id: undefined };
+    assert.throws(() => quoRawToUnified(row, OWNER), /external_id/);
+  });
+
+  it('throws when sent_at is missing', () => {
+    const row = { ...QUO_ROW_INBOUND, sent_at: undefined };
+    assert.throws(() => quoRawToUnified(row, OWNER), /sent_at/);
+  });
+
+  it('throws when parties is empty (no participants reachable)', () => {
+    const row: QuoRawRow = {
+      external_id: 'OPxxx',
+      sent_at: '2026-01-01T00:00:00Z',
+      direction: 'inbound',
+      parties: [],
+    };
+    assert.throws(() => quoRawToUnified(row, OWNER), /no participants/);
+  });
+
+  it('deduplicates repeated non-self counterparty (seenCounter path)', () => {
+    const row: QuoRawRow = {
+      ...QUO_ROW_INBOUND,
+      parties: [
+        { role: 'sender', identifier: '+13122186717' },
+        { role: 'sender', identifier: '+13122186717' }, // duplicate — seenCounter skips it
+        { role: 'recipient', identifier: '+13125551212' }, // owner alias
+      ],
+    };
+    const e = quoRawToUnified(row, OWNER);
+    const nonSelf = e.participants.filter((p) => !p.self);
+    assert.equal(nonSelf.length, 1, 'duplicate counterparty collapsed to one');
+    assert.equal(nonSelf[0].identifier, '+13122186717');
+  });
+
+  it('assigns identifierKind "handle" for non-email non-phone identifiers', () => {
+    const row: QuoRawRow = {
+      ...QUO_ROW_INBOUND,
+      parties: [
+        { role: 'sender', identifier: 'slack:U123456' }, // handle — neither email nor E.164
+        { role: 'recipient', identifier: '+13125551212' }, // owner alias
+      ],
+    };
+    const e = quoRawToUnified(row, OWNER);
+    const handle = e.participants.find((p) => !p.self);
+    assert.equal(handle?.identifierKind, 'handle');
+  });
+
+  it('uses source value as provider when source is not "openphone"', () => {
+    const row: QuoRawRow = { ...QUO_ROW_INBOUND, source: 'twilio' };
+    const e = quoRawToUnified(row, OWNER);
+    assert.equal(e.provider, 'twilio');
+  });
+});
+
 describe('gmailRawToUnified', () => {
   it('derives inbound direction (owner not sender) — divergence #1', () => {
     const e = gmailRawToUnified(GMAIL_INBOUND, OWNER);
@@ -145,5 +201,55 @@ describe('gmailRawToUnified', () => {
     const sender = e.participants.find((p) => p.role === 'sender');
     assert.equal(sender?.identifier, 'maria.bianchi@example-law.com');
     assert.equal(sender?.displayName, 'Maria Bianchi');
+  });
+});
+
+describe('gmailRawToUnified — branch gaps', () => {
+  it('throws when id is missing', () => {
+    const msg = { ...GMAIL_INBOUND, id: undefined };
+    assert.throws(() => gmailRawToUnified(msg, OWNER), /missing id/);
+  });
+
+  it('throws when date is missing', () => {
+    const msg = { ...GMAIL_INBOUND, date: undefined };
+    assert.throws(() => gmailRawToUnified(msg, OWNER), /missing date/);
+  });
+
+  it('throws when no participants can be pushed (no sender, no recipients)', () => {
+    const msg: GmailRawMessage = {
+      id: 'abc123',
+      date: '2026-01-01T00:00:00Z',
+      // no sender, no toRecipients, no ccRecipients
+    };
+    assert.throws(() => gmailRawToUnified(msg, OWNER), /no participants/);
+  });
+
+  it('skips empty addr in pushParty — empty-string sender does not add a participant', () => {
+    const msg: GmailRawMessage = {
+      id: 'test-empty-sender',
+      date: '2026-01-01T00:00:00Z',
+      sender: '',
+      toRecipients: ['nick@nevershitty.com'],
+    };
+    const e = gmailRawToUnified(msg, OWNER);
+    assert.ok(!e.participants.find((p) => p.role === 'sender'), 'empty sender skipped');
+    assert.equal(e.participants.length, 1);
+    assert.equal(e.participants[0].identifier, 'nick@nevershitty.com');
+  });
+
+  it('uses plaintext_body as body fallback when body is absent (divergence #5)', () => {
+    const msg: GmailRawMessage = {
+      ...GMAIL_INBOUND,
+      body: undefined,
+      plaintext_body: 'Plain text content here.',
+    };
+    const e = gmailRawToUnified(msg, OWNER);
+    assert.equal(e.body, 'Plain text content here.');
+  });
+
+  it('uses threadId argument as threadRef when msg.threadId is absent', () => {
+    const { threadId: _omit, ...msgWithoutThreadId } = GMAIL_INBOUND;
+    const e = gmailRawToUnified(msgWithoutThreadId, OWNER, 'external-thread-001');
+    assert.equal(e.threadRef, 'external-thread-001');
   });
 });
