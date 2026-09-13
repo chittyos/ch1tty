@@ -4514,3 +4514,26 @@ Check if any of the 36 open PRs merged (if CI was re-enabled). Next coverage gap
 
 ### Next run recommendation
 BC target done. Next (BD): check `apps/tasks-mcp/src/server.ts` for similar empty-string branch gaps in namespace/id validation, or check `apps/evidence-mcp/src/server.ts`. **Priority human action: enable GitHub Actions CI to unblock 37 queued PRs.**
+
+---
+
+## Run log — 2026-09-13 ~22:45 UTC (automated, run ~1616)
+
+**Workstream advanced:** BG — `src/dlq-store.ts` error-path coverage (4 catch-block branch tests)
+**Branch/PR:** `auto/BG-dlq-store-error-paths` → https://github.com/chittyos/ch1tty/pull/1251
+**Build:** tsc clean (0 errors)
+**Tests:** 1969 pass / 0 fail / 3 skip (was 1965/0/3, +4 new tests)
+**Coverage delta:** `src/dlq-store.ts` branch 78.26% → 96%
+
+**What was done:**
+- Read CLAUDE.md + CHITTY.md; guardrails confirmed. npm ci clean. Build clean. Full suite: 1965/0/3.
+- Ran c8 coverage over `src/` — `dlq-store.ts` was highest-impact gap (78.26% branch, lines 37-40/57-59/74-75/82-83) with no open PR targeting it.
+- Added `test/bg-dlq-store-error-paths.test.ts`: 4 tests injecting a throwing SqlStorage shim to hit the catch blocks in `append()`, `readEntries()`, `rewrite()`, and `count()`.
+- Opened PR #1251; subscribed for CI/review events. Notion board also updated (token valid this run).
+
+**Persistent blockers** (unchanged):
+1. GitHub Actions CI disabled at org level — ~22 PRs queued
+2. Missing env: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+
+### Next run recommendation
+Next coverage targets (not yet in open PRs): `codemode-fns.ts` lines 27/29 (85.71% branch), `comms-mcp/recent-log.ts` lines 46-62/104-108/135-140/192 (80% branch). **Priority human action: enable GitHub Actions CI to unblock ~22 queued PRs.**
