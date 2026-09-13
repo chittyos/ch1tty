@@ -336,4 +336,29 @@ describe('SessionClient', () => {
     assert.equal(lastAuthHeader, 'Bearer env-session-token');
     delete process.env['CHITTY_SESSION_TOKEN'];
   });
+
+  it('strips trailing slash from baseUrl constructor arg', () => {
+    const client = new SessionClient('http://example.com/', 'tok');
+    assert.equal((client as unknown as { baseUrl: string }).baseUrl, 'http://example.com');
+  });
+
+  it('sends cursor query param in listEvents', async () => {
+    let capturedSearch: URLSearchParams | undefined;
+    const server = http.createServer((req, res) => {
+      const u = new URL(req.url!, 'http://localhost');
+      capturedSearch = u.searchParams;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ events: [], has_more: true, cursor: 'tok-next' }));
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new SessionClient(`http://127.0.0.1:${addr.port}`, 'test-token');
+    try {
+      const result = await client.listEvents('sess-1', { cursor: 'page2' });
+      assert.equal(capturedSearch!.get('cursor'), 'page2');
+      assert.equal(result.has_more, true);
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
 });
