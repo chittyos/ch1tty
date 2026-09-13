@@ -4398,3 +4398,33 @@ Remaining coverage gaps: `aggregator.ts` branch still 97.3% — many branches in
 
 ### Next run recommendation
 Same as ~1579 and ~1580: idle unless CI is re-enabled (allows PRs to merge) or new workstreams are added to the scheduled prompt. Priority human action: enable GitHub Actions.
+
+---
+
+### Run ~1603 — 2026-09-13T~07:00Z — PRODUCTIVE: BB workstream
+
+**Workstream advanced**: BB — session-coordinator-mcp branch gaps
+**Branch/PR**: `auto/BB-session-coord-mcp-branch-gaps` → PR #1244
+**Build**: tsc clean (ch1tty@4.1.0, 0 errors) | **Tests**: 1971 pass / 0 fail / 3 skip (1974 total, +6 vs ~1602)
+
+### What was done
+- Startup: `npm ci` clean, `npm run build` clean, `npm test`: 1965/0/3. Confirmed all A-E and extended workstreams done.
+- Checked Notion board (36e94de4) — still blocked (workspace out of free blocks). Run log here.
+- GitHub state: 34 open PRs (including run-log PRs #1242, #1243); CI disabled at org level.
+- Ran c8 coverage on `src/` and `apps/` to find genuine uncovered branches not already claimed by open PRs.
+- Identified `apps/session-coordinator-mcp/src/server.ts` 5 uncovered branches (lines 183, 213-214, 224-225, 243) and `session-client.ts` 1 uncovered branch (line 116) — all NOT covered by any existing open PR.
+- Added 6 tests: 5 in `mcp-tool-layer.test.ts` (create_session scalar context, append_event non-object payload, list_events non-numeric limit, non-Error catch coercion, isPlainObject edge cases) and 1 in `session-client.test.ts` (cursor param forwarding).
+- Result: `server.ts` branch coverage 86.2% → 98.24%.
+
+### Open PRs (35 total as of this run — CI disabled)
+#1209–#1244. All queued pending CI re-enable.
+
+### Blockers (require human action)
+1. **GitHub Actions `ci.yml` disabled at org level** — Settings → Actions → General → "Allow all actions"; 35 PRs stuck
+2. **Notion workspace out of free blocks** — board MCP updates blocked; run log falls back to this file
+3. **`GITHUB_MCP_AUTHORIZATION` unset on prod** — GitHub MCP backend disconnected
+4. **CF Access creds unset** — `CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`; ledger DLQ backlog
+5. **1100+ stale `auto/` branches** — enable "Automatically delete head branches" in GitHub repo settings
+
+### Next run recommendation
+Check coverage of remaining gaps: `session-client.ts` line 79 (204 No Content path), `codemode-fns.ts` lines 27/29 (note: may overlap with open PR #AX). If all genuinely covered by open PRs, advance only when CI is re-enabled. **Priority human action: enable GitHub Actions CI.**
