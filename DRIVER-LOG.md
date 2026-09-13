@@ -4533,7 +4533,7 @@ BC target done. Next (BD): check `apps/tasks-mcp/src/server.ts` for similar empt
 - No new coverage gaps outside existing open PRs. Standing down per ≥ 20 PR cap. No new PR opened.
 - PushNotification NOT SENT — no change from run ~1606; same blocked state; last notification sent at ~1597; queue unchanged at 37.
 
-**State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BC(open). **37 PRs open total** (#1209–#1245 = U through BC). Tests: 1965/0/3.
+**State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–T ✓ U–BC(open). **37 PRs open total** (#1209–#1245 = U through BC). Tests: 1965/0/3.
 
 **Persistent blockers** (unchanged — require human action):
 1. **GitHub Actions `ci.yml` disabled at org level** — Settings → Actions → General → "Allow all actions"; all 37 PRs queued with 0-job CI failure
@@ -4542,4 +4542,4 @@ BC target done. Next (BD): check `apps/tasks-mcp/src/server.ts` for similar empt
 4. **CF Access creds unset** — `CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`
 5. **1100+ stale `auto/` branches** — enable "Automatically delete head branches" in GitHub repo settings
 
-**Next run recommendation**: Idle until PR queue drops below 20 or CI is re-enabled. When queue < 20, next coverage candidate (BD): `apps/tasks-mcp/src/server.ts` — similar empty-string namespace/id validation branch gaps as BC (ledger-mcp). **Priority human action: enable GitHub Actions CI.**
+**Next run recommendation**: Idle until PR queue drops below 20 or CI is re-enabled. When queue < 20, next coverage candidate (BD): `apps/evidence-mcp/src/server.ts` — has `|| !value` two-arm conditions (lines 108-144: content/kind/id/query args) whose second arms are untested by empty-string inputs; same pattern as BC (ledger-mcp). (Note: tasks-mcp was an incorrect candidate — its `requireString` helper only does `typeof !== 'string'`, no empty-string branch.) **Priority human action: enable GitHub Actions CI.**
