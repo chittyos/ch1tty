@@ -135,3 +135,37 @@ test('handleReload pre-warms lazy:false backends after reload', async () => {
 
   assert.ok(calls.includes('warm-on-reload'), `reload must pre-warm lazy:false backends; got calls: ${JSON.stringify(calls)}`);
 });
+
+// ─── filterSuggestionsCatalog — invalid key warn branch ──────────────────────
+
+test('filterSuggestionsCatalog: keys "catalog" and containing "/" emit warn and are dropped', () => {
+  // Capture stderr to verify the warn is emitted for invalid profile names.
+  const warned: string[] = [];
+  const origWrite = process.stderr.write.bind(process.stderr);
+  (process.stderr as NodeJS.WriteStream & { write: typeof process.stderr.write }).write = (
+    chunk: string | Uint8Array, ..._rest: unknown[]
+  ) => {
+    const s = typeof chunk === 'string' ? chunk : Buffer.from(chunk).toString();
+    if (s.includes('ignoring invalid profile name')) warned.push(s);
+    return origWrite(chunk as string);
+  };
+
+  try {
+    const aggregator = new Aggregator([], {
+      embedEnabled: false,
+      suggestionsCatalog: {
+        'catalog': { description: 'reserved name', combos: [], prompts: [] },
+        'finance/sub': { description: 'slash in key', combos: [], prompts: [] },
+        'valid': { description: 'valid profile', combos: [], prompts: [] },
+      },
+    });
+    // Both invalid keys should have triggered warn logs
+    assert.equal(warned.length, 2, `expected 2 warn logs, got ${warned.length}: ${JSON.stringify(warned)}`);
+    assert.ok(warned.some((w) => w.includes('"catalog"')), 'warn for "catalog" key expected');
+    assert.ok(warned.some((w) => w.includes('"finance/sub"')), 'warn for "finance/sub" key expected');
+    // Clean up the aggregator
+    aggregator.shutdown().catch(() => {});
+  } finally {
+    process.stderr.write = origWrite;
+  }
+});

@@ -243,3 +243,49 @@ describe('Logger.childStderr', () => {
     assert.equal(cap.lines.length, 0);
   });
 });
+
+// ─── setLevel ────────────────────────────────────────────────────────────────
+
+describe('Logger.setLevel', () => {
+  let cap: ReturnType<typeof captureStderr>;
+  beforeEach(() => { cap = captureStderr(); });
+  afterEach(() => cap.restore());
+
+  test('setLevel(undefined) leaves level unchanged — debug still suppressed at info', () => {
+    const logger = makeLogger({ CH1TTY_LOG_LEVEL: 'info', CH1TTY_LOG_FORMAT: undefined });
+    logger.setLevel(undefined);
+    logger.debug('suppressed');
+    assert.equal(cap.lines.length, 0);
+  });
+
+  test('setLevel("") leaves level unchanged — debug still suppressed at info', () => {
+    const logger = makeLogger({ CH1TTY_LOG_LEVEL: 'info', CH1TTY_LOG_FORMAT: undefined });
+    logger.setLevel('');
+    logger.debug('suppressed');
+    assert.equal(cap.lines.length, 0);
+  });
+
+  test('setLevel("warn") raises floor — info is now suppressed', () => {
+    const logger = makeLogger({ CH1TTY_LOG_LEVEL: 'info', CH1TTY_LOG_FORMAT: undefined });
+    logger.setLevel('warn');
+    logger.info('suppressed');
+    assert.equal(cap.lines.length, 0);
+    logger.warn('passes');
+    assert.equal(cap.lines.length, 1);
+  });
+
+  test('setLevel("debug") lowers floor — debug messages now appear', () => {
+    const logger = makeLogger({ CH1TTY_LOG_LEVEL: 'info', CH1TTY_LOG_FORMAT: undefined });
+    logger.setLevel('debug');
+    logger.debug('now visible');
+    assert.equal(cap.lines.length, 1);
+    assert.ok(cap.lines[0].includes('now visible'));
+  });
+
+  test('setLevel with unknown string leaves level unchanged', () => {
+    const logger = makeLogger({ CH1TTY_LOG_LEVEL: 'warn', CH1TTY_LOG_FORMAT: undefined });
+    logger.setLevel('unknown-level');
+    logger.info('still suppressed at warn floor');
+    assert.equal(cap.lines.length, 0);
+  });
+});
