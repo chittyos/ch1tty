@@ -441,6 +441,36 @@ test('create_session — scalar context returns error without calling client', a
   }
 });
 
+test('create_session — null context returns error without calling client', async () => {
+  let called = false;
+  const { client, cleanup } = await setup({
+    createSession: async () => { called = true; return SESSION_1; },
+  });
+  try {
+    const res = await client.callTool({ name: 'create_session', arguments: { channel: 'web', context: null } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /context/);
+    assert.equal(called, false);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('create_session — array context returns error without calling client', async () => {
+  let called = false;
+  const { client, cleanup } = await setup({
+    createSession: async () => { called = true; return SESSION_1; },
+  });
+  try {
+    const res = await client.callTool({ name: 'create_session', arguments: { channel: 'web', context: ['a', 'b'] } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /context/);
+    assert.equal(called, false);
+  } finally {
+    await cleanup();
+  }
+});
+
 test('append_event — non-object payload returns error without calling client', async () => {
   let called = false;
   const { client, cleanup } = await setup({
@@ -448,6 +478,36 @@ test('append_event — non-object payload returns error without calling client',
   });
   try {
     const res = await client.callTool({ name: 'append_event', arguments: { session_id: 'sess-1', type: 'foo', payload: 'bad-payload' } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /payload/);
+    assert.equal(called, false);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('append_event — null payload returns error without calling client', async () => {
+  let called = false;
+  const { client, cleanup } = await setup({
+    appendEvent: async () => { called = true; return EVENT_1; },
+  });
+  try {
+    const res = await client.callTool({ name: 'append_event', arguments: { session_id: 'sess-1', type: 'foo', payload: null } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /payload/);
+    assert.equal(called, false);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('append_event — array payload returns error without calling client', async () => {
+  let called = false;
+  const { client, cleanup } = await setup({
+    appendEvent: async () => { called = true; return EVENT_1; },
+  });
+  try {
+    const res = await client.callTool({ name: 'append_event', arguments: { session_id: 'sess-1', type: 'foo', payload: [1, 2] } });
     assert.equal(res.isError, true);
     assert.match((res.content[0] as { text: string }).text, /payload/);
     assert.equal(called, false);
