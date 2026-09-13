@@ -2,6 +2,24 @@
 
 ---
 
+### 2026-09-13T~12:30Z (run ~1608 — idle; 38 PRs queued; CI still disabled)
+- **Workstream**: Idle — all workstreams A–E (and extended F–BD) confirmed complete
+- **Build**: tsc clean (0 errors) | **Tests**: 1965 pass / 0 fail / 3 skip (1968 total, ~46s)
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F–BD ✓. ~38 PRs open (#1210–#1247). Tests: 1965/0/3. Build: clean.
+- **What was done**:
+  - Verified build is clean and full test suite green (1965/0/3).
+  - Confirmed all named workstreams A–E complete on Notion board.
+  - Latest open PRs: #1247 (BD: logger+aggregator 6 tests), #1246 (run-log ~1607 idle), #1245 (BC: ledger-mcp 4 tests), #1244 (BB: session-coord-mcp 6 tests).
+  - No new code work opened — CI is still disabled at org level; 38 PRs are queued and can't merge.
+- **Human-action items (unchanged)**:
+  1. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions" (unblocks all 38 queued PRs)
+  2. **Merge queued PRs** — all locally validated; CI disabled at org level prevents auto-merge
+  3. **Disable/redirect hourly cron** — all workstreams done; hourly runs are idle-burning ~50k tokens
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+- **Next run**: Idle. All workstreams complete. Enable CI and merge PRs to unblock.
+
+---
+
 ### 2026-09-12T~19:00Z (run ~1594 — AZ: workers-ai-brain branch coverage 87.71% → 92.37%, PR #1240)
 - **Workstream**: AZ — `src/workers-ai-brain.ts` remaining branch coverage (+4 tests)
 - **Branch/PR**: `auto/AZ-workers-ai-brain-branch-gaps` → https://github.com/chittyos/ch1tty/pull/1240 (stacked on AY #1239)
