@@ -300,6 +300,14 @@ describe('ChildManager — chittysecrets URI resolution', { concurrency: false }
       ok: false, status: 401, statusText: 'Unauthorized',
       json: async () => ({ error: 'access denied' }),
     }) as unknown as Response;
+    // Assert exact error message so the test fails if the "no reason" fallback is removed.
+    await assert.rejects(
+      () => (cm as any).resolveChittySecret('k'),
+      (err: Error) => {
+        assert.ok(err.message.includes('access denied (no reason)'), `expected "access denied (no reason)" in: ${err.message}`);
+        return true;
+      },
+    );
     const env = await (cm as any).resolveEnv(makeConfig({ K: 'chittysecrets://k' }));
     assert.ok(!('K' in env), 'secret with no-reason error body must be removed');
   });
@@ -310,6 +318,15 @@ describe('ChildManager — chittysecrets URI resolution', { concurrency: false }
       ok: false, status: 503, statusText: 'Service Unavailable',
       json: async () => { throw new SyntaxError('Unexpected token'); },
     }) as unknown as Response;
+    // Assert exact error message: the catch swallows the SyntaxError so only the HTTP status line survives.
+    await assert.rejects(
+      () => (cm as any).resolveChittySecret('k'),
+      (err: Error) => {
+        assert.ok(err.message.includes('HTTP 503 Service Unavailable'), `expected HTTP status in: ${err.message}`);
+        assert.ok(!err.message.includes('SyntaxError'), `SyntaxError must not escape: ${err.message}`);
+        return true;
+      },
+    );
     const env = await (cm as any).resolveEnv(makeConfig({ K: 'chittysecrets://k' }));
     assert.ok(!('K' in env), 'secret whose error body cannot be parsed must be removed');
   });
