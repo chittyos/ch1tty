@@ -1,7 +1,7 @@
-# ch1tty goal-driver board (fallback — Notion auth blocked)
+# ch1tty goal-driver board (fallback — Notion board write-blocked)
 
-Notion auth returns 401. This file is the cross-run state fallback until the token is refreshed.
-**To restore Notion board**: run `chitty-mcp-token notion` (or rotate the Notion integration token in the Notion workspace settings) and re-connect the `notion` server.
+Notion MCP auth succeeds (401 resolved), but the workspace has hit its free-block limit — page updates fail. This file is the cross-run state fallback until the block limit is resolved.
+**To restore Notion board**: upgrade the Notion workspace plan, or free up blocks by archiving unused pages. Token rotation (`chitty-mcp-token notion`) is only needed if a future 401 appears.
 
 ## Workstream checklist
 
@@ -25,7 +25,7 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 
 **Status**: All workstreams A-E remain complete. **32 open PRs stacked (#1209–#1241)** from prior auto-runs. Mix of types: branch-gap test coverage (most), dependency bumps (#1209 `@types/node`/c8, #1210 MCP SDK, #1212 wrangler, #1213 TypeScript 5→7, #1217 zod, #1223 agents+codemode, #1227 agents), a comms tool-ref fix (#1221), a toMcpResult refactor (#1216), and a CI matrix addition (#1220 comms-mcp). None merged. GitHub MCP entry confirmed correct (`https://api.githubcopilot.com/mcp/`). Notion MCP connects successfully (401 resolved); board writes blocked by workspace free-block limit.
 
-**Next run**: Same idle state. **Human action required**: review and merge or close PRs #1209–#1241 (32 PRs — mix of dep bumps, test, fix, refactor), then disable the schedule or add new workstreams.
+**Next run**: Same idle state. **Human action required**: review and merge or close open PRs (this run counted 32 PRs #1209–#1241; run ~1603 counted 10 PRs #1233–#1242 — discrepancy likely due to PRs closed between runs; verify on GitHub), then disable the schedule or add new workstreams.
 
 ---
 
