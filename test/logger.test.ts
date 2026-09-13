@@ -251,18 +251,22 @@ describe('Logger.setLevel', () => {
   beforeEach(() => { cap = captureStderr(); });
   afterEach(() => cap.restore());
 
-  test('setLevel(undefined) leaves level unchanged — debug still suppressed at info', () => {
+  test('setLevel(undefined) leaves level unchanged — debug suppressed, info still passes', () => {
     const logger = makeLogger({ CH1TTY_LOG_LEVEL: 'info', CH1TTY_LOG_FORMAT: undefined });
     logger.setLevel(undefined);
     logger.debug('suppressed');
-    assert.equal(cap.lines.length, 0);
+    assert.equal(cap.lines.length, 0, 'debug must remain suppressed');
+    logger.info('still passes');
+    assert.equal(cap.lines.length, 1, 'info must still be emitted at the unchanged info floor');
   });
 
-  test('setLevel("") leaves level unchanged — debug still suppressed at info', () => {
+  test('setLevel("") leaves level unchanged — debug suppressed, info still passes', () => {
     const logger = makeLogger({ CH1TTY_LOG_LEVEL: 'info', CH1TTY_LOG_FORMAT: undefined });
     logger.setLevel('');
     logger.debug('suppressed');
-    assert.equal(cap.lines.length, 0);
+    assert.equal(cap.lines.length, 0, 'debug must remain suppressed');
+    logger.info('still passes');
+    assert.equal(cap.lines.length, 1, 'info must still be emitted at the unchanged info floor');
   });
 
   test('setLevel("warn") raises floor — info is now suppressed', () => {
@@ -282,10 +286,12 @@ describe('Logger.setLevel', () => {
     assert.ok(cap.lines[0].includes('now visible'));
   });
 
-  test('setLevel with unknown string leaves level unchanged', () => {
+  test('setLevel with unknown string leaves level unchanged — warn still emitted', () => {
     const logger = makeLogger({ CH1TTY_LOG_LEVEL: 'warn', CH1TTY_LOG_FORMAT: undefined });
     logger.setLevel('unknown-level');
     logger.info('still suppressed at warn floor');
-    assert.equal(cap.lines.length, 0);
+    assert.equal(cap.lines.length, 0, 'info must remain suppressed at unchanged warn floor');
+    logger.warn('still passes at warn floor');
+    assert.equal(cap.lines.length, 1, 'warn must still be emitted at the unchanged warn floor');
   });
 });
