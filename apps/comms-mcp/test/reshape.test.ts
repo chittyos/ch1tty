@@ -224,16 +224,14 @@ describe('gmailRawToUnified — branch gaps', () => {
     assert.throws(() => gmailRawToUnified(msg, OWNER), /no participants/);
   });
 
-  it('skips empty addr in pushParty — empty-string sender does not add a participant', () => {
+  it('skips empty addr in pushParty — empty string in toRecipients returns early via !addr guard', () => {
     const msg: GmailRawMessage = {
-      id: 'test-empty-sender',
+      id: 'test-empty-recipient',
       date: '2026-01-01T00:00:00Z',
-      sender: '',
-      toRecipients: ['nick@nevershitty.com'],
+      toRecipients: ['nick@nevershitty.com', ''],
     };
     const e = gmailRawToUnified(msg, OWNER);
-    assert.ok(!e.participants.find((p) => p.role === 'sender'), 'empty sender skipped');
-    assert.equal(e.participants.length, 1);
+    assert.equal(e.participants.length, 1, 'empty-addr recipient skipped; valid one kept');
     assert.equal(e.participants[0].identifier, 'nick@nevershitty.com');
   });
 
