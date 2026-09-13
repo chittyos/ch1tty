@@ -1,7 +1,7 @@
-# ch1tty goal-driver board (fallback — Notion auth blocked)
+# ch1tty goal-driver board (fallback — Notion board write-blocked)
 
-Notion auth returns 401. This file is the cross-run state fallback until the token is refreshed.
-**To restore Notion board**: run `chitty-mcp-token notion` (or rotate the Notion integration token in the Notion workspace settings) and re-connect the `notion` server.
+Notion MCP auth succeeds (401 resolved), but the workspace has hit its free-block limit — page updates fail. This file is the cross-run state fallback until the block limit is resolved.
+**To restore Notion board**: upgrade the Notion workspace plan, or free up blocks by archiving unused pages. Token rotation (`chitty-mcp-token notion`) is only needed if a future 401 appears.
 
 ## Workstream checklist
 
@@ -13,9 +13,21 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 
 ## Blocker
 
-- **Notion auth invalid (401)**: `notion` MCP server connects but API calls fail. Fix: refresh the Notion integration token in workspace settings → Settings & Members → Connections → ch1tty integration, or run `chitty-mcp-token notion` to rotate via 1Password.
+- **Notion workspace out of free blocks**: `notion` MCP server connects and auth succeeds (401 resolved), but page updates fail with a block-limit error. Fix: upgrade the Notion workspace plan, or free up blocks by archiving unused pages. Token rotation (`chitty-mcp-token notion`) is only needed if a future 401 appears.
 
 ## Run log
+
+### 2026-09-13T00:00:00Z — Scheduled run
+
+**Workstream advanced**: None — all A-E complete, schedule idle
+
+**Build/test**: build clean, **1965 pass / 0 fail / 3 skipped** (up from 1438 on 2026-08-18 — prior auto-runs added 527 tests via coverage PRs).
+
+**Status**: All workstreams A-E remain complete. **32 open PRs stacked (#1209–#1241)** from prior auto-runs. Mix of types: branch-gap test coverage (most), dependency bumps (#1209 `@types/node`/c8, #1210 MCP SDK, #1212 wrangler, #1213 TypeScript 5→7, #1217 zod, #1223 agents+codemode, #1227 agents), a comms tool-ref fix (#1221), a toMcpResult refactor (#1216), and a CI matrix addition (#1220 comms-mcp). None merged. GitHub MCP entry confirmed correct (`https://api.githubcopilot.com/mcp/`). Notion MCP connects successfully (401 resolved); board writes blocked by workspace free-block limit.
+
+**Next run**: Same idle state. **Human action required**: review and merge or close open PRs (this run counted 32 PRs #1209–#1241; run ~1603 counted 10 PRs #1233–#1242 — discrepancy likely due to PRs closed between runs; verify on GitHub), then disable the schedule or add new workstreams.
+
+---
 
 ### 2026-08-18T12:00:00Z — ~1143rd run (escalation #46)
 
@@ -4398,3 +4410,34 @@ Remaining coverage gaps: `aggregator.ts` branch still 97.3% — many branches in
 
 ### Next run recommendation
 Same as ~1579 and ~1580: idle unless CI is re-enabled (allows PRs to merge) or new workstreams are added to the scheduled prompt. Priority human action: enable GitHub Actions.
+
+---
+
+## Run ~1603 — 2026-09-13T (UTC) — second session today — IDLE
+
+**Workstream advanced**: None — all workstreams A–E and extended through BA complete; queue saturated
+**Branch/PR**: Appended to existing PR #1242 (`auto/2026-09-13-run-log`)
+**Build**: tsc clean (ch1tty@4.1.0, 0 errors) | **Tests**: 1965 pass / 0 fail / 3 skip
+
+### What was done
+- Read CLAUDE.md + CHITTY.md; confirmed 5-tool surface invariant.
+- Read Notion board (36e94de4): blocked — workspace out of free blocks (cannot update).
+- Fetched all branches; confirmed run-log branch `auto/2026-09-13-run-log` from earlier session (~1602).
+- Ran `npm ci` → build clean → `npm test` → 1965/0/3.
+- Checked PR #1242 (today's run-log): open, CodeQL-only checks (no CI test run — org CI still disabled).
+- Checked PR #1241 check runs: CodeQL 3/3 green; no `ci.yml` / test check present — confirms GitHub Actions still org-disabled.
+- Confirmed servers.json github entry: `https://api.githubcopilot.com/mcp/` with envHeaders Authorization (B: done).
+- Open PRs: #1233–#1242 (10 PRs), mix of test-coverage (AT–BA) and today's run-log PR.
+
+### Open PRs (10 total, CI-disabled)
+AS (#1233), AT (#1234), AU (#1235), AV (#1236), AW (#1237), AX (#1238), AY (#1239), AZ (#1240), BA (#1241), run-log (#1242)
+
+### Blockers (require human action — unchanged for multiple runs)
+1. **GitHub Actions `ci.yml` disabled at org level** — Settings → Actions → General → "Allow all actions"; PRs cannot merge
+2. **Hourly cron running with no work** — all workstreams exhausted; disable schedule or define new workstreams
+3. **Notion workspace out of free blocks** — run log falls back to DRIVER-LOG.md
+4. **`GITHUB_MCP_AUTHORIZATION` unset on prod** — GitHub MCP backend disconnected
+5. **CF Access creds unset** — `CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`; ledger DLQ backlog
+
+### Next run recommendation
+Idle. If org CI is re-enabled, test coverage PRs #1233–#1241 will be mergeable. If new workstreams are defined, advance the earliest. Otherwise this schedule is burning tokens with no work — disable it.
