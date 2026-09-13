@@ -125,6 +125,39 @@ describe('suggestions catalog', () => {
       assert.ok(relevant, `communication/${combo.name}: no comm-relevant server in chain ${JSON.stringify(combo.chain)}`);
     }
   });
+
+  it('no combo chain or prompt resolves_to references comms/list_messages or comms/send_message (comms-mcp is read-only)', () => {
+    const catalog = freshCatalog();
+    const forbidden = ['comms/list_messages', 'comms/send_message'];
+    for (const [focus, profile] of Object.entries(catalog)) {
+      for (const combo of profile.combos) {
+        for (const tool of combo.chain) {
+          assert.ok(!forbidden.includes(tool),
+            `${focus}/${combo.name}: chain references non-existent tool "${tool}" (comms-mcp only exposes comms/comms.recentLog)`);
+        }
+      }
+      for (const prompt of profile.prompts) {
+        for (const ref of forbidden) {
+          assert.ok(!prompt.resolves_to.includes(ref),
+            `${focus}: prompt "${prompt.text}" resolves_to references non-existent tool "${ref}"`);
+        }
+      }
+    }
+  });
+
+  it('all comms/* chain references are comms/comms.recentLog', () => {
+    const catalog = freshCatalog();
+    for (const [focus, profile] of Object.entries(catalog)) {
+      for (const combo of profile.combos) {
+        for (const tool of combo.chain) {
+          if (tool.startsWith('comms/')) {
+            assert.equal(tool, 'comms/comms.recentLog',
+              `${focus}/${combo.name}: unexpected comms tool "${tool}" (only comms/comms.recentLog is valid)`);
+          }
+        }
+      }
+    }
+  });
 });
 
 describe('cast plan includes suggestions', () => {
