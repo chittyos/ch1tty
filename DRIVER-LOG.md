@@ -17,6 +17,18 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 
 ## Run log
 
+### 2026-09-13T00:00:00Z — Scheduled run
+
+**Workstream advanced**: None — all A-E complete, schedule idle
+
+**Build/test**: build clean, **1965 pass / 0 fail / 3 skipped** (up from 1438 on 2026-08-18 — prior auto-runs added 527 tests via coverage PRs).
+
+**Status**: All workstreams A-E remain complete. 20 open PRs stacked (#1222–#1241), all test-coverage additions from prior auto-runs (branch gap tests, named AU–BA). None of these PRs have been merged. GitHub MCP entry already migrated to `https://api.githubcopilot.com/mcp/`. Notion MCP now available (token restored since last 401). `servers.json` github entry confirmed correct.
+
+**Next run**: Same idle state. **Human action required**: review and merge or close the 20 open test PRs (#1222–#1241), then disable the schedule or add new workstreams.
+
+---
+
 ### 2026-08-18T12:00:00Z — ~1143rd run (escalation #46)
 
 **Workstream advanced**: None — all A-E complete, schedule idle
