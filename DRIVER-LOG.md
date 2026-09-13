@@ -4428,3 +4428,28 @@ Same as ~1579 and ~1580: idle unless CI is re-enabled (allows PRs to merge) or n
 
 ### Next run recommendation
 Check coverage of remaining gaps: `session-client.ts` line 79 (204 No Content path), `codemode-fns.ts` lines 27/29 (note: may overlap with open PR #AX). If all genuinely covered by open PRs, advance only when CI is re-enabled. **Priority human action: enable GitHub Actions CI.**
+
+---
+
+## Run ~1604 — 2026-09-13T06:57 UTC
+
+**Trigger**: Scheduled hourly continuation from run ~1603.
+
+**Actions**:
+- Woke to Codex P2 review comment on PR #1244 (auto/BB-session-coord-mcp-branch-gaps): string-based context/payload tests only exercised `typeof v === 'object'` path of `isPlainObject`; `v !== null` and `!Array.isArray(v)` branches not covered.
+- Added 4 tests covering the missing paths: `null` and `[]` for `create_session` context, `null` and `[1,2]` for `append_event` payload. Committed `231b490`, pushed.
+- Replied to Codex thread with fix details, resolved thread.
+- CodeRabbit re-reviewed `231b490`: no actionable comments, ⚪ Minimal risk, 5/5 checks passed.
+- Codex re-reviewed `231b490`: completed with no findings.
+- PR #1244 is fully clean. Waiting on CI (disabled at org level) to merge.
+
+**Suite**: 30 pass / 0 fail in `mcp-tool-layer.test.ts` (+4 vs ~1603).
+
+**Persistent blockers** (unchanged):
+1. GitHub Actions CI disabled at org level — 36 PRs queued
+2. Notion workspace out of free blocks — using DRIVER-LOG.md as fallback
+3. Missing env: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+4. 1100+ stale `auto/` branches
+
+### Next run recommendation
+Check if any of the 36 open PRs merged (if CI was re-enabled). Next coverage gap candidate (BC): `session-client.ts` line 79 (204 No Content / empty-body path). **Priority human action: enable GitHub Actions CI.**
