@@ -291,4 +291,26 @@ describe('ChildManager — chittysecrets URI resolution', { concurrency: false }
     const env = await (cm as any).resolveEnv(makeConfig({}));
     assert.ok(typeof env === 'object');
   });
+
+  // ── Branch gaps: lines 137-139 ─────────────────────────────────────────────
+
+  test('HTTP error with error body but no reason field — "no reason" fallback used', async () => {
+    // Covers the `errJson.reason || "no reason"` false branch: error is present but reason is absent.
+    globalThis.fetch = async (_url: any, _init: any) => ({
+      ok: false, status: 401, statusText: 'Unauthorized',
+      json: async () => ({ error: 'access denied' }),
+    }) as unknown as Response;
+    const env = await (cm as any).resolveEnv(makeConfig({ K: 'chittysecrets://k' }));
+    assert.ok(!('K' in env), 'secret with no-reason error body must be removed');
+  });
+
+  test('HTTP error response with malformed JSON body — catch {} suppresses parse error', async () => {
+    // Covers the `catch {}` block: res.json() throws when the body is not valid JSON.
+    globalThis.fetch = async (_url: any, _init: any) => ({
+      ok: false, status: 503, statusText: 'Service Unavailable',
+      json: async () => { throw new SyntaxError('Unexpected token'); },
+    }) as unknown as Response;
+    const env = await (cm as any).resolveEnv(makeConfig({ K: 'chittysecrets://k' }));
+    assert.ok(!('K' in env), 'secret whose error body cannot be parsed must be removed');
+  });
 });
