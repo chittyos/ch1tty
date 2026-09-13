@@ -23,9 +23,9 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 
 **Build/test**: build clean, **1965 pass / 0 fail / 3 skipped** (up from 1438 on 2026-08-18 — prior auto-runs added 527 tests via coverage PRs).
 
-**Status**: All workstreams A-E remain complete. 20 open PRs stacked (#1222–#1241), all test-coverage additions from prior auto-runs (branch gap tests, named AU–BA). None of these PRs have been merged. GitHub MCP entry already migrated to `https://api.githubcopilot.com/mcp/`. Notion MCP now available (token restored since last 401). `servers.json` github entry confirmed correct.
+**Status**: All workstreams A-E remain complete. **32 open PRs stacked (#1209–#1241)** from prior auto-runs. Mix of types: branch-gap test coverage (most), dependency bumps (#1209 `@types/node`/c8, #1210 MCP SDK, #1212 wrangler, #1213 TypeScript 5→7, #1217 zod, #1223 agents+codemode, #1227 agents), a comms tool-ref fix (#1221), a toMcpResult refactor (#1216), and a CI matrix addition (#1220 comms-mcp). None merged. GitHub MCP entry confirmed correct (`https://api.githubcopilot.com/mcp/`). Notion MCP connects successfully (401 resolved); board writes blocked by workspace free-block limit.
 
-**Next run**: Same idle state. **Human action required**: review and merge or close the 20 open test PRs (#1222–#1241), then disable the schedule or add new workstreams.
+**Next run**: Same idle state. **Human action required**: review and merge or close PRs #1209–#1241 (32 PRs — mix of dep bumps, test, fix, refactor), then disable the schedule or add new workstreams.
 
 ---
 
