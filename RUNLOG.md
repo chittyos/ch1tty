@@ -2,6 +2,14 @@
 
 ---
 
+### 2026-09-14 (event — PRs #1260/BC/#1261/BK/#1262 merged — BJ/BC/BK now in main)
+- **PR #1260 (BJ)** merged: `test/bj-cast-explain-no-match.test.ts` — 4 tests, aggregator.ts:1372 covered
+- **PR #1261 (BC)** merged: `test/bc-session-client-api-methods.test.ts` — session-client HTTP method coverage
+- **PR #1262 (BK)** merged: `apps/comms-mcp/test/bk-recent-log-server-gaps.test.ts` — fetchChannel unbound-provider + brain metadata gaps
+- **Next**: Identify next earliest incomplete workstream (BL or later); run build+coverage check
+
+---
+
 ### 2026-09-14 (run ~1628 — BJ: cast no_match + explain:true, PR #1260)
 - **Workstream**: BJ — `aggregator.ts:1372` outer+inner ternary in `no_match + explain:true` path
 - **Branch/PR**: `auto/BJ-execute-dryrun-malformed-cast-explain-no-match` → https://github.com/chittyos/ch1tty/pull/1260
