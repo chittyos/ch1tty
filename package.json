@@ -17,9 +17,9 @@
   },
   "dependencies": {
     "@chittyos/schema-client": "file:../../CHITTYFOUNDATION/chittyschema/clients/schema-client",
-    "@cloudflare/codemode": "^0.5.1",
+    "@cloudflare/codemode": "^0.5.2",
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "agents": "^0.22.0",
+    "agents": "^0.23.0",
     "zod": "4.6.2"
   },
   "devDependencies": {
@@ -27,7 +27,7 @@
     "@types/node": "22.20.2",
     "c8": "^12.0.0",
     "tsx": "4.23.13",
-    "typescript": "^5.7.0",
+    "typescript": "^7.0.2",
     "wrangler": "4.131.0"
   },
   "engines": {

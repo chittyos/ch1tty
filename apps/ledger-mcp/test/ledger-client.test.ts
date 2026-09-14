@@ -192,6 +192,19 @@ describe('LedgerClient', () => {
     delete process.env['CHITTY_LEDGER_URL'];
   });
 
+  it('strips trailing slash from baseUrl constructor arg', () => {
+    const client = new LedgerClient('http://example.com/', 'tok');
+    assert.equal((client as unknown as { baseUrl: string }).baseUrl, 'http://example.com');
+  });
+
+  it('uses default URL when no arg and no env var', () => {
+    const saved = process.env['CHITTY_LEDGER_URL'];
+    delete process.env['CHITTY_LEDGER_URL'];
+    const client = new LedgerClient();
+    assert.equal((client as unknown as { baseUrl: string }).baseUrl, 'https://ledger.chitty.cc');
+    if (saved !== undefined) process.env['CHITTY_LEDGER_URL'] = saved;
+  });
+
   it('reads CHITTY_LEDGER_TOKEN from environment', async () => {
     process.env['CHITTY_LEDGER_TOKEN'] = 'env-ledger-token';
     const client = new LedgerClient(baseUrl);
@@ -207,11 +220,4 @@ describe('LedgerClient', () => {
     assert.ok(Array.isArray(result.entries));
   });
 
-  it('uses default CHITTY_LEDGER_URL when neither arg nor env var is set', () => {
-    const savedUrl = process.env['CHITTY_LEDGER_URL'];
-    delete process.env['CHITTY_LEDGER_URL'];
-    const client = new LedgerClient();
-    assert.equal((client as unknown as { baseUrl: string }).baseUrl, 'https://ledger.chitty.cc');
-    if (savedUrl !== undefined) process.env['CHITTY_LEDGER_URL'] = savedUrl;
-  });
 });

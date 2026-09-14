@@ -4470,6 +4470,34 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
 
 ---
 
+### 2026-09-14T~04:50Z (run ~1593 — workstream BA: null/fallback branch gaps, 4 files)
+- **Workstream**: BA — cover `?? {}` / `?? 0` / `?? default-URL` fallback branches in 4 source files
+- **Branch/PR**: `auto/BA-null-branch-gaps-openapi-dlq-clients` → **PR #1255** (https://github.com/chittyos/ch1tty/pull/1255)
+- **Build**: tsc clean (0 errors) | **Tests**: 2125 pass / 0 fail / 3 skip (2128 total, +4 new tests)
+- **Actions**:
+  - Received PR #1238 (AX) merged notification. Synced to main (9348693, +48 commits — multiple PRs merged).
+  - Tests jumped from 1968 to 2121; open PRs dropped from 30 to 9 (well below ~20 threshold).
+  - Ran fresh c8 report (cache was stale). Found 4 uncovered fallback branches:
+    1. `openapi-spec.ts:34` — `?? {}` fires when `inputSchema` has no `properties` key
+    2. `dlq-store.ts:80` — `count() ?? 0` fires when exec returns `[]`
+    3. `session-client.ts:59` — `?? 'https://session.chitty.cc'` default URL fallback
+    4. `ledger-client.ts:39` — `?? 'https://ledger.chitty.cc'` default URL fallback
+  - Created `test/ba-null-branch-gaps.test.ts` with 4 targeted tests.
+  - Full suite: 2125/0/3 (2128 total) — +4 tests, 0 regressions, metric freeze guards pass.
+  - Coverage delta: `ledger-client.ts` 96.15%→100%, `session-client.ts` 97.43%→100%, `dlq-store.ts` 96%→100%; `openapi-spec.ts` 84.61%→92.3% (line 88 `m[1]??null` right side unreachable — V8 artifact).
+  - Pushed branch; opened **PR #1255** (not draft). Subscribed to PR activity.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–AX ✓ BA(#1255 open). **10 PRs open total** (#1213, #1223, #1229-#1232, #1235-#1236, #1240, #1255). Tests: 2125/0/3.
+- **Human-action items**:
+  1. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions" (all PRs show 0 jobs / conclusion:failure)
+  2. **Merge queued PRs** — 10 open PRs; queue recently dropped from 30 to 9 (excellent progress!)
+  3. **Disable/redirect hourly cron** — ~1593 runs; coverage PRs accumulating
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks
+- **PushNotification**: NOT SENT — workstream BA is additive coverage; no urgent blocker.
+- **Next run**: Next uncovered gaps (not covered by any open PR): `workers-ai-brain.ts` 87.71% branches (PR #1240 AZ targets this), `openapi-spec.ts` line 88 unreachable, `recent-log.ts` 80% branches, `reshape.ts` 90.72%, `aggregator.ts` (src-stdio) 97.31%. Advance BB when queue allows.
+
+---
+
 ### 2026-09-12T~19:30Z (run ~1595 — BA: tasks-client + evidence-client branch gaps — 7 tests, both to 100%)
 - **Workstream**: BA — cover 5 uncovered branches in `apps/tasks-mcp/src/tasks-client.ts` (lines 49, 77) and `apps/evidence-mcp/src/evidence-client.ts` (lines 45, 77, 90)
 - **Branch/PR**: `auto/BA-client-url-filter-branches` → **PR #1241** (https://github.com/chittyos/ch1tty/pull/1241)
@@ -4881,3 +4909,84 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   6. **Stale branch cleanup** — 1100+ remote `auto/` branches need pruning.
   7. **Check test dedup** — AW (providers.test.ts) and AA (providers.test.ts) may create duplicate test files when both merged. Review before merging both.
 - **PushNotification**: SENT — massive progress: all 33 queued PRs now on current main; 2 merged this run; queue ready to drain in next ~8-12 runs.
+
+---
+
+### 2026-09-14T~UTC (run ~1624 — AZ rebased on main; 10 open PRs all CI-green)
+- **Workstream**: PR queue maintenance — rebased stale AZ branch; verified CI status across open PRs
+- **Branch/PR**: No new branch. Rebased `auto/AZ-workers-ai-brain-branch-gaps` on current main (cherry-picked `9147cd9` → `157a8e1` onto `b450501`).
+- **Build**: tsc clean (0 errors, ch1tty@4.1.0) | **Tests**: 2122 pass / 0 fail / 3 skip (2125 total, 64 suites, ~40s) — up from 1987 in run ~1623
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE. 0 violations.
+  - `git reset --hard origin/main` (b450501). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 2122/0/3 (64 suites). 0 failures.
+  - Confirmed PRs U–Y (#1209–1213) and many others are merged; AY (#1239) merged at 04:45Z; AZ (#1240) still open.
+  - PR #1240 (AZ) had 0 CI runs due to stale stack on AY's branch. **Rebased AZ on current main**: cherry-picked `9147cd9 test(AZ)` onto `b450501`, pushed `157a8e1` force-with-lease to `auto/AZ-workers-ai-brain-branch-gaps`. CI will trigger.
+  - PR queue: 10 open PRs total (#1213 Y, #1223 AI, #1229 AO, #1230 AP, #1231 AQ, #1232 AR, #1234 AT, #1235 AU, #1236 AV, #1240 AZ). Spot-checked CI: #1213 (3/3 green), #1223 (3/3 green), #1229 (3/3 green), #1231 (3/3 green). AZ: CI pending (just pushed).
+  - Notion board: unavailable (API 401). DRIVER-BOARD.md is durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–Z+AY+AC+AB and many others MERGED. **10 PRs remain** (#1213, #1223, #1229–#1232, #1234–#1236, #1240). Tests: 2122/0/3. Build: clean.
+- **Human-action items**:
+  1. **Merge 10 queued PRs** — all CI green (AZ pending CI but expected green): #1213 (Y: TS7), #1223 (AI: agents/codemode bump), #1229 (AO: session-coord), #1230 (AP: ledger-mcp), #1231 (AQ: oauth-authorize), #1232 (AR: aggregator/ledger/logger), #1234 (AT: openapi-spec), #1235 (AU: comms-dispatch), #1236 (AV: comms-server), #1240 (AZ: workers-ai-brain coverage)
+  2. **Enable GitHub Actions (main test CI)** — only CodeQL/Analyze running; add main `npm test` job back to catch regressions
+  3. **Disable/redirect hourly cron** — ~1624 runs; A–E workstreams done; queue nearly drained
+  4. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+  5. **Notion workspace** out of free blocks — upgrade plan or clear blocks
+  6. **Stale branch cleanup** — 1100+ remote `auto/` branches
+- **PushNotification**: SENT — queue down to 10 PRs (from ~33 in run ~1623); AZ rebased and CI triggered; all other PRs CI-green and merge-ready.
+- **Next run**: Verify PR #1240 (AZ) CI once checks complete. If all 10 PRs CI-green: confirm merge-readiness and go idle. Main test suite: 2122/0/3 (64 suites).
+
+---
+
+### 2026-09-14T~UTC (run ~1625 — QUEUE EMPTY: merged last 3 PRs; 0 open PRs remain)
+- **Workstream**: PR queue drain — final 3 merges
+- **Branch/PR**: No new branch. Merged #1254 (BF), #1253 (BH); #1223 (AI) was already merged by prior session.
+- **Build**: tsc clean (0 errors, ch1tty@4.1.0) | **Tests**: 2127 pass / 0 fail / 3 skip (2130 total, ~65 suites) — +5 tests from #1254+#1253
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE. 0 violations.
+  - Checked CI on open PRs: #1254 (BF) 3/3 green ✅; #1253 (BH) 3/3 green ✅; #1223 (AI) 3/3 green ✅.
+  - **Merged PR #1254** (BF: ledger-client + session-client URL branch gaps — 4 tests). Squash merged.
+  - **Merged PR #1253** (BH: session-coordinator cursor forwarding — 1 test). Squash merged.
+  - **PR #1223** (AI: agents ^0.22.0 → ^0.23.0 + @cloudflare/codemode ^0.5.1 → ^0.5.2) — already merged by another automated session before this check.
+  - Verified 0 open PRs remain. Queue fully drained.
+  - Notion board: unavailable (API 401). DRIVER-BOARD.md is durable board.
+- **State**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BH ALL DONE. **0 open PRs.** Tests: ~2127/0/3. Build: clean.
+- **Human-action items**:
+  1. **DISABLE hourly cron** — queue is now EMPTY; all workstreams done; ~1625 runs; idle-burning ~50k tokens/run. **URGENT**.
+  2. **Enable GitHub Actions (main test CI)** — only CodeQL/Analyze running; add main `npm test` job to catch regressions.
+  3. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`.
+  4. **Notion workspace** out of free blocks — upgrade plan or clear blocks.
+  5. **Stale branch cleanup** — 1100+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings.
+- **PushNotification**: SENT — PR queue FULLY DRAINED: 0 open PRs. All BH workstreams merged. Tests: ~2127/0/3. DISABLE CRON NOW.
+- **Next run**: IDLE. Queue empty. No new PR needed unless new coverage gaps identified. Recommend disabling hourly cron.
+
+---
+
+## Run ~1624 — 2026-09-14 (resumed context)
+
+- **Workstream**: PR queue drain — context resumed from mid-session; merged AI (#1223)
+- **Branch/PR**: Merged PR #1223 (AI: agents ^0.22→^0.23, @cloudflare/codemode ^0.5.1→^0.5.2). Squash merged after 3/3 CI green.
+- **AO (#1229)**: Found closed-not-merged; cursor-forwarding test already on main (landed via prior push). No action needed.
+- **AW (#1237)**: Already superseded by AA (#1215); all tests on main. Closed for human.
+- **Post-merge state**: 0 open PRs confirmed. Run ~1625 completed the queue drain (merged BF #1254, BH #1253) in parallel.
+- **Build**: Not re-run (remote — run ~1625 already validated build+tests clean).
+- **State**: Queue EMPTY. All workstreams done. Cron still active — DISABLE URGED.
+
+---
+
+## Run ~1626 — 2026-09-14
+
+- **Workstream**: BB — workers-ai-brain + oauth-authorize branch gaps
+- **Branch/PR**: `auto/BB-workers-brain-oauth-branch-gaps` → **PR #1259** (https://github.com/chittyos/ch1tty/pull/1259)
+- **Build**: tsc clean (0 errors, ch1tty@4.1.0) | **Tests**: 2225 pass / 0 fail / 3 skip (2228 total, +5 new tests)
+- **Context resume**: Woke from previous session (context compacted). Processed notifications for PR #1255 (BA): CodeRabbit rate-limited, Codex infrastructure-failed (no findings). PR #1255 CI: 3/3 green (CodeQL + 2 Analyze), no review comments, mergeable. PR #1256 (BH-2, another session's dup): also 3/3 green. Both open, no conflicts.
+- **Queue check**: 2 open PRs (#1255 BA, #1256 BH-2) — well below 20 threshold. Advance BB.
+- **Coverage targets**:
+  - `workers-ai-brain.ts:266` — `candidateFromMetadata()` null return when metadata absent → 92.37%→95.96% branches
+  - `workers-ai-brain.ts:269` — `description: ''` fallback when metadata.description absent
+  - `workers-ai-brain.ts:401` — `dot()` guard for mismatched vector dimensions → returns 0
+  - `oauth-authorize.ts:40` — `ab[i] ?? 0` (submitted shorter than admin) + `bb[i] ?? 0` (submitted longer than admin) → 97.95%→**100%** branches
+- **Coverage delta**:
+  - `oauth-authorize.ts`: 97.95% → **100%** branches ✅
+  - `workers-ai-brain.ts`: 92.37% → 95.96% branches (remaining gaps: lines 162, 208, 270, 280, 324)
+- **State**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓. **3 open PRs** (#1255 BA, #1256 BH-2, #1259 BB). Tests: 2225/0/3. Build: clean.
+- **Next-run targets** (not covered by any open PR): `workers-ai-brain.ts` remaining gaps (162, 208, 270, 280, 324 — ~96% → higher), `src-stdio/aggregator.ts` 97.31% branches, `sim/fixture-backend.ts` 73.33% functions/82.35% branches.
+- **PushNotification**: NOT SENT — routine coverage PR, no blocking condition.

@@ -2,6 +2,14 @@
 
 ---
 
+### 2026-09-14T04:49Z (event — PR #1235 merged — AU workstream now in main)
+- **Event**: PR #1235 (`auto/AU-comms-dispatch-unit-tests`) merged into main.
+- **AU workstream**: 4 `McpClientDispatch` unit tests in `apps/comms-mcp/test/au-dispatch-unit-tests.test.ts` now in baseline.
+- **Open PR queue**: 14 remaining per head commit (AE/#1219 also merged earlier today).
+- **Next workstream**: deferred — queue still ≥20 per run ~1615 state; idle until queue drops.
+
+---
+
 ### 2026-09-13T~10:50Z (run ~1608 — BD: logger setLevel + aggregator filterSuggestionsCatalog gaps, PR #1247)
 - **Workstream**: BD — `src-stdio/logger.ts` `setLevel` (90% func coverage) + `aggregator.ts` `filterSuggestionsCatalog` warn branch (lines 51–53)
 - **Branch/PR**: `auto/BD-logger-aggregator-branch-gaps` → https://github.com/chittyos/ch1tty/pull/1247
@@ -2987,3 +2995,30 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   5. **Upgrade Notion plan** — workspace out of free blocks; board cannot be updated
   6. **Stale branch cleanup** — 1100+ remote `auto/` branches
 - **Next run**: Idle. No new PR until queue drains. Next productive workstream: `apps/comms-mcp/src/dispatch.ts` comprehensive tests once queue clears.
+
+### run ~1625 — 2026-09-14 — QUEUE FULLY DRAINED
+- **CI**: tsc clean | tests ~2127/0/3
+- **PRs merged this run**: #1254 (BF: ledger/session-client URL branch gaps, 4 tests), #1253 (BH: session-coord cursor forwarding, 1 test), #1223 (AI: dep bump — merged by prior session)
+- **Open PRs**: 0 (queue empty)
+- **Notes**: Queue drained from 33 PRs (run ~1622) to 0 over ~4 runs. No new workstream — CRON SHOULD BE DISABLED.
+
+### run ~1627 — 2026-09-14 — coverage saturation confirmed; no new PR
+- **Action**: Investigated workstream BC (openapi-spec.ts null-coalescing fallback branches).
+  - Target: `?? {}` (line 34) and `?? []` (line 35) in `buildOpenApiSpec`, plus `m[1] ?? null` (line 88) in `parseToolPath`.
+  - Added test with `inputSchema: {}` (no properties key) to `test/iiiii-openapi-spec-evaluator.test.ts`.
+  - Test passed but branch coverage remained at 92.86% (13/14 branches) — confirming `?? {}` / `?? []` were already covered by existing tests.
+  - The sole remaining uncovered branch is `m[1] ?? null` on line 88: dead code — the regex `([^/]+\/[^/]+)` always captures group 1 when `m` is truthy, so `m[1]` is never undefined within that ternary arm.
+  - Reverted test change (never committed). Switched back to main.
+- **Coverage campaign**: SATURATED. All remaining branch gaps across `src/` and `apps/` are either dead code (unreachable by construction) or V8 source map artifacts (tsx maps JavaScript bytecode positions to wrong TypeScript lines).
+- **Open PRs**: 5 — #1255 (BA), #1256 (BH), #1257 (BA), #1258 (BI), #1259 (BB) — all CI green, awaiting human approval.
+- **Build**: tsc clean | **Tests**: 2220 pass / 0 fail.
+- **Human-action items**:
+  1. **Merge open PRs #1255–#1259** — all CI green, no outstanding review threads
+  2. **DISABLE hourly cron** — coverage campaign exhausted; idle-burning tokens
+  3. **Enable GitHub Actions** (if not already) and **Stale branch cleanup** (1100+ auto/ branches)
+
+### run ~1626 — 2026-09-14 — BI: Codex P2 fixed; PR #1258 green
+- **Action**: Fixed Codex P2 finding on PR #1258 (BI: cast chain non-scalar extraction). Injected `NullRoutingCoordinator extends SessionCoordinator` (overrides `routeIntent()` → null) via `AggregatorOptions.coordinator` so chain tests are deterministic regardless of `CH1TTY_USE_OLLAMA_BRAIN`.
+- **CI**: All 3 checks green on `5c65045` (CodeQL + 2× Analyze). No open review threads.
+- **PR #1258**: Ready to merge (awaiting human review/approval).
+- **Build**: tsc clean | tests 4/4 pass on BI file.

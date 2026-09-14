@@ -162,10 +162,10 @@
       "combos": [
         {
           "name": "comms-log-to-notion",
-          "chain": ["comms/list_messages", "notion/API-post-page"],
-          "accomplishes": "List recent ChittyComms messages and log a summary into Notion for team record-keeping.",
+          "chain": ["comms/comms.recentLog", "notion/API-post-page"],
+          "accomplishes": "Fetch the recent ChittyComms activity log and post a summary into Notion for team record-keeping.",
           "verified": false,
-          "notes": "comms tool names inferred; notion verified."
+          "notes": "comms/comms.recentLog is the sole comms-mcp tool (read-only); notion verified."
         },
         {
           "name": "task-with-message-notify",
@@ -176,16 +176,16 @@
         },
         {
           "name": "notion-search-then-share",
-          "chain": ["notion/API-retrieve-a-page", "comms/send_message"],
-          "accomplishes": "Retrieve a Notion page and share its content via ChittyComms for team visibility.",
+          "chain": ["notion/API-retrieve-a-page", "imessage/send_message"],
+          "accomplishes": "Retrieve a Notion page and share its content via iMessage for team visibility.",
           "verified": false,
-          "notes": "notion/API-retrieve-a-page verified; comms inferred."
+          "notes": "notion/API-retrieve-a-page verified; imessage inferred (comms-mcp is read-only)."
         }
       ],
       "prompts": [
-        { "text": "Send a message via ChittyComms", "resolves_to": "comms/send_message" },
+        { "text": "Send a message via iMessage", "resolves_to": "imessage/send_message" },
         { "text": "Create a task and notify via iMessage", "resolves_to": "tasks/create_task → imessage/send_message" },
-        { "text": "Log recent messages into Notion", "resolves_to": "comms/list_messages → notion/API-post-page" }
+        { "text": "Log recent comms activity into Notion", "resolves_to": "comms/comms.recentLog → notion/API-post-page" }
       ]
     },
     "data": {
@@ -734,16 +734,16 @@
         },
         {
           "name": "task-status-and-notify",
-          "chain": ["tasks/list_tasks", "comms/send_message"],
-          "accomplishes": "List task statuses and send a ChittyComms summary to the team channel with open/blocked items.",
+          "chain": ["tasks/list_tasks", "imessage/send_message"],
+          "accomplishes": "List task statuses and send an iMessage summary to the team with open/blocked items.",
           "verified": false,
-          "notes": "tasks verified; comms inferred."
+          "notes": "tasks verified; imessage inferred (comms-mcp is read-only, sending uses imessage)."
         }
       ],
       "prompts": [
         { "text": "List open tasks and export to Notion", "resolves_to": "tasks/list_tasks → notion/API-post-page" },
         { "text": "Create a task and mirror it in Linear", "resolves_to": "tasks/create_task → linear/createIssue" },
-        { "text": "Send a task status summary via ChittyComms", "resolves_to": "tasks/list_tasks → comms/send_message" }
+        { "text": "Send a task status summary via iMessage", "resolves_to": "tasks/list_tasks → imessage/send_message" }
       ]
     },
     "workspace": {
@@ -758,10 +758,10 @@
         },
         {
           "name": "tasks-status-to-comms",
-          "chain": ["tasks/list_tasks", "comms/send_message"],
-          "accomplishes": "List open tasks and broadcast a team standup summary via ChittyComms.",
+          "chain": ["tasks/list_tasks", "imessage/send_message"],
+          "accomplishes": "List open tasks and broadcast a team standup summary via iMessage.",
           "verified": false,
-          "notes": "tasks verified; comms inferred."
+          "notes": "tasks verified; imessage inferred (comms-mcp is read-only, sending uses imessage)."
         },
         {
           "name": "context7-docs-to-notion",
@@ -773,7 +773,7 @@
       ],
       "prompts": [
         { "text": "Sync a Notion page with related Google Drive files", "resolves_to": "notion/API-retrieve-a-page → google/search_files" },
-        { "text": "Send a task status standup via ChittyComms", "resolves_to": "tasks/list_tasks → comms/send_message" },
+        { "text": "Send a task status standup via iMessage", "resolves_to": "tasks/list_tasks → imessage/send_message" },
         { "text": "Fetch library docs and create a Notion reference page", "resolves_to": "context7/resolve-library-id → context7/get-library-docs → notion/API-post-page" }
       ]
     }
