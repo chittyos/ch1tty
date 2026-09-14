@@ -4969,3 +4969,24 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 - **Post-merge state**: 0 open PRs confirmed. Run ~1625 completed the queue drain (merged BF #1254, BH #1253) in parallel.
 - **Build**: Not re-run (remote — run ~1625 already validated build+tests clean).
 - **State**: Queue EMPTY. All workstreams done. Cron still active — DISABLE URGED.
+
+---
+
+## Run ~1626 — 2026-09-14
+
+- **Workstream**: BB — workers-ai-brain + oauth-authorize branch gaps
+- **Branch/PR**: `auto/BB-workers-brain-oauth-branch-gaps` → **PR #1259** (https://github.com/chittyos/ch1tty/pull/1259)
+- **Build**: tsc clean (0 errors, ch1tty@4.1.0) | **Tests**: 2225 pass / 0 fail / 3 skip (2228 total, +5 new tests)
+- **Context resume**: Woke from previous session (context compacted). Processed notifications for PR #1255 (BA): CodeRabbit rate-limited, Codex infrastructure-failed (no findings). PR #1255 CI: 3/3 green (CodeQL + 2 Analyze), no review comments, mergeable. PR #1256 (BH-2, another session's dup): also 3/3 green. Both open, no conflicts.
+- **Queue check**: 2 open PRs (#1255 BA, #1256 BH-2) — well below 20 threshold. Advance BB.
+- **Coverage targets**:
+  - `workers-ai-brain.ts:266` — `candidateFromMetadata()` null return when metadata absent → 92.37%→95.96% branches
+  - `workers-ai-brain.ts:269` — `description: ''` fallback when metadata.description absent
+  - `workers-ai-brain.ts:401` — `dot()` guard for mismatched vector dimensions → returns 0
+  - `oauth-authorize.ts:40` — `ab[i] ?? 0` (submitted shorter than admin) + `bb[i] ?? 0` (submitted longer than admin) → 97.95%→**100%** branches
+- **Coverage delta**:
+  - `oauth-authorize.ts`: 97.95% → **100%** branches ✅
+  - `workers-ai-brain.ts`: 92.37% → 95.96% branches (remaining gaps: lines 162, 208, 270, 280, 324)
+- **State**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓. **3 open PRs** (#1255 BA, #1256 BH-2, #1259 BB). Tests: 2225/0/3. Build: clean.
+- **Next-run targets** (not covered by any open PR): `workers-ai-brain.ts` remaining gaps (162, 208, 270, 280, 324 — ~96% → higher), `src-stdio/aggregator.ts` 97.31% branches, `sim/fixture-backend.ts` 73.33% functions/82.35% branches.
+- **PushNotification**: NOT SENT — routine coverage PR, no blocking condition.
