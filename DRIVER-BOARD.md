@@ -5062,3 +5062,28 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   4. Notion workspace out of free blocks.
   5. Stale branch cleanup — 1100+ remote auto/ branches.
 - **Next run**: IDLE. Queue empty. No new workstream. DISABLE CRON.
+
+---
+
+### 2026-09-14T~UTC (run ~1633 — inspected PR #1270; CI 0-job transient issue; re-trigger)
+
+- **Workstream**: BR (dead branch fixes, PR #1270) — monitoring + re-trigger CI
+- **Branch/PR**: `auto/BR-dead-branch-coverage-fixes` → PR #1270 (https://github.com/chittyos/ch1tty/pull/1270)
+- **Build**: tsc clean (0 errors, ch1tty@4.1.0) | **Tests**: 2298 pass / 0 fail / 3 skip (2301 total, 99 suites)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE. 0 violations.
+  - `git reset --hard origin/main`. `npm ci` clean. `npm run build` clean (tsc 0 errors). `npm test`: 2293/0/3 on main. 0 failures.
+  - Found 1 open PR #1270 (BR): dead branches in openapi-spec.ts + workers-ai-brain.ts. CI shows "failure" with 0 jobs (known 0-job transient issue per board blockers).
+  - Verified fix locally: BR tests 5/5 pass. c8 coverage: src/openapi-spec.ts 92.3% → 100%, workers-ai-brain.ts 96% → 100% on this branch.
+  - Cannot re-run CI via API (403). Pushing board update to branch to trigger fresh CI run.
+  - src-stdio/ coverage: **100% all metrics** (unchanged, confirmed).
+  - src/ coverage (main before BR): openapi-spec.ts 92.3% branches (line 89), workers-ai-brain.ts 96% branches (lines 162,208,270,280,324).
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BQ ALL DONE. **1 open PR** (#1270 BR, waiting for CI). Tests on branch: 2298/0/3. Build: clean.
+- **Human-action items** (URGENT):
+  1. **DISABLE hourly cron** — queue has 1 PR pending CI; all workstreams exhausted; ~1633 runs; burning ~50k tokens/run.
+  2. Enable GitHub Actions (main npm test CI job) — CI 0-job failure on PR #1270 is blocking coverage completion.
+  3. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET.
+  4. Notion workspace out of free blocks (board is fallback DRIVER-BOARD.md).
+  5. Stale branch cleanup — 1100+ remote auto/ branches.
+- **PushNotification**: SENT — PR #1270 blocked on CI 0-job issue; all workstreams done; cron should be disabled.
+- **Next run**: If CI recovers: merge PR #1270 (BR dead branch fixes → src/ at 100% branches). Otherwise idle.
