@@ -206,4 +206,12 @@ describe('LedgerClient', () => {
     const result = await client.listEntries(NS, { cursor: 'cursor-abc' });
     assert.ok(Array.isArray(result.entries));
   });
+
+  it('uses default CHITTY_LEDGER_URL when neither arg nor env var is set', () => {
+    const savedUrl = process.env['CHITTY_LEDGER_URL'];
+    delete process.env['CHITTY_LEDGER_URL'];
+    const client = new LedgerClient();
+    assert.equal((client as unknown as { baseUrl: string }).baseUrl, 'https://ledger.chitty.cc');
+    if (savedUrl !== undefined) process.env['CHITTY_LEDGER_URL'] = savedUrl;
+  });
 });
