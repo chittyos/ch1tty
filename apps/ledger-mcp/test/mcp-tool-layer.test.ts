@@ -459,3 +459,69 @@ test('append_entry error: 422 from API surfaces in isError response', async () =
     await cleanup();
   }
 });
+
+// ── Branch gap coverage (BC) ──────────────────────────────────────────────────
+// server.ts validation uses `=== undefined || === null` (payload) and
+// `typeof !== 'string' || !field` (namespace/id). Prior tests always omit
+// the argument entirely (hitting the `undefined` / `typeof` arm). These four
+// tests exercise the second arm of each || so both branches are covered.
+
+test('append_entry: payload null → isError (covers a["payload"] === null branch)', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.callTool({
+      name: 'append_entry',
+      arguments: { namespace: 'events', payload: null },
+    });
+    assert.equal(result.isError, true);
+    const content = result.content as Array<{ type: string; text: string }>;
+    assert.ok(content[0].text.includes('"payload"'));
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_entries: empty-string namespace → isError (covers !a["namespace"] branch)', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.callTool({
+      name: 'list_entries',
+      arguments: { namespace: '' },
+    });
+    assert.equal(result.isError, true);
+    const content = result.content as Array<{ type: string; text: string }>;
+    assert.ok(content[0].text.includes('"namespace"'));
+  } finally {
+    await cleanup();
+  }
+});
+
+test('get_entry: empty-string namespace → isError (covers !a["namespace"] branch in get_entry)', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.callTool({
+      name: 'get_entry',
+      arguments: { namespace: '', id: 'e1' },
+    });
+    assert.equal(result.isError, true);
+    const content = result.content as Array<{ type: string; text: string }>;
+    assert.ok(content[0].text.includes('"namespace"'));
+  } finally {
+    await cleanup();
+  }
+});
+
+test('get_entry: empty-string id → isError (covers !a["id"] branch)', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.callTool({
+      name: 'get_entry',
+      arguments: { namespace: 'events', id: '' },
+    });
+    assert.equal(result.isError, true);
+    const content = result.content as Array<{ type: string; text: string }>;
+    assert.ok(content[0].text.includes('"id"'));
+  } finally {
+    await cleanup();
+  }
+});
