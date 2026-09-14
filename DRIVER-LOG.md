@@ -4482,3 +4482,79 @@ Same as ~1604: idle unless CI is re-enabled or queue drops below 20. When queue 
 
 ### Next run recommendation
 Check if any of the 36 open PRs merged (if CI was re-enabled). Next coverage gap candidate (BC): `session-client.ts` line 79 (204 No Content / empty-body path). **Priority human action: enable GitHub Actions CI.**
+
+---
+
+## Run ~1606 — 2026-09-13T~UTC (BC: ledger-mcp branch gaps)
+
+**Trigger**: Scheduled hourly run.
+
+**Actions**:
+- Read CLAUDE.md + CHITTY.md; confirmed 5-tool surface invariant and metric freeze guardrail.
+- Read DRIVER-BOARD.md: all workstreams A–E done; CI org-disabled; 36 PRs queued.
+- `npm ci` clean; `npm run build` clean (tsc 0 errors).
+- Full test suite: **1965 pass / 0 fail / 3 skip** (baseline confirmed).
+- Checked open PRs: 37 open (latest BB #1244). No new merges since ~1605.
+- Identified BC coverage target: `apps/ledger-mcp/src/server.ts` has two-arm `||` validation conditions whose second arm was never exercised by existing tests.
+- Added 4 tests to `apps/ledger-mcp/test/mcp-tool-layer.test.ts`:
+  - `append_entry` payload: null → `a['payload'] === null` branch (line 111)
+  - `list_entries` namespace: "" → `!a['namespace']` falsy branch (line 95)
+  - `get_entry` namespace: "" → `!a['namespace']` falsy branch (line 104)
+  - `get_entry` id: "" → `!a['id']` falsy branch (line 105)
+- Full suite after: **1969 pass / 0 fail / 3 skip** (+4).
+- Branch: `auto/BC-ledger-mcp-branch-gaps`, PR #1245 opened, subscribed.
+
+**Suite**: 28 pass / 0 fail in `mcp-tool-layer.test.ts` (+4 vs previous 24). Full: 1969/0/3.
+
+**Persistent blockers** (unchanged):
+1. GitHub Actions CI disabled at org level — 37 PRs queued
+2. Notion workspace blocked — using DRIVER-LOG.md as fallback
+3. Missing env: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+4. 1100+ stale `auto/` branches
+
+### Next run recommendation
+BC target done. Next (BD): check `apps/tasks-mcp/src/server.ts` for similar empty-string branch gaps in namespace/id validation, or check `apps/evidence-mcp/src/server.ts`. **Priority human action: enable GitHub Actions CI to unblock 37 queued PRs.**
+
+---
+
+## Run log — 2026-09-13 ~22:45 UTC (automated, run ~1616)
+
+**Workstream advanced:** BG — `src/dlq-store.ts` error-path coverage (4 catch-block branch tests)
+**Branch/PR:** `auto/BG-dlq-store-error-paths` → https://github.com/chittyos/ch1tty/pull/1251
+**Build:** tsc clean (0 errors)
+**Tests:** 1969 pass / 0 fail / 3 skip (was 1965/0/3, +4 new tests)
+**Coverage delta:** `src/dlq-store.ts` branch 78.26% → 96%
+
+**What was done:**
+- Read CLAUDE.md + CHITTY.md; guardrails confirmed. npm ci clean. Build clean. Full suite: 1965/0/3.
+- Ran c8 coverage over `src/` — `dlq-store.ts` was highest-impact gap (78.26% branch, lines 37-40/57-59/74-75/82-83) with no open PR targeting it.
+- Added `test/bg-dlq-store-error-paths.test.ts`: 4 tests injecting a throwing SqlStorage shim to hit the catch blocks in `append()`, `readEntries()`, `rewrite()`, and `count()`.
+- Opened PR #1251; subscribed for CI/review events. Notion board also updated (token valid this run).
+
+**Persistent blockers** (unchanged):
+1. GitHub Actions CI disabled at org level — ~22 PRs queued
+2. Missing env: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+
+### Next run recommendation
+Next coverage targets (not yet in open PRs): `codemode-fns.ts` lines 27/29 (85.71% branch), `comms-mcp/recent-log.ts` lines 46-62/104-108/135-140/192 (80% branch). **Priority human action: enable GitHub Actions CI to unblock ~22 queued PRs.**
+
+---
+
+## Run ~1619 — 2026-09-14 UTC (idle — all workstreams complete)
+
+**Trigger**: Scheduled hourly run.
+
+**Actions**:
+- Read CLAUDE.md + CHITTY.md; confirmed 5-tool surface invariant and metric freeze guardrail.
+- Fetched all remote branches; checked open PRs (24 open, all test-coverage branches BF–BG + prior AA–BA series).
+- Read Notion board: all workstreams A–E (+ extensions L–O and AA–BG) confirmed complete.
+- `npm ci` clean; `npm run build` clean (tsc 0 errors, 0 warnings).
+- Full test suite: **1965 pass / 0 fail / 3 skip** (52 suites, 42.6s) — green.
+- No new workstreams to advance. Did NOT open a new PR — 24 PRs already queued, CI still disabled; adding more increases merge debt without benefit.
+
+**Persistent blockers** (unchanged — require human action):
+1. GitHub Actions CI disabled at org level — 24 open PRs queued, none mergeable
+2. Missing env vars on prod: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`, `CHITTY_TASKS_TOKEN`
+3. 1100+ stale `auto/` branches accumulating in origin
+
+**Next run recommendation**: Idle unless new workstreams are defined in the scheduled prompt. **Priority human action: enable GitHub Actions CI (`Settings → Actions → General → Allow all actions`) to unblock the 24 queued PRs.**
