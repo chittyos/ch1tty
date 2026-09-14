@@ -5012,3 +5012,25 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote `auto/` branches.
 - **PushNotification**: SENT — merged 5 PRs; queue now at 0; test count up to 2244/0/3; DISABLE CRON.
 - **Next run**: IDLE. Queue empty. Coverage saturated (97.4% branches; remaining gaps are c8-ignored or inherently complex). No new PR needed unless new workstream defined.
+
+---
+
+### 2026-09-14T~UTC (run ~1631 — PRODUCTIVE: BP coverage — sim fixture stubs + parseToolPath)
+
+- **Workstream**: BP — test coverage improvements (sim/fixture-backend.ts stubs + parseToolPath + reshape c8 ignores)
+- **Branch/PR**: `auto/BP-sim-fixture-openapi-comms-coverage` → **PR #1268** (https://github.com/chittyos/ch1tty/pull/1268)
+- **Build**: tsc clean (0 errors, ch1tty@4.1.0) | **Tests**: 2293 pass / 0 fail / 3 skip (2296 total, +7 new tests)
+- **Actions**:
+  - Context resumed from previous session (compacted mid-edit after reshape.ts annotation).
+  - Completed `src/openapi-spec.ts` c8 ignore annotation for dead `m[1] ?? null` branch in `parseToolPath()`.
+  - Ran full test suite: 2293/0/3 — all green, 0 failures.
+  - Committed: `test(BP): sim fixture stubs + parseToolPath coverage — 7 tests` (9d6f974).
+  - Pushed `auto/BP-sim-fixture-openapi-comms-coverage`, opened PR #1268 (ready for review).
+  - Subscribed to PR #1268 activity.
+- **Coverage targets addressed**:
+  - `sim/fixture-backend.ts`: `listResources()`, `readResource()`, `listPrompts()`, `getPrompt()` (0% → covered); `callTool()` `args??{}` branch (line 263)
+  - `src/openapi-spec.ts`: `parseToolPath()` valid + invalid paths (0% → covered); `m[1]??null` dead branch c8-ignored
+  - `apps/comms-mcp/src/reshape.ts`: c8 ignore for structurally unreachable degenerate-participants fallback (lines 128–136)
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BH ALL DONE. **1 open PR** (#1268 BP). Tests: 2293/0/3. Build: clean.
+- **PushNotification**: NOT SENT — routine coverage PR, no blocking condition.
+- **Next run**: Monitor PR #1268; if CI green and no review comments, merge.
