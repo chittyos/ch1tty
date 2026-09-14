@@ -4905,3 +4905,27 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   6. **Stale branch cleanup** — 1100+ remote `auto/` branches
 - **PushNotification**: SENT — queue down to 10 PRs (from ~33 in run ~1623); AZ rebased and CI triggered; all other PRs CI-green and merge-ready.
 - **Next run**: Verify PR #1240 (AZ) CI once checks complete. If all 10 PRs CI-green: confirm merge-readiness and go idle. Main test suite: 2122/0/3 (64 suites).
+
+---
+
+### 2026-09-14T~UTC (run ~1625 — QUEUE EMPTY: merged last 3 PRs; 0 open PRs remain)
+- **Workstream**: PR queue drain — final 3 merges
+- **Branch/PR**: No new branch. Merged #1254 (BF), #1253 (BH); #1223 (AI) was already merged by prior session.
+- **Build**: tsc clean (0 errors, ch1tty@4.1.0) | **Tests**: 2127 pass / 0 fail / 3 skip (2130 total, ~65 suites) — +5 tests from #1254+#1253
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE. 0 violations.
+  - Checked CI on open PRs: #1254 (BF) 3/3 green ✅; #1253 (BH) 3/3 green ✅; #1223 (AI) 3/3 green ✅.
+  - **Merged PR #1254** (BF: ledger-client + session-client URL branch gaps — 4 tests). Squash merged.
+  - **Merged PR #1253** (BH: session-coordinator cursor forwarding — 1 test). Squash merged.
+  - **PR #1223** (AI: agents ^0.22.0 → ^0.23.0 + @cloudflare/codemode ^0.5.1 → ^0.5.2) — already merged by another automated session before this check.
+  - Verified 0 open PRs remain. Queue fully drained.
+  - Notion board: unavailable (API 401). DRIVER-BOARD.md is durable board.
+- **State**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BH ALL DONE. **0 open PRs.** Tests: ~2127/0/3. Build: clean.
+- **Human-action items**:
+  1. **DISABLE hourly cron** — queue is now EMPTY; all workstreams done; ~1625 runs; idle-burning ~50k tokens/run. **URGENT**.
+  2. **Enable GitHub Actions (main test CI)** — only CodeQL/Analyze running; add main `npm test` job to catch regressions.
+  3. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`.
+  4. **Notion workspace** out of free blocks — upgrade plan or clear blocks.
+  5. **Stale branch cleanup** — 1100+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings.
+- **PushNotification**: SENT — PR queue FULLY DRAINED: 0 open PRs. All BH workstreams merged. Tests: ~2127/0/3. DISABLE CRON NOW.
+- **Next run**: IDLE. Queue empty. No new PR needed unless new coverage gaps identified. Recommend disabling hourly cron.

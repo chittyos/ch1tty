@@ -2995,3 +2995,9 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   5. **Upgrade Notion plan** — workspace out of free blocks; board cannot be updated
   6. **Stale branch cleanup** — 1100+ remote `auto/` branches
 - **Next run**: Idle. No new PR until queue drains. Next productive workstream: `apps/comms-mcp/src/dispatch.ts` comprehensive tests once queue clears.
+
+### run ~1625 — 2026-09-14 — QUEUE FULLY DRAINED
+- **CI**: tsc clean | tests ~2127/0/3
+- **PRs merged this run**: #1254 (BF: ledger/session-client URL branch gaps, 4 tests), #1253 (BH: session-coord cursor forwarding, 1 test), #1223 (AI: dep bump — merged by prior session)
+- **Open PRs**: 0 (queue empty)
+- **Notes**: Queue drained from 33 PRs (run ~1622) to 0 over ~4 runs. No new workstream — CRON SHOULD BE DISABLED.
