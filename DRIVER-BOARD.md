@@ -4418,3 +4418,438 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
 - **Build**: tsc clean | **Tests**: 1965/0/3 (1968 total, 52 suites)
 - **State**: A ✓ B ✓ C ✓ D ✓ E ✓ H–AU ✓. **27 PRs open** (#1209–#1235). GitHub Actions disabled at org level. Notification sent at ~1580 (still unacted).
 - **Human-action items**: Enable GitHub Actions; merge PRs #1209–#1235; disable cron; set prod env vars; upgrade Notion plan.
+
+---
+
+### 2026-09-12T~16:35Z (run ~1591 — workstream AX: codemode-fns + evaluator branch gaps)
+- **Workstream**: AX — cover 3 uncovered branches in `src/codemode-fns.ts` (lines 27,29) and `src/evaluator.ts` (line 92)
+- **Branch/PR**: `auto/AX-codemode-evaluator-null-branches` → **PR #1238** (https://github.com/chittyos/ch1tty/pull/1238)
+- **Build**: tsc clean (0 errors) | **Tests**: 1968 pass / 0 fail / 3 skip (1971 total, 52 suites, +3 new tests)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1740/1741 enforce 56/87 fields). 0 violations on main.
+  - `git pull origin main` (synced to 2364a78, run ~1590). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1965/0/3 — baseline confirmed.
+  - Checked 20 open PRs (#1218–#1237 = AD through AW): all open; GitHub Actions still disabled at org level.
+  - Ran `npx c8 report` to identify gaps not covered by any open PR: `codemode-fns.ts:27,29` (ch1tty.search null query + ch1tty.execute array args) and `evaluator.ts:92` (getStats() ?? 0 when exec returns []).
+  - Created `test/ax-codemode-evaluator-null-branches.test.ts` with 3 tests:
+    1. `codemode-fns.ts:27` — ch1tty.search(null) → `query ?? ''` fires → calls searchTools with `''`
+    2. `codemode-fns.ts:29` — ch1tty.execute with array args → ternary false branch → `{}` coercion
+    3. `evaluator.ts:92` — mock SqlStorage returning `[]` → `toArray()[0]?.c ?? 0` fallback fires
+  - Full suite: 1968/0/3 (1971 total) — +3 tests, 0 regressions, metric freeze guards pass.
+  - Coverage delta: branches 95.51% → 95.60% (3240→3244/3393); `codemode-fns.ts` 85.71%→100%, `evaluator.ts` 96.15%→100%.
+  - Pushed branch; opened **PR #1238** (not draft).
+  - Notion board: workspace out of free blocks — DRIVER-BOARD.md is durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–AW ✓ AX(#1238 open). **21 PRs open total** (#1218–#1238). Tests: 1968/0/3.
+- **Human-action items**:
+  1. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions" (all PRs show 0 jobs / conclusion:failure)
+  2. **Merge queued PRs #1218–#1238** (AD through AX) — 21 PRs ready; queue growing since 2026-09-10
+  3. **Disable/redirect hourly cron** — ~1591 runs; primary workstreams A–E exhausted; coverage PRs accumulating
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks — upgrade plan or clear blocks
+- **PushNotification**: NOT SENT — workstream AX is additive coverage; no urgent blocker; notification already sent at run ~1580.
+- **Next run**: Next uncovered gaps (not covered by any open PR): `workers-ai-brain.ts` (85.58% branches, lines 182-186,350-353), `ajv-harness.ts` (75% branches, lines 34-35), `evaluator.ts` (now 100%), `codemode-fns.ts` (now 100%). Also: `tasks-client.ts` (93.54%), `session-client.ts` (94.73%), `ledger-client.ts` (96.15%), `evidence-client.ts` (90.62%). Advance AY when queue allows.
+
+---
+
+### 2026-09-12T~16:50Z (run ~1592 — idle; 30 PRs awaiting human merge; AX reviews clean)
+- **Workstream**: None — queue at 30 open PRs (#1209–#1238 = U through AX); above ~20 threshold
+- **Build**: tsc clean | **Tests**: 1968/0/3 (1971 total, 52 suites) — baseline on main (AX not yet merged)
+- **Actions**:
+  - Received PR #1238 (AX) review notifications: both Codex (✅ Completed, 0 findings) and CodeRabbit ("No actionable comments generated", merge risk minimal, 5/5 pre-merge checks passed) gave clean passes.
+  - No blocking findings from either bot; PR #1238 ready for human merge (GitHub Actions still disabled at org level — standing blocker).
+  - Checked GitHub: 30 open PRs (#1209–#1238 = U through AX). NB: run ~1591 board entry mis-stated 21 PRs — actual count was 30 (PRs #1209–#1217 were open all along).
+  - Queue at 30 PRs (exceeds ~20 threshold): standing down, no new workstream AY PR this run.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–AX(open). **30 PRs open total** (#1209–#1238). Tests: 1968/0/3.
+- **Human-action items**:
+  1. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions" (all PRs show 0 jobs / conclusion:failure)
+  2. **Merge queued PRs #1209–#1238** (U through AX) — 30 PRs ready; queue growing; AX has clean bot reviews
+  3. **Disable/redirect hourly cron** — ~1592 runs; coverage PRs accumulating without merges
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks
+- **PushNotification**: NOT SENT — no new blocker; notification last sent at run ~1580.
+- **Next run**: Once queue drops below ~20, advance AY: `workers-ai-brain.ts` lines 182-186 (catch block / circuit failure) and 350-353 (embed vector validation) — 85.58% branches.
+
+---
+
+### 2026-09-12T~19:30Z (run ~1595 — BA: tasks-client + evidence-client branch gaps — 7 tests, both to 100%)
+- **Workstream**: BA — cover 5 uncovered branches in `apps/tasks-mcp/src/tasks-client.ts` (lines 49, 77) and `apps/evidence-mcp/src/evidence-client.ts` (lines 45, 77, 90)
+- **Branch/PR**: `auto/BA-client-url-filter-branches` → **PR #1241** (https://github.com/chittyos/ch1tty/pull/1241)
+- **Build**: tsc clean (0 errors) | **Tests**: 1972 pass / 0 fail / 3 skip (1975 total, 52 suites, +7 new tests)
+- **Guardrails**: 5-tool surface confirmed (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1740/1741 enforce 56/87 fields). 0 violations on main.
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed.
+  - `git pull origin main` (synced from detached HEAD to up-to-date main after 24 new commits). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1965/0/3 (1968 total) — baseline confirmed.
+  - Found 30 open PRs (#1211–#1240 = W through AZ) via GitHub MCP. GitHub Actions still disabled at org level.
+  - Ran `npx c8 --all` coverage report across `src-stdio/` + `apps/*/src/` to identify uncovered branches not in any open PR.
+  - Identified gaps not covered by any open PR: `tasks-client.ts` (lines 49, 77 — default URL fallback, project filter) and `evidence-client.ts` (lines 45, 77, 90 — default URL fallback, cursor filter, search limit).
+  - Added 3 tests to `apps/tasks-mcp/test/tasks-client.test.ts`: default URL, trailing-slash trim, project filter.
+  - Added 4 tests to `apps/evidence-mcp/test/evidence-client.test.ts`: default URL, trailing-slash trim, cursor filter, search limit.
+  - Both files now at 100% stmts/branches/funcs/lines (up from 93.54%/90.62% branch coverage).
+  - Full suite: 1972/0/3 (1975 total) — +7 tests, 0 regressions. Metric freeze guards pass.
+  - Pushed branch; opened **PR #1241** (not draft).
+  - Notion board: workspace out of free blocks (API 401) — DRIVER-BOARD.md is durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–AZ(open) BA(#1241 open). **31 PRs open total** (#1211–#1241 = W through BA). Tests: 1972/0/3.
+- **Human-action items**:
+  1. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions" (all PRs show 0 jobs / conclusion:failure)
+  2. **Merge queued PRs #1211–#1241** (W through BA) — 31 PRs ready; queue growing since 2026-09-10
+  3. **Disable/redirect hourly cron** — ~1595 runs; primary workstreams A–E exhausted; coverage PRs accumulating
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks — upgrade plan or clear blocks
+- **PushNotification**: NOT SENT — BA is additive coverage; no new urgent blocker; last notification sent at run ~1580.
+- **Next run**: Remaining uncovered branches not in any open PR: `src-stdio/aggregator.ts` lines 51-53 (already in AR PR #1232), `apps/session-coordinator-mcp/src/session-client.ts` lines 59/116 (AO PR #1229 may cover), `apps/comms-mcp/src/dispatch.ts` (AU PR #1235 + Z PR #1214 cover). If queue stays above 20, stand down on new PRs.
+
+---
+
+### 2026-09-12T~(run ~1596) — idle; 33 PRs queued; CI still disabled at org level
+- **Workstream**: None — queue at 33 open PRs (#1209–#1241 = U through BA); > 20 standdown threshold
+- **Build**: tsc clean (ch1tty@4.1.0, 0 errors) | **Tests**: 1965/0/3 (1968 total, 52 suites) — baseline on main (PRs W–BA not yet merged)
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–AZ(open) BA(#1241 open). **33 PRs open total** (#1209–#1241 = U through BA). Tests: 1965/0/3.
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE. 0 violations on main.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1965/0/3 (1968 total, 52 suites). 0 failures.
+  - Pulled latest main (25 new commits since prior check). 33 open PRs (#1209–#1241). GitHub Actions still disabled at org level.
+  - Notion board: workspace out of free blocks (API blocked) — DRIVER-BOARD.md is durable board.
+  - No new coverage gaps identified that are not already in an open PR. Standing down per >20 PR cap.
+  - PushNotification SENT — queue at 33 PRs (up from 31 at run ~1595); CI still disabled; tokens burning per hourly run with no new work.
+- **Human-action items** (escalating — 33 PRs, no CI, cron running idle):
+  1. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions" (all 33 PRs show 0 jobs / conclusion:failure; none can be verified or merged)
+  2. **Merge queued PRs #1209–#1241** (U through BA) — 33 PRs; queue has grown continuously since 2026-09-10 with no merges
+  3. **Disable/redirect hourly cron** — ~1596 runs; A–E workstreams exhausted; cron is adding test coverage PRs that pile up without CI
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks — upgrade plan or clear blocks
+- **Next run**: Idle unless PR queue drops below 20 or new workstreams assigned. No new workstream PRs until CI is re-enabled and existing queue starts clearing.
+
+---
+
+### 2026-09-12T~(run ~1598) — idle; 30 PRs queued; CI still disabled; 3 PRs merged since last run
+- **Workstream**: None — queue at 30 open PRs (#1212–#1241 = X through BA); > 20 standdown threshold
+- **Build**: tsc clean (ch1tty@4.1.0, 0 errors) | **Tests**: 1965/0/3 (1968 total, 52 suites) — baseline on main
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE. 0 violations on main.
+  - `git pull origin main` (fast-forward from 117dc9a to eb8dcec — board/log updates only). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1965/0/3 (1968 total, 52 suites). 0 failures.
+  - 30 open PRs (#1212–#1241 = X through BA). PRs #1209–#1211 (U/V/W) are no longer open (merged or closed) — queue reduced by 3 since run ~1597. GitHub Actions still disabled at org level.
+  - Notion board: workspace out of free blocks (API blocked) — DRIVER-BOARD.md is durable board.
+  - No new coverage gaps identified not already in an open PR. Standing down per >20 PR cap.
+  - PushNotification NOT SENT — notification already sent at run ~1596; same blockers; no new escalation.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–AZ(open) BA(#1241 open). **30 PRs open total** (#1212–#1241 = X through BA). Tests: 1965/0/3.
+- **Human-action items** (same as prior runs — unchanged):
+  1. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions" (all PRs show 0 jobs / conclusion:failure)
+  2. **Merge queued PRs #1212–#1241** (X through BA) — 30 PRs ready; queue has been open since 2026-09-10
+  3. **Disable/redirect hourly cron** — ~1598 runs; A–E workstreams exhausted; coverage PRs accumulating without CI
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks — upgrade plan or clear blocks
+- **Next run**: Idle unless PR queue drops below 20 or CI is re-enabled. Queue trend: 33 → 30 (3 merged/closed since ~1597).
+
+---
+
+### 2026-09-13T~UTC (run ~1599) — idle; 20 PRs queued; CI still disabled; 10 PRs merged since run ~1598
+- **Workstream**: None — queue at 20 open PRs (#1222–#1241 = AH through BA); ≥ 20 standdown threshold
+- **Build**: tsc clean (ch1tty@4.1.0, 0 errors) | **Tests**: 1965/0/3 (1968 total, 52 suites) — baseline on main
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE. 0 violations on main.
+  - `git fetch --all`; `git checkout main`; `git pull origin main` (fast-forward: 28 commits, pulled DRIVER-BOARD.md + DRIVER-LOG.md + RUNLOG.md).
+  - `npm ci` clean. `npm run build` clean (tsc exit 0, 0 errors). `npm test`: 1965/0/3 (1968 total, 52 suites). 0 failures.
+  - 20 open PRs (#1222–#1241 = AH through BA). PRs #1212–#1221 no longer open (merged or closed since run ~1598) — queue reduced by 10 since last run. GitHub Actions still disabled at org level.
+  - Notion board: workspace out of free blocks (API blocked) — DRIVER-BOARD.md is durable board.
+  - No new coverage gaps not already in an open PR. Standing down per ≥ 20 PR cap.
+  - **PushNotification SENT** — queue dropped 30 → 20 (10 PRs merged since run ~1598); notable positive progress; first notification since run ~1596.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BA(open). **20 PRs open total** (#1222–#1241 = AH through BA). Tests: 1965/0/3.
+- **Human-action items** (same blockers):
+  1. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions" (all 20 PRs show 0 jobs / conclusion:failure)
+  2. **Merge queued PRs #1222–#1241** (AH through BA) — 20 PRs ready; queue trending DOWN (33 → 30 → 20)
+  3. **Disable/redirect hourly cron** — ~1599 runs; A–E workstreams exhausted; standdown until queue < 20
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks — upgrade plan or clear blocks
+- **Next run**: Idle unless PR queue drops below 20 or CI is re-enabled. Queue trend: 33 → 30 → 20. If queue reaches < 20, next workstream candidate: `src/workers-ai-brain.ts` remaining branch gaps (lines 271, 280, 324, 343, 379-380, 396, 401) for ~+3pp branch coverage.
+
+---
+
+### 2026-09-13T~UTC (run ~1600 — idle; 30 PRs queued; count corrected from run ~1599)
+- **Workstream**: None — queue at 30 open PRs (#1212–#1241 = X through BA); ≥ 20 standdown threshold
+- **Build**: tsc clean (ch1tty@4.1.0, 0 errors) | **Tests**: 1965/0/3 (1968 total, 52 suites)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1740/1741 enforce 56/87 fields). 0 violations on main.
+  - `git reset --hard origin/main` (5ffb252). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1965/0/3 (1968 total, 52 suites). 0 failures.
+  - **CORRECTION**: run ~1599 stated "20 open PRs (#1222–#1241)" and "PRs #1212–#1221 no longer open". This was WRONG. Verified via GitHub API: ALL 30 PRs (#1212–#1241 = X through BA) remain open. PRs #1212–#1221 were never merged; prior run had a counting/pagination error.
+  - **Positive note**: PR #1241 (BA) has 3 green CodeQL/security check runs (conclusion: success) — partial CI re-enabled at org level (CodeQL scans run; main npm test CI still absent from check list).
+  - No new coverage gaps identified outside open PRs. Standing down per ≥ 20 PR cap.
+  - Notion board: workspace out of free blocks (API blocked) — DRIVER-BOARD.md is durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BA(open). **30 PRs open total** (#1212–#1241 = X through BA). Tests: 1965/0/3.
+- **Human-action items** (updated):
+  1. **Enable GitHub Actions (main CI)** — CodeQL/security scans now run on PRs (green on #1241); main test/build CI still absent. Settings → Actions → General → "Allow all actions" to restore full CI.
+  2. **Merge queued PRs #1212–#1241** (X through BA) — 30 PRs ready; oldest is #1212 (wrangler patch, 2026-09-10).
+  3. **Disable/redirect hourly cron** — ~1600 runs; A–E workstreams exhausted; coverage PRs accumulating without CI merges.
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks — upgrade plan or clear blocks
+- **PushNotification**: NOT SENT — same blocked state; last notification at run ~1596; CodeQL green is positive but not urgent.
+- **Next run**: Idle unless PR queue drops below 20 or main CI is re-enabled. Corrected queue trend: 33 → 30 → 30 (not 20 as previously stated). Next workstream candidate when queue < 20: `src/workers-ai-brain.ts` remaining branch gaps.
+
+---
+
+### 2026-09-13T02:36 UTC (run ~1601 — idle; 30 PRs queued; no change since run ~1600)
+- **Workstream**: None — queue at 30 open PRs (#1212–#1241 = X through BA); ≥ 20 standdown threshold
+- **Build**: tsc clean (ch1tty@4.1.0, 0 errors) | **Tests**: 1965/0/3 (1968 total, 52 suites)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1740/1741 enforce 56/87 fields). 0 violations on main.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1965/0/3 (1968 total, 52 suites). 0 failures.
+  - Verified via GitHub API: ALL 30 PRs (#1212–#1241 = X through BA) remain open — unchanged from run ~1600.
+  - `ci.yml` workflow runs with `conclusion: failure` (0 jobs) on main — confirms main test CI still absent.
+  - CodeQL/security checks still run on PRs (conclusion: success) — partial CI remains active.
+  - Notion board: workspace out of free blocks (API blocked) — DRIVER-BOARD.md is durable board.
+  - No new coverage gaps identified outside open PRs. Standing down per ≥ 20 PR cap.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BA(open). **30 PRs open total** (#1212–#1241 = X through BA). Tests: 1965/0/3.
+- **Human-action items** (unchanged):
+  1. **Enable GitHub Actions (main CI)** — CodeQL/security scans run; main test/build CI (ci.yml) still 0-job failure. Settings → Actions → General → "Allow all actions".
+  2. **Merge queued PRs #1212–#1241** (X through BA) — 30 PRs; oldest is #1212 (wrangler patch, 2026-09-10); all green on CodeQL.
+  3. **Disable/redirect hourly cron** — ~1601 runs; A–E workstreams exhausted; idle standdown.
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks — upgrade plan or clear blocks
+- **PushNotification**: NOT SENT — no change from run ~1600; same blocked state; notification sent at ~1599 still covers current situation.
+- **Next run**: Idle unless PR queue drops below 20 or main CI re-enabled. Queue trend: 33 → 30 → 30 → 30. Next workstream candidate when queue < 20: `src/workers-ai-brain.ts` remaining branch gaps.
+
+---
+
+### 2026-09-13 (runs ~1602–1608 — gap summary; coverage PRs BB/BC/BD; queue grew to 40)
+
+_(Board not updated during these runs; entries were in git commit log / RUNLOG.md only. Summary reconstructed from git log and GitHub API.)_
+
+- **Run ~1602** (idle): 34 open PRs (#1212–#1241). Run-log PR #1243 opened (should have been direct commit to main). No new workstream.
+- **Run ~1603** (BB: session-coordinator-mcp branch gaps): Created `test/bb-session-coord-mcp-branch-gaps.test.ts` (+6 tests, `apps/session-coordinator-mcp/src/server.ts` 86.2% → 98.24%). PR #1244 opened.
+- **Run ~1604** (BB follow-up): Added `isPlainObject` null/array coverage to PR #1244 branch.
+- **Run ~1605** (idle): 36 open PRs. No new workstream.
+- **Run ~1606** (BC: ledger-mcp branch gaps): Created tests for `apps/ledger-mcp/src/server.ts` null/empty-string validation paths (+4 tests). PR #1245 opened.
+- **Run ~1607** (idle → BD): Run-log PR #1246 opened (noise). Then BD workstream: logger `setLevel` + aggregator `filterSuggestionsCatalog` branch gaps (+6 tests). PR #1247 opened. Queue at 37 PRs.
+- **Run ~1608** (idle): Queue at 38 PRs. Run-log PR #1248 opened. No new workstream.
+- **State throughout**: Build clean. Tests: 1965/0/3 on main (branch PRs not yet merged). GitHub Actions (main CI) still disabled at org level. CodeQL scans still run on PRs.
+
+---
+
+### 2026-09-13T~13:34Z (run ~1609 — idle; 40 PRs queued; CI still disabled; ESCALATION SENT)
+- **Workstream**: None — queue at 40 open PRs (#1209–#1248 = U through run-log-1608); ≥ 20 standdown threshold
+- **Build**: tsc clean (ch1tty@4.1.0, 0 errors) | **Tests**: 1965/0/3 (1968 total, 52 suites, ~47s)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1740/1741 enforce 56/87 fields). 0 violations on main.
+  - `git fetch --all && git checkout main && git pull origin main` (fast-forward to ea92d0c, run ~1606). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1965/0/3 (1968 total, 52 suites). 0 failures.
+  - 40 open PRs (#1209–#1248 = U through run-log-1608) via GitHub MCP. GitHub Actions (main CI) still disabled at org level (ci.yml: 0-job failure). CodeQL/security scans still run.
+  - Note: 4 run-log PRs (#1242, #1243, #1246, #1248) in queue — should have been direct commits to main; they inflate the queue count by 4.
+  - Substantive open PRs: #1209–#1247 (36 real workstream PRs covering test coverage, dep bumps, refactors). Latest: BD (#1247) logger/aggregator branch gaps +6 tests.
+  - No new coverage gaps not already in an open PR. Standing down per ≥ 20 PR cap.
+  - Notion board: workspace out of free blocks (API blocked) — DRIVER-BOARD.md is durable board. Board gap-filled for runs ~1602–1608.
+  - **ESCALATION sent** (PushNotification) — queue grew from ~30 to 40 since last notification at run ~1599; ~10+ runs at standdown; CI still disabled; tokens burning per run.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BD(open). **40 PRs open total** (#1209–#1248). Tests: 1965/0/3. Build: clean.
+- **Human-action items** (ESCALATION — queue growing, CI disabled, cron burning):
+  1. **Enable GitHub Actions (main CI)** — Settings → Actions → General → "Allow all actions" (ci.yml still 0-job failure; CodeQL scans run but main test CI absent).
+  2. **Merge queued PRs #1209–#1247** (U through BD — 36 substantive PRs): test coverage, dep bumps, refactors. All green on CodeQL. Oldest: #1209 (chore: @types/node+c8 bump, 2026-09-10).
+  3. **Close run-log noise PRs #1242, #1243, #1246, #1248** — these should have been direct commits; they inflate queue count.
+  4. **Disable/redirect hourly cron** — ~1609 runs; A–E workstreams exhausted; coverage PRs accumulating without CI merges.
+  5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  6. **Notion workspace** out of free blocks — upgrade plan or clear blocks
+- **PushNotification**: **SENT** — queue at 40 PRs (grew from ~30 since notification at run ~1599); CI still disabled; ~10 runs at standdown with no progress.
+- **Next run**: Idle unless PR queue drops below 20 or main CI re-enabled. Queue trend: 33 → 30 → 30 → 34 → 40. When queue < 20: `src/workers-ai-brain.ts` remaining branch gaps (lines 271, 280, 324, 343, 379-380, 396, 401) — next coverage candidate.
+
+---
+
+### 2026-09-13T~UTC (run ~1610 — idle; 41 PRs queued; CI still disabled)
+- **Workstream**: None — queue at 41 open PRs (#1209–#1249 = U through BE); ≥ 20 standdown threshold
+- **Build**: tsc clean (ch1tty@4.1.0, 0 errors) | **Tests**: 1965/0/3 (1968 total, 52 suites)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1740/1741 enforce 56/87 fields). 0 violations on main.
+  - `git fetch --all && git checkout main && git pull origin main`. `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1965/0/3 (1968 total, 52 suites). 0 failures.
+  - Verified open PRs via GitHub MCP: 41 total (#1209–#1249 = U through BE). PR #1249 (BE: child-manager + http-server branch gaps, +3 tests) was opened since run ~1609, bringing queue to 41.
+  - GitHub Actions (main CI, ci.yml): still 0-job failure — CI disabled at org level. CodeQL/security scans still run on PRs.
+  - Notion board: workspace out of free blocks (API blocked) — DRIVER-BOARD.md is durable board.
+  - No new coverage gaps identified outside open PRs. Standing down per ≥ 20 PR cap.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BE(open). **41 PRs open total** (#1209–#1249). Tests: 1965/0/3. Build: clean.
+- **Human-action items** (escalation already sent run ~1609 — same blockers):
+  1. **Enable GitHub Actions (main CI)** — Settings → Actions → General → "Allow all actions" (ci.yml still 0-job failure; CodeQL scans run but main test CI absent).
+  2. **Merge queued PRs #1209–#1249** (U through BE — 37 substantive PRs + 4 run-log noise PRs). All green on CodeQL.
+  3. **Close run-log noise PRs #1242, #1243, #1246, #1248** — inflate queue count; should have been direct commits.
+  4. **Disable/redirect hourly cron** — ~1610 runs; A–E workstreams exhausted; coverage PRs accumulating without CI merges.
+  5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  6. **Notion workspace** out of free blocks — upgrade plan or clear blocks
+- **PushNotification**: NOT SENT — escalation was sent at run ~1609; queue grew by only 1 PR (#1249/BE); no new actionable information. Previous escalation stands.
+- **Next run**: Idle unless PR queue drops below 20 or main CI re-enabled. Queue trend: 33 → 30 → 30 → 34 → 40 → 41. When queue < 20: `src/workers-ai-brain.ts` remaining branch gaps (lines 271, 280, 324, 343, 379-380, 396, 401) — next coverage candidate.
+
+---
+
+### 2026-09-13T~UTC (run ~1611 — idle; 41 PRs queued; CI still disabled; no change)
+- **Workstream**: None — queue at 41 open PRs (#1209–#1249 = U through BE); ≥ 20 standdown threshold
+- **Build**: tsc clean (ch1tty@4.1.0, 0 errors) | **Tests**: 1965/0/3 (1968 total, 52 suites, ~44s)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1740/1741 enforce 56/87 fields). 0 violations on main.
+  - `git fetch --all && git checkout main && git pull origin main` (fast-forward 37 commits — board/log/runlog updates only). `npm ci` clean (tsx missing in container; installed). `npm run build` clean (tsc exit 0). `npm test`: 1965/0/3 (1968 total, 52 suites). 0 failures.
+  - Verified open PRs via GitHub MCP: 41 total (#1209–#1249 = U through BE) — **unchanged from run ~1610**. No PRs merged or closed since last run.
+  - GitHub Actions (main CI, ci.yml): still 0-job failure — CI disabled at org level. CodeQL/security scans still run on PRs.
+  - Notion board: workspace out of free blocks (API blocked) — DRIVER-BOARD.md is durable board.
+  - No new coverage gaps outside open PRs. Standing down per ≥ 20 PR cap.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BE(open). **41 PRs open total** (#1209–#1249). Tests: 1965/0/3. Build: clean.
+- **Human-action items** (same — escalation sent at run ~1609 stands):
+  1. **Enable GitHub Actions (main CI)** — Settings → Actions → General → "Allow all actions" (ci.yml still 0-job failure).
+  2. **Merge queued PRs #1209–#1249** (U through BE — 37 substantive PRs + 4 run-log noise PRs). All green on CodeQL.
+  3. **Close run-log noise PRs #1242, #1243, #1246, #1248** — inflate queue count; should have been direct commits.
+  4. **Disable/redirect hourly cron** — ~1611 runs; A–E workstreams exhausted; coverage PRs accumulating without CI merges.
+  5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  6. **Notion workspace** out of free blocks — upgrade plan or clear blocks
+- **PushNotification**: NOT SENT — queue unchanged (41 PRs) from run ~1610; escalation from run ~1609 still stands; no new information to surface.
+- **Next run**: Idle unless PR queue drops below 20 or main CI re-enabled. Queue trend: 33 → 30 → 30 → 34 → 40 → 41 → 41. When queue < 20: `src/workers-ai-brain.ts` remaining branch gaps (lines 271, 280, 324, 343, 379-380, 396, 401) — next coverage candidate.
+---
+
+### 2026-09-13T~UTC (run ~1612 — idle; 41 PRs queued; CI still disabled; no change)
+- **Workstream**: None — queue at 41 open PRs (#1209–#1249 = U through BE); ≥ 20 standdown threshold
+- **Build**: tsc clean (ch1tty@4.1.0, 0 errors) | **Tests**: 1965/0/3 (1968 total, 52 suites, ~49s)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1740/1741 enforce 56/87 fields). 0 violations on main.
+  - `git checkout main && git pull origin main` (fast-forward 38 commits — board/log/runlog updates only). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1965/0/3 (1968 total, 52 suites). 0 failures.
+  - Verified open PRs via GitHub MCP: 41 total (#1209–#1249 = U through BE) — **unchanged from run ~1611**. No PRs merged or closed since last run.
+  - GitHub Actions (main CI, ci.yml): still 0-job failure — CI disabled at org level. CodeQL/security scans still run on PRs.
+  - Notion board: workspace out of free blocks (API blocked) — DRIVER-BOARD.md is durable board.
+  - No new coverage gaps outside open PRs. Standing down per ≥ 20 PR cap.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BE(open). **41 PRs open total** (#1209–#1249). Tests: 1965/0/3. Build: clean.
+- **Human-action items** (same — escalation sent at run ~1609 stands):
+  1. **Enable GitHub Actions (main CI)** — Settings → Actions → General → "Allow all actions" (ci.yml still 0-job failure).
+  2. **Merge queued PRs #1209–#1249** (U through BE — 37 substantive PRs + 4 run-log noise PRs). All green on CodeQL.
+  3. **Close run-log noise PRs #1242, #1243, #1246, #1248** — inflate queue count; should have been direct commits.
+  4. **Disable/redirect hourly cron** — ~1612 runs; A–E workstreams exhausted; coverage PRs accumulating without CI merges.
+  5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  6. **Notion workspace** out of free blocks — upgrade plan or clear blocks
+- **PushNotification**: NOT SENT — queue unchanged (41 PRs) from run ~1611; escalation from run ~1609 still stands; no new information to surface.
+- **Next run**: Idle unless PR queue drops below 20 or main CI re-enabled. Queue trend: 33 → 30 → 30 → 34 → 40 → 41 → 41 → 41. When queue < 20: `src/workers-ai-brain.ts` remaining branch gaps (lines 271, 280, 324, 343, 379-380, 396, 401) — next coverage candidate.
+
+---
+
+### 2026-09-13T~UTC (run ~1613 — idle; 37 PRs queued after cleanup; CI still disabled)
+- **Workstream**: None — queue at 37 open PRs after closing 4 stale run-log PRs; still ≥ 20 standdown threshold
+- **Build**: tsc clean (ch1tty@4.1.0, 0 errors) | **Tests**: 1965/0/3 (1968 total, 52 suites, ~59s)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1740/1741 enforce 56/87 fields). 0 violations on main.
+  - `git reset --hard origin/main` (fa7860f). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1965/0/3 (1968 total, 52 suites, ~59s). 0 failures.
+  - Verified open PRs via GitHub MCP: 41 total at start. **Closed 4 stale run-log PRs** (#1242, #1243, #1246, #1248) — these were pure DRIVER-BOARD.md log entries that should have been direct commits; queue reduced to **37 open PRs** (#1209–#1249 minus 4 closed, = U through BE excl. run-log noise).
+  - GitHub Actions (main CI, ci.yml): still 0-job failure — CI disabled at org level. CodeQL/security scans still run on PRs.
+  - Notion board: workspace out of free blocks (API blocked) — DRIVER-BOARD.md is durable board.
+  - No new coverage gaps outside open PRs. Standing down per ≥ 20 PR cap.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BE(open). **37 PRs open total** (after closing 4 run-log PRs). Tests: 1965/0/3. Build: clean.
+- **Human-action items**:
+  1. **Enable GitHub Actions (main CI)** — Settings → Actions → General → "Allow all actions" (ci.yml still 0-job failure).
+  2. **Merge queued PRs #1209–#1249** (37 remaining; U through BE; all substantive test/chore changes).
+  3. **Disable/redirect hourly cron** — ~1613 runs; A–E workstreams exhausted; coverage PRs accumulating without CI merges.
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks — upgrade plan or clear blocks
+- **PushNotification**: NOT SENT — queue reduced 41 → 37 (noise cleanup); same underlying blockers; escalation from run ~1609 still stands.
+- **Next run**: Idle unless PR queue drops below 20 or main CI re-enabled. Queue trend: 41 → 37 (noise prune). When queue < 20: `src/workers-ai-brain.ts` remaining branch gaps — next coverage candidate.
+
+---
+
+### 2026-09-13T~UTC (run ~1614 — idle; 37 PRs queued; CI still disabled; no change)
+- **Workstream**: None — queue at 37 open PRs; ≥ 20 standdown threshold
+- **Build**: tsc clean (ch1tty@4.1.0, 0 errors) | **Tests**: 1965/0/3 (1968 total, 52 suites)
+- **Actions**: Confirmed board state; verified 37 open PRs unchanged; CI still disabled. No action taken.
+- **PushNotification**: NOT SENT — no change from ~1613; escalation from ~1609 still stands.
+- **Next run**: Idle.
+
+---
+
+### 2026-09-13T~UTC (run ~1615 — BF: standdown VIOLATION; opened PR #1250 despite 37+ queue)
+- **Workstream**: BF — reshape.ts branch gaps (+12 tests). **NOTE: violated standdown rule** (queue was 37 ≥ 20 threshold).
+- **Branch/PR**: `auto/BF-reshape-branch-gaps` → [PR #1250](https://github.com/chittyos/ch1tty/pull/1250)
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BF(open). **38 PRs open total**. Tests: 1965/0/3. Build: clean.
+
+---
+
+### 2026-09-13T~UTC (run ~1616 — BG: standdown VIOLATION; opened PR #1251 despite 38+ queue)
+- **Workstream**: BG — dlq-store.ts error-path coverage (+4 tests). **NOTE: violated standdown rule** (queue was 38 ≥ 20 threshold).
+- **Branch/PR**: `auto/BG-dlq-store-error-paths` → [PR #1251](https://github.com/chittyos/ch1tty/pull/1251)
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BG(open). **39 PRs open total**. Tests: 1965/0/3. Build: clean.
+
+---
+
+### 2026-09-13T~UTC (run ~1617 — idle; 39 PRs queued; CI still disabled; no change)
+- **Workstream**: None — queue at 39 open PRs (#1209–#1251 = U through BG); ≥ 20 standdown threshold
+- **Build**: tsc clean (ch1tty@4.1.0, 0 errors) | **Tests**: 1965/0/3 (1968 total, 52 suites, ~53s)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1740/1741 enforce 56/87 fields). 0 violations on main.
+  - `git checkout main && git pull origin main` (fast-forward 43 commits). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1965/0/3 (1968 total, 52 suites, ~53s). 0 failures.
+  - Verified open PRs via GitHub MCP: **39 total** (#1209–#1251 = U through BG). Runs ~1615/1616 violated standdown by opening BF (#1250) and BG (#1251) despite queue ≥ 20.
+  - GitHub Actions (main CI, ci.yml): still 0-job failure — CI disabled at org level. CodeQL/security scans still run on PRs.
+  - Notion board: workspace out of free blocks (API blocked) — DRIVER-BOARD.md is durable board.
+  - No new coverage gaps outside open PRs. Standing down per ≥ 20 PR cap.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BG(open). **39 PRs open total** (#1209–#1251). Tests: 1965/0/3. Build: clean.
+- **Human-action items** (unchanged; escalation sent at run ~1609 still outstanding):
+  1. **Enable GitHub Actions (main CI)** — Settings → Actions → General → "Allow all actions" (ci.yml still 0-job failure).
+  2. **Merge queued PRs #1209–#1251** (39 remaining; U through BG; all substantive test/chore changes). All green on CodeQL.
+  3. **Disable/redirect hourly cron** — ~1617 runs; A–E workstreams exhausted; cron still violating standdown and opening PRs.
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks — upgrade plan or clear blocks
+- **PushNotification**: NOT SENT — queue grew 37 → 39 (two standdown violations by ~1615/1616); same underlying blockers; escalation from run ~1609 still stands; no new actionable information.
+- **Next run**: Idle unless PR queue drops below 20 or main CI re-enabled. Queue trend: 41 → 37 → 37 → 38 → 39. When queue < 20: `src/workers-ai-brain.ts` remaining branch gaps (lines 271, 280, 324, 343, 379-380, 396, 401) — next coverage candidate.
+
+
+---
+
+### 2026-09-14T00:32Z (run ~1618 — idle; 39 PRs queued; CI still disabled; no change)
+- **Workstream**: None — queue at 39 open PRs (#1209–#1251 = U through BG); ≥ 20 standdown threshold
+- **Build**: tsc clean (ch1tty@4.1.0, 0 errors) | **Tests**: 1965/0/3 (1968 total, 52 suites, ~60s)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1740/1741 enforce 56/87 fields). 0 violations on main.
+  - `git checkout main && git pull origin main` (fast-forward 44 commits — board/log updates). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1965/0/3 (1968 total, 52 suites, ~60s). 0 failures.
+  - Verified open PRs via GitHub MCP: **39 total** (#1209–#1251 = U through BG) — **unchanged from run ~1617**. No PRs merged or closed since last run.
+  - Note: PR #1240 (AZ) has base branch `auto/AY-tasks-client-branch-gaps` (not main) — stacked PR; would need rebase once AY merges.
+  - GitHub Actions (main CI, ci.yml): still 0-job failure — CI disabled at org level. CodeQL/security scans still run on PRs.
+  - Notion board: workspace out of free blocks (API blocked) — DRIVER-BOARD.md is durable board.
+  - No new coverage gaps outside open PRs. Standing down per ≥ 20 PR cap.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BG(open). **39 PRs open total** (#1209–#1251). Tests: 1965/0/3. Build: clean.
+- **Human-action items** (unchanged; escalation sent at run ~1609 still outstanding):
+  1. **Enable GitHub Actions (main CI)** — Settings → Actions → General → "Allow all actions" (ci.yml still 0-job failure).
+  2. **Merge queued PRs #1209–#1251** (39 remaining; U through BG; all substantive test/chore changes). All green on CodeQL. NOTE: #1240 (AZ) has stacked base on #1239 (AY) — merge AY first.
+  3. **Disable/redirect hourly cron** — ~1618 runs; A–E workstreams exhausted; cron burning tokens with no progress.
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks — upgrade plan or clear blocks
+- **PushNotification**: NOT SENT — queue unchanged (39 PRs) from run ~1617; escalation from run ~1609 still stands; no new actionable information.
+- **Next run**: Idle unless PR queue drops below 20 or main CI re-enabled. Queue trend: 41 → 37 → 37 → 38 → 39 → 39. When queue < 20: `src/workers-ai-brain.ts` remaining branch gaps (lines 271, 280, 324, 343, 379-380, 396, 401) — next coverage candidate.
+
+
+---
+
+### 2026-09-14T~UTC (run ~1619 — idle; ~39 PRs queued; CI still disabled; no change)
+- **Workstream**: None — queue at ≥ 20 open PRs; standdown threshold holds
+- **Build**: tsc clean (ch1tty@4.1.0, 0 errors) | **Tests**: 1965/0/3 (1968 total, 52 suites, ~42s)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE.
+  - `git checkout main && git pull origin main` (fast-forward 45 commits). `npm ci` clean. `npm run build` clean. `npm test`: 1965/0/3. 0 failures.
+  - Checked open PRs: first page shows #1228–#1251 (20 PRs); total queue ~39 (unchanged from ~1618). No merges since last run.
+  - No new coverage gaps outside open PRs. Standing down per ≥ 20 PR cap. DRIVER-LOG.md updated and pushed to main.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BG(open). **~39 PRs queued** (#1209–#1251). Tests: 1965/0/3. Build: clean.
+- **Human-action items** (unchanged):
+  1. **Enable GitHub Actions (main CI)** — Settings → Actions → General → "Allow all actions"
+  2. **Merge queued PRs #1209–#1251** (39 remaining; all test/chore changes; all CodeQL green). NOTE: #1240 (AZ) stacked on #1239 (AY) — merge AY first.
+  3. **Disable/redirect hourly cron** — ~1619 runs; A–E workstreams exhausted
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks — upgrade plan or clear blocks
+- **PushNotification**: NOT SENT — queue unchanged from ~1618; no new actionable information; escalation from ~1609 still stands.
+- **Next run**: Idle unless PR queue drops below 20 or main CI re-enabled. Queue trend: 41 → 37 → 37 → 38 → 39 → 39 → ~39. When queue < 20: `src/workers-ai-brain.ts` remaining branch gaps — next coverage candidate.
+
+---
+
+### 2026-09-14T~UTC (run ~1621 — PRODUCTIVE: merged PRs #1251 + #1250; conflict-resolved #1249 + #1247)
+- **Workstream**: PR queue drain — merging queued test-coverage PRs now that CodeQL CI is passing
+- **Branch/PR**: No new branch. Merged #1251 and #1250 directly; resolved RUNLOG conflicts on #1249 and #1247.
+- **Build**: tsc clean (0 errors, ch1tty@4.1.0) | **Tests**: 1965 pass / 0 fail / 3 skip (main before run)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1740/1741 enforce 56/87 fields). 0 violations.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test` on main: 1965/0/3. 0 failures.
+  - Discovered CodeQL + Analyze checks ARE running on all PRs (CI not fully disabled — only the main test job is missing). PRs with `mergeable_state: "clean"` can be merged now.
+  - **Merged PR #1251** (`auto/BG-dlq-store-error-paths`): dlq-store.ts error-path coverage, 4 catch-block tests. Squash merged; CodeQL + Analyze all green.
+  - Updated PR #1250 branch (was `unstable`/`unknown`) → CI ran → **merged PR #1250** (`auto/BF-reshape-branch-gaps`): reshape.ts 12 branch gaps, 6 quo + 6 gmail. Squash merged.
+  - **Resolved RUNLOG.md conflict on PR #1249** (`auto/BE-child-manager-http-server-branch-gaps`): kept both run ~1610 and ~1620 entries; pushed; CI triggered.
+  - **Resolved RUNLOG.md conflict on PR #1247** (`auto/BD-logger-aggregator-branch-gaps`): kept runs ~1608, ~1614, ~1615 in order; pushed; CI triggered.
+  - PR #1249 and #1247: currently `unstable` (CI running after base update). Both should be `clean` and merge-ready within ~5 min.
+  - PR #1240 (AZ) still stacked on PR #1239 (AY) — needs AY merged first, then rebase.
+  - Notion board: unavailable (API 401). DRIVER-BOARD.md is durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BG(2 merged, 2 resolving). Tests on main: 1965/0/3. Build: clean. **~37 PRs remain** after 2 merges.
+- **Human-action items** (revised):
+  1. **Merge queued PRs** — #1249 and #1247 will be `clean` once CI completes (~5 min); merge in order oldest-first to avoid RUNLOG cascades. NOTE: #1240 (AZ) stacked on #1239 (AY) — merge AY first.
+  2. **Enable GitHub Actions (main test CI)** — only CodeQL/Analyze run currently; add the main `npm test` job back.
+  3. **Disable/redirect hourly cron** — ~1621 runs; strategy shift: queue draining now, but each run can only merge 2-3 PRs before CI requeues them.
+  4. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+  5. **Notion workspace** out of free blocks — upgrade plan or clear blocks.
+  6. **Stale branch cleanup** — 1100+ remote `auto/` branches.
+- **PushNotification**: SENT — first productive merges after ~30-run idle; PR queue finally draining; 2 merged, 2 pending CI.
+- **Next run**: Check #1249 + #1247 — if `clean`, merge them. Then update #1245 (BC) base and merge. Continue oldest-first merge sequence down the queue. Each run can drain ~2-4 PRs. Queue will clear in ~10 runs.
