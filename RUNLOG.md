@@ -2,6 +2,14 @@
 
 ---
 
+### 2026-09-14T04:49Z (event — PR #1235 merged — AU workstream now in main)
+- **Event**: PR #1235 (`auto/AU-comms-dispatch-unit-tests`) merged into main.
+- **AU workstream**: 4 `McpClientDispatch` unit tests in `apps/comms-mcp/test/au-dispatch-unit-tests.test.ts` now in baseline.
+- **Open PR queue**: 14 remaining per head commit (AE/#1219 also merged earlier today).
+- **Next workstream**: deferred — queue still ≥20 per run ~1615 state; idle until queue drops.
+
+---
+
 ### 2026-09-13T~10:50Z (run ~1608 — BD: logger setLevel + aggregator filterSuggestionsCatalog gaps, PR #1247)
 - **Workstream**: BD — `src-stdio/logger.ts` `setLevel` (90% func coverage) + `aggregator.ts` `filterSuggestionsCatalog` warn branch (lines 51–53)
 - **Branch/PR**: `auto/BD-logger-aggregator-branch-gaps` → https://github.com/chittyos/ch1tty/pull/1247
