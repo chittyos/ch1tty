@@ -38,6 +38,9 @@ jobs:
       - name: Verify servers.json is valid JSON
         run: node -e "JSON.parse(require(\"fs\").readFileSync(\"servers.json\",\"utf8\")); console.log(\"servers.json: valid\")"
 
+      - name: Typecheck Worker/DO codebase (src/)
+        run: npm run typecheck:worker
+
   apps-build-and-test:
     if: github.event.deleted != true
     runs-on: ubuntu-latest
