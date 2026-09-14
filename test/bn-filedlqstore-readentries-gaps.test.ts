@@ -16,7 +16,7 @@
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { writeFileSync, mkdirSync, rmSync } from 'node:fs';
+import { writeFileSync, mkdirSync, rmSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { mkdtempSync } from 'node:fs';
@@ -86,6 +86,44 @@ test('BN-4: FileDlqStore.readEntries — JSON array lines are skipped (Array.isA
     const result = store.readEntries();
     assert.equal(result.length, 1, 'JSON array lines must be skipped');
     assert.deepEqual((result[0] as Record<string, unknown>)['event_type'], 'tool_call');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('BN-5: FileDlqStore.rewrite([]) when DLQ file does not exist — ENOENT is swallowed', () => {
+  const dir = makeTempDir();
+  try {
+    const dlqPath = join(dir, 'nonexistent.dlq.jsonl');
+    const store = new FileDlqStore(dlqPath);
+    // File doesn't exist; unlinkSync throws ENOENT → catch swallows it
+    assert.doesNotThrow(() => store.rewrite([]));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('BN-6: FileDlqStore.rewrite([]) when DLQ file exists — file is deleted', () => {
+  const dir = makeTempDir();
+  try {
+    const dlqPath = join(dir, 'dlq.jsonl');
+    writeFileSync(dlqPath, '{"event_type":"old"}\n', 'utf8');
+    const store = new FileDlqStore(dlqPath);
+    store.rewrite([]);
+    assert.equal(existsSync(dlqPath), false, 'file should be deleted after rewrite([])');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('BN-7: FileDlqStore.rewrite() with non-serializable entry — outer catch is triggered', () => {
+  const dir = makeTempDir();
+  try {
+    const dlqPath = join(dir, 'dlq.jsonl');
+    const store = new FileDlqStore(dlqPath);
+    // BigInt is not JSON-serializable; JSON.stringify throws → outer catch swallows it
+    const entries = [{ event_type: 'test', val: BigInt(1) }] as unknown as object[];
+    assert.doesNotThrow(() => store.rewrite(entries));
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

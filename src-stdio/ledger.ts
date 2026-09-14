@@ -78,7 +78,6 @@ export class FileDlqStore implements DlqStore {
   rewrite(entries: object[]): void {
     try {
       if (entries.length === 0) {
-        /* c8 ignore next */
         try { unlinkSync(this.dlqPath); } catch { /* file may not exist or already gone */ }
         return;
       }
@@ -95,7 +94,6 @@ export class FileDlqStore implements DlqStore {
         /* c8 ignore next */
         try { rmSync(tmpDir, { recursive: true, force: true }); } catch { /* cleanup best-effort */ }
       }
-    /* c8 ignore next 3 */ // requires OS-level fault (ENOSPC/EROFS), untestable in sandbox
     } catch (err) {
       log.error(`Ledger DLQ rewrite failed (${this.dlqPath}): ${err}`);
     }
