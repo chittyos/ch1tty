@@ -219,4 +219,5 @@ describe('LedgerClient', () => {
     const result = await client.listEntries(NS, { cursor: 'cursor-abc' });
     assert.ok(Array.isArray(result.entries));
   });
+
 });
