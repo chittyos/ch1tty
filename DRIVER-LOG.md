@@ -13,8 +13,8 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 
 ## Blockers
 
-- **Notion auth invalid (401)**: `notion` MCP server connects but API calls fail. Fix: refresh the Notion integration token in workspace settings → Settings & Members → Connections → ch1tty integration, or run `chitty-mcp-token notion` to rotate via 1Password.
-- **Notion free-block quota exhausted**: `update_page` returns "workspace has used all of its free blocks". Fix: upgrade Notion plan to Plus or higher (https://app.notion.com) to restore write access to the goal-driver board.
+- **Notion free-block quota exhausted** _(active)_: `update_page` returns "workspace has used all of its free blocks" (confirmed 2026-09-14). Notion reads/searches work fine — auth is valid. Fix: upgrade Notion plan to Plus or higher (https://app.notion.com) to restore write access to the goal-driver board.
+- ~~**Notion auth invalid (401)**~~ _(resolved 2026-09-14)_: Notion search and fetch succeed — authentication is working. This blocker is no longer active; only the quota limit above prevents board writes.
 
 ## Run log
 
