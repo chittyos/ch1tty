@@ -2,6 +2,21 @@
 
 ---
 
+### 2026-09-14 (run ~1628 — BJ: cast no_match + explain:true, PR #1260)
+- **Workstream**: BJ — `aggregator.ts:1372` outer+inner ternary in `no_match + explain:true` path
+- **Branch/PR**: `auto/BJ-execute-dryrun-malformed-cast-explain-no-match` → https://github.com/chittyos/ch1tty/pull/1260
+- **Build**: tsc clean | **Tests added**: 4 (bj-cast-explain-no-match.test.ts)
+- **Coverage target**: aggregator.ts:1372 — both ternaries now covered
+  - Outer `explain ?` branch: tests 1–3 (NullRoutingCoordinator + nonsense intent)
+  - Inner `castRoute==='brain' ? brainRouteMs : undefined` branch: test 4 (BrainZeroConfidenceCoordinator returning confidence:0 tools → sets castRoute='brain' but all filtered → no_match)
+- **Key patterns**:
+  - `BrainZeroConfidenceCoordinator`: returns `[{ tool: candidates[0], confidence: 0 }]` — routed.length>0 triggers brain path (line 1288) but score=0 filtered at line 1271 → scoredTools=[]
+  - `suggestionsCatalog: {}` suppresses built-in suggestion resources (would otherwise substring-match nonsense terms)
+  - `NO_MATCH_INTENT = 'xzqvj kwplm bfrnq vzptw'` — pure nonsense, no real English substrings
+- **State**: Watching PR #1260. Awaiting CI and review.
+
+---
+
 ### 2026-09-14T04:49Z (event — PR #1235 merged — AU workstream now in main)
 - **Event**: PR #1235 (`auto/AU-comms-dispatch-unit-tests`) merged into main.
 - **AU workstream**: 4 `McpClientDispatch` unit tests in `apps/comms-mcp/test/au-dispatch-unit-tests.test.ts` now in baseline.
