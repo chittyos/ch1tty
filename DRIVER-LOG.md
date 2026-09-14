@@ -11,9 +11,10 @@ Notion auth returns 401. This file is the cross-run state fallback until the tok
 - [x] **D** — Scenario testing + simulation: `sim/` harness (`scenarios.ts`, `run.ts`, `fixture-backend.ts`), `test/scenario.test.ts`, `test/simulation.test.ts`, cloudflare-builds ops coverage fixtures + scenarios. ✅ DONE
 - [x] **E** — Alchemist brainstorm: catalog in `focus-suggestions.json`. ✅ DONE — 105th pass: 1152 combos / 496 verified / 1173 prompts across 6 profiles. 130/376 tools at 6/6 profile coverage. Latest completed: fs/edit_file, orchestrator/agent_execute(alchemist) at 6/6; browser-rendering/get_url_screenshot 6/6 combo added (unverified — 401 this session).
 
-## Blocker
+## Blockers
 
 - **Notion auth invalid (401)**: `notion` MCP server connects but API calls fail. Fix: refresh the Notion integration token in workspace settings → Settings & Members → Connections → ch1tty integration, or run `chitty-mcp-token notion` to rotate via 1Password.
+- **Notion free-block quota exhausted**: `update_page` returns "workspace has used all of its free blocks". Fix: upgrade Notion plan to Plus or higher (https://app.notion.com) to restore write access to the goal-driver board.
 
 ## Run log
 
