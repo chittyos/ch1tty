@@ -157,6 +157,14 @@ test('cast: no_match (brain route, zero-confidence) + explain:true → explanati
     assert.ok('explanation' in cast, 'explanation field must be present when explain:true and no_match');
     assert.ok(cast.explanation !== null && typeof cast.explanation === 'object',
       'explanation must be a non-null object');
+    const explanation = cast.explanation as Record<string, unknown>;
+    // Verify the inner ternary's true branch actually forwarded brainRouteMs:
+    // explanation.method must be 'brain' and brainMs must be a non-negative number.
+    assert.equal(explanation.method, 'brain', 'explanation.method must be "brain" when brain route taken');
+    assert.ok(
+      typeof explanation.brainMs === 'number' && explanation.brainMs >= 0,
+      `explanation.brainMs must be a non-negative number, got ${explanation.brainMs}`,
+    );
   } finally {
     await agg.shutdown();
   }
