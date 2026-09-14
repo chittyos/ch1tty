@@ -19,35 +19,12 @@ import {
 import { z } from 'zod';
 import { Ch1ttyCore, SESSION_IDLE_MS } from './core.js';
 import { LEDGER_FLUSH_INTERVAL_MS } from './ledger.js';
-import type { Env, ToolCallResult } from './types.js';
+import type { Env } from './types.js';
+import { toMcpResult } from './mcp-content.js';
 import { VERSION } from './utils.js';
 import { log } from './logger.js';
 
 const FLUSH_TICK_SECONDS = Math.max(1, Math.ceil(LEDGER_FLUSH_INTERVAL_MS / 1000));
-
-/** MCP SDK CallToolResult content union (text | image | resource with text XOR blob). */
-type McpContent =
-  | { type: 'text'; text: string }
-  | { type: 'image'; data: string; mimeType: string }
-  | { type: 'resource'; resource: { uri: string; mimeType?: string; text: string } | { uri: string; mimeType?: string; blob: string } };
-
-/**
- * Adapt the gateway's ToolCallResult to the MCP SDK's stricter CallToolResult:
- * the SDK requires embedded resources to carry `text` XOR `blob` (both required
- * variants), while the gateway type leaves them optional.
- */
-function toMcpResult(r: ToolCallResult): { [key: string]: unknown; content: McpContent[]; isError?: boolean } {
-  const content: McpContent[] = r.content.map((c) => {
-    if (c.type === 'resource') {
-      const { uri, mimeType, text, blob } = c.resource;
-      return blob !== undefined
-        ? { type: 'resource' as const, resource: { uri, mimeType, blob } }
-        : { type: 'resource' as const, resource: { uri, mimeType, text: text ?? '' } };
-    }
-    return c;
-  });
-  return { ...r, content };
-}
 
 // ── Zod schemas (all params .describe()d, mirroring the DO's JSON schemas) ──
 
