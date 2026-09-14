@@ -113,6 +113,7 @@ export function quoRawToUnified(row: QuoRawRow, owner: OwnerIdentity): UnifiedCo
   if (ownerIdentifier !== undefined) {
     participants.push({
       // Owner role: on an outbound message the owner is the sender; inbound = recipient.
+      /* c8 ignore next — ownerRole is always set with ownerIdentifier (co-assigned in the loop above) */
       role: ownerRole ?? (row.direction === 'outbound' ? 'sender' : 'recipient'),
       identifier: ownerIdentifier,
       identifierKind: identifierKind(ownerIdentifier),
