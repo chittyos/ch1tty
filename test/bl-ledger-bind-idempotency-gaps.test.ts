@@ -61,8 +61,10 @@ test('ledger.ts:181 — bind() twice: second bind updates backend but does not c
     });
 
     let callCount2 = 0;
-    const backend2 = makeBackend(async () => {
+    let capturedServerId2: string | undefined;
+    const backend2 = makeBackend(async (serverId) => {
       callCount2++;
+      capturedServerId2 = serverId;
       return { content: [{ type: 'text' as const, text: 'ok' }] };
     });
 
@@ -87,6 +89,7 @@ test('ledger.ts:181 — bind() twice: second bind updates backend but does not c
     assert.equal(flushed, 1, 'flush must succeed through the second-bound backend');
     assert.equal(callCount2, 1, 'second backend received the flush call');
     assert.equal(callCount1, 0, 'first backend was not called after rebind');
+    assert.equal(capturedServerId2, 'eco-bl-2', 'flush must use the serverId from the second bind call');
 
     await client.shutdown();
   } finally {
@@ -133,21 +136,33 @@ test('ledger.ts:228 — tool_call_batch: recording the same tool twice keeps cou
 test('ledger.ts:298 — flush() with isError:true backend response exhausts retries and writes to DLQ', async () => {
   const { dlqPath, cleanup } = tempDlq();
   try {
-    // Backend returns isError:true on every call instead of throwing.
     const client = new LedgerClient(dlqPath);
-    const backend = makeBackend(async () => ({
-      isError: true,
-      content: [{ type: 'text' as const, text: 'ledger write rejected: forbidden' }],
-    }));
+
+    let backendCallCount = 0;
+    const backend = makeBackend(async () => {
+      backendCallCount++;
+      return {
+        isError: true,
+        content: [{ type: 'text' as const, text: 'ledger write rejected: forbidden' }],
+      };
+    });
     client.bind(backend, 'eco-bl-iserror');
 
     client.record('sess-bl-iserror', 'session_start', { detail: 'test' });
 
-    // 3 flushes: after each, entry is re-queued with retries++.
-    // On the 3rd flush (retries === MAX_RETRIES === 3), the entry is dropped to DLQ.
-    for (let i = 0; i < 3; i++) {
-      await client.flush();
-    }
+    // Flush 1: retries++ → 1 < MAX_RETRIES (3) → entry re-queued, still buffered.
+    await client.flush();
+    assert.equal(client.getStats().buffered, 1, 'entry must still be buffered after attempt 1 (retries=1 < 3)');
+    assert.equal(backendCallCount, 1, 'backend called once after first flush');
+
+    // Flush 2: retries++ → 2 < MAX_RETRIES → re-queued again.
+    await client.flush();
+    assert.equal(client.getStats().buffered, 1, 'entry must still be buffered after attempt 2 (retries=2 < 3)');
+    assert.equal(backendCallCount, 2, 'backend called twice after second flush');
+
+    // Flush 3: retries++ → 3 is NOT < MAX_RETRIES → DLQ drop.
+    await client.flush();
+    assert.equal(backendCallCount, 3, 'backend called three times total (once per retry)');
 
     // After MAX_RETRIES exhausted, entry must have been written to the DLQ.
     const stats = client.getStats();
