@@ -4929,3 +4929,15 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings.
 - **PushNotification**: SENT — PR queue FULLY DRAINED: 0 open PRs. All BH workstreams merged. Tests: ~2127/0/3. DISABLE CRON NOW.
 - **Next run**: IDLE. Queue empty. No new PR needed unless new coverage gaps identified. Recommend disabling hourly cron.
+
+---
+
+## Run ~1624 — 2026-09-14 (resumed context)
+
+- **Workstream**: PR queue drain — context resumed from mid-session; merged AI (#1223)
+- **Branch/PR**: Merged PR #1223 (AI: agents ^0.22→^0.23, @cloudflare/codemode ^0.5.1→^0.5.2). Squash merged after 3/3 CI green.
+- **AO (#1229)**: Found closed-not-merged; cursor-forwarding test already on main (landed via prior push). No action needed.
+- **AW (#1237)**: Already superseded by AA (#1215); all tests on main. Closed for human.
+- **Post-merge state**: 0 open PRs confirmed. Run ~1625 completed the queue drain (merged BF #1254, BH #1253) in parallel.
+- **Build**: Not re-run (remote — run ~1625 already validated build+tests clean).
+- **State**: Queue EMPTY. All workstreams done. Cron still active — DISABLE URGED.
