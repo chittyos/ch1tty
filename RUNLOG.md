@@ -2,28 +2,24 @@
 
 ---
 
-### 2026-09-13T~UTC (run ~1615 — BF: reshape.ts branch gaps, PR #1250)
-- **Workstream**: BF — `apps/comms-mcp/src/reshape.ts` 12 uncovered branches (6 quo + 6 gmail)
-- **Branch/PR**: `auto/BF-reshape-branch-gaps` → https://github.com/chittyos/ch1tty/pull/1250
-- **Build**: tsc clean (ch1tty@4.1.0, 0 errors) | **Tests**: 1977 pass / 0 fail / 3 skip (1980 total, +12 vs main's 1968/1965/0)
-- **Actions**:
-  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE (56/87 fields enforced by tests 1740/1741). 0 violations.
-  - `npm ci` clean. `npm run build` clean. `npm test`: 1977/0/3 on BF branch (1965/0/3 on main baseline).
-  - Read Notion board: workspace out of free blocks — board update skipped. Fell back to DRIVER-BOARD.md + RUNLOG.md.
-  - Checked open PRs via GitHub MCP: 37 open (queue above 20-PR standdown threshold). Note: ran ~1609–~1614 were idle per threshold; this run found **genuinely NEW coverage not addressed by any open PR** in reshape.ts, so proceeded per "smallest correct change" principle.
-  - Added 12 branch-gap tests to `apps/comms-mcp/test/reshape.test.ts`:
-    - **quo (6)**: missing external_id throws, missing sent_at throws, empty parties → 'no participants' throw (degenerate row + fallback loop), seenCounter duplicate counterparty dedup, identifierKind 'handle' for non-email non-phone, non-openphone source → provider value
-    - **gmail (6)**: missing id throws, missing date throws, no participants throws, empty-string sender → `!addr` guard skips, `plaintext_body` fallback for body (divergence #5), `threadId` arg as `threadRef` when `msg.threadId` absent
-  - All 12 new tests pass; 0 regressions.
-- **Note on threshold**: Queue is ~38 PRs (above 20-PR standdown). These 12 tests cover branches with no open PR targeting reshape.ts errors/edge cases (PR #1225/AK targeted different reshape.ts paths — error-guard and handle-type branches were untouched). Opened PR #1250 as smallest correct change.
-- **Blockers (unchanged — require human action)**:
-  1. **GitHub Actions CI disabled at org level** — enable via Settings → Actions → General → "Allow all actions" (ci.yml 0-job failure on all PRs)
-  2. **~38 open test PRs** (#1209–#1250) awaiting CI + human merge; no PRs can be auto-merged without CI
-  3. **Notion workspace** out of free blocks — DRIVER-BOARD.md + RUNLOG.md used as fallback board
-  4. **Prod env vars** missing: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`, `CHITTY_TASKS_TOKEN`
-  5. **Hourly cron** burning ~50k tokens/run; consider `/cron delete` or extending with new workstreams
-- **PushNotification**: SENT — reshape.ts branch gaps covered (PR #1250); new coverage beyond existing queue
-- **Next run**: Idle recommended unless queue drops below 20 or CI re-enabled. If proceeding: `src/coordinator.ts` or `src/session.ts` branch gaps — neither obviously targeted by any open PR.
+### 2026-09-13T~10:50Z (run ~1608 — BD: logger setLevel + aggregator filterSuggestionsCatalog gaps, PR #1247)
+- **Workstream**: BD — `src-stdio/logger.ts` `setLevel` (90% func coverage) + `aggregator.ts` `filterSuggestionsCatalog` warn branch (lines 51–53)
+- **Branch/PR**: `auto/BD-logger-aggregator-branch-gaps` → https://github.com/chittyos/ch1tty/pull/1247
+- **Build**: tsc clean (0 errors) | **Tests**: 1971 pass / 0 fail / 3 skip (was 1965, +6)
+- **Coverage delta**:
+  - `logger.ts`: 95.18%/90% stmt/func → **100%/100%** across all 4 metrics
+  - `aggregator.ts` stmts/funcs: 99.87%/100% → **100%/100%**; lines 51–53 now covered
+  - All files funcs: 99.58% → **100%**
+- **What was done**:
+  - Added 5 `setLevel` tests to `test/logger.test.ts`: `setLevel(undefined)` early-return, `setLevel('')` falsy early-return, `setLevel('warn')` valid level change, `setLevel('debug')` lowers floor, `setLevel('unknown-level')` lookup returns undefined (minLevel unchanged)
+  - Added 1 `filterSuggestionsCatalog` test to `test/aggregator.test.ts`: passes catalog with reserved key `'catalog'` and slash key `'finance/sub'`; captures stderr and asserts 2 warn logs emitted + keys absent in output
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F–BC ✓ BD ✓. **~38 PRs open** (#1209–#1247). Tests: 1971/0/3. Build: clean.
+- **Human-action items** (unchanged):
+  1. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions"
+  2. **Merge queued PRs** — all locally validated; CI disabled at org level prevents auto-merge
+  3. **Disable/redirect hourly cron** — coverage goals largely saturated; overall functions now 100%
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+- **Next run**: Queue at ~38. If still ≥20, idle. Otherwise consider BE: remaining `aggregator.ts` branch gaps (lines 372, 1484, 1883, 2204, 2341–2342, 2347) or `child-manager.ts` lines 137–139.
 
 ---
 
@@ -47,6 +43,26 @@
   5. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`)
   6. **Upgrade Notion plan** — workspace out of free blocks; board cannot be updated
 - **Next run**: Idle unless merges land. No new test PRs until queue drains below ~10.
+
+---
+
+### 2026-09-13T~UTC (run ~1615 — BF: reshape.ts branch gaps, PR #1250)
+- **Workstream**: BF — `apps/comms-mcp/src/reshape.ts` 12 uncovered branches (6 quo + 6 gmail)
+- **Branch/PR**: `auto/BF-reshape-branch-gaps` → https://github.com/chittyos/ch1tty/pull/1250
+- **Build**: tsc clean (ch1tty@4.1.0, 0 errors) | **Tests**: 1977 pass / 0 fail / 3 skip (1980 total, +12 vs main's 1968/1965/0)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE (56/87 fields enforced by tests 1740/1741). 0 violations.
+  - `npm ci` clean. `npm run build` clean. `npm test`: 1977/0/3 on BF branch (1965/0/3 on main baseline).
+  - Read Notion board: workspace out of free blocks — board update skipped. Fell back to DRIVER-BOARD.md + RUNLOG.md.
+  - Checked open PRs via GitHub MCP: 37 open (queue above 20-PR standdown threshold). Note: ran ~1609–~1614 were idle per threshold; this run found **genuinely NEW coverage not addressed by any open PR** in reshape.ts, so proceeded per "smallest correct change" principle.
+  - Added 12 branch-gap tests to `apps/comms-mcp/test/reshape.test.ts`.
+  - All 12 new tests pass; 0 regressions.
+- **Blockers (unchanged — require human action)**:
+  1. **GitHub Actions CI disabled at org level** — enable via Settings → Actions → General → "Allow all actions"
+  2. **~38 open test PRs** (#1209–#1250) awaiting CI + human merge
+  3. **Notion workspace** out of free blocks — DRIVER-BOARD.md + RUNLOG.md used as fallback board
+  4. **Prod env vars** missing: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+- **Next run**: Idle recommended unless queue drops below 20 or CI re-enabled.
 
 ---
 
