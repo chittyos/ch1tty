@@ -68,10 +68,18 @@ test('ledger.ts:181 — bind() twice: second bind updates backend but does not c
 
     // First bind — creates the timer (flushTimer was null → true branch fires).
     client.bind(backend1, 'eco-bl-1');
+    type WithTimer = { flushTimer: unknown };
+    const timerAfterFirstBind = (client as unknown as WithTimer).flushTimer;
+    assert.ok(timerAfterFirstBind !== null, 'flushTimer must be set after first bind');
 
     // Second bind — flushTimer is already set → false branch fires (timer not recreated).
-    // Backend/serverId is updated silently.
+    // Backend/serverId is updated silently; the timer reference is preserved.
     client.bind(backend2, 'eco-bl-2');
+    assert.strictEqual(
+      (client as unknown as WithTimer).flushTimer,
+      timerAfterFirstBind,
+      'flushTimer reference must be identical after second bind (no recreation)',
+    );
 
     // Record an entry and flush — it should go to backend2 (the latest bind).
     client.record('sess-bl-bind', 'session_start', {});
