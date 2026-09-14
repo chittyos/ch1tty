@@ -4470,6 +4470,34 @@ Added overrides `"fast-uri": ">=3.1.6"` and `"qs": ">=6.15.4"` to package.json; 
 
 ---
 
+### 2026-09-14T~04:50Z (run ~1593 — workstream BA: null/fallback branch gaps, 4 files)
+- **Workstream**: BA — cover `?? {}` / `?? 0` / `?? default-URL` fallback branches in 4 source files
+- **Branch/PR**: `auto/BA-null-branch-gaps-openapi-dlq-clients` → **PR #1255** (https://github.com/chittyos/ch1tty/pull/1255)
+- **Build**: tsc clean (0 errors) | **Tests**: 2125 pass / 0 fail / 3 skip (2128 total, +4 new tests)
+- **Actions**:
+  - Received PR #1238 (AX) merged notification. Synced to main (9348693, +48 commits — multiple PRs merged).
+  - Tests jumped from 1968 to 2121; open PRs dropped from 30 to 9 (well below ~20 threshold).
+  - Ran fresh c8 report (cache was stale). Found 4 uncovered fallback branches:
+    1. `openapi-spec.ts:34` — `?? {}` fires when `inputSchema` has no `properties` key
+    2. `dlq-store.ts:80` — `count() ?? 0` fires when exec returns `[]`
+    3. `session-client.ts:59` — `?? 'https://session.chitty.cc'` default URL fallback
+    4. `ledger-client.ts:39` — `?? 'https://ledger.chitty.cc'` default URL fallback
+  - Created `test/ba-null-branch-gaps.test.ts` with 4 targeted tests.
+  - Full suite: 2125/0/3 (2128 total) — +4 tests, 0 regressions, metric freeze guards pass.
+  - Coverage delta: `ledger-client.ts` 96.15%→100%, `session-client.ts` 97.43%→100%, `dlq-store.ts` 96%→100%; `openapi-spec.ts` 84.61%→92.3% (line 88 `m[1]??null` right side unreachable — V8 artifact).
+  - Pushed branch; opened **PR #1255** (not draft). Subscribed to PR activity.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–AX ✓ BA(#1255 open). **10 PRs open total** (#1213, #1223, #1229-#1232, #1235-#1236, #1240, #1255). Tests: 2125/0/3.
+- **Human-action items**:
+  1. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions" (all PRs show 0 jobs / conclusion:failure)
+  2. **Merge queued PRs** — 10 open PRs; queue recently dropped from 30 to 9 (excellent progress!)
+  3. **Disable/redirect hourly cron** — ~1593 runs; coverage PRs accumulating
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks
+- **PushNotification**: NOT SENT — workstream BA is additive coverage; no urgent blocker.
+- **Next run**: Next uncovered gaps (not covered by any open PR): `workers-ai-brain.ts` 87.71% branches (PR #1240 AZ targets this), `openapi-spec.ts` line 88 unreachable, `recent-log.ts` 80% branches, `reshape.ts` 90.72%, `aggregator.ts` (src-stdio) 97.31%. Advance BB when queue allows.
+
+---
+
 ### 2026-09-12T~19:30Z (run ~1595 — BA: tasks-client + evidence-client branch gaps — 7 tests, both to 100%)
 - **Workstream**: BA — cover 5 uncovered branches in `apps/tasks-mcp/src/tasks-client.ts` (lines 49, 77) and `apps/evidence-mcp/src/evidence-client.ts` (lines 45, 77, 90)
 - **Branch/PR**: `auto/BA-client-url-filter-branches` → **PR #1241** (https://github.com/chittyos/ch1tty/pull/1241)
