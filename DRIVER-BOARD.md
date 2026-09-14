@@ -5045,3 +5045,20 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 - **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BP ALL DONE. **0 open PRs.** Build: clean.
 - **PushNotification**: NOT SENT — routine merge, no blocking condition.
 - **Next run**: IDLE. Queue empty. No new workstream defined.
+
+---
+
+### 2026-09-14T~UTC (run ~1632 — PRODUCTIVE: merged PR #1269 BQ)
+
+- **Workstream**: BQ — merged PR #1269 (c8 ignore placement / 100% branch coverage)
+- **Branch/PR**: Merged PR #1269 (squash, SHA afcd1e6). 0 open PRs remain.
+- **Build**: tsc clean (0 errors, ch1tty@4.1.0) | **Tests**: 2290 pass / 0 fail / 3 skip (2293 total, 99 suites)
+- **Actions**: Read CLAUDE.md (guardrails OK). npm ci + build clean. npm test 2290/0/3. Found 1 open PR #1269 (BQ, CI 3/3 green). Merged #1269 squash. Queue now 0 open PRs.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BQ ALL DONE. **0 open PRs.** Tests: 2290/0/3. Build: clean.
+- **Human-action items** (URGENT):
+  1. **DISABLE hourly cron** — queue EMPTY; ~1632 runs; burning ~50k tokens/run.
+  2. Enable GitHub Actions (main npm test CI job).
+  3. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET.
+  4. Notion workspace out of free blocks.
+  5. Stale branch cleanup — 1100+ remote auto/ branches.
+- **Next run**: IDLE. Queue empty. No new workstream. DISABLE CRON.
