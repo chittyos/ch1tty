@@ -85,6 +85,5 @@ export function parseToolPath(path: string): string | null {
   // Path pattern: /tools/<serverId>/<toolName>
   // namespacedName = "<serverId>/<toolName>"
   const m = /^\/tools\/([^/]+\/[^/]+)$/.exec(path);
-  // c8 ignore next — m[1] is always defined when the regex matches (captured group 1)
-  return m ? (m[1] ?? null) : null;
+  return m ? m[1]! : null;
 }

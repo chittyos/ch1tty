@@ -159,6 +159,7 @@ export class WorkersAiBrain {
       const scored: RoutedTool[] = [];
       for (let i = 0; i < pruned.length; i++) {
         const vec = candidateVecs[i];
+        /* c8 ignore next — ensureCandidateVectors fills all slots before returning; vec is always a Float32Array here */
         if (!vec) continue;
         const sim = dot(queryVec, vec);
         if (sim < this.config.minSimilarity) continue;
@@ -277,7 +278,7 @@ export class WorkersAiBrain {
   private async embedSingle(text: string): Promise<Float32Array | null> {
     const res = await this.embed([text]);
     if (!res || res.length !== 1) return null;
-    return res[0] ?? null;
+    return res[0]!;
   }
 
   private async ensureCandidateVectors(candidates: ToolCandidate[]): Promise<(Float32Array | null)[] | null> {
@@ -321,6 +322,7 @@ export class WorkersAiBrain {
    * order, or null on any failure. bge-base supports batched string arrays.
    */
   private async embed(inputs: string[]): Promise<Float32Array[] | null> {
+    /* c8 ignore next — never called with empty inputs: ensureCandidateVectors guards via missingIdx.length===0, embedSingle always passes [text] */
     if (inputs.length === 0) return [];
     try {
       // Wrap ai.run() in a manual timeout: if Workers AI hangs, the circuit
