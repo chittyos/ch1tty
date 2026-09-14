@@ -342,6 +342,27 @@ describe('SessionClient', () => {
     assert.equal((client as unknown as { baseUrl: string }).baseUrl, 'http://example.com');
   });
 
+  it('uses default URL when no arg and no env var', () => {
+    const saved = process.env['CHITTY_SESSION_URL'];
+    delete process.env['CHITTY_SESSION_URL'];
+    const client = new SessionClient();
+    assert.equal((client as unknown as { baseUrl: string }).baseUrl, 'https://session.chitty.cc');
+    if (saved !== undefined) process.env['CHITTY_SESSION_URL'] = saved;
+  });
+
+  it('returns undefined for 204 No Content responses', async () => {
+    const srv = http.createServer((_req, res) => { res.writeHead(204); res.end(); });
+    await new Promise<void>(resolve => srv.listen(0, '127.0.0.1', resolve));
+    const addr = srv.address() as { port: number };
+    const client = new SessionClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      const result = await client.listSessions();
+      assert.equal(result as unknown, undefined);
+    } finally {
+      await new Promise<void>((res, rej) => srv.close(e => (e ? rej(e) : res())));
+    }
+  });
+
   it('sends cursor query param in listEvents', async () => {
     let capturedSearch: URLSearchParams | undefined;
     const server = http.createServer((req, res) => {
