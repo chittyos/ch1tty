@@ -41,14 +41,17 @@ const FIXTURE_CONFIGS: ServerConfig[] = [
 type SearchResult = { tools?: Array<{ tool: string; score?: number; inFocus?: boolean }>; focus?: string };
 type CastResult = Record<string, unknown>;
 
+/** Parse a ch1tty/search tool result into a typed SearchResult. */
 function parseSearch(result: { content: Array<{ type: string; text?: string }> }): SearchResult {
   return JSON.parse(result.content[0]?.text ?? '{}') as SearchResult;
 }
 
+/** Parse a ch1tty/cast tool result into a typed CastResult. */
 function parseCast(result: { content: Array<{ type: string; text?: string }> }): CastResult {
   return JSON.parse(result.content[0]?.text ?? '{}') as CastResult;
 }
 
+/** Build a fixture-backed Aggregator under the given focus profile. */
 function buildAggregator(focus?: string): { aggregator: Aggregator; fixture: FixtureBackend } {
   const fixture = new FixtureBackend();
   for (const [id, def] of Object.entries(FIXTURE_SERVERS)) {
