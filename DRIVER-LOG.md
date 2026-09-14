@@ -4398,3 +4398,163 @@ Remaining coverage gaps: `aggregator.ts` branch still 97.3% — many branches in
 
 ### Next run recommendation
 Same as ~1579 and ~1580: idle unless CI is re-enabled (allows PRs to merge) or new workstreams are added to the scheduled prompt. Priority human action: enable GitHub Actions.
+
+---
+
+### Run ~1603 — 2026-09-13T~07:00Z — PRODUCTIVE: BB workstream
+
+**Workstream advanced**: BB — session-coordinator-mcp branch gaps
+**Branch/PR**: `auto/BB-session-coord-mcp-branch-gaps` → PR #1244
+**Build**: tsc clean (ch1tty@4.1.0, 0 errors) | **Tests**: 1971 pass / 0 fail / 3 skip (1974 total, +6 vs ~1602)
+
+### What was done
+- Startup: `npm ci` clean, `npm run build` clean, `npm test`: 1965/0/3. Confirmed all A-E and extended workstreams done.
+- Checked Notion board (36e94de4) — still blocked (workspace out of free blocks). Run log here.
+- GitHub state: 34 open PRs (including run-log PRs #1242, #1243); CI disabled at org level.
+- Ran c8 coverage on `src/` and `apps/` to find genuine uncovered branches not already claimed by open PRs.
+- Identified `apps/session-coordinator-mcp/src/server.ts` 5 uncovered branches (lines 183, 213-214, 224-225, 243) and `session-client.ts` 1 uncovered branch (line 116) — all NOT covered by any existing open PR.
+- Added 6 tests: 5 in `mcp-tool-layer.test.ts` (create_session scalar context, append_event non-object payload, list_events non-numeric limit, non-Error catch coercion, isPlainObject edge cases) and 1 in `session-client.test.ts` (cursor param forwarding).
+- Result: `server.ts` branch coverage 86.2% → 98.24%.
+
+### Open PRs (35 total as of this run — CI disabled)
+#1209–#1244. All queued pending CI re-enable.
+
+### Blockers (require human action)
+1. **GitHub Actions `ci.yml` disabled at org level** — Settings → Actions → General → "Allow all actions"; 35 PRs stuck
+2. **Notion workspace out of free blocks** — board MCP updates blocked; run log falls back to this file
+3. **`GITHUB_MCP_AUTHORIZATION` unset on prod** — GitHub MCP backend disconnected
+4. **CF Access creds unset** — `CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`; ledger DLQ backlog
+5. **1100+ stale `auto/` branches** — enable "Automatically delete head branches" in GitHub repo settings
+
+### Next run recommendation
+Check coverage of remaining gaps: `session-client.ts` line 79 (204 No Content path), `codemode-fns.ts` lines 27/29 (note: may overlap with open PR #AX). If all genuinely covered by open PRs, advance only when CI is re-enabled. **Priority human action: enable GitHub Actions CI.**
+
+---
+
+## Run ~1605 — 2026-09-13T~08:00Z — IDLE
+
+**Workstream advanced**: None — all workstreams A–E and extended done; PR queue saturated at 36 open PRs
+**Branch/PR**: None opened this run
+**Build**: tsc clean (ch1tty@4.1.0, 0 errors) | **Tests**: 1965 pass / 0 fail / 3 skip (1968 total, on main)
+
+### What was done
+- Startup: read CLAUDE.md + CHITTY.md; guardrails confirmed — 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1740/1741 enforce 56/87 fields). 0 violations on main.
+- `git pull origin main` (fast-forward to b5bc1dc). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1965/0/3 (1968 total, 52 suites). 0 failures.
+- Read DRIVER-BOARD.md + DRIVER-LOG.md. Read Notion board (36e94de4) — still blocked (workspace out of free blocks); run log falls back to this file.
+- GitHub API: verified **36 open PRs** (#1209–#1244 = U through BB). No change since run ~1604.
+- `ci.yml` still disabled at org level (0-job failure on every push). PRs cannot auto-merge. No new coverage gaps outside open PRs. Standing down per ≥ 20 PR cap.
+- No PushNotification sent — same blocked state as previous runs; last escalation notification was at ~1597; no new trigger.
+
+### Open PRs (36 total — CI disabled, all queued pending GitHub Actions re-enable)
+#1209 (U), #1210 (V), #1211 (W), #1212 (X), #1213 (Y), #1214 (Z), #1215 (AA), #1216 (AB), #1217 (AC), #1218 (AD), #1219 (AE), #1220 (AF), #1221 (AG), #1222 (AH), #1223 (AI), #1224 (AJ), #1225 (AK), #1226 (AL), #1227 (AM), #1228 (AN), #1229 (AO), #1230 (AP), #1231 (AQ), #1232 (AR), #1233 (AS), #1234 (AT), #1235 (AU), #1236 (AV), #1237 (AW), #1238 (AX), #1239 (AY), #1240 (AZ), #1241 (BA), #1242 (run-log), #1243 (run-log), #1244 (BB)
+
+### Blockers (require human action — unchanged)
+1. **GitHub Actions `ci.yml` disabled at org level** — Settings → Actions → General → "Allow all actions"; 36 PRs stuck
+2. **Notion workspace out of free blocks** — board MCP updates blocked; run log falls back to this file
+3. **`GITHUB_MCP_AUTHORIZATION` unset on prod** — GitHub MCP backend disconnected
+4. **CF Access creds unset** — `CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`; ledger DLQ backlog
+5. **1100+ stale `auto/` branches** — enable "Automatically delete head branches" in GitHub repo settings
+
+### Next run recommendation
+Same as ~1604: idle unless CI is re-enabled or queue drops below 20. When queue < 20, BC candidate: `session-client.ts` line 79 (204 No Content / empty-body path). **Priority human action: enable GitHub Actions CI.**
+
+---
+
+## Run ~1604 — 2026-09-13T06:57 UTC
+
+**Trigger**: Scheduled hourly continuation from run ~1603.
+
+**Actions**:
+- Woke to Codex P2 review comment on PR #1244 (auto/BB-session-coord-mcp-branch-gaps): string-based context/payload tests only exercised `typeof v === 'object'` path of `isPlainObject`; `v !== null` and `!Array.isArray(v)` branches not covered.
+- Added 4 tests covering the missing paths: `null` and `[]` for `create_session` context, `null` and `[1,2]` for `append_event` payload. Committed `231b490`, pushed.
+- Replied to Codex thread with fix details, resolved thread.
+- CodeRabbit re-reviewed `231b490`: no actionable comments, ⚪ Minimal risk, 5/5 checks passed.
+- Codex re-reviewed `231b490`: completed with no findings.
+- PR #1244 is fully clean. Waiting on CI (disabled at org level) to merge.
+
+**Suite**: 30 pass / 0 fail in `mcp-tool-layer.test.ts` (+4 vs ~1603).
+
+**Persistent blockers** (unchanged):
+1. GitHub Actions CI disabled at org level — 36 PRs queued
+2. Notion workspace out of free blocks — using DRIVER-LOG.md as fallback
+3. Missing env: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+4. 1100+ stale `auto/` branches
+
+### Next run recommendation
+Check if any of the 36 open PRs merged (if CI was re-enabled). Next coverage gap candidate (BC): `session-client.ts` line 79 (204 No Content / empty-body path). **Priority human action: enable GitHub Actions CI.**
+
+---
+
+## Run ~1606 — 2026-09-13T~UTC (BC: ledger-mcp branch gaps)
+
+**Trigger**: Scheduled hourly run.
+
+**Actions**:
+- Read CLAUDE.md + CHITTY.md; confirmed 5-tool surface invariant and metric freeze guardrail.
+- Read DRIVER-BOARD.md: all workstreams A–E done; CI org-disabled; 36 PRs queued.
+- `npm ci` clean; `npm run build` clean (tsc 0 errors).
+- Full test suite: **1965 pass / 0 fail / 3 skip** (baseline confirmed).
+- Checked open PRs: 37 open (latest BB #1244). No new merges since ~1605.
+- Identified BC coverage target: `apps/ledger-mcp/src/server.ts` has two-arm `||` validation conditions whose second arm was never exercised by existing tests.
+- Added 4 tests to `apps/ledger-mcp/test/mcp-tool-layer.test.ts`:
+  - `append_entry` payload: null → `a['payload'] === null` branch (line 111)
+  - `list_entries` namespace: "" → `!a['namespace']` falsy branch (line 95)
+  - `get_entry` namespace: "" → `!a['namespace']` falsy branch (line 104)
+  - `get_entry` id: "" → `!a['id']` falsy branch (line 105)
+- Full suite after: **1969 pass / 0 fail / 3 skip** (+4).
+- Branch: `auto/BC-ledger-mcp-branch-gaps`, PR #1245 opened, subscribed.
+
+**Suite**: 28 pass / 0 fail in `mcp-tool-layer.test.ts` (+4 vs previous 24). Full: 1969/0/3.
+
+**Persistent blockers** (unchanged):
+1. GitHub Actions CI disabled at org level — 37 PRs queued
+2. Notion workspace blocked — using DRIVER-LOG.md as fallback
+3. Missing env: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+4. 1100+ stale `auto/` branches
+
+### Next run recommendation
+BC target done. Next (BD): check `apps/tasks-mcp/src/server.ts` for similar empty-string branch gaps in namespace/id validation, or check `apps/evidence-mcp/src/server.ts`. **Priority human action: enable GitHub Actions CI to unblock 37 queued PRs.**
+
+---
+
+## Run log — 2026-09-13 ~22:45 UTC (automated, run ~1616)
+
+**Workstream advanced:** BG — `src/dlq-store.ts` error-path coverage (4 catch-block branch tests)
+**Branch/PR:** `auto/BG-dlq-store-error-paths` → https://github.com/chittyos/ch1tty/pull/1251
+**Build:** tsc clean (0 errors)
+**Tests:** 1969 pass / 0 fail / 3 skip (was 1965/0/3, +4 new tests)
+**Coverage delta:** `src/dlq-store.ts` branch 78.26% → 96%
+
+**What was done:**
+- Read CLAUDE.md + CHITTY.md; guardrails confirmed. npm ci clean. Build clean. Full suite: 1965/0/3.
+- Ran c8 coverage over `src/` — `dlq-store.ts` was highest-impact gap (78.26% branch, lines 37-40/57-59/74-75/82-83) with no open PR targeting it.
+- Added `test/bg-dlq-store-error-paths.test.ts`: 4 tests injecting a throwing SqlStorage shim to hit the catch blocks in `append()`, `readEntries()`, `rewrite()`, and `count()`.
+- Opened PR #1251; subscribed for CI/review events. Notion board also updated (token valid this run).
+
+**Persistent blockers** (unchanged):
+1. GitHub Actions CI disabled at org level — ~22 PRs queued
+2. Missing env: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+
+### Next run recommendation
+Next coverage targets (not yet in open PRs): `codemode-fns.ts` lines 27/29 (85.71% branch), `comms-mcp/recent-log.ts` lines 46-62/104-108/135-140/192 (80% branch). **Priority human action: enable GitHub Actions CI to unblock ~22 queued PRs.**
+
+---
+
+## Run ~1619 — 2026-09-14 UTC (idle — all workstreams complete)
+
+**Trigger**: Scheduled hourly run.
+
+**Actions**:
+- Read CLAUDE.md + CHITTY.md; confirmed 5-tool surface invariant and metric freeze guardrail.
+- Fetched all remote branches; checked open PRs (24 open, all test-coverage branches BF–BG + prior AA–BA series).
+- Read Notion board: all workstreams A–E (+ extensions L–O and AA–BG) confirmed complete.
+- `npm ci` clean; `npm run build` clean (tsc 0 errors, 0 warnings).
+- Full test suite: **1965 pass / 0 fail / 3 skip** (52 suites, 42.6s) — green.
+- No new workstreams to advance. Did NOT open a new PR — 24 PRs already queued, CI still disabled; adding more increases merge debt without benefit.
+
+**Persistent blockers** (unchanged — require human action):
+1. GitHub Actions CI disabled at org level — 24 open PRs queued, none mergeable
+2. Missing env vars on prod: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`, `CHITTY_TASKS_TOKEN`
+3. 1100+ stale `auto/` branches accumulating in origin
+
+**Next run recommendation**: Idle unless new workstreams are defined in the scheduled prompt. **Priority human action: enable GitHub Actions CI (`Settings → Actions → General → Allow all actions`) to unblock the 24 queued PRs.**
