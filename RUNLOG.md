@@ -2911,6 +2911,34 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 
 ---
 
+## Run ~1610 — 2026-09-13T~14:00 UTC — PRODUCTIVE: BE: child-manager + http-server branch gaps (+3 tests)
+
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1968 pass / 0 fail / 3 skip (was 1965/0/3, +3)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5 meta-tools, `buildCastExplanation` metric freeze).
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 1965/0/3 on main; 1968/0/3 on this branch.
+  - Checked Notion board (36e94de4, last edit 2026-09-10): all workstreams A–BA ✓ done.
+  - Reviewed 38 open PRs — all are coverage gap PRs. Identified which coverage gaps are NOT yet addressed by open PRs.
+  - Ran `npm run coverage` on main: identified 2 genuine gaps not covered by any open PR:
+    1. `child-manager.ts:137-139` (98.73% branches) — `|| "no reason"` fallback + JSON-parse-throw catch
+    2. `http-server.ts:168` (99.15% branches) — `if (isClosing) return` double-close guard
+  - Added 3 tests across 2 existing test files:
+    - `test/child-manager-chittysecrets.test.ts`: `errJson.reason` absent → "no reason" fallback; malformed JSON body → catch {} fires
+    - `test/ooo-http-gptactions-close-edge-paths.test.ts`: onclose fired twice → second call hits isClosing guard
+  - Verified coverage after: `child-manager.ts` 100% branch, `http-server.ts` 100% branch.
+  - Branch: `auto/BE-child-manager-http-server-branch-gaps`, PR opened.
+- **State**: A ✓ B ✓ C ✓ D ✓ E ✓ F–BE ✓. Tests: 1968/0/3. Build: clean. **~1610th run.**
+- **Human-action items** (ESCALATION — pile still growing):
+  1. **Enable GitHub Actions** (Settings → Actions → General → "Allow all actions") — ~38 PRs await CI.
+  2. **Merge or close queued PRs** — all passing locally; coverage saturated; no benefit to new PRs until queue drains.
+  3. **DISABLE hourly cron** — all workstreams exhausted; coverage saturated; schedule burns ~50k tokens/run. 1610+ runs since inception.
+  4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod — reconnects GitHub MCP backend.
+  5. **Configure CF Access** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`) — clears ledger DLQ.
+  6. **Stale branch cleanup** — 1100+ remote `auto/` branches.
+- **Next run**: If queue still ~38 PRs, remain idle. Remaining coverage gaps (aggregator/ledger/logger/remote-proxy lines 51-53/97-98+167/34-37/113-114) are already in open PRs AR/BD/AS.
+
+---
+
 ### 2026-09-14T~UTC (run ~1620 — idle; ~30 PRs queued; CI disabled)
 - **Workstream**: None — halt policy in effect (queue >~10 PRs; no new PR until queue drains below threshold)
 - **Branch/PR**: None — direct run-log commit to main only
