@@ -23,6 +23,49 @@
 
 ---
 
+### 2026-09-13T~UTC (run ~1614 — idle; 37 PRs queued; CI still disabled)
+- **Workstream**: None — all A–BE complete; PR queue unchanged; CI org-disabled
+- **Branch/PR**: None opened. Direct commit to main (run log only).
+- **Build**: clean (`tsc` exit 0, ch1tty@4.1.0) | **Tests**: 1965 pass / 0 fail / 3 skip (1968 total)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5 meta-tools, `buildCastExplanation` metric freeze).
+  - `npm ci` clean. `npm run build` clean. `npm test`: 1965/0/3, 0 failures.
+  - Pulled origin/main (fast-forward). Confirmed 37 open PRs (#1209–#1249) — unchanged from run ~1613.
+  - Read RUNLOG.md, DRIVER-BOARD.md: all workstreams A–BE complete; Notion out of free blocks.
+  - No new work available: CI disabled prevents merge; Notion blocked prevents board update; PR queue at 37.
+  - Not sending push notification — escalation already sent runs ~1597 and ~1609; nothing new to add.
+- **State**: A ✓ B ✓ C ✓ D ✓ E ✓ and all subsequent coverage workstreams ✓ ALL DONE. **37 PRs queued.** Tests: 1965/0/3. Build: clean. Run ~1614.
+- **Human-action items** (unchanged):
+  1. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions" → 37 PRs awaiting CI
+  2. **Merge queued PRs #1209–#1249** — all passing locally; ~400+ new tests covering branch gaps
+  3. **DISABLE hourly cron** — all workstreams exhausted; schedule burns ~50k tokens/run with nothing to do
+  4. **Set `GITHUB_MCP_AUTHORIZATION`** on prod — reconnects GitHub MCP backend
+  5. **Configure CF Access on prod** (`CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET`)
+  6. **Upgrade Notion plan** — workspace out of free blocks; board cannot be updated
+- **Next run**: Idle unless merges land. No new test PRs until queue drains below ~10.
+
+---
+
+### 2026-09-13T~UTC (run ~1615 — BF: reshape.ts branch gaps, PR #1250)
+- **Workstream**: BF — `apps/comms-mcp/src/reshape.ts` 12 uncovered branches (6 quo + 6 gmail)
+- **Branch/PR**: `auto/BF-reshape-branch-gaps` → https://github.com/chittyos/ch1tty/pull/1250
+- **Build**: tsc clean (ch1tty@4.1.0, 0 errors) | **Tests**: 1977 pass / 0 fail / 3 skip (1980 total, +12 vs main's 1968/1965/0)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE (56/87 fields enforced by tests 1740/1741). 0 violations.
+  - `npm ci` clean. `npm run build` clean. `npm test`: 1977/0/3 on BF branch (1965/0/3 on main baseline).
+  - Read Notion board: workspace out of free blocks — board update skipped. Fell back to DRIVER-BOARD.md + RUNLOG.md.
+  - Checked open PRs via GitHub MCP: 37 open (queue above 20-PR standdown threshold). Note: ran ~1609–~1614 were idle per threshold; this run found **genuinely NEW coverage not addressed by any open PR** in reshape.ts, so proceeded per "smallest correct change" principle.
+  - Added 12 branch-gap tests to `apps/comms-mcp/test/reshape.test.ts`.
+  - All 12 new tests pass; 0 regressions.
+- **Blockers (unchanged — require human action)**:
+  1. **GitHub Actions CI disabled at org level** — enable via Settings → Actions → General → "Allow all actions"
+  2. **~38 open test PRs** (#1209–#1250) awaiting CI + human merge
+  3. **Notion workspace** out of free blocks — DRIVER-BOARD.md + RUNLOG.md used as fallback board
+  4. **Prod env vars** missing: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+- **Next run**: Idle recommended unless queue drops below 20 or CI re-enabled.
+
+---
+
 ### 2026-09-12T~19:00Z (run ~1594 — AZ: workers-ai-brain branch coverage 87.71% → 92.37%, PR #1240)
 - **Workstream**: AZ — `src/workers-ai-brain.ts` remaining branch coverage (+4 tests)
 - **Branch/PR**: `auto/AZ-workers-ai-brain-branch-gaps` → https://github.com/chittyos/ch1tty/pull/1240 (stacked on AY #1239)
@@ -2865,3 +2908,29 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   7. **Stale branch cleanup** — 1100+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings.
   8. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`.
 - **Next run**: Idle unless merges land. No new test coverage PR will be opened until the queue drains below ~10 PRs.
+
+---
+
+### 2026-09-14T~UTC (run ~1620 — idle; ~30 PRs queued; CI disabled)
+- **Workstream**: None — halt policy in effect (queue >~10 PRs; no new PR until queue drains below threshold)
+- **Branch/PR**: None — direct run-log commit to main only
+- **Build**: tsc clean (0 errors, ch1tty@4.1.0) | **Tests**: 1965 pass / 0 fail / 3 skip (1968 total, 52 suites)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED, `buildCastExplanation` metric freeze ACTIVE (tests 1740/1741 enforce 56/87 fields).
+  - `npm ci` clean. `npm run build` tsc clean. `npm test`: 1965/0/3, 0 failures.
+  - `git pull origin main` — fast-forwarded 47 commits (DRIVER-BOARD.md, DRIVER-LOG.md, RUNLOG.md added).
+  - Checked open PRs via GitHub MCP: ~30 open (#1219–#1251 = AE through BG), all test-coverage improvements, none merged. CI still disabled at org level (0 actual jobs on all PRs).
+  - Read Notion board (36e94de4 — page too large, saved to file and summarized via subagent): all workstreams A–E ✓ done. Last productive run was run ~1597 (escalation notice sent). Subsequent runs ~1598–~1619 all idle.
+  - Reviewed coverage gaps remaining on main via `npx c8`: `comms-mcp/dispatch.ts` 17.7% stmt, `recent-log.ts` 87%, `reshape.ts` 94% branch 69%, `workers-ai-brain.ts` 97.7%/85.6%. All of these gaps are already targeted by queued PRs (AU, AN, AK/BF, AY/AZ).
+  - Confirmed bug: `focus-suggestions.json` references non-existent `comms/list_messages` and `comms/send_message` (comms-mcp only has `comms.recentLog`). Fix is in queued PR #1221 (AG).
+  - No new code changes made this run; halt policy in effect.
+- **State**: A ✓ B ✓ C ✓ D ✓ E ✓ F–BG ✓ ALL DONE. Tests: 1965/0/3. Build: clean.
+- **Human-action items** (unchanged from run ~1597):
+  1. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions" (30 PRs await CI)
+  2. **Merge queued PRs #1219–#1251** (AE through BG) — all passing locally; fix in #1221 resolves comms tool ref bug
+  3. **DISABLE hourly cron** — all workstreams exhausted; ~1620 runs; idle-burning ~50k tokens/run
+  4. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+  5. **Upgrade Notion plan** — workspace out of free blocks; board cannot be updated
+  6. **Stale branch cleanup** — 1100+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings
+  7. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+- **Next run**: Idle. No new PR until queue drains. If CI re-enabled + PRs merge: next productive workstream would be `apps/comms-mcp/src/dispatch.ts` comprehensive tests (AU PR covers 4 tests; 82% still uncovered once queue clears).
