@@ -41,6 +41,9 @@ jobs:
       - name: Typecheck Worker/DO codebase (src/)
         run: npm run typecheck:worker
 
+      - name: Apps coverage (src/ 100% stmts/lines/funcs, 95% branches)
+        run: npm run coverage:apps
+
   apps-build-and-test:
     if: github.event.deleted != true
     runs-on: ubuntu-latest
