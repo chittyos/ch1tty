@@ -197,6 +197,52 @@ test('http-server GET /mcp with no Mcp-Session-Id header → 400 bad request', a
   }
 });
 
+// ── 5b. transport.onclose double-fire — isClosing guard ──────────────────────
+
+test('http-server transport.onclose: firing twice — second call returns early via isClosing guard', async () => {
+  // Covers http-server.ts:168 — `if (isClosing) return` branch.
+  // The guard prevents duplicate cleanup when onclose fires more than once.
+  const dlq = dlqPath();
+  const aggregator = new Aggregator([], { ledgerDlqPath: dlq });
+  const httpServer = new HttpMcpServer(aggregator, { port: 0, bindAddress: '127.0.0.1' });
+  await httpServer.start();
+
+  try {
+    // Establish a real session so onclose is wired.
+    const initRes = await fetch(`http://127.0.0.1:${httpServer.getPort()}/mcp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json, text/event-stream' },
+      body: JSON.stringify({
+        jsonrpc: '2.0', id: 1, method: 'initialize',
+        params: { protocolVersion: '2025-11-25', capabilities: {}, clientInfo: { name: 'be-double-close', version: '1.0.0' } },
+      }),
+    });
+    assert.equal(initRes.status, 200, 'initialize must succeed');
+
+    type SessionMap = Map<string, { server: { close: () => Promise<void> }; transport: { onclose?: () => void } }>;
+    const sessions = (httpServer as unknown as { sessions: SessionMap }).sessions;
+    assert.equal(sessions.size, 1, 'one session expected');
+
+    const [[, session]] = [...sessions.entries()];
+    let mcpCloseCount = 0;
+    session.server.close = async () => { mcpCloseCount++; };
+
+    // First onclose: runs full cleanup, sets isClosing = true.
+    assert.doesNotThrow(() => session.transport.onclose?.());
+    await new Promise<void>((r) => setImmediate(r));
+    assert.equal(mcpCloseCount, 1, 'first onclose must call mcpServer.close() once');
+
+    // Second onclose: hits `if (isClosing) return` — no extra cleanup.
+    assert.doesNotThrow(() => session.transport.onclose?.());
+    await new Promise<void>((r) => setImmediate(r));
+    assert.equal(mcpCloseCount, 1, 'second onclose must be a no-op — mcpServer.close() not called again');
+  } finally {
+    await httpServer.stop();
+    await aggregator.shutdown();
+    rmSync(dlq, { force: true });
+  }
+});
+
 // ── 5. POST /gpt-actions with empty body → readBody if(!raw) ─────────────────
 
 test('gpt-actions POST /session/get with empty body → readBody if(!raw) early return → 200', async () => {

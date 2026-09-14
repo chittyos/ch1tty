@@ -135,3 +135,33 @@ test('handleReload pre-warms lazy:false backends after reload', async () => {
 
   assert.ok(calls.includes('warm-on-reload'), `reload must pre-warm lazy:false backends; got calls: ${JSON.stringify(calls)}`);
 });
+
+// ─── filterSuggestionsCatalog — invalid key warn branch ──────────────────────
+
+test('filterSuggestionsCatalog: invalid keys "catalog" and keys with "/" are dropped from the catalog', async () => {
+  // Primary assertion: verify the filtering result via the public readResource API.
+  // This is log-level-independent — it checks the actual catalog state, not stderr.
+  const aggregator = new Aggregator([], {
+    embedEnabled: false,
+    suggestionsCatalog: {
+      'catalog': { description: 'reserved name', combos: [], prompts: [] },
+      'finance/sub': { description: 'slash in key', combos: [], prompts: [] },
+      'valid': { description: 'valid profile', combos: [], prompts: [] },
+    },
+  });
+
+  try {
+    const res = await aggregator.readResource('ch1tty://suggestions/catalog');
+    const index = JSON.parse(res.contents[0].text as string) as { profiles: Record<string, unknown> };
+    const profileKeys = Object.keys(index.profiles);
+
+    // Only 'valid' should survive filtering
+    assert.ok(profileKeys.includes('valid'), `'valid' must be present; got: ${JSON.stringify(profileKeys)}`);
+    assert.ok(!profileKeys.includes('catalog'), `reserved key 'catalog' must be filtered out; got: ${JSON.stringify(profileKeys)}`);
+    assert.ok(!profileKeys.includes('finance/sub'), `slash key 'finance/sub' must be filtered out; got: ${JSON.stringify(profileKeys)}`);
+    assert.equal(profileKeys.length, 1, `only 'valid' should remain; got: ${JSON.stringify(profileKeys)}`);
+
+  } finally {
+    aggregator.shutdown().catch(() => {});
+  }
+});
