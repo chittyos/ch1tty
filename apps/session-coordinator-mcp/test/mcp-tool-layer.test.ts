@@ -543,3 +543,23 @@ test('non-Error thrown by client surfaces as isError with string coercion', asyn
     await cleanup();
   }
 });
+
+test('list_events — cursor is forwarded to client and returned in response', async () => {
+  let capturedCursor: string | undefined;
+  const { client, cleanup } = await setup({
+    listEvents: async (_id, opts) => {
+      capturedCursor = (opts as { cursor?: string } | undefined)?.cursor;
+      return { events: [EVENT_1], has_more: true, cursor: 'next-page' };
+    },
+  });
+  try {
+    const res = await client.callTool({ name: 'list_events', arguments: { session_id: 'sess-1', cursor: 'page-2' } });
+    assert.equal(res.isError, undefined);
+    assert.equal(capturedCursor, 'page-2');
+    const data = JSON.parse((res.content[0] as { text: string }).text);
+    assert.equal(data.has_more, true);
+    assert.equal(data.cursor, 'next-page');
+  } finally {
+    await cleanup();
+  }
+});
