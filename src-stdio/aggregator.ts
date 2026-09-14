@@ -606,6 +606,7 @@ export class Aggregator {
                 const dr = JSON.parse(first.text) as Record<string, unknown>;
                 dr.latencyMs = latencyMs;
                 first.text = JSON.stringify(dr);
+              /* c8 ignore next */ // handleExecute dryRun always returns valid JSON (JSON.stringify); catch is dead code
               } catch { /* ignore malformed JSON */ }
             }
           } else {
@@ -1880,6 +1881,7 @@ export class Aggregator {
     });
 
     const results = await Promise.allSettled(resourcePromises);
+    /* c8 ignore next */ // async callbacks with try-catch always fulfill; rejected branch is dead code
     const backendResources = results.flatMap((r) => r.status === 'fulfilled' ? r.value : []);
     return {
       resources: [...this.listSuggestionResources(), ...backendResources],
