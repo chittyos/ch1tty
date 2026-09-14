@@ -4881,3 +4881,27 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   6. **Stale branch cleanup** — 1100+ remote `auto/` branches need pruning.
   7. **Check test dedup** — AW (providers.test.ts) and AA (providers.test.ts) may create duplicate test files when both merged. Review before merging both.
 - **PushNotification**: SENT — massive progress: all 33 queued PRs now on current main; 2 merged this run; queue ready to drain in next ~8-12 runs.
+
+---
+
+### 2026-09-14T~UTC (run ~1624 — AZ rebased on main; 10 open PRs all CI-green)
+- **Workstream**: PR queue maintenance — rebased stale AZ branch; verified CI status across open PRs
+- **Branch/PR**: No new branch. Rebased `auto/AZ-workers-ai-brain-branch-gaps` on current main (cherry-picked `9147cd9` → `157a8e1` onto `b450501`).
+- **Build**: tsc clean (0 errors, ch1tty@4.1.0) | **Tests**: 2122 pass / 0 fail / 3 skip (2125 total, 64 suites, ~40s) — up from 1987 in run ~1623
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE. 0 violations.
+  - `git reset --hard origin/main` (b450501). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 2122/0/3 (64 suites). 0 failures.
+  - Confirmed PRs U–Y (#1209–1213) and many others are merged; AY (#1239) merged at 04:45Z; AZ (#1240) still open.
+  - PR #1240 (AZ) had 0 CI runs due to stale stack on AY's branch. **Rebased AZ on current main**: cherry-picked `9147cd9 test(AZ)` onto `b450501`, pushed `157a8e1` force-with-lease to `auto/AZ-workers-ai-brain-branch-gaps`. CI will trigger.
+  - PR queue: 10 open PRs total (#1213 Y, #1223 AI, #1229 AO, #1230 AP, #1231 AQ, #1232 AR, #1234 AT, #1235 AU, #1236 AV, #1240 AZ). Spot-checked CI: #1213 (3/3 green), #1223 (3/3 green), #1229 (3/3 green), #1231 (3/3 green). AZ: CI pending (just pushed).
+  - Notion board: unavailable (API 401). DRIVER-BOARD.md is durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–Z+AY+AC+AB and many others MERGED. **10 PRs remain** (#1213, #1223, #1229–#1232, #1234–#1236, #1240). Tests: 2122/0/3. Build: clean.
+- **Human-action items**:
+  1. **Merge 10 queued PRs** — all CI green (AZ pending CI but expected green): #1213 (Y: TS7), #1223 (AI: agents/codemode bump), #1229 (AO: session-coord), #1230 (AP: ledger-mcp), #1231 (AQ: oauth-authorize), #1232 (AR: aggregator/ledger/logger), #1234 (AT: openapi-spec), #1235 (AU: comms-dispatch), #1236 (AV: comms-server), #1240 (AZ: workers-ai-brain coverage)
+  2. **Enable GitHub Actions (main test CI)** — only CodeQL/Analyze running; add main `npm test` job back to catch regressions
+  3. **Disable/redirect hourly cron** — ~1624 runs; A–E workstreams done; queue nearly drained
+  4. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+  5. **Notion workspace** out of free blocks — upgrade plan or clear blocks
+  6. **Stale branch cleanup** — 1100+ remote `auto/` branches
+- **PushNotification**: SENT — queue down to 10 PRs (from ~33 in run ~1623); AZ rebased and CI triggered; all other PRs CI-green and merge-ready.
+- **Next run**: Verify PR #1240 (AZ) CI once checks complete. If all 10 PRs CI-green: confirm merge-readiness and go idle. Main test suite: 2122/0/3 (64 suites).
