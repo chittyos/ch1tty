@@ -1,34 +1,28 @@
 /**
- * test(AK): reshape.ts uncovered edge paths — quoRawToUnified + gmailRawToUnified
+ * test(AK): reshape.ts additional edge paths — quoRawToUnified + gmailRawToUnified
  *
- * Covers branches not exercised by reshape.test.ts (happy paths):
+ * Covers branches not exercised by reshape.test.ts (happy paths) or the BF
+ * branch-gaps additions to that file. BF (f68cef8) already covers: missing
+ * external_id/sent_at throws, empty parties throws, counterparty dedup, non-
+ * openphone source, missing id/date throws, no-participants throws, plaintext_body
+ * fallback, threadId arg. This file covers the remaining gaps:
  *
  *   quoRawToUnified:
- *     1. Missing external_id → throws
- *     2. Missing sent_at → throws
- *     3. Empty parties array → throws "no participants"
- *     4. No parties key at all → throws "no participants"
- *     5. Degenerate row: no self matches, non-self parties → raw parties fallback path
- *     6. No message_id → internalId absent from result
- *     7. No external_thread_id → threadRef absent from result
- *     8. No body_text → body absent; snippet undefined
- *     9. Long body_text → snippet truncated at 140 chars with ellipsis
- *    10. Source != 'openphone' → provider field reflects raw source
- *    11. Duplicate non-owner counterparties → collapsed to one via seenCounter
- *    12. Phone identifier with formatting chars → normId matches owner bundle
+ *     1. Absent parties key (undefined) → throws "no participants"
+ *     2. Degenerate row (no self match, all unknown IDs) → raw parties fallback
+ *     3. No message_id → internalId absent
+ *     4. No external_thread_id → threadRef absent
+ *     5. No body_text → body absent, snippet undefined
+ *     6. Long body_text → snippet truncated at 140 chars with ellipsis
+ *     7. Phone with formatting chars in owner bundle → normId strips to match
  *
  *   gmailRawToUnified:
- *    13. Missing id → throws
- *    14. Missing date → throws
- *    15. No sender + no recipients → throws "no participants"
- *    16. body preferred over plaintext_body when both present
- *    17. plaintext_body used when body absent
- *    18. No snippet, short body → snippet derived from body
- *    19. No snippet, long body → snippet truncated at 140 chars
- *    20. Explicit threadId param used when msg.threadId absent
- *    21. No labels → labels absent from result
- *    22. Empty ccRecipients → no cc parties
- *    23. Bare email address (no "Name <addr>" wrapper) → addr parsed, name null
+ *     8. body preferred over plaintext_body when both present
+ *     9. No snippet field, short body → snippet derived from body
+ *    10. No snippet field, long body → snippet truncated at 140 chars
+ *    11. Labels absent from result when labelIds not provided
+ *    12. Empty ccRecipients → no cc parties
+ *    13. Bare email address (no "Name <addr>") → identifier set, displayName null
  */
 
 import { describe, it } from 'node:test';
@@ -65,25 +59,10 @@ const BASE_GMAIL: GmailRawMessage = {
   toRecipients: ['owner@example.com'],
 };
 
-// ── quoRawToUnified: error paths ──────────────────────────────────────────────
+// ── quoRawToUnified: absent parties key (distinct from empty array) ───────────
 
-describe('quoRawToUnified — required-field errors', () => {
-  it('throws when external_id is missing', () => {
-    const row: QuoRawRow = { ...BASE_QUO, external_id: undefined };
-    assert.throws(() => quoRawToUnified(row, OWNER), /external_id/);
-  });
-
-  it('throws when sent_at is missing', () => {
-    const row: QuoRawRow = { ...BASE_QUO, sent_at: undefined };
-    assert.throws(() => quoRawToUnified(row, OWNER), /sent_at/);
-  });
-
-  it('throws "no participants" when parties array is empty', () => {
-    const row: QuoRawRow = { ...BASE_QUO, parties: [] };
-    assert.throws(() => quoRawToUnified(row, OWNER), /no participants/);
-  });
-
-  it('throws "no participants" when parties key is absent', () => {
+describe('quoRawToUnified — absent parties key', () => {
+  it('throws "no participants" when parties key is absent (undefined)', () => {
     const row: QuoRawRow = { ...BASE_QUO, parties: undefined };
     assert.throws(() => quoRawToUnified(row, OWNER), /no participants/);
   });
@@ -92,7 +71,7 @@ describe('quoRawToUnified — required-field errors', () => {
 // ── quoRawToUnified: degenerate fallback path ─────────────────────────────────
 
 describe('quoRawToUnified — degenerate parties fallback', () => {
-  it('emits raw parties when no owner match and no counterparty (unknown identifiers only)', () => {
+  it('emits raw parties when no party matches owner bundle (unknown identifiers)', () => {
     // None of these identifiers are in OWNER.identifiers, so isSelf returns false
     // for all. ownerIdentifier stays undefined → participants starts empty →
     // falls back to raw parties path rather than throwing.
@@ -105,13 +84,13 @@ describe('quoRawToUnified — degenerate parties fallback', () => {
     };
     const e = quoRawToUnified(row, OWNER);
     assert.equal(e.participants.length, 2);
-    assert.ok(e.participants.every((p) => p.self === false), 'all parties are non-self in fallback');
+    assert.ok(e.participants.every((p) => p.self === false), 'all parties non-self in fallback');
   });
 });
 
 // ── quoRawToUnified: optional fields absent ───────────────────────────────────
 
-describe('quoRawToUnified — optional fields', () => {
+describe('quoRawToUnified — optional fields absent', () => {
   it('internalId absent when message_id not provided', () => {
     const row: QuoRawRow = { ...BASE_QUO, message_id: undefined };
     const e = quoRawToUnified(row, OWNER);
@@ -135,111 +114,50 @@ describe('quoRawToUnified — optional fields', () => {
     const longBody = 'A'.repeat(200);
     const row: QuoRawRow = { ...BASE_QUO, body_text: longBody };
     const e = quoRawToUnified(row, OWNER);
-    assert.ok(e.snippet, 'snippet should be present');
-    assert.ok(e.snippet!.length <= 145, 'snippet should not exceed 140 + ellipsis length');
-    assert.ok(e.snippet!.endsWith('…'), 'snippet should end with ellipsis');
+    assert.ok(e.snippet, 'snippet present');
+    assert.ok(e.snippet!.endsWith('…'), 'snippet ends with ellipsis');
+    assert.ok(e.snippet!.length <= 145, 'snippet within truncation range');
     assert.equal(e.body, longBody, 'full body preserved despite truncated snippet');
   });
-
-  it('provider reflects raw source value when source is not openphone', () => {
-    const row: QuoRawRow = { ...BASE_QUO, source: 'imessage' };
-    const e = quoRawToUnified(row, OWNER);
-    assert.equal(e.provider, 'imessage');
-  });
 });
 
-// ── quoRawToUnified: counterparty deduplication ───────────────────────────────
+// ── quoRawToUnified: phone normId with formatting chars ───────────────────────
 
-describe('quoRawToUnified — counterparty deduplication', () => {
-  it('collapses duplicate non-owner counterparties with same role to one', () => {
-    const row: QuoRawRow = {
-      ...BASE_QUO,
-      parties: [
-        { role: 'sender', identifier: '+15555550001' },
-        { role: 'sender', identifier: '+15555550001' }, // duplicate
-        { role: 'recipient', identifier: '+15555550000' }, // owner
-      ],
-    };
-    const e = quoRawToUnified(row, OWNER);
-    const senders = e.participants.filter((p) => p.role === 'sender');
-    assert.equal(senders.length, 1, 'duplicate counterparty collapsed to one');
-    assert.equal(senders[0].identifier, '+15555550001');
-  });
-});
-
-// ── quoRawToUnified: normId phone formatting ──────────────────────────────────
-
-describe('quoRawToUnified — phone normalization in owner matching', () => {
-  it('owner identifier with formatting chars (spaces/dashes) still matches bundle', () => {
+describe('quoRawToUnified — phone normId formatting', () => {
+  it('formatted phone in owner bundle (dashes/spaces) still recognized as self', () => {
     const ownerWithFormatted: OwnerIdentity = {
       identifiers: ['+1-555-555-0000', 'owner@example.com'],
       displayName: 'Owner',
       chittyId: null,
     };
-    // The counterparty matches the raw owner identifier format after normId strips non-digit/+
     const row: QuoRawRow = {
       ...BASE_QUO,
       parties: [
         { role: 'sender', identifier: '+15555550001' },
-        { role: 'recipient', identifier: '+15555550000' }, // maps to owner after normId
+        { role: 'recipient', identifier: '+15555550000' }, // normId strips dashes to match
       ],
     };
     const e = quoRawToUnified(row, ownerWithFormatted);
     const selves = e.participants.filter((p) => p.self);
-    assert.equal(selves.length, 1, 'formatted owner identifier still recognized as self');
+    assert.equal(selves.length, 1, 'formatted owner phone still recognized as self');
   });
 });
 
-// ── gmailRawToUnified: error paths ────────────────────────────────────────────
+// ── gmailRawToUnified: body vs plaintext_body preference ─────────────────────
 
-describe('gmailRawToUnified — required-field errors', () => {
-  it('throws when id is missing', () => {
-    const msg: GmailRawMessage = { ...BASE_GMAIL, id: undefined };
-    assert.throws(() => gmailRawToUnified(msg, OWNER), /id/);
-  });
-
-  it('throws when date is missing', () => {
-    const msg: GmailRawMessage = { ...BASE_GMAIL, date: undefined };
-    assert.throws(() => gmailRawToUnified(msg, OWNER), /date/);
-  });
-
-  it('throws "no participants" when no sender and no recipients', () => {
-    const msg: GmailRawMessage = {
-      id: 'gm-empty-001',
-      date: '2026-09-05T10:00:00Z',
-      sender: undefined,
-      toRecipients: [],
-      ccRecipients: [],
-    };
-    assert.throws(() => gmailRawToUnified(msg, OWNER), /no participants/);
-  });
-});
-
-// ── gmailRawToUnified: body / plaintext_body fallback ────────────────────────
-
-describe('gmailRawToUnified — body field resolution', () => {
+describe('gmailRawToUnified — body field preference', () => {
   it('body preferred over plaintext_body when both present', () => {
     const msg: GmailRawMessage = {
       ...BASE_GMAIL,
-      body: 'full html body',
-      plaintext_body: 'plain text fallback',
+      body: 'primary body content',
+      plaintext_body: 'fallback text',
     };
     const e = gmailRawToUnified(msg, OWNER);
-    assert.equal(e.body, 'full html body');
-  });
-
-  it('plaintext_body used when body absent', () => {
-    const msg: GmailRawMessage = {
-      ...BASE_GMAIL,
-      body: undefined,
-      plaintext_body: 'plain text only',
-    };
-    const e = gmailRawToUnified(msg, OWNER);
-    assert.equal(e.body, 'plain text only');
+    assert.equal(e.body, 'primary body content');
   });
 });
 
-// ── gmailRawToUnified: snippet derivation ────────────────────────────────────
+// ── gmailRawToUnified: snippet derivation from body ──────────────────────────
 
 describe('gmailRawToUnified — snippet derivation', () => {
   it('snippet derived from short body when snippet field absent', () => {
@@ -252,7 +170,7 @@ describe('gmailRawToUnified — snippet derivation', () => {
     assert.equal(e.snippet, 'Short body text');
   });
 
-  it('snippet truncated at 140 chars when body is long and no snippet field', () => {
+  it('snippet truncated at 140 chars when body is long and snippet field absent', () => {
     const longBody = 'B'.repeat(200);
     const msg: GmailRawMessage = {
       ...BASE_GMAIL,
@@ -269,12 +187,6 @@ describe('gmailRawToUnified — snippet derivation', () => {
 // ── gmailRawToUnified: optional fields ───────────────────────────────────────
 
 describe('gmailRawToUnified — optional fields', () => {
-  it('uses explicit threadId param when msg.threadId absent', () => {
-    const msg: GmailRawMessage = { ...BASE_GMAIL, threadId: undefined };
-    const e = gmailRawToUnified(msg, OWNER, 'explicit-thread-id');
-    assert.equal(e.threadRef, 'explicit-thread-id');
-  });
-
   it('labels absent from result when labelIds not provided', () => {
     const msg: GmailRawMessage = { ...BASE_GMAIL, labelIds: undefined };
     const e = gmailRawToUnified(msg, OWNER);
@@ -289,10 +201,10 @@ describe('gmailRawToUnified — optional fields', () => {
   });
 });
 
-// ── gmailRawToUnified: parseEmailParty bare address ──────────────────────────
+// ── gmailRawToUnified: bare email address parsing ────────────────────────────
 
 describe('gmailRawToUnified — bare email address parsing', () => {
-  it('parses bare address (no display name) — identifier set, displayName null for non-owner', () => {
+  it('bare address (no "Name <addr>") → identifier set, displayName null for non-owner', () => {
     const msg: GmailRawMessage = {
       ...BASE_GMAIL,
       sender: 'bare@example.com', // no "Name <addr>" wrapper
