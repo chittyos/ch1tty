@@ -587,3 +587,54 @@ test('embed(): data item is empty array → malformed vector branch returns null
   assert.equal(result, null, 'empty sub-array vector must produce null');
   assert.ok(brain.getStats().errors >= 1, 'errors must increment on malformed empty vector');
 });
+
+// ── 11. Further branch-gap coverage ──────────────────────────────────────────
+
+test('embed(): AI returns non-array data field → "not-array" log branch, null result', async () => {
+  // When resp.data is not an array at all, the log call takes the `'not-array'` branch
+  // (Array.isArray(data) ? data.length : 'not-array') on the false side of the ternary.
+  const ai = makeAi(async () => ({ data: 'not-an-array' as unknown as number[][] }));
+  const brain = new WorkersAiBrain(ai, undefined, { circuitBreakerThreshold: 100 });
+  const result = await brain.route('query', [candidate('s/t', 'desc')]);
+  assert.equal(result, null, 'non-array data must produce null');
+  assert.ok(brain.getStats().errors >= 1, 'errors must increment');
+});
+
+test('routeVectorize(): match not in candidates + no serverName in metadata → serverName: undefined branch', async () => {
+  // match.id is NOT in the candidates map → candidateFromMetadata() is called.
+  // metadata omits serverName → covers the false branch of typeof m.serverName === 'string' (line 271).
+  const ai = makeEmbedAi(4);
+  const vz = makeVectorize(async () => ({
+    matches: [{
+      id: 'extra/tool',
+      score: 0.95,
+      metadata: { namespacedName: 'extra/tool', description: 'extra', category: 'code' },
+    }],
+  }));
+  const brain = new WorkersAiBrain(ai, vz, { minSimilarity: 0 });
+  const result = await brain.route('query', [candidate('a/b', 'desc')]);
+  assert.ok(Array.isArray(result) && result.length > 0, 'tool from metadata must be surfaced');
+  assert.equal(result![0]!.tool.serverName, undefined, 'serverName must be undefined when absent from metadata');
+});
+
+test('describeForEmbed(): empty description + no category → both falsy branches covered', async () => {
+  // c.description is '' → (c.description || '') takes the '' right-hand side (line 379 false branch).
+  // c.category is undefined → c.category ? ... : '' takes the '' right-hand side (line 380 false branch).
+  const brain = new WorkersAiBrain(makeEmbedAi(4), undefined, { minSimilarity: 0 });
+  const bare: ToolCandidate = { namespacedName: 's/bare', description: '' };
+  await brain.route('query', [bare]);
+  assert.equal(brain.getStats().errors, 0, 'embed must succeed despite empty description and no category');
+});
+
+test('normalizeInPlace(): all-zero embedding vector → norm===0 early return, confidence is 0', async () => {
+  // When Workers AI returns a vector of all zeros, normalizeInPlace() hits norm===0 and returns
+  // early without dividing, leaving the vector as zeros. dot product of two zero vectors is 0.
+  const ai = makeAi(async (_m, { text }) => ({
+    data: text.map(() => new Array<number>(4).fill(0)),
+  }));
+  const brain = new WorkersAiBrain(ai, undefined, { minSimilarity: 0 });
+  const result = await brain.route('query', [candidate('s/t', 'desc')]);
+  assert.ok(Array.isArray(result) && result.length > 0, 'zero-vector must still produce a result when minSimilarity=0');
+  assert.equal(result![0]!.confidence, 0, 'dot product of zero vectors is 0');
+  assert.equal(brain.getStats().errors, 0, 'zero vector must not increment errors');
+});
