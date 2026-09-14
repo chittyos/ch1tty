@@ -5087,3 +5087,25 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. Stale branch cleanup — 1100+ remote auto/ branches.
 - **PushNotification**: SENT — PR #1270 blocked on CI 0-job issue; all workstreams done; cron should be disabled.
 - **Next run**: If CI recovers: merge PR #1270 (BR dead branch fixes → src/ at 100% branches). Otherwise idle.
+
+---
+
+### 2026-09-14T~UTC (run ~1634 — BR DONE; PR #1270 merged; src/ at 100% branch coverage)
+
+- **Workstream**: BR (dead branch fixes) — **COMPLETE**
+- **Branch/PR**: `auto/BR-dead-branch-coverage-fixes` → PR #1270 — **MERGED** (squash, SHA 9abd295)
+- **Actions**:
+  - Woken by Codex review completing on caf6c03 (no findings). Checked CI: both runs show 0-job transient failure (known non-blocking issue per board).
+  - PR `mergeable_state: "clean"`. CodeQL: 3/3 ✅. CodeRabbit: no actionable code comments. Codex: no findings.
+  - Squash-merged PR #1270 into main at 9abd295.
+  - **src/ branch coverage**: openapi-spec.ts 100%, workers-ai-brain.ts 100%. All src/ dead branches resolved.
+  - **src-stdio/ coverage**: 100% all metrics (unchanged).
+  - **Test count on main**: 2298 pass / 0 fail / 3 skip.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BR ALL DONE. **0 open PRs**. Queue **EMPTY**.
+- **Human-action items** (URGENT):
+  1. **DISABLE hourly cron** — all workstreams A–BR exhausted; 0 open PRs; cron is burning ~50k tokens/run doing nothing.
+  2. Enable GitHub Actions (main npm test CI job) — CI 0-job failure is a recurring infra issue.
+  3. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET.
+  4. Notion workspace out of free blocks (board is fallback DRIVER-BOARD.md).
+  5. Stale branch cleanup — 1100+ remote auto/ branches.
+- **Next run**: IDLE. Queue empty. No new workstream. **DISABLE CRON.**
