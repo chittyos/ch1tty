@@ -425,3 +425,121 @@ test('list_sessions — invalid status enum returns error without calling client
     await cleanup();
   }
 });
+
+test('create_session — scalar context returns error without calling client', async () => {
+  let called = false;
+  const { client, cleanup } = await setup({
+    createSession: async () => { called = true; return SESSION_1; },
+  });
+  try {
+    const res = await client.callTool({ name: 'create_session', arguments: { channel: 'web', context: 'bad-context' } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /context/);
+    assert.equal(called, false);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('create_session — null context returns error without calling client', async () => {
+  let called = false;
+  const { client, cleanup } = await setup({
+    createSession: async () => { called = true; return SESSION_1; },
+  });
+  try {
+    const res = await client.callTool({ name: 'create_session', arguments: { channel: 'web', context: null } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /context/);
+    assert.equal(called, false);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('create_session — array context returns error without calling client', async () => {
+  let called = false;
+  const { client, cleanup } = await setup({
+    createSession: async () => { called = true; return SESSION_1; },
+  });
+  try {
+    const res = await client.callTool({ name: 'create_session', arguments: { channel: 'web', context: ['a', 'b'] } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /context/);
+    assert.equal(called, false);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('append_event — non-object payload returns error without calling client', async () => {
+  let called = false;
+  const { client, cleanup } = await setup({
+    appendEvent: async () => { called = true; return EVENT_1; },
+  });
+  try {
+    const res = await client.callTool({ name: 'append_event', arguments: { session_id: 'sess-1', type: 'foo', payload: 'bad-payload' } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /payload/);
+    assert.equal(called, false);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('append_event — null payload returns error without calling client', async () => {
+  let called = false;
+  const { client, cleanup } = await setup({
+    appendEvent: async () => { called = true; return EVENT_1; },
+  });
+  try {
+    const res = await client.callTool({ name: 'append_event', arguments: { session_id: 'sess-1', type: 'foo', payload: null } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /payload/);
+    assert.equal(called, false);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('append_event — array payload returns error without calling client', async () => {
+  let called = false;
+  const { client, cleanup } = await setup({
+    appendEvent: async () => { called = true; return EVENT_1; },
+  });
+  try {
+    const res = await client.callTool({ name: 'append_event', arguments: { session_id: 'sess-1', type: 'foo', payload: [1, 2] } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /payload/);
+    assert.equal(called, false);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_events — non-numeric limit returns error without calling client', async () => {
+  let called = false;
+  const { client, cleanup } = await setup({
+    listEvents: async () => { called = true; return { events: [], has_more: false }; },
+  });
+  try {
+    const res = await client.callTool({ name: 'list_events', arguments: { session_id: 'sess-1', limit: 'ten' } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /limit/);
+    assert.equal(called, false);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('non-Error thrown by client surfaces as isError with string coercion', async () => {
+  const { client, cleanup } = await setup({
+    getSession: async () => { throw 'plain string error'; },
+  });
+  try {
+    const res = await client.callTool({ name: 'get_session', arguments: { id: 'x' } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /plain string error/);
+  } finally {
+    await cleanup();
+  }
+});
