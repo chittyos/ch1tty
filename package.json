@@ -27,7 +27,7 @@
     "@types/node": "22.20.2",
     "c8": "^12.0.0",
     "tsx": "4.23.13",
-    "typescript": "^5.7.0",
+    "typescript": "^7.0.2",
     "wrangler": "4.131.0"
   },
   "engines": {
