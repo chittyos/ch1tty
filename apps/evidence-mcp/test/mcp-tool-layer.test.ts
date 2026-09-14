@@ -442,3 +442,83 @@ test('ingest_document error: surfaces in isError response', async () => {
     await cleanup();
   }
 });
+
+// ── Branch gap coverage (BD) ──────────────────────────────────────────────────
+// server.ts validation uses `typeof !== 'string' || !field` for all required
+// string fields. Existing tests omit arguments entirely (hitting the typeof arm).
+// These five tests pass empty strings to exercise the !field (second) arm.
+
+test('ingest_document: empty-string content → isError (covers !a["content"] branch)', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.callTool({
+      name: 'ingest_document',
+      arguments: { content: '', kind: 'note' },
+    });
+    assert.equal(result.isError, true);
+    const content = result.content as Array<{ type: string; text: string }>;
+    assert.ok(content[0].text.includes('"content"'));
+  } finally {
+    await cleanup();
+  }
+});
+
+test('ingest_document: empty-string kind → isError (covers !a["kind"] branch)', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.callTool({
+      name: 'ingest_document',
+      arguments: { content: 'Hello world', kind: '' },
+    });
+    assert.equal(result.isError, true);
+    const content = result.content as Array<{ type: string; text: string }>;
+    assert.ok(content[0].text.includes('"kind"'));
+  } finally {
+    await cleanup();
+  }
+});
+
+test('get_document: empty-string id → isError (covers !a["id"] branch in get_document)', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.callTool({
+      name: 'get_document',
+      arguments: { id: '' },
+    });
+    assert.equal(result.isError, true);
+    const content = result.content as Array<{ type: string; text: string }>;
+    assert.ok(content[0].text.includes('"id"'));
+  } finally {
+    await cleanup();
+  }
+});
+
+test('search_documents: empty-string query → isError (covers !a["query"] branch)', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.callTool({
+      name: 'search_documents',
+      arguments: { query: '' },
+    });
+    assert.equal(result.isError, true);
+    const content = result.content as Array<{ type: string; text: string }>;
+    assert.ok(content[0].text.includes('"query"'));
+  } finally {
+    await cleanup();
+  }
+});
+
+test('get_canonical_uri: empty-string id → isError (covers !a["id"] branch in get_canonical_uri)', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.callTool({
+      name: 'get_canonical_uri',
+      arguments: { id: '' },
+    });
+    assert.equal(result.isError, true);
+    const content = result.content as Array<{ type: string; text: string }>;
+    assert.ok(content[0].text.includes('"id"'));
+  } finally {
+    await cleanup();
+  }
+});
