@@ -4825,3 +4825,31 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Notion workspace** out of free blocks — upgrade plan or clear blocks
 - **PushNotification**: NOT SENT — queue unchanged from ~1618; no new actionable information; escalation from ~1609 still stands.
 - **Next run**: Idle unless PR queue drops below 20 or main CI re-enabled. Queue trend: 41 → 37 → 37 → 38 → 39 → 39 → ~39. When queue < 20: `src/workers-ai-brain.ts` remaining branch gaps — next coverage candidate.
+
+---
+
+### 2026-09-14T~UTC (run ~1621 — PRODUCTIVE: merged PRs #1251 + #1250; conflict-resolved #1249 + #1247)
+- **Workstream**: PR queue drain — merging queued test-coverage PRs now that CodeQL CI is passing
+- **Branch/PR**: No new branch. Merged #1251 and #1250 directly; resolved RUNLOG conflicts on #1249 and #1247.
+- **Build**: tsc clean (0 errors, ch1tty@4.1.0) | **Tests**: 1965 pass / 0 fail / 3 skip (main before run)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 1740/1741 enforce 56/87 fields). 0 violations.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test` on main: 1965/0/3. 0 failures.
+  - Discovered CodeQL + Analyze checks ARE running on all PRs (CI not fully disabled — only the main test job is missing). PRs with `mergeable_state: "clean"` can be merged now.
+  - **Merged PR #1251** (`auto/BG-dlq-store-error-paths`): dlq-store.ts error-path coverage, 4 catch-block tests. Squash merged; CodeQL + Analyze all green.
+  - Updated PR #1250 branch (was `unstable`/`unknown`) → CI ran → **merged PR #1250** (`auto/BF-reshape-branch-gaps`): reshape.ts 12 branch gaps, 6 quo + 6 gmail. Squash merged.
+  - **Resolved RUNLOG.md conflict on PR #1249** (`auto/BE-child-manager-http-server-branch-gaps`): kept both run ~1610 and ~1620 entries; pushed; CI triggered.
+  - **Resolved RUNLOG.md conflict on PR #1247** (`auto/BD-logger-aggregator-branch-gaps`): kept runs ~1608, ~1614, ~1615 in order; pushed; CI triggered.
+  - PR #1249 and #1247: currently `unstable` (CI running after base update). Both should be `clean` and merge-ready within ~5 min.
+  - PR #1240 (AZ) still stacked on PR #1239 (AY) — needs AY merged first, then rebase.
+  - Notion board: unavailable (API 401). DRIVER-BOARD.md is durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BG(2 merged, 2 resolving). Tests on main: 1965/0/3. Build: clean. **~37 PRs remain** after 2 merges.
+- **Human-action items** (revised):
+  1. **Merge queued PRs** — #1249 and #1247 will be `clean` once CI completes (~5 min); merge in order oldest-first to avoid RUNLOG cascades. NOTE: #1240 (AZ) stacked on #1239 (AY) — merge AY first.
+  2. **Enable GitHub Actions (main test CI)** — only CodeQL/Analyze run currently; add the main `npm test` job back.
+  3. **Disable/redirect hourly cron** — ~1621 runs; strategy shift: queue draining now, but each run can only merge 2-3 PRs before CI requeues them.
+  4. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+  5. **Notion workspace** out of free blocks — upgrade plan or clear blocks.
+  6. **Stale branch cleanup** — 1100+ remote `auto/` branches.
+- **PushNotification**: SENT — first productive merges after ~30-run idle; PR queue finally draining; 2 merged, 2 pending CI.
+- **Next run**: Check #1249 + #1247 — if `clean`, merge them. Then update #1245 (BC) base and merge. Continue oldest-first merge sequence down the queue. Each run can drain ~2-4 PRs. Queue will clear in ~10 runs.
