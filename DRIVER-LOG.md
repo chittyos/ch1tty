@@ -4585,3 +4585,29 @@ Identify next coverage gap (BC or later). Main has advanced with BD/BE/BF merged
 - 14 open PRs still queued: Y, AI–AZ (all test/chore workstreams)
 
 **Next run recommendation**: 14 PRs queued — do NOT open more. Monitor open PRs for CI failures. If all merge, scan for next genuine gap (workers-ai-brain, session-coordinator coverage, or config-data).
+
+---
+
+## Run ~1620 — 2026-09-14T UTC (BD: evidence-mcp branch gaps)
+
+**Workstream**: BD — `apps/evidence-mcp` branch coverage gap
+
+**Build**: clean (tsc 0 errors)
+**Tests**: 2123 pass / 0 fail / 3 skip (+5 vs 2118 baseline pre-run)
+
+### Work done
+
+Identified 5 uncovered second arms of `typeof !== 'string' || !field` guards in `apps/evidence-mcp/src/server.ts`:
+- L108: `!a['content']` (ingest_document)
+- L109: `!a['kind']` (ingest_document)
+- L130: `!a['id']` (get_document)
+- L135: `!a['query']` (search_documents)
+- L144: `!a['id']` (get_canonical_uri)
+
+Added 5 empty-string tests to `apps/evidence-mcp/test/mcp-tool-layer.test.ts` (+80 lines).
+
+Branch `auto/BD-evidence-mcp-branch-gaps` pushed. PR #1252 opened and watched.
+
+### Next run recommendation
+
+BE — scan `apps/comms-mcp/src/server.ts` and `apps/session-coordinator-mcp/src/server.ts` for remaining branch gaps not yet covered by empty-string or null tests. **Priority human actions**: enable GitHub Actions CI; rotate Notion API token; bulk-delete 1100+ stale `auto/` branches.
