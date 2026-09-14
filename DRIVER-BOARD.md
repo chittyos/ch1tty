@@ -4990,3 +4990,25 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 - **State**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓. **3 open PRs** (#1255 BA, #1256 BH-2, #1259 BB). Tests: 2225/0/3. Build: clean.
 - **Next-run targets** (not covered by any open PR): `workers-ai-brain.ts` remaining gaps (162, 208, 270, 280, 324 — ~96% → higher), `src-stdio/aggregator.ts` 97.31% branches, `sim/fixture-backend.ts` 73.33% functions/82.35% branches.
 - **PushNotification**: NOT SENT — routine coverage PR, no blocking condition.
+
+---
+
+### 2026-09-14T~UTC (run ~1628 — PRODUCTIVE: merged 5 queued PRs; coverage 97.4% branches)
+- **Workstream**: PR queue drain — merged 5 queued test-coverage PRs (#1255, #1256, #1257, #1258, #1259)
+- **Branch/PR**: No new branch. Merged PRs #1255 (BA), #1257 (BA-sim), #1258 (BI), #1259 (BB), #1256 (BH). Resolved conflict on #1256 (duplicate default-URL tests vs main).
+- **Build**: tsc clean (0 errors, ch1tty@4.1.0) | **Tests**: 2244 pass / 0 fail / 3 skip (2247 total, 94 suites) — up from 2220
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE. 0 violations.
+  - `git reset --hard origin/main`. `npm ci` clean. `npm run build` clean (tsc 0 errors). `npm test`: 2244/0/3. 0 failures.
+  - Checked 5 open PRs: all 3/3 CI green. Merged #1255, #1257, #1258, #1259 (squash). PR #1256 was dirty (conflict): resolved by accepting origin/main's session-client.test.ts (main already had the default-URL and 204 tests) and removing duplicate ledger-client test. PR #1256 auto-merged after push.
+  - Coverage after merges: `aggregator.ts` 97.4% branches (up from 97.31%); remaining uncovered: 609, 1372, 1883, 2204, 2341-2342, 2347. Lines 1883/2204/2341-2342/2347 are c8-ignored. Lines 609/1372 are complex conditional branches — coverage saturation confirmed (same conclusion as run ~1627).
+  - Queue: **0 open PRs** after all merges.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BH ALL DONE. **0 open PRs.** Tests: 2244/0/3. Build: clean.
+- **Human-action items** (unchanged):
+  1. **DISABLE hourly cron** — queue EMPTY; workstreams exhausted; ~1628 runs; ~50k tokens/run wasted.
+  2. **Enable GitHub Actions (main test CI)** — only CodeQL/Analyze running; add main `npm test` job.
+  3. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`.
+  4. **Notion workspace** out of free blocks — upgrade or clear.
+  5. **Stale branch cleanup** — 1100+ remote `auto/` branches.
+- **PushNotification**: SENT — merged 5 PRs; queue now at 0; test count up to 2244/0/3; DISABLE CRON.
+- **Next run**: IDLE. Queue empty. Coverage saturated (97.4% branches; remaining gaps are c8-ignored or inherently complex). No new PR needed unless new workstream defined.
