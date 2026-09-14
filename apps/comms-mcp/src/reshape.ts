@@ -125,6 +125,10 @@ export function quoRawToUnified(row: QuoRawRow, owner: OwnerIdentity): UnifiedCo
 
   // participants requires minItems 1 — if neither side resolved (degenerate row),
   // surface the raw parties rather than fabricate.
+  // c8 ignore next 9 — structurally unreachable: every rawParty is either isSelf
+  // (sets ownerIdentifier → participants non-empty) or a counterparty (adds to
+  // counterparties → participants non-empty). An empty rawParties[] would also be
+  // caught by the throw below without entering this loop.
   if (participants.length === 0) {
     for (const p of rawParties) {
       participants.push({
