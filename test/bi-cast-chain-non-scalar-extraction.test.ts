@@ -18,7 +18,13 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
 import { Aggregator } from '../src/aggregator.js';
+import { SessionCoordinator } from '../src/coordinator.js';
 import type { Backend, BackendStatus, ServerConfig, ToolCallResult, ToolEntry } from '../src/types.js';
+
+// Stub out brain routing so tests are deterministic regardless of CH1TTY_USE_OLLAMA_BRAIN.
+class NullRoutingCoordinator extends SessionCoordinator {
+  override async routeIntent(): Promise<null> { return null; }
+}
 
 function dlqPath(label: string): string {
   return join(tmpdir(), `ch1tty-bi-${label}-${Date.now()}.jsonl`);
@@ -87,12 +93,14 @@ function makeAggWithCapture(
     shutdown: async () => {},
   };
 
+  const dPath = dlqPath(label);
   const agg = new Aggregator([NEON_CFG], {
     focusProfiles: FOCUS_PROFILES,
     suggestionsCatalog: CHAIN_CATALOG,
     backendFactory: () => backend,
     embedEnabled: false,
-    ledgerDlqPath: dlqPath(label),
+    ledgerDlqPath: dPath,
+    coordinator: new NullRoutingCoordinator({}, { enabled: false }, dPath),
   });
 
   return { agg, capturedCalls };
