@@ -3001,3 +3001,9 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 - **PRs merged this run**: #1254 (BF: ledger/session-client URL branch gaps, 4 tests), #1253 (BH: session-coord cursor forwarding, 1 test), #1223 (AI: dep bump — merged by prior session)
 - **Open PRs**: 0 (queue empty)
 - **Notes**: Queue drained from 33 PRs (run ~1622) to 0 over ~4 runs. No new workstream — CRON SHOULD BE DISABLED.
+
+### run ~1626 — 2026-09-14 — BI: Codex P2 fixed; PR #1258 green
+- **Action**: Fixed Codex P2 finding on PR #1258 (BI: cast chain non-scalar extraction). Injected `NullRoutingCoordinator extends SessionCoordinator` (overrides `routeIntent()` → null) via `AggregatorOptions.coordinator` so chain tests are deterministic regardless of `CH1TTY_USE_OLLAMA_BRAIN`.
+- **CI**: All 3 checks green on `5c65045` (CodeQL + 2× Analyze). No open review threads.
+- **PR #1258**: Ready to merge (awaiting human review/approval).
+- **Build**: tsc clean | tests 4/4 pass on BI file.
