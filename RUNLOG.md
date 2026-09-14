@@ -3002,6 +3002,21 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 - **Open PRs**: 0 (queue empty)
 - **Notes**: Queue drained from 33 PRs (run ~1622) to 0 over ~4 runs. No new workstream — CRON SHOULD BE DISABLED.
 
+### run ~1627 — 2026-09-14 — coverage saturation confirmed; no new PR
+- **Action**: Investigated workstream BC (openapi-spec.ts null-coalescing fallback branches).
+  - Target: `?? {}` (line 34) and `?? []` (line 35) in `buildOpenApiSpec`, plus `m[1] ?? null` (line 88) in `parseToolPath`.
+  - Added test with `inputSchema: {}` (no properties key) to `test/iiiii-openapi-spec-evaluator.test.ts`.
+  - Test passed but branch coverage remained at 92.86% (13/14 branches) — confirming `?? {}` / `?? []` were already covered by existing tests.
+  - The sole remaining uncovered branch is `m[1] ?? null` on line 88: dead code — the regex `([^/]+\/[^/]+)` always captures group 1 when `m` is truthy, so `m[1]` is never undefined within that ternary arm.
+  - Reverted test change (never committed). Switched back to main.
+- **Coverage campaign**: SATURATED. All remaining branch gaps across `src/` and `apps/` are either dead code (unreachable by construction) or V8 source map artifacts (tsx maps JavaScript bytecode positions to wrong TypeScript lines).
+- **Open PRs**: 5 — #1255 (BA), #1256 (BH), #1257 (BA), #1258 (BI), #1259 (BB) — all CI green, awaiting human approval.
+- **Build**: tsc clean | **Tests**: 2220 pass / 0 fail.
+- **Human-action items**:
+  1. **Merge open PRs #1255–#1259** — all CI green, no outstanding review threads
+  2. **DISABLE hourly cron** — coverage campaign exhausted; idle-burning tokens
+  3. **Enable GitHub Actions** (if not already) and **Stale branch cleanup** (1100+ auto/ branches)
+
 ### run ~1626 — 2026-09-14 — BI: Codex P2 fixed; PR #1258 green
 - **Action**: Fixed Codex P2 finding on PR #1258 (BI: cast chain non-scalar extraction). Injected `NullRoutingCoordinator extends SessionCoordinator` (overrides `routeIntent()` → null) via `AggregatorOptions.coordinator` so chain tests are deterministic regardless of `CH1TTY_USE_OLLAMA_BRAIN`.
 - **CI**: All 3 checks green on `5c65045` (CodeQL + 2× Analyze). No open review threads.
