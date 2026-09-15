@@ -563,3 +563,86 @@ test('list_events — cursor is forwarded to client and returned in response', a
     await cleanup();
   }
 });
+
+// ── Empty-string branch coverage (BE) ─────────────────────────────────────────
+// The guard `typeof a['x'] !== 'string' || !a['x']` has two arms:
+//   arm 1: typeof !== 'string'  — covered by omitting the arg (undefined case above)
+//   arm 2: !a['x']              — only reachable when the value IS a string but empty ('')
+// These tests exercise the second arm for every required string field.
+
+test('get_session — empty-string id returns error', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.callTool({ name: 'get_session', arguments: { id: '' } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /required argument "id"/);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('create_session — empty-string channel returns error', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.callTool({ name: 'create_session', arguments: { channel: '' } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /required argument "channel"/);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('update_session — empty-string id returns error', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.callTool({ name: 'update_session', arguments: { id: '', status: 'idle' } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /required argument "id"/);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('close_session — empty-string id returns error', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.callTool({ name: 'close_session', arguments: { id: '' } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /required argument "id"/);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('append_event — empty-string session_id returns error', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.callTool({ name: 'append_event', arguments: { session_id: '', type: 'agent.tool_call' } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /required argument "session_id"/);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('append_event — empty-string type returns error', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.callTool({ name: 'append_event', arguments: { session_id: 'sess-1', type: '' } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /required argument "type"/);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_events — empty-string session_id returns error', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.callTool({ name: 'list_events', arguments: { session_id: '' } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /required argument "session_id"/);
+  } finally {
+    await cleanup();
+  }
+});
