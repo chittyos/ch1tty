@@ -5208,3 +5208,25 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. Stale branch cleanup — 1100+ remote auto/ branches.
 - **PushNotification**: NOT SENT — idle run, nothing changed.
 - **Next run**: IDLE. Queue empty. No new workstream. **DISABLE CRON.**
+
+---
+
+### 2026-09-15T~UTC (run ~1642 — IDLE: BY(#1279)+BZ(#1280) still open, CI-green, awaiting merge)
+
+- **Workstream**: None — all workstreams A–BW done; 2 open PRs pending human merge
+- **Branch/PR**: #1279 (BY: zod+wrangler bump) open, 3/3 CI green | #1280 (BZ: E2E 5-tool invariant) open, 3/3 CI green
+- **Build**: tsc clean (0 errors, ch1tty@4.1.0) | **Tests**: 2333 pass / 0 fail / 3 skip (2336 total, 107 suites)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE.
+  - `npm ci` clean. `npm run build` clean. `npm test`: 2333/0/3. Both PRs: 3/3 CI green.
+  - No new workstream. All known gaps covered by open PRs.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BW ALL DONE. **2 open PRs (#1279, #1280), both CI-green.** Tests: 2333/0/3.
+- **Human-action items** (URGENT — ~1642nd run burning tokens):
+  1. **DISABLE hourly cron** — all workstreams exhausted; ~1642 runs; burning ~50k tokens/run with no productive work
+  2. **Merge PR #1279** (BY: zod 4.6.5 + wrangler 4.131.2) — 3/3 CI green
+  3. **Merge PR #1280** (BZ: subprocess E2E 5-tool invariant) — 3/3 CI green
+  4. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. Notion workspace out of free blocks
+  6. Stale branch cleanup — 1100+ remote auto/ branches
+- **PushNotification**: SENT — repeated idle; 2 PRs waiting; cron must be disabled.
+- **Next run**: IDLE. Same state. **DISABLE CRON.**
