@@ -88,6 +88,7 @@ export function createCommsMcpServer(dispatch: CommsDispatch, owner: OwnerIdenti
         content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
       };
     } catch (err) {
+      /* c8 ignore next — String(err) branch: all in-process throws use new Error(); defensive only */
       const msg = err instanceof Error ? err.message : String(err);
       return {
         content: [{ type: 'text' as const, text: `Error: ${msg}` }],

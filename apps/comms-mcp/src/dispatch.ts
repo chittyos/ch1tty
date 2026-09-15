@@ -40,6 +40,7 @@ export function getTimeoutMs(): number {
 /** Injectable factory: given resolved endpoint+headers, returns a connected Client. */
 export type ConnectFn = (endpoint: string, headers: Record<string, string>) => Promise<Client>;
 
+/* c8 ignore next 11 — defaultConnect wires a real HTTP transport; exercised via injectable connectFn in tests */
 async function defaultConnect(endpoint: string, headers: Record<string, string>): Promise<Client> {
   const transport = new StreamableHTTPClientTransport(new URL(endpoint), {
     requestInit: { headers },
