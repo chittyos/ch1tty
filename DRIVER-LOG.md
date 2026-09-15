@@ -4722,3 +4722,50 @@ HTTP E2E test suite now complete: BZ (stdio 5-tool), CA (stdio status/search/cas
 ### Next run recommendation
 
 IDLE. All workstreams exhausted. No new genuine coverage gaps. If cron continues: scan for `codemode-fns.ts` or `src/aggregator.ts` error-throw paths that still have coverage — but at 100% src/ coverage these don't exist. **DISABLE CRON.**
+
+---
+
+### 2026-09-15T16:43Z (run ~1650 — IDLE: all workstreams done; verified coverage + Worker gap documented)
+
+**Workstream**: None — idle
+
+**Build**: tsc clean (0 errors, ch1tty@4.1.0)
+**Tests**: 2364 pass / 0 fail / 3 skip (2367 total, 107 suites, ~53s)
+**Coverage (src-stdio/)**: 100% all metrics (18 files)
+**Coverage (apps/)**: 100% all metrics (all 5 apps)
+
+### Work done
+
+- Startup: read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE).
+- `git fetch --all`; no new remote branches. `npm ci` clean. `npm run build` tsc clean. `npm test`: 2364/0/3.
+- No open PRs. 0 open PRs on entry or exit.
+- Read DRIVER-LOG.md + RUNLOG.md: last run (~1648) confirmed IDLE; all workstreams (A–CF) exhausted; 100% coverage on tracked files.
+- Verified current coverage: `npm run coverage` → 100% all metrics across all 18 `src-stdio/` files. `npm run coverage:apps` → 100% all metrics across all 5 apps.
+- **New finding — Worker coverage gap**: `src/` contains 3 Worker-specific files with 0% test coverage:
+  - `src/api-agent.ts` (114 lines) — Ch1ttyApiAgent (McpAgent + openApiMcpServer, requires workerd/miniflare)
+  - `src/ch1tty-do.ts` (90 lines) — Ch1ttyDO (Durable Object, requires workerd SQLite + alarm API)
+  - `src/mcp-agent.ts` (225 lines) — Ch1ttyMcpAgent (McpAgent, requires workerd scheduler)
+  - `src/core.ts` (1134 lines) — Ch1ttyCore (transport-agnostic Worker core, depends on ctx.storage.sql)
+  - These 4 files total ~1563 lines with NO test coverage. Testing them requires workerd or miniflare (not Node.js test runner). No npm script tracks coverage for these files.
+- Assessed `packages/` workstream: packages/README.md describes 3 planned packages (shared-types, shared-logger, shared-mcp) that are empty stubs. Implementing shared-types would require extracting `Backend`, `ServerConfig`, `ToolCallResult` from `src-stdio/types.ts` and updating all imports across `src-stdio/`. This is a valid workstream but non-trivial refactor with no immediate functional gain.
+- No productive workstream found that doesn't require: (a) Cloudflare Workers runtime, or (b) a broad architectural refactor.
+
+### State summary
+
+A ✓ B ✓ C ✓ D ✓ E ✓ + all extensions through CF ✓ ALL DONE.
+**0 open PRs.** Tests: 2364/0/3. Build: clean. Coverage: 100% src-stdio/ + 100% apps/.
+
+### Human-action items (unchanged)
+
+1. **DISABLE hourly cron** — all workstreams exhausted; ~1650 runs; idle-burning ~50k tokens/run with no genuine progress possible.
+2. **Enable GitHub Actions CI** — ci.yml fires but 0 jobs run (org-level disabled). Settings → Actions → General → "Allow all actions".
+3. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`.
+4. **Notion workspace** out of free blocks — upgrade or clear (board fallback: this DRIVER-LOG.md).
+5. **Stale branch cleanup** — 1100+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings.
+
+### Next run recommendation
+
+IDLE. All workstreams exhausted. If a new workstream is desired:
+- **CG**: Test `src/core.ts` + `src/ch1tty-do.ts` with miniflare (requires adding miniflare dev dep; significant effort).
+- **CG alt**: Seed `packages/shared-types/` with Backend/ServerConfig/ToolCallResult extracted from `src-stdio/types.ts` (architectural cleanup; no functional change).
+**DISABLE CRON** unless a new workstream is explicitly defined.
