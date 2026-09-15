@@ -10,6 +10,7 @@
     "start": "node dist/index.js",
     "dev": "tsc --watch",
     "typecheck:worker": "tsc -p tsconfig.worker.json",
+    "typecheck:apps": "for app in apps/*/; do if [ -f \"$app/tsconfig.json\" ]; then (cd \"$app\" && npx tsc --noEmit) || exit 1; fi; done",
     "sim": "CH1TTY_EMBED_ENABLED=false node --import tsx sim/run.ts",
     "test": "node --import tsx --test test/**/*.test.ts apps/*/test/*.test.ts",
     "test:watch": "node --import tsx --test --watch test/**/*.test.ts apps/*/test/*.test.ts",

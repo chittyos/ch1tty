@@ -44,6 +44,9 @@ jobs:
       - name: Apps coverage (src/ 100% stmts/lines/funcs, 95% branches)
         run: npm run coverage:apps
 
+      - name: Typecheck apps (all apps/*/src — must find process via root @types/node)
+        run: npm run typecheck:apps
+
   apps-build-and-test:
     if: github.event.deleted != true
     runs-on: ubuntu-latest
