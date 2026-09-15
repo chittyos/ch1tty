@@ -40,6 +40,7 @@ import { CodemodeBridge } from './codemode-bridge.js';
 import { OntologyClient } from '@chittyos/schema-client';
 import { VERSION } from './utils.js';
 import { log } from './logger.js';
+import { isChittyHost, extractEntityTypeCode } from './core-utils.js';
 
 const SEPARATOR = '/';
 const META_SERVER_ID = 'ch1tty';
@@ -47,38 +48,6 @@ const META_TOOL_VERBS: ReadonlySet<string> = new Set(['search', 'execute', 'stat
 const REGISTRY_TTL = 5 * 60 * 1000;
 /** Idle window after which the owning DO's alarm() runs onSessionEnd for a session. */
 export const SESSION_IDLE_MS = 15 * 60 * 1000;
-
-/**
- * Extract the canonical entity-type code (T position) from a ChittyID of the
- * form VV-G-LLL-SSSS-T-YM-C-X. Returns the single-letter code (e.g. 'P') when
- * the id matches that shape, else null (callers skip type validation rather
- * than guess). @canon chittycanon://gov/governance#core-types
- */
-/**
- * True when the URL's host is chitty.cc or a *.chitty.cc subdomain (https only).
- * Used to allowlist dynamically-ingested upstream endpoints before sending them
- * inherited credentials. Rejects look-alikes like chitty.cc.evil.com.
- */
-function isChittyHost(url: string): boolean {
-  let host: string;
-  let protocol: string;
-  try {
-    const u = new URL(url);
-    host = u.hostname.toLowerCase();
-    protocol = u.protocol;
-  } catch {
-    return false;
-  }
-  if (protocol !== 'https:') return false;
-  return host === 'chitty.cc' || host.endsWith('.chitty.cc');
-}
-
-function extractEntityTypeCode(entityId: string): string | null {
-  const parts = entityId.split('-');
-  // VV-G-LLL-SSSS-T-YM-C-X => exactly 8 segments, type code is index 4.
-  if (parts.length === 8 && /^[A-Z]$/.test(parts[4]!)) return parts[4]!;
-  return null;
-}
 
 interface NamespacedTool {
   serverId: string;
