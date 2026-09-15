@@ -4645,3 +4645,41 @@ BE — scan `apps/comms-mcp/src/server.ts` and `apps/session-coordinator-mcp/src
   5. **Stale branch cleanup** — 1100+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings.
 - **PushNotification**: SENT — merged 3 more PRs (#1260 BJ, #1261 BC, #1262 BK); queue at 0; cron still active — DISABLE CRON.
 - **Next run**: IDLE. Queue empty. No new workstream defined. Recommend disabling hourly cron to stop token burn.
+
+---
+
+## Run ~1638 — 2026-09-15T (auto-run, PRODUCTIVE: BE empty-string branch coverage)
+
+**Workstream**: BE — `apps/session-coordinator-mcp` empty-string branch gap coverage
+
+**Build**: tsc clean (0 errors, ch1tty@4.1.0)
+**Tests**: 2333 pass / 0 fail / 3 skip (+7 vs 2326 baseline)
+
+### Work done
+
+- Startup: read CLAUDE.md + CHITTY.md; `npm ci` clean; build clean; tests 2326/0/3.
+- Read Notion board: all A-E confirmed done. DRIVER-LOG.md is durable board (Notion blocked, API 401).
+- No open PRs on entry.
+- Identified BE: each `typeof a['x'] !== 'string' || !a['x']` guard in `apps/session-coordinator-mcp/src/server.ts` has two arms. Existing tests pass `{}` (omits the field → `typeof undefined !== 'string'` fires, arm 2 `!a['x']` never reached). Empty-string `''` is a string, so it reaches arm 2.
+- Added 7 empty-string tests to `apps/session-coordinator-mcp/test/mcp-tool-layer.test.ts`:
+  - `get_session { id: '' }`, `create_session { channel: '' }`, `update_session { id: '' }`, `close_session { id: '' }`, `append_event { session_id: '' }`, `append_event { type: '' }`, `list_events { session_id: '' }`
+- All 7 new tests pass; full suite 2333/0/3 (+7).
+- Branch `auto/BE-session-coord-empty-string-branches` pushed. PR #1278 opened.
+- Auto-merge: unavailable (GitHub Actions org-level disabled — CI required checks failing).
+- Subscribed to PR #1278 for CI/review events.
+
+### State summary
+
+A ✓ B ✓ C ✓ D ✓ E ✓. **1 open PR** (#1278). Tests: 2333/0/3.
+
+### Human-action items (unchanged)
+
+1. **Enable GitHub Actions CI** — only CodeQL running; required check failing blocks auto-merge. Settings → Actions → General → "Allow all actions".
+2. **DISABLE hourly cron** (or redirect) — workstreams exhausted except incremental coverage fixes. Cron burning ~50k tokens/run.
+3. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`.
+4. **Notion workspace** out of free blocks — upgrade or clear.
+5. **Stale branch cleanup** — 1100+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings.
+
+### Next run recommendation
+
+BF — scan remaining apps (`apps/ledger-mcp`, `apps/tasks-mcp`) for the same empty-string pattern in `missingArg` guards; if exhausted, scan for uncovered error-path throw branches in the main gateway (`src/aggregator.ts`).
