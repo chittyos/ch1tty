@@ -5330,11 +5330,13 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   - Notion board update attempted — rejected (free tier, all blocks used)
   - DRIVER-BOARD.md updated as fallback run log
 - **Status:** IDLE — all workstreams done; no new work identified
-- **Blockers (unchanged):**
-  1. **DISABLE hourly cron** — ~1653 runs; all workstreams A–CF exhausted; burning ~50k tokens/run
-  2. **Notion workspace out of free blocks** — upgrade plan or clear blocks to re-enable board
+- **Blockers (updated from run ~1649):**
+  1. **DISABLE hourly cron** — ~1653 runs; all workstreams A–CF exhausted; burning ~50k tokens/run with nothing left to do *(new)*
+  2. **Notion workspace out of free blocks** — `insert_content` rejected; upgrade plan or clear blocks *(updated — prior entry was API-token 401; now the connector works but workspace is out of blocks)*
   3. **GITHUB_MCP_AUTHORIZATION** not set — GitHub MCP backend fails at runtime
-  4. **CHITTY_CF_ACCESS_CLIENT_ID / CHITTY_CF_ACCESS_CLIENT_SECRET** not set — CF Access backends unreachable
-  5. **CHITTY_TASKS_TOKEN** not set — tasks-mcp live integration disabled
-  6. **1100+ stale auto/ branches** — GitHub UI: Settings → Branches → "Automatically delete head branches"
+  4. **CHITTY_CF_ACCESS_CLIENT_ID / CHITTY_CF_ACCESS_CLIENT_SECRET** not set — CF Access backends unreachable (covers prior CH1TTY_ALLOW_UNAUTH / prod CF Access creds item)
+  5. **CHITTY_TASKS_TOKEN** not set — tasks-mcp live integration disabled *(new)*
+  6. **1100+ stale auto/ branches** — GitHub UI: Settings → Branches → "Automatically delete head branches" *(was 1081+)*
+  7. **Major dep bumps** — typescript 5→7, @types/node 22→26, c8 11→12 await human review *(carried from ~1649)*
+  8. **Issues #1071/#1072** — require human decisions *(carried from ~1649)*
 - **Next run:** IDLE. Same state. **HUMAN ACTION REQUIRED: disable/pause cron or add new workstreams.**
