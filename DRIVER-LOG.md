@@ -4769,3 +4769,42 @@ IDLE. All workstreams exhausted. If a new workstream is desired:
 - **CG**: Test `src/core.ts` + `src/ch1tty-do.ts` with miniflare (requires adding miniflare dev dep; significant effort).
 - **CG alt**: Seed `packages/shared-types/` with Backend/ServerConfig/ToolCallResult extracted from `src-stdio/types.ts` (architectural cleanup; no functional change).
 **DISABLE CRON** unless a new workstream is explicitly defined.
+
+---
+
+### 2026-09-15T (run ~1651 — IDLE: all workstreams done; 2364/0/3 clean)
+
+**Workstream**: None — idle
+
+**Build**: tsc clean (0 errors, ch1tty@4.1.0)
+**Tests**: 2364 pass / 0 fail / 3 skip (2367 total, 107 suites)
+
+### Work done
+
+- Startup: read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE).
+- `git fetch --all`; reset to origin/main (e4d9d8a — run ~1650). `npm ci` clean. `npm run build` tsc clean. `npm test`: 2364/0/3.
+- No open PRs. 0 open PRs on entry or exit.
+- Read DRIVER-LOG.md: last run (~1650) confirmed IDLE; all workstreams (A–CF) exhausted; 100% coverage src-stdio/ + apps/.
+- **Notion MCP newly available in this session** (prior sessions: API 401). Board fetched; confirms A–E all ✓; last edited 2026-09-10. DRIVER-LOG.md is more current.
+- No productive workstream found. Worker files (src/api-agent.ts, src/ch1tty-do.ts, src/mcp-agent.ts, src/core.ts ~1563 lines) require workerd/miniflare for testing — outside Node.js test runner. packages/ stubs need human architectural decision before any work proceeds.
+- **PushNotification**: SENT — ~1651 consecutive runs, all workstreams exhausted; hourly cron still active burning ~50k tokens/run; human action required to disable.
+
+### State summary
+
+A ✓ B ✓ C ✓ D ✓ E ✓ + all extensions through CF ✓ ALL DONE.
+**0 open PRs.** Tests: 2364/0/3. Build: clean. Coverage: 100% src-stdio/ + 100% apps/.
+
+### Human-action items
+
+1. **DISABLE hourly cron** — all workstreams exhausted; ~1651 runs; idle-burning ~50k tokens/run with no genuine progress possible.
+2. **Enable GitHub Actions CI** — ci.yml fires but 0 jobs run (org-level disabled). Settings → Actions → General → "Allow all actions".
+3. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`.
+4. **Notion workspace** out of free blocks — upgrade or clear (board fallback: DRIVER-LOG.md).
+5. **Stale branch cleanup** — 1100+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings.
+
+### Next run recommendation
+
+IDLE unless new workstream defined. Candidates requiring human decision:
+- **CG**: Test `src/core.ts` + Worker files with miniflare (requires adding miniflare dev dep).
+- **CG alt**: Seed `packages/shared-types/` from `src-stdio/types.ts` (architectural refactor; human sign-off needed).
+**DISABLE CRON** to stop token burn.
