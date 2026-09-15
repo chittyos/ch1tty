@@ -5255,3 +5255,21 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches; enable "Automatically delete head branches"
 - **PushNotification**: SENT — merged 4 CI-green PRs (BY/BZ/CA/CB); E2E coverage complete for all 5 meta-tools; tests 2344/0/3; queue now empty.
 - **Next run**: IDLE. Queue empty. No new workstream. **DISABLE CRON.**
+
+---
+
+## Run log — 2026-09-15T13:15Z (run ~1646)
+
+- **Workstream advanced:** CE — `ch1tty/search` + `ch1tty/cast` via HTTP transport subprocess E2E
+- **Branch/PR:** `auto/CE-http-search-cast-e2e` → https://github.com/chittyos/ch1tty/pull/1287
+- **Build:** tsc clean (0 errors)
+- **Tests:** 2348 pass / 0 fail / 3 skip (baseline 2344/0/3 on main, +4)
+- **What was done:**
+  - Startup: read CLAUDE.md + CHITTY.md; npm ci clean; build clean; tests 2344/0/3 on main
+  - Read Notion board + DRIVER-BOARD.md: A–CB all complete; 2 open CI-green PRs (#1285 CC, #1286 CD) awaiting merge
+  - Selected CE: HTTP analog of CA (search/cast over Streamable HTTP transport)
+  - Added `test/ce-gateway-e2e-http-search-cast.test.ts` — 3 subtests: search no-query, search+keyword, cast confirm:true
+  - All 4 tests pass; full suite 2348/0/3 (+4)
+  - PR #1287 opened; subscribed CI/review
+- **Open PRs:** #1285 (CC), #1286 (CD), #1287 (CE) — all CI-green
+- **Next run:** CF candidate — HTTP reload+execute E2E (analog of CB), or idle if no new tests needed.
