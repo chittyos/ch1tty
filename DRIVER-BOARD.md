@@ -5273,3 +5273,22 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   - PR #1287 opened; subscribed CI/review
 - **Open PRs:** #1285 (CC), #1286 (CD), #1287 (CE) — all CI-green
 - **Next run:** CF candidate — HTTP reload+execute E2E (analog of CB), or idle if no new tests needed.
+
+---
+
+## Run log — 2026-09-15T~UTC (run ~1647)
+
+- **Workstream advanced:** CF — `ch1tty/reload` + `ch1tty/execute` (error paths) via HTTP transport subprocess E2E
+- **Branch/PR:** `auto/CF-http-reload-execute-e2e` → https://github.com/chittyos/ch1tty/pull/1288
+- **Build:** tsc clean (0 errors)
+- **Tests:** 2352 pass / 0 fail / 3 skip (baseline 2348/0/3 on prior branch, +4 new)
+- **What was done:**
+  - Startup: read notifications (2 CodeRabbit echo-confirms on PR #1287 CE — no action needed)
+  - Synced to origin/main (987ad8e). npm ci + build clean. Tests 2348/0/3.
+  - Read CB (stdio) and CE (HTTP) test patterns; confirmed no CF test existed.
+  - Identified CF: HTTP analog of CB — reload snapshot + execute error paths via StreamableHTTPClientTransport.
+  - Added `test/cf-gateway-e2e-http-reload-execute.test.ts` — 5 subtests: reload snapshot shape, execute missing arg, execute invalid format, execute unknown server.
+  - All 5 subtests pass; full suite 2352/0/3 (+4 vs main).
+  - PR #1288 opened; subscribed to CI/review.
+- **Open PRs:** #1285 (CC), #1286 (CD), #1287 (CE), #1288 (CF) — CC/CD/CE CI-green; CF awaiting CI
+- **Next run:** CG candidate — HTTP status dispatch E2E cross-check, or idle if all 4 PRs remain open and no new gap.
