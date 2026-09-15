@@ -44,6 +44,7 @@ test(
       args: [GATEWAY_ENTRY],
       env: {
         ...process.env,
+        CH1TTY_PORT: '',
         CH1TTY_CONFIG: configPath,
         CH1TTY_SPAWN_TIMEOUT_MS: '2000',
         CH1TTY_REMOTE_TIMEOUT_MS: '2000',
@@ -51,9 +52,12 @@ test(
     });
     const client = new Client({ name: 'bz-e2e', version: '1.0.0' }, { capabilities: {} });
 
+    // Sub-20s deadline shared by both MCP requests so neither outlasts the
+    // node:test 20s timeout and leaves subprocess/temp-dir cleanup pending.
+    const deadline = Date.now() + 15_000;
     try {
-      await client.connect(transport);
-      const { tools } = await client.listTools();
+      await client.connect(transport, { timeout: deadline - Date.now() });
+      const { tools } = await client.listTools(undefined, { timeout: deadline - Date.now() });
       const names = tools.map((t) => t.name).sort();
       assert.equal(
         tools.length,
