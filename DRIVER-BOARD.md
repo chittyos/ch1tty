@@ -5230,3 +5230,28 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   6. Stale branch cleanup — 1100+ remote auto/ branches
 - **PushNotification**: SENT — repeated idle; 2 PRs waiting; cron must be disabled.
 - **Next run**: IDLE. Same state. **DISABLE CRON.**
+
+---
+
+### 2026-09-15T~UTC (run ~1644 — PRODUCTIVE: merged PRs #1279 BY, #1280 BZ, #1282 CA, #1283 CB)
+
+- **Workstream**: BY/BZ/CA/CB queue drain — all 4 CI-green PRs squash-merged
+- **Branch/PRs**: Merged #1279 (BY: zod+wrangler bump, SHA 7765e04), #1280 (BZ: 5-tool E2E invariant, SHA 3383340), #1282 (CA: E2E status/search/cast, SHA c67083a), #1283 (CB: E2E reload/execute, SHA f489e4f). 0 open PRs.
+- **Build**: tsc clean (0 errors, ch1tty@4.1.0) | **Tests**: 2344 pass / 0 fail / 3 skip (2347 total, 107 suites)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE. 0 violations.
+  - `git reset --hard origin/main`. `npm ci` clean. `npm run build` clean (tsc 0 errors). 
+  - Found 4 open PRs all `mergeable_state: clean`, all 3/3 CI green: #1279 BY, #1280 BZ, #1282 CA, #1283 CB.
+  - Squash-merged all 4 in order. Synced to new origin/main (f489e4f).
+  - `npm test`: 2344/0/3 (2347 total, 107 suites) on post-merge main.
+  - `npm outdated`: @types/node 22.20.2 current = latest for v22 line (26.5.1 is for Node.js 26, not applicable on Node.js 22). 0 truly outdated packages. `npm audit`: 0 vulnerabilities.
+  - E2E meta-tool surface now **fully covered** by subprocess tests: BZ (tools/list), CA (status/search/cast), CB (reload/execute) — all 5 meta-tools exercised via real gateway process.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–CB ALL DONE. **0 open PRs.** Tests: 2344/0/3. Build: clean. 0 vulns. E2E surface: 100% meta-tool coverage.
+- **Human-action items** (URGENT — same as prior runs):
+  1. **DISABLE hourly cron** — all workstreams A–CB exhausted; 0 open PRs; ~1644 runs; burning ~50k tokens/run with nothing left to do
+  2. **Enable GitHub Actions (main npm test CI)** — CI still only CodeQL; add main `npm test` job
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Notion workspace** out of free blocks — upgrade or clear
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches; enable "Automatically delete head branches"
+- **PushNotification**: SENT — merged 4 CI-green PRs (BY/BZ/CA/CB); E2E coverage complete for all 5 meta-tools; tests 2344/0/3; queue now empty.
+- **Next run**: IDLE. Queue empty. No new workstream. **DISABLE CRON.**
