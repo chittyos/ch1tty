@@ -51,10 +51,13 @@ async function waitForHealth(port: number, timeoutMs: number): Promise<void> {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     try {
-      const res = await fetch(`http://127.0.0.1:${port}/health`);
+      const remainingMs = deadline - Date.now();
+      const res = await fetch(`http://127.0.0.1:${port}/health`, {
+        signal: AbortSignal.timeout(Math.max(1, Math.min(1000, remainingMs))),
+      });
       if (res.ok) return;
     } catch {
-      // server not up yet
+      // server not up yet or probe aborted
     }
     await new Promise((r) => setTimeout(r, 100));
   }
@@ -159,8 +162,11 @@ test(
       if (proc && !proc.killed) {
         proc.kill('SIGTERM');
         await new Promise<void>((res) => {
-          proc!.once('exit', () => res());
-          setTimeout(res, 2000);
+          const timer = setTimeout(res, 2000);
+          proc!.once('exit', () => {
+            clearTimeout(timer);
+            res();
+          });
         });
       }
       rmSync(dir, { recursive: true, force: true });
