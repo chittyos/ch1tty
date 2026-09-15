@@ -5138,3 +5138,25 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. Stale branch cleanup — 1100+ remote auto/ branches.
 - **PushNotification**: NOT SENT — productive run, no blocking condition; last notification sent at run ~1633.
 - **Next run**: IDLE. Queue empty. No new workstream. DISABLE CRON.
+
+---
+
+### 2026-09-15T~UTC (run ~1636 — IDLE: confirmed clean, 0 open PRs, queue empty)
+
+- **Workstream**: None — queue empty, all workstreams A–BW done
+- **Branch/PR**: 0 open PRs confirmed via GitHub API.
+- **Build**: tsc clean (0 errors, ch1tty@4.1.0) | **Tests**: 2326 pass / 0 fail / 3 skip (2329 total, 107 suites)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE. 0 violations.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 2326/0/3. 0 failures.
+  - 0 open PRs confirmed via GitHub API.
+  - Board state: DRIVER-BOARD.md (Notion unavailable / free-block limit). Last productive run was ~1635 (merged BS–BW). Board state unchanged.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BW ALL DONE. **0 open PRs.** Tests: 2326/0/3. Build: clean.
+- **Human-action items** (URGENT — repeated each run):
+  1. **DISABLE hourly cron** — all workstreams exhausted; 0 open PRs; ~1636 runs; cron burning ~50k tokens/run doing nothing.
+  2. Enable GitHub Actions (main npm test CI job).
+  3. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET.
+  4. Notion workspace out of free blocks.
+  5. Stale branch cleanup — 1100+ remote auto/ branches.
+- **PushNotification**: NOT SENT — idle run, nothing changed.
+- **Next run**: IDLE. Queue empty. No new workstream. **DISABLE CRON.**
