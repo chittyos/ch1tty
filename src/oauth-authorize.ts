@@ -175,6 +175,7 @@ export async function handleAuthorize(req: Request, env: AuthEnv): Promise<Respo
       userId: 'admin',
       scope: oauthReq.scope,
       props: {},
+      metadata: {},
     });
 
     return Response.redirect(redirectTo, 302);
