@@ -5308,3 +5308,35 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 - **Status:** IDLE — all workstreams A–CF complete; no open PRs; 0 vulns; tests green.
 - **Blockers (unchanged):** (1) Notion API token 401 on DRIVER-BOARD fallback path — rotate op://ChittyOS-Integrations/notion/api_token (Notion MCP working this session via connector); (2) CH1TTY_ALLOW_UNAUTH / prod CF Access creds; (3) GITHUB_MCP_AUTHORIZATION on prod; (4) 1081+ stale auto/ branches; (5) Major dep bumps (typescript 5→7, @types/node 22→26, c8 11→12) await human review; (6) Issues #1071/#1072 require human decisions.
 - **Next run:** Idle. No new workstreams defined. Human action required to either (a) add new workstreams to the scheduled prompt, or (b) disable/pause this hourly schedule.
+
+---
+
+## Run log — 2026-09-15T~UTC (run ~1653)
+
+- **Workstream advanced:** None — all workstreams A–CF complete; idle run
+- **Branch/PR:** `auto/2026-09-15-run-log-1653` (this PR — run log only)
+- **Build:** tsc clean (0 errors, ch1tty@4.1.0)
+- **Tests:** 2364 pass / 0 fail / 3 skip (guardrail freeze guards: 56 no-focus / 87 focus:code ✓)
+- **Open PRs:** 0
+- **Notion MCP:** BLOCKED — free tier out of blocks (insert_content rejected)
+- **Actions taken:**
+  - `git reset --hard origin/main` → at e59c8c3 (run ~1652)
+  - `npm ci` clean; `npm run build` clean (tsc 0 errors)
+  - `npm test`: 2364/0/3 (2367 total, 107 suites) — all green
+  - Checked all original workstreams A–E + extended F–CF: all done, all merged
+  - 0 open PRs confirmed via GitHub MCP
+  - PR #1203 (Workstream O — evidence-mcp) confirmed merged 2026-09-10
+  - `apps/ledger-mcp/test/mcp-tool-layer.test.ts` (33 tests) + `apps/session-coordinator-mcp/test/mcp-tool-layer.test.ts` (38 tests) both pass and included in main suite
+  - Notion board update attempted — rejected (free tier, all blocks used)
+  - DRIVER-BOARD.md updated as fallback run log
+- **Status:** IDLE — all workstreams done; no new work identified
+- **Blockers (updated from run ~1649):**
+  1. **DISABLE hourly cron** — ~1653 runs; all workstreams A–CF exhausted; burning ~50k tokens/run with nothing left to do *(new)*
+  2. **Notion workspace out of free blocks** — `insert_content` rejected; upgrade plan or clear blocks *(updated — prior entry was API-token 401; now the connector works but workspace is out of blocks)*
+  3. **GITHUB_MCP_AUTHORIZATION** not set — GitHub MCP backend fails at runtime
+  4. **CHITTY_CF_ACCESS_CLIENT_ID / CHITTY_CF_ACCESS_CLIENT_SECRET** not set — CF Access backends unreachable (covers prior CH1TTY_ALLOW_UNAUTH / prod CF Access creds item)
+  5. **CHITTY_TASKS_TOKEN** not set — tasks-mcp live integration disabled *(new)*
+  6. **1100+ stale auto/ branches** — GitHub UI: Settings → Branches → "Automatically delete head branches" *(was 1081+)*
+  7. **Major dep bumps** — typescript 5→7, @types/node 22→26, c8 11→12 await human review *(carried from ~1649)*
+  8. **Issues #1071/#1072** — require human decisions *(carried from ~1649)*
+- **Next run:** IDLE. Same state. **HUMAN ACTION REQUIRED: disable/pause cron or add new workstreams.**
