@@ -24,6 +24,11 @@ Workstreams A–F ALL DONE. Build clean, tests green (1492/0/3), guardrails enfo
 - [x] **Q** — session-coordinator-mcp MCP tool-layer tests via InMemoryTransport: extracted `createSessionCoordinatorServer()` factory, 22 tests (18 happy-path/required-arg + 4 runtime-validation negative tests). PR #1205 merged 2026-09-10.
 - [x] **R** — comms-mcp MCP tool-layer tests via InMemoryTransport: extracted `createCommsMcpServer()` factory, 11 tests (identifier/person happy-paths, channel filtering, degradation, ordering, truncation, metadata). PR #1206 merged 2026-09-10.
 - [x] **S** — dep refresh: bump `zod` 4.5.4 → 4.6.1 (patch, exact pin). PR #1207 merged 2026-09-10.
+- [x] **BS** — fix(typecheck): resolve 5 Worker/DO typecheck errors in src/ + add `typecheck:worker` CI step. PR #1273 merged 2026-09-15.
+- [x] **BT** — test(BT): add `coverage:apps` script + fix comms-mcp coverage gaps (3 c8 ignores + 2 new tests). PR #1274 merged 2026-09-15.
+- [x] **BU** — test(BU): close reshape.ts branch gaps → 100% branch coverage on comms-mcp (6 new tests). PR #1275 merged 2026-09-15.
+- [x] **BV** — test(BV): extract `isChittyHost` + `extractEntityTypeCode` to `src/core-utils.ts` + 20 unit tests. PR #1276 merged 2026-09-15.
+- [x] **BW** — fix(typecheck): resolve TS2591 `process` not found across all 5 apps tsconfigs + `typecheck:apps` CI step. PR #1277 merged 2026-09-15.
 
 ## Guardrail: buildCastExplanation metric freeze
 
@@ -5109,3 +5114,27 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   4. Notion workspace out of free blocks (board is fallback DRIVER-BOARD.md).
   5. Stale branch cleanup — 1100+ remote auto/ branches.
 - **Next run**: IDLE. Queue empty. No new workstream. **DISABLE CRON.**
+
+---
+
+### 2026-09-15T~UTC (run ~1635 — PRODUCTIVE: merged PRs #1273–#1277 (BS–BW); closed stale #1271/#1272)
+
+- **Workstream**: BS/BT/BU/BV/BW — all 5 merged this run
+- **Branch/PRs**: Merged PRs: #1273 (BS squash 98341cd), #1274 (BT squash 3c2b427), #1276 (BV squash 79cc336), #1275 (BU squash 86f51e9), #1277 (BW squash 83f23e4). Closed stale run-log PRs #1271 and #1272.
+- **Build**: tsc clean (0 errors, ch1tty@4.1.0) | **Tests**: 2326 pass / 0 fail / 3 skip (2329 total, 107 suites)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE. 0 violations.
+  - `npm ci` clean. `npm run build` clean. `npm test`: 2298/0/3 on old main (4084bb5); 2326/0/3 on post-merge main (83f23e4).
+  - Found 7 open PRs (5 workstream + 2 stale run-logs). Board was stale (last updated run ~1634 showing 0 open PRs, but subsequent runs added BS–BW).
+  - BS (#1273): CI 3/3 ✅, clean → squash-merged. BT (#1274): CI 3/3 ✅ after rebase over BS (ci.yml conflict: typecheck:worker vs coverage:apps — kept both) → squash-merged. BV (#1276): CI 3/3 ✅, independent → squash-merged. BU (#1275): CI 3/3 ✅ after rebase-onto (stacked on old BT) → squash-merged. BW (#1277): rebased over all (ci.yml conflict with BS+BT: added typecheck:apps step after typecheck:worker + coverage:apps) → squash-merged.
+  - `npm run typecheck:apps`: exit 0 (all 5 apps). `npm run typecheck:worker`: exit 0. `npm run build`: exit 0.
+  - Closed stale PRs #1271 and #1272 (outdated run-log-only branches).
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BW ALL DONE. **0 open PRs.** Tests: 2326/0/3. Build: clean.
+- **Human-action items** (URGENT):
+  1. **DISABLE hourly cron** — all workstreams A–BW exhausted; 0 open PRs; cron is burning ~50k tokens/run.
+  2. Enable GitHub Actions (main npm test CI job) — CI 0-job failure is a recurring infra issue.
+  3. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET.
+  4. Notion workspace out of free blocks (board is fallback DRIVER-BOARD.md).
+  5. Stale branch cleanup — 1100+ remote auto/ branches.
+- **PushNotification**: NOT SENT — productive run, no blocking condition; last notification sent at run ~1633.
+- **Next run**: IDLE. Queue empty. No new workstream. DISABLE CRON.
