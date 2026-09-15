@@ -4683,3 +4683,42 @@ A ✓ B ✓ C ✓ D ✓ E ✓. **1 open PR** (#1278). Tests: 2333/0/3.
 ### Next run recommendation
 
 BF — scan remaining apps (`apps/ledger-mcp`, `apps/tasks-mcp`) for the same empty-string pattern in `missingArg` guards; if exhausted, scan for uncovered error-path throw branches in the main gateway (`src/aggregator.ts`).
+
+---
+
+### 2026-09-15T (run ~1648 — PRODUCTIVE: merged 4 HTTP E2E PRs; BF exhausted)
+
+**Workstream**: PR queue drain + BF verification
+
+**Build**: tsc clean (0 errors, ch1tty@4.1.0)
+**Tests**: 2364 pass / 0 fail / 3 skip (post-merge; was 2344/0/3 before CC/CD/CE/CF)
+
+### Work done
+
+- Startup: read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE).
+- `git fetch --all`; reset to origin/main (`987ad8e`). `npm ci` clean. `npm run build` clean. `npm test`: 2344/0/3.
+- Found 4 open PRs: #1285 (CC: HTTP transport 5-tool+status), #1286 (CD: HTTP API endpoints), #1287 (CE: HTTP search/cast), #1288 (CF: HTTP reload/execute).
+  - #1287 and #1288: mergeable_state=clean. #1285 and #1286: state=unknown (behind main).
+  - All add separate test files — no conflicts. All PR check runs green (CodeQL+Analyze success).
+- **Merged #1285 (CC), #1286 (CD), #1287 (CE), #1288 (CF)** squash → main now at `1101780`.
+- Pulled new main, ran full suite: **2364/0/3** (+20 vs pre-merge baseline; CC+CD+CE+CF E2E tests included).
+- BF verification: ran `npm run coverage` (src/ 100%) and `npm run coverage:apps` (apps/ 100%). All gaps already covered — BF is complete.
+- ci.yml push-event runs still showing `conclusion: failure` with 0 jobs (0-second runtime) — confirmed same persistent blocker (org-level Actions disabled). Not a regression from HTTP E2E tests.
+
+### State summary
+
+A ✓ B ✓ C ✓ D ✓ E ✓. **0 open PRs.** Tests: 2364/0/3. Coverage: 100% src/ + 100% apps/.
+
+HTTP E2E test suite now complete: BZ (stdio 5-tool), CA (stdio status/search/cast), CB (stdio reload/execute), CC (HTTP 5-tool+status), CD (HTTP API endpoints), CE (HTTP search/cast), CF (HTTP reload/execute) — all on main.
+
+### Human-action items (unchanged)
+
+1. **Enable GitHub Actions CI** — ci.yml workflow fires but 0 jobs run (org-level disabled). Settings → Actions → General → "Allow all actions".
+2. **DISABLE hourly cron** — all workstreams + coverage + E2E tests complete. Cron burning ~50k tokens/run with no new genuine work remaining.
+3. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`.
+4. **Notion workspace** out of free blocks — upgrade or clear.
+5. **Stale branch cleanup** — 1100+ remote `auto/` branches; enable "Automatically delete head branches" in GitHub Settings.
+
+### Next run recommendation
+
+IDLE. All workstreams exhausted. No new genuine coverage gaps. If cron continues: scan for `codemode-fns.ts` or `src/aggregator.ts` error-throw paths that still have coverage — but at 100% src/ coverage these don't exist. **DISABLE CRON.**
