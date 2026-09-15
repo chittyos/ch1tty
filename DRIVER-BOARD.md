@@ -5163,6 +5163,32 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 ---
 
+### 2026-09-15T~08:50 UTC (run ~1641 — IDLE: 2 PRs ready to merge, no new workstream found)
+
+- **Workstream**: None — all A–BW done; #1279 (BY) and #1280 (BZ) ready for merge; no new gap found
+- **Branch/PR**: Closed stale PR #1281 (CA: @types/node was already 22.20.2 on new main — regressive branch, created from outdated local main 117dc9a before discovering remote was force-updated to c685592).
+- **Build**: tsc clean (0 errors, ch1tty@4.1.0) | **Tests**: 2333 pass / 0 fail / 3 skip (2336 total, 107 suites, ~49s)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE. 0 violations.
+  - Started from detached HEAD; `git checkout main` → main was at 117dc9a (run ~1571); remote was at c685592 (run ~1640) after a force-update that merged the prior session's 51 detached-HEAD commits. `git reset --hard origin/main` → now at c685592.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 2333/0/3 (2336 total, 107 suites). `npm audit`: 0 vulnerabilities.
+  - Checked 2 open PRs: **#1279** (BY: zod 4.6.2→4.6.5 + wrangler 4.131.0→4.131.2) — 3/3 CI green, 0 review threads; **#1280** (BZ: E2E subprocess 5-tool invariant) — 3/3 CI green, 2 CodeRabbit threads both resolved. Both ready for human merge.
+  - `npm outdated`: only `wrangler 4.131.0→4.131.2` and `zod 4.6.2→4.6.5` outdated — both covered by open PR #1279.
+  - No new workstream: all outdated packages covered by open PRs; 0 coverage gaps newly found; all workstreams A–BW done.
+  - Closed PR #1281 (CA — @types/node bump was redundant; new main already at 22.20.2).
+  - Notion board: unavailable (API 401 / free-block limit). DRIVER-BOARD.md is durable board.
+- **State summary**: A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–BW ALL DONE. **2 open PRs (#1279, #1280), both CI-green.** Tests: 2333/0/3. Build: clean. 0 vulns.
+- **Human-action items** (URGENT — same as prior runs):
+  1. **Merge PR #1279** (BY: zod 4.6.5 + wrangler 4.131.2) — 3/3 CI green, 0 threads
+  2. **Merge PR #1280** (BZ: subprocess E2E 5-tool invariant) — 3/3 CI green, 2 threads resolved
+  3. **DISABLE hourly cron** — all workstreams exhausted; ~1641 runs; burning tokens with no productive work
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks — upgrade plan or clear blocks
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+- **PushNotification**: NOT SENT — clean idle, 2 PRs ready to merge, no new blocker.
+- **Next run**: IDLE. Merge #1279 + #1280 if human hasn't; then truly nothing left. **DISABLE CRON.**
+---
+
 ### 2026-09-15T~UTC (run ~1637 — IDLE: confirmed clean, 0 open PRs, queue empty)
 
 - **Workstream**: None — queue empty, all workstreams A–BW done
