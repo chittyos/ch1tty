@@ -382,4 +382,244 @@ describe('SessionClient', () => {
       await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
     }
   });
+
+  // ── URL-encoding ─────────────────────────────────────────────────────────────
+
+  it('getSession: URL-encodes IDs with special characters', async () => {
+    let capturedPath = '';
+    const server = http.createServer((req, res) => {
+      capturedPath = req.url!;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify(FIXTURE_SESSIONS[0]));
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new SessionClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await client.getSession('id with space');
+      assert.equal(capturedPath, '/api/sessions/id%20with%20space');
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('updateSession: URL-encodes IDs with special characters', async () => {
+    let capturedPath = '';
+    const server = http.createServer((req, res) => {
+      capturedPath = req.url!;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify(FIXTURE_SESSIONS[0]));
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new SessionClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await client.updateSession('id with space', { status: 'idle' });
+      assert.equal(capturedPath, '/api/sessions/id%20with%20space');
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('closeSession: URL-encodes IDs with special characters', async () => {
+    let capturedPath = '';
+    const server = http.createServer((req, res) => {
+      capturedPath = req.url!;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ ...FIXTURE_SESSIONS[0], status: 'closed' }));
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new SessionClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await client.closeSession('id with space');
+      assert.equal(capturedPath, '/api/sessions/id%20with%20space/close');
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('appendEvent: URL-encodes session IDs with special characters', async () => {
+    let capturedPath = '';
+    const server = http.createServer((req, res) => {
+      capturedPath = req.url!;
+      res.setHeader('Content-Type', 'application/json');
+      res.writeHead(201);
+      res.end(JSON.stringify({ id: 'ev_x', session_id: 'id with space', type: 'test', created_at: '2026-01-01T00:00:00Z' }));
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new SessionClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await client.appendEvent('id with space', { type: 'test' });
+      assert.equal(capturedPath, '/api/sessions/id%20with%20space/events');
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('listEvents: URL-encodes session IDs with special characters', async () => {
+    let capturedPath = '';
+    const server = http.createServer((req, res) => {
+      capturedPath = new URL(req.url!, 'http://localhost').pathname;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ events: [], has_more: false }));
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new SessionClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await client.listEvents('id with space');
+      assert.equal(capturedPath, '/api/sessions/id%20with%20space/events');
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  // ── HTTP method verification ──────────────────────────────────────────────────
+
+  it('createSession: sends POST to /api/sessions', async () => {
+    let capturedMethod = '';
+    let capturedPath = '';
+    const server = http.createServer((req, res) => {
+      capturedMethod = req.method!;
+      capturedPath = req.url!;
+      res.setHeader('Content-Type', 'application/json');
+      res.writeHead(201);
+      res.end(JSON.stringify({ id: 's_new', channel: 'web', status: 'active', event_count: 0, created_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-01T00:00:00Z' }));
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new SessionClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await client.createSession({ channel: 'web' });
+      assert.equal(capturedMethod, 'POST');
+      assert.equal(capturedPath, '/api/sessions');
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('updateSession: sends PATCH method', async () => {
+    let capturedMethod = '';
+    const server = http.createServer((req, res) => {
+      capturedMethod = req.method!;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify(FIXTURE_SESSIONS[0]));
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new SessionClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await client.updateSession('s1', { status: 'idle' });
+      assert.equal(capturedMethod, 'PATCH');
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('closeSession: sends POST to /api/sessions/:id/close', async () => {
+    let capturedMethod = '';
+    let capturedPath = '';
+    const server = http.createServer((req, res) => {
+      capturedMethod = req.method!;
+      capturedPath = req.url!;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ ...FIXTURE_SESSIONS[0], status: 'closed' }));
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new SessionClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await client.closeSession('s1');
+      assert.equal(capturedMethod, 'POST');
+      assert.equal(capturedPath, '/api/sessions/s1/close');
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('appendEvent: sends POST to /api/sessions/:id/events', async () => {
+    let capturedMethod = '';
+    let capturedPath = '';
+    const server = http.createServer((req, res) => {
+      capturedMethod = req.method!;
+      capturedPath = req.url!;
+      res.setHeader('Content-Type', 'application/json');
+      res.writeHead(201);
+      res.end(JSON.stringify({ id: 'ev_x', session_id: 's1', type: 'ping', created_at: '2026-01-01T00:00:00Z' }));
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new SessionClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await client.appendEvent('s1', { type: 'ping' });
+      assert.equal(capturedMethod, 'POST');
+      assert.equal(capturedPath, '/api/sessions/s1/events');
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  // ── Error path coverage ───────────────────────────────────────────────────────
+
+  it('getSession: non-ok response (500) throws with status code in message', async () => {
+    const server = http.createServer((_req, res) => { res.writeHead(500); res.end('internal server error'); });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new SessionClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await assert.rejects(() => client.getSession('s1'), /500/);
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('createSession: non-ok response (422) throws with status code in message', async () => {
+    const server = http.createServer((_req, res) => { res.writeHead(422); res.end('{"error":"validation failed"}'); });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new SessionClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await assert.rejects(() => client.createSession({ channel: 'web' }), /422/);
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('updateSession: non-ok response (422) throws with status code in message', async () => {
+    const server = http.createServer((_req, res) => { res.writeHead(422); res.end('{"error":"invalid status"}'); });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new SessionClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await assert.rejects(() => client.updateSession('s1', { status: 'idle' }), /422/);
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('closeSession: non-ok response (500) throws with status code in message', async () => {
+    const server = http.createServer((_req, res) => { res.writeHead(500); res.end('internal error'); });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new SessionClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await assert.rejects(() => client.closeSession('s1'), /500/);
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('appendEvent: non-ok response (500) throws with status code in message', async () => {
+    const server = http.createServer((_req, res) => { res.writeHead(500); res.end('internal error'); });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new SessionClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await assert.rejects(() => client.appendEvent('s1', { type: 'ping' }), /500/);
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
 });
