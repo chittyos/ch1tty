@@ -1,36 +1,84 @@
 {
-  "_comment": "Focus-profile suggestions catalog — 3 combos + 3 prompts per profile, covering all 25 active profiles. verified:false = tool names inferred from server MCP surface, not confirmed live.",
-  "generatedFrom": "auto-driver run 2026-09-07 — initial catalog populate, all 25 profiles",
+  "_comment": "Focus-profile suggestions catalog \u2014 5 combos + 5 prompts per profile, covering all 25 active profiles. verified:false = tool names inferred from server MCP surface, not confirmed live. Expanded from 3\u21925 in E2 workstream.",
+  "generatedFrom": "auto-driver run 2026-09-07 \u2014 initial catalog populate, all 25 profiles",
   "profiles": {
     "analytics": {
       "description": "Analytics and metrics tools for querying usage data, dashboards, and reporting.",
       "combos": [
         {
           "name": "analytics-to-notion-report",
-          "chain": ["analytics/query_metrics", "notion/API-post-page"],
+          "chain": [
+            "analytics/query_metrics",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Query an analytics data source for recent metrics and write the results into a Notion report page for sharing.",
           "verified": false,
           "notes": "analytics server tool names inferred; notion/API-post-page verified."
         },
         {
           "name": "analytics-insights-to-tasks",
-          "chain": ["analytics/query_metrics", "thinking/sequentialthinking", "tasks/create_task"],
+          "chain": [
+            "analytics/query_metrics",
+            "thinking/sequentialthinking",
+            "tasks/create_task"
+          ],
           "accomplishes": "Pull metrics, reason over anomalies with sequential thinking, then create a follow-up task for any significant deviation.",
           "verified": false,
           "notes": "analytics inferred; thinking and tasks verified."
         },
         {
           "name": "analytics-dashboard-screenshot",
-          "chain": ["analytics/query_metrics", "playwright/screenshot"],
+          "chain": [
+            "analytics/query_metrics",
+            "playwright/screenshot"
+          ],
           "accomplishes": "Fetch current metrics and capture a browser screenshot of the live dashboard for archiving or sharing.",
           "verified": false,
           "notes": "playwright verified; analytics inferred."
+        },
+        {
+          "name": "analytics-anomaly-to-linear",
+          "chain": [
+            "analytics/query_metrics",
+            "thinking/sequentialthinking",
+            "linear/create_issue"
+          ],
+          "accomplishes": "Query analytics metrics, reason over anomalies with sequential thinking, and open a Linear issue for any significant deviation detected.",
+          "verified": false,
+          "notes": "analytics and linear tool names inferred; thinking verified."
+        },
+        {
+          "name": "analytics-cross-db-join",
+          "chain": [
+            "analytics/query_metrics",
+            "neon/run_sql"
+          ],
+          "accomplishes": "Fetch aggregated analytics events then join against the application's Neon database to correlate business data with usage patterns.",
+          "verified": false,
+          "notes": "analytics inferred; neon/run_sql verified."
         }
       ],
       "prompts": [
-        { "text": "Show me the latest usage metrics", "resolves_to": "analytics/query_metrics" },
-        { "text": "Generate a weekly analytics report in Notion", "resolves_to": "analytics/query_metrics → notion/API-post-page" },
-        { "text": "Alert me if any metric spikes above threshold", "resolves_to": "analytics/query_metrics → tasks/create_task" }
+        {
+          "text": "Show me the latest usage metrics",
+          "resolves_to": "analytics/query_metrics"
+        },
+        {
+          "text": "Generate a weekly analytics report in Notion",
+          "resolves_to": "analytics/query_metrics \u2192 notion/API-post-page"
+        },
+        {
+          "text": "Alert me if any metric spikes above threshold",
+          "resolves_to": "analytics/query_metrics \u2192 tasks/create_task"
+        },
+        {
+          "text": "Compare this week's metrics against last week",
+          "resolves_to": "analytics/query_metrics"
+        },
+        {
+          "text": "Create a Linear issue for any metric anomalies",
+          "resolves_to": "analytics/query_metrics \u2192 linear/create_issue"
+        }
       ]
     },
     "auth": {
@@ -38,30 +86,79 @@
       "combos": [
         {
           "name": "session-health-check",
-          "chain": ["session/list_sessions", "chittyos/health"],
+          "chain": [
+            "session/list_sessions",
+            "chittyos/health"
+          ],
           "accomplishes": "List active MCP sessions and cross-check ChittyOS service health to surface any auth-related degradation.",
           "verified": false,
           "notes": "session and chittyos tool names inferred."
         },
         {
           "name": "stale-session-cleanup",
-          "chain": ["session/list_sessions", "session/evict_session", "tasks/create_task"],
+          "chain": [
+            "session/list_sessions",
+            "session/evict_session",
+            "tasks/create_task"
+          ],
           "accomplishes": "List sessions, evict any that are stale, and create a task tracking the cleanup for audit.",
           "verified": false,
           "notes": "session tools inferred; tasks verified."
         },
         {
           "name": "auth-audit-to-notion",
-          "chain": ["session/list_sessions", "chittyos/health", "notion/API-post-page"],
+          "chain": [
+            "session/list_sessions",
+            "chittyos/health",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Capture a snapshot of active sessions and ChittyOS auth state into a Notion audit log page.",
           "verified": false,
           "notes": "notion/API-post-page verified; others inferred."
+        },
+        {
+          "name": "auth-token-verify-and-log",
+          "chain": [
+            "auth/verify_token",
+            "ledger/record_transaction"
+          ],
+          "accomplishes": "Verify an inbound auth token against ChittyOS identity and record the verification event in the ledger for audit trail.",
+          "verified": false,
+          "notes": "auth/verify_token inferred; ledger/record_transaction inferred."
+        },
+        {
+          "name": "session-sweep-and-notify",
+          "chain": [
+            "session/list_sessions",
+            "session/evict_session",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "List active sessions, evict any stale or suspicious ones, and post a Notion audit note with the cleanup summary.",
+          "verified": false,
+          "notes": "session tools inferred; notion verified."
         }
       ],
       "prompts": [
-        { "text": "List all active sessions", "resolves_to": "session/list_sessions" },
-        { "text": "Check ChittyOS auth health", "resolves_to": "chittyos/health" },
-        { "text": "Evict stale sessions and log the cleanup", "resolves_to": "session/evict_session → notion/API-post-page" }
+        {
+          "text": "List all active sessions",
+          "resolves_to": "session/list_sessions"
+        },
+        {
+          "text": "Check ChittyOS auth health",
+          "resolves_to": "chittyos/health"
+        },
+        {
+          "text": "Evict stale sessions and log the cleanup",
+          "resolves_to": "session/evict_session \u2192 notion/API-post-page"
+        },
+        {
+          "text": "Verify this token and log the check",
+          "resolves_to": "auth/verify_token \u2192 ledger/record_transaction"
+        },
+        {
+          "text": "Sweep stale sessions and notify me",
+          "resolves_to": "session/list_sessions \u2192 session/evict_session"
+        }
       ]
     },
     "chittyevidence": {
@@ -69,30 +166,76 @@
       "combos": [
         {
           "name": "evidence-search-to-notion",
-          "chain": ["chittyevidence/search_evidence", "notion/API-post-page"],
+          "chain": [
+            "chittyevidence/search_evidence",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Search the ChittyEvidence corpus for matching documents and log the results into a Notion evidence tracker page.",
           "verified": false,
           "notes": "chittyevidence tool names inferred; notion verified."
         },
         {
           "name": "evidence-ingest-and-track",
-          "chain": ["chittyevidence/ingest_document", "tasks/create_task"],
+          "chain": [
+            "chittyevidence/ingest_document",
+            "tasks/create_task"
+          ],
           "accomplishes": "Ingest a new document into ChittyEvidence and create a task to review and tag the ingested material.",
           "verified": false,
           "notes": "chittyevidence inferred; tasks verified."
         },
         {
           "name": "evidence-to-linear-issue",
-          "chain": ["chittyevidence/search_evidence", "linear/createIssue"],
+          "chain": [
+            "chittyevidence/search_evidence",
+            "linear/createIssue"
+          ],
           "accomplishes": "Search evidence corpus for findings related to an issue and open a linked Linear issue to track remediation.",
           "verified": false,
           "notes": "chittyevidence inferred; linear/createIssue inferred."
+        },
+        {
+          "name": "evidence-canonical-uri-lookup",
+          "chain": [
+            "chittyevidence/get_canonical_uri",
+            "chittyevidence/get_document"
+          ],
+          "accomplishes": "Resolve a canonical URI from the evidence corpus and immediately retrieve the full document content for review.",
+          "verified": false,
+          "notes": "chittyevidence tool names inferred from apps/evidence-mcp surface."
+        },
+        {
+          "name": "evidence-search-and-task",
+          "chain": [
+            "chittyevidence/search_evidence",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Search ChittyEvidence for relevant documents and create a follow-up task pinning the key findings for human review.",
+          "verified": false,
+          "notes": "chittyevidence search inferred; tasks verified."
         }
       ],
       "prompts": [
-        { "text": "Search ChittyEvidence for documents about a topic", "resolves_to": "chittyevidence/search_evidence" },
-        { "text": "Ingest a new document into the evidence corpus", "resolves_to": "chittyevidence/ingest_document" },
-        { "text": "Log evidence findings into Notion", "resolves_to": "chittyevidence/search_evidence → notion/API-post-page" }
+        {
+          "text": "Search ChittyEvidence for documents about a topic",
+          "resolves_to": "chittyevidence/search_evidence"
+        },
+        {
+          "text": "Ingest a new document into the evidence corpus",
+          "resolves_to": "chittyevidence/ingest_document"
+        },
+        {
+          "text": "Log evidence findings into Notion",
+          "resolves_to": "chittyevidence/search_evidence \u2192 notion/API-post-page"
+        },
+        {
+          "text": "Look up a canonical URI and fetch the document",
+          "resolves_to": "chittyevidence/get_canonical_uri \u2192 chittyevidence/get_document"
+        },
+        {
+          "text": "Search evidence and create a review task",
+          "resolves_to": "chittyevidence/search_evidence \u2192 tasks/create_task"
+        }
       ]
     },
     "cloud": {
@@ -100,30 +243,76 @@
       "combos": [
         {
           "name": "workers-build-and-deploy",
-          "chain": ["cloudflare-builds/trigger_build", "cloudflare/workers_get"],
+          "chain": [
+            "cloudflare-builds/trigger_build",
+            "cloudflare/workers_get"
+          ],
           "accomplishes": "Trigger a Cloudflare Workers build and then fetch the deployed worker's status to confirm the deployment.",
           "verified": false,
           "notes": "cloudflare-builds and cloudflare tool names inferred."
         },
         {
           "name": "ship-deploy-and-verify",
-          "chain": ["ship/deploy", "cloudflare/workers_get"],
+          "chain": [
+            "ship/deploy",
+            "cloudflare/workers_get"
+          ],
           "accomplishes": "Run a Ship deployment then verify the Cloudflare Worker edge configuration is updated correctly.",
           "verified": false,
           "notes": "ship and cloudflare tool names inferred."
         },
         {
           "name": "build-list-and-notify",
-          "chain": ["cloudflare-builds/list_builds", "tasks/create_task"],
+          "chain": [
+            "cloudflare-builds/list_builds",
+            "tasks/create_task"
+          ],
           "accomplishes": "List recent Cloudflare builds and create a task to investigate any that failed.",
           "verified": false,
           "notes": "cloudflare-builds inferred; tasks verified."
+        },
+        {
+          "name": "cloud-build-then-deploy",
+          "chain": [
+            "cloudflare-builds/trigger_build",
+            "cloudflare/deploy_worker"
+          ],
+          "accomplishes": "Trigger a Cloudflare Pages or Workers build and then deploy the resulting artifact to the target environment.",
+          "verified": false,
+          "notes": "cloudflare-builds and cloudflare tool names inferred."
+        },
+        {
+          "name": "cloud-deploy-and-ship",
+          "chain": [
+            "cloudflare/deploy_worker",
+            "ship/create_deployment"
+          ],
+          "accomplishes": "Deploy a Worker to Cloudflare and register the deployment via the ship service for release tracking.",
+          "verified": false,
+          "notes": "ship tool names inferred."
         }
       ],
       "prompts": [
-        { "text": "Trigger a Cloudflare Workers build", "resolves_to": "cloudflare-builds/trigger_build" },
-        { "text": "Check the status of the latest deployment", "resolves_to": "cloudflare/workers_get" },
-        { "text": "Deploy via Ship and verify on Cloudflare", "resolves_to": "ship/deploy → cloudflare/workers_get" }
+        {
+          "text": "Trigger a Cloudflare Workers build",
+          "resolves_to": "cloudflare-builds/trigger_build"
+        },
+        {
+          "text": "Check the status of the latest deployment",
+          "resolves_to": "cloudflare/workers_get"
+        },
+        {
+          "text": "Deploy via Ship and verify on Cloudflare",
+          "resolves_to": "ship/deploy \u2192 cloudflare/workers_get"
+        },
+        {
+          "text": "Build and deploy the latest Worker",
+          "resolves_to": "cloudflare-builds/trigger_build \u2192 cloudflare/deploy_worker"
+        },
+        {
+          "text": "Deploy to Cloudflare and register the release",
+          "resolves_to": "cloudflare/deploy_worker \u2192 ship/create_deployment"
+        }
       ]
     },
     "code": {
@@ -131,30 +320,77 @@
       "combos": [
         {
           "name": "code-search-with-docs",
-          "chain": ["serena/search_files", "context7/resolve-library-id", "context7/get-library-docs"],
+          "chain": [
+            "serena/search_files",
+            "context7/resolve-library-id",
+            "context7/get-library-docs"
+          ],
           "accomplishes": "Search the codebase for a function or pattern, then fetch the relevant library documentation to understand its usage.",
           "verified": false,
           "notes": "serena/search_files verified; context7 tools verified."
         },
         {
           "name": "quality-issue-to-linear",
-          "chain": ["quality/get_metrics", "linear/createIssue"],
+          "chain": [
+            "quality/get_metrics",
+            "linear/createIssue"
+          ],
           "accomplishes": "Pull quality metrics for the codebase and open a Linear issue for any coverage or complexity regressions found.",
           "verified": false,
           "notes": "quality inferred; linear inferred."
         },
         {
           "name": "neon-query-to-notion",
-          "chain": ["neon/run_sql", "notion/API-post-page"],
+          "chain": [
+            "neon/run_sql",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Run a Neon SQL query and write the results into a Notion page for sharing or documentation.",
           "verified": false,
           "notes": "neon/run_sql verified; notion/API-post-page verified."
+        },
+        {
+          "name": "code-search-and-docs",
+          "chain": [
+            "github/search_code",
+            "context7/search_docs"
+          ],
+          "accomplishes": "Search the GitHub codebase for a symbol or pattern and then look up its upstream library documentation to understand the intended contract.",
+          "verified": false,
+          "notes": "github/search_code inferred; context7/search_docs inferred."
+        },
+        {
+          "name": "code-db-query-and-lint",
+          "chain": [
+            "neon/run_sql",
+            "quality/lint"
+          ],
+          "accomplishes": "Run a SQL query against the Neon database to inspect schema or data, then run the linter to confirm no code changes broke style rules.",
+          "verified": false,
+          "notes": "neon/run_sql verified; quality/lint inferred."
         }
       ],
       "prompts": [
-        { "text": "Search the codebase for a function or pattern", "resolves_to": "serena/search_files" },
-        { "text": "Look up library documentation for a package", "resolves_to": "context7/resolve-library-id → context7/get-library-docs" },
-        { "text": "Check code quality metrics and file a Linear issue", "resolves_to": "quality/get_metrics → linear/createIssue" }
+        {
+          "text": "Search the codebase for a function or pattern",
+          "resolves_to": "serena/search_files"
+        },
+        {
+          "text": "Look up library documentation for a package",
+          "resolves_to": "context7/resolve-library-id \u2192 context7/get-library-docs"
+        },
+        {
+          "text": "Check code quality metrics and file a Linear issue",
+          "resolves_to": "quality/get_metrics \u2192 linear/createIssue"
+        },
+        {
+          "text": "Search the codebase and look up the library docs",
+          "resolves_to": "github/search_code \u2192 context7/search_docs"
+        },
+        {
+          "text": "Run the DB query then lint the project",
+          "resolves_to": "neon/run_sql \u2192 quality/lint"
+        }
       ]
     },
     "communication": {
@@ -162,30 +398,77 @@
       "combos": [
         {
           "name": "comms-log-to-notion",
-          "chain": ["comms/comms.recentLog", "notion/API-post-page"],
+          "chain": [
+            "comms/comms.recentLog",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Fetch the recent ChittyComms activity log and post a summary into Notion for team record-keeping.",
           "verified": false,
           "notes": "comms/comms.recentLog is the sole comms-mcp tool (read-only); notion verified."
         },
         {
           "name": "task-with-message-notify",
-          "chain": ["tasks/create_task", "imessage/send_message"],
+          "chain": [
+            "tasks/create_task",
+            "imessage/send_message"
+          ],
           "accomplishes": "Create a task for an urgent issue and send an iMessage notification to the owner immediately.",
           "verified": false,
           "notes": "tasks verified; imessage tool names inferred (macOS homelab)."
         },
         {
           "name": "notion-search-then-share",
-          "chain": ["notion/API-retrieve-a-page", "imessage/send_message"],
+          "chain": [
+            "notion/API-retrieve-a-page",
+            "imessage/send_message"
+          ],
           "accomplishes": "Retrieve a Notion page and share its content via iMessage for team visibility.",
           "verified": false,
           "notes": "notion/API-retrieve-a-page verified; imessage inferred (comms-mcp is read-only)."
+        },
+        {
+          "name": "comms-digest-to-task",
+          "chain": [
+            "comms/comms.recentLog",
+            "thinking/sequentialthinking",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Pull recent communication log via comms.recentLog, reason over any action items, and create tasks from them.",
+          "verified": false,
+          "notes": "comms/comms.recentLog verified; thinking and tasks verified."
+        },
+        {
+          "name": "imessage-to-notion-note",
+          "chain": [
+            "imessage/search_messages",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search iMessage conversations for relevant context and archive a cleaned-up summary into a Notion note.",
+          "verified": false,
+          "notes": "imessage tool names inferred; notion verified."
         }
       ],
       "prompts": [
-        { "text": "Send a message via iMessage", "resolves_to": "imessage/send_message" },
-        { "text": "Create a task and notify via iMessage", "resolves_to": "tasks/create_task → imessage/send_message" },
-        { "text": "Log recent comms activity into Notion", "resolves_to": "comms/comms.recentLog → notion/API-post-page" }
+        {
+          "text": "Send a message via iMessage",
+          "resolves_to": "imessage/send_message"
+        },
+        {
+          "text": "Create a task and notify via iMessage",
+          "resolves_to": "tasks/create_task \u2192 imessage/send_message"
+        },
+        {
+          "text": "Log recent comms activity into Notion",
+          "resolves_to": "comms/comms.recentLog \u2192 notion/API-post-page"
+        },
+        {
+          "text": "Turn my recent comms log into tasks",
+          "resolves_to": "comms/comms.recentLog \u2192 tasks/create_task"
+        },
+        {
+          "text": "Archive this iMessage thread to Notion",
+          "resolves_to": "imessage/search_messages \u2192 notion/API-post-page"
+        }
       ]
     },
     "data": {
@@ -193,30 +476,76 @@
       "combos": [
         {
           "name": "neon-query-to-file",
-          "chain": ["neon/run_sql", "fs/write_file"],
+          "chain": [
+            "neon/run_sql",
+            "fs/write_file"
+          ],
           "accomplishes": "Run a Neon SQL query and write the results to a local CSV file for export or analysis.",
           "verified": false,
           "notes": "neon/run_sql verified; fs/write_file inferred."
         },
         {
           "name": "storage-list-to-neon",
-          "chain": ["neon/list_projects", "neon/run_sql"],
+          "chain": [
+            "neon/list_projects",
+            "neon/run_sql"
+          ],
           "accomplishes": "List Neon projects to identify the target database, then run a SQL query against it.",
           "verified": false,
           "notes": "neon tools verified."
         },
         {
           "name": "schema-inspect-and-document",
-          "chain": ["neon/describe_table_schema", "notion/API-post-page"],
+          "chain": [
+            "neon/describe_table_schema",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Introspect a Neon table schema and write a data dictionary page in Notion for team reference.",
           "verified": false,
           "notes": "neon schema tools inferred; notion verified."
+        },
+        {
+          "name": "data-query-and-export",
+          "chain": [
+            "neon/run_sql",
+            "storage/upload"
+          ],
+          "accomplishes": "Run a SQL query against the Neon database and upload the result CSV to cloud storage for downstream consumption.",
+          "verified": false,
+          "notes": "neon verified; storage/upload inferred."
+        },
+        {
+          "name": "data-fs-inspect-and-query",
+          "chain": [
+            "fs/read_file",
+            "neon/run_sql"
+          ],
+          "accomplishes": "Read a local data file (CSV, JSON) and cross-reference its contents with a live Neon database query to validate or enrich the data.",
+          "verified": false,
+          "notes": "fs/read_file inferred; neon/run_sql verified."
         }
       ],
       "prompts": [
-        { "text": "Run a SQL query on Neon", "resolves_to": "neon/run_sql" },
-        { "text": "Export Neon query results to a file", "resolves_to": "neon/run_sql → fs/write_file" },
-        { "text": "Inspect a table schema and document it in Notion", "resolves_to": "neon/describe_table_schema → notion/API-post-page" }
+        {
+          "text": "Run a SQL query on Neon",
+          "resolves_to": "neon/run_sql"
+        },
+        {
+          "text": "Export Neon query results to a file",
+          "resolves_to": "neon/run_sql \u2192 fs/write_file"
+        },
+        {
+          "text": "Inspect a table schema and document it in Notion",
+          "resolves_to": "neon/describe_table_schema \u2192 notion/API-post-page"
+        },
+        {
+          "text": "Run this query and export to storage",
+          "resolves_to": "neon/run_sql \u2192 storage/upload"
+        },
+        {
+          "text": "Read this file and compare with the database",
+          "resolves_to": "fs/read_file \u2192 neon/run_sql"
+        }
       ]
     },
     "deploy": {
@@ -224,30 +553,78 @@
       "combos": [
         {
           "name": "build-and-track-linear",
-          "chain": ["cloudflare-builds/trigger_build", "linear/createIssue"],
+          "chain": [
+            "cloudflare-builds/trigger_build",
+            "linear/createIssue"
+          ],
           "accomplishes": "Trigger a Cloudflare Workers build and open a Linear issue to track the deployment milestone.",
           "verified": false,
           "notes": "cloudflare-builds and linear inferred."
         },
         {
           "name": "pr-and-task",
-          "chain": ["github/create_pull_request", "tasks/create_task"],
+          "chain": [
+            "github/create_pull_request",
+            "tasks/create_task"
+          ],
           "accomplishes": "Open a GitHub pull request for a feature branch and create a tracking task for review follow-up.",
           "verified": false,
           "notes": "github/create_pull_request inferred (not connected); tasks verified."
         },
         {
           "name": "ship-deploy-and-verify-worker",
-          "chain": ["ship/deploy", "cloudflare/workers_get", "tasks/create_task"],
+          "chain": [
+            "ship/deploy",
+            "cloudflare/workers_get",
+            "tasks/create_task"
+          ],
           "accomplishes": "Deploy via Ship, verify the Cloudflare Worker edge configuration, then create a task to confirm post-deploy checks.",
           "verified": false,
           "notes": "ship and cloudflare inferred; tasks verified."
+        },
+        {
+          "name": "deploy-pr-then-ship",
+          "chain": [
+            "github/create_pull_request",
+            "cloudflare/deploy_worker",
+            "ship/create_deployment"
+          ],
+          "accomplishes": "Open a GitHub PR, deploy the Worker to Cloudflare, and register the deployment via ship \u2014 covering the full release path in one chain.",
+          "verified": false,
+          "notes": "github and cloudflare tool names inferred; ship inferred."
+        },
+        {
+          "name": "deploy-linear-track",
+          "chain": [
+            "cloudflare/deploy_worker",
+            "linear/update_issue"
+          ],
+          "accomplishes": "Deploy to Cloudflare and immediately update the corresponding Linear issue to 'Done', closing the loop between code and delivery.",
+          "verified": false,
+          "notes": "linear/update_issue inferred."
         }
       ],
       "prompts": [
-        { "text": "Trigger a build and track it in Linear", "resolves_to": "cloudflare-builds/trigger_build → linear/createIssue" },
-        { "text": "Open a pull request for this branch", "resolves_to": "github/create_pull_request" },
-        { "text": "Deploy via Ship and verify on Cloudflare", "resolves_to": "ship/deploy → cloudflare/workers_get" }
+        {
+          "text": "Trigger a build and track it in Linear",
+          "resolves_to": "cloudflare-builds/trigger_build \u2192 linear/createIssue"
+        },
+        {
+          "text": "Open a pull request for this branch",
+          "resolves_to": "github/create_pull_request"
+        },
+        {
+          "text": "Deploy via Ship and verify on Cloudflare",
+          "resolves_to": "ship/deploy \u2192 cloudflare/workers_get"
+        },
+        {
+          "text": "Open a PR, deploy, and register the release",
+          "resolves_to": "github/create_pull_request \u2192 cloudflare/deploy_worker \u2192 ship/create_deployment"
+        },
+        {
+          "text": "Deploy and close the Linear issue",
+          "resolves_to": "cloudflare/deploy_worker \u2192 linear/update_issue"
+        }
       ]
     },
     "design": {
@@ -255,30 +632,76 @@
       "combos": [
         {
           "name": "playwright-screenshot-to-notion",
-          "chain": ["playwright/screenshot", "notion/API-post-page"],
+          "chain": [
+            "playwright/screenshot",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Capture a browser screenshot of a UI or design page and attach it to a Notion design review page.",
           "verified": false,
           "notes": "playwright/screenshot verified; notion verified."
         },
         {
           "name": "render-and-capture",
-          "chain": ["browser-rendering/screenshot", "notion/API-post-page"],
+          "chain": [
+            "browser-rendering/screenshot",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Render a URL via Cloudflare Browser Rendering and capture the result for visual QA in Notion.",
           "verified": false,
           "notes": "browser-rendering inferred; notion verified."
         },
         {
           "name": "playwright-navigate-and-extract",
-          "chain": ["playwright/navigate", "playwright/get_text"],
+          "chain": [
+            "playwright/navigate",
+            "playwright/get_text"
+          ],
           "accomplishes": "Navigate to a design URL and extract visible text content for accessibility or copy review.",
           "verified": false,
           "notes": "playwright tools verified."
+        },
+        {
+          "name": "design-screenshot-to-notion",
+          "chain": [
+            "playwright/screenshot",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Capture a screenshot of the current design in the browser and embed it into a Notion page for stakeholder review.",
+          "verified": false,
+          "notes": "playwright verified; notion verified."
+        },
+        {
+          "name": "design-render-and-task",
+          "chain": [
+            "browser-rendering/render",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Render a design asset in the browser and create a task with the output URL for design review sign-off.",
+          "verified": false,
+          "notes": "browser-rendering tool names inferred."
         }
       ],
       "prompts": [
-        { "text": "Take a screenshot of this URL", "resolves_to": "playwright/screenshot" },
-        { "text": "Render a page and save to Notion", "resolves_to": "browser-rendering/screenshot → notion/API-post-page" },
-        { "text": "Extract text from a design page for review", "resolves_to": "playwright/navigate → playwright/get_text" }
+        {
+          "text": "Take a screenshot of this URL",
+          "resolves_to": "playwright/screenshot"
+        },
+        {
+          "text": "Render a page and save to Notion",
+          "resolves_to": "browser-rendering/screenshot \u2192 notion/API-post-page"
+        },
+        {
+          "text": "Extract text from a design page for review",
+          "resolves_to": "playwright/navigate \u2192 playwright/get_text"
+        },
+        {
+          "text": "Screenshot the design and post to Notion",
+          "resolves_to": "playwright/screenshot \u2192 notion/API-post-page"
+        },
+        {
+          "text": "Render the design and create a review task",
+          "resolves_to": "browser-rendering/render \u2192 tasks/create_task"
+        }
       ]
     },
     "devops": {
@@ -286,30 +709,77 @@
       "combos": [
         {
           "name": "build-and-pr",
-          "chain": ["cloudflare-builds/list_builds", "github/create_pull_request"],
+          "chain": [
+            "cloudflare-builds/list_builds",
+            "github/create_pull_request"
+          ],
           "accomplishes": "List recent Cloudflare builds to identify the latest artifact and open a GitHub PR to ship it.",
           "verified": false,
           "notes": "cloudflare-builds and github inferred."
         },
         {
           "name": "neon-branch-for-feature",
-          "chain": ["neon/create_branch", "cloudflare-builds/trigger_build"],
+          "chain": [
+            "neon/create_branch",
+            "cloudflare-builds/trigger_build"
+          ],
           "accomplishes": "Create a Neon database branch for an isolated feature environment, then trigger the build against it.",
           "verified": false,
           "notes": "neon/create_branch verified; cloudflare-builds inferred."
         },
         {
           "name": "github-issues-to-linear",
-          "chain": ["github/list_issues", "linear/createIssue"],
+          "chain": [
+            "github/list_issues",
+            "linear/createIssue"
+          ],
           "accomplishes": "List open GitHub issues and mirror critical ones into Linear for sprint planning.",
           "verified": false,
           "notes": "github inferred; linear inferred."
+        },
+        {
+          "name": "devops-code-search-and-neon",
+          "chain": [
+            "github/search_code",
+            "neon/run_sql"
+          ],
+          "accomplishes": "Search GitHub for a service or config pattern, then query Neon for its corresponding runtime data to validate consistency.",
+          "verified": false,
+          "notes": "github/search_code inferred; neon/run_sql verified."
+        },
+        {
+          "name": "devops-linear-to-deploy",
+          "chain": [
+            "linear/list_issues",
+            "cloudflare/deploy_worker",
+            "linear/update_issue"
+          ],
+          "accomplishes": "List Linear issues in the current sprint, deploy the target Worker, and mark the relevant issue done to close the delivery loop.",
+          "verified": false,
+          "notes": "linear tool names inferred."
         }
       ],
       "prompts": [
-        { "text": "List recent Cloudflare builds and open a PR", "resolves_to": "cloudflare-builds/list_builds → github/create_pull_request" },
-        { "text": "Create a Neon branch for a feature", "resolves_to": "neon/create_branch" },
-        { "text": "Sync GitHub issues to Linear", "resolves_to": "github/list_issues → linear/createIssue" }
+        {
+          "text": "List recent Cloudflare builds and open a PR",
+          "resolves_to": "cloudflare-builds/list_builds \u2192 github/create_pull_request"
+        },
+        {
+          "text": "Create a Neon branch for a feature",
+          "resolves_to": "neon/create_branch"
+        },
+        {
+          "text": "Sync GitHub issues to Linear",
+          "resolves_to": "github/list_issues \u2192 linear/createIssue"
+        },
+        {
+          "text": "Search code and check the DB for consistency",
+          "resolves_to": "github/search_code \u2192 neon/run_sql"
+        },
+        {
+          "text": "Pick a Linear issue, deploy, and mark it done",
+          "resolves_to": "linear/list_issues \u2192 cloudflare/deploy_worker \u2192 linear/update_issue"
+        }
       ]
     },
     "documents": {
@@ -317,30 +787,77 @@
       "combos": [
         {
           "name": "docs-research-to-notion",
-          "chain": ["context7/resolve-library-id", "context7/get-library-docs", "notion/API-post-page"],
+          "chain": [
+            "context7/resolve-library-id",
+            "context7/get-library-docs",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Resolve a library's Context7 ID, fetch its documentation, and write a summary into a Notion page.",
           "verified": false,
           "notes": "context7 tools verified; notion verified."
         },
         {
           "name": "notion-search-and-update",
-          "chain": ["notion/API-retrieve-a-page", "notion/API-patch-page"],
+          "chain": [
+            "notion/API-retrieve-a-page",
+            "notion/API-patch-page"
+          ],
           "accomplishes": "Retrieve an existing Notion page and patch it with new content or updated metadata.",
           "verified": false,
           "notes": "notion tools verified."
         },
         {
           "name": "pdf-fill-and-log",
-          "chain": ["pdf/fill_form", "notion/API-post-page"],
+          "chain": [
+            "pdf/fill_form",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Fill a PDF form with structured data and log the completed form reference into a Notion tracker.",
           "verified": false,
           "notes": "pdf/fill_form inferred (macOS); notion verified."
+        },
+        {
+          "name": "docs-pdf-extract-to-notion",
+          "chain": [
+            "pdf/extract_text",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Extract text from a PDF document and write a structured summary to a Notion page for team review.",
+          "verified": false,
+          "notes": "pdf/extract_text inferred; notion verified."
+        },
+        {
+          "name": "docs-search-and-enrich",
+          "chain": [
+            "context7/search_docs",
+            "notes/create_note"
+          ],
+          "accomplishes": "Search library documentation via Context7 and save a curated note with the most relevant findings for offline reference.",
+          "verified": false,
+          "notes": "context7 inferred; notes tool names inferred."
         }
       ],
       "prompts": [
-        { "text": "Look up documentation for a library and save to Notion", "resolves_to": "context7/resolve-library-id → context7/get-library-docs → notion/API-post-page" },
-        { "text": "Update a Notion page with new content", "resolves_to": "notion/API-patch-page" },
-        { "text": "Fill a PDF form and log it in Notion", "resolves_to": "pdf/fill_form → notion/API-post-page" }
+        {
+          "text": "Look up documentation for a library and save to Notion",
+          "resolves_to": "context7/resolve-library-id \u2192 context7/get-library-docs \u2192 notion/API-post-page"
+        },
+        {
+          "text": "Update a Notion page with new content",
+          "resolves_to": "notion/API-patch-page"
+        },
+        {
+          "text": "Fill a PDF form and log it in Notion",
+          "resolves_to": "pdf/fill_form \u2192 notion/API-post-page"
+        },
+        {
+          "text": "Extract this PDF and post the summary to Notion",
+          "resolves_to": "pdf/extract_text \u2192 notion/API-post-page"
+        },
+        {
+          "text": "Search the docs and save a note",
+          "resolves_to": "context7/search_docs \u2192 notes/create_note"
+        }
       ]
     },
     "finance": {
@@ -348,30 +865,77 @@
       "combos": [
         {
           "name": "invoice-to-ledger",
-          "chain": ["stripe/list_invoices", "ledger/record_entry"],
+          "chain": [
+            "stripe/list_invoices",
+            "ledger/record_entry"
+          ],
           "accomplishes": "Pull recent Stripe invoices and record each into ChittyLedger as an immutable audit entry.",
           "verified": false,
           "notes": "stripe inferred (not connected); ledger inferred."
         },
         {
           "name": "ledger-balance-alert",
-          "chain": ["ledger/get_balance", "tasks/create_task"],
+          "chain": [
+            "ledger/get_balance",
+            "tasks/create_task"
+          ],
           "accomplishes": "Check the ChittyLedger balance and create a task if it falls below a threshold or shows unexpected entries.",
           "verified": false,
           "notes": "ledger inferred; tasks verified."
         },
         {
           "name": "stripe-customer-to-notion",
-          "chain": ["stripe/retrieve_customer", "notion/API-post-page"],
+          "chain": [
+            "stripe/retrieve_customer",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Retrieve a Stripe customer record and log it into a Notion CRM page for account management.",
           "verified": false,
           "notes": "stripe inferred; notion verified."
+        },
+        {
+          "name": "finance-charges-to-ledger",
+          "chain": [
+            "stripe/list_charges",
+            "ledger/record_transaction"
+          ],
+          "accomplishes": "Pull recent Stripe charges and record each as a ledger transaction for double-entry bookkeeping.",
+          "verified": false,
+          "notes": "stripe tool names inferred; ledger inferred."
+        },
+        {
+          "name": "finance-task-for-overdue",
+          "chain": [
+            "stripe/list_charges",
+            "thinking/sequentialthinking",
+            "tasks/create_task"
+          ],
+          "accomplishes": "List charges, reason over any overdue or failed payments, and create follow-up tasks for collections or retry.",
+          "verified": false,
+          "notes": "stripe inferred; thinking and tasks verified."
         }
       ],
       "prompts": [
-        { "text": "List recent Stripe invoices", "resolves_to": "stripe/list_invoices" },
-        { "text": "Check the ledger balance and alert if low", "resolves_to": "ledger/get_balance → tasks/create_task" },
-        { "text": "Log a Stripe customer into Notion", "resolves_to": "stripe/retrieve_customer → notion/API-post-page" }
+        {
+          "text": "List recent Stripe invoices",
+          "resolves_to": "stripe/list_invoices"
+        },
+        {
+          "text": "Check the ledger balance and alert if low",
+          "resolves_to": "ledger/get_balance \u2192 tasks/create_task"
+        },
+        {
+          "text": "Log a Stripe customer into Notion",
+          "resolves_to": "stripe/retrieve_customer \u2192 notion/API-post-page"
+        },
+        {
+          "text": "Pull Stripe charges and post to the ledger",
+          "resolves_to": "stripe/list_charges \u2192 ledger/record_transaction"
+        },
+        {
+          "text": "Find overdue payments and create follow-up tasks",
+          "resolves_to": "stripe/list_charges \u2192 tasks/create_task"
+        }
       ]
     },
     "google": {
@@ -379,30 +943,76 @@
       "combos": [
         {
           "name": "google-drive-to-notion",
-          "chain": ["google/search_files", "notion/API-post-page"],
+          "chain": [
+            "google/search_files",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Search Google Drive for files matching a query and create a Notion reference page linking to them.",
           "verified": false,
           "notes": "google/search_files inferred; notion verified."
         },
         {
           "name": "gam-user-to-task",
-          "chain": ["gam/list_users", "tasks/create_task"],
+          "chain": [
+            "gam/list_users",
+            "tasks/create_task"
+          ],
           "accomplishes": "List Google Workspace users via GAM and create onboarding or offboarding tasks for new/departing users.",
           "verified": false,
           "notes": "gam tool names inferred; tasks verified."
         },
         {
           "name": "calendar-event-to-notion",
-          "chain": ["google/list_events", "notion/API-post-page"],
+          "chain": [
+            "google/list_events",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Pull upcoming Google Calendar events and create a Notion meeting prep page for each.",
           "verified": false,
           "notes": "google/list_events inferred; notion verified."
+        },
+        {
+          "name": "google-users-to-notion",
+          "chain": [
+            "gam/list_users",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "List Google Workspace users via GAM and write a current roster to a Notion database page for HR or security review.",
+          "verified": false,
+          "notes": "gam/list_users inferred; notion verified."
+        },
+        {
+          "name": "google-search-and-task",
+          "chain": [
+            "google/search",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Run a Google search for a topic and create a research task capturing the top findings for follow-up.",
+          "verified": false,
+          "notes": "google/search inferred; tasks verified."
         }
       ],
       "prompts": [
-        { "text": "Search Google Drive and save results to Notion", "resolves_to": "google/search_files → notion/API-post-page" },
-        { "text": "List Google Workspace users via GAM", "resolves_to": "gam/list_users" },
-        { "text": "Pull calendar events and create Notion meeting notes", "resolves_to": "google/list_events → notion/API-post-page" }
+        {
+          "text": "Search Google Drive and save results to Notion",
+          "resolves_to": "google/search_files \u2192 notion/API-post-page"
+        },
+        {
+          "text": "List Google Workspace users via GAM",
+          "resolves_to": "gam/list_users"
+        },
+        {
+          "text": "Pull calendar events and create Notion meeting notes",
+          "resolves_to": "google/list_events \u2192 notion/API-post-page"
+        },
+        {
+          "text": "List all Google Workspace users to Notion",
+          "resolves_to": "gam/list_users \u2192 notion/API-post-page"
+        },
+        {
+          "text": "Search Google and create a research task",
+          "resolves_to": "google/search \u2192 tasks/create_task"
+        }
       ]
     },
     "governance": {
@@ -410,30 +1020,80 @@
       "combos": [
         {
           "name": "evidence-to-notion-audit",
-          "chain": ["chittyevidence/search_evidence", "ledger/get_entries", "notion/API-post-page"],
+          "chain": [
+            "chittyevidence/search_evidence",
+            "ledger/get_entries",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Search ChittyEvidence for relevant records, cross-reference ledger entries, and write a governance audit log into Notion.",
           "verified": false,
           "notes": "chittyevidence and ledger inferred; notion verified."
         },
         {
           "name": "session-orchestrator-health",
-          "chain": ["session/list_sessions", "orchestrator/get_status"],
+          "chain": [
+            "session/list_sessions",
+            "orchestrator/get_status"
+          ],
           "accomplishes": "Check active MCP sessions and orchestrator job queue status to assess governance health.",
           "verified": false,
           "notes": "session and orchestrator inferred."
         },
         {
           "name": "ledger-anomaly-to-linear",
-          "chain": ["ledger/get_entries", "thinking/sequentialthinking", "linear/createIssue"],
+          "chain": [
+            "ledger/get_entries",
+            "thinking/sequentialthinking",
+            "linear/createIssue"
+          ],
           "accomplishes": "Review ledger entries, reason over anomalies with sequential thinking, and file a Linear governance issue.",
           "verified": false,
           "notes": "ledger inferred; thinking verified; linear inferred."
+        },
+        {
+          "name": "governance-ledger-audit",
+          "chain": [
+            "ledger/list_transactions",
+            "neon/run_sql",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Pull ledger transactions, cross-reference with the Neon database for completeness, and publish an audit snapshot to Notion.",
+          "verified": false,
+          "notes": "ledger and neon inferred; notion verified."
+        },
+        {
+          "name": "governance-session-health",
+          "chain": [
+            "session/list_sessions",
+            "chittyos/health",
+            "linear/create_issue"
+          ],
+          "accomplishes": "Inspect active sessions and ChittyOS service health, then open a Linear governance issue for any degraded signals.",
+          "verified": false,
+          "notes": "session and chittyos inferred; linear inferred."
         }
       ],
       "prompts": [
-        { "text": "Run a governance audit and log to Notion", "resolves_to": "chittyevidence/search_evidence → ledger/get_entries → notion/API-post-page" },
-        { "text": "Check session and orchestrator health", "resolves_to": "session/list_sessions → orchestrator/get_status" },
-        { "text": "Find ledger anomalies and file a Linear issue", "resolves_to": "ledger/get_entries → linear/createIssue" }
+        {
+          "text": "Run a governance audit and log to Notion",
+          "resolves_to": "chittyevidence/search_evidence \u2192 ledger/get_entries \u2192 notion/API-post-page"
+        },
+        {
+          "text": "Check session and orchestrator health",
+          "resolves_to": "session/list_sessions \u2192 orchestrator/get_status"
+        },
+        {
+          "text": "Find ledger anomalies and file a Linear issue",
+          "resolves_to": "ledger/get_entries \u2192 linear/createIssue"
+        },
+        {
+          "text": "Audit the ledger and post results to Notion",
+          "resolves_to": "ledger/list_transactions \u2192 neon/run_sql \u2192 notion/API-post-page"
+        },
+        {
+          "text": "Check session + health and flag issues to Linear",
+          "resolves_to": "session/list_sessions \u2192 chittyos/health \u2192 linear/create_issue"
+        }
       ]
     },
     "ledger": {
@@ -441,30 +1101,77 @@
       "combos": [
         {
           "name": "ledger-balance-to-notion",
-          "chain": ["ledger/get_balance", "notion/API-post-page"],
+          "chain": [
+            "ledger/get_balance",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Fetch the current ChittyLedger balance and export a snapshot to a Notion page for accounting records.",
           "verified": false,
           "notes": "ledger inferred; notion verified."
         },
         {
           "name": "ledger-dlq-to-linear",
-          "chain": ["ledger/get_dlq", "linear/createIssue"],
+          "chain": [
+            "ledger/get_dlq",
+            "linear/createIssue"
+          ],
           "accomplishes": "Check the ledger dead-letter queue for failed entries and open a Linear issue to investigate any backlog.",
           "verified": false,
           "notes": "ledger and linear inferred."
         },
         {
           "name": "ledger-entries-to-task",
-          "chain": ["ledger/get_entries", "tasks/create_task"],
+          "chain": [
+            "ledger/get_entries",
+            "tasks/create_task"
+          ],
           "accomplishes": "List recent ledger entries and create a review task for any entries requiring manual verification.",
           "verified": false,
           "notes": "ledger inferred; tasks verified."
+        },
+        {
+          "name": "ledger-batch-flush",
+          "chain": [
+            "ledger/list_transactions",
+            "ledger/flush"
+          ],
+          "accomplishes": "List pending ledger transactions and flush them to the durable store, ensuring no data remains in the in-memory buffer.",
+          "verified": false,
+          "notes": "ledger tool names inferred from apps/ledger-mcp surface."
+        },
+        {
+          "name": "ledger-to-notion-report",
+          "chain": [
+            "ledger/list_transactions",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Retrieve ledger entries, reason over balance or anomaly patterns, and write a financial summary report to Notion.",
+          "verified": false,
+          "notes": "ledger inferred; thinking and notion verified."
         }
       ],
       "prompts": [
-        { "text": "Get the current ChittyLedger balance", "resolves_to": "ledger/get_balance" },
-        { "text": "Check ledger DLQ and file an issue", "resolves_to": "ledger/get_dlq → linear/createIssue" },
-        { "text": "Export ledger entries to Notion", "resolves_to": "ledger/get_entries → notion/API-post-page" }
+        {
+          "text": "Get the current ChittyLedger balance",
+          "resolves_to": "ledger/get_balance"
+        },
+        {
+          "text": "Check ledger DLQ and file an issue",
+          "resolves_to": "ledger/get_dlq \u2192 linear/createIssue"
+        },
+        {
+          "text": "Export ledger entries to Notion",
+          "resolves_to": "ledger/get_entries \u2192 notion/API-post-page"
+        },
+        {
+          "text": "Flush pending ledger entries to storage",
+          "resolves_to": "ledger/list_transactions \u2192 ledger/flush"
+        },
+        {
+          "text": "Summarise the ledger and post to Notion",
+          "resolves_to": "ledger/list_transactions \u2192 notion/API-post-page"
+        }
       ]
     },
     "legal": {
@@ -472,30 +1179,76 @@
       "combos": [
         {
           "name": "evidence-to-case-log",
-          "chain": ["chittyevidence/search_evidence", "notion/API-post-page"],
+          "chain": [
+            "chittyevidence/search_evidence",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Search the ChittyEvidence corpus for documents relevant to a legal matter and log them into a Notion case file.",
           "verified": false,
           "notes": "chittyevidence inferred; notion verified."
         },
         {
           "name": "dispute-ledger-audit",
-          "chain": ["dispute/get_dispute", "ledger/get_entries"],
+          "chain": [
+            "dispute/get_dispute",
+            "ledger/get_entries"
+          ],
           "accomplishes": "Retrieve dispute details and cross-check corresponding ledger entries to build a financial timeline.",
           "verified": false,
           "notes": "dispute and ledger inferred."
         },
         {
           "name": "resolve-status-to-task",
-          "chain": ["resolve/get_status", "tasks/create_task"],
+          "chain": [
+            "resolve/get_status",
+            "tasks/create_task"
+          ],
           "accomplishes": "Check the resolution status of a legal matter and create a follow-up task for the next required action.",
           "verified": false,
           "notes": "resolve inferred; tasks verified."
+        },
+        {
+          "name": "legal-evidence-to-ledger",
+          "chain": [
+            "chittyevidence/search_evidence",
+            "ledger/record_transaction"
+          ],
+          "accomplishes": "Search the ChittyEvidence corpus for case-relevant documents and record the discovery event in the ledger for chain-of-custody tracking.",
+          "verified": false,
+          "notes": "chittyevidence and ledger inferred."
+        },
+        {
+          "name": "legal-dispute-and-task",
+          "chain": [
+            "dispute/file_claim",
+            "tasks/create_task"
+          ],
+          "accomplishes": "File a dispute claim via the resolve service and immediately create a follow-up task for case management and deadline tracking.",
+          "verified": false,
+          "notes": "dispute/file_claim inferred; tasks verified."
         }
       ],
       "prompts": [
-        { "text": "Search evidence for a legal matter and log to Notion", "resolves_to": "chittyevidence/search_evidence → notion/API-post-page" },
-        { "text": "Get dispute details and check ledger entries", "resolves_to": "dispute/get_dispute → ledger/get_entries" },
-        { "text": "Check resolution status and create a follow-up task", "resolves_to": "resolve/get_status → tasks/create_task" }
+        {
+          "text": "Search evidence for a legal matter and log to Notion",
+          "resolves_to": "chittyevidence/search_evidence \u2192 notion/API-post-page"
+        },
+        {
+          "text": "Get dispute details and check ledger entries",
+          "resolves_to": "dispute/get_dispute \u2192 ledger/get_entries"
+        },
+        {
+          "text": "Check resolution status and create a follow-up task",
+          "resolves_to": "resolve/get_status \u2192 tasks/create_task"
+        },
+        {
+          "text": "Find case evidence and log the discovery",
+          "resolves_to": "chittyevidence/search_evidence \u2192 ledger/record_transaction"
+        },
+        {
+          "text": "File a dispute and create the case task",
+          "resolves_to": "dispute/file_claim \u2192 tasks/create_task"
+        }
       ]
     },
     "market": {
@@ -503,30 +1256,77 @@
       "combos": [
         {
           "name": "market-listings-to-neon",
-          "chain": ["market/list_listings", "neon/run_sql"],
+          "chain": [
+            "market/list_listings",
+            "neon/run_sql"
+          ],
           "accomplishes": "Fetch market listings and store or cross-reference them against a Neon database for analysis.",
           "verified": false,
           "notes": "market inferred; neon/run_sql verified."
         },
         {
           "name": "neon-analytics-to-notion",
-          "chain": ["neon/run_sql", "notion/API-post-page"],
+          "chain": [
+            "neon/run_sql",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Run a Neon analytics query over market data and write the results into a Notion market report.",
           "verified": false,
           "notes": "neon and notion both verified."
         },
         {
           "name": "market-search-to-notion",
-          "chain": ["market/search_listings", "notion/API-post-page"],
+          "chain": [
+            "market/search_listings",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Search market listings by criteria and create a Notion comparison page with the top results.",
           "verified": false,
           "notes": "market inferred; notion verified."
+        },
+        {
+          "name": "market-listings-to-neon",
+          "chain": [
+            "market/search_listings",
+            "neon/run_sql"
+          ],
+          "accomplishes": "Fetch market listings from the market service and upsert them into a Neon database table for longitudinal trend analysis.",
+          "verified": false,
+          "notes": "market/search_listings inferred; neon verified."
+        },
+        {
+          "name": "market-compare-and-task",
+          "chain": [
+            "market/search_listings",
+            "thinking/sequentialthinking",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Search market listings, reason over pricing anomalies or opportunities, and create a task for the most actionable finding.",
+          "verified": false,
+          "notes": "market inferred; thinking and tasks verified."
         }
       ],
       "prompts": [
-        { "text": "Search market listings by criteria", "resolves_to": "market/search_listings" },
-        { "text": "Analyze market data in Neon and report to Notion", "resolves_to": "neon/run_sql → notion/API-post-page" },
-        { "text": "List market listings and store in database", "resolves_to": "market/list_listings → neon/run_sql" }
+        {
+          "text": "Search market listings by criteria",
+          "resolves_to": "market/search_listings"
+        },
+        {
+          "text": "Analyze market data in Neon and report to Notion",
+          "resolves_to": "neon/run_sql \u2192 notion/API-post-page"
+        },
+        {
+          "text": "List market listings and store in database",
+          "resolves_to": "market/list_listings \u2192 neon/run_sql"
+        },
+        {
+          "text": "Fetch listings and store in the database",
+          "resolves_to": "market/search_listings \u2192 neon/run_sql"
+        },
+        {
+          "text": "Compare market listings and create an opportunity task",
+          "resolves_to": "market/search_listings \u2192 tasks/create_task"
+        }
       ]
     },
     "monitoring": {
@@ -534,30 +1334,76 @@
       "combos": [
         {
           "name": "monitor-alert-to-task",
-          "chain": ["monitor/get_health", "tasks/create_task"],
+          "chain": [
+            "monitor/get_health",
+            "tasks/create_task"
+          ],
           "accomplishes": "Fetch monitor health status and create an urgent task if any service is degraded or down.",
           "verified": false,
           "notes": "monitor inferred; tasks verified."
         },
         {
           "name": "monitor-metrics-to-notion",
-          "chain": ["monitor/get_metrics", "notion/API-post-page"],
+          "chain": [
+            "monitor/get_metrics",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Pull monitoring metrics and write a status snapshot into a Notion ops log for the day.",
           "verified": false,
           "notes": "monitor inferred; notion verified."
         },
         {
           "name": "monitor-alert-to-linear",
-          "chain": ["monitor/get_alerts", "linear/createIssue"],
+          "chain": [
+            "monitor/get_alerts",
+            "linear/createIssue"
+          ],
           "accomplishes": "Fetch active monitoring alerts and open Linear issues for any that aren't already tracked.",
           "verified": false,
           "notes": "monitor and linear inferred."
+        },
+        {
+          "name": "monitor-alert-to-task",
+          "chain": [
+            "monitor/get_alerts",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Pull active monitoring alerts and create follow-up tasks for each unacknowledged alert, ensuring nothing is missed.",
+          "verified": false,
+          "notes": "monitor tool names inferred."
+        },
+        {
+          "name": "monitor-health-to-notion",
+          "chain": [
+            "monitor/check_health",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Run a health check across monitored services and write a status page snapshot to Notion for team visibility.",
+          "verified": false,
+          "notes": "monitor inferred; notion verified."
         }
       ],
       "prompts": [
-        { "text": "Check service health and alert if degraded", "resolves_to": "monitor/get_health → tasks/create_task" },
-        { "text": "Log monitoring metrics to Notion", "resolves_to": "monitor/get_metrics → notion/API-post-page" },
-        { "text": "Create Linear issues for active alerts", "resolves_to": "monitor/get_alerts → linear/createIssue" }
+        {
+          "text": "Check service health and alert if degraded",
+          "resolves_to": "monitor/get_health \u2192 tasks/create_task"
+        },
+        {
+          "text": "Log monitoring metrics to Notion",
+          "resolves_to": "monitor/get_metrics \u2192 notion/API-post-page"
+        },
+        {
+          "text": "Create Linear issues for active alerts",
+          "resolves_to": "monitor/get_alerts \u2192 linear/createIssue"
+        },
+        {
+          "text": "Get alerts and create tasks for each",
+          "resolves_to": "monitor/get_alerts \u2192 tasks/create_task"
+        },
+        {
+          "text": "Run health checks and post status to Notion",
+          "resolves_to": "monitor/check_health \u2192 notion/API-post-page"
+        }
       ]
     },
     "ops": {
@@ -565,30 +1411,77 @@
       "combos": [
         {
           "name": "orchestrator-and-neon-health",
-          "chain": ["orchestrator/get_status", "neon/list_projects"],
+          "chain": [
+            "orchestrator/get_status",
+            "neon/list_projects"
+          ],
           "accomplishes": "Check the ChittyAgent Orchestrator job queue status alongside Neon project health for a unified ops view.",
           "verified": false,
           "notes": "orchestrator inferred; neon/list_projects verified."
         },
         {
           "name": "workers-and-builds-audit",
-          "chain": ["cloudflare/workers_list", "cloudflare-builds/list_builds"],
+          "chain": [
+            "cloudflare/workers_list",
+            "cloudflare-builds/list_builds"
+          ],
           "accomplishes": "List all Cloudflare Workers and their associated builds to audit what is deployed and what is pending.",
           "verified": false,
           "notes": "cloudflare and cloudflare-builds inferred."
         },
         {
           "name": "neon-branch-list-and-cleanup",
-          "chain": ["neon/list_branches", "neon/delete_branch"],
+          "chain": [
+            "neon/list_branches",
+            "neon/delete_branch"
+          ],
           "accomplishes": "List Neon database branches and delete any that are stale or no longer associated with an active feature.",
           "verified": false,
           "notes": "neon tools verified."
+        },
+        {
+          "name": "ops-code-quality-gate",
+          "chain": [
+            "github/search_code",
+            "quality/lint",
+            "neon/run_sql"
+          ],
+          "accomplishes": "Search the codebase for a pattern, run the linter to validate quality, and query Neon for any runtime data needed to confirm the fix is safe.",
+          "verified": false,
+          "notes": "github and quality inferred; neon verified."
+        },
+        {
+          "name": "ops-build-and-db-migrate",
+          "chain": [
+            "cloudflare-builds/trigger_build",
+            "neon/run_sql"
+          ],
+          "accomplishes": "Trigger a Cloudflare build and apply the corresponding database migration against Neon in one coordinated step.",
+          "verified": false,
+          "notes": "cloudflare-builds inferred; neon verified."
         }
       ],
       "prompts": [
-        { "text": "Check Orchestrator status and Neon health", "resolves_to": "orchestrator/get_status → neon/list_projects" },
-        { "text": "Audit Cloudflare Workers and pending builds", "resolves_to": "cloudflare/workers_list → cloudflare-builds/list_builds" },
-        { "text": "List and clean up stale Neon branches", "resolves_to": "neon/list_branches → neon/delete_branch" }
+        {
+          "text": "Check Orchestrator status and Neon health",
+          "resolves_to": "orchestrator/get_status \u2192 neon/list_projects"
+        },
+        {
+          "text": "Audit Cloudflare Workers and pending builds",
+          "resolves_to": "cloudflare/workers_list \u2192 cloudflare-builds/list_builds"
+        },
+        {
+          "text": "List and clean up stale Neon branches",
+          "resolves_to": "neon/list_branches \u2192 neon/delete_branch"
+        },
+        {
+          "text": "Lint the code and validate with a DB query",
+          "resolves_to": "quality/lint \u2192 neon/run_sql"
+        },
+        {
+          "text": "Build and apply the DB migration together",
+          "resolves_to": "cloudflare-builds/trigger_build \u2192 neon/run_sql"
+        }
       ]
     },
     "realestate": {
@@ -596,30 +1489,77 @@
       "combos": [
         {
           "name": "tenant-list-to-task",
-          "chain": ["turbotenant/list_tenants", "tasks/create_task"],
+          "chain": [
+            "turbotenant/list_tenants",
+            "tasks/create_task"
+          ],
           "accomplishes": "List TurboTenant tenants and create tasks for any with upcoming lease renewals or open maintenance requests.",
           "verified": false,
           "notes": "turbotenant inferred; tasks verified."
         },
         {
           "name": "listing-to-notion",
-          "chain": ["market/search_listings", "notion/API-post-page"],
+          "chain": [
+            "market/search_listings",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Search market listings for properties matching criteria and log them into a Notion property comparison page.",
           "verified": false,
           "notes": "market inferred; notion verified."
         },
         {
           "name": "lease-to-ledger",
-          "chain": ["turbotenant/get_lease", "ledger/record_entry"],
+          "chain": [
+            "turbotenant/get_lease",
+            "ledger/record_entry"
+          ],
           "accomplishes": "Retrieve a TurboTenant lease and record the key financial terms as a ledger entry for audit.",
           "verified": false,
           "notes": "turbotenant and ledger inferred."
+        },
+        {
+          "name": "realestate-listing-to-task",
+          "chain": [
+            "turbotenant/list_properties",
+            "tasks/create_task"
+          ],
+          "accomplishes": "List TurboTenant properties and create a maintenance or follow-up task for any property requiring attention.",
+          "verified": false,
+          "notes": "turbotenant tool names inferred; tasks verified."
+        },
+        {
+          "name": "realestate-market-compare",
+          "chain": [
+            "market/search_listings",
+            "turbotenant/list_properties",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "Pull market listings and owned properties, then reason over pricing gaps or vacancy opportunities across the portfolio.",
+          "verified": false,
+          "notes": "market and turbotenant inferred; thinking verified."
         }
       ],
       "prompts": [
-        { "text": "List tenants and create renewal tasks", "resolves_to": "turbotenant/list_tenants → tasks/create_task" },
-        { "text": "Search market listings and save to Notion", "resolves_to": "market/search_listings → notion/API-post-page" },
-        { "text": "Record a lease in the ledger", "resolves_to": "turbotenant/get_lease → ledger/record_entry" }
+        {
+          "text": "List tenants and create renewal tasks",
+          "resolves_to": "turbotenant/list_tenants \u2192 tasks/create_task"
+        },
+        {
+          "text": "Search market listings and save to Notion",
+          "resolves_to": "market/search_listings \u2192 notion/API-post-page"
+        },
+        {
+          "text": "Record a lease in the ledger",
+          "resolves_to": "turbotenant/get_lease \u2192 ledger/record_entry"
+        },
+        {
+          "text": "List my properties and flag action items",
+          "resolves_to": "turbotenant/list_properties \u2192 tasks/create_task"
+        },
+        {
+          "text": "Compare market listings with my portfolio",
+          "resolves_to": "market/search_listings \u2192 turbotenant/list_properties \u2192 thinking/sequentialthinking"
+        }
       ]
     },
     "search": {
@@ -627,30 +1567,77 @@
       "combos": [
         {
           "name": "evidence-and-contextual",
-          "chain": ["evidence/search", "contextual/search"],
+          "chain": [
+            "evidence/search",
+            "contextual/search"
+          ],
           "accomplishes": "Search the Evidence corpus and run a contextual search over the same query to cross-validate findings.",
           "verified": false,
           "notes": "evidence and contextual tool names inferred."
         },
         {
           "name": "scrape-and-save",
-          "chain": ["scrape/fetch_page", "notion/API-post-page"],
+          "chain": [
+            "scrape/fetch_page",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Scrape a web page for its content and save the extracted text into a Notion research page.",
           "verified": false,
           "notes": "scrape inferred; notion verified."
         },
         {
           "name": "contextual-then-evidence",
-          "chain": ["contextual/search", "evidence/verify"],
+          "chain": [
+            "contextual/search",
+            "evidence/verify"
+          ],
           "accomplishes": "Run a contextual search to surface candidate documents, then verify the top result against the Evidence index.",
           "verified": false,
           "notes": "contextual and evidence inferred."
+        },
+        {
+          "name": "search-scrape-and-summarise",
+          "chain": [
+            "scrape/scrape_url",
+            "thinking/sequentialthinking",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Scrape a URL for content, reason over the key findings, and write a clean summary to Notion for archiving.",
+          "verified": false,
+          "notes": "scrape/scrape_url inferred; thinking and notion verified."
+        },
+        {
+          "name": "search-evidence-and-task",
+          "chain": [
+            "evidence/search",
+            "tasks/create_task"
+          ],
+          "accomplishes": "Search the evidence corpus for relevant records and create a task pinning the top results for human follow-up.",
+          "verified": false,
+          "notes": "evidence/search inferred; tasks verified."
         }
       ],
       "prompts": [
-        { "text": "Search Evidence and cross-check with contextual search", "resolves_to": "evidence/search → contextual/search" },
-        { "text": "Scrape a web page and save to Notion", "resolves_to": "scrape/fetch_page → notion/API-post-page" },
-        { "text": "Find and verify documents across search backends", "resolves_to": "contextual/search → evidence/verify" }
+        {
+          "text": "Search Evidence and cross-check with contextual search",
+          "resolves_to": "evidence/search \u2192 contextual/search"
+        },
+        {
+          "text": "Scrape a web page and save to Notion",
+          "resolves_to": "scrape/fetch_page \u2192 notion/API-post-page"
+        },
+        {
+          "text": "Find and verify documents across search backends",
+          "resolves_to": "contextual/search \u2192 evidence/verify"
+        },
+        {
+          "text": "Scrape this URL and summarise to Notion",
+          "resolves_to": "scrape/scrape_url \u2192 notion/API-post-page"
+        },
+        {
+          "text": "Search evidence and create a review task",
+          "resolves_to": "evidence/search \u2192 tasks/create_task"
+        }
       ]
     },
     "security": {
@@ -658,30 +1645,77 @@
       "combos": [
         {
           "name": "evidence-to-security-issue",
-          "chain": ["chittyevidence/search_evidence", "linear/createIssue"],
+          "chain": [
+            "chittyevidence/search_evidence",
+            "linear/createIssue"
+          ],
           "accomplishes": "Search ChittyEvidence for security-related findings and open a Linear security issue to track remediation.",
           "verified": false,
           "notes": "chittyevidence inferred; linear inferred."
         },
         {
           "name": "neon-audit-and-ledger",
-          "chain": ["neon/run_sql", "ledger/get_entries"],
+          "chain": [
+            "neon/run_sql",
+            "ledger/get_entries"
+          ],
           "accomplishes": "Run a Neon audit query against application data and cross-reference the ledger to detect unauthorized changes.",
           "verified": false,
           "notes": "neon/run_sql verified; ledger inferred."
         },
         {
           "name": "security-scan-to-task",
-          "chain": ["security/run_scan", "tasks/create_task"],
+          "chain": [
+            "security/run_scan",
+            "tasks/create_task"
+          ],
           "accomplishes": "Run a security scan and create remediation tasks for each finding, prioritized by severity.",
           "verified": false,
           "notes": "security inferred; tasks verified."
+        },
+        {
+          "name": "security-scan-and-ledger",
+          "chain": [
+            "security/scan_vulnerabilities",
+            "ledger/record_transaction"
+          ],
+          "accomplishes": "Run a vulnerability scan and record each finding as a ledger event for compliance audit trail.",
+          "verified": false,
+          "notes": "security/scan_vulnerabilities inferred; ledger inferred."
+        },
+        {
+          "name": "security-evidence-and-linear",
+          "chain": [
+            "chittyevidence/search_evidence",
+            "neon/run_sql",
+            "linear/create_issue"
+          ],
+          "accomplishes": "Search the evidence corpus for security-relevant documents, cross-check with Neon data, and open a Linear security issue for any confirmed finding.",
+          "verified": false,
+          "notes": "chittyevidence and neon inferred; linear inferred."
         }
       ],
       "prompts": [
-        { "text": "Search evidence for security findings and file an issue", "resolves_to": "chittyevidence/search_evidence → linear/createIssue" },
-        { "text": "Run a security scan and create remediation tasks", "resolves_to": "security/run_scan → tasks/create_task" },
-        { "text": "Audit Neon data and cross-check the ledger", "resolves_to": "neon/run_sql → ledger/get_entries" }
+        {
+          "text": "Search evidence for security findings and file an issue",
+          "resolves_to": "chittyevidence/search_evidence \u2192 linear/createIssue"
+        },
+        {
+          "text": "Run a security scan and create remediation tasks",
+          "resolves_to": "security/run_scan \u2192 tasks/create_task"
+        },
+        {
+          "text": "Audit Neon data and cross-check the ledger",
+          "resolves_to": "neon/run_sql \u2192 ledger/get_entries"
+        },
+        {
+          "text": "Scan for vulnerabilities and log findings to ledger",
+          "resolves_to": "security/scan_vulnerabilities \u2192 ledger/record_transaction"
+        },
+        {
+          "text": "Search evidence and open a security issue in Linear",
+          "resolves_to": "chittyevidence/search_evidence \u2192 linear/create_issue"
+        }
       ]
     },
     "session": {
@@ -689,30 +1723,76 @@
       "combos": [
         {
           "name": "session-list-to-task",
-          "chain": ["session/list_sessions", "tasks/create_task"],
+          "chain": [
+            "session/list_sessions",
+            "tasks/create_task"
+          ],
           "accomplishes": "List active sessions and create a task for any that appear stuck or have exceeded their expected TTL.",
           "verified": false,
           "notes": "session inferred; tasks verified."
         },
         {
           "name": "session-details-to-notion",
-          "chain": ["session/get_session", "notion/API-post-page"],
+          "chain": [
+            "session/get_session",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Retrieve full details for a specific session and log its state into a Notion session audit page.",
           "verified": false,
           "notes": "session inferred; notion verified."
         },
         {
           "name": "session-evict-and-log",
-          "chain": ["session/evict_session", "ledger/record_entry"],
+          "chain": [
+            "session/evict_session",
+            "ledger/record_entry"
+          ],
           "accomplishes": "Evict a stale or compromised session and record the eviction as an immutable ledger entry for audit.",
           "verified": false,
           "notes": "session and ledger inferred."
+        },
+        {
+          "name": "session-evict-and-log",
+          "chain": [
+            "session/evict_session",
+            "ledger/record_transaction"
+          ],
+          "accomplishes": "Evict a stale or expired session and record the eviction event in the ledger for audit purposes.",
+          "verified": false,
+          "notes": "session and ledger inferred."
+        },
+        {
+          "name": "session-list-to-notion",
+          "chain": [
+            "session/list_sessions",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Capture the current active-session snapshot and write it to a Notion monitoring page for team visibility.",
+          "verified": false,
+          "notes": "session inferred; notion verified."
         }
       ],
       "prompts": [
-        { "text": "List active sessions and flag any stuck ones", "resolves_to": "session/list_sessions → tasks/create_task" },
-        { "text": "Get session details and log to Notion", "resolves_to": "session/get_session → notion/API-post-page" },
-        { "text": "Evict a session and record in ledger", "resolves_to": "session/evict_session → ledger/record_entry" }
+        {
+          "text": "List active sessions and flag any stuck ones",
+          "resolves_to": "session/list_sessions \u2192 tasks/create_task"
+        },
+        {
+          "text": "Get session details and log to Notion",
+          "resolves_to": "session/get_session \u2192 notion/API-post-page"
+        },
+        {
+          "text": "Evict a session and record in ledger",
+          "resolves_to": "session/evict_session \u2192 ledger/record_entry"
+        },
+        {
+          "text": "Evict this session and log the event",
+          "resolves_to": "session/evict_session \u2192 ledger/record_transaction"
+        },
+        {
+          "text": "Snapshot active sessions to Notion",
+          "resolves_to": "session/list_sessions \u2192 notion/API-post-page"
+        }
       ]
     },
     "tasks": {
@@ -720,30 +1800,76 @@
       "combos": [
         {
           "name": "tasks-list-to-notion",
-          "chain": ["tasks/list_tasks", "notion/API-post-page"],
+          "chain": [
+            "tasks/list_tasks",
+            "notion/API-post-page"
+          ],
           "accomplishes": "List open tasks and export a summary into a Notion project tracker page for team visibility.",
           "verified": false,
           "notes": "tasks verified; notion verified."
         },
         {
           "name": "task-create-and-linear-sync",
-          "chain": ["tasks/create_task", "linear/createIssue"],
+          "chain": [
+            "tasks/create_task",
+            "linear/createIssue"
+          ],
           "accomplishes": "Create a task in ChittyAgent Tasks and mirror it as a Linear issue for engineering sprint tracking.",
           "verified": false,
           "notes": "tasks verified; linear inferred."
         },
         {
           "name": "task-status-and-notify",
-          "chain": ["tasks/list_tasks", "imessage/send_message"],
+          "chain": [
+            "tasks/list_tasks",
+            "imessage/send_message"
+          ],
           "accomplishes": "List task statuses and send an iMessage summary to the team with open/blocked items.",
           "verified": false,
           "notes": "tasks verified; imessage inferred (comms-mcp is read-only, sending uses imessage)."
+        },
+        {
+          "name": "tasks-complete-and-notify",
+          "chain": [
+            "tasks/complete_task",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Mark a task complete and post a Notion note to inform stakeholders and close the loop.",
+          "verified": false,
+          "notes": "tasks verified; notion verified."
+        },
+        {
+          "name": "tasks-list-and-prioritise",
+          "chain": [
+            "tasks/list_tasks",
+            "thinking/sequentialthinking"
+          ],
+          "accomplishes": "List all open tasks and reason over them to surface a prioritised daily work order based on deadlines and dependencies.",
+          "verified": false,
+          "notes": "tasks verified; thinking verified."
         }
       ],
       "prompts": [
-        { "text": "List open tasks and export to Notion", "resolves_to": "tasks/list_tasks → notion/API-post-page" },
-        { "text": "Create a task and mirror it in Linear", "resolves_to": "tasks/create_task → linear/createIssue" },
-        { "text": "Send a task status summary via iMessage", "resolves_to": "tasks/list_tasks → imessage/send_message" }
+        {
+          "text": "List open tasks and export to Notion",
+          "resolves_to": "tasks/list_tasks \u2192 notion/API-post-page"
+        },
+        {
+          "text": "Create a task and mirror it in Linear",
+          "resolves_to": "tasks/create_task \u2192 linear/createIssue"
+        },
+        {
+          "text": "Send a task status summary via iMessage",
+          "resolves_to": "tasks/list_tasks \u2192 imessage/send_message"
+        },
+        {
+          "text": "Complete this task and post a Notion update",
+          "resolves_to": "tasks/complete_task \u2192 notion/API-post-page"
+        },
+        {
+          "text": "List tasks and prioritise for today",
+          "resolves_to": "tasks/list_tasks \u2192 thinking/sequentialthinking"
+        }
       ]
     },
     "workspace": {
@@ -751,31 +1877,80 @@
       "combos": [
         {
           "name": "notion-and-google-sync",
-          "chain": ["notion/API-retrieve-a-page", "google/search_files"],
+          "chain": [
+            "notion/API-retrieve-a-page",
+            "google/search_files"
+          ],
           "accomplishes": "Retrieve a Notion page and search Google Drive for related files to create a consolidated workspace view.",
           "verified": false,
           "notes": "notion verified; google inferred."
         },
         {
           "name": "tasks-status-to-comms",
-          "chain": ["tasks/list_tasks", "imessage/send_message"],
+          "chain": [
+            "tasks/list_tasks",
+            "imessage/send_message"
+          ],
           "accomplishes": "List open tasks and broadcast a team standup summary via iMessage.",
           "verified": false,
           "notes": "tasks verified; imessage inferred (comms-mcp is read-only, sending uses imessage)."
         },
         {
           "name": "context7-docs-to-notion",
-          "chain": ["context7/resolve-library-id", "context7/get-library-docs", "notion/API-post-page"],
+          "chain": [
+            "context7/resolve-library-id",
+            "context7/get-library-docs",
+            "notion/API-post-page"
+          ],
           "accomplishes": "Resolve a library, fetch its documentation from Context7, and create a shared Notion reference page for the team.",
           "verified": false,
           "notes": "context7 verified; notion verified."
+        },
+        {
+          "name": "workspace-google-to-notion",
+          "chain": [
+            "google/search",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Search Google for workspace-related content and archive the most relevant results into a Notion research page.",
+          "verified": false,
+          "notes": "google/search inferred; notion verified."
+        },
+        {
+          "name": "workspace-comms-digest",
+          "chain": [
+            "comms/comms.recentLog",
+            "tasks/create_task",
+            "notion/API-post-page"
+          ],
+          "accomplishes": "Pull the recent comms log, extract action items into tasks, and post the daily digest to Notion.",
+          "verified": false,
+          "notes": "comms/comms.recentLog verified; tasks and notion verified."
         }
       ],
       "prompts": [
-        { "text": "Sync a Notion page with related Google Drive files", "resolves_to": "notion/API-retrieve-a-page → google/search_files" },
-        { "text": "Send a task status standup via iMessage", "resolves_to": "tasks/list_tasks → imessage/send_message" },
-        { "text": "Fetch library docs and create a Notion reference page", "resolves_to": "context7/resolve-library-id → context7/get-library-docs → notion/API-post-page" }
+        {
+          "text": "Sync a Notion page with related Google Drive files",
+          "resolves_to": "notion/API-retrieve-a-page \u2192 google/search_files"
+        },
+        {
+          "text": "Send a task status standup via iMessage",
+          "resolves_to": "tasks/list_tasks \u2192 imessage/send_message"
+        },
+        {
+          "text": "Fetch library docs and create a Notion reference page",
+          "resolves_to": "context7/resolve-library-id \u2192 context7/get-library-docs \u2192 notion/API-post-page"
+        },
+        {
+          "text": "Search Google and post results to Notion",
+          "resolves_to": "google/search \u2192 notion/API-post-page"
+        },
+        {
+          "text": "Digest the comms log into tasks and a Notion note",
+          "resolves_to": "comms/comms.recentLog \u2192 tasks/create_task \u2192 notion/API-post-page"
+        }
       ]
     }
-  }
+  },
+  "expandedFrom": "auto-driver run 2026-09-16 \u2014 E2: expanded all 25 profiles from 3 to 5 combos + prompts"
 }
