@@ -1,7 +1,7 @@
 /**
  * LLL batch — one uncovered branch
  *
- * http-server.ts transport.onclose handler (line 162-168):
+ * McpSessionManager transport.onclose handler (in @ch1tty/shared-mcp):
  *   The onclose callback uses find() to look up the session by transport reference.
  *   When the session is no longer in the map (e.g. stop() already removed it, or
  *   a duplicate close event fires), sid is undefined, the `if (sid)` block is
@@ -53,9 +53,11 @@ test('http-server onclose: session already removed from map → if(sid) skips, m
     });
     assert.equal(res.status, 200, 'MCP initialize must succeed');
 
-    // Access the private sessions map and grab the single session.
+    // Access the private sessions map via McpSessionManager and grab the single session.
     type SessionMap = Map<string, { server: { close: () => Promise<void> }; transport: { onclose?: () => void } }>;
-    const sessions = (httpServer as unknown as { sessions: SessionMap }).sessions;
+    const sessions = (
+      (httpServer as unknown as { mcpSessionManager: unknown }).mcpSessionManager as unknown as { sessions: SessionMap }
+    ).sessions;
     assert.equal(sessions.size, 1, 'exactly one session must be active');
 
     const [[sid, session]] = [...sessions.entries()];

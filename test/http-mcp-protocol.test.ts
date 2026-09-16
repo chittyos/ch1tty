@@ -257,7 +257,7 @@ test('POST /mcp with invalid JSON body returns 400', async () => {
   }
 });
 
-test('POST /mcp with unknown session ID returns 400 from ch1tty session guard', async () => {
+test('POST /mcp with unknown session ID returns 404 (session not found)', async () => {
   const s = await startServer();
   try {
     const res = await fetch(`${s.baseUrl}/mcp`, {
@@ -268,9 +268,9 @@ test('POST /mcp with unknown session ID returns 400 from ch1tty session guard', 
       },
       body: JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'tools/list', params: {} }),
     });
-    assert.equal(res.status, 400);
-    const body = await res.json() as { error: string; message: string };
-    assert.equal(body.error, 'bad request');
+    assert.equal(res.status, 404);
+    const body = await res.json() as { error: string };
+    assert.equal(body.error, 'session not found');
   } finally {
     await stop(s);
   }

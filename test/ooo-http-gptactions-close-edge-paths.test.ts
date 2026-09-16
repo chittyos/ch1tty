@@ -96,7 +96,9 @@ test('http-server transport.onclose: sid IS in sessions map → if(sid) block ex
       server: { close: () => Promise<void> };
       transport: { onclose?: () => void };
     }>;
-    const sessions = (httpServer as unknown as { sessions: SessionMap }).sessions;
+    const sessions = (
+      (httpServer as unknown as { mcpSessionManager: unknown }).mcpSessionManager as unknown as { sessions: SessionMap }
+    ).sessions;
     assert.equal(sessions.size, 1, 'exactly one session must be active after initialize');
 
     const [[sid, session]] = [...sessions.entries()];
@@ -220,7 +222,9 @@ test('http-server transport.onclose: firing twice — second call returns early 
     assert.equal(initRes.status, 200, 'initialize must succeed');
 
     type SessionMap = Map<string, { server: { close: () => Promise<void> }; transport: { onclose?: () => void } }>;
-    const sessions = (httpServer as unknown as { sessions: SessionMap }).sessions;
+    const sessions = (
+      (httpServer as unknown as { mcpSessionManager: unknown }).mcpSessionManager as unknown as { sessions: SessionMap }
+    ).sessions;
     assert.equal(sessions.size, 1, 'one session expected');
 
     const [[, session]] = [...sessions.entries()];

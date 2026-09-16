@@ -135,8 +135,10 @@ test('stop() with active MCP session closes transports and clears sessions map',
     const sessionId = res.headers.get('mcp-session-id');
     assert.ok(sessionId, 'session ID must be present in response headers');
 
-    // Session must now be tracked
-    const sessionsBefore = (s.server as unknown as { sessions: Map<string, unknown> }).sessions;
+    // Session must now be tracked (via McpSessionManager)
+    const sessionsBefore = (
+      (s.server as unknown as { mcpSessionManager: unknown }).mcpSessionManager as unknown as { sessions: Map<string, unknown> }
+    ).sessions;
     assert.equal(sessionsBefore.size, 1, 'server must have exactly 1 active session after initialize');
 
     // stop() must close and clear all sessions
