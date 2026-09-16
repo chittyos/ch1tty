@@ -8,7 +8,7 @@ Shared code between the gateway (current `src/`, future `apps/gateway/src/`) and
 |---|---|---|
 | `shared-types/` | **seeded** | `Backend` interface, `ServerConfig`, `ToolCallResult`, `ContentItem`, `AggregatedTool`, `ServerStatus`, and related shared types — canonical definitions that `src-stdio/types.ts` will import from here once workspaces are wired up |
 | `shared-logger/` | **seeded** | `Logger` class + `log` singleton from `src-stdio/logger.ts`; `LogLevel` type |
-| `shared-mcp/` | planned | Streamable HTTP transport glue, bearer-auth helper |
+| `shared-mcp/` | **seeded** | Streamable HTTP transport glue (`McpSessionManager`), bearer-auth helper (`checkBearerToken`, `writeUnauthorized`) |
 
 ## Migration plan
 
