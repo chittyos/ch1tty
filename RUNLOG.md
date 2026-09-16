@@ -2,26 +2,40 @@
 
 ---
 
-### run ~1670b — 2026-09-16 — Workstream R: wire @ch1tty/shared-types into npm workspaces
+### run ~1672 — 2026-09-16 — fix(build): build both shared-types + shared-logger before tsc
 
-- **Build**: tsc clean (shared-types first, then gateway) | **Tests**: 2487 pass / 0 fail / 3 skip
-- **Workstream advanced**: **R — npm workspaces + shared-types wiring** (`auto/R-wire-shared-types`)
+- **Build**: tsc clean | **Tests**: 2503 pass / 0 fail / 3 skip
+- **Workstream advanced**: **Build fix — `auto/R-wire-shared-types`** → PR #1310
 - **What was done**:
-  - Added `"workspaces": ["packages/*", "apps/*"]` to root `package.json`
-  - Added `@ch1tty/shared-types: "workspace:*"` as gateway dependency
-  - Updated root `build` script to build shared-types first
-  - Deleted `packages/shared-types/package-lock.json` (root workspace lockfile manages it)
-  - Flipped `src-stdio/types.ts` to re-export all types from `@ch1tty/shared-types`
-  - `node_modules/@ch1tty/shared-types` is now a workspace symlink; all downstream imports unchanged
-- **Trigger**: PR #1305 (Q — seed) merged at 15:39 UTC → immediately advanced to R
-- **Branch/PR**: `auto/R-wire-shared-types` → PR #1310 (CI ✅ 3/3 green; CodeRabbit: Merge Risk ⚪ Minimal, no actionable comments; waiting on human merge)
+  - Found build broken on fresh checkout: packages had no `dist/` → `tsc` failed with `Cannot find module '@ch1tty/shared-logger'` and `@ch1tty/shared-types`
+  - Root cause: build script was `tsc` only; packages must be built first
+  - **Fix**: updated build script to `npm run build --workspace=packages/shared-types --workspace=packages/shared-logger && tsc`
+  - Added both `@ch1tty/shared-logger` and `@ch1tty/shared-types` as `workspace:*` deps (explicit, auditable)
+  - Merged main into PR branch; resolved all conflicts (RUNLOG, package.json, src-stdio/types.ts)
+  - Verified: `npm run build` → clean; tests 2503/0/3
+- **Branch/PR**: `auto/R-wire-shared-types` → PR #1310 (updated with this fix)
 - **Blockers (unchanged — all require human action)**:
   1. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions"
-  2. **Upgrade Notion plan** — workspace out of free blocks; board cannot be updated
-  3. **DISABLE hourly cron** — ~1670 runs; idle-burning ~50k tokens/run
+  2. **Notion workspace out of free blocks** — board cannot be updated; run logs written here instead
+  3. **DISABLE hourly cron** — ~1672 runs; idle-burning tokens/run
   4. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
   5. **Stale branch cleanup** — 1100+ remote `auto/` branches
-- **Next run**: After R merges, also wire `src-stdio/logger.ts` to re-export from `@ch1tty/shared-logger` (per main's run ~1670 entry, shared-logger is already seeded).
+- **Next run**: Wire `@ch1tty/shared-mcp` — flip `src-stdio/http-server.ts` to use `McpSessionManager`/bearer-auth from `@ch1tty/shared-mcp` (migration plan step 3).
+
+---
+
+### run ~1671 — 2026-09-16 — feat(packages): wire monorepo workspaces (shared-types + shared-logger)
+
+**Merged:** #1311 (run ~1670 log chore, `clean`).
+
+**Workstream:** Wire npm workspaces (migration plan step 1+2).
+- `package.json`: added `"workspaces": ["packages/*", "apps/*"]`; deps `@ch1tty/shared-types: "*"` + `@ch1tty/shared-logger: "*"`
+- `src-stdio/types.ts`: 123-line inline defs → 18-line `export type { … } from '@ch1tty/shared-types'`
+- `src-stdio/logger.ts`: 80-line inline defs → 2-line re-export shim from `@ch1tty/shared-logger`
+- Built both packages (`npm run build` in each); gateway tsc clean; tests **2503/0/3** (unchanged)
+- PR #1312 open: `auto/wire-monorepo-workspaces`
+
+**Next workstream:** Wire `@ch1tty/shared-mcp` — flip `src-stdio/http-server.ts` to import `McpSessionManager` + `checkBearerToken`/`writeUnauthorized` from `@ch1tty/shared-mcp` (migration plan step 3).
 
 ---
 
