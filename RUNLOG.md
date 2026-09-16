@@ -2,6 +2,31 @@
 
 ---
 
+### run ~1668 — 2026-09-16 — steady state; PR #1302 CI-green; no new workstream
+
+- **Build**: tsc clean | **Tests**: 2473 pass / 0 fail / 3 skip (2476 total)
+- **Workstream advanced**: None — all A–E and extended F–P workstreams confirmed complete
+- **Branch/PR**: None — run-log entry only
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface FIXED, buildCastExplanation metric freeze ACTIVE)
+  - `npm ci` clean. `npm run build` tsc clean. `npm test`: 2473/0/3, 0 failures
+  - Checked open PRs: 2 open (#1302, #1303 — both CI-green)
+    - PR #1302 (`auto/session-client-url-error-method-tests`): session-client URL/error/method coverage (+14 tests); 3/3 CI checks ✅; no review comments; mergeable_state: clean
+    - PR #1303 (`auto/2026-09-16-run-log`): run ~1667 log entry; CI-green; mergeable_state: clean
+  - Verified no actionable workstream gaps: coverage saturated (remaining gaps are dead code/V8 artifacts); packages/ has README-only placeholder (planned future migration, not blocking); focus-suggestions.json has 25×3 combos (could expand but no functional gap)
+  - Notion board still blocked (workspace out of free blocks — board last updated 2026-09-10)
+- **State**: A ✓ B ✓ C ✓ D ✓ E ✓ F–P ✓ ALL DONE. Tests: 2473/0/3. Build: clean. **~1668th run.**
+- **Blockers (unchanged — all require human action)**:
+  1. **Merge PR #1302** — CI-green, no reviews, ready
+  2. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions"
+  3. **Upgrade Notion plan** — workspace out of free blocks; board cannot be updated
+  4. **DISABLE hourly cron** — all workstreams exhausted; ~1668 runs; idle-burning ~50k tokens/run
+  5. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+  6. **Stale branch cleanup** — 1100+ remote `auto/` branches
+- **Next run**: Idle unless new work defined. Merge PR #1302 when approved. Next code workstream candidate: `packages/shared-types` extraction (Backend interface + ServerConfig into @ch1tty/shared-types — see packages/README.md) but this is architectural, not urgent.
+
+---
+
 ### 2026-09-14 (event — PRs #1260/BC/#1261/BK/#1262 merged — BJ/BC/BK now in main)
 - **PR #1260 (BJ)** merged: `test/bj-cast-explain-no-match.test.ts` — 4 tests, aggregator.ts:1372 covered
 - **PR #1261 (BC)** merged: `test/bc-session-client-api-methods.test.ts` — session-client HTTP method coverage
