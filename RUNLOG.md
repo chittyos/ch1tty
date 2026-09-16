@@ -2,7 +2,7 @@
 
 ---
 
-### run ~1670 — 2026-09-16 — Workstream R: wire @ch1tty/shared-types into npm workspaces
+### run ~1670b — 2026-09-16 — Workstream R: wire @ch1tty/shared-types into npm workspaces
 
 - **Build**: tsc clean (shared-types first, then gateway) | **Tests**: 2487 pass / 0 fail / 3 skip
 - **Workstream advanced**: **R — npm workspaces + shared-types wiring** (`auto/R-wire-shared-types`)
@@ -14,15 +14,41 @@
   - Flipped `src-stdio/types.ts` to re-export all types from `@ch1tty/shared-types`
   - `node_modules/@ch1tty/shared-types` is now a workspace symlink; all downstream imports unchanged
 - **Trigger**: PR #1305 (Q — seed) merged at 15:39 UTC → immediately advanced to R
-- **Branch/PR**: `auto/R-wire-shared-types` → PR #1310 (CI pending)
+- **Branch/PR**: `auto/R-wire-shared-types` → PR #1310 (CI ✅ 3/3 green; CodeRabbit: Merge Risk ⚪ Minimal, no actionable comments; waiting on human merge)
 - **Blockers (unchanged — all require human action)**:
-  1. **Merge PR #1302** — CI-green, no review comments, ready
+  1. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions"
+  2. **Upgrade Notion plan** — workspace out of free blocks; board cannot be updated
+  3. **DISABLE hourly cron** — ~1670 runs; idle-burning ~50k tokens/run
+  4. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+  5. **Stale branch cleanup** — 1100+ remote `auto/` branches
+- **Next run**: After R merges, also wire `src-stdio/logger.ts` to re-export from `@ch1tty/shared-logger` (per main's run ~1670 entry, shared-logger is already seeded).
+
+---
+
+### run ~1670 — 2026-09-16 — PR queue drain: merged 7 PRs (#1302, #1303, #1305–#1309); tests 2503/0/3
+
+- **Build**: tsc clean | **Tests**: 2503 pass / 0 fail / 3 skip (2506 total, 107 suites) — was 2473/0/3; +30 tests
+- **Workstreams advanced**: V (session-client URL/error tests), E2 (suggestions expand 3→5), Q (shared-types), R (shared-logger), S (shared-mcp), T (shared-mcp tests)
+- **PRs merged this run**:
+  - #1302 — `test(session-coordinator-mcp): session-client URL/error/method coverage` (+14 tests) ✅
+  - #1303 — `chore(board): run ~1667 steady state` (run log) ✅
+  - #1305 — `feat(packages): seed @ch1tty/shared-types` — Backend, ServerConfig, ToolCallResult scaffold ✅
+  - #1306 — `feat(packages): seed @ch1tty/shared-logger` — Logger class, log singleton, LogLevel type ✅
+  - #1307 — `feat(packages): seed @ch1tty/shared-mcp` — McpSessionManager + bearer-auth helpers ✅
+  - #1308 — `feat(suggestions): expand focus-suggestions.json 3→5 combos+prompts per profile` ✅
+  - #1309 — `test(shared-mcp): 16 unit tests for bearer-auth + McpSessionManager` ✅
+- **Conflict resolution**: All PRs had RUNLOG.md and packages/README.md conflicts (multiple runs generated concurrent log entries). Resolved locally per branch, pushed, then squash-merged.
+- **Skipped**: #1304 (stale run-log chore superseded by this entry; conflicted and not worth rebasing)
+- **Guardrails**: 5-tool surface FIXED (search/execute/status/reload/cast); buildCastExplanation metric freeze ACTIVE
+- **Open PRs**: #1304 (stale run-log — can be closed)
+- **State summary**: A–U + E2/Q/R/S/T/V ALL DONE. `packages/shared-types`, `shared-logger`, `shared-mcp` all seeded on main. Tests: 2503/0/3. 0 vulns.
+- **Blockers (human action required)**:
+  1. **Close PR #1304** — stale run-log chore, conflicts with current main
   2. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions"
-  3. **Upgrade Notion plan** — workspace out of free blocks; board cannot be updated
-  4. **DISABLE hourly cron** — ~1670 runs; idle-burning ~50k tokens/run
-  5. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
-  6. **Stale branch cleanup** — 1100+ remote `auto/` branches
-- **Next run**: After R merges, Workstream S candidate: seed `shared-logger` package (extract `log` singleton from `src-stdio/logger.ts` into `packages/shared-logger/`).
+  3. **Notion workspace out of free blocks** — board cannot be updated; run logs written here instead
+  4. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+  5. **Stale branch cleanup** — 1100+ remote `auto/` branches
+- **Next run**: Wire monorepo workspaces — add `"workspaces": ["packages/*", "apps/*"]` to root `package.json`, flip `src-stdio/types.ts` + `src-stdio/logger.ts` to re-export from `@ch1tty/shared-types` / `@ch1tty/shared-logger`. Or advance next coverage gap workstream.
 
 ---
 
