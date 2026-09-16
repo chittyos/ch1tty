@@ -2,6 +2,30 @@
 
 ---
 
+### run ~1670 — 2026-09-16 — Workstream R: wire @ch1tty/shared-types into npm workspaces
+
+- **Build**: tsc clean (shared-types first, then gateway) | **Tests**: 2487 pass / 0 fail / 3 skip
+- **Workstream advanced**: **R — npm workspaces + shared-types wiring** (`auto/R-wire-shared-types`)
+- **What was done**:
+  - Added `"workspaces": ["packages/*", "apps/*"]` to root `package.json`
+  - Added `@ch1tty/shared-types: "workspace:*"` as gateway dependency
+  - Updated root `build` script to build shared-types first
+  - Deleted `packages/shared-types/package-lock.json` (root workspace lockfile manages it)
+  - Flipped `src-stdio/types.ts` to re-export all types from `@ch1tty/shared-types`
+  - `node_modules/@ch1tty/shared-types` is now a workspace symlink; all downstream imports unchanged
+- **Trigger**: PR #1305 (Q — seed) merged at 15:39 UTC → immediately advanced to R
+- **Branch/PR**: `auto/R-wire-shared-types` → PR #1310 (CI pending)
+- **Blockers (unchanged — all require human action)**:
+  1. **Merge PR #1302** — CI-green, no review comments, ready
+  2. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions"
+  3. **Upgrade Notion plan** — workspace out of free blocks; board cannot be updated
+  4. **DISABLE hourly cron** — ~1670 runs; idle-burning ~50k tokens/run
+  5. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+  6. **Stale branch cleanup** — 1100+ remote `auto/` branches
+- **Next run**: After R merges, Workstream S candidate: seed `shared-logger` package (extract `log` singleton from `src-stdio/logger.ts` into `packages/shared-logger/`).
+
+---
+
 ### run ~1669b — 2026-09-16 — Workstream Q: packages/shared-types seed
 
 - **Build**: tsc clean | **Tests**: 2473 pass / 0 fail / 3 skip (2476 total)
