@@ -7,8 +7,8 @@ import { createTasksHttpApp } from './http-server.js';
 const portEnv = process.env.TASKS_MCP_PORT;
 
 if (portEnv) {
-  const port = parseInt(portEnv, 10);
-  if (!Number.isFinite(port) || port < 1 || port > 65535) {
+  const port = Number(portEnv);
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
     process.stderr.write(`[tasks-mcp] Invalid TASKS_MCP_PORT: ${portEnv}\n`);
     process.exit(1);
   }

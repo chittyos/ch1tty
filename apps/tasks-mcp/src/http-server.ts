@@ -37,7 +37,7 @@ export function createTasksHttpApp(options: TasksHttpAppOptions = {}): TasksHttp
   async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
     const url = req.url ?? '';
 
-    if (url === '/health') {
+    if (req.method === 'GET' && url === '/health') {
       res.setHeader('Content-Type', 'application/json');
       res.writeHead(200);
       res.end(JSON.stringify({ status: 'ok', service: 'tasks-mcp' }));

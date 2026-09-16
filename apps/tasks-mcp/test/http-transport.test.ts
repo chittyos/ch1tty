@@ -181,15 +181,16 @@ test('/mcp 401 response body has error: unauthorized', async () => {
 test('POST /mcp without session ID — MCP handler responds (not 401, not 404)', async () => {
   const { baseUrl, stop } = await startApp();
   try {
-    // A bare POST to /mcp with application/json content type initiates a session.
-    // McpSessionManager will either start a session (200) or return 400 for bad request.
     const res = await fetch(`${baseUrl}/mcp`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json, text/event-stream',
+      },
       body: JSON.stringify({ jsonrpc: '2.0', method: 'initialize', id: 1, params: { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'test', version: '1.0.0' } } }),
     });
-    assert.notEqual(res.status, 401);
-    assert.notEqual(res.status, 404);
+    assert.ok(res.ok, `Expected MCP initialize success, got ${res.status}`);
+    assert.ok(res.headers.get('mcp-session-id'), 'Expected mcp-session-id header');
   } finally {
     await stop();
   }
