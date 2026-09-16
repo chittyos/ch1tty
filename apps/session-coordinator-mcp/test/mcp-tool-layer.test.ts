@@ -689,3 +689,250 @@ test('list_events — empty-string session_id returns error', async () => {
     await cleanup();
   }
 });
+
+// ── list_tools property-type schema assertions ─────────────────────────────────
+
+type PropertySchema = { type?: string; description?: string; enum?: string[]; additionalProperties?: boolean };
+type ToolInputSchema = { type?: string; properties?: Record<string, PropertySchema>; required?: string[] };
+
+test('list_tools: list_sessions channel and user_id properties are type string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.listTools();
+    const tool = res.tools.find(t => t.name === 'list_sessions');
+    assert.ok(tool, 'list_sessions missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['channel']?.type, 'string');
+    assert.equal(schema.properties?.['user_id']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: list_sessions status property is type string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.listTools();
+    const tool = res.tools.find(t => t.name === 'list_sessions');
+    assert.ok(tool, 'list_sessions missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['status']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: list_sessions limit property is type number', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.listTools();
+    const tool = res.tools.find(t => t.name === 'list_sessions');
+    assert.ok(tool, 'list_sessions missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['limit']?.type, 'number');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: list_sessions has no required array', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.listTools();
+    const tool = res.tools.find(t => t.name === 'list_sessions');
+    assert.ok(tool, 'list_sessions missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.ok(!schema.required || schema.required.length === 0, 'list_sessions should have no required fields');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: get_session id property is type string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.listTools();
+    const tool = res.tools.find(t => t.name === 'get_session');
+    assert.ok(tool, 'get_session missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['id']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: create_session channel and user_id properties are type string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.listTools();
+    const tool = res.tools.find(t => t.name === 'create_session');
+    assert.ok(tool, 'create_session missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['channel']?.type, 'string');
+    assert.equal(schema.properties?.['user_id']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: create_session context property is type object with additionalProperties', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.listTools();
+    const tool = res.tools.find(t => t.name === 'create_session');
+    assert.ok(tool, 'create_session missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['context']?.type, 'object');
+    assert.equal(schema.properties?.['context']?.additionalProperties, true);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: update_session id and status properties are type string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.listTools();
+    const tool = res.tools.find(t => t.name === 'update_session');
+    assert.ok(tool, 'update_session missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['id']?.type, 'string');
+    assert.equal(schema.properties?.['status']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: update_session context property is type object with additionalProperties', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.listTools();
+    const tool = res.tools.find(t => t.name === 'update_session');
+    assert.ok(tool, 'update_session missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['context']?.type, 'object');
+    assert.equal(schema.properties?.['context']?.additionalProperties, true);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: close_session id property is type string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.listTools();
+    const tool = res.tools.find(t => t.name === 'close_session');
+    assert.ok(tool, 'close_session missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['id']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: append_event session_id, type, actor properties are type string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.listTools();
+    const tool = res.tools.find(t => t.name === 'append_event');
+    assert.ok(tool, 'append_event missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['session_id']?.type, 'string');
+    assert.equal(schema.properties?.['type']?.type, 'string');
+    assert.equal(schema.properties?.['actor']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: append_event payload property is type object with additionalProperties', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.listTools();
+    const tool = res.tools.find(t => t.name === 'append_event');
+    assert.ok(tool, 'append_event missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['payload']?.type, 'object');
+    assert.equal(schema.properties?.['payload']?.additionalProperties, true);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: list_events session_id and cursor properties are type string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.listTools();
+    const tool = res.tools.find(t => t.name === 'list_events');
+    assert.ok(tool, 'list_events missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['session_id']?.type, 'string');
+    assert.equal(schema.properties?.['cursor']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: list_events limit property is type number', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.listTools();
+    const tool = res.tools.find(t => t.name === 'list_events');
+    assert.ok(tool, 'list_events missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['limit']?.type, 'number');
+  } finally {
+    await cleanup();
+  }
+});
+
+// ── Functional gap: has_more forwarding ───────────────────────────────────────
+
+test('list_events: returns has_more:true when client returns has_more:true', async () => {
+  const { client, cleanup } = await setup({
+    listEvents: async () => ({ events: [EVENT_1], has_more: true }),
+  });
+  try {
+    const res = await client.callTool({ name: 'list_events', arguments: { session_id: 'sess-1' } });
+    assert.equal(res.isError, undefined);
+    const body = JSON.parse((res.content[0] as { text: string }).text) as ListEventsResult;
+    assert.equal(body.has_more, true);
+    assert.equal(body.events.length, 1);
+  } finally {
+    await cleanup();
+  }
+});
+
+// ── Functional gap: optional-arg passthrough ──────────────────────────────────
+
+test('append_event: no actor arg → client receives actor:undefined', async () => {
+  let capturedActor: string | undefined = 'sentinel';
+  const { client, cleanup } = await setup({
+    appendEvent: async (_sessionId, input) => {
+      capturedActor = (input as { actor?: string }).actor;
+      return { ...EVENT_1, id: 'evt-new', session_id: _sessionId };
+    },
+  });
+  try {
+    await client.callTool({ name: 'append_event', arguments: { session_id: 'sess-1', type: 'user.message' } });
+    assert.equal(capturedActor, undefined);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('append_event: no payload arg → client receives payload:undefined', async () => {
+  let capturedPayload: Record<string, unknown> | undefined = { sentinel: true };
+  const { client, cleanup } = await setup({
+    appendEvent: async (_sessionId, input) => {
+      capturedPayload = (input as { payload?: Record<string, unknown> }).payload;
+      return { ...EVENT_1, id: 'evt-new', session_id: _sessionId };
+    },
+  });
+  try {
+    await client.callTool({ name: 'append_event', arguments: { session_id: 'sess-1', type: 'user.message' } });
+    assert.equal(capturedPayload, undefined);
+  } finally {
+    await cleanup();
+  }
+});
