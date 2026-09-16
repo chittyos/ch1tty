@@ -5379,3 +5379,46 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   6. **Issues #1071/#1072** require human decisions
 - **PushNotification:** SENT — merged 4 CI-green test PRs (R/S/T/U); +44 tests; now 2473/0/3; 0 open PRs.
 - **Next run:** IDLE. No new workstream. Potential V: comms-client or session-coordinator-client URL/error/method gap coverage (same pattern as S/T/U). **HUMAN ACTION REQUIRED: disable/pause cron or define new workstream.**
+
+---
+
+## Run log — 2026-09-16T~UTC (run ~1670 — PRODUCTIVE: merged 7 PRs)
+
+- **Workstream advanced**: V (session-client tests), E2 (suggestions expand), Q (shared-types), R (shared-logger), S (shared-mcp), T (shared-mcp tests)
+- **Branch/PRs merged**:
+  - #1302 session-client URL/error/method (+14 tests)
+  - #1303 run-log chore
+  - #1305 packages/shared-types seed
+  - #1306 packages/shared-logger seed
+  - #1307 packages/shared-mcp seed (McpSessionManager + bearer-auth)
+  - #1308 focus-suggestions.json 3→5 combos+prompts per profile
+  - #1309 test(shared-mcp) 16 unit tests for bearer-auth + McpSessionManager
+- **Build:** tsc clean (0 errors, ch1tty@4.1.0)
+- **Tests:** 2503 pass / 0 fail / 3 skip (2506 total, 107 suites) — was 2473/0/3; +30 tests
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE
+- **Open PRs:** 1 (#1304 — stale runlog, can be closed)
+- **State summary:** A ✓ B ✓ C ✓ D ✓ E ✓ F–V+E2+Q+R+S+T ALL DONE. packages/ seeded: shared-types ✓, shared-logger ✓, shared-mcp ✓. Tests: 2503/0/3. 0 vulns.
+- **Actions taken:**
+  - Read CLAUDE.md + guardrails confirmed.
+  - npm ci + build (tsc 0 errors) + test 2473/0/3 (pre-merge baseline).
+  - Found 8 open PRs. Checked CI (7 green, #1307 blocked due to CodeRabbit rate limit after fixes).
+  - Merged #1302 (clean), #1303 (clean).
+  - Resolved RUNLOG.md and packages/README.md conflicts locally for #1308, #1305, #1306, #1307, #1309.
+  - Merged #1308 (suggestions), #1305 (shared-types), #1306 (shared-logger), #1307 (shared-mcp), #1309 (shared-mcp tests).
+  - Updated #1309 base from #1307 branch → main before merging.
+  - Post-merge test: 2503/0/3 — +30 tests; all green.
+- **[x] V** — test(session-coordinator-mcp): session-client URL/error/method coverage. PR #1302 merged.
+- **[x] E2** — feat(suggestions): expand 3→5 combos+prompts per profile. PR #1308 merged.
+- **[x] Q** — feat(packages): seed @ch1tty/shared-types. PR #1305 merged.
+- **[x] R** — feat(packages): seed @ch1tty/shared-logger. PR #1306 merged.
+- **[x] S** — feat(packages): seed @ch1tty/shared-mcp. PR #1307 merged.
+- **[x] T** — test(shared-mcp): 16 unit tests. PR #1309 merged.
+- **Human-action items**:
+  1. Close PR #1304 (stale run-log chore)
+  2. Enable GitHub Actions (Settings → Actions → "Allow all actions")
+  3. Notion workspace out of free blocks — upgrade or clear
+  4. Stale branch cleanup — 1100+ remote auto/ branches
+  5. Major dep bumps — typescript 5→7, @types/node 22→26, c8 11→12 await human review
+  6. Issues #1071/#1072 require human decisions
+  7. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+- **Next run:** Wire monorepo workspaces — add workspaces to root package.json, flip src-stdio/types.ts + logger.ts to import from @ch1tty/shared-types / @ch1tty/shared-logger. Or advance next coverage gap workstream.

@@ -2,6 +2,34 @@
 
 ---
 
+### run ~1670 — 2026-09-16 — PR queue drain: merged 7 PRs (#1302, #1303, #1305–#1309); tests 2503/0/3
+
+- **Build**: tsc clean | **Tests**: 2503 pass / 0 fail / 3 skip (2506 total, 107 suites) — was 2473/0/3; +30 tests
+- **Workstreams advanced**: V (session-client URL/error tests), E2 (suggestions expand 3→5), Q (shared-types), R (shared-logger), S (shared-mcp), T (shared-mcp tests)
+- **PRs merged this run**:
+  - #1302 — `test(session-coordinator-mcp): session-client URL/error/method coverage` (+14 tests) ✅
+  - #1303 — `chore(board): run ~1667 steady state` (run log) ✅
+  - #1305 — `feat(packages): seed @ch1tty/shared-types` — Backend, ServerConfig, ToolCallResult scaffold ✅
+  - #1306 — `feat(packages): seed @ch1tty/shared-logger` — Logger class, log singleton, LogLevel type ✅
+  - #1307 — `feat(packages): seed @ch1tty/shared-mcp` — McpSessionManager + bearer-auth helpers ✅
+  - #1308 — `feat(suggestions): expand focus-suggestions.json 3→5 combos+prompts per profile` ✅
+  - #1309 — `test(shared-mcp): 16 unit tests for bearer-auth + McpSessionManager` ✅
+- **Conflict resolution**: All PRs had RUNLOG.md and packages/README.md conflicts (multiple runs generated concurrent log entries). Resolved locally per branch, pushed, then squash-merged.
+- **Skipped**: #1304 (stale run-log chore superseded by this entry; conflicted and not worth rebasing)
+- **Guardrails**: 5-tool surface FIXED (search/execute/status/reload/cast); buildCastExplanation metric freeze ACTIVE
+- **Open PRs**: #1304 (stale run-log — can be closed)
+- **State summary**: A–U + E2/Q/R/S/T/V ALL DONE. `packages/shared-types`, `shared-logger`, `shared-mcp` all seeded on main. Tests: 2503/0/3. 0 vulns.
+- **Blockers (human action required)**:
+  1. **Close PR #1304** — stale run-log chore, conflicts with current main
+  2. **Unblock #1307 pattern**: CodeRabbit left actionable comments → fixed in same session but CR hit rate limit; PR merged after rebasing. Resolved.
+  3. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions"
+  4. **Notion workspace out of free blocks** — board cannot be updated; run logs written here instead
+  5. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+  6. **Stale branch cleanup** — 1100+ remote `auto/` branches
+- **Next run**: Wire monorepo workspaces — add `"workspaces": ["packages/*", "apps/*"]` to root `package.json`, flip `src-stdio/types.ts` + `src-stdio/logger.ts` to re-export from `@ch1tty/shared-types` / `@ch1tty/shared-logger`. Or advance next coverage gap workstream.
+
+---
+
 ### run ~1669b — 2026-09-16 — Workstream Q: packages/shared-types seed
 
 - **Build**: tsc clean | **Tests**: 2473 pass / 0 fail / 3 skip (2476 total)
