@@ -5,7 +5,7 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "build": "npm run build --workspace=packages/shared-types --workspace=packages/shared-logger && tsc",
+    "build": "npm run build --workspace=packages/shared-types --workspace=packages/shared-logger --workspace=packages/shared-mcp && tsc",
     "build:apps": "for app in apps/*/; do if [ -f \"$app/package.json\" ]; then (cd \"$app\" && npm run build) || exit 1; fi; done",
     "start": "node dist/index.js",
     "dev": "tsc --watch",

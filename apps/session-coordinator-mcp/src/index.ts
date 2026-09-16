@@ -1,8 +1,26 @@
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { createServer } from 'node:http';
 import { SessionClient } from './session-client.js';
 import { createSessionCoordinatorServer } from './server.js';
+import { createSessionMcpHttpApp } from './http-server.js';
 
-const client = new SessionClient();
-const server = createSessionCoordinatorServer(client);
-const transport = new StdioServerTransport();
-await server.connect(transport);
+const portEnv = process.env.SESSION_MCP_PORT;
+
+if (portEnv) {
+  const port = Number(portEnv);
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    process.stderr.write(`[session-coordinator-mcp] Invalid SESSION_MCP_PORT: ${portEnv}\n`);
+    process.exit(1);
+  }
+
+  const app = createSessionMcpHttpApp({ mcpToken: process.env.SESSION_MCP_TOKEN });
+  const httpServer = createServer((req, res) => { void app.handleRequest(req, res); });
+  httpServer.listen(port, '0.0.0.0', () => {
+    process.stderr.write(`[session-coordinator-mcp] HTTP server listening on port ${port}\n`);
+  });
+} else {
+  const client = new SessionClient();
+  const server = createSessionCoordinatorServer(client);
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
+}
