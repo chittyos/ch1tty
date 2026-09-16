@@ -289,4 +289,135 @@ describe('EvidenceClient', () => {
     assert.equal(result.total, 1);
     assert.equal(lastRequestUrl?.searchParams.get('limit'), '5');
   });
+
+  it('listDocuments: no filters → GET /api/evidence/documents with no query string', async () => {
+    const client = new EvidenceClient(baseUrl, 'test-token');
+    await client.listDocuments();
+    assert.equal(lastRequestUrl?.pathname, '/api/evidence/documents');
+    assert.equal(lastRequestUrl?.search, '');
+  });
+
+  it('getDocument: URL-encodes IDs with special characters', async () => {
+    let capturedPath = '';
+    const server = http.createServer((req, res) => {
+      capturedPath = req.url!;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify(FIXTURE_DOCS[0]));
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new EvidenceClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await client.getDocument('doc/v1/report');
+      assert.equal(capturedPath, '/api/evidence/documents/doc%2Fv1%2Freport');
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('getCanonicalUri: URL-encodes IDs with special characters', async () => {
+    let capturedPath = '';
+    const server = http.createServer((req, res) => {
+      capturedPath = req.url!;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ id: 'doc/v1/report', canonical_uri: 'chittycanon://evidence/doc%2Fv1%2Freport' }));
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new EvidenceClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await client.getCanonicalUri('doc/v1/report');
+      assert.equal(capturedPath, '/api/evidence/canonical/doc%2Fv1%2Freport');
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('getDocument: non-ok response (500) throws with status code in message', async () => {
+    const server = http.createServer((_req, res) => { res.writeHead(500); res.end('internal error'); });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new EvidenceClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await assert.rejects(() => client.getDocument('doc1'), /500/);
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('ingestDocument: non-ok response (422) throws with status code in message', async () => {
+    const server = http.createServer((_req, res) => { res.writeHead(422); res.end('{"error":"content required"}'); });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new EvidenceClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await assert.rejects(() => client.ingestDocument({ content: '', kind: 'note' }), /422/);
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('ingestDocument: sends POST to /api/evidence/documents', async () => {
+    let capturedMethod = '';
+    let capturedPath = '';
+    const server = http.createServer((req, res) => {
+      capturedMethod = req.method!;
+      capturedPath = req.url!;
+      res.setHeader('Content-Type', 'application/json');
+      res.writeHead(201);
+      res.end(JSON.stringify({ ...FIXTURE_DOCS[0], id: 'doc_new' }));
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new EvidenceClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await client.ingestDocument({ content: 'test', kind: 'note' });
+      assert.equal(capturedMethod, 'POST');
+      assert.equal(capturedPath, '/api/evidence/documents');
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('searchDocuments: sends GET to /api/evidence/documents/search', async () => {
+    let capturedMethod = '';
+    let capturedPathname = '';
+    const server = http.createServer((req, res) => {
+      capturedMethod = req.method!;
+      capturedPathname = new URL(req.url!, 'http://localhost').pathname;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ documents: [], total: 0 }));
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new EvidenceClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await client.searchDocuments('test query');
+      assert.equal(capturedMethod, 'GET');
+      assert.equal(capturedPathname, '/api/evidence/documents/search');
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('getDocument: sends GET to /api/evidence/documents/:id', async () => {
+    let capturedMethod = '';
+    let capturedPath = '';
+    const server = http.createServer((req, res) => {
+      capturedMethod = req.method!;
+      capturedPath = req.url!;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify(FIXTURE_DOCS[0]));
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new EvidenceClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await client.getDocument('doc99');
+      assert.equal(capturedMethod, 'GET');
+      assert.equal(capturedPath, '/api/evidence/documents/doc99');
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
 });
