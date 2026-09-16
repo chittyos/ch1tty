@@ -2,6 +2,64 @@
 
 ---
 
+### run ~1669b — 2026-09-16 — Workstream Q: packages/shared-types seed
+
+- **Build**: tsc clean | **Tests**: 2473 pass / 0 fail / 3 skip (2476 total)
+- **Workstream advanced**: **Q — packages/shared-types scaffold** (`auto/Q-packages-shared-types-seed`)
+- **What was done**:
+  - Created `packages/shared-types/` with `package.json`, `tsconfig.json`, `src/index.ts`
+  - `src/index.ts` contains all shared type definitions (Backend, ServerConfig, ToolCallResult, ContentItem, AggregatedTool, ServerStatus, etc.) — canonical source, mirroring `src-stdio/types.ts`
+  - Package builds to `dist/` with full declaration files; `npm run build` clean (0 errors)
+  - Updated `packages/README.md` to mark `shared-types/` status as "seeded" with explicit migration plan
+  - Main gateway build and full test suite unaffected (nothing imports the new package yet)
+- **Open PRs before this run**: #1302 (session-client tests; CI-green), #1303/#1304 (run-log entries)
+- **Branch/PR**: `auto/Q-packages-shared-types-seed` → PR #1305 (CI ✅ 3/3 green)
+- **Blockers (unchanged — all require human action)**:
+  1. **Merge PR #1302** — CI-green, no review comments, ready
+  2. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions"
+  3. **Upgrade Notion plan** — workspace out of free blocks; board cannot be updated
+  4. **DISABLE hourly cron** — ~1669 runs; all workstreams exhausted; idle-burning ~50k tokens/run
+  5. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+  6. **Stale branch cleanup** — 1100+ remote `auto/` branches
+- **Next run**: After Q PR merges, Workstream R candidate: wire `@ch1tty/shared-types` — add npm workspaces, flip `src-stdio/types.ts` to re-export from the package, update app dependencies.
+
+---
+
+### run ~1669 — 2026-09-16 — E2: focus-suggestions.json expanded 3→5 combos+prompts per profile
+
+- **Build**: tsc clean | **Tests**: 2473 pass / 0 fail / 3 skip (2476 total)
+- **Workstream advanced**: E2 — expanded `focus-suggestions.json` from 3 to 5 combos + 5 prompts per profile across all 25 active profiles (+50 combos, +50 prompts)
+- **Branch/PR**: `auto/E2-focus-suggestions-expand-5` → opened as PR this run
+- **Open PRs before run**: 6 (#1302, #1303, #1304, #1305, #1306, #1307)
+  - All CI-green; #1302 (session-coordinator-mcp tests) + #1305-#1307 (packages/shared scaffold) awaiting human merge
+  - #1303 and #1304 are stale run-log chores (superseded by this entry)
+- **Key fix**: `suggestions.test.ts` enforces `comms/comms.recentLog`-only for comms/* — fixed 4 combos + 3 prompts that referenced non-existent `comms/send_message` / `comms/list_messages`
+- **Blockers** (unchanged):
+  1. **Notion workspace out of free blocks** — board cannot be updated; run logs written here instead
+  2. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions"
+  3. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+- **Next run**: Merge PR queue if any have new reviews. Next workstream candidate: wire `src-stdio/types.ts` to import from `@ch1tty/shared-types` (depends on #1305 merging) or add scenario tests for new suggestion-aware cast responses
+
+---
+
+### run ~1667 — 2026-09-16 — full steady state; Notion blocked; PR #1302 watched
+
+- **Build**: tsc clean | **Tests**: 2473 pass / 0 fail / 3 skip (2476 total)
+- **Coverage**: 100% lines/branches/functions/statements across all `src/` modules and all `apps/*/src/` modules
+- **Workstream assessment**:
+  - A–E: done ✓ | F–O: done ✓ | P (ledger/session factory+test): done ✓ (729 + 938 line files already exist)
+  - All 25 focus profiles have scenario test files in `test/`
+  - All client modules have URL-encoding + HTTP-method + error-path tests (pattern complete after #1302 merges)
+  - E2E gateway tests BZ–CF cover stdio + HTTP transport, all 5 meta-tools, reload, execute, search, cast
+- **Open PR**: #1302 (`auto/session-client-url-error-method-tests`) — session-client URL/error/method gaps; CI-green (CodeQL + Analyze ✅); no review comments; subscribed
+- **Blockers** (unchanged):
+  1. **Notion workspace out of free blocks** — board cannot be updated; run logs written here instead
+  2. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions"
+  3. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+- **Next run**: After #1302 merges, consider (a) reviewing issues #1071/#1072 for extensibility-rebuild ch1tty work; (b) expanding `focus-suggestions.json` combos 3→5 per profile; (c) `packages/` shared-library refactor from CLAUDE.md § Split Architecture
+
+---
+
 ### 2026-09-14 (event — PRs #1260/BC/#1261/BK/#1262 merged — BJ/BC/BK now in main)
 - **PR #1260 (BJ)** merged: `test/bj-cast-explain-no-match.test.ts` — 4 tests, aggregator.ts:1372 covered
 - **PR #1261 (BC)** merged: `test/bc-session-client-api-methods.test.ts` — session-client HTTP method coverage
