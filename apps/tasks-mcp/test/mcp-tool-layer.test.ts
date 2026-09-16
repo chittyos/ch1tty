@@ -497,3 +497,264 @@ test('complete_task: missing id returns isError before reaching client', async (
     await cleanup();
   }
 });
+
+// ── Schema property-type assertions ───────────────────────────────────────────
+
+type PropertySchema = { type?: string; description?: string; items?: { type?: string }; enum?: string[] };
+type ToolInputSchema = { type?: string; properties?: Record<string, PropertySchema>; required?: string[] };
+
+test('list_tasks: string properties have type=string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'list_tasks');
+    assert.ok(tool, 'list_tasks tool missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['status']?.type, 'string');
+    assert.equal(schema.properties?.['assignee']?.type, 'string');
+    assert.equal(schema.properties?.['project']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tasks: limit property has type=number', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'list_tasks');
+    assert.ok(tool, 'list_tasks tool missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['limit']?.type, 'number');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tasks: status has correct enum values', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'list_tasks');
+    assert.ok(tool, 'list_tasks tool missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.deepEqual(schema.properties?.['status']?.enum, ['open', 'in_progress', 'done', 'cancelled']);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tasks: has no required array', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'list_tasks');
+    assert.ok(tool, 'list_tasks tool missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.required, undefined);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('get_task: id property has type=string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'get_task');
+    assert.ok(tool, 'get_task tool missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['id']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('create_task: string properties have type=string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'create_task');
+    assert.ok(tool, 'create_task tool missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['title']?.type, 'string');
+    assert.equal(schema.properties?.['description']?.type, 'string');
+    assert.equal(schema.properties?.['assignee']?.type, 'string');
+    assert.equal(schema.properties?.['project']?.type, 'string');
+    assert.equal(schema.properties?.['due_date']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('create_task: status and priority have type=string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'create_task');
+    assert.ok(tool, 'create_task tool missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['status']?.type, 'string');
+    assert.equal(schema.properties?.['priority']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('create_task: status has correct enum values', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'create_task');
+    assert.ok(tool, 'create_task tool missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.deepEqual(schema.properties?.['status']?.enum, ['open', 'in_progress', 'done', 'cancelled']);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('create_task: priority has correct enum values', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'create_task');
+    assert.ok(tool, 'create_task tool missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.deepEqual(schema.properties?.['priority']?.enum, ['low', 'medium', 'high']);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('create_task: tags property has type=array with items.type=string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'create_task');
+    assert.ok(tool, 'create_task tool missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['tags']?.type, 'array');
+    assert.equal(schema.properties?.['tags']?.items?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('update_task: string properties have type=string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'update_task');
+    assert.ok(tool, 'update_task tool missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['id']?.type, 'string');
+    assert.equal(schema.properties?.['title']?.type, 'string');
+    assert.equal(schema.properties?.['description']?.type, 'string');
+    assert.equal(schema.properties?.['assignee']?.type, 'string');
+    assert.equal(schema.properties?.['project']?.type, 'string');
+    assert.equal(schema.properties?.['due_date']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('update_task: status and priority have type=string with enums', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'update_task');
+    assert.ok(tool, 'update_task tool missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['status']?.type, 'string');
+    assert.deepEqual(schema.properties?.['status']?.enum, ['open', 'in_progress', 'done', 'cancelled']);
+    assert.equal(schema.properties?.['priority']?.type, 'string');
+    assert.deepEqual(schema.properties?.['priority']?.enum, ['low', 'medium', 'high']);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('update_task: tags property has type=array with items.type=string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'update_task');
+    assert.ok(tool, 'update_task tool missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['tags']?.type, 'array');
+    assert.equal(schema.properties?.['tags']?.items?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('complete_task: id property has type=string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'complete_task');
+    assert.ok(tool, 'complete_task tool missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['id']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('delete_task: id property has type=string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'delete_task');
+    assert.ok(tool, 'delete_task tool missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['id']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+// ── Optional-arg passthrough ──────────────────────────────────────────────────
+
+test('create_task: no description arg → client receives description:undefined', async () => {
+  let capturedInput: CreateTaskInput | undefined;
+  const { client, cleanup } = await setup({
+    createTask: async (input) => { capturedInput = input; return { ...TASK_1, id: 't_new', title: input.title }; },
+  });
+  try {
+    await client.callTool({ name: 'create_task', arguments: { title: 'No desc' } });
+    assert.equal(capturedInput?.description, undefined);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('create_task: no tags arg → client receives tags:undefined', async () => {
+  let capturedInput: CreateTaskInput | undefined;
+  const { client, cleanup } = await setup({
+    createTask: async (input) => { capturedInput = input; return { ...TASK_1, id: 't_new', title: input.title }; },
+  });
+  try {
+    await client.callTool({ name: 'create_task', arguments: { title: 'No tags' } });
+    assert.equal(capturedInput?.tags, undefined);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tasks: no args → all filter fields undefined', async () => {
+  let capturedFilter: ListTasksFilter | undefined;
+  const { client, cleanup } = await setup({
+    listTasks: async (filter) => { capturedFilter = filter; return []; },
+  });
+  try {
+    await client.callTool({ name: 'list_tasks', arguments: {} });
+    assert.equal(capturedFilter?.status, undefined);
+    assert.equal(capturedFilter?.assignee, undefined);
+    assert.equal(capturedFilter?.project, undefined);
+    assert.equal(capturedFilter?.limit, undefined);
+  } finally {
+    await cleanup();
+  }
+});
