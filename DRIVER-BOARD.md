@@ -5340,3 +5340,42 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   7. **Major dep bumps** — typescript 5→7, @types/node 22→26, c8 11→12 await human review *(carried from ~1649)*
   8. **Issues #1071/#1072** — require human decisions *(carried from ~1649)*
 - **Next run:** IDLE. Same state. **HUMAN ACTION REQUIRED: disable/pause cron or add new workstreams.**
+
+---
+
+## Run log — 2026-09-16T~UTC (run ~1666 — PRODUCTIVE: merged PRs #1298 R, #1299 S, #1300 T, #1301 U)
+
+- **Workstream advanced:** R/S/T/U queue drain — all 4 CI-green test-coverage PRs squash-merged
+- **Branch/PRs merged:**
+  - #1298 (R: tasks-mcp schema+enum+optional-arg gaps, SHA af19ec9) — +18 tests
+  - #1299 (S: tasks-client URL encoding, error paths, HTTP method, SHA a139e44) — +10 tests
+  - #1300 (T: evidence-client URL encoding, error paths, HTTP method, SHA 22787b8) — +8 tests
+  - #1301 (U: ledger-client URL encoding, HTTP method, error paths, SHA 48e7588) — +8 tests
+- **Build:** tsc clean (0 errors, ch1tty@4.1.0)
+- **Tests:** 2473 pass / 0 fail / 3 skip (2476 total, 107 suites) — was 2429/0/3 before merges; +44 tests
+- **Guardrails:** 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE (56/87 field freeze guards). 0 violations on main.
+- **Open PRs:** 0 (all 4 merged this run)
+- **Vulnerabilities:** 0
+- **Actions taken:**
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed.
+  - `npm ci` clean; `npm run build` clean (tsc exit 0); `npm test` 2429/0/3 (pre-merge).
+  - Found 4 open PRs all `mergeable_state: clean`, all 3/3 CI green.
+  - Squash-merged #1298 → #1299 → #1300 → #1301 in sequence.
+  - `git pull origin main` fast-forward (+693 lines across 4 test files). `npm test` post-merge: 2473/0/3.
+  - Workstreams R/S/T/U marked done.
+  - Notion board: not attempted (free-block limit).
+- **State summary:** A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ H–U ALL DONE. **0 open PRs.** Tests: 2473/0/3. Build: clean. 0 vulns.
+- **Workstream status updates:**
+  - [x] **R** — test(tasks-mcp): schema property-type assertions + enum + optional-arg gap coverage. PR #1298 merged.
+  - [x] **S** — test(tasks-mcp): tasks-client URL encoding, error paths, HTTP method coverage. PR #1299 merged.
+  - [x] **T** — test(evidence-mcp): evidence-client URL encoding, error paths, HTTP method coverage. PR #1300 merged.
+  - [x] **U** — test(ledger-client): URL encoding, HTTP method, and error path coverage. PR #1301 merged.
+- **Human-action items** (unchanged):
+  1. **DISABLE hourly cron** — all workstreams A–U exhausted; 0 open PRs; ~1666 runs; burning ~50k tokens/run
+  2. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  3. **Notion workspace** out of free blocks — upgrade or clear
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Major dep bumps** — typescript 5→7, @types/node 22→26, c8 11→12 await human review
+  6. **Issues #1071/#1072** require human decisions
+- **PushNotification:** SENT — merged 4 CI-green test PRs (R/S/T/U); +44 tests; now 2473/0/3; 0 open PRs.
+- **Next run:** IDLE. No new workstream. Potential V: comms-client or session-coordinator-client URL/error/method gap coverage (same pattern as S/T/U). **HUMAN ACTION REQUIRED: disable/pause cron or define new workstream.**
