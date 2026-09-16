@@ -2,6 +2,28 @@
 
 ---
 
+### run ~1672 — 2026-09-16 — fix(build): build both shared-types + shared-logger before tsc
+
+- **Build**: tsc clean | **Tests**: 2503 pass / 0 fail / 3 skip
+- **Workstream advanced**: **Build fix — `auto/R-wire-shared-types`** → PR #1310
+- **What was done**:
+  - Found build broken on fresh checkout: packages had no `dist/` → `tsc` failed with `Cannot find module '@ch1tty/shared-logger'` and `@ch1tty/shared-types`
+  - Root cause: build script was `tsc` only; packages must be built first
+  - **Fix**: updated build script to `npm run build --workspace=packages/shared-types --workspace=packages/shared-logger && tsc`
+  - Added both `@ch1tty/shared-logger` and `@ch1tty/shared-types` as `workspace:*` deps (explicit, auditable)
+  - Merged main into PR branch; resolved all conflicts (RUNLOG, package.json, src-stdio/types.ts)
+  - Verified: `npm run build` → clean; tests 2503/0/3
+- **Branch/PR**: `auto/R-wire-shared-types` → PR #1310 (updated with this fix)
+- **Blockers (unchanged — all require human action)**:
+  1. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions"
+  2. **Notion workspace out of free blocks** — board cannot be updated; run logs written here instead
+  3. **DISABLE hourly cron** — ~1672 runs; idle-burning tokens/run
+  4. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+  5. **Stale branch cleanup** — 1100+ remote `auto/` branches
+- **Next run**: Wire `@ch1tty/shared-mcp` — flip `src-stdio/http-server.ts` to use `McpSessionManager`/bearer-auth from `@ch1tty/shared-mcp` (migration plan step 3).
+
+---
+
 ### run ~1671 — 2026-09-16 — feat(packages): wire monorepo workspaces (shared-types + shared-logger)
 
 **Merged:** #1311 (run ~1670 log chore, `clean`).
@@ -36,11 +58,10 @@
 - **State summary**: A–U + E2/Q/R/S/T/V ALL DONE. `packages/shared-types`, `shared-logger`, `shared-mcp` all seeded on main. Tests: 2503/0/3. 0 vulns.
 - **Blockers (human action required)**:
   1. **Close PR #1304** — stale run-log chore, conflicts with current main
-  2. **Unblock #1307 pattern**: CodeRabbit left actionable comments → fixed in same session but CR hit rate limit; PR merged after rebasing. Resolved.
-  3. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions"
-  4. **Notion workspace out of free blocks** — board cannot be updated; run logs written here instead
-  5. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
-  6. **Stale branch cleanup** — 1100+ remote `auto/` branches
+  2. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions"
+  3. **Notion workspace out of free blocks** — board cannot be updated; run logs written here instead
+  4. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+  5. **Stale branch cleanup** — 1100+ remote `auto/` branches
 - **Next run**: Wire monorepo workspaces — add `"workspaces": ["packages/*", "apps/*"]` to root `package.json`, flip `src-stdio/types.ts` + `src-stdio/logger.ts` to re-export from `@ch1tty/shared-types` / `@ch1tty/shared-logger`. Or advance next coverage gap workstream.
 
 ---

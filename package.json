@@ -5,7 +5,7 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "npm run build --workspace=packages/shared-types --workspace=packages/shared-logger && tsc",
     "build:apps": "for app in apps/*/; do if [ -f \"$app/package.json\" ]; then (cd \"$app\" && npm run build) || exit 1; fi; done",
     "start": "node dist/index.js",
     "dev": "tsc --watch",
@@ -22,8 +22,8 @@
     "apps/*"
   ],
   "dependencies": {
-    "@ch1tty/shared-logger": "*",
-    "@ch1tty/shared-types": "*",
+    "@ch1tty/shared-logger": "workspace:*",
+    "@ch1tty/shared-types": "workspace:*",
     "@chittyos/schema-client": "file:../../CHITTYFOUNDATION/chittyschema/clients/schema-client",
     "@cloudflare/codemode": "^0.5.2",
     "@modelcontextprotocol/sdk": "^1.29.0",
