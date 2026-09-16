@@ -539,8 +539,15 @@ test('comms.recentLog channels omitted — quo+imessage+email all appear in chan
   }
 });
 
-test('comms.recentLog with since — metadata.window.since reflects input', async () => {
-  const { client, cleanup } = await setup();
+test('comms.recentLog with since — metadata.window.since reflects input and out-of-window entry is excluded', async () => {
+  const beforeRow = { ...QUO_ROW, external_id: 'AC-before', sent_at: '2026-08-31T23:59:00Z' };
+  const inWindowRow = { ...QUO_ROW, external_id: 'AC-in', sent_at: '2026-09-05T10:00:00Z' };
+  const { client, cleanup } = await setup(
+    makeDispatch(async (serverId) => {
+      if (serverId === 'chittyagent-quo') return [beforeRow, inWindowRow];
+      return [];
+    }),
+  );
   try {
     const inputSince = '2026-09-01T00:00:00.000Z';
     const res = await client.callTool({
@@ -549,9 +556,12 @@ test('comms.recentLog with since — metadata.window.since reflects input', asyn
     });
     assert.equal(res.isError, undefined);
     const body = JSON.parse((res.content[0] as { text: string }).text) as {
+      entries: Array<{ providerMessageId: string }>;
       metadata: { window: { since: string } };
     };
     assert.equal(body.metadata.window.since, inputSince);
+    assert.equal(body.entries.length, 1, 'only in-window entry should be included');
+    assert.equal(body.entries[0].providerMessageId, 'AC-in');
   } finally {
     await cleanup();
   }
@@ -576,7 +586,7 @@ test('comms.recentLog with days:7 — metadata.window spans ~7 days', async () =
   }
 });
 
-test('comms.recentLog with includeBody:true — call succeeds and entries is an array', async () => {
+test('comms.recentLog with includeBody:true — call succeeds and quo entry body is preserved', async () => {
   const { client, cleanup } = await setup();
   try {
     const res = await client.callTool({
@@ -584,8 +594,13 @@ test('comms.recentLog with includeBody:true — call succeeds and entries is an 
       arguments: { identifier: '+15555550001', channels: ['quo'], includeBody: true },
     });
     assert.equal(res.isError, undefined);
-    const body = JSON.parse((res.content[0] as { text: string }).text) as { entries: unknown[] };
+    const body = JSON.parse((res.content[0] as { text: string }).text) as {
+      entries: Array<{ channel: string; body?: string }>;
+    };
     assert.ok(Array.isArray(body.entries));
+    const quoEntry = body.entries.find((e) => e.channel === 'quo');
+    assert.ok(quoEntry, 'quo entry should be present');
+    assert.equal(quoEntry.body, 'hello from test');
   } finally {
     await cleanup();
   }
