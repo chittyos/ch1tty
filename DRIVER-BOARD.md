@@ -5421,4 +5421,5 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. Major dep bumps — typescript 5→7, @types/node 22→26, c8 11→12 await human review
   6. Issues #1071/#1072 require human decisions
   7. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
-- **Next run:** Wire monorepo workspaces — add workspaces to root package.json, flip src-stdio/types.ts + logger.ts to import from @ch1tty/shared-types / @ch1tty/shared-logger. Or advance next coverage gap workstream.
+- **Run ~1671 (2026-09-16):** Merged #1311. Wired npm workspaces: added `"workspaces"` to root package.json, built shared-types + shared-logger, flipped src-stdio/types.ts + logger.ts to re-export shims. PR #1312 open (`auto/wire-monorepo-workspaces`). Tests 2503/0/3.
+- **Next run:** Wire @ch1tty/shared-mcp — flip src-stdio/http-server.ts to import McpSessionManager + bearer-auth helpers from @ch1tty/shared-mcp (migration plan step 3).
