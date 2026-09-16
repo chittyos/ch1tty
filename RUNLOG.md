@@ -2,6 +2,29 @@
 
 ---
 
+### run ~1669 — 2026-09-16 — Workstream Q: packages/shared-types seed
+
+- **Build**: tsc clean | **Tests**: 2473 pass / 0 fail / 3 skip (2476 total)
+- **Workstream advanced**: **Q — packages/shared-types scaffold** (`auto/Q-packages-shared-types-seed`)
+- **What was done**:
+  - Created `packages/shared-types/` with `package.json`, `tsconfig.json`, `src/index.ts`
+  - `src/index.ts` contains all shared type definitions (Backend, ServerConfig, ToolCallResult, ContentItem, AggregatedTool, ServerStatus, etc.) — canonical source, mirroring `src-stdio/types.ts`
+  - Package builds to `dist/` with full declaration files; `npm run build` clean (0 errors)
+  - Updated `packages/README.md` to mark `shared-types/` status as "seeded" with explicit migration plan
+  - Main gateway build and full test suite unaffected (nothing imports the new package yet)
+- **Open PRs before this run**: #1302 (session-client tests; CI-green), #1303/#1304 (run-log entries)
+- **Branch/PR**: `auto/Q-packages-shared-types-seed` → PR TBD
+- **Blockers (unchanged — all require human action)**:
+  1. **Merge PR #1302** — CI-green, no review comments, ready
+  2. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions"
+  3. **Upgrade Notion plan** — workspace out of free blocks; board cannot be updated
+  4. **DISABLE hourly cron** — ~1669 runs; all workstreams exhausted; idle-burning ~50k tokens/run
+  5. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+  6. **Stale branch cleanup** — 1100+ remote `auto/` branches
+- **Next run**: After Q PR merges, Workstream R candidate: wire `@ch1tty/shared-types` — add npm workspaces, flip `src-stdio/types.ts` to re-export from the package, update app dependencies.
+
+---
+
 ### 2026-09-14 (event — PRs #1260/BC/#1261/BK/#1262 merged — BJ/BC/BK now in main)
 - **PR #1260 (BJ)** merged: `test/bj-cast-explain-no-match.test.ts` — 4 tests, aggregator.ts:1372 covered
 - **PR #1261 (BC)** merged: `test/bc-session-client-api-methods.test.ts` — session-client HTTP method coverage
