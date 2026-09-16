@@ -706,3 +706,14 @@ Runs ~1234–1239 were idle (same state: 1438/0/3, 0 open PRs). Run ~1240 raised
 - **Open PRs**: 0
 - **State**: ~158th consecutive idle run since all workstreams completed (2026-05-28). No new workstreams defined in scheduled prompt.
 - **Most useful thing for next run**: Human must define workstreams F+ in the scheduled prompt OR disable the hourly cron via `/cron` — no actionable work remains until then.
+
+## Run ~1674 — 2026-09-16T~20:45 UTC
+- **Workstream**: Q — `packages/shared-logger` unit tests
+- **Branch/PR**: `auto/Q-shared-logger-unit-tests` → PR #1316 https://github.com/chittyos/ch1tty/pull/1316
+- **Build**: tsc clean (ch1tty@4.1.0, 0 errors)
+- **Tests**: 2526 total — 2523 pass / 0 fail / 3 skip (+20 vs prior baseline of 2503)
+- **Guardrails**: 5-tool surface confirmed. `buildCastExplanation` freeze guards: 56 (no-focus) / 87 (focus:code) ✓
+- **Open PRs**: #1314 (wire shared-mcp into http-server, CI green, awaiting human merge), #1315 (Workstream P — comms-mcp tool-layer tests, CI green, awaiting human merge), #1316 (Workstream Q — this run)
+- **State**: A ✓ B ✓ C ✓ D ✓ E ✓ + extended workstreams through P ✓. Q opened this run.
+- **Action taken**: Created 20 unit tests for `packages/shared-logger`'s `Logger` class covering level filtering, JSON/text format, `setLevel()`, and `childStderr()`. All green. Committed to `auto/Q-shared-logger-unit-tests`, pushed, opened PR #1316.
+- **Most useful thing for next run**: Advance Workstream R — `packages/shared-types` has no tests (type-only exports; tests could validate shape guards/narrowing), OR check if PRs #1314–#1316 merged and find the next untested path. Check open PRs first.
