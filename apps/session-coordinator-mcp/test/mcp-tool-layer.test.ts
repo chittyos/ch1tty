@@ -164,6 +164,19 @@ test('list_sessions — forwards filter args to client', async () => {
   }
 });
 
+test('list_sessions — forwards user_id filter to client', async () => {
+  let capturedFilter: unknown;
+  const { client, cleanup } = await setup({
+    listSessions: async (filter) => { capturedFilter = filter; return [SESSION_1]; },
+  });
+  try {
+    await client.callTool({ name: 'list_sessions', arguments: { user_id: 'u42' } });
+    assert.deepEqual(capturedFilter, { channel: undefined, user_id: 'u42', status: undefined, limit: undefined });
+  } finally {
+    await cleanup();
+  }
+});
+
 // ── get_session ───────────────────────────────────────────────────────────────
 
 test('get_session — returns session by id', async () => {
@@ -388,6 +401,36 @@ test('update_session — scalar context returns error without calling client', a
   });
   try {
     const res = await client.callTool({ name: 'update_session', arguments: { id: 'sess-1', context: 'not-an-object' } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /context/);
+    assert.equal(called, false);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('update_session — null context returns error without calling client', async () => {
+  let called = false;
+  const { client, cleanup } = await setup({
+    updateSession: async () => { called = true; return SESSION_1; },
+  });
+  try {
+    const res = await client.callTool({ name: 'update_session', arguments: { id: 'sess-1', context: null } });
+    assert.equal(res.isError, true);
+    assert.match((res.content[0] as { text: string }).text, /context/);
+    assert.equal(called, false);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('update_session — array context returns error without calling client', async () => {
+  let called = false;
+  const { client, cleanup } = await setup({
+    updateSession: async () => { called = true; return SESSION_1; },
+  });
+  try {
+    const res = await client.callTool({ name: 'update_session', arguments: { id: 'sess-1', context: ['a', 'b'] } });
     assert.equal(res.isError, true);
     assert.match((res.content[0] as { text: string }).text, /context/);
     assert.equal(called, false);
