@@ -7,13 +7,14 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 export function checkBearerToken(req: IncomingMessage, expectedToken: string): boolean {
   const auth = req.headers.authorization;
   if (!auth) return false;
-  const [scheme, token] = auth.split(' ', 2);
-  return scheme?.toLowerCase() === 'bearer' && token === expectedToken;
+  const match = /^Bearer +(\S+)$/i.exec(auth);
+  return match?.[1] === expectedToken;
 }
 
 /** Write a 401 Unauthorized JSON response. */
 export function writeUnauthorized(res: ServerResponse): void {
   res.setHeader('Content-Type', 'application/json');
+  res.setHeader('WWW-Authenticate', 'Bearer');
   res.writeHead(401);
   res.end(JSON.stringify({ error: 'unauthorized' }));
 }

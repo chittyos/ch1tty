@@ -16,6 +16,12 @@ interface McpSession {
  * Each POST to /mcp without an Mcp-Session-Id header creates a new session.
  * Subsequent requests carrying the session ID are routed to the existing session.
  * Sessions are cleaned up when the transport closes.
+ *
+ * Security note (CWE-346): The caller is responsible for Origin/Host validation
+ * before invoking `handleRequest`. For browser-facing deployments, verify that
+ * `req.headers.origin` matches a known-safe set to prevent cross-site request
+ * forgery via DNS rebinding. Server-to-server callers that never serve browsers
+ * may skip this check.
  */
 export class McpSessionManager {
   private readonly sessions = new Map<string, McpSession>();
@@ -40,32 +46,40 @@ export class McpSessionManager {
 
     if (req.method === 'POST' && !sessionId) {
       let mcpSessionId: string | undefined;
+      // Declared here so onsessioninitialized and onclose can both close over it;
+      // assigned inside the try block so synchronous factory errors are caught.
+      let mcpServer: Server | undefined;
       const transport = new StreamableHTTPServerTransport({
         sessionIdGenerator: () => crypto.randomUUID(),
         onsessioninitialized: (newSessionId) => {
           mcpSessionId = newSessionId;
-          this.sessions.set(newSessionId, { server: mcpServer, transport });
+          // mcpServer is guaranteed to be assigned before connect() fires this callback
+          this.sessions.set(newSessionId, { server: mcpServer!, transport });
           this.onSessionStart?.(newSessionId);
         },
       });
 
-      const mcpServer = this.createServer(() => mcpSessionId);
-
       let isClosing = false;
-      transport.onclose = () => {
-        if (isClosing) return;
-        isClosing = true;
-        const sid = [...this.sessions.entries()].find(([, s]) => s.transport === transport)?.[0];
-        if (sid) {
-          this.sessions.delete(sid);
-          this.onSessionEnd?.(sid);
-        }
-        mcpServer.close().catch(() => {});
-      };
 
       try {
+        mcpServer = this.createServer(() => mcpSessionId);
+
+        transport.onclose = () => {
+          if (isClosing) return;
+          isClosing = true;
+          const sid = [...this.sessions.entries()].find(([, s]) => s.transport === transport)?.[0];
+          if (sid) {
+            this.sessions.delete(sid);
+            this.onSessionEnd?.(sid);
+          }
+          mcpServer!.close().catch(() => {});
+        };
+
         await mcpServer.connect(transport);
         await transport.handleRequest(req, res);
+        if (!mcpSessionId) {
+          await transport.close();
+        }
       } catch {
         if (!res.headersSent) {
           res.setHeader('Content-Type', 'application/json');
@@ -79,8 +93,9 @@ export class McpSessionManager {
     }
 
     res.setHeader('Content-Type', 'application/json');
-    res.writeHead(400);
-    res.end(JSON.stringify({ error: 'bad request', message: 'Missing or invalid session' }));
+    // 404 for a known-but-terminated session (MCP spec); 400 for a request with no session context
+    res.writeHead(sessionId !== undefined ? 404 : 400);
+    res.end(JSON.stringify({ error: sessionId !== undefined ? 'session not found' : 'bad request', message: 'Missing or invalid session' }));
   }
 
   /** Close all active sessions and clean up resources. */
