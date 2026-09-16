@@ -361,3 +361,247 @@ test('comms.recentLog — metadata.window is present with since and until', asyn
     await cleanup();
   }
 });
+
+// ── list_tools property-type schema assertions ────────────────────────────────
+
+type PropertySchema = { type?: string; description?: string; items?: { type?: string } };
+type InputSchema = {
+  type?: string;
+  additionalProperties?: boolean;
+  oneOf?: Array<{ required: string[] }>;
+  properties?: Record<string, PropertySchema>;
+};
+
+test('list_tools: comms.recentLog inputSchema type is object', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.listTools();
+    const tool = res.tools.find((t) => t.name === 'comms.recentLog');
+    assert.ok(tool, 'comms.recentLog missing');
+    assert.equal((tool.inputSchema as InputSchema).type, 'object');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: comms.recentLog inputSchema has additionalProperties:false', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.listTools();
+    const tool = res.tools.find((t) => t.name === 'comms.recentLog');
+    assert.ok(tool, 'comms.recentLog missing');
+    assert.equal((tool.inputSchema as InputSchema).additionalProperties, false);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: comms.recentLog person property is type string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.listTools();
+    const tool = res.tools.find((t) => t.name === 'comms.recentLog');
+    assert.ok(tool, 'comms.recentLog missing');
+    assert.equal((tool.inputSchema as InputSchema).properties?.['person']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: comms.recentLog identifier property is type string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.listTools();
+    const tool = res.tools.find((t) => t.name === 'comms.recentLog');
+    assert.ok(tool, 'comms.recentLog missing');
+    assert.equal((tool.inputSchema as InputSchema).properties?.['identifier']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: comms.recentLog channels property is type array', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.listTools();
+    const tool = res.tools.find((t) => t.name === 'comms.recentLog');
+    assert.ok(tool, 'comms.recentLog missing');
+    assert.equal((tool.inputSchema as InputSchema).properties?.['channels']?.type, 'array');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: comms.recentLog channels items type is string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.listTools();
+    const tool = res.tools.find((t) => t.name === 'comms.recentLog');
+    assert.ok(tool, 'comms.recentLog missing');
+    assert.equal((tool.inputSchema as InputSchema).properties?.['channels']?.items?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: comms.recentLog days property is type integer', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.listTools();
+    const tool = res.tools.find((t) => t.name === 'comms.recentLog');
+    assert.ok(tool, 'comms.recentLog missing');
+    assert.equal((tool.inputSchema as InputSchema).properties?.['days']?.type, 'integer');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: comms.recentLog since property is type string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.listTools();
+    const tool = res.tools.find((t) => t.name === 'comms.recentLog');
+    assert.ok(tool, 'comms.recentLog missing');
+    assert.equal((tool.inputSchema as InputSchema).properties?.['since']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: comms.recentLog until property is type string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.listTools();
+    const tool = res.tools.find((t) => t.name === 'comms.recentLog');
+    assert.ok(tool, 'comms.recentLog missing');
+    assert.equal((tool.inputSchema as InputSchema).properties?.['until']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: comms.recentLog limit property is type integer', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.listTools();
+    const tool = res.tools.find((t) => t.name === 'comms.recentLog');
+    assert.ok(tool, 'comms.recentLog missing');
+    assert.equal((tool.inputSchema as InputSchema).properties?.['limit']?.type, 'integer');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: comms.recentLog order property is type string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.listTools();
+    const tool = res.tools.find((t) => t.name === 'comms.recentLog');
+    assert.ok(tool, 'comms.recentLog missing');
+    assert.equal((tool.inputSchema as InputSchema).properties?.['order']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: comms.recentLog includeBody property is type boolean', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.listTools();
+    const tool = res.tools.find((t) => t.name === 'comms.recentLog');
+    assert.ok(tool, 'comms.recentLog missing');
+    assert.equal(
+      (tool.inputSchema as unknown as { properties?: Record<string, { type?: string }> }).properties?.['includeBody']?.type,
+      'boolean',
+    );
+  } finally {
+    await cleanup();
+  }
+});
+
+// ── Functional gaps ───────────────────────────────────────────────────────────
+
+test('comms.recentLog channels omitted — quo+imessage+email all appear in channelsQueried', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.callTool({
+      name: 'comms.recentLog',
+      arguments: { identifier: '+15555550001' },
+    });
+    assert.equal(res.isError, undefined);
+    const body = JSON.parse((res.content[0] as { text: string }).text) as {
+      metadata: { channelsQueried: Array<{ channel: string }> };
+    };
+    const channels = body.metadata.channelsQueried.map((c) => c.channel).sort();
+    assert.deepEqual(channels, ['email', 'imessage', 'quo']);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('comms.recentLog with since — metadata.window.since reflects input and out-of-window entry is excluded', async () => {
+  const beforeRow = { ...QUO_ROW, external_id: 'AC-before', sent_at: '2026-08-31T23:59:00Z' };
+  const inWindowRow = { ...QUO_ROW, external_id: 'AC-in', sent_at: '2026-09-05T10:00:00Z' };
+  const { client, cleanup } = await setup(
+    makeDispatch(async (serverId) => {
+      if (serverId === 'chittyagent-quo') return [beforeRow, inWindowRow];
+      return [];
+    }),
+  );
+  try {
+    const inputSince = '2026-09-01T00:00:00.000Z';
+    const res = await client.callTool({
+      name: 'comms.recentLog',
+      arguments: { identifier: '+15555550001', channels: ['quo'], since: inputSince },
+    });
+    assert.equal(res.isError, undefined);
+    const body = JSON.parse((res.content[0] as { text: string }).text) as {
+      entries: Array<{ providerMessageId: string }>;
+      metadata: { window: { since: string } };
+    };
+    assert.equal(body.metadata.window.since, inputSince);
+    assert.equal(body.entries.length, 1, 'only in-window entry should be included');
+    assert.equal(body.entries[0].providerMessageId, 'AC-in');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('comms.recentLog with days:7 — metadata.window spans ~7 days', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.callTool({
+      name: 'comms.recentLog',
+      arguments: { identifier: '+15555550001', channels: ['quo'], days: 7 },
+    });
+    assert.equal(res.isError, undefined);
+    const body = JSON.parse((res.content[0] as { text: string }).text) as {
+      metadata: { window: { since: string; until: string } };
+    };
+    const diff = Date.parse(body.metadata.window.until) - Date.parse(body.metadata.window.since);
+    const expected = 7 * 24 * 60 * 60 * 1000;
+    assert.ok(Math.abs(diff - expected) < 5000, `window span ${diff}ms should be ~${expected}ms`);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('comms.recentLog with includeBody:true — call succeeds and quo entry body is preserved', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const res = await client.callTool({
+      name: 'comms.recentLog',
+      arguments: { identifier: '+15555550001', channels: ['quo'], includeBody: true },
+    });
+    assert.equal(res.isError, undefined);
+    const body = JSON.parse((res.content[0] as { text: string }).text) as {
+      entries: Array<{ channel: string; body?: string }>;
+    };
+    assert.ok(Array.isArray(body.entries));
+    const quoEntry = body.entries.find((e) => e.channel === 'quo');
+    assert.ok(quoEntry, 'quo entry should be present');
+    assert.equal(quoEntry.body, 'hello from test');
+  } finally {
+    await cleanup();
+  }
+});
