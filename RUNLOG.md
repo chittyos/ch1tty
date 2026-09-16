@@ -19,6 +19,24 @@
 
 ---
 
+### run ~1667 — 2026-09-16 — full steady state; Notion blocked; PR #1302 watched
+
+- **Build**: tsc clean | **Tests**: 2473 pass / 0 fail / 3 skip (2476 total)
+- **Coverage**: 100% lines/branches/functions/statements across all `src/` modules and all `apps/*/src/` modules
+- **Workstream assessment**:
+  - A–E: done ✓ | F–O: done ✓ | P (ledger/session factory+test): done ✓ (729 + 938 line files already exist)
+  - All 25 focus profiles have scenario test files in `test/`
+  - All client modules have URL-encoding + HTTP-method + error-path tests (pattern complete after #1302 merges)
+  - E2E gateway tests BZ–CF cover stdio + HTTP transport, all 5 meta-tools, reload, execute, search, cast
+- **Open PR**: #1302 (`auto/session-client-url-error-method-tests`) — session-client URL/error/method gaps; CI-green (CodeQL + Analyze ✅); no review comments; subscribed
+- **Blockers** (unchanged):
+  1. **Notion workspace out of free blocks** — board cannot be updated; run logs written here instead
+  2. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions"
+  3. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+- **Next run**: After #1302 merges, consider (a) reviewing issues #1071/#1072 for extensibility-rebuild ch1tty work; (b) expanding `focus-suggestions.json` combos 3→5 per profile; (c) `packages/` shared-library refactor from CLAUDE.md § Split Architecture
+
+---
+
 ### 2026-09-14 (event — PRs #1260/BC/#1261/BK/#1262 merged — BJ/BC/BK now in main)
 - **PR #1260 (BJ)** merged: `test/bj-cast-explain-no-match.test.ts` — 4 tests, aggregator.ts:1372 covered
 - **PR #1261 (BC)** merged: `test/bc-session-client-api-methods.test.ts` — session-client HTTP method coverage
