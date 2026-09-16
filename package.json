@@ -5,7 +5,7 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "npm run build --workspace=packages/shared-types && tsc",
     "build:apps": "for app in apps/*/; do if [ -f \"$app/package.json\" ]; then (cd \"$app\" && npm run build) || exit 1; fi; done",
     "start": "node dist/index.js",
     "dev": "tsc --watch",
@@ -17,7 +17,12 @@
     "coverage": "c8 --all --include=src-stdio/**/*.ts --exclude=src-stdio/index.ts --exclude=src-stdio/types.ts --lines 99 --branches 95 --functions 100 --statements 99 node --import tsx --test test/**/*.test.ts apps/*/test/*.test.ts",
     "coverage:apps": "c8 --all --include=apps/*/src/**/*.ts --exclude=apps/*/src/index.ts --exclude=apps/*/src/types.ts --lines 100 --branches 95 --functions 100 --statements 100 node --import tsx --test apps/*/test/*.test.ts"
   },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "dependencies": {
+    "@ch1tty/shared-types": "workspace:*",
     "@chittyos/schema-client": "file:../../CHITTYFOUNDATION/chittyschema/clients/schema-client",
     "@cloudflare/codemode": "^0.5.2",
     "@modelcontextprotocol/sdk": "^1.29.0",
