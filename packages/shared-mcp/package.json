@@ -1,0 +1,29 @@
+{
+  "name": "@ch1tty/shared-mcp",
+  "version": "1.0.0",
+  "description": "Shared MCP HTTP transport utilities for the ch1tty gateway and focused MCP servers",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "peerDependencies": {
+    "@modelcontextprotocol/sdk": ">=1.0.0"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^7.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
