@@ -2,6 +2,21 @@
 
 ---
 
+### run ~1671 — 2026-09-16 — feat(packages): wire monorepo workspaces (shared-types + shared-logger)
+
+**Merged:** #1311 (run ~1670 log chore, `clean`).
+
+**Workstream:** Wire npm workspaces (migration plan step 1+2).
+- `package.json`: added `"workspaces": ["packages/*", "apps/*"]`; deps `@ch1tty/shared-types: "*"` + `@ch1tty/shared-logger: "*"`
+- `src-stdio/types.ts`: 123-line inline defs → 18-line `export type { … } from '@ch1tty/shared-types'`
+- `src-stdio/logger.ts`: 80-line inline defs → 2-line re-export shim from `@ch1tty/shared-logger`
+- Built both packages (`npm run build` in each); gateway tsc clean; tests **2503/0/3** (unchanged)
+- PR #1312 open: `auto/wire-monorepo-workspaces`
+
+**Next workstream:** Wire `@ch1tty/shared-mcp` — flip `src-stdio/http-server.ts` to import `McpSessionManager` + `checkBearerToken`/`writeUnauthorized` from `@ch1tty/shared-mcp` (migration plan step 3).
+
+---
+
 ### run ~1670 — 2026-09-16 — PR queue drain: merged 7 PRs (#1302, #1303, #1305–#1309); tests 2503/0/3
 
 - **Build**: tsc clean | **Tests**: 2503 pass / 0 fail / 3 skip (2506 total, 107 suites) — was 2473/0/3; +30 tests
