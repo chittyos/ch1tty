@@ -13,7 +13,7 @@
   - Updated `packages/README.md` to mark `shared-types/` status as "seeded" with explicit migration plan
   - Main gateway build and full test suite unaffected (nothing imports the new package yet)
 - **Open PRs before this run**: #1302 (session-client tests; CI-green), #1303/#1304 (run-log entries)
-- **Branch/PR**: `auto/Q-packages-shared-types-seed` → PR TBD
+- **Branch/PR**: `auto/Q-packages-shared-types-seed` → PR #1305 (CI ✅ 3/3 green on fix commit c66d3ea; `mergeable_state: clean`; waiting on human merge)
 - **Blockers (unchanged — all require human action)**:
   1. **Merge PR #1302** — CI-green, no review comments, ready
   2. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions"
