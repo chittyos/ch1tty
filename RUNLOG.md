@@ -2,6 +2,23 @@
 
 ---
 
+### run ~1669 — 2026-09-16 — E2: focus-suggestions.json expanded 3→5 combos+prompts per profile
+
+- **Build**: tsc clean | **Tests**: 2473 pass / 0 fail / 3 skip (2476 total)
+- **Workstream advanced**: E2 — expanded `focus-suggestions.json` from 3 to 5 combos + 5 prompts per profile across all 25 active profiles (+50 combos, +50 prompts)
+- **Branch/PR**: `auto/E2-focus-suggestions-expand-5` → opened as PR this run
+- **Open PRs before run**: 6 (#1302, #1303, #1304, #1305, #1306, #1307)
+  - All CI-green; #1302 (session-coordinator-mcp tests) + #1305-#1307 (packages/shared scaffold) awaiting human merge
+  - #1303 and #1304 are stale run-log chores (superseded by this entry)
+- **Key fix**: `suggestions.test.ts` enforces `comms/comms.recentLog`-only for comms/* — fixed 4 combos + 3 prompts that referenced non-existent `comms/send_message` / `comms/list_messages`
+- **Blockers** (unchanged):
+  1. **Notion workspace out of free blocks** — board cannot be updated; run logs written here instead
+  2. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions"
+  3. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+- **Next run**: Merge PR queue if any have new reviews. Next workstream candidate: wire `src-stdio/types.ts` to import from `@ch1tty/shared-types` (depends on #1305 merging) or add scenario tests for new suggestion-aware cast responses
+
+---
+
 ### 2026-09-14 (event — PRs #1260/BC/#1261/BK/#1262 merged — BJ/BC/BK now in main)
 - **PR #1260 (BJ)** merged: `test/bj-cast-explain-no-match.test.ts` — 4 tests, aggregator.ts:1372 covered
 - **PR #1261 (BC)** merged: `test/bc-session-client-api-methods.test.ts` — session-client HTTP method coverage
