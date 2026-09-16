@@ -244,4 +244,163 @@ describe('TasksClient', () => {
     assert.equal(tasks[0].id, 't1');
     assert.equal(lastRequestUrl?.searchParams.get('project'), 'infra');
   });
+
+  it('listTasks: no filters → GET /api/tasks with no query string', async () => {
+    const client = new TasksClient(baseUrl, 'test-token');
+    await client.listTasks();
+    assert.equal(lastRequestUrl?.pathname, '/api/tasks');
+    assert.equal(lastRequestUrl?.search, '');
+  });
+
+  it('getTask: URL-encodes IDs with special characters', async () => {
+    let capturedPath = '';
+    const server = http.createServer((req, res) => {
+      capturedPath = req.url!;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ ...FIXTURE_TASKS[0], id: 'id/with/slash' }));
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new TasksClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await client.getTask('id/with/slash');
+      assert.equal(capturedPath, '/api/tasks/id%2Fwith%2Fslash');
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('updateTask: URL-encodes IDs with special characters', async () => {
+    let capturedPath = '';
+    const server = http.createServer((req, res) => {
+      capturedPath = req.url!.split('?')[0];
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify(FIXTURE_TASKS[0]));
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new TasksClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await client.updateTask('id with space', { status: 'done' });
+      assert.equal(capturedPath, '/api/tasks/id%20with%20space');
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('deleteTask: URL-encodes IDs with special characters', async () => {
+    let capturedPath = '';
+    const server = http.createServer((req, res) => {
+      capturedPath = req.url!;
+      res.writeHead(204);
+      res.end();
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new TasksClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await client.deleteTask('id#hash');
+      assert.equal(capturedPath, '/api/tasks/id%23hash');
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('deleteTask: returns undefined for 204 No Content', async () => {
+    const server = http.createServer((_req, res) => { res.writeHead(204); res.end(); });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new TasksClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      const result = await client.deleteTask('any-id');
+      assert.equal(result as unknown, undefined);
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('getTask: non-ok response (500) throws with status code in message', async () => {
+    const server = http.createServer((_req, res) => { res.writeHead(500); res.end('internal server error'); });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new TasksClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await assert.rejects(() => client.getTask('t1'), /500/);
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('createTask: non-ok response (422) throws with status code in message', async () => {
+    const server = http.createServer((_req, res) => { res.writeHead(422); res.end('{"error":"validation failed"}'); });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new TasksClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await assert.rejects(() => client.createTask({ title: 'Bad task' }), /422/);
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('updateTask: sends PATCH method', async () => {
+    let capturedMethod = '';
+    const server = http.createServer((req, res) => {
+      capturedMethod = req.method!;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify(FIXTURE_TASKS[0]));
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new TasksClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await client.updateTask('t1', { status: 'done' });
+      assert.equal(capturedMethod, 'PATCH');
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('deleteTask: sends DELETE method to /api/tasks/:id', async () => {
+    let capturedMethod = '';
+    let capturedPath = '';
+    const server = http.createServer((req, res) => {
+      capturedMethod = req.method!;
+      capturedPath = req.url!;
+      res.writeHead(204);
+      res.end();
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new TasksClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await client.deleteTask('t99');
+      assert.equal(capturedMethod, 'DELETE');
+      assert.equal(capturedPath, '/api/tasks/t99');
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('createTask: sends POST to /api/tasks', async () => {
+    let capturedMethod = '';
+    let capturedPath = '';
+    const server = http.createServer((req, res) => {
+      capturedMethod = req.method!;
+      capturedPath = req.url!;
+      res.setHeader('Content-Type', 'application/json');
+      res.writeHead(201);
+      res.end(JSON.stringify({ ...FIXTURE_TASKS[0], id: 't_new' }));
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new TasksClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await client.createTask({ title: 'New task' });
+      assert.equal(capturedMethod, 'POST');
+      assert.equal(capturedPath, '/api/tasks');
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
 });
