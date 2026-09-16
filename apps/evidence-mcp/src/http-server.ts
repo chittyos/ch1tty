@@ -45,6 +45,14 @@ export function createEvidenceHttpApp(options: EvidenceHttpAppOptions = {}): Evi
     }
 
     if (url === '/mcp' || url.startsWith('/mcp?') || url.startsWith('/mcp/')) {
+      // Reject browser-originated requests to prevent DNS rebinding (CWE-346).
+      // evidence-mcp is a server-to-server service; no browser Origin is expected.
+      if (req.headers['origin'] !== undefined) {
+        res.setHeader('Content-Type', 'application/json');
+        res.writeHead(403);
+        res.end(JSON.stringify({ error: 'forbidden' }));
+        return;
+      }
       if (options.mcpToken && !checkBearerToken(req, options.mcpToken)) {
         writeUnauthorized(res);
         return;

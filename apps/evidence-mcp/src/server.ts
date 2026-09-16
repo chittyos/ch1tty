@@ -156,9 +156,9 @@ export function createEvidenceServer(client: EvidenceClient): Server {
         content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
       };
     } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
+      process.stderr.write(`[evidence-mcp] tool error: ${err instanceof Error ? err.message : String(err)}\n`);
       return {
-        content: [{ type: 'text' as const, text: `Error: ${msg}` }],
+        content: [{ type: 'text' as const, text: 'An error occurred processing this request.' }],
         isError: true,
       };
     }
