@@ -3,8 +3,8 @@
  *
  * Shared TypeScript types for the ch1tty gateway (src-stdio/) and focused MCP
  * servers (apps/*-mcp). This package is the canonical home for types that cross
- * the gateway/app boundary. src-stdio/types.ts currently re-exports these; a
- * follow-up PR will flip the direction so src-stdio/types.ts imports from here.
+ * the gateway/app boundary. A follow-up PR will update src-stdio/types.ts to
+ * import and re-export these canonical definitions.
  */
 
 export type ServerAccess = 'read' | 'write' | 'readwrite';
