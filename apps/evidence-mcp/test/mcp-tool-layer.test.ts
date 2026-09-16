@@ -522,3 +522,240 @@ test('get_canonical_uri: empty-string id → isError (covers !a["id"] branch in 
     await cleanup();
   }
 });
+
+// ── list_tools property-type schema assertions ─────────────────────────────────
+
+type PropertySchema = { type?: string; description?: string; items?: { type?: string }; additionalProperties?: boolean };
+type ToolInputSchema = { type?: string; properties?: Record<string, PropertySchema>; required?: string[] };
+
+test('list_tools: ingest_document content and kind properties are type string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'ingest_document');
+    assert.ok(tool, 'ingest_document missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['content']?.type, 'string');
+    assert.equal(schema.properties?.['kind']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: ingest_document title property is type string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'ingest_document');
+    assert.ok(tool, 'ingest_document missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['title']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: ingest_document tags property is type array', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'ingest_document');
+    assert.ok(tool, 'ingest_document missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['tags']?.type, 'array');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: ingest_document metadata property is type object with additionalProperties', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'ingest_document');
+    assert.ok(tool, 'ingest_document missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['metadata']?.type, 'object');
+    assert.equal(schema.properties?.['metadata']?.additionalProperties, true);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: list_documents has no required array', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'list_documents');
+    assert.ok(tool, 'list_documents missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.ok(!schema.required || schema.required.length === 0, 'list_documents should have no required fields');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: list_documents kind, tag, since, cursor properties are type string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'list_documents');
+    assert.ok(tool, 'list_documents missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['kind']?.type, 'string');
+    assert.equal(schema.properties?.['tag']?.type, 'string');
+    assert.equal(schema.properties?.['since']?.type, 'string');
+    assert.equal(schema.properties?.['cursor']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: list_documents limit property is type number', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'list_documents');
+    assert.ok(tool, 'list_documents missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['limit']?.type, 'number');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: get_document id property is type string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'get_document');
+    assert.ok(tool, 'get_document missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['id']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: search_documents query and kind properties are type string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'search_documents');
+    assert.ok(tool, 'search_documents missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['query']?.type, 'string');
+    assert.equal(schema.properties?.['kind']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: search_documents limit property is type number', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'search_documents');
+    assert.ok(tool, 'search_documents missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['limit']?.type, 'number');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: get_canonical_uri id property is type string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'get_canonical_uri');
+    assert.ok(tool, 'get_canonical_uri missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['id']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+// ── Functional gap: has_more forwarding ───────────────────────────────────────
+
+test('list_documents: returns has_more:true when client returns has_more:true', async () => {
+  const { client, cleanup } = await setup({
+    listDocuments: async () => ({ documents: [DOC_1], has_more: true }),
+  });
+  try {
+    const result = await client.callTool({ name: 'list_documents', arguments: {} });
+    assert.ok(!result.isError);
+    const content = result.content as Array<{ type: string; text: string }>;
+    const body = JSON.parse(content[0].text) as ListDocumentsResult;
+    assert.equal(body.has_more, true);
+    assert.equal(body.documents.length, 1);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_documents: returns has_more:false when client returns has_more:false', async () => {
+  const { client, cleanup } = await setup({
+    listDocuments: async () => ({ documents: [], has_more: false }),
+  });
+  try {
+    const result = await client.callTool({ name: 'list_documents', arguments: {} });
+    assert.ok(!result.isError);
+    const content = result.content as Array<{ type: string; text: string }>;
+    const body = JSON.parse(content[0].text) as ListDocumentsResult;
+    assert.equal(body.has_more, false);
+  } finally {
+    await cleanup();
+  }
+});
+
+// ── Functional gap: optional-arg passthrough ──────────────────────────────────
+
+test('ingest_document: no metadata arg → client receives metadata:undefined', async () => {
+  let capturedMetadata: Record<string, unknown> | undefined = { sentinel: true } as Record<string, unknown>;
+  const { client, cleanup } = await setup({
+    ingestDocument: async (input) => {
+      capturedMetadata = input.metadata;
+      return { ...DOC_1, id: 'doc-new', kind: input.kind, content: input.content };
+    },
+  });
+  try {
+    await client.callTool({ name: 'ingest_document', arguments: { content: 'Hello', kind: 'note' } });
+    assert.equal(capturedMetadata, undefined);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('ingest_document: no title arg → client receives title:undefined', async () => {
+  let capturedTitle: string | undefined = 'sentinel';
+  const { client, cleanup } = await setup({
+    ingestDocument: async (input) => {
+      capturedTitle = input.title;
+      return { ...DOC_1, id: 'doc-new', kind: input.kind, content: input.content };
+    },
+  });
+  try {
+    await client.callTool({ name: 'ingest_document', arguments: { content: 'Hello', kind: 'note' } });
+    assert.equal(capturedTitle, undefined);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('ingest_document: no tags arg → client receives tags:undefined', async () => {
+  let capturedTags: string[] | undefined = ['sentinel'];
+  const { client, cleanup } = await setup({
+    ingestDocument: async (input) => {
+      capturedTags = input.tags;
+      return { ...DOC_1, id: 'doc-new', kind: input.kind, content: input.content };
+    },
+  });
+  try {
+    await client.callTool({ name: 'ingest_document', arguments: { content: 'Hello', kind: 'note' } });
+    assert.equal(capturedTags, undefined);
+  } finally {
+    await cleanup();
+  }
+});
