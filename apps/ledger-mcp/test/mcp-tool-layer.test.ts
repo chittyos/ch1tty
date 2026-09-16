@@ -591,3 +591,139 @@ test('get_entry: empty-string id → isError (covers !a["id"] branch)', async ()
     await cleanup();
   }
 });
+
+// ── list_tools property-type schema assertions ─────────────────────────────────
+
+type PropertySchema = { type?: string; description?: string; additionalProperties?: boolean };
+type ToolInputSchema = { type?: string; properties?: Record<string, PropertySchema>; required?: string[] };
+
+test('list_tools: list_namespaces has no required array', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'list_namespaces');
+    assert.ok(tool, 'list_namespaces missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.ok(!schema.required || schema.required.length === 0, 'list_namespaces should have no required fields');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: list_entries namespace property is type string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'list_entries');
+    assert.ok(tool, 'list_entries missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['namespace']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: list_entries limit property is type number', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'list_entries');
+    assert.ok(tool, 'list_entries missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['limit']?.type, 'number');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: list_entries cursor and since properties are type string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'list_entries');
+    assert.ok(tool, 'list_entries missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['cursor']?.type, 'string');
+    assert.equal(schema.properties?.['since']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: get_entry namespace and id properties are type string', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'get_entry');
+    assert.ok(tool, 'get_entry missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['namespace']?.type, 'string');
+    assert.equal(schema.properties?.['id']?.type, 'string');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: append_entry payload property is type object with additionalProperties', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'append_entry');
+    assert.ok(tool, 'append_entry missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['payload']?.type, 'object');
+    assert.equal(schema.properties?.['payload']?.additionalProperties, true);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: append_entry metadata property is type object', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'append_entry');
+    assert.ok(tool, 'append_entry missing');
+    const schema = tool.inputSchema as ToolInputSchema;
+    assert.equal(schema.properties?.['metadata']?.type, 'object');
+  } finally {
+    await cleanup();
+  }
+});
+
+// ── Functional gap: has_more forwarding ───────────────────────────────────────
+
+test('list_entries: returns has_more:true when client returns has_more:true', async () => {
+  const { client, cleanup } = await setup({
+    listEntries: async () => ({ entries: [ENTRY_1], has_more: true }),
+  });
+  try {
+    const result = await client.callTool({ name: 'list_entries', arguments: { namespace: 'events' } });
+    assert.ok(!result.isError);
+    const content = result.content as Array<{ type: string; text: string }>;
+    const body = JSON.parse(content[0].text) as ListEntriesResult;
+    assert.equal(body.has_more, true);
+    assert.equal(body.entries.length, 1);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('append_entry: no metadata arg → client receives metadata:undefined', async () => {
+  let capturedMetadata: Record<string, unknown> | undefined = { sentinel: true } as Record<string, unknown>;
+  const { client, cleanup } = await setup({
+    appendEntry: async (_ns, input) => {
+      capturedMetadata = input.metadata;
+      return { ...ENTRY_1, id: 'e_new', sequence: 3, created_at: '2026-01-03T00:00:00Z' };
+    },
+  });
+  try {
+    await client.callTool({
+      name: 'append_entry',
+      arguments: { namespace: 'events', payload: { x: 1 } },
+    });
+    assert.equal(capturedMetadata, undefined);
+  } finally {
+    await cleanup();
+  }
+});
