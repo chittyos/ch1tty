@@ -123,6 +123,58 @@ test('list_tools: get_task has required=[id]', async () => {
   }
 });
 
+test('list_tools: update_task has required=[id]', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'update_task');
+    assert.ok(tool, 'update_task tool missing');
+    const schema = tool.inputSchema as { required?: string[] };
+    assert.deepEqual(schema.required, ['id']);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: complete_task has required=[id]', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'complete_task');
+    assert.ok(tool, 'complete_task tool missing');
+    const schema = tool.inputSchema as { required?: string[] };
+    assert.deepEqual(schema.required, ['id']);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: delete_task has required=[id]', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.listTools();
+    const tool = result.tools.find(t => t.name === 'delete_task');
+    assert.ok(tool, 'delete_task tool missing');
+    const schema = tool.inputSchema as { required?: string[] };
+    assert.deepEqual(schema.required, ['id']);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tasks: passes project filter to client', async () => {
+  let capturedFilter: unknown;
+  const { client, cleanup } = await setup({
+    listTasks: async (filter) => { capturedFilter = filter; return []; },
+  });
+  try {
+    await client.callTool({ name: 'list_tasks', arguments: { project: 'proj-x' } });
+    assert.deepEqual(capturedFilter, { status: undefined, assignee: undefined, project: 'proj-x', limit: undefined });
+  } finally {
+    await cleanup();
+  }
+});
+
 // ── list_tasks ────────────────────────────────────────────────────────────────
 
 test('list_tasks: returns all tasks as JSON', async () => {
