@@ -4842,3 +4842,43 @@ A ✓ B ✓ C ✓ D ✓ E ✓ + all extensions through CF ✓ ALL DONE.
 ### Next run recommendation
 
 IDLE. All workstreams exhausted. **DISABLE CRON** to stop token burn.
+
+---
+
+## Run log — 2026-09-16T~UTC (run ~1672 — PRODUCTIVE: PR #1314 opened)
+
+**Workstream**: W — wire @ch1tty/shared-mcp into src-stdio/http-server.ts
+
+**Build**: tsc clean (0 errors, ch1tty@4.1.0)
+**Tests**: 2503 pass / 0 fail / 3 skip (2506 total, 107 suites)
+
+### Work done
+
+- Startup: read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE).
+- `git fetch --all`. `npm ci`. `npm run build` clean (tsc 0 errors). `npm test`: 2503/0/3. Build clean.
+- 0 open PRs on entry. Read DRIVER-BOARD.md + DRIVER-LOG.md tail: last run ~1671 left PR #1312 open; next step defined as "Wire @ch1tty/shared-mcp — flip src-stdio/http-server.ts to import McpSessionManager + bearer-auth helpers."
+- PR #1312 is merged (git log confirms on main: commits for wire-monorepo-workspaces on main).
+- Implemented workstream W: `auto/wire-shared-mcp-http-server` branch:
+  - Add `@ch1tty/shared-mcp: workspace:*` to root `package.json` dependencies
+  - Update build script: `--workspace=packages/shared-mcp` added before tsc
+  - Migrate `src-stdio/http-server.ts`: replace inline `sessions` Map + `handleMcp` + `checkAuth`/`unauthorized` methods with `McpSessionManager` from `@ch1tty/shared-mcp`; wire `onSessionStart`/`onSessionEnd` hooks for aggregator + coordinator lifecycle
+  - Update 7 tests to access `mcpSessionManager.sessions` instead of `httpServer.sessions` directly
+  - Update `http-mcp-protocol.test.ts`: unknown session ID → 404 (MCP spec correct) not 400
+  - Build: tsc clean. Tests: 2503/0/3 (no regressions).
+- Pushed branch; opened PR #1314; subscribed to PR activity.
+
+### State summary
+
+A ✓ B ✓ C ✓ D ✓ E ✓ F–V+E2+Q+R+S+T+U ALL DONE. **W: PR #1314 open.** Tests: 2503/0/3. Build: clean. 0 vulns.
+
+### Human-action items
+
+1. **DISABLE hourly cron** — ~1672 runs; all substantive workstreams exhausted or in PR
+2. **Enable GitHub Actions CI** — ci.yml fires but 0 jobs run (org-level disabled). Settings → Actions → "Allow all actions"
+3. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`
+4. **Notion workspace** out of free blocks — upgrade or clear (board fallback: DRIVER-LOG.md)
+5. **Stale branch cleanup** — 1100+ remote `auto/` branches
+
+### Next run recommendation
+
+Watch PR #1314 for CI/review; if merged, advance to next workstream (X: wire `@ch1tty/shared-mcp` into `apps/*-mcp` focused servers, or miniflare testing for Worker files).
