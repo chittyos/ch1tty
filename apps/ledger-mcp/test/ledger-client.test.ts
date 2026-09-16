@@ -220,4 +220,146 @@ describe('LedgerClient', () => {
     assert.ok(Array.isArray(result.entries));
   });
 
+  it('listEntries with no options sends GET with no query string', async () => {
+    let capturedUrl: URL | undefined;
+    const server = http.createServer((req, res) => {
+      capturedUrl = new URL(req.url!, 'http://localhost');
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ entries: [], has_more: false }));
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new LedgerClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await client.listEntries('events');
+      assert.equal(capturedUrl?.search, '');
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('getEntry URL-encodes entry IDs with special characters', async () => {
+    let capturedPath = '';
+    const server = http.createServer((req, res) => {
+      capturedPath = req.url!;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ ...FIXTURE_ENTRIES[0], id: 'e/slash' }));
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new LedgerClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await client.getEntry('events', 'e/slash');
+      assert.equal(capturedPath, '/api/ledger/events/entries/e%2Fslash');
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('listEntries URL-encodes namespace with special characters', async () => {
+    let capturedPath = '';
+    const server = http.createServer((req, res) => {
+      capturedPath = new URL(req.url!, 'http://localhost').pathname;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ entries: [], has_more: false }));
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new LedgerClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await client.listEntries('ns/with/slash');
+      assert.equal(capturedPath, '/api/ledger/ns%2Fwith%2Fslash/entries');
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('getEntry URL-encodes namespace with special characters', async () => {
+    let capturedPath = '';
+    const server = http.createServer((req, res) => {
+      capturedPath = new URL(req.url!, 'http://localhost').pathname;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify(FIXTURE_ENTRIES[0]));
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new LedgerClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await client.getEntry('ns/space', 'e1');
+      assert.equal(capturedPath, '/api/ledger/ns%2Fspace/entries/e1');
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('appendEntry sends a POST request', async () => {
+    let capturedMethod = '';
+    let capturedPath = '';
+    const server = http.createServer((req, res) => {
+      capturedMethod = req.method!;
+      capturedPath = new URL(req.url!, 'http://localhost').pathname;
+      res.setHeader('Content-Type', 'application/json');
+      res.writeHead(201);
+      res.end(JSON.stringify({ ...FIXTURE_ENTRIES[0], id: 'e_new' }));
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new LedgerClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await client.appendEntry('events', { payload: { type: 'test' } });
+      assert.equal(capturedMethod, 'POST');
+      assert.equal(capturedPath, '/api/ledger/events/entries');
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('getEntry sends a GET request', async () => {
+    let capturedMethod = '';
+    const server = http.createServer((req, res) => {
+      capturedMethod = req.method!;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify(FIXTURE_ENTRIES[0]));
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new LedgerClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await client.getEntry('events', 'e1');
+      assert.equal(capturedMethod, 'GET');
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('getEntry throws on 500 error', async () => {
+    const server = http.createServer((req, res) => {
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'internal server error' }));
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new LedgerClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await assert.rejects(() => client.getEntry('events', 'e1'), /500/);
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
+  it('appendEntry throws on 422 error', async () => {
+    const server = http.createServer((req, res) => {
+      res.writeHead(422);
+      res.end(JSON.stringify({ error: 'invalid payload' }));
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address() as { port: number };
+    const client = new LedgerClient(`http://127.0.0.1:${addr.port}`, 'tok');
+    try {
+      await assert.rejects(() => client.appendEntry('events', { payload: { bad: true } }), /422/);
+    } finally {
+      await new Promise<void>((res, rej) => server.close(e => (e ? rej(e) : res())));
+    }
+  });
+
 });
