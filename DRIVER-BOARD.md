@@ -5570,3 +5570,22 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   7. **Stale branch cleanup** — 1100+ remote auto/ branches
 - **PushNotification:** NOT SENT — productive but no exceptional event; two PRs open for CI.
 - **Next run:** Merge #1327 and/or #1329 if CI green. Next gap: CI — check remaining coverage gaps across `src-stdio/` or apps.
+
+## Run log — 2026-09-17 (run ~1684 — MERGED: PR #1327 (CG) + PR #1329 (CH) both landed)
+
+- **Trigger:** PR activity notification — PR #1327 (CG) merged
+- **Status:** Both pending workstream PRs merged. No new code written this run.
+- **Confirmed merged:**
+  - [x] **CH** — PR #1329 (onclose edge-case branches, 2 tests) — merged 14:58 UTC
+  - [x] **CG** — PR #1327 (session-manager routing + close branches, 6 tests) — merged ~19:34 UTC
+- **Workstream status:**
+  - All workstreams A–F, AA, CG, CH: DONE and merged.
+  - No open PRs.
+- **Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — 1684+ runs; cron burning ~50k tokens/run
+  2. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  3. **Enable GitHub Actions** (main npm test CI job) — CI still only CodeQL
+  4. **Notion workspace** out of free blocks — upgrade or clear
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+- **PushNotification:** Sent — both CG and CH workstreams now merged and closed.
+- **Next run:** Find next coverage/quality gap to advance. All shared-mcp session-manager branches now covered.
