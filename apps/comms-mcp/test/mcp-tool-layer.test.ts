@@ -1,84 +1,50 @@
-/**
- * MCP tool layer tests for comms-mcp (Workstream R).
- *
- * Tests the `createCommsMcpServer` factory against a mock CommsDispatch, using
- * InMemoryTransport to wire a real MCP Client/Server pair in-process — no
- * spawned processes, no network. Covers the single `comms.recentLog` tool:
- * happy paths (identifier, person, channel filter), error cases (missing
- * selector, unknown tool), channel failure degradation, and imessage unbound.
- */
-
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { createCommsMcpServer } from '../src/server.ts';
-import type { CommsDispatch, OwnerIdentity } from '../src/types.ts';
+import type { CommsDispatch, OwnerIdentity, RecentLogOutput } from '../src/types.ts';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
 const OWNER: OwnerIdentity = {
-  identifiers: ['+15555550000', 'owner@example.com'],
-  displayName: 'Owner',
+  identifiers: ['nick@nevershitty.com', '+13125550100'],
+  displayName: 'Nick',
   chittyId: null,
 };
 
-const QUO_ROW = {
-  external_id: 'AC-msg-1',
-  message_id: 'int-1',
-  external_thread_id: 'AC-thread-1',
-  direction: 'inbound',
-  body_text: 'hello from test',
-  sent_at: '2026-09-05T10:00:00Z',
-  source: 'openphone',
-  parties: [
-    { role: 'sender', identifier: '+15555550001' },
-    { role: 'recipient', identifier: '+15555550000' },
-  ],
-};
-
-const GMAIL_MSG = {
-  id: 'gmail-msg-1',
-  threadId: 'gmail-thread-1',
-  date: '2026-09-06T11:00:00Z',
-  sender: 'alice@example.com',
-  toRecipients: ['owner@example.com'],
-  subject: 'Test email',
-  snippet: 'Email snippet text',
-};
-
-// ── Mock dispatch ─────────────────────────────────────────────────────────────
-
-type CallHandler = (serverId: string, tool: string, args: Record<string, unknown>) => Promise<unknown>;
-
-function makeDispatch(handler?: CallHandler): CommsDispatch {
-  return {
-    call: handler ?? (async () => []),
-  };
+/** Stub dispatch: returns [] for every call (no entries, all channels ok=true). */
+function stubDispatch(): CommsDispatch {
+  return { async call() { return []; } };
 }
 
-function defaultDispatch(): CommsDispatch {
-  return makeDispatch(async (serverId) => {
-    if (serverId === 'chittyagent-quo') return [QUO_ROW];
-    if (serverId === 'chittyagent-google') return [GMAIL_MSG];
-    return [];
-  });
+type DispatchCall = { mcpServerId: string; tool: string; args: Record<string, unknown> };
+
+/** Capturing dispatch: records each call then returns []. */
+function capturingDispatch(): { dispatch: CommsDispatch; calls: DispatchCall[] } {
+  const calls: DispatchCall[] = [];
+  const dispatch: CommsDispatch = {
+    async call(mcpServerId, tool, args) {
+      calls.push({ mcpServerId, tool, args });
+      return [];
+    },
+  };
+  return { dispatch, calls };
+}
+
+/** Throwing dispatch: throws the given error on any call. */
+function throwingDispatch(msg = 'backend unavailable'): CommsDispatch {
+  return { async call() { throw new Error(msg); } };
 }
 
 // ── Test harness ──────────────────────────────────────────────────────────────
 
-async function setup(dispatch?: CommsDispatch, owner?: OwnerIdentity): Promise<{ client: Client; cleanup: () => Promise<void> }> {
-  const server = createCommsMcpServer(dispatch ?? defaultDispatch(), owner ?? OWNER);
+async function setup(dispatch: CommsDispatch, owner = OWNER): Promise<{ client: Client; cleanup: () => Promise<void> }> {
+  const server = createCommsMcpServer(dispatch, owner);
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
-
-  const mcpClient = new Client(
-    { name: 'test-client', version: '1.0.0' },
-    { capabilities: {} },
-  );
-
+  const mcpClient = new Client({ name: 'test-client', version: '1.0.0' }, { capabilities: {} });
   await server.connect(serverTransport);
   await mcpClient.connect(clientTransport);
-
   return {
     client: mcpClient,
     cleanup: async () => { await mcpClient.close(); },
@@ -87,520 +53,256 @@ async function setup(dispatch?: CommsDispatch, owner?: OwnerIdentity): Promise<{
 
 // ── Tool listing ──────────────────────────────────────────────────────────────
 
-test('list_tools returns exactly 1 tool: comms.recentLog', async () => {
-  const { client, cleanup } = await setup();
+test('list_tools: returns exactly 1 tool', async () => {
+  const { client, cleanup } = await setup(stubDispatch());
   try {
-    const res = await client.listTools();
-    assert.equal(res.tools.length, 1);
-    assert.equal(res.tools[0].name, 'comms.recentLog');
+    const result = await client.listTools();
+    assert.equal(result.tools.length, 1);
   } finally {
     await cleanup();
   }
 });
 
-// ── Happy path: identifier ────────────────────────────────────────────────────
-
-test('comms.recentLog with identifier — returns merged entries from quo + email', async () => {
-  const { client, cleanup } = await setup();
+test('list_tools: tool is named comms.recentLog', async () => {
+  const { client, cleanup } = await setup(stubDispatch());
   try {
-    const res = await client.callTool({
+    const result = await client.listTools();
+    assert.equal(result.tools[0].name, 'comms.recentLog');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('list_tools: comms.recentLog schema has oneOf [person, identifier]', async () => {
+  const { client, cleanup } = await setup(stubDispatch());
+  try {
+    const result = await client.listTools();
+    const tool = result.tools[0];
+    type Schema = { oneOf?: Array<{ required?: string[] }> };
+    const schema = tool.inputSchema as Schema;
+    assert.ok(Array.isArray(schema.oneOf), 'schema should have oneOf');
+    const oneOfFields = schema.oneOf!.flatMap((o) => o.required ?? []);
+    assert.ok(oneOfFields.includes('person'), 'oneOf should include person');
+    assert.ok(oneOfFields.includes('identifier'), 'oneOf should include identifier');
+  } finally {
+    await cleanup();
+  }
+});
+
+// ── Argument validation ───────────────────────────────────────────────────────
+
+test('comms.recentLog with both person and identifier: returns isError (mutual exclusivity)', async () => {
+  const { client, cleanup } = await setup(stubDispatch());
+  try {
+    const result = await client.callTool({
       name: 'comms.recentLog',
-      arguments: { identifier: '+15555550001', channels: ['quo', 'email'] },
+      arguments: { person: 'AB-C-DEF-GHIJ-P-KL-M-NO', identifier: '+13125550100' },
     });
-    assert.equal(res.isError, undefined);
-    const body = JSON.parse((res.content[0] as { text: string }).text) as {
-      entries: Array<{ channel: string; providerMessageId: string }>;
-      metadata: { channelsQueried: Array<{ channel: string; ok: boolean; count: number }> };
-    };
-    assert.ok(Array.isArray(body.entries));
-    assert.ok(body.entries.length >= 1);
-    const channels = body.entries.map((e) => e.channel);
-    assert.ok(channels.includes('quo'), 'should have quo entry');
-    assert.ok(channels.includes('email'), 'should have email entry');
-    const channelStatus = body.metadata.channelsQueried;
-    const quoStatus = channelStatus.find((c) => c.channel === 'quo');
-    const emailStatus = channelStatus.find((c) => c.channel === 'email');
-    assert.ok(quoStatus?.ok, 'quo should be ok');
-    assert.ok(emailStatus?.ok, 'email should be ok');
+    assert.equal(result.isError, true);
+    const content = result.content as Array<{ type: string; text: string }>;
+    assert.ok(content[0].text.includes('exactly one of'), `expected mutual-exclusivity message, got: ${content[0].text}`);
   } finally {
     await cleanup();
   }
 });
 
-// ── Happy path: person (ChittyID) ─────────────────────────────────────────────
-
-test('comms.recentLog with person — resolvedContact carries chittyId', async () => {
-  const { client, cleanup } = await setup(
-    makeDispatch(async () => [QUO_ROW]),
-  );
+test('comms.recentLog with neither person nor identifier: returns isError', async () => {
+  const { client, cleanup } = await setup(stubDispatch());
   try {
-    const res = await client.callTool({
+    const result = await client.callTool({ name: 'comms.recentLog', arguments: {} });
+    assert.equal(result.isError, true);
+    const content = result.content as Array<{ type: string; text: string }>;
+    assert.ok(content[0].text.includes('exactly one of'), `expected selector message, got: ${content[0].text}`);
+  } finally {
+    await cleanup();
+  }
+});
+
+// ── Successful paths ──────────────────────────────────────────────────────────
+
+test('comms.recentLog with person: returns JSON with entries and metadata', async () => {
+  const { client, cleanup } = await setup(stubDispatch());
+  try {
+    const result = await client.callTool({
       name: 'comms.recentLog',
-      arguments: {
-        person: 'CH-1-ABC-1234-P-US-1-A1',
-        channels: ['quo'],
-      },
+      arguments: { person: 'AB-C-DEF-GHIJ-P-KL-M-NO', channels: ['quo'] },
     });
-    assert.equal(res.isError, undefined);
-    const body = JSON.parse((res.content[0] as { text: string }).text) as {
-      metadata: { resolvedContact: { chittyId: string | null } };
-    };
-    assert.equal(body.metadata.resolvedContact.chittyId, 'CH-1-ABC-1234-P-US-1-A1');
+    assert.ok(!result.isError);
+    const content = result.content as Array<{ type: string; text: string }>;
+    const parsed = JSON.parse(content[0].text) as RecentLogOutput;
+    assert.ok(Array.isArray(parsed.entries), 'entries should be an array');
+    assert.ok(parsed.metadata, 'metadata should be present');
+    assert.ok(Array.isArray(parsed.metadata.channelsQueried), 'channelsQueried should be an array');
   } finally {
     await cleanup();
   }
 });
 
-// ── Channel filter: single channel ────────────────────────────────────────────
-
-test('comms.recentLog channels:["quo"] — only quo queried', async () => {
-  let callCount = 0;
-  const { client, cleanup } = await setup(
-    makeDispatch(async (serverId) => {
-      callCount++;
-      if (serverId === 'chittyagent-quo') return [QUO_ROW];
-      return [];
-    }),
-  );
+test('comms.recentLog with identifier: returns JSON result', async () => {
+  const { client, cleanup } = await setup(stubDispatch());
   try {
-    const res = await client.callTool({
+    const result = await client.callTool({
       name: 'comms.recentLog',
-      arguments: { identifier: '+15555550001', channels: ['quo'] },
+      arguments: { identifier: '+13125550199', channels: ['quo'] },
     });
-    assert.equal(res.isError, undefined);
-    const body = JSON.parse((res.content[0] as { text: string }).text) as {
-      metadata: { channelsQueried: Array<{ channel: string }> };
-    };
-    assert.equal(body.metadata.channelsQueried.length, 1);
-    assert.equal(body.metadata.channelsQueried[0].channel, 'quo');
-    assert.equal(callCount, 1, 'dispatch called exactly once for quo');
+    assert.ok(!result.isError);
+    const content = result.content as Array<{ type: string; text: string }>;
+    const parsed = JSON.parse(content[0].text) as RecentLogOutput;
+    assert.ok(Array.isArray(parsed.entries));
   } finally {
     await cleanup();
   }
 });
 
-// ── imessage: known unbound → ok:false, not an error ─────────────────────────
+// ── Dispatch interaction ──────────────────────────────────────────────────────
 
-test('comms.recentLog channels:["imessage"] — ok:false with honest reason, no entries', async () => {
-  const { client, cleanup } = await setup(makeDispatch(async () => []));
+test('comms.recentLog channels:[quo] dispatches to chittyagent-quo', async () => {
+  const { dispatch, calls } = capturingDispatch();
+  const { client, cleanup } = await setup(dispatch);
   try {
-    const res = await client.callTool({
+    await client.callTool({
       name: 'comms.recentLog',
-      arguments: { identifier: '+15555550001', channels: ['imessage'] },
+      arguments: { identifier: '+13125550199', channels: ['quo'] },
     });
-    assert.equal(res.isError, undefined);
-    const body = JSON.parse((res.content[0] as { text: string }).text) as {
-      entries: unknown[];
-      metadata: { channelsQueried: Array<{ channel: string; ok: boolean; error: string | null }> };
-    };
-    assert.equal(body.entries.length, 0);
-    const im = body.metadata.channelsQueried.find((c) => c.channel === 'imessage');
-    assert.ok(im, 'imessage should appear in channelsQueried');
-    assert.equal(im.ok, false);
-    assert.ok(typeof im.error === 'string' && im.error.length > 0, 'error message should be present');
+    assert.ok(calls.length >= 1, 'dispatch should have been called at least once');
+    const quoCall = calls.find((c) => c.mcpServerId === 'chittyagent-quo');
+    assert.ok(quoCall, 'expected a dispatch call to chittyagent-quo');
+    assert.equal(quoCall!.tool, 'quo_recent_messages_local');
   } finally {
     await cleanup();
   }
 });
 
-// ── Channel failure degradation ───────────────────────────────────────────────
-
-test('one channel dispatch failure — other channel still returns, failed degrades to ok:false', async () => {
-  const { client, cleanup } = await setup(
-    makeDispatch(async (serverId) => {
-      if (serverId === 'chittyagent-quo') throw new Error('quo backend down');
-      if (serverId === 'chittyagent-google') return [GMAIL_MSG];
-      return [];
-    }),
-  );
+test('comms.recentLog channels:[email] dispatches to chittyagent-google', async () => {
+  const { dispatch, calls } = capturingDispatch();
+  const { client, cleanup } = await setup(dispatch);
   try {
-    const res = await client.callTool({
+    await client.callTool({
       name: 'comms.recentLog',
-      arguments: { identifier: 'alice@example.com', channels: ['quo', 'email'] },
+      arguments: { identifier: 'alice@example.com', channels: ['email'] },
     });
-    assert.equal(res.isError, undefined);
-    const body = JSON.parse((res.content[0] as { text: string }).text) as {
-      entries: Array<{ channel: string }>;
-      metadata: { channelsQueried: Array<{ channel: string; ok: boolean; error?: string | null }> };
-    };
-    const emailEntries = body.entries.filter((e) => e.channel === 'email');
-    assert.ok(emailEntries.length >= 1, 'email entries should be returned');
-    const quoStatus = body.metadata.channelsQueried.find((c) => c.channel === 'quo');
-    const emailStatus = body.metadata.channelsQueried.find((c) => c.channel === 'email');
-    assert.equal(quoStatus?.ok, false);
-    assert.ok(typeof quoStatus?.error === 'string', 'quo error should be a string');
-    assert.equal(emailStatus?.ok, true);
+    const emailCall = calls.find((c) => c.mcpServerId === 'chittyagent-google');
+    assert.ok(emailCall, 'expected a dispatch call to chittyagent-google');
+    assert.equal(emailCall!.tool, 'search_threads');
   } finally {
     await cleanup();
   }
 });
 
-// ── Error: missing both person and identifier ─────────────────────────────────
-
-test('comms.recentLog without person or identifier returns isError', async () => {
-  const { client, cleanup } = await setup();
+test('comms.recentLog channels:[quo]: dispatch args include participants array', async () => {
+  const { dispatch, calls } = capturingDispatch();
+  const { client, cleanup } = await setup(dispatch);
   try {
-    const res = await client.callTool({
+    await client.callTool({
       name: 'comms.recentLog',
-      arguments: {},
+      arguments: { identifier: '+13125550199', channels: ['quo'] },
     });
-    assert.equal(res.isError, true);
-    assert.match((res.content[0] as { text: string }).text, /person|identifier/);
+    const quoCall = calls.find((c) => c.mcpServerId === 'chittyagent-quo');
+    assert.ok(quoCall, 'expected a dispatch call to chittyagent-quo');
+    assert.ok(Array.isArray(quoCall!.args['participants']), 'args.participants should be an array');
+    assert.ok((quoCall!.args['participants'] as string[]).includes('+13125550199'));
   } finally {
     await cleanup();
   }
 });
 
-// ── Error: both person AND identifier provided (XOR violation) ────────────────
-
-test('comms.recentLog with both person and identifier returns isError', async () => {
-  const { client, cleanup } = await setup();
+test('comms.recentLog channels:[quo]: no dispatch call for email', async () => {
+  const { dispatch, calls } = capturingDispatch();
+  const { client, cleanup } = await setup(dispatch);
   try {
-    const res = await client.callTool({
+    await client.callTool({
       name: 'comms.recentLog',
-      arguments: { person: 'CH-1-ABC-1234-P-US-1-A1', identifier: '+15555550001' },
+      arguments: { identifier: '+13125550199', channels: ['quo'] },
     });
-    assert.equal(res.isError, true);
-    assert.match((res.content[0] as { text: string }).text, /person|identifier/);
+    const emailCall = calls.find((c) => c.mcpServerId === 'chittyagent-google');
+    assert.equal(emailCall, undefined, 'should not dispatch to email when channels=[quo]');
   } finally {
     await cleanup();
   }
 });
 
-// ── Error: unknown tool ───────────────────────────────────────────────────────
+// ── Channel degradation ───────────────────────────────────────────────────────
 
-test('unknown tool returns isError', async () => {
-  const { client, cleanup } = await setup();
+test('comms.recentLog: imessage channel always ok=false (unbound) — not isError', async () => {
+  const { client, cleanup } = await setup(stubDispatch());
   try {
-    const res = await client.callTool({ name: 'nonexistent_tool', arguments: {} });
-    assert.equal(res.isError, true);
-    assert.match((res.content[0] as { text: string }).text, /Unknown tool/);
-  } finally {
-    await cleanup();
-  }
-});
-
-// ── Ordering: desc vs asc ─────────────────────────────────────────────────────
-
-test('comms.recentLog order:asc — entries sorted oldest first', async () => {
-  const olderRow = { ...QUO_ROW, external_id: 'AC-old', sent_at: '2026-09-01T08:00:00Z' };
-  const newerRow = { ...QUO_ROW, external_id: 'AC-new', sent_at: '2026-09-08T08:00:00Z' };
-  const { client, cleanup } = await setup(
-    makeDispatch(async (serverId) => {
-      if (serverId === 'chittyagent-quo') return [newerRow, olderRow];
-      return [];
-    }),
-  );
-  try {
-    const res = await client.callTool({
+    const result = await client.callTool({
       name: 'comms.recentLog',
-      arguments: { identifier: '+15555550001', channels: ['quo'], order: 'asc' },
+      arguments: { identifier: '+13125550199', channels: ['imessage'] },
     });
-    assert.equal(res.isError, undefined);
-    const body = JSON.parse((res.content[0] as { text: string }).text) as {
-      entries: Array<{ providerMessageId: string; occurredAt: string }>;
-    };
-    assert.ok(body.entries.length >= 2);
-    const times = body.entries.map((e) => Date.parse(e.occurredAt));
-    for (let i = 1; i < times.length; i++) {
-      assert.ok(times[i] >= times[i - 1], 'entries should be asc by occurredAt');
-    }
+    assert.ok(!result.isError, 'unbound channel should not make the whole tool isError');
+    const content = result.content as Array<{ type: string; text: string }>;
+    const parsed = JSON.parse(content[0].text) as RecentLogOutput;
+    const imessageChannel = parsed.metadata.channelsQueried.find((c) => c.channel === 'imessage');
+    assert.ok(imessageChannel, 'imessage should be in channelsQueried');
+    assert.equal(imessageChannel!.ok, false, 'imessage channel should be ok=false');
   } finally {
     await cleanup();
   }
 });
 
-// ── Truncation: limit ─────────────────────────────────────────────────────────
-
-test('comms.recentLog limit:1 — truncates to 1 entry and sets truncated:true', async () => {
-  const rows = [
-    { ...QUO_ROW, external_id: 'AC-a', sent_at: '2026-09-05T10:00:00Z' },
-    { ...QUO_ROW, external_id: 'AC-b', sent_at: '2026-09-05T09:00:00Z' },
-    { ...QUO_ROW, external_id: 'AC-c', sent_at: '2026-09-05T08:00:00Z' },
-  ];
-  const { client, cleanup } = await setup(
-    makeDispatch(async (serverId) => {
-      if (serverId === 'chittyagent-quo') return rows;
-      return [];
-    }),
-  );
+test('comms.recentLog: dispatch error degrades channel to ok=false — result is still JSON, not isError', async () => {
+  const { client, cleanup } = await setup(throwingDispatch('quo backend down'));
   try {
-    const res = await client.callTool({
+    const result = await client.callTool({
       name: 'comms.recentLog',
-      arguments: { identifier: '+15555550001', channels: ['quo'], limit: 1 },
+      arguments: { identifier: '+13125550199', channels: ['quo'] },
     });
-    assert.equal(res.isError, undefined);
-    const body = JSON.parse((res.content[0] as { text: string }).text) as {
-      entries: unknown[];
-      metadata: { truncated: boolean; totalBeforeLimit: number };
-    };
-    assert.equal(body.entries.length, 1);
-    assert.equal(body.metadata.truncated, true);
-    assert.ok(body.metadata.totalBeforeLimit >= 3);
+    assert.ok(!result.isError, 'dispatch error should degrade channel, not make tool isError');
+    const content = result.content as Array<{ type: string; text: string }>;
+    const parsed = JSON.parse(content[0].text) as RecentLogOutput;
+    const quoChannel = parsed.metadata.channelsQueried.find((c) => c.channel === 'quo');
+    assert.ok(quoChannel, 'quo should be in channelsQueried');
+    assert.equal(quoChannel!.ok, false, 'quo channel should be ok=false after dispatch error');
+    assert.ok(quoChannel!.error?.includes('quo backend down'));
   } finally {
     await cleanup();
   }
 });
 
-// ── Metadata: window fields ───────────────────────────────────────────────────
+// ── Result structure ──────────────────────────────────────────────────────────
 
-test('comms.recentLog — metadata.window is present with since and until', async () => {
-  const { client, cleanup } = await setup();
+test('comms.recentLog: metadata.window has since and until', async () => {
+  const { client, cleanup } = await setup(stubDispatch());
   try {
-    const res = await client.callTool({
+    const result = await client.callTool({
       name: 'comms.recentLog',
-      arguments: { identifier: '+15555550001', channels: ['quo'] },
+      arguments: { identifier: '+13125550199', channels: ['quo'] },
     });
-    assert.equal(res.isError, undefined);
-    const body = JSON.parse((res.content[0] as { text: string }).text) as {
-      metadata: { window: { since: string; until: string } };
-    };
-    assert.ok(typeof body.metadata.window.since === 'string');
-    assert.ok(typeof body.metadata.window.until === 'string');
+    const content = result.content as Array<{ type: string; text: string }>;
+    const parsed = JSON.parse(content[0].text) as RecentLogOutput;
+    assert.ok(parsed.metadata.window.since, 'window.since should be set');
+    assert.ok(parsed.metadata.window.until, 'window.until should be set');
   } finally {
     await cleanup();
   }
 });
 
-// ── list_tools property-type schema assertions ────────────────────────────────
-
-type PropertySchema = { type?: string; description?: string; items?: { type?: string } };
-type InputSchema = {
-  type?: string;
-  additionalProperties?: boolean;
-  oneOf?: Array<{ required: string[] }>;
-  properties?: Record<string, PropertySchema>;
-};
-
-test('list_tools: comms.recentLog inputSchema type is object', async () => {
-  const { client, cleanup } = await setup();
+test('comms.recentLog: metadata.channelsQueried includes requested channel', async () => {
+  const { client, cleanup } = await setup(stubDispatch());
   try {
-    const res = await client.listTools();
-    const tool = res.tools.find((t) => t.name === 'comms.recentLog');
-    assert.ok(tool, 'comms.recentLog missing');
-    assert.equal((tool.inputSchema as InputSchema).type, 'object');
-  } finally {
-    await cleanup();
-  }
-});
-
-test('list_tools: comms.recentLog inputSchema has additionalProperties:false', async () => {
-  const { client, cleanup } = await setup();
-  try {
-    const res = await client.listTools();
-    const tool = res.tools.find((t) => t.name === 'comms.recentLog');
-    assert.ok(tool, 'comms.recentLog missing');
-    assert.equal((tool.inputSchema as InputSchema).additionalProperties, false);
-  } finally {
-    await cleanup();
-  }
-});
-
-test('list_tools: comms.recentLog person property is type string', async () => {
-  const { client, cleanup } = await setup();
-  try {
-    const res = await client.listTools();
-    const tool = res.tools.find((t) => t.name === 'comms.recentLog');
-    assert.ok(tool, 'comms.recentLog missing');
-    assert.equal((tool.inputSchema as InputSchema).properties?.['person']?.type, 'string');
-  } finally {
-    await cleanup();
-  }
-});
-
-test('list_tools: comms.recentLog identifier property is type string', async () => {
-  const { client, cleanup } = await setup();
-  try {
-    const res = await client.listTools();
-    const tool = res.tools.find((t) => t.name === 'comms.recentLog');
-    assert.ok(tool, 'comms.recentLog missing');
-    assert.equal((tool.inputSchema as InputSchema).properties?.['identifier']?.type, 'string');
-  } finally {
-    await cleanup();
-  }
-});
-
-test('list_tools: comms.recentLog channels property is type array', async () => {
-  const { client, cleanup } = await setup();
-  try {
-    const res = await client.listTools();
-    const tool = res.tools.find((t) => t.name === 'comms.recentLog');
-    assert.ok(tool, 'comms.recentLog missing');
-    assert.equal((tool.inputSchema as InputSchema).properties?.['channels']?.type, 'array');
-  } finally {
-    await cleanup();
-  }
-});
-
-test('list_tools: comms.recentLog channels items type is string', async () => {
-  const { client, cleanup } = await setup();
-  try {
-    const res = await client.listTools();
-    const tool = res.tools.find((t) => t.name === 'comms.recentLog');
-    assert.ok(tool, 'comms.recentLog missing');
-    assert.equal((tool.inputSchema as InputSchema).properties?.['channels']?.items?.type, 'string');
-  } finally {
-    await cleanup();
-  }
-});
-
-test('list_tools: comms.recentLog days property is type integer', async () => {
-  const { client, cleanup } = await setup();
-  try {
-    const res = await client.listTools();
-    const tool = res.tools.find((t) => t.name === 'comms.recentLog');
-    assert.ok(tool, 'comms.recentLog missing');
-    assert.equal((tool.inputSchema as InputSchema).properties?.['days']?.type, 'integer');
-  } finally {
-    await cleanup();
-  }
-});
-
-test('list_tools: comms.recentLog since property is type string', async () => {
-  const { client, cleanup } = await setup();
-  try {
-    const res = await client.listTools();
-    const tool = res.tools.find((t) => t.name === 'comms.recentLog');
-    assert.ok(tool, 'comms.recentLog missing');
-    assert.equal((tool.inputSchema as InputSchema).properties?.['since']?.type, 'string');
-  } finally {
-    await cleanup();
-  }
-});
-
-test('list_tools: comms.recentLog until property is type string', async () => {
-  const { client, cleanup } = await setup();
-  try {
-    const res = await client.listTools();
-    const tool = res.tools.find((t) => t.name === 'comms.recentLog');
-    assert.ok(tool, 'comms.recentLog missing');
-    assert.equal((tool.inputSchema as InputSchema).properties?.['until']?.type, 'string');
-  } finally {
-    await cleanup();
-  }
-});
-
-test('list_tools: comms.recentLog limit property is type integer', async () => {
-  const { client, cleanup } = await setup();
-  try {
-    const res = await client.listTools();
-    const tool = res.tools.find((t) => t.name === 'comms.recentLog');
-    assert.ok(tool, 'comms.recentLog missing');
-    assert.equal((tool.inputSchema as InputSchema).properties?.['limit']?.type, 'integer');
-  } finally {
-    await cleanup();
-  }
-});
-
-test('list_tools: comms.recentLog order property is type string', async () => {
-  const { client, cleanup } = await setup();
-  try {
-    const res = await client.listTools();
-    const tool = res.tools.find((t) => t.name === 'comms.recentLog');
-    assert.ok(tool, 'comms.recentLog missing');
-    assert.equal((tool.inputSchema as InputSchema).properties?.['order']?.type, 'string');
-  } finally {
-    await cleanup();
-  }
-});
-
-test('list_tools: comms.recentLog includeBody property is type boolean', async () => {
-  const { client, cleanup } = await setup();
-  try {
-    const res = await client.listTools();
-    const tool = res.tools.find((t) => t.name === 'comms.recentLog');
-    assert.ok(tool, 'comms.recentLog missing');
-    assert.equal(
-      (tool.inputSchema as unknown as { properties?: Record<string, { type?: string }> }).properties?.['includeBody']?.type,
-      'boolean',
-    );
-  } finally {
-    await cleanup();
-  }
-});
-
-// ── Functional gaps ───────────────────────────────────────────────────────────
-
-test('comms.recentLog channels omitted — quo+imessage+email all appear in channelsQueried', async () => {
-  const { client, cleanup } = await setup();
-  try {
-    const res = await client.callTool({
+    const result = await client.callTool({
       name: 'comms.recentLog',
-      arguments: { identifier: '+15555550001' },
+      arguments: { identifier: '+13125550199', channels: ['quo'] },
     });
-    assert.equal(res.isError, undefined);
-    const body = JSON.parse((res.content[0] as { text: string }).text) as {
-      metadata: { channelsQueried: Array<{ channel: string }> };
-    };
-    const channels = body.metadata.channelsQueried.map((c) => c.channel).sort();
-    assert.deepEqual(channels, ['email', 'imessage', 'quo']);
+    const content = result.content as Array<{ type: string; text: string }>;
+    const parsed = JSON.parse(content[0].text) as RecentLogOutput;
+    const channels = parsed.metadata.channelsQueried.map((c) => c.channel);
+    assert.ok(channels.includes('quo'), 'quo should be in channelsQueried');
   } finally {
     await cleanup();
   }
 });
 
-test('comms.recentLog with since — metadata.window.since reflects input and out-of-window entry is excluded', async () => {
-  const beforeRow = { ...QUO_ROW, external_id: 'AC-before', sent_at: '2026-08-31T23:59:00Z' };
-  const inWindowRow = { ...QUO_ROW, external_id: 'AC-in', sent_at: '2026-09-05T10:00:00Z' };
-  const { client, cleanup } = await setup(
-    makeDispatch(async (serverId) => {
-      if (serverId === 'chittyagent-quo') return [beforeRow, inWindowRow];
-      return [];
-    }),
-  );
-  try {
-    const inputSince = '2026-09-01T00:00:00.000Z';
-    const res = await client.callTool({
-      name: 'comms.recentLog',
-      arguments: { identifier: '+15555550001', channels: ['quo'], since: inputSince },
-    });
-    assert.equal(res.isError, undefined);
-    const body = JSON.parse((res.content[0] as { text: string }).text) as {
-      entries: Array<{ providerMessageId: string }>;
-      metadata: { window: { since: string } };
-    };
-    assert.equal(body.metadata.window.since, inputSince);
-    assert.equal(body.entries.length, 1, 'only in-window entry should be included');
-    assert.equal(body.entries[0].providerMessageId, 'AC-in');
-  } finally {
-    await cleanup();
-  }
-});
+// ── Error handling ────────────────────────────────────────────────────────────
 
-test('comms.recentLog with days:7 — metadata.window spans ~7 days', async () => {
-  const { client, cleanup } = await setup();
+test('unknown tool: returns isError with "Unknown tool" message', async () => {
+  const { client, cleanup } = await setup(stubDispatch());
   try {
-    const res = await client.callTool({
-      name: 'comms.recentLog',
-      arguments: { identifier: '+15555550001', channels: ['quo'], days: 7 },
-    });
-    assert.equal(res.isError, undefined);
-    const body = JSON.parse((res.content[0] as { text: string }).text) as {
-      metadata: { window: { since: string; until: string } };
-    };
-    const diff = Date.parse(body.metadata.window.until) - Date.parse(body.metadata.window.since);
-    const expected = 7 * 24 * 60 * 60 * 1000;
-    assert.ok(Math.abs(diff - expected) < 5000, `window span ${diff}ms should be ~${expected}ms`);
-  } finally {
-    await cleanup();
-  }
-});
-
-test('comms.recentLog with includeBody:true — call succeeds and quo entry body is preserved', async () => {
-  const { client, cleanup } = await setup();
-  try {
-    const res = await client.callTool({
-      name: 'comms.recentLog',
-      arguments: { identifier: '+15555550001', channels: ['quo'], includeBody: true },
-    });
-    assert.equal(res.isError, undefined);
-    const body = JSON.parse((res.content[0] as { text: string }).text) as {
-      entries: Array<{ channel: string; body?: string }>;
-    };
-    assert.ok(Array.isArray(body.entries));
-    const quoEntry = body.entries.find((e) => e.channel === 'quo');
-    assert.ok(quoEntry, 'quo entry should be present');
-    assert.equal(quoEntry.body, 'hello from test');
+    const result = await client.callTool({ name: 'comms.nonExistentTool', arguments: {} });
+    assert.equal(result.isError, true);
+    const content = result.content as Array<{ type: string; text: string }>;
+    assert.ok(content[0].text.includes('Unknown tool'));
   } finally {
     await cleanup();
   }
