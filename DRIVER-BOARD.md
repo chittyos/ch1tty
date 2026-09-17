@@ -5486,7 +5486,8 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 - **Workstream status updates:**
   - [x] **W** — test(apps): port-validation subprocess tests for all 5 HTTP-capable apps. PR #1323 merged.
   - [x] **X** — fix(config-data): add missing workspace/devops/security focus profiles + drift tests. PR #1324 merged.
-  - [ ] **Y** — test(apps): focused-app MCP tools/list E2E via StreamableHTTPClientTransport. PR #1325 open (CI pending).
+  - [x] **Y** — test(apps): focused-app MCP tools/list E2E via StreamableHTTPClientTransport. PR #1325 merged.
+  - [ ] **Z** — test(shared-mcp): export-surface drift guard (McpSessionManager/checkBearerToken/writeUnauthorized API contract). PR #1326 open (CI pending).
 - **Human-action items:**
   1. **DISABLE hourly cron** — 1680+ runs; all original workstreams A–E + extended F–Y exhausted; cron burning ~50k tokens/run
   2. **Merge PR #1325** once CI green (Y: focused-app MCP tools/list E2E, 7 tests, CI pending)

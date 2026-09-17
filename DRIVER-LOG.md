@@ -4901,3 +4901,45 @@ W: PR #1314 open, CI green, awaiting human approval. No new workstream started t
 ### Next run recommendation
 
 If #1314 merged: advance to workstream X (wire `@ch1tty/shared-mcp` into `apps/*-mcp`). If CodeRabbit posts findings: address them.
+
+---
+
+## Run log — 2026-09-17T~UTC (run ~1681 — PRODUCTIVE: opened PR #1326)
+
+- **Workstream advanced:** Z — @ch1tty/shared-mcp export-surface drift guard
+- **Branch/PR:** `auto/Z-shared-mcp-export-drift-guard` → https://github.com/chittyos/ch1tty/pull/1326
+- **Build:** tsc clean (0 errors, ch1tty@4.1.0)
+- **Tests:** 2635 pass / 0 fail / 3 skip (2638 total, 109 suites) — was 2623/0/3; +12 tests
+
+### Work done
+
+- Startup: read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE).
+- `git fetch --all`. `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 2623/0/3 (baseline — PR #1325 already merged).
+- 0 open PRs on entry.
+- Read DRIVER-BOARD.md + DRIVER-LOG.md tail: all workstreams A–Y done; next candidate Z defined as "shared-mcp export-surface drift guard."
+- Implemented workstream Z: `packages/shared-mcp/test/exports.test.ts` — 12 tests:
+  - Exact runtime export list (3 names: McpSessionManager, checkBearerToken, writeUnauthorized)
+  - typeof assertions for each export
+  - Re-export identity (SharedMcp.McpSessionManager === direct import)
+  - Prototype methods: handleRequest + closeAll present
+  - Instance API: sessionCount = 0, onSessionStart/End undefined, hooks assignable
+- All 12 new tests pass in isolation and full suite. Tests: 2635/0/3 (+12).
+- Pushed branch; opened PR #1326; subscribed to PR activity.
+
+### State summary
+
+A ✓ B ✓ C ✓ D ✓ E ✓ F–Y ALL DONE. **Z: PR #1326 open (CI pending).** Tests: 2635/0/3. Build: clean. 0 vulns.
+
+### Human-action items
+
+1. **DISABLE hourly cron** — 1681+ runs; cron burning ~50k tokens/run
+2. **Merge PR #1326** once CI green (Z: shared-mcp drift guard, 12 tests)
+3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+4. **Enable GitHub Actions** (npm test CI job) — CI still only CodeQL
+5. **Notion workspace** out of free blocks — upgrade or clear
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+7. **Major dep bumps** — typescript 5→7, @types/node 22→26, c8 11→12 await human review
+
+### Next run recommendation
+
+Merge #1326 if CI green. Next gap candidate after Z: run `npm run coverage` to check if new test file opened any uncovered branches in session-manager.ts; if so, gap-fill. Otherwise evaluate packages/shared-types or packages/shared-logger for similar drift guards.
