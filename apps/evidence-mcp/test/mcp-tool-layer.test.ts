@@ -409,7 +409,9 @@ test('client error: propagates as isError=true text response', async () => {
     const result = await client.callTool({ name: 'get_document', arguments: { id: 'bad' } });
     assert.equal(result.isError, true);
     const content = result.content as Array<{ type: string; text: string }>;
-    assert.ok(content[0].text.includes('404'));
+    // Error details are sanitized (CWE-209); only a generic message is returned to callers.
+    assert.ok(content[0].text.includes('error'));
+    assert.ok(!content[0].text.includes('404'));
   } finally {
     await cleanup();
   }
@@ -423,7 +425,9 @@ test('client error: non-Error thrown captured as string', async () => {
     const result = await client.callTool({ name: 'list_documents', arguments: {} });
     assert.equal(result.isError, true);
     const content = result.content as Array<{ type: string; text: string }>;
-    assert.ok(content[0].text.includes('network timeout'));
+    // Error details are sanitized (CWE-209); only a generic message is returned to callers.
+    assert.ok(content[0].text.includes('error'));
+    assert.ok(!content[0].text.includes('network timeout'));
   } finally {
     await cleanup();
   }
@@ -437,7 +441,9 @@ test('ingest_document error: surfaces in isError response', async () => {
     const result = await client.callTool({ name: 'ingest_document', arguments: { content: 'x', kind: 'note' } });
     assert.equal(result.isError, true);
     const content = result.content as Array<{ type: string; text: string }>;
-    assert.ok(content[0].text.includes('422'));
+    // Error details are sanitized (CWE-209); only a generic message is returned to callers.
+    assert.ok(content[0].text.includes('error'));
+    assert.ok(!content[0].text.includes('422'));
   } finally {
     await cleanup();
   }
