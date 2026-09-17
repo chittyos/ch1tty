@@ -4943,3 +4943,44 @@ A ✓ B ✓ C ✓ D ✓ E ✓ F–Y ALL DONE. **Z: PR #1326 open (CI pending).**
 ### Next run recommendation
 
 Merge #1326 if CI green. Next gap candidate after Z: run `npm run coverage` to check if new test file opened any uncovered branches in session-manager.ts; if so, gap-fill. Otherwise evaluate packages/shared-types or packages/shared-logger for similar drift guards.
+
+---
+
+## Run log — 2026-09-17T~UTC (run ~1691 — PRODUCTIVE: opened PR #1341)
+
+- **Workstream advanced:** CR — McpSessionManager catch branch gaps (session-manager.ts lines 89-90)
+- **Branch/PR:** `auto/CR-session-manager-catch-branches` → https://github.com/chittyos/ch1tty/pull/1341
+- **Build:** tsc clean (0 errors, ch1tty@4.1.0)
+- **Tests:** 2728 pass / 0 fail / 3 skip (was 2726/0/3; +2)
+
+### Work done
+
+- Startup: read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE).
+- `git fetch --all`. `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 2726/0/3 (baseline).
+- 0 open PRs on entry. Read DRIVER-LOG.md tail + DRIVER-BOARD.md + Notion board.
+- All workstreams A–CQ done; A–E + F–Y + Z–CQ checked; coverage 100% src-stdio + apps.
+- Ran `npx c8 --include='packages/*/src/**/*.ts' ...` → found 1 gap: `session-manager.ts:89-90` at 97.22% branch coverage.
+- Lines 89-90 are the `else if (!res.writableEnded) { res.end(); }` branch in the `catch` block of `handleRequest`. The existing factory-error test always hits the first branch (`!res.headersSent`), so both sides of the else-if were unexercised.
+- Implemented workstream CR: `packages/shared-mcp/test/session-manager.test.ts` — 2 new tests using mock req/res:
+  1. `headersSent=true, writableEnded=false` → `res.end()` must be called
+  2. `headersSent=true, writableEnded=true` → `res.end()` must NOT be called
+- packages/shared-mcp coverage: 97.22% → 100% branches, 98.24% → 100% statements.
+- Full suite: 2728/0/3 (+2). No regressions.
+- Pushed branch; opened PR #1341; subscribed to PR activity.
+
+### State summary
+
+A ✓ B ✓ C ✓ D ✓ E ✓ + all extensions through CQ ✓ **CR: PR #1341 open.** Tests: 2728/0/3. Build: clean.
+
+### Human-action items
+
+1. **DISABLE hourly cron** — all workstreams exhausted or in PR; ~1691 runs; idle-burning ~50k tokens/run.
+2. **Enable GitHub Actions CI** — ci.yml fires but 0 jobs run (org-level disabled). Settings → Actions → "Allow all actions".
+3. **Prod env vars**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`.
+4. **Notion workspace** out of free blocks — upgrade or clear (board fallback: DRIVER-LOG.md).
+5. **Stale branch cleanup** — 1100+ remote `auto/` branches.
+6. **Major dep bumps** — typescript 5→7, @types/node 22→26, c8 11→12 await human review.
+
+### Next run recommendation
+
+Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps already 100%. Consider workers/ coverage (needs workerd/miniflare — human setup) or dep bumps (human review). If no new gaps found, recommend disabling cron.
