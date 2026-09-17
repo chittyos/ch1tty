@@ -23,6 +23,7 @@
   ],
   "dependencies": {
     "@ch1tty/shared-logger": "workspace:*",
+    "@ch1tty/shared-mcp": "workspace:*",
     "@ch1tty/shared-types": "workspace:*",
     "@chittyos/schema-client": "file:../../CHITTYFOUNDATION/chittyschema/clients/schema-client",
     "@cloudflare/codemode": "^0.5.2",

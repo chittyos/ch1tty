@@ -2,7 +2,6 @@ import { handleGptAction } from './gpt-actions.js';
 import { handleOpenClawRoute } from './openclaw-facade.js';
 import { createServer, type Server as HttpServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import {
   ListToolsRequestSchema,
   CallToolRequestSchema,
@@ -12,6 +11,7 @@ import {
   ListPromptsRequestSchema,
   GetPromptRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
+import { checkBearerToken, McpSessionManager, writeUnauthorized } from '@ch1tty/shared-mcp';
 import type { Aggregator } from './aggregator.js';
 import { VERSION } from './utils.js';
 import { log } from './logger.js';
@@ -27,13 +27,23 @@ export class HttpMcpServer {
   private port: number;
   private bindAddress: string;
   private mcpToken?: string;
-  private sessions = new Map<string, { server: Server; transport: StreamableHTTPServerTransport }>();
+  private mcpSessionManager: McpSessionManager;
   private boundPort: number | null = null;
 
   constructor(private aggregator: Aggregator, options: HttpServerOptions) {
     this.port = options.port;
     this.bindAddress = options.bindAddress ?? '0.0.0.0';
     this.mcpToken = options.mcpToken;
+
+    this.mcpSessionManager = new McpSessionManager((getSessionId) => this.createMcpServer(getSessionId));
+    this.mcpSessionManager.onSessionStart = (sessionId) => {
+      this.aggregator.sessions.getOrCreate(sessionId, 'http');
+      this.aggregator.coordinator.onSessionStart(sessionId, 'http');
+    };
+    this.mcpSessionManager.onSessionEnd = (sessionId) => {
+      this.aggregator.sessions.remove(sessionId);
+      this.aggregator.coordinator.onSessionEnd(sessionId);
+    };
 
     this.server = createServer((req, res) => this.handleRequest(req, res));
   }
@@ -100,7 +110,7 @@ export class HttpMcpServer {
 
     // Sessions snapshot (operational)
     if (req.method === 'GET' && path === '/api/v1/sessions') {
-      if (this.mcpToken && !this.checkAuth(req)) return this.unauthorized(res);
+      if (this.mcpToken && !checkBearerToken(req, this.mcpToken)) return writeUnauthorized(res);
       res.setHeader('Content-Type', 'application/json');
       res.writeHead(200);
       res.end(JSON.stringify({ sessions: this.aggregator.sessions.listSessions() }));
@@ -109,92 +119,18 @@ export class HttpMcpServer {
 
     // MCP endpoint — bearer token required if configured
     if (path === '/mcp') {
-      if (this.mcpToken && !this.checkAuth(req)) {
-        res.setHeader('Content-Type', 'application/json');
-        res.writeHead(401);
-        res.end(JSON.stringify({ error: 'unauthorized' }));
+      if (this.mcpToken && !checkBearerToken(req, this.mcpToken)) {
+        writeUnauthorized(res);
         return;
       }
 
-      this.handleMcp(req, res);
+      void this.mcpSessionManager.handleRequest(req, res);
       return;
     }
 
     res.setHeader('Content-Type', 'application/json');
     res.writeHead(404);
     res.end(JSON.stringify({ error: 'not found' }));
-  }
-
-  private checkAuth(req: IncomingMessage): boolean {
-    const auth = req.headers.authorization;
-    if (!auth) return false;
-    const [scheme, token] = auth.split(' ', 2);
-    return scheme?.toLowerCase() === 'bearer' && token === this.mcpToken;
-  }
-
-  private unauthorized(res: ServerResponse): void {
-    res.setHeader('Content-Type', 'application/json');
-    res.writeHead(401);
-    res.end(JSON.stringify({ error: 'unauthorized' }));
-  }
-
-  private async handleMcp(req: IncomingMessage, res: ServerResponse): Promise<void> {
-    // Get or create session from Mcp-Session-Id header
-    const sessionId = req.headers['mcp-session-id'] as string | undefined;
-
-    if (sessionId && this.sessions.has(sessionId)) {
-      // Existing session
-      const session = this.sessions.get(sessionId)!;
-      await session.transport.handleRequest(req, res);
-      return;
-    }
-
-    if (req.method === 'POST' && !sessionId) {
-      // New session — create server + transport
-      let mcpSessionId: string | undefined;
-      const transport = new StreamableHTTPServerTransport({
-        sessionIdGenerator: () => crypto.randomUUID(),
-        onsessioninitialized: (newSessionId) => {
-          mcpSessionId = newSessionId;
-          this.sessions.set(newSessionId, { server: mcpServer, transport });
-          this.aggregator.sessions.getOrCreate(newSessionId, 'http');
-          this.aggregator.coordinator.onSessionStart(newSessionId, 'http');
-        },
-      });
-
-      const mcpServer = this.createMcpServer(() => mcpSessionId);
-
-      // Clean up on close
-      let isClosing = false; transport.onclose = () => { if (isClosing) return; isClosing = true;
-        const sid = [...this.sessions.entries()].find(([, s]) => s.transport === transport)?.[0];
-        if (sid) {
-          this.sessions.delete(sid);
-          this.aggregator.sessions.remove(sid);
-          this.aggregator.coordinator.onSessionEnd(sid);
-        }
-        mcpServer.close().catch((err) => log.warn(`MCP server close failed: ${err}`, sid));
-      };
-
-      try {
-        await mcpServer.connect(transport);
-        await transport.handleRequest(req, res);
-      } catch (err) {
-        log.error(`MCP handler threw: ${err}`);
-        if (!res.headersSent) {
-          res.setHeader('Content-Type', 'application/json');
-          res.writeHead(500);
-          res.end(JSON.stringify({ error: 'internal', message: 'MCP handler failed' }));
-        } else if (!res.writableEnded) {
-          res.end();
-        }
-      }
-      return;
-    }
-
-    // Invalid — no session ID on non-POST, or session not found
-    res.setHeader('Content-Type', 'application/json');
-    res.writeHead(400);
-    res.end(JSON.stringify({ error: 'bad request', message: 'Missing or invalid session' }));
   }
 
   private createMcpServer(getSessionId: () => string | undefined): Server {
@@ -270,13 +206,7 @@ export class HttpMcpServer {
   }
 
   async stop(): Promise<void> {
-    // Close all MCP sessions
-    for (const [sid, session] of this.sessions) {
-      await session.transport.close().catch((err) => log.warn(`Transport close failed: ${err}`, sid));
-      await session.server.close().catch((err) => log.warn(`Server close failed: ${err}`, sid));
-    }
-    this.sessions.clear();
-
+    await this.mcpSessionManager.closeAll();
     return new Promise((resolve) => {
       this.server.close(() => resolve());
     });
