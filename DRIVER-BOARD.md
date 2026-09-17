@@ -5686,3 +5686,32 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   6. **Major dep bumps** — typescript 5→7, @types/node 22→26, c8 11→12 await human review
 - **PushNotification:** NOT SENT — routine merge, no exceptional event.
 - **Next run:** Find Workstream CO. Candidates: remaining branch gaps in `src-stdio/` (e.g. `ollama-brain.ts` partial-response extraction, `embedding-brain.ts` cache-miss race) or apps/* export-surface drift guards.
+
+## Run log — 2026-09-17 (run ~1688 — PRODUCTIVE: responded to post-merge CR finding + opened PR #1338 (CO))
+
+- **Workstream advanced:** CO — deterministic cooldown test (fix flaky `setTimeout` in CN test file)
+- **Branch/PR:** `auto/CO-circuit-breaker-deterministic-cooldown-test` → https://github.com/chittyos/ch1tty/pull/1338
+- **Build:** tsc clean (0 errors, ch1tty@4.1.0)
+- **Tests:** 2690 pass / 0 fail / 3 skip (2693 total, 110 suites) — unchanged from CN baseline
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations on main.
+- **Open PRs at end of run:** 1 — PR #1338 (CO: deterministic cooldown test, CI pending)
+- **What was done:**
+  - Processed 5 queued PR notifications: CodeRabbit posted a valid finding on #1337 AFTER it was merged.
+  - Finding: `cooldownMs: 10` + 20ms `setTimeout` in test 2 is flaky on slow/preempted runners.
+  - Replied to CodeRabbit thread on #1337 (standing down, carrying forward to CO).
+  - Implemented fix: replaced `async/setTimeout` with a synchronous `Date.now` mock (stub global, fixed start time FIXED_START=1_000_000, advance mock past cooldownMs+1, restore in finally).
+  - Test 2 now runs in ~0.3ms (was ~20ms). Both tests pass. Full suite unchanged at 2690/0/3.
+  - Committed, pushed, opened PR #1338, subscribed.
+- **Workstream status updates:**
+  - [x] **CN** — test(circuit-breaker): 2 branch-gap tests. PR #1337 merged. DONE.
+  - [ ] **CO** — test(circuit-breaker): deterministic cooldown test (CR followup). PR #1338 open (CI pending).
+- **Human-action items:**
+  1. **DISABLE hourly cron** — 1688+ runs; cron burning ~50k tokens/run
+  2. **Merge PR #1338** once CI green (CO: deterministic cooldown test, 0 net new tests)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job) — CI still only CodeQL
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — typescript 5→7, @types/node 22→26, c8 11→12 await human review
+- **PushNotification:** NOT SENT — routine fix, no exceptional event.
+- **Next run:** Merge #1338 if CI green. Next gap: CP — look at remaining branch gaps in `src-stdio/` or apps/* export-surface drift guards.
