@@ -5535,3 +5535,38 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   7. **Major dep bumps** — typescript 5→7, @types/node 22→26, c8 11→12 await human review
 - **PushNotification:** NOT SENT — productive run but no exceptional event requiring immediate human attention; PR #1328 open for CI.
 - **Next run:** Merge #1328 if CI green. Next gap candidate: AB — shared-logger has tests but no export-surface drift guard (similar pattern; Logger class + format/level exports).
+
+---
+
+## Run log — 2026-09-17 (run ~1683 — PRODUCTIVE: opened PR #1329 (CH))
+
+- **Workstream advanced:** CH — `packages/shared-mcp/src/session-manager.ts` onclose edge-case branches
+- **Branch/PR:** `auto/CH-session-manager-onclose-edge-cases` → https://github.com/chittyos/ch1tty/pull/1329
+- **Build:** tsc clean (0 errors, ch1tty@4.1.0)
+- **Tests:** 2653 pass / 0 fail / 3 skip (2656 total, 109 suites) — was 2651/0/3; +2 tests this run
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations on main.
+- **Open PRs at end of run:** 2 — PR #1327 (CG: session-manager routing branches, clean), PR #1329 (CH: onclose edge cases, just pushed)
+- **What was done:**
+  - Context restored from session summary. Local main was stale (at run ~1571); reset to origin/main (f9463b9).
+  - Build clean; baseline tests: 2651/0/3.
+  - Identified remaining coverage gaps in `session-manager.ts` not covered by existing tests or PR #1327 (CG):
+    - Line 71: `if (sid)` falsy path — `transport.onclose` fires but session already removed from map
+    - Line 75: `.catch(() => {})` callback — `mcpServer!.close()` rejection absorption
+  - Created `packages/shared-mcp/test/session-manager-onclose-edge-cases.test.ts` with 2 tests covering both branches.
+  - Both new tests pass in isolation. Full suite: 2653/0/3 (+2 vs baseline).
+  - Committed, pushed `auto/CH-session-manager-onclose-edge-cases`, opened PR #1329, subscribed.
+  - Notion update attempt failed: workspace out of free blocks (same recurring blocker).
+- **Workstream status updates:**
+  - [x] **AA** — test(shared-types): export-surface drift guard. PR #1328 merged (f9463b9).
+  - [x] **CG** — test(shared-mcp): session-manager routing + close branches. PR #1327 open (mergeable).
+  - [ ] **CH** — test(shared-mcp): onclose edge-case branches — 2 tests. PR #1329 open (just pushed).
+- **Human-action items:**
+  1. **DISABLE hourly cron** — 1683+ runs; cron burning ~50k tokens/run
+  2. **Merge PR #1327** (CG: session-manager routing branches, 6 tests) — CI pending; mergeable
+  3. **Merge PR #1329** (CH: session-manager onclose edge cases, 2 tests) — CI pending; just pushed
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Enable GitHub Actions** (main npm test CI job) — CI still only CodeQL
+  6. **Notion workspace** out of free blocks — upgrade or clear
+  7. **Stale branch cleanup** — 1100+ remote auto/ branches
+- **PushNotification:** NOT SENT — productive but no exceptional event; two PRs open for CI.
+- **Next run:** Merge #1327 and/or #1329 if CI green. Next gap: CI — check remaining coverage gaps across `src-stdio/` or apps.
