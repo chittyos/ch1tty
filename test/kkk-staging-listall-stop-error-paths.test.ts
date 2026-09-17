@@ -288,9 +288,11 @@ test('HttpMcpServer.stop(): transport.close() rejects → .catch() swallows; sto
     });
     assert.equal(res.status, 200, 'MCP initialize must succeed');
 
-    // Patch the session's transport.close to reject, exercising http-server.ts:267
+    // Patch the session's transport.close to reject, exercising McpSessionManager.closeAll()
     type RawSessions = Map<string, { server: { close: () => Promise<void> }; transport: { close: () => Promise<void> } }>;
-    const sessions = (httpServer as unknown as { sessions: RawSessions }).sessions;
+    const sessions = (
+      (httpServer as unknown as { mcpSessionManager: unknown }).mcpSessionManager as unknown as { sessions: RawSessions }
+    ).sessions;
     assert.equal(sessions.size, 1, 'exactly one session must be active');
     for (const session of sessions.values()) {
       session.transport.close = async () => { throw new Error('simulated transport close failure'); };

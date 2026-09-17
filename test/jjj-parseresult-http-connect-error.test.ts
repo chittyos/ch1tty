@@ -6,9 +6,9 @@
  *      → JSON.parse throws → catch returns null → no entity resolved,
  *        staging still completes normally.
  *
- * http-server.ts handleMcp() catch block (lines 174-182):
+ * McpSessionManager catch block (in @ch1tty/shared-mcp):
  *   2. mcpServer.connect(transport) throws during new-session setup
- *      → catch fires → HTTP 500 with {error:'internal', message:'MCP handler failed'}
+ *      → catch fires → HTTP 500 with {error:'internal'}
  *        (only when headers have not yet been sent, which is the case here since
  *         connect() throws before handleRequest() writes anything).
  */
@@ -102,7 +102,7 @@ test('coordinator parseResult: context_resolve returns text with invalid JSON �
 
 // ── 2. http-server.ts handleMcp catch block ───────────────────────────────────
 
-test('http handleMcp: mcpServer.connect() throws → 500 {error:internal, message:MCP handler failed}', async () => {
+test('http: mcpServer.connect() throws → 500 {error:internal}', async () => {
   const dlq = dlqPath();
   const aggregator = new Aggregator([], { ledgerDlqPath: dlq });
   const httpServer = new HttpMcpServer(aggregator, { port: 0, bindAddress: '127.0.0.1' });
@@ -138,9 +138,8 @@ test('http handleMcp: mcpServer.connect() throws → 500 {error:internal, messag
     });
 
     assert.equal(res.status, 500, 'must return 500 when mcpServer.connect() throws');
-    const body = await res.json() as { error: string; message: string };
+    const body = await res.json() as { error: string };
     assert.equal(body.error, 'internal', 'error field must be "internal"');
-    assert.equal(body.message, 'MCP handler failed', 'message field must be "MCP handler failed"');
   } finally {
     await httpServer.stop();
     await aggregator.shutdown();

@@ -172,11 +172,10 @@ test('http-server transport.onclose isClosing guard — second call returns earl
     assert.ok(sessionId, 'mcp-session-id must be present');
     await parseSse(initRes); // drain the SSE body
 
-    // Locate the transport via the server's internal sessions map
-    const sessions = (server as Record<string, unknown>)['sessions'] as Map<
-      string,
-      { transport: { onclose?: () => void } }
-    >;
+    // Locate the transport via the server's McpSessionManager sessions map
+    const sessions = (
+      (server as Record<string, unknown>)['mcpSessionManager'] as Record<string, unknown>
+    )['sessions'] as Map<string, { transport: { onclose?: () => void } }>;
     const session = sessions.get(sessionId);
     assert.ok(session, `session ${sessionId} must be in server.sessions`);
     assert.ok(typeof session.transport.onclose === 'function', 'transport.onclose must be set');
