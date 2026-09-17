@@ -5715,3 +5715,28 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   7. **Major dep bumps** — typescript 5→7, @types/node 22→26, c8 11→12 await human review
 - **PushNotification:** NOT SENT — routine fix, no exceptional event.
 - **Next run:** Merge #1338 if CI green. Next gap: CP — look at remaining branch gaps in `src-stdio/` or apps/* export-surface drift guards.
+
+## Run log — 2026-09-17T~UTC (run ~1689 — PRODUCTIVE: opened PR #1339 (CP))
+
+- **Workstream:** CP — 4 branch gaps in OllamaBrain.extractRoutedTools + EmbeddingBrain.embed vector validation
+- **Branch/PR:** `auto/cp-brain-extract-embed-vector-gaps` → **PR #1339** (https://github.com/chittyos/ch1tty/pull/1339)
+- **Build:** clean (tsc exit 0) | **Tests:** 2694 pass / 0 fail / 3 skip (+4 from baseline 2690)
+- **Actions:**
+  - Pulled main (fast-forward to CO merge commit). `npm ci` + `npm run build` clean. `npm test`: 2690/0/3.
+  - Identified 4 uncovered branches:
+    1. `ollama-brain.ts:360` — `typeof parsed !== 'object'` when safeParseJson returns primitive (42).
+    2. `ollama-brain.ts:362` — `!Array.isArray(matches)` when matches is a string.
+    3. `embedding-brain.ts:337` — `raw.length === 0` (empty vector array).
+    4. `embedding-brain.ts:343` — `!Number.isFinite(v)` when v=Infinity (via 1e309 JSON literal trick).
+  - Created `test/cp-brain-extract-embed-vector-gaps.test.ts` with 4 tests, all passing.
+  - `npm test`: 2694/0/3. Pushed branch, opened PR #1339, subscribed for CI.
+- **State summary:** A ✓ … CO ✓ ALL DONE. **1 open PR (#1339, CP).** Tests: 2694/0/3. Build: clean.
+- **Human action items** (unchanged):
+  1. **DISABLE hourly cron** — ~1689 runs; burning ~50k tokens/run
+  2. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  3. **Enable GitHub Actions** (main ci.yml npm test job — CI still only CodeQL)
+  4. **Notion workspace** out of free blocks — upgrade or clear
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Major dep bumps** — typescript 5→7, @types/node 22→26, c8 11→12 await human review
+- **PushNotification:** NOT SENT — routine gap-coverage PR, no exceptional event.
+- **Next run:** Merge #1339 if CI green. Next gap: CQ — find next uncovered branch in src-stdio/ or apps/*.
