@@ -33,7 +33,7 @@ const serversJson = JSON.parse(readFileSync(join(ROOT, 'servers.json'), 'utf-8')
 
 const focusProfilesJson = JSON.parse(
   readFileSync(join(ROOT, 'focus-profiles.json'), 'utf-8'),
-) as { profiles: Record<string, { boost: number; description: string }> };
+) as { profiles: Record<string, { boost: number; description: string; categories: string[]; servers: string[] }> };
 
 // ── REMOTE_SERVERS drift ───────────────────────────────────────────────────────
 
@@ -206,6 +206,54 @@ describe('FOCUS_PROFILES_RAW — config-data.ts vs focus-profiles.json', () => {
         profile.boost,
         jsonProfile.boost,
         `boost mismatch for profile '${name}': config-data.ts has ${profile.boost}, focus-profiles.json has ${jsonProfile.boost}`,
+      );
+    }
+  });
+
+  test('focus profile description matches between config-data.ts and focus-profiles.json', async () => {
+    const { FOCUS_PROFILES_RAW } = await import('../src/config-data.js');
+    const rawProfiles = FOCUS_PROFILES_RAW.profiles as Record<string, { description: string }>;
+
+    for (const [name, profile] of Object.entries(rawProfiles)) {
+      const jsonProfile = focusProfilesJson.profiles[name];
+      if (!jsonProfile) continue; // covered by previous test
+
+      assert.strictEqual(
+        profile.description,
+        jsonProfile.description,
+        `description mismatch for profile '${name}': config-data.ts has "${profile.description}", focus-profiles.json has "${jsonProfile.description}"`,
+      );
+    }
+  });
+
+  test('focus profile categories match between config-data.ts and focus-profiles.json', async () => {
+    const { FOCUS_PROFILES_RAW } = await import('../src/config-data.js');
+    const rawProfiles = FOCUS_PROFILES_RAW.profiles as Record<string, { categories: readonly string[] }>;
+
+    for (const [name, profile] of Object.entries(rawProfiles)) {
+      const jsonProfile = focusProfilesJson.profiles[name];
+      if (!jsonProfile) continue;
+
+      assert.deepStrictEqual(
+        [...profile.categories].sort(),
+        [...jsonProfile.categories].sort(),
+        `categories mismatch for profile '${name}': config-data.ts has [${[...profile.categories].sort()}], focus-profiles.json has [${[...jsonProfile.categories].sort()}]`,
+      );
+    }
+  });
+
+  test('focus profile server lists match between config-data.ts and focus-profiles.json', async () => {
+    const { FOCUS_PROFILES_RAW } = await import('../src/config-data.js');
+    const rawProfiles = FOCUS_PROFILES_RAW.profiles as Record<string, { servers: readonly string[] }>;
+
+    for (const [name, profile] of Object.entries(rawProfiles)) {
+      const jsonProfile = focusProfilesJson.profiles[name];
+      if (!jsonProfile) continue;
+
+      assert.deepStrictEqual(
+        [...profile.servers].sort(),
+        [...jsonProfile.servers].sort(),
+        `servers mismatch for profile '${name}': config-data.ts has [${[...profile.servers].sort()}], focus-profiles.json has [${[...jsonProfile.servers].sort()}]`,
       );
     }
   });
