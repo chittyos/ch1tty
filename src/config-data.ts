@@ -301,6 +301,24 @@ export const FOCUS_PROFILES_RAW = {
       servers: ['tasks'],
       boost: 0.6,
     },
+    workspace: {
+      description: 'Personal and team workspace productivity — notes, docs, calendar, messaging, and tasks across Notion, Google Workspace, and ChittyComms',
+      categories: ['documents', 'communication'],
+      servers: ['notion', 'google', 'comms', 'tasks', 'context7', 'notes'],
+      boost: 0.5,
+    },
+    devops: {
+      description: 'DevOps and infrastructure — deploy, build, monitor, and manage Cloudflare Workers, GitHub repositories, and Neon databases',
+      categories: ['code'],
+      servers: ['cloudflare', 'cloudflare-builds', 'github', 'neon', 'tasks', 'linear'],
+      boost: 0.6,
+    },
+    security: {
+      description: 'Security operations — access auditing, secret scanning, incident triage, evidence preservation, and immutable audit-trail recording',
+      categories: ['ecosystem', 'code'],
+      servers: ['security', 'chittyevidence', 'ledger', 'neon', 'tasks', 'linear'],
+      boost: 0.6,
+    },
   },
 } as const;
 
