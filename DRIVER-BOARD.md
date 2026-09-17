@@ -5461,3 +5461,39 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   7. **Major dep bumps** — typescript 5→7, @types/node 22→26, c8 11→12 await human review
 - **PushNotification:** SENT — merged 8 CI-green PRs (HTTP transport for all 5 apps + shared-logger/logger tests + comms-mcp tool-layer tests); +74 tests; now 2577/0/3; PR #1322 open.
 - **Next run:** Merge #1322 if CI green. Look for next coverage gap: could add E2E HTTP transport tests for apps (similar to CE/CF gateway E2E tests but for focused apps).
+
+---
+
+## Run log — 2026-09-17T~UTC (run ~1680 — PRODUCTIVE: merged 2 PRs; opened PR #1325)
+
+- **Workstream advanced:** W (port-validation tests), X (config-data drift fix), Y (focused-app MCP tools/list E2E)
+- **Branch/PR:** `auto/Y-focused-app-mcp-tools-list-e2e` → https://github.com/chittyos/ch1tty/pull/1325
+- **Build:** tsc clean (0 errors, ch1tty@4.1.0)
+- **Tests:** 2623 pass / 0 fail / 3 skip (2626 total, 109 suites) — was 2577/0/3; +46 tests this run
+- **Guardrails:** 5-tool surface (search/execute/status/reload/cast) FIXED; buildCastExplanation metric freeze ACTIVE (56/87 field freeze guards). 0 violations on main.
+- **Open PRs at end of run:** 1 — PR #1325 (Y: focused-app MCP tools/list E2E, CI pending)
+- **What was done:**
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed. `git reset --hard origin/main`. `npm ci` clean; build clean.
+  - Tests at start: 2577/0/3 (baseline on main at b9bb17f — PR #1322 already merged).
+  - Found 2 open PRs both CI 3/3 green, mergeable_state: clean:
+    - #1323 (W: port-validation subprocess tests for all 5 HTTP-capable apps, +25 tests) — squash-merged ✓
+    - #1324 (X: config-data drift fix — missing workspace/devops/security focus profiles + 11 drift tests) — squash-merged ✓
+  - Post-merge pull: tests 2616/0/3 (+39 vs start).
+  - Identified next gap: focused apps have HTTP transport (PRs #1317–#1321) and http-transport.test.ts covers HTTP layer but no MCP protocol-level test (tools/list via SDK client) existed.
+  - Added `test/cg-app-mcp-tools-list.test.ts` — 7 tests: tools/list via StreamableHTTPClientTransport for all 5 apps; bearer-token enforcement for comms-mcp; tool-name set assertions.
+  - All 7 pass isolated. Full suite: 2623/0/3 (+7 vs post-merge baseline). `npm run build` clean.
+  - Committed, pushed `auto/Y-focused-app-mcp-tools-list-e2e`, opened PR #1325, subscribed.
+- **Workstream status updates:**
+  - [x] **W** — test(apps): port-validation subprocess tests for all 5 HTTP-capable apps. PR #1323 merged.
+  - [x] **X** — fix(config-data): add missing workspace/devops/security focus profiles + drift tests. PR #1324 merged.
+  - [ ] **Y** — test(apps): focused-app MCP tools/list E2E via StreamableHTTPClientTransport. PR #1325 open (CI pending).
+- **Human-action items:**
+  1. **DISABLE hourly cron** — 1680+ runs; all original workstreams A–E + extended F–Y exhausted; cron burning ~50k tokens/run
+  2. **Merge PR #1325** once CI green (Y: focused-app MCP tools/list E2E, 7 tests, CI pending)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job) — CI still only CodeQL
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — typescript 5→7, @types/node 22→26, c8 11→12 await human review
+- **PushNotification:** SENT — merged W (#1323 +25 tests) + X (#1324 +11 tests, real bug fix); opened Y PR #1325 (+7 tests); tests now 2623/0/3.
+- **Next run:** Merge #1325 if CI green. Next gap candidate: Z — shared-mcp package has `McpSessionManager` + bearer-auth helpers but no exported types test or drift guard between `@ch1tty/shared-mcp` and individual app usage.
