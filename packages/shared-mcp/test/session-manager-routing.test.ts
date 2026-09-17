@@ -92,11 +92,8 @@ test('McpSessionManager: known Mcp-Session-Id routes to existing transport, sess
       },
       body: JSON.stringify({ jsonrpc: '2.0', method: 'ping', id: 2 }),
     });
-    // Routed to existing session — must not be 400 (bad request) or 404 (not found)
-    assert.ok(
-      res2.status !== 400 && res2.status !== 404,
-      `expected existing-session routing, got HTTP ${res2.status}`,
-    );
+    // Routed to existing session — must return a 2xx response
+    assert.ok(res2.ok, `expected 2xx from existing-session ping, got HTTP ${res2.status}`);
     // No new session was created
     assert.equal(manager.sessionCount, 1, 'sessionCount must remain 1 after routing to existing session');
   } finally {
@@ -136,9 +133,7 @@ test('McpSessionManager: non-initialize POST without session ID → no session c
       headers: { 'Content-Type': 'application/json', Accept: MCP_ACCEPT },
       body: JSON.stringify({ jsonrpc: '2.0', method: 'tools/list', params: {}, id: 1 }),
     });
-    // The transport handles (and likely rejects) the message — any status is acceptable
-    // as long as the server doesn't crash and sessionCount stays 0.
-    assert.ok(typeof res.status === 'number', 'response must have a numeric status');
+    assert.equal(res.status, 400, 'non-initialize POST without session ID must return 400');
     assert.equal(manager.sessionCount, 0, 'no session must be created for a non-initialize POST');
   } finally {
     await close();
