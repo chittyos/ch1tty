@@ -34,19 +34,39 @@ async function startApp(token?: string): Promise<{ baseUrl: string; stop: () => 
   };
 }
 
+/** MCP initialize request body used to create a new session. */
+const INIT_BODY = JSON.stringify({
+  jsonrpc: '2.0',
+  method: 'initialize',
+  id: 1,
+  params: {
+    protocolVersion: '2024-11-05',
+    capabilities: {},
+    clientInfo: { name: 'test', version: '1.0.0' },
+  },
+});
+
+/** Headers required for a valid MCP initialize request. */
+const INIT_HEADERS = {
+  'Content-Type': 'application/json',
+  'Accept': 'application/json, text/event-stream',
+};
+
 // ── url.startsWith('/mcp?') → routes to MCP handler ──────────────────────────
 
-test('comms-mcp: POST /mcp?foo=bar routes to MCP handler (not 404)', async () => {
+test('comms-mcp: POST /mcp?foo=bar routes to MCP handler — returns 200 + mcp-session-id', async () => {
   const { baseUrl, stop } = await startApp();
   try {
-    // A POST to /mcp?<query> must hit the MCP handler branch, not fall through to 404.
-    // The session manager returns 400/other for a malformed body, proving routing occurred.
-    const res = await fetch(`${baseUrl}/mcp?session=abc`, {
+    // The session manager reads the session ID from the mcp-session-id header only,
+    // not from URL query params. A POST to /mcp?<query> with no mcp-session-id header
+    // is therefore treated as a fresh initialize, which must return 200 + mcp-session-id.
+    const res = await fetch(`${baseUrl}/mcp?foo=bar`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: '{}',
+      headers: INIT_HEADERS,
+      body: INIT_BODY,
     });
-    assert.notEqual(res.status, 404, 'POST /mcp?<query> must not return 404');
+    assert.ok(res.ok, `Expected 200 from MCP initialize on /mcp?foo=bar, got ${res.status}`);
+    assert.ok(res.headers.get('mcp-session-id'), 'Expected mcp-session-id header on /mcp?<query> initialize');
   } finally {
     await stop();
   }
@@ -54,16 +74,17 @@ test('comms-mcp: POST /mcp?foo=bar routes to MCP handler (not 404)', async () =>
 
 // ── url.startsWith('/mcp/') → routes to MCP handler ──────────────────────────
 
-test('comms-mcp: POST /mcp/something routes to MCP handler (not 404)', async () => {
+test('comms-mcp: POST /mcp/something routes to MCP handler — returns 200 + mcp-session-id', async () => {
   const { baseUrl, stop } = await startApp();
   try {
-    // A POST to /mcp/<subpath> must hit the MCP handler branch, not fall through to 404.
+    // Same as above: no mcp-session-id header → treated as fresh initialize.
     const res = await fetch(`${baseUrl}/mcp/session`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: '{}',
+      headers: INIT_HEADERS,
+      body: INIT_BODY,
     });
-    assert.notEqual(res.status, 404, 'POST /mcp/<subpath> must not return 404');
+    assert.ok(res.ok, `Expected 200 from MCP initialize on /mcp/session, got ${res.status}`);
+    assert.ok(res.headers.get('mcp-session-id'), 'Expected mcp-session-id header on /mcp/<subpath> initialize');
   } finally {
     await stop();
   }
