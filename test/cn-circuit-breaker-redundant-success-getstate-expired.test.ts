@@ -59,28 +59,39 @@ describe('CircuitBreaker branch gaps (CN)', { concurrency: false }, () => {
   // The state entry still exists in the map with openUntil > 0, but the time
   // condition makes the half-open gate pass.
 
-  it('getState with expired cooldown returns open=false and cooldownRemaining=0', async () => {
-    const cb = new CircuitBreaker({ failureThreshold: 2, cooldownMs: 10 });
+  it('getState with expired cooldown returns open=false and cooldownRemaining=0', () => {
+    // Use a Date.now mock so the test is deterministic on slow or preempted runners.
+    const FIXED_START = 1_000_000;
+    const COOLDOWN_MS = 100;
+    let mockNow = FIXED_START;
+    const origDateNow = Date.now;
+    Date.now = () => mockNow;
+    try {
+      const cb = new CircuitBreaker({ failureThreshold: 2, cooldownMs: COOLDOWN_MS });
 
-    cb.recordFailure('srv');
-    cb.recordFailure('srv');
+      cb.recordFailure('srv');
+      cb.recordFailure('srv');
+      // openUntil is now FIXED_START + COOLDOWN_MS; Date.now() is still FIXED_START.
 
-    // Immediately after tripping: breaker is open.
-    const sOpen = cb.getState('srv');
-    assert.equal(sOpen.open, true, 'breaker should be open immediately after tripping');
-    assert.ok(sOpen.cooldownRemaining > 0, 'cooldownRemaining should be positive while open');
+      // Immediately after tripping: breaker is open.
+      const sOpen = cb.getState('srv');
+      assert.equal(sOpen.open, true, 'breaker should be open immediately after tripping');
+      assert.ok(sOpen.cooldownRemaining > 0, 'cooldownRemaining should be positive while open');
 
-    // Wait for cooldown to expire.
-    await new Promise<void>((resolve) => setTimeout(resolve, 20));
+      // Advance mock time past cooldown — no wall-clock delay needed.
+      mockNow = FIXED_START + COOLDOWN_MS + 1;
 
-    // getState AFTER expiry: openUntil is still > 0 in the map, but
-    // Date.now() >= openUntil → open computed as false, cooldownRemaining = 0.
-    const sExpired = cb.getState('srv');
-    assert.equal(sExpired.failures, 2, 'failures must still be 2 (not reset by cooldown expiry)');
-    assert.equal(sExpired.open, false, 'open must be false once cooldown expires');
-    assert.equal(sExpired.cooldownRemaining, 0, 'cooldownRemaining must be 0 once cooldown expires');
+      // getState AFTER expiry: openUntil is still > 0 in the map, but
+      // Date.now() >= openUntil → open computed as false, cooldownRemaining = 0.
+      const sExpired = cb.getState('srv');
+      assert.equal(sExpired.failures, 2, 'failures must still be 2 (not reset by cooldown expiry)');
+      assert.equal(sExpired.open, false, 'open must be false once cooldown expires');
+      assert.equal(sExpired.cooldownRemaining, 0, 'cooldownRemaining must be 0 once cooldown expires');
 
-    // isAllowed should also be true (half-open probe allowed).
-    assert.equal(cb.isAllowed('srv'), true, 'half-open probe must be allowed after cooldown');
+      // isAllowed should also be true (half-open probe allowed).
+      assert.equal(cb.isAllowed('srv'), true, 'half-open probe must be allowed after cooldown');
+    } finally {
+      Date.now = origDateNow;
+    }
   });
 });
