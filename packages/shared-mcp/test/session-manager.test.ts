@@ -159,6 +159,40 @@ test('McpSessionManager: factory error on POST → 500 internal', async () => {
   }
 });
 
+test('McpSessionManager: catch — headers sent, res not ended → res.end() called', async () => {
+  let endCalled = false;
+  const manager = new McpSessionManager(() => {
+    throw new Error('simulated error after headers flushed');
+  });
+  const req = { headers: {}, method: 'POST' } as unknown as IncomingMessage;
+  const res = {
+    headersSent: true,
+    writableEnded: false,
+    end() { endCalled = true; },
+    setHeader() {},
+    writeHead() {},
+  } as unknown as ServerResponse;
+  await manager.handleRequest(req, res);
+  assert.ok(endCalled, 'res.end() should be called when headers sent but res not yet ended');
+});
+
+test('McpSessionManager: catch — headers sent, res already ended → res.end() not called', async () => {
+  let endCalled = false;
+  const manager = new McpSessionManager(() => {
+    throw new Error('simulated error after response fully written');
+  });
+  const req = { headers: {}, method: 'POST' } as unknown as IncomingMessage;
+  const res = {
+    headersSent: true,
+    writableEnded: true,
+    end() { endCalled = true; },
+    setHeader() {},
+    writeHead() {},
+  } as unknown as ServerResponse;
+  await manager.handleRequest(req, res);
+  assert.ok(!endCalled, 'res.end() should NOT be called when response already ended');
+});
+
 test('McpSessionManager: closeAll after creating session → sessionCount returns to 0', async () => {
   const manager = new McpSessionManager(minimalFactory());
   const { url, close } = await startHttpServer(manager);
