@@ -16,6 +16,7 @@ import assert from 'node:assert/strict';
 import { createServer, type Server } from 'node:http';
 import { createSessionMcpHttpApp } from '../src/http-server.ts';
 
+/** Spin up a real HTTP server on a random port and return its base URL + a stop handle. */
 async function startApp(token?: string): Promise<{ baseUrl: string; stop: () => Promise<void> }> {
   const app = createSessionMcpHttpApp({ mcpToken: token });
   const server: Server = createServer((req, res) => { void app.handleRequest(req, res); });
