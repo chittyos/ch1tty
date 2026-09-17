@@ -5589,3 +5589,45 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
 - **PushNotification:** Sent — both CG and CH workstreams now merged and closed.
 - **Next run:** Find next coverage/quality gap to advance. All shared-mcp session-manager branches now covered.
+
+## Run log — 2026-09-17 (run ~1685 — PRODUCTIVE: merged 5 PRs + opened PR #1335 (CM))
+
+- **Workstream advanced:** CM — `packages/shared-logger` export-surface drift guard (13 tests)
+- **Branch/PR:** `auto/CM-shared-logger-exports-drift-guard` → https://github.com/chittyos/ch1tty/pull/1335
+- **Build:** tsc clean (0 errors, ch1tty@4.1.0)
+- **Tests:** 2688 pass / 0 fail / 3 skip (2691 total, 109 suites) — was 2653/0/3; +35 tests this run
+- **Guardrails:** 5-tool surface (search/execute/status/reload/cast) FIXED; buildCastExplanation metric freeze ACTIVE (56/87 field freeze guards). 0 violations on main.
+- **Open PRs at end of run:** 1 — PR #1335 (CM: shared-logger exports drift guard, CI pending)
+- **What was done:**
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed.
+  - `git reset --hard origin/main`; `npm ci` clean; `npm run build` clean (tsc 0 errors).
+  - Baseline tests: 2653/0/3 (109 suites).
+  - Found 6 open PRs: CG (#1327), CI (#1330), CJ (#1331), run-log (#1332), CK (#1333), CL (#1334).
+  - All 5 test PRs had 3/3 green CI (CodeQL). Squash-merged CG+CI in parallel, then CJ+CK+CL in parallel.
+  - Closed stale run-log PR #1332.
+  - Post-merge pull: 2675/0/3 (+22 vs baseline). All 5 merges fast.
+  - Identified Workstream CM: `packages/shared-logger` has no export-surface drift guard (planned as "AB" in prior board). `packages/shared-mcp` and `packages/shared-types` both have `exports.test.ts`; shared-logger was the missing one.
+  - Wrote `packages/shared-logger/test/exports.test.ts` — 13 tests:
+    - Runtime surface exactly {Logger, log}; LogLevel type-only, correctly absent
+    - Logger constructor identity; log instanceof Logger
+    - All 6 prototype methods (info/warn/error/debug/setLevel/childStderr)
+    - **New branch**: constructor `LEVEL_ORDER[envLevel] ?? LEVEL_ORDER.info` fallback for unknown CH1TTY_LOG_LEVEL
+  - All 13 pass in isolation. Full suite: 2688/0/3 (+13 vs post-merge). Build clean.
+  - Committed, pushed `auto/CM-shared-logger-exports-drift-guard`, opened PR #1335, subscribed.
+- **Workstream status updates:**
+  - [x] **CG** — PR #1327 merged (6 tests). DONE.
+  - [x] **CI** — PR #1330 merged (4 tests). DONE.
+  - [x] **CJ** — PR #1331 merged (6 tests). DONE.
+  - [x] **CK** — PR #1333 merged (4 tests). DONE.
+  - [x] **CL** — PR #1334 merged (2 tests). DONE.
+  - [ ] **CM** — test(shared-logger): exports drift guard — 13 tests. PR #1335 open (CI pending).
+- **Human-action items:**
+  1. **DISABLE hourly cron** — 1685+ runs; cron burning ~50k tokens/run
+  2. **Merge PR #1335** once CI green (CM: shared-logger exports drift guard, 13 tests)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job) — CI still only CodeQL
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — typescript 5→7, @types/node 22→26, c8 11→12 await human review
+- **PushNotification:** SENT — merged 5 CI-green test PRs (CG/CI/CJ/CK/CL) +22 tests; opened CM PR #1335 +13 tests; now 2688/0/3.
+- **Next run:** Merge #1335 if CI green. Next gap candidate: CN — packages/shared-mcp `index.ts` re-export is the only file with no runtime test directly importing from `../src/index.js` (only session-manager.ts and bearer-auth.ts are direct-imported); or look at gateway src/ files with remaining branch gaps (circuit-breaker.ts, token-source.ts).
