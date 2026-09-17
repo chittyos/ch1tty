@@ -5631,3 +5631,39 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   7. **Major dep bumps** — typescript 5→7, @types/node 22→26, c8 11→12 await human review
 - **PushNotification:** SENT — merged 5 CI-green test PRs (CG/CI/CJ/CK/CL) +22 tests; opened CM PR #1335 +13 tests; now 2688/0/3.
 - **Next run:** Merge #1335 if CI green. Next gap candidate: CN — packages/shared-mcp `index.ts` re-export is the only file with no runtime test directly importing from `../src/index.js` (only session-manager.ts and bearer-auth.ts are direct-imported); or look at gateway src/ files with remaining branch gaps (circuit-breaker.ts, token-source.ts).
+
+## Run log — 2026-09-17 (run ~1686 — PRODUCTIVE: merged PR #1335 (CM) + opened PR #1337 (CN))
+
+- **Workstream advanced:** CN — `src-stdio/circuit-breaker.ts` branch gaps (2 tests)
+- **Branch/PR:** `auto/CN-circuit-breaker-redundant-success` → https://github.com/chittyos/ch1tty/pull/1337
+- **Build:** tsc clean (0 errors, ch1tty@4.1.0)
+- **Tests:** 2690 pass / 0 fail / 3 skip (2693 total, 110 suites) — was 2688/0/3; +2 tests this run
+- **Guardrails:** 5-tool surface (search/execute/status/reload/cast) FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations on main.
+- **Open PRs at end of run:** 1 — PR #1337 (CN: circuit-breaker branch gaps, CI pending)
+- **What was done:**
+  - Context restored from session summary. PR #1335 (CM) was open with all 3 CI checks green.
+  - Squash-merged PR #1335 (CM: shared-logger exports drift guard, 13 tests).
+  - `git pull origin main`; `npm ci` clean; `npm run build` clean.
+  - Baseline tests post-merge: 2688/0/3 (110 suites).
+  - Found `packages/shared-mcp/test/exports.test.ts` already exists (board CN candidate was wrong).
+  - Checked `circuit-breaker.ts` against `test/circuit-breaker.test.ts`:
+    - Branch gap 1: `recordSuccess` when state exists but failures=0, openUntil=0 (already recovered).
+      The `if (state && (state.failures > 0 || state.openUntil > 0))` body is skipped — no-op path not tested.
+    - Branch gap 2: `getState` after cooldown expiry — `openUntil > 0` but `Date.now() >= openUntil` →
+      `open = false`, `cooldownRemaining = 0` via ternary. Only tested with openUntil===0 (after reset) previously.
+  - Wrote `test/cn-circuit-breaker-redundant-success-getstate-expired.test.ts` — 2 tests covering both branches.
+  - Both pass in isolation. Full suite: 2690/0/3 (+2 vs post-merge baseline). Build clean.
+  - Committed, pushed `auto/CN-circuit-breaker-redundant-success`, opened PR #1337, subscribed.
+- **Workstream status updates:**
+  - [x] **CM** — test(shared-logger): exports drift guard — 13 tests. PR #1335 merged. DONE.
+  - [ ] **CN** — test(circuit-breaker): 2 branch-gap tests. PR #1337 open (CI pending).
+- **Human-action items:**
+  1. **DISABLE hourly cron** — 1686+ runs; cron burning ~50k tokens/run
+  2. **Merge PR #1337** once CI green (CN: circuit-breaker branch gaps, 2 tests)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job) — CI still only CodeQL
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — typescript 5→7, @types/node 22→26, c8 11→12 await human review
+- **PushNotification:** SENT — merged CM (#1335, +13 tests) + opened CN (#1337, +2 tests); suite now 2690/0/3.
+- **Next run:** Merge #1337 if CI green. Next gap candidate: CO — check remaining branch gaps in `src-stdio/` (e.g. `ollama-brain.ts` partial-response path, or `embedding-brain.ts` cache miss race) or another apps/ export-surface drift guard.
