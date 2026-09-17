@@ -31,6 +31,7 @@ import { McpSessionManager } from '../src/session-manager.js';
 
 const MCP_ACCEPT = 'application/json, text/event-stream';
 
+/** Starts an HTTP server wrapping the given McpSessionManager and returns its base URL and a close handle. */
 async function startHttpServer(
   manager: McpSessionManager,
 ): Promise<{ url: string; close: () => Promise<void> }> {
@@ -53,6 +54,7 @@ async function startHttpServer(
   };
 }
 
+/** Sends an MCP initialize request to the given URL and returns the assigned session ID. */
 async function initializeSession(url: string): Promise<string> {
   const res = await fetch(`${url}/mcp`, {
     method: 'POST',
@@ -85,12 +87,17 @@ type SessionEntry = { server: Server; transport: { onclose?: () => void } };
 // Saving a reference to transport.onclose BEFORE closeAll() and calling it after:
 //   isClosing is now true → `if (isClosing) return;` fires immediately.
 //   onSessionEnd must NOT be called a second time, and must not throw.
+//   Server.close() must NOT be called again.
 
 test('McpSessionManager isClosing guard: closeAll + manual re-fire — cleanup runs once, guard stops second call', async () => {
   const endedIds: string[] = [];
-  const manager = new McpSessionManager(() =>
-    new Server({ name: 'cl-test', version: '1.0.0' }, { capabilities: {} }),
-  );
+  let closeCount = 0;
+  const manager = new McpSessionManager(() => {
+    const srv = new Server({ name: 'cl-test', version: '1.0.0' }, { capabilities: {} });
+    const origClose = srv.close.bind(srv);
+    srv.close = (async () => { closeCount++; return origClose(); }) as typeof srv.close;
+    return srv;
+  });
   manager.onSessionEnd = (id) => endedIds.push(id);
 
   const { url, close } = await startHttpServer(manager);
@@ -110,8 +117,11 @@ test('McpSessionManager isClosing guard: closeAll + manual re-fire — cleanup r
     assert.equal(manager.sessionCount, 0, 'session must be gone after closeAll');
     assert.deepEqual(endedIds, [sessionId], 'onSessionEnd must have fired exactly once after closeAll');
 
+    // Snapshot Server.close() call count before the second (guarded) fire.
+    const closeCountAfterCloseAll = closeCount;
+
     // Second trigger: call the saved onclose directly.
-    // isClosing is now true → guard returns immediately.
+    // isClosing is now true → guard returns immediately, Server.close() must NOT be called again.
     assert.doesNotThrow(
       () => savedOnClose(),
       'second call to onclose must not throw when isClosing=true',
@@ -124,6 +134,11 @@ test('McpSessionManager isClosing guard: closeAll + manual re-fire — cleanup r
       'onSessionEnd must not fire on the second onclose call (isClosing guard)',
     );
     assert.equal(manager.sessionCount, 0, 'sessionCount must stay 0 after guarded no-op');
+    assert.equal(
+      closeCount,
+      closeCountAfterCloseAll,
+      'Server.close must not be called again when isClosing guard fires',
+    );
   } finally {
     await close();
   }
@@ -137,13 +152,17 @@ test('McpSessionManager isClosing guard: closeAll + manual re-fire — cleanup r
 //   sid undefined → if (sid) block skipped → onSessionEnd NOT called → mcpServer.close() called.
 //
 // Second call: isClosing=true → `if (isClosing) return;` fires immediately.
-//   No further side effects. Must not throw.
+//   No further side effects. Must not throw. Server.close() must NOT be called again.
 
 test('McpSessionManager isClosing guard: double manual fire (no closeAll) — second call is no-op', async () => {
   const endedIds: string[] = [];
-  const manager = new McpSessionManager(() =>
-    new Server({ name: 'cl-test', version: '1.0.0' }, { capabilities: {} }),
-  );
+  let closeCount = 0;
+  const manager = new McpSessionManager(() => {
+    const srv = new Server({ name: 'cl-test', version: '1.0.0' }, { capabilities: {} });
+    const origClose = srv.close.bind(srv);
+    srv.close = (async () => { closeCount++; return origClose(); }) as typeof srv.close;
+    return srv;
+  });
   manager.onSessionEnd = (id) => endedIds.push(id);
 
   const { url, close } = await startHttpServer(manager);
@@ -162,14 +181,22 @@ test('McpSessionManager isClosing guard: double manual fire (no closeAll) — se
     assert.equal(manager.sessionCount, 0, 'session must be manually evicted from map');
 
     // First manual fire: isClosing=false → true; sid not found → cleanup skipped;
-    // mcpServer.close() called via the .catch() path.
+    // mcpServer.close() called (closeCount becomes 1).
     assert.doesNotThrow(() => savedOnClose(), 'first manual onclose must not throw');
     assert.deepEqual(endedIds, [], 'onSessionEnd must not fire when session is pre-removed');
 
-    // Second manual fire: isClosing=true → guard returns immediately.
+    // Snapshot Server.close() call count before the second (guarded) fire.
+    const closeCountAfterFirst = closeCount;
+
+    // Second manual fire: isClosing=true → guard returns immediately, Server.close() must NOT be called again.
     assert.doesNotThrow(() => savedOnClose(), 'second manual onclose must not throw (isClosing guard)');
     assert.deepEqual(endedIds, [], 'onSessionEnd must still not fire on second call');
     assert.equal(manager.sessionCount, 0);
+    assert.equal(
+      closeCount,
+      closeCountAfterFirst,
+      'Server.close must not be called again when isClosing guard fires',
+    );
   } finally {
     await close();
     // manager.closeAll() intentionally omitted — sessions map is empty.
