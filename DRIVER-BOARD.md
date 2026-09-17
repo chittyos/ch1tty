@@ -5487,7 +5487,8 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   - [x] **W** — test(apps): port-validation subprocess tests for all 5 HTTP-capable apps. PR #1323 merged.
   - [x] **X** — fix(config-data): add missing workspace/devops/security focus profiles + drift tests. PR #1324 merged.
   - [x] **Y** — test(apps): focused-app MCP tools/list E2E via StreamableHTTPClientTransport. PR #1325 merged.
-  - [ ] **Z** — test(shared-mcp): export-surface drift guard (McpSessionManager/checkBearerToken/writeUnauthorized API contract). PR #1326 open (CI pending).
+  - [x] **Z** — test(shared-mcp): export-surface drift guard (McpSessionManager/checkBearerToken/writeUnauthorized API contract). PR #1326 merged.
+  - [ ] **AA** — test(shared-types): export-surface drift guard — pure type package zero-export guard + 16 runtime/compile-time type shape tests. PR #1328 open (CI pending).
 - **Human-action items:**
   1. **DISABLE hourly cron** — 1680+ runs; all original workstreams A–E + extended F–Y exhausted; cron burning ~50k tokens/run
   2. **Merge PR #1325** once CI green (Y: focused-app MCP tools/list E2E, 7 tests, CI pending)
@@ -5498,3 +5499,39 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   7. **Major dep bumps** — typescript 5→7, @types/node 22→26, c8 11→12 await human review
 - **PushNotification:** SENT — merged W (#1323 +25 tests) + X (#1324 +11 tests, real bug fix); opened Y PR #1325 (+7 tests); tests now 2623/0/3.
 - **Next run:** Merge #1325 if CI green. Next gap candidate: Z — shared-mcp package has `McpSessionManager` + bearer-auth helpers but no exported types test or drift guard between `@ch1tty/shared-mcp` and individual app usage.
+
+---
+
+## Run log — 2026-09-17T~UTC (run ~1682 — PRODUCTIVE: merged PR #1326; opened PR #1328)
+
+- **Workstream advanced:** Z (merged), AA (opened)
+- **Branch/PR:** `auto/AA-shared-types-drift-guard` → https://github.com/chittyos/ch1tty/pull/1328
+- **Build:** tsc clean (0 errors, ch1tty@4.1.0)
+- **Tests:** 2651 pass / 0 fail / 3 skip (2654 total, 109 suites) — was 2623/0/3; +28 tests this run
+- **Guardrails:** 5-tool surface (search/execute/status/reload/cast) FIXED; buildCastExplanation metric freeze ACTIVE (56/87 field freeze guards). 0 violations on main.
+- **Open PRs at end of run:** 1 — PR #1328 (AA: shared-types drift guard, CI pending)
+- **What was done:**
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed. git reset --hard origin/main. npm ci clean; build clean (tsc 0 errors).
+  - Tests baseline: 2623/0/3 (pre-merge).
+  - Found 1 open PR: #1326 (Z: shared-mcp export-surface drift guard, 3/3 CI green, mergeable_state: clean) → squash-merged ✓
+  - Post-merge pull: git fast-forward. npm test: 2635/0/3 (+12 vs pre-merge).
+  - Identified next gap: @ch1tty/shared-types has no tests at all (pure type package — zero runtime exports).
+  - Added packages/shared-types/test/exports.test.ts — 16 tests:
+    - 1 runtime zero-export guard (pure type package contract)
+    - 12 compile-time structural helpers (all exported types/interfaces)
+    - 15 runtime fixture tests (discriminated union narrowing, ContentItem variants, BackendStatus/ServerStatus, etc.)
+  - All 16 pass. Full suite: 2651/0/3 (+28 total vs pre-Z-merge baseline).
+  - Committed, pushed auto/AA-shared-types-drift-guard, opened PR #1328, subscribed.
+- **Workstream status updates:**
+  - [x] **Z** — test(shared-mcp): export-surface drift guard. PR #1326 merged.
+  - [ ] **AA** — test(shared-types): export-surface drift guard — 16 tests. PR #1328 open (CI pending).
+- **Human-action items:**
+  1. **DISABLE hourly cron** — 1682+ runs; all original workstreams A–E + F–AA underway; cron burning ~50k tokens/run
+  2. **Merge PR #1328** once CI green (AA: shared-types drift guard, 16 tests, CI pending)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job) — CI still only CodeQL
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — typescript 5→7, @types/node 22→26, c8 11→12 await human review
+- **PushNotification:** NOT SENT — productive run but no exceptional event requiring immediate human attention; PR #1328 open for CI.
+- **Next run:** Merge #1328 if CI green. Next gap candidate: AB — shared-logger has tests but no export-surface drift guard (similar pattern; Logger class + format/level exports).
