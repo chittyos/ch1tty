@@ -5740,3 +5740,15 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   6. **Major dep bumps** — typescript 5→7, @types/node 22→26, c8 11→12 await human review
 - **PushNotification:** NOT SENT — routine gap-coverage PR, no exceptional event.
 - **Next run:** Merge #1339 if CI green. Next gap: CQ — find next uncovered branch in src-stdio/ or apps/*.
+
+## Run log — 2026-09-17T~UTC (run ~1690 — MERGED: PR #1339 (CP) merged on CI green)
+
+- **Workstream:** CP — merged
+- **Branch/PR:** PR #1339 squash-merged (SHA 07e55e5). 0 open PRs.
+- **Build:** clean | **Tests:** 2694 pass / 0 fail / 3 skip
+- **Actions:**
+  - CI green: CodeQL success, Analyze (javascript-typescript) success, Analyze (actions) success.
+  - CodeRabbit + Codex hit rate limits (no review findings). Merged.
+  - Pulled main.
+- **State summary:** A ✓ … CP ✓ ALL DONE. **0 open PRs.** Tests: 2694/0/3. Build: clean.
+- **Next run:** Find Workstream CQ. Candidates: remaining branch gaps in `src-stdio/` or apps/*.
