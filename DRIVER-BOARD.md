@@ -5667,3 +5667,22 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   7. **Major dep bumps** — typescript 5→7, @types/node 22→26, c8 11→12 await human review
 - **PushNotification:** SENT — merged CM (#1335, +13 tests) + opened CN (#1337, +2 tests); suite now 2690/0/3.
 - **Next run:** Merge #1337 if CI green. Next gap candidate: CO — check remaining branch gaps in `src-stdio/` (e.g. `ollama-brain.ts` partial-response path, or `embedding-brain.ts` cache miss race) or another apps/ export-surface drift guard.
+
+## Run log — 2026-09-17 (run ~1687 — MERGED: PR #1337 (CN) merged on CI green)
+
+- **Trigger:** PR activity notification — CodeRabbit completed (5/5 checks passed), CI all green
+- **Status:** PR #1337 (CN) squash-merged. No new code written this run.
+- **Confirmed merged:**
+  - [x] **CN** — test(circuit-breaker): 2 branch-gap tests. PR #1337 merged.
+- **Workstream status:**
+  - All workstreams A–F, AA, CG, CH, CI, CJ, CK, CL, CM, CN: DONE and merged.
+  - No open PRs.
+- **Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — 1687+ runs; cron burning ~50k tokens/run
+  2. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  3. **Enable GitHub Actions** (main npm test CI job) — CI still only CodeQL
+  4. **Notion workspace** out of free blocks — upgrade or clear
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Major dep bumps** — typescript 5→7, @types/node 22→26, c8 11→12 await human review
+- **PushNotification:** NOT SENT — routine merge, no exceptional event.
+- **Next run:** Find Workstream CO. Candidates: remaining branch gaps in `src-stdio/` (e.g. `ollama-brain.ts` partial-response extraction, `embedding-brain.ts` cache-miss race) or apps/* export-surface drift guards.
