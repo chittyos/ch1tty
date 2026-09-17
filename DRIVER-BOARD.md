@@ -5488,7 +5488,7 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   - [x] **X** — fix(config-data): add missing workspace/devops/security focus profiles + drift tests. PR #1324 merged.
   - [x] **Y** — test(apps): focused-app MCP tools/list E2E via StreamableHTTPClientTransport. PR #1325 merged.
   - [x] **Z** — test(shared-mcp): export-surface drift guard (McpSessionManager/checkBearerToken/writeUnauthorized API contract). PR #1326 merged.
-  - [ ] **AA** — test(shared-types): export-surface drift guard — pure type package zero-export guard + 16 runtime/compile-time type shape tests. PR #1328 open (CI pending).
+  - [x] **AA** — test(shared-types): export-surface drift guard — pure type package zero-export guard + 16 runtime/compile-time type shape tests. PR #1328 merged.
 - **Human-action items:**
   1. **DISABLE hourly cron** — 1680+ runs; all original workstreams A–E + extended F–Y exhausted; cron burning ~50k tokens/run
   2. **Merge PR #1325** once CI green (Y: focused-app MCP tools/list E2E, 7 tests, CI pending)
