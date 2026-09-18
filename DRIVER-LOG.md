@@ -5140,3 +5140,25 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   7. **agents 0.23.0 → 0.24.0** minor bump — human review recommended before advancing
 - **PushNotification:** NOT SENT — routine workstream PR, no exceptional event.
 - **Next run:** Merge #1362 if CI green. Next gap: DP — further structural drift guards or quality opportunities (e.g. package.json cross-workspace dep version consistency check).
+
+## Run log — 2026-09-18 (run ~1704 follow-up — PRODUCTIVE: merged DO (#1362))
+
+- **Workstream advanced:** DO closed — PR #1362 squash-merged (tsconfig consistency + 99 drift-guard tests)
+- **Build:** n/a (merge-only follow-up)
+- **Tests:** 2976 pass / 0 fail / 3 skip (confirmed)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - 5 GitHub notifications: 2× duplicate subscription.created for #1362, Codex bot rate-limit (recurring, non-blocking), CodeRabbit review-in-progress × 2 (no blocking findings).
+  - CI: 3/3 green (CodeQL, Analyze actions, Analyze javascript-typescript). No blocking review findings.
+  - Squash-merged PR #1362.
+- **Workstream status updates:**
+  - [x] **DO** — chore(DO): tsconfig consistency + 99 drift-guard tests. PR #1362 merged. DONE.
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1704 runs; burning ~50k tokens/run
+  2. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  3. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  4. **Notion workspace** out of free blocks — upgrade or clear
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **agents 0.23.0 → 0.24.0** minor bump — human review recommended
+- **PushNotification:** NOT SENT — routine merge run, no exceptional event.
+- **Next run:** DP — package.json cross-workspace dep version consistency check or further quality opportunities.
