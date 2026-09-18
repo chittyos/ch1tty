@@ -4984,3 +4984,53 @@ A ✓ B ✓ C ✓ D ✓ E ✓ + all extensions through CQ ✓ **CR: PR #1341 ope
 ### Next run recommendation
 
 Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps already 100%. Consider workers/ coverage (needs workerd/miniflare — human setup) or dep bumps (human review). If no new gaps found, recommend disabling cron.
+
+## Run log — 2026-09-18 (run ~1701 — PRODUCTIVE: merged DF-DK (6 PRs); opened PR #1359 (DL))
+
+- **Workstream advanced:** DL — `test/dl-wrangler-config-drift.test.ts` (14 tests) — wrangler.jsonc + wrangler.harness.jsonc structural drift guard
+- **Branch:** `auto/DL-wrangler-config-drift-guard`
+- **PR:** #1359 open (CI pending) — https://github.com/chittyos/ch1tty/pull/1359
+- **Build:** `npm run build` clean (tsc)
+- **Tests:** 2864 pass / 0 fail / 3 skip (was 2779 at start; +71 from merged DF-DK + DL)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **Startup state:**
+  - 6 open PRs at start: DF (#1353), DG (#1354), DH (#1355), DI (#1356), DJ (#1357), DK (#1358) — all 3/3 CI green.
+  - Synced to origin/main (7d1d829). `npm ci` clean. `npm run build` clean. `npm test`: 2779/0/3.
+  - Coverage: src/ 100%, packages/ 100%, apps/ 100%.
+- **What was done:**
+  - Merged 6 open PRs (all green CI, squash merge):
+    - #1353 (DF): shared-mcp bearer-auth unit tests (20 tests)
+    - #1354 (DG): shared-mcp McpSessionManager unit tests (13 tests)
+    - #1355 (DH): circuit-breaker + utils branch gaps (9 tests)
+    - #1356 (DI): child-manager listResources + listPrompts branch gaps
+    - #1357 (DJ): gpt-actions readBody empty-body and malformed-JSON branches
+    - #1358 (DK): EvidenceClient and TasksClient HTTP client branch coverage
+  - Post-merge pull + `npm test` → 2850/0/3 confirmed (+71 from DF-DK).
+  - Coverage check: src/ 100%, packages/ 100%, apps/ 100% — no new gaps from merged tests.
+  - Identified next drift guard gap: wrangler.jsonc + wrangler.harness.jsonc had no structural guards.
+  - Added `test/dl-wrangler-config-drift.test.ts` — 14 tests across 2 suites:
+    - wrangler.jsonc: worker name, main entry, nodejs_compat + global_fetch_strictly_public flags,
+      exactly 3 DO bindings (Ch1ttyDO/Ch1ttyMcpAgent/Ch1ttyApiAgent), unique class names,
+      migrations v1/v2/v3 present + unique tags (9 tests)
+    - wrangler.harness.jsonc: name + main match main config, nodejs_compat present, harness
+      DO bindings are a subset of main by class_name, shared bindings keep same names (5 tests)
+  - Full suite: 2864/0/3 (+14 from DL). Build clean.
+  - Pushed branch `auto/DL-wrangler-config-drift-guard`, opened PR #1359, subscribed.
+- **Workstream status updates:**
+  - [x] **DF** — test(DF): shared-mcp bearer-auth unit tests (20 tests). PR #1353 merged. DONE.
+  - [x] **DG** — test(DG): shared-mcp McpSessionManager unit tests (13 tests). PR #1354 merged. DONE.
+  - [x] **DH** — test(DH): circuit-breaker + utils branch gaps (9 tests). PR #1355 merged. DONE.
+  - [x] **DI** — test(DI): child-manager listResources + listPrompts branch gaps. PR #1356 merged. DONE.
+  - [x] **DJ** — test(DJ): gpt-actions readBody branches. PR #1357 merged. DONE.
+  - [x] **DK** — test(DK): EvidenceClient and TasksClient HTTP client branch coverage. PR #1358 merged. DONE.
+  - [ ] **DL** — test(DL): wrangler.jsonc + wrangler.harness.jsonc drift guard (14 tests). PR #1359 open (CI pending).
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1701 runs; burning ~50k tokens/run
+  2. **Merge PR #1359 (DL)** once CI green — wrangler config drift guard, 14 tests
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+- **Next run:** Merge #1359 if CI green. Next gap: DM — further structural guards or quality opportunities.
