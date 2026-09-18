@@ -110,10 +110,9 @@ test('checkBearerToken: correct token with multiple leading spaces → true', ()
   assert.equal(checkBearerToken(fakeReq('Bearer  multispc'), 'multispc'), true);
 });
 
-// ── checkBearerToken — timing-safety (same-length distinct tokens) ───────────
+// ── checkBearerToken — same-length token mismatch ────────────────────────────
 
-test('checkBearerToken: same-length wrong token → false (not a trivial equality check)', () => {
-  // Both tokens are 8 chars; a naive === would distinguish them but so should timingSafeEqual
+test('checkBearerToken: same-length wrong token → false', () => {
   assert.equal(checkBearerToken(fakeReq('Bearer aaaaaaaa'), 'bbbbbbbb'), false);
 });
 
