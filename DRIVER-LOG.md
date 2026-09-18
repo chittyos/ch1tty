@@ -5239,3 +5239,29 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   8. **shared-mcp SDK lag**: @modelcontextprotocol/sdk at ^1.29.0 vs apps ^1.30.0 — can bump when convenient
 - **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
 - **Next run:** Merge #1365 if CI green. Next gap: DR — cast-explain field-count snapshot guard or other structural quality gaps.
+
+---
+
+## Run log — 2026-09-18 (run ~1705 follow-up — PRODUCTIVE: merged DQ (#1365))
+
+- **Workstream advanced:** DQ closed — PR #1365 squash-merged (focus-profiles.json drift guard, 125 tests)
+- **Build:** n/a (merge-only follow-up)
+- **Tests:** 3126 pass / 0 fail / 3 skip (confirmed post-merge)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - 4 GitHub notifications: 2× subscription.created (duplicate), Codex bot rate-limit (recurring, non-blocking), CodeRabbit review-in-progress (no findings).
+  - CI: 3/3 green (CodeQL, Analyze actions, Analyze javascript-typescript). No blocking review findings.
+  - Squash-merged PR #1365.
+  - `git pull origin main`; `npm test` → 3126/0/3 confirmed.
+- **Workstream status updates:**
+  - [x] **DQ** — test(DQ): focus-profiles.json structural drift guard — 125 tests. PR #1365 merged. DONE.
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1705 runs; burning ~50k tokens/run
+  2. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  3. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  4. **Notion workspace** out of free blocks — upgrade or clear
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Major dep bumps** — @types/node 22→26, typescript 5→7 for apps/, agents 0.23→0.24 — human review recommended
+  7. **shared-mcp SDK lag**: @modelcontextprotocol/sdk at ^1.29.0 vs apps ^1.30.0 — can bump when convenient
+- **PushNotification:** NOT SENT — routine merge run, no exceptional event.
+- **Next run:** DR — cast-explain field-count snapshot guard (the existing metric-freeze test guards the count, but a dedicated snapshot guard covering both focus-off=56 and focus-on=87 field sets would be more explicit) or other structural quality opportunities.
