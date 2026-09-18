@@ -5090,3 +5090,27 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   7. **agents 0.23.0 → 0.24.0** minor bump — human review recommended before advancing
 - **PushNotification:** NOT SENT — routine dep bump PR, no exceptional event.
 - **Next run:** Merge #1360 if CI green. Next gap: DN — tsconfig.json cross-package version consistency check or package.json cross-package dependency checks.
+
+## Run log — 2026-09-18 (run ~1703 follow-up — PRODUCTIVE: merged DM (#1360))
+
+- **Workstream advanced:** DM closed — PR #1360 squash-merged (wrangler 4.134.0 → 4.135.0 patch bump)
+- **Build:** n/a (merge-only follow-up)
+- **Tests:** 2864 pass / 0 fail / 3 skip (unchanged)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - CodeRabbit review: no actionable comments, Merge Risk ⚪ Minimal.
+  - Codex bot: usage limit reached (known recurring, non-blocking).
+  - ci.yml failure: 0-job recurring non-blocking infra issue (same on main); standing-down comment posted.
+  - check_suite.completed: no third-party checks still running or failed.
+  - Squash-merged PR #1360 (wrangler 4.135.0 bump).
+- **Workstream status updates:**
+  - [x] **DM** — chore(deps): wrangler 4.134.0 → 4.135.0 patch bump. PR #1360 merged. DONE.
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1703 runs; burning ~50k tokens/run
+  2. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  3. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  4. **Notion workspace** out of free blocks — upgrade or clear
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **agents 0.23.0 → 0.24.0** minor bump — human review recommended
+- **PushNotification:** NOT SENT — routine merge run, no exceptional event.
+- **Next run:** DN — tsconfig.json cross-package consistency check or package.json cross-package dep version checks.
