@@ -5203,3 +5203,39 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   8. **shared-mcp SDK lag**: @modelcontextprotocol/sdk at ^1.29.0 vs apps ^1.30.0 — can bump when convenient
 - **PushNotification:** SENDING — opened PR #1363 with 21 new drift-guard tests.
 - **Next run:** Merge #1363 if CI green. Next gap: DQ — focus-profiles.json structural drift guard (validateFocusProfiles against actual file; 25 profiles; no test today covers the actual JSON file via the validator).
+
+---
+
+## Run log — 2026-09-18 (run ~1705 — PRODUCTIVE: merged DP (#1363) + DQ opened PR #1365)
+
+- **Workstream advanced:** DP merged + DQ opened
+- **Build:** `npm run build` clean | **Tests:** 3126 pass / 0 fail / 3 skip (+125 from DQ on branch)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - Startup: read CLAUDE.md + CHITTY.md + DRIVER-LOG.md. On main at 78dde11 (post-DP, run ~1705).
+  - `npm ci` clean. `npm run build` clean. `npm test` → 3001/0/3 (post-DP baseline).
+  - 2 open PRs: #1363 (DP) and #1364 (DQ) — both 3/3 CI green.
+  - PR #1363 (DP): CodeRabbit threads both resolved (commit 8b7d471). Squash-merged.
+  - PR #1364 (DQ): developed a merge conflict after #1363 landed. Closed with note pointing to #1365.
+  - Created fresh branch `auto/dq-focus-profiles-drift-v2` from main, applied DQ test file cleanly.
+  - `test/dq-focus-profiles-json-drift.test.ts` — 125 tests (3 suites):
+    1. validateFocusProfiles() passes on real file (2 tests)
+    2. Profile count + roster: exactly 25 profiles (28 tests — 3 + 25 name checks)
+    3. Per-profile invariants: description, ≥1 category/server, positive boost, valid categories (95 tests)
+  - Full suite: 3126/0/3 (+125 on branch). Build clean.
+  - Pushed branch `auto/dq-focus-profiles-drift-v2`, opened PR #1365, subscribed.
+  - Closed PR #1364 with note referencing #1365.
+- **Workstream status updates:**
+  - [x] **DP** — test(DP): package.json cross-workspace dep version drift guard — 25 tests. PR #1363 merged. DONE.
+  - [ ] **DQ** — test(DQ): focus-profiles.json structural drift guard — 125 tests. PR #1365 open (CI pending).
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1705 runs; burning ~50k tokens/run
+  2. **Merge PR #1365 (DQ)** once CI green — focus-profiles.json drift guard, 125 tests
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 for apps/, agents 0.23→0.24 — human review recommended
+  8. **shared-mcp SDK lag**: @modelcontextprotocol/sdk at ^1.29.0 vs apps ^1.30.0 — can bump when convenient
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+- **Next run:** Merge #1365 if CI green. Next gap: DR — cast-explain field-count snapshot guard or other structural quality gaps.
