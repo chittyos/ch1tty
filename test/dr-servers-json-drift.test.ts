@@ -28,7 +28,21 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { isIP } from 'node:net';
 import { validateServersConfig } from '../src-stdio/config.js';
+
+// Parse the URL and check the hostname exactly — prefix matching on the raw
+// string allows http://127.attacker.example to pass a startsWith('http://127.')
+// check. Using URL + isIP ensures only real loopback addresses are accepted.
+const isLocalhost = (ep: string): boolean => {
+  try {
+    const { hostname } = new URL(ep);
+    return hostname === 'localhost'
+      || (isIP(hostname) === 4 && hostname.startsWith('127.'));
+  } catch {
+    return false;
+  }
+};
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const RAW = JSON.parse(readFileSync(join(ROOT, 'servers.json'), 'utf-8')) as unknown;
@@ -163,11 +177,6 @@ describe('type-specific field constraints', () => {
         `remote server "${server.id}" missing endpoint`,
       );
     });
-
-    // Localhost endpoints (VM bridges, local services) may use http://;
-    // public remote endpoints must use https://.
-    const isLocalhost = (ep: string) =>
-      ep.startsWith('http://127.') || ep.startsWith('http://localhost');
 
     test(`remote server "${server.id}" endpoint uses https (or is localhost)`, () => {
       const ep = server.endpoint as string;
