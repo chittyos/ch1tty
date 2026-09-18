@@ -5906,3 +5906,43 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   6. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine merge run, no exceptional event.
 - **Next run:** CX — packages/* export-surface drift guards (if any missing), or worker-specific file opportunities.
+
+## Run log — 2026-09-18 (run ~1697 — PRODUCTIVE: merged CY/CZ/DA/DB + opened PR #1351 (DC))
+
+- **Workstream advanced:** DC — `test/dc-orchestrator-config-drift.test.ts` (6 structural consistency checks for servers.orchestrator.json)
+- **Branch:** `auto/DC-orchestrator-config-drift-guard`
+- **PR:** #1351 open (CI pending)
+- **Build:** `npm run build` clean (tsc)
+- **Tests:** 2760 pass / 0 fail / 3 skip (was 2754; +6 from DC drift guard tests)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - Synced to origin/main (3c2620a). `npm ci` clean. `npm run build` clean. `npm test`: 2754/0/3.
+  - Found 4 open PRs at start: CY (#1347), CZ (#1348), DA (#1349), DB (#1350) — all 3/3 CI green.
+  - Merged all 4 PRs in parallel. Pulled main. `npm test`: 2754/0/3 confirmed (was already counted).
+  - Coverage: src-stdio/ 100%; apps/ 100%; all testable src/ files 100%. Worker files (api-agent.ts, ch1tty-do.ts, codemode-bridge.ts, core.ts, mcp-agent.ts) at 0% — Cloudflare Workers–specific, require workerd harness.
+  - No patch dep updates available (only major: @types/node 22→26, typescript 5→7 — human decision).
+  - Identified DC gap: `servers.orchestrator.json` has no drift guard (CX covers config-data.ts↔servers.json, but not the orchestrator profile itself).
+  - Added `test/dc-orchestrator-config-drift.test.ts` — 6 tests:
+    1. File parses as valid JSON with non-empty servers array
+    2. Every orchestrator server ID exists in servers.json (phantom guard)
+    3. No duplicate IDs in orchestrator profile
+    4. Every entry has required fields (id, name, type, access, category)
+    5. access values match servers.json for shared IDs
+    6. category values match servers.json for shared IDs
+  - Committed, pushed branch, opened PR #1351, subscribed.
+- **Workstream status updates:**
+  - [x] **CY** — test(cy): isConnectionError outer return-false via non-numeric Error.code. PR #1347 merged. DONE.
+  - [x] **CZ** — test(cz): readResource + getPrompt non-connection RPC error → recordSuccess. PR #1348 merged. DONE.
+  - [x] **DA** — test(da): handleCast chain catch{} when step output is non-JSON. PR #1349 merged. DONE.
+  - [x] **DB** — test(db): Array.isArray branch in handleCast chain step-arg extraction. PR #1350 merged. DONE.
+  - [ ] **DC** — test(dc): servers.orchestrator.json drift guard — 6 tests. PR #1351 open (CI pending).
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1697 runs; burning ~50k tokens/run
+  2. **Merge PR #1351 (DC)** once CI green — servers.orchestrator.json drift guard, 6 tests
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+- **Next run:** Merge #1351 if CI green. Next gap: DE — look at remaining quality opportunities (integration tests, scenario coverage, or worker-file testability exploration).
