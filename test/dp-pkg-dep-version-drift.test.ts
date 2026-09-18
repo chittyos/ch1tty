@@ -7,7 +7,7 @@
  * that silently diverge from the rest of the group.
  *
  * Coverage:
- *   - Workspace counts: apps/* = 5, packages/* = 3
+ *   - Workspace counts: apps/* = 5, packages/* = 3 (discovered from filesystem)
  *   - Apps group: @modelcontextprotocol/sdk, @types/node, tsx, typescript
  *     must be at the same version across all 5 apps
  *   - Packages group: @types/node must be at the same version across all 3 packages
@@ -16,12 +16,14 @@
  *       shared-logger → ^5.7.0 (pre-migration)
  *   - SDK version lag: shared-mcp (@modelcontextprotocol/sdk) is one minor
  *     behind apps/ — documented here so the lag is visible and intentional
+ *   - SDK peer/dev alignment: shared-mcp peerDependencies and devDependencies
+ *     must declare the same SDK version (independent peer drift is caught)
  *   - Each workspace has a non-empty "name" and "version" in its package.json
  */
 
 import test, { describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -32,31 +34,48 @@ interface PkgJson {
   version: string;
   dependencies?: Record<string, string>;
   devDependencies?: Record<string, string>;
+  peerDependencies?: Record<string, string>;
 }
 
+/** Read a workspace's package.json by its repo-relative path (e.g. 'apps/tasks-mcp'). */
 function readPkg(relPath: string): PkgJson {
   return JSON.parse(readFileSync(join(ROOT, relPath, 'package.json'), 'utf-8')) as PkgJson;
 }
 
+/** Merge dependencies + devDependencies (excludes peerDependencies — check that separately). */
 function allDeps(pkg: PkgJson): Record<string, string> {
   return { ...pkg.dependencies, ...pkg.devDependencies };
 }
 
-// ── Fixture: all workspace packages ──────────────────────────────────────────
+// ── Fixture: discover workspace packages from the filesystem ──────────────────
+// Discovering rather than hard-coding ensures a newly added workspace is covered
+// by every dep-consistency assertion automatically, and count drift is caught.
 
-const APPS = [
+function discoverWorkspaces(group: 'apps' | 'packages'): string[] {
+  const dir = join(ROOT, group);
+  return readdirSync(dir)
+    .filter(name => existsSync(join(dir, name, 'package.json')))
+    .map(name => `${group}/${name}`)
+    .sort();
+}
+
+const APPS = discoverWorkspaces('apps');
+const PACKAGES = discoverWorkspaces('packages');
+
+// Snapshot of expected names — update when a workspace is intentionally added/removed.
+const EXPECTED_APP_NAMES = [
   'apps/comms-mcp',
   'apps/evidence-mcp',
   'apps/ledger-mcp',
   'apps/session-coordinator-mcp',
   'apps/tasks-mcp',
-] as const;
+];
 
-const PACKAGES = [
+const EXPECTED_PACKAGE_NAMES = [
   'packages/shared-logger',
   'packages/shared-mcp',
   'packages/shared-types',
-] as const;
+];
 
 const appPkgs = APPS.map(readPkg);
 const packagePkgs = PACKAGES.map(readPkg);
@@ -65,11 +84,19 @@ const packagePkgs = PACKAGES.map(readPkg);
 
 describe('workspace counts', () => {
   test('apps/* has exactly 5 workspaces', () => {
-    assert.equal(APPS.length, 5);
+    assert.equal(APPS.length, 5, `apps/* count: expected 5, got ${APPS.length}: ${APPS.join(', ')}`);
   });
 
   test('packages/* has exactly 3 workspaces', () => {
-    assert.equal(PACKAGES.length, 3);
+    assert.equal(PACKAGES.length, 3, `packages/* count: expected 3, got ${PACKAGES.length}: ${PACKAGES.join(', ')}`);
+  });
+
+  test('apps/* roster matches expected names', () => {
+    assert.deepEqual(APPS, EXPECTED_APP_NAMES, 'apps/* workspace names changed — update EXPECTED_APP_NAMES');
+  });
+
+  test('packages/* roster matches expected names', () => {
+    assert.deepEqual(PACKAGES, EXPECTED_PACKAGE_NAMES, 'packages/* workspace names changed — update EXPECTED_PACKAGE_NAMES');
   });
 
   test('all apps have non-empty name and version', () => {
@@ -221,19 +248,39 @@ describe('packages/* typescript migration state', () => {
 // or accidental sync) is caught.
 
 describe('@modelcontextprotocol/sdk version across groups', () => {
-  test('shared-mcp declares @modelcontextprotocol/sdk ^1.29.0 (one minor behind apps)', () => {
+  test('shared-mcp devDependencies declares @modelcontextprotocol/sdk ^1.29.0 (one minor behind apps)', () => {
     const pkg = packagePkgs.find(p => p.name === '@ch1tty/shared-mcp')!;
     assert.ok(pkg, 'shared-mcp not found');
     assert.equal(
-      allDeps(pkg)['@modelcontextprotocol/sdk'],
+      pkg.devDependencies?.['@modelcontextprotocol/sdk'],
       '^1.29.0',
-      'shared-mcp: @modelcontextprotocol/sdk version must be ^1.29.0 — update this test when the lag is resolved',
+      'shared-mcp: devDependencies @modelcontextprotocol/sdk must be ^1.29.0 — update this test when the lag is resolved',
     );
+  });
+
+  test('shared-mcp peerDependencies declares @modelcontextprotocol/sdk ^1.29.0 (must match devDependencies)', () => {
+    const pkg = packagePkgs.find(p => p.name === '@ch1tty/shared-mcp')!;
+    assert.ok(pkg, 'shared-mcp not found');
+    assert.equal(
+      pkg.peerDependencies?.['@modelcontextprotocol/sdk'],
+      '^1.29.0',
+      'shared-mcp: peerDependencies @modelcontextprotocol/sdk must match devDependencies (^1.29.0) — independent peer drift is a real API contract change',
+    );
+  });
+
+  test('shared-mcp peer and dev SDK declarations are in sync', () => {
+    const pkg = packagePkgs.find(p => p.name === '@ch1tty/shared-mcp')!;
+    assert.ok(pkg, 'shared-mcp not found');
+    const peerSdk = pkg.peerDependencies?.['@modelcontextprotocol/sdk'];
+    const devSdk = pkg.devDependencies?.['@modelcontextprotocol/sdk'];
+    assert.ok(peerSdk !== undefined, 'shared-mcp peerDependencies must declare @modelcontextprotocol/sdk');
+    assert.ok(devSdk !== undefined, 'shared-mcp devDependencies must declare @modelcontextprotocol/sdk');
+    assert.equal(peerSdk, devSdk, `shared-mcp peer/dev SDK declarations diverged: peer=${peerSdk} dev=${devSdk}`);
   });
 
   test('apps declare @modelcontextprotocol/sdk ^1.30.0 (one minor ahead of shared-mcp)', () => {
     const appsWithSdk = appPkgs.filter(p => '@modelcontextprotocol/sdk' in allDeps(p));
-    assert.equal(appsWithSdk.length, 5, 'all 5 apps must declare @modelcontextprotocol/sdk');
+    assert.equal(appsWithSdk.length, APPS.length, `all ${APPS.length} apps must declare @modelcontextprotocol/sdk`);
     for (const pkg of appsWithSdk) {
       assert.equal(
         allDeps(pkg)['@modelcontextprotocol/sdk'],
