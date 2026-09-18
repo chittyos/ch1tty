@@ -6006,3 +6006,26 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
 - **Next run:** Merge #1352 if CI green. Next gap: DF — look at remaining data file drift opportunities (e.g. wrangler.jsonc/wrangler.harness.jsonc structural guards, or further scenario test improvements).
+
+## Run log — 2026-09-18 (run ~1700 — PRODUCTIVE: merged DE (#1352))
+
+- **Workstream advanced:** DE closed — PR #1352 squash-merged (register.json drift guard, 19 tests)
+- **Build:** n/a (merge-only run)
+- **Tests:** 2779 pass / 0 fail / 3 skip (confirmed post-merge)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - 4 GitHub notifications: 2× subscription-created (duplicate), Codex bot rate-limit, CodeRabbit rate-limit.
+  - CI: 3/3 green (CodeQL, Analyze actions, Analyze javascript-typescript). No CodeRabbit findings posted.
+  - Squash-merged PR #1352.
+  - `git pull --ff-only origin main`; `npm test` → 2779/0/3 confirmed.
+- **Workstream status updates:**
+  - [x] **DE** — test(de): register.json drift guard — 19 tests. PR #1352 merged. DONE.
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1700 runs; burning ~50k tokens/run
+  2. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  3. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  4. **Notion workspace** out of free blocks — upgrade or clear
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine merge run, no exceptional event.
+- **Next run:** DF — wrangler.jsonc/wrangler.harness.jsonc structural guards, or further scenario test improvements, or other quality opportunities.
