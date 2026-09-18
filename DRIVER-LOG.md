@@ -5162,3 +5162,44 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   6. **agents 0.23.0 → 0.24.0** minor bump — human review recommended
 - **PushNotification:** NOT SENT — routine merge run, no exceptional event.
 - **Next run:** DP — package.json cross-workspace dep version consistency check or further quality opportunities.
+
+## Run log — 2026-09-18 (run ~1705 — PRODUCTIVE: opened PR #1363 (DP))
+
+- **Workstream advanced:** DP — `test/dp-pkg-dep-version-drift.test.ts` (21 tests) — package.json cross-workspace dep version drift guard
+- **Branch:** `auto/dp-pkg-dep-version-drift`
+- **PR:** #1363 open (CI pending) — https://github.com/chittyos/ch1tty/pull/1363
+- **Build:** `npm run build` clean (tsc + all workspace packages)
+- **Tests:** 2997 pass / 0 fail / 3 skip (was 2976; +21 from DP)
+- **npm audit:** 0 vulnerabilities
+- **Guardrails:** 5-tool surface (search/execute/status/reload/cast) FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations on main.
+- **Startup state:**
+  - 0 open PRs at start (DO #1362 already merged at run ~1704). Synced to main.
+  - `npm ci` clean. `npm run build` clean. `npm test`: 2976/0/3 (pre-DP baseline).
+  - No security vulnerabilities.
+  - Notion board last updated 2026-09-10; DRIVER-LOG.md is the active run log.
+- **What was done:**
+  - Confirmed 0 open PRs. All A-O workstreams done. Extended through DO (run ~1704).
+  - Identified DP gap: no cross-workspace package.json dep version drift guard existed.
+  - Found clear version divergences: `typescript` is `^5.7.0` in apps/shared-logger vs `^7.0.0` in shared-mcp/shared-types; `@modelcontextprotocol/sdk` is `^1.29.0` in shared-mcp vs `^1.30.0` in all apps.
+  - Added `test/dp-pkg-dep-version-drift.test.ts` (21 tests, 5 suites):
+    1. Workspace counts: apps/* = 5, packages/* = 3
+    2. Apps group consistency: MCP SDK, @types/node, tsx, typescript all agree
+    3. Packages @types/node consistency: ^22.0.0 everywhere
+    4. TypeScript migration state: shared-mcp + shared-types at ^7.0.0 (migrated); shared-logger at ^5.7.0 (pre-migration)
+    5. SDK version lag: shared-mcp at ^1.29.0 vs apps at ^1.30.0 — documented for visibility
+  - Full suite: 2997/0/3 (+21). Build clean.
+  - Committed, pushed `auto/dp-pkg-dep-version-drift`, opened PR #1363, subscribed.
+- **Workstream status updates:**
+  - [x] **DO** — chore(DO): tsconfig consistency + 99 drift-guard tests. PR #1362 merged. DONE.
+  - [ ] **DP** — test(DP): package.json cross-workspace dep version drift guard — 21 tests. PR #1363 open (CI pending).
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1705 runs; burning ~50k tokens/run
+  2. **Merge PR #1363 (DP)** once CI green — cross-workspace dep version drift guard, 21 tests
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 for apps/, agents 0.23→0.24 — human review recommended
+  8. **shared-mcp SDK lag**: @modelcontextprotocol/sdk at ^1.29.0 vs apps ^1.30.0 — can bump when convenient
+- **PushNotification:** SENDING — opened PR #1363 with 21 new drift-guard tests.
+- **Next run:** Merge #1363 if CI green. Next gap: DQ — focus-profiles.json structural drift guard (validateFocusProfiles against actual file; 25 profiles; no test today covers the actual JSON file via the validator).
