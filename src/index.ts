@@ -14,25 +14,11 @@ import { Ch1ttyMcpAgent } from './mcp-agent.js';
 import { Ch1ttyApiAgent } from './api-agent.js';
 import { handleAuthorize } from './oauth-authorize.js';
 import { handleMcpDeprecated } from './mcp-deprecated.js';
+import { checkBearerAuth } from './worker-auth.js';
 import type { Env } from './types.js';
 import { VERSION } from './utils.js';
 
 export { Ch1ttyDO, Ch1ttyMcpAgent, Ch1ttyApiAgent };
-
-/** Bearer check for /mcp-api (static token, fail-closed). */
-function checkAuth(req: Request, token?: string): boolean {
-  if (!token) return true; // no token configured → open (warned at deploy)
-  const auth = req.headers.get('authorization');
-  if (!auth) return false;
-  const [scheme, value] = auth.split(' ', 2);
-  const enc = new TextEncoder();
-  const ab = enc.encode(value ?? '');
-  const bb = enc.encode(token);
-  const len = Math.max(ab.length, bb.length);
-  let diff = ab.length ^ bb.length;
-  for (let i = 0; i < len; i++) diff |= (ab[i] ?? 0) ^ (bb[i] ?? 0);
-  return scheme?.toLowerCase() === 'bearer' && diff === 0;
-}
 
 // The McpAgent handler for /mcp2 — receives requests that passed OAuth validation.
 const mcp2Handler = {
@@ -86,7 +72,7 @@ const defaultHandler = {
           { status: 503 },
         );
       }
-      if (!checkAuth(req, tokenSecret)) {
+      if (!checkBearerAuth(req, tokenSecret)) {
         return Response.json({ error: 'unauthorized' }, { status: 401 });
       }
       return Ch1ttyApiAgent.serve('/mcp-api', { binding: 'API_OBJECT' }).fetch(req, env, ctx);
