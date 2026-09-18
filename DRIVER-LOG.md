@@ -5034,3 +5034,26 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
 - **Next run:** Merge #1359 if CI green. Next gap: DM — further structural guards or quality opportunities.
+
+## Run log — 2026-09-18 (run ~1702 — PRODUCTIVE: merged DL (#1359))
+
+- **Workstream advanced:** DL closed — PR #1359 squash-merged (wrangler.jsonc + wrangler.harness.jsonc drift guard, 14 tests)
+- **Build:** n/a (merge-only run)
+- **Tests:** 2864 pass / 0 fail / 3 skip (confirmed post-merge)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - 4 GitHub notifications: 2× duplicate subscription.created for #1359, Codex bot rate-limit, CodeRabbit review-in-progress (no blocking findings).
+  - CI: 3/3 green (CodeQL, Analyze actions, Analyze javascript-typescript). No blocking review findings.
+  - Squash-merged PR #1359.
+  - `git reset --hard origin/main`; `npm test` → 2864/0/3 confirmed.
+- **Workstream status updates:**
+  - [x] **DL** — test(DL): wrangler.jsonc + wrangler.harness.jsonc drift guard (14 tests). PR #1359 merged. DONE.
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1702 runs; burning ~50k tokens/run
+  2. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  3. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  4. **Notion workspace** out of free blocks — upgrade or clear
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine merge run, no exceptional event.
+- **Next run:** DM — further structural drift guard opportunities (e.g. tsconfig.json consistency, register.json schema, or package.json cross-package version checks).
