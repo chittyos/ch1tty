@@ -1285,7 +1285,7 @@
           "notes": "market inferred; notion verified."
         },
         {
-          "name": "market-listings-to-neon",
+          "name": "market-search-to-neon",
           "chain": [
             "market/search_listings",
             "neon/run_sql"
@@ -1363,7 +1363,7 @@
           "notes": "monitor and linear inferred."
         },
         {
-          "name": "monitor-alert-to-task",
+          "name": "monitor-alerts-to-task",
           "chain": [
             "monitor/get_alerts",
             "tasks/create_task"
@@ -1752,7 +1752,7 @@
           "notes": "session and ledger inferred."
         },
         {
-          "name": "session-evict-and-log",
+          "name": "session-evict-and-record",
           "chain": [
             "session/evict_session",
             "ledger/record_transaction"
