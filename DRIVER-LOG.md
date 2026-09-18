@@ -5057,3 +5057,36 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   6. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine merge run, no exceptional event.
 - **Next run:** DM — further structural drift guard opportunities (e.g. tsconfig.json consistency, register.json schema, or package.json cross-package version checks).
+
+## Run log — 2026-09-18 (run ~1703 — PRODUCTIVE: opened PR #1360 (DM))
+
+- **Workstream advanced:** DM — `chore(deps): bump wrangler 4.134.0 → 4.135.0`
+- **Branch:** `auto/DM-wrangler-bump-4135`
+- **PR:** #1360 open (CI pending) — https://github.com/chittyos/ch1tty/pull/1360
+- **Build:** `npm run build` clean (tsc)
+- **Tests:** 2864 pass / 0 fail / 3 skip (unchanged — dep bump, no test changes)
+- **npm audit:** 0 vulnerabilities
+- **Guardrails:** 5-tool surface (search/execute/status/reload/cast) FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations on main.
+- **Startup state:**
+  - 0 open PRs at start. Latest commit: 5ae8fce (run ~1702 DL merged).
+  - `npm ci` clean. `npm run build` clean. `npm test`: 2864/0/3.
+  - `npm outdated`: wrangler 4.134.0 → 4.135.0 (patch); agents 0.23.0 → 0.24.0 (minor, skipped pending human review); @types/node 22→26 (major, human decision); typescript 5→7 (already at ^7.0.2 in package.json); c8 11→12 (already at ^12.0.0). No new vulnerabilities.
+- **What was done:**
+  - Confirmed DL merged (run ~1702). 0 open PRs.
+  - Identified DM: wrangler patch bump 4.134.0 → 4.135.0 (caret range updated from ^4.134.0 → ^4.135.0).
+  - Ran `npm install wrangler@4.135.0` — updated package.json + package-lock.json. 5 packages changed, 0 vulnerabilities.
+  - `npm run build`: clean. `npm test`: 2864/0/3 (unchanged).
+  - Committed, pushed `auto/DM-wrangler-bump-4135`, opened PR #1360, subscribed to CI.
+- **Workstream status updates:**
+  - [x] **DL** — test(DL): wrangler.jsonc + wrangler.harness.jsonc drift guard (14 tests). PR #1359 merged. DONE.
+  - [ ] **DM** — chore(deps): wrangler 4.134.0 → 4.135.0 patch bump. PR #1360 open (CI pending).
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1703 runs; burning ~50k tokens/run
+  2. **Merge PR #1360 (DM)** once CI green — wrangler patch bump
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **agents 0.23.0 → 0.24.0** minor bump — human review recommended before advancing
+- **PushNotification:** NOT SENT — routine dep bump PR, no exceptional event.
+- **Next run:** Merge #1360 if CI green. Next gap: DN — tsconfig.json cross-package version consistency check or package.json cross-package dependency checks.
