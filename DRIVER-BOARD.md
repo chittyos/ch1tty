@@ -5969,3 +5969,40 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   6. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine merge run, no exceptional event.
 - **Next run:** DE — find next quality gap (all testable coverage at 100%; candidates: further data file drift guards, scenario test improvements, or other quality opportunities).
+
+## Run log — 2026-09-18 (run ~1699 — PRODUCTIVE: opened PR #1352 (DE))
+
+- **Workstream advanced:** DE — `test/de-register-json-drift.test.ts` (19 tests) — register.json drift guard
+- **Branch:** `auto/DE-register-json-drift-guard`
+- **PR:** #1352 open (CI pending) — https://github.com/chittyos/ch1tty/pull/1352
+- **Build:** `npm run build` clean (tsc)
+- **Tests:** 2779 pass / 0 fail / 3 skip (was 2760; +19 from DE)
+- **npm audit:** 0 vulnerabilities
+- **Guardrails:** 5-tool surface (search/execute/status/reload/cast) FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations on main.
+- **Startup state:**
+  - 0 open PRs at start (DC #1351 already merged last run). Synced to cf6c0fb.
+  - `npm ci` clean. `npm run build` clean. `npm test`: 2760/0/3 (pre-DE baseline).
+  - Coverage: src-stdio/ 100%; apps/ 100%. Only major dep bumps available (@types/node 22→26, typescript 5→7 — human decision).
+- **What was done:**
+  - Confirmed DC merged (run ~1698). 0 open PRs.
+  - Identified DE gap: `register.json` (public contract for register.chitty.cc) had no drift guard.
+  - Added `test/de-register-json-drift.test.ts` — 19 tests across 4 suites:
+    1. 5-tool surface invariant: exactly 5 tools, names match, canonical order
+    2. Version sync: register.json version === package.json version
+    3. Structural: base_url HTTPS, canonicalUri non-empty, endpoints has /health + /api/v1/status + /mcp
+    4. Per-tool: description non-empty, inputSchema.type == "object" (for all 5 tools)
+  - Full suite: 2779/0/3 (+19). Build clean.
+  - Committed, pushed `auto/DE-register-json-drift-guard`, opened PR #1352, subscribed.
+- **Workstream status updates:**
+  - [x] **DC** — test(dc): servers.orchestrator.json drift guard. PR #1351 merged. DONE.
+  - [ ] **DE** — test(de): register.json drift guard — 19 tests. PR #1352 open (CI pending).
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1699 runs; burning ~50k tokens/run
+  2. **Merge PR #1352 (DE)** once CI green — register.json 5-tool surface + version drift guard
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+- **Next run:** Merge #1352 if CI green. Next gap: DF — look at remaining data file drift opportunities (e.g. wrangler.jsonc/wrangler.harness.jsonc structural guards, or further scenario test improvements).
