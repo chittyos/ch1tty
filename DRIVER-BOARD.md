@@ -5828,3 +5828,26 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine coverage/test PR, no exceptional event.
 - **Next run:** Merge #1345 if CI green. Next gap: CW — check if any packages/* export-surface drift guards are missing, or look at worker-specific files (api-agent.ts, codemode-bridge.ts, mcp-agent.ts) for workerd test harness.
+
+## Run log — 2026-09-18 (run ~1694 — PRODUCTIVE: merged PR #1345 (CV))
+
+- **Workstream advanced:** CV closed — PR #1345 squash-merged (direct resolveChittySecret error-message assertion tests)
+- **Build:** n/a (merge-only run)
+- **Tests:** 2741 pass / 0 fail / 3 skip (confirmed post-merge)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - Verified PR #1345 CI: 3/3 green (CodeQL, Analyze actions, Analyze javascript-typescript).
+  - No CodeRabbit review posted (no blocking findings).
+  - Squash-merged PR #1345.
+  - `git reset --hard origin/main`; `npm test` → 2741/0/3 confirmed.
+- **Workstream status updates:**
+  - [x] **CV** — test(chittysecrets): 2 direct resolveChittySecret error-message assertions. PR #1345 merged. DONE.
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1694 runs; burning ~50k tokens/run
+  2. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  3. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  4. **Notion workspace** out of free blocks — upgrade or clear
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — merge-only run, no exceptional event.
+- **Next run:** CW — check packages/* export-surface drift guards, worker-specific files (api-agent.ts, codemode-bridge.ts, mcp-agent.ts) for workerd test harness, or other opportunities.
