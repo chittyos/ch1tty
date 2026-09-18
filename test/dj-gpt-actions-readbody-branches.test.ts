@@ -35,12 +35,20 @@ async function startServer(): Promise<Started> {
   const server = new HttpMcpServer(aggregator, { port: 0, bindAddress: '127.0.0.1' });
   await server.start();
   const baseUrl = `http://127.0.0.1:${server.getPort()}`;
-  // Patch callTool to return graceful no-op result (avoids real MCP backend)
-  (aggregator as unknown as { callTool: unknown }).callTool = async () => ({
-    content: [{ type: 'text', text: 'ok' }],
-    isError: false,
-  });
   return { server, aggregator, baseUrl, dlqPath };
+}
+
+interface CapturedCall { tool: string; args: Record<string, unknown> }
+
+function patchCallTool(s: Started, captured: CapturedCall[]): void {
+  (s.aggregator as unknown as { callTool: unknown }).callTool = async (
+    tool: string,
+    args: Record<string, unknown>,
+    _sessionId?: string,
+  ) => {
+    captured.push({ tool, args });
+    return { content: [{ type: 'text', text: 'ok' }], isError: false };
+  };
 }
 
 async function stop(s: Started): Promise<void> {
@@ -52,6 +60,8 @@ async function stop(s: Started): Promise<void> {
 // Line 29: `if (!raw) return {}` — empty body path
 test('readBody empty body → {} args → 200 with ok envelope', async () => {
   const s = await startServer();
+  const calls: CapturedCall[] = [];
+  patchCallTool(s, calls);
   try {
     const res = await fetch(`${s.baseUrl}/gpt-actions/session/get`, {
       method: 'POST',
@@ -64,6 +74,12 @@ test('readBody empty body → {} args → 200 with ok envelope', async () => {
     assert.equal(body.ok, true, 'ok must be true when callTool succeeds');
     assert.equal(typeof body.timestamp, 'string', 'timestamp must be present');
     assert.equal(body.chitty_id, null, 'chitty_id must be null when no chittyId');
+    // Verify mapArgs({}) produces the expected fallback arguments
+    assert.equal(calls.length, 1, 'callTool must be called exactly once');
+    assert.equal(calls[0].tool, 'chitty_memory_recall', 'tool must be chitty_memory_recall');
+    assert.equal(calls[0].args['query'], 'session context', 'query must default to "session context"');
+    assert.equal(calls[0].args['scope'], 'session', 'scope must be "session"');
+    assert.equal(calls[0].args['conversation_id'], undefined, 'conversation_id must be undefined when absent');
   } finally {
     await stop(s);
   }
@@ -72,6 +88,8 @@ test('readBody empty body → {} args → 200 with ok envelope', async () => {
 // Line 30: `catch { return {} }` — malformed JSON body path
 test('readBody malformed JSON → {} args → 200 with ok envelope', async () => {
   const s = await startServer();
+  const calls: CapturedCall[] = [];
+  patchCallTool(s, calls);
   try {
     const res = await fetch(`${s.baseUrl}/gpt-actions/session/get`, {
       method: 'POST',
@@ -84,6 +102,12 @@ test('readBody malformed JSON → {} args → 200 with ok envelope', async () =>
     assert.equal(body.ok, true, 'ok must be true when callTool succeeds');
     assert.equal(typeof body.timestamp, 'string', 'timestamp must be present');
     assert.equal(body.chitty_id, null, 'chitty_id must be null when no chittyId');
+    // Verify mapArgs({}) produces the expected fallback arguments
+    assert.equal(calls.length, 1, 'callTool must be called exactly once');
+    assert.equal(calls[0].tool, 'chitty_memory_recall', 'tool must be chitty_memory_recall');
+    assert.equal(calls[0].args['query'], 'session context', 'query must default to "session context"');
+    assert.equal(calls[0].args['scope'], 'session', 'scope must be "session"');
+    assert.equal(calls[0].args['conversation_id'], undefined, 'conversation_id must be undefined when absent');
   } finally {
     await stop(s);
   }
