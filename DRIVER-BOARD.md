@@ -5789,3 +5789,42 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   9. **Stale branch cleanup** — 1100+ remote auto/ branches
 - **PushNotification:** NOT SENT — routine dep bump, 4 open PRs (all queued, no exceptional event).
 - **Next run:** Merge CR/CS/CT/CU once CI green. Next gap: CV — if all coverage is at 100% after merges, look at worker-specific files (api-agent.ts, codemode-bridge.ts, mcp-agent.ts) for potential workerd-test harness, or other patch dep bumps.
+
+## Run log — 2026-09-18 (run ~1693 — PRODUCTIVE: merged CR/CS/CT/CU + opened PR #1345 (CV))
+
+- **Workstream advanced:** CV — direct error-message assertions for resolveChittySecret json.error and !json.value paths
+- **Branch/PR:** `auto/CV-chittysecrets-direct-json-error-paths` → **PR #1345** (https://github.com/chittyos/ch1tty/pull/1345)
+- **Build:** tsc clean (0 errors, ch1tty@4.1.0)
+- **Tests:** 2741 pass / 0 fail / 3 skip (2744 total, 112 suites) — was 2726/0/3; +15 total (+13 CR/CS/CT + 2 CV)
+- **npm audit:** 0 vulnerabilities
+- **Guardrails:** 5-tool surface (search/execute/status/reload/cast) FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations on main.
+- **Startup state:**
+  - 4 open PRs at start: #1341 (CR), #1342 (CS), #1343 (CT) — all CodeQL green; #1344 (CU) — CI green.
+  - `npm ci` clean. `npm run build` clean. `npm test`: 2726/0/3 (pre-merge baseline).
+- **What was done:**
+  - Verified all 4 PRs had 3/3 green CI checks (CodeQL, Analyze js-ts, Analyze actions).
+  - Squash-merged CR (#1341) + CS (#1342) in parallel, then CT (#1343) + CU (#1344) in parallel.
+  - `git reset --hard origin/main`; `npm ci` clean; `npm run build` clean.
+  - Post-merge baseline: 2739/0/3 (+13 from CR:2 + CS:4 + CT:7 + CU:0).
+  - **Coverage check:** `npm run coverage` → c8 reports 100% for all `src-stdio/` files. `npm run coverage:apps` → 100% for all `apps/` files. No real gaps (node:test --experimental-test-coverage tsx source-map artifacts are NOT real gaps).
+  - **npm outdated:** only `@types/node` 22→26 and `typescript` 5→7 (major, human decision). No patch bumps available.
+  - Identified Workstream CV: add 2 direct tests for `resolveChittySecret` json.error and !json.value paths (the existing indirect tests via resolveEnv/allSettled don't assert on error message content).
+  - Wrote `test/cv-chittysecrets-json-error-empty-value.test.ts` — 2 tests calling `resolveChittySecret` directly, asserting exact error message format.
+  - Full suite: 2741/0/3 (+2 vs post-merge baseline). Build clean.
+  - Committed, pushed `auto/CV-chittysecrets-direct-json-error-paths`, opened PR #1345, subscribed.
+- **Workstream status updates:**
+  - [x] **CR** — test(session-manager): 2 catch branch gap tests. PR #1341 merged. DONE.
+  - [x] **CS** — test(timer-unref): 4 workerd guard tests. PR #1342 merged. DONE.
+  - [x] **CT** — test(workers-ai-brain): 7 branch gap tests. PR #1343 merged. DONE.
+  - [x] **CU** — chore(deps): wrangler 4.132.0 → 4.134.0. PR #1344 merged. DONE.
+  - [ ] **CV** — test(chittysecrets): 2 direct resolveChittySecret error-message assertions. PR #1345 open (CI pending).
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1693 runs; cron burning ~50k tokens/run
+  2. **Merge PR #1345 (CV)** once CI green — 2 direct error-message guard tests
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine coverage/test PR, no exceptional event.
+- **Next run:** Merge #1345 if CI green. Next gap: CW — check if any packages/* export-surface drift guards are missing, or look at worker-specific files (api-agent.ts, codemode-bridge.ts, mcp-agent.ts) for workerd test harness.
