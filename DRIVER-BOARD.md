@@ -5851,3 +5851,36 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   6. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — merge-only run, no exceptional event.
 - **Next run:** CW — check packages/* export-surface drift guards, worker-specific files (api-agent.ts, codemode-bridge.ts, mcp-agent.ts) for workerd test harness, or other opportunities.
+
+## Run log — 2026-09-18 (run ~1695 — PRODUCTIVE: opened PR #1346 (CW))
+
+- **Workstream advanced:** CW — `test/cw-focus-suggestions-drift.test.ts` + fix 3 duplicate combo names in `focus-suggestions.json`
+- **Branch:** `auto/CW-focus-suggestions-drift-guard`
+- **PR:** #1346 open (CI pending)
+- **Build:** `npm run build` clean (tsc)
+- **Tests:** 2745 pass / 0 fail / 3 skip (was 2741; +4 from CW drift guard tests)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - Found 3 duplicate combo names in `focus-suggestions.json` (data bug, not caught by existing tests):
+    - `market`: `market-listings-to-neon` appeared twice → second renamed `market-search-to-neon`
+    - `monitoring`: `monitor-alert-to-task` appeared twice → second renamed `monitor-alerts-to-task`
+    - `session`: `session-evict-and-log` appeared twice → second renamed `session-evict-and-record`
+  - Added `test/cw-focus-suggestions-drift.test.ts` (4 drift guard tests):
+    1. Every suggestion profile appears in focus-profiles.json (reverse direction — bidirectional parity)
+    2. Profile counts match exactly between files
+    3. Combo names are unique within each profile
+    4. Every profile has a non-empty string description
+  - Committed, pushed branch, opened PR #1346, subscribed.
+- **Workstream status updates:**
+  - [x] **CV** — test(chittysecrets): 2 direct resolveChittySecret error-message assertions. PR #1345 merged. DONE.
+  - [ ] **CW** — drift guard + fix 3 duplicate combo names in focus-suggestions.json. PR #1346 open (CI pending).
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1695 runs; burning ~50k tokens/run
+  2. **Merge PR #1346 (CW)** once CI green
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine productive run (data bug fix + drift guard), no exceptional event.
+- **Next run:** Merge #1346 if CI green. Next gap: CX — packages/* export-surface drift guards (if any missing), or worker-specific file opportunities.
