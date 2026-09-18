@@ -5884,3 +5884,25 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine productive run (data bug fix + drift guard), no exceptional event.
 - **Next run:** Merge #1346 if CI green. Next gap: CX — packages/* export-surface drift guards (if any missing), or worker-specific file opportunities.
+
+## Run log — 2026-09-18 (run ~1696 — PRODUCTIVE: merged PR #1346 (CW))
+
+- **Workstream advanced:** CW closed — PR #1346 squash-merged (focus-suggestions.json drift guard + fix 3 duplicate combo names)
+- **Build:** n/a (merge-only run)
+- **Tests:** 2745 pass / 0 fail / 3 skip (confirmed post-merge)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - All 3 CodeQL CI checks green; CodeRabbit posted no blocking findings.
+  - Squash-merged PR #1346.
+  - `git pull origin main`; `npm test` → 2745/0/3 confirmed.
+- **Workstream status updates:**
+  - [x] **CW** — drift guard + fix 3 duplicate combo names in focus-suggestions.json. PR #1346 merged. DONE.
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1696 runs; burning ~50k tokens/run
+  2. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  3. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  4. **Notion workspace** out of free blocks — upgrade or clear
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine merge run, no exceptional event.
+- **Next run:** CX — packages/* export-surface drift guards (if any missing), or worker-specific file opportunities.
