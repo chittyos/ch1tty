@@ -5114,3 +5114,29 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   6. **agents 0.23.0 → 0.24.0** minor bump — human review recommended
 - **PushNotification:** NOT SENT — routine merge run, no exceptional event.
 - **Next run:** DN — tsconfig.json cross-package consistency check or package.json cross-package dep version checks.
+
+## Run log — 2026-09-18 (run ~1704 — PRODUCTIVE: merged DN (#1361), opened DO (#1362))
+
+- **Workstream advanced:** DN merged + DO opened
+- **Build:** `npm run build` clean (tsc) | **Tests:** 2976 pass / 0 fail / 3 skip (+99 from DO)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations on main.
+- **What was done:**
+  - Startup: git reset to main (0789021, post-DM merge). `npm ci` clean. Build clean. Tests: 2877/0/3.
+  - PR #1361 (DN: extract checkBearerAuth + 13 timing-safe auth unit tests): all 3 CI checks green, mergeable_state clean, no blocking reviews. Squash-merged.
+  - Reset to new main (0789021→07890213d84). Tests confirmed 2877/0/3.
+  - DO workstream identified: coverage at 100% for all src/, src-stdio/, apps/, packages/. Found tsconfig inconsistency: `forceConsistentCasingInFileNames: true` missing from 6 of 9 tsconfigs.
+  - Fixed 6 tsconfigs (packages/shared-logger + all 5 apps/*). Added `test/do-tsconfig-consistency-drift.test.ts` (99 assertions over all 9 tsconfigs). typecheck:apps clean.
+  - Pushed `auto/DO-tsconfig-consistency-drift`, opened PR #1362, subscribed to CI.
+- **Workstream status updates:**
+  - [x] **DN** — test(DN): extract checkBearerAuth + 13 timing-safe auth unit tests. PR #1361 merged. DONE.
+  - [ ] **DO** — chore(DO): tsconfig consistency + 99 drift-guard tests. PR #1362 open (CI pending).
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1704 runs; burning ~50k tokens/run
+  2. **Merge PR #1362 (DO)** once CI green — tsconfig consistency + drift guard (99 tests)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **agents 0.23.0 → 0.24.0** minor bump — human review recommended before advancing
+- **PushNotification:** NOT SENT — routine workstream PR, no exceptional event.
+- **Next run:** Merge #1362 if CI green. Next gap: DP — further structural drift guards or quality opportunities (e.g. package.json cross-workspace dep version consistency check).
