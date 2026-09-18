@@ -5162,3 +5162,28 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   6. **agents 0.23.0 → 0.24.0** minor bump — human review recommended
 - **PushNotification:** NOT SENT — routine merge run, no exceptional event.
 - **Next run:** DP — package.json cross-workspace dep version consistency check or further quality opportunities.
+
+---
+
+## Run ~1706 — 2026-09-18
+
+- **Workstream advanced:** DP confirmed CI green (#1363 ready for merge); DQ opened — PR #1364 (focus-profiles.json structural drift guard, +104 tests)
+- **Build:** n/a (test-only addition; build was clean on main)
+- **Tests:** 3101 pass / 0 fail / 3 skip
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - PR #1363 (DP) CI verified: 3/3 checks green (CodeQL + both Analyze). Ready for human merge.
+  - Created `test/dq-focus-profiles-json-drift.test.ts` — imports `validateFocusProfiles()` from `src-stdio/focus.ts` and exercises it against the actual `focus-profiles.json`. 104 new tests across 3 suites: validator passes, 25-profile roster guard, per-profile invariants (description/coverage/boost/categories).
+  - Opened PR #1364 on branch `auto/dq-focus-profiles-json-drift`.
+- **Workstream status updates:**
+  - [ ] **DP** — PR #1363 CI green, awaiting human merge.
+  - [ ] **DQ** — PR #1364 opened; awaiting CI + human merge.
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1706 runs; burning ~50k tokens/run
+  2. **Merge PR #1363** (DP) — CI green
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+- **PushNotification:** NOT SENT — routine test addition, no exceptional event.
+- **Next run:** Verify #1363/#1364 CI. Next gap: DR — cast-explain field-count snapshot guard (no test guards the 56-field/87-field counts independently of the metric-freeze test), or examine other structural gaps.
