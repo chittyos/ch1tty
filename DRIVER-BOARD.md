@@ -5946,3 +5946,26 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
 - **Next run:** Merge #1351 if CI green. Next gap: DE — look at remaining quality opportunities (integration tests, scenario coverage, or worker-file testability exploration).
+
+## Run log — 2026-09-18 (run ~1698 — PRODUCTIVE: merged DC (#1351))
+
+- **Workstream advanced:** DC closed — PR #1351 squash-merged (servers.orchestrator.json drift guard + CodeRabbit fix)
+- **Build:** n/a (merge-only run)
+- **Tests:** 2760 pass / 0 fail / 3 skip (confirmed post-merge)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - CI green on fix commit ade694d (3/3: CodeQL neutral, Analyze actions success, Analyze js-ts success).
+  - CodeRabbit confirmed fix: "Id-less malformed entries now reach the required-fields check."
+  - Squash-merged PR #1351.
+  - `git reset --hard origin/main`; `npm test` → 2760/0/3 confirmed.
+- **Workstream status updates:**
+  - [x] **DC** — test(dc): servers.orchestrator.json drift guard — 6 tests + CodeRabbit fix. PR #1351 merged. DONE.
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1698 runs; burning ~50k tokens/run
+  2. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  3. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  4. **Notion workspace** out of free blocks — upgrade or clear
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine merge run, no exceptional event.
+- **Next run:** DE — find next quality gap (all testable coverage at 100%; candidates: further data file drift guards, scenario test improvements, or other quality opportunities).
