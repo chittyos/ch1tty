@@ -5228,3 +5228,15 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   6. **Stale branch cleanup** — 1100+ remote auto/ branches
 - **PushNotification:** NOT SENT — routine test addition, no exceptional event.
 - **Next run:** Verify #1363/#1364 CI. Next gap: DR — cast-explain field-count snapshot guard (no test guards the 56-field/87-field counts independently of the metric-freeze test), or examine other structural gaps.
+
+---
+
+## Run ~1706 follow-up — 2026-09-18
+
+- **Event:** PR #1364 (DQ — focus-profiles.json drift guard) closed without merging by human.
+- **Action:** No reopen or new PR created per policy. `test/dq-focus-profiles-json-drift.test.ts` remains on branch `auto/dq-focus-profiles-json-drift`.
+- **Workstream status updates:**
+  - [x] **DP** — PR #1363 merged. DONE.
+  - [ ] **DQ** — PR #1364 closed without merge. Branch `auto/dq-focus-profiles-json-drift` preserved. Awaiting human direction.
+- **PushNotification:** SENDING — PR #1364 closed without merge; flagging for human awareness.
+- **Next run:** If DQ is to land, human must reopen #1364 or ask next run to re-open. Next gap after DQ: DR — cast-explain field-count snapshot guard.
