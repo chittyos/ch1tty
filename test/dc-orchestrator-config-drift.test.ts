@@ -36,7 +36,7 @@ function loadJson(filename: string): { servers: ServerEntry[] } {
 }
 
 function realServers(entries: ServerEntry[]): ServerEntry[] {
-  return entries.filter((s) => typeof s === 'object' && s !== null && 'id' in s);
+  return entries.filter((s) => typeof s === 'object' && s !== null && !('_comment' in s));
 }
 
 describe('servers.orchestrator.json — drift guard', () => {
