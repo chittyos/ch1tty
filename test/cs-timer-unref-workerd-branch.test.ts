@@ -72,13 +72,26 @@ describe('CS — timer unref?.() workerd branch', { concurrency: false }, () => 
   });
 
   it('LedgerClient.bind: does not throw when setInterval returns a Node.js timer (standard path)', async () => {
-    globalThis.setInterval = savedSetInterval;
-    const { LedgerClient } = await import('../src-stdio/ledger.js');
-    const client = new LedgerClient();
-    assert.doesNotThrow(() => {
-      client.bind(makeFakeBackend(), 'test-server-id');
-    });
-    client.unbind();
+    let unrefCalls = 0;
+    (globalThis as any).setInterval = (...args: any[]) => {
+      const timer = (savedSetInterval as any)(...args);
+      const origUnref = (timer as any).unref?.bind(timer);
+      if (origUnref) {
+        (timer as any).unref = () => { unrefCalls++; return origUnref(); };
+      }
+      return timer;
+    };
+    try {
+      const { LedgerClient } = await import('../src-stdio/ledger.js');
+      const client = new LedgerClient();
+      assert.doesNotThrow(() => {
+        client.bind(makeFakeBackend(), 'test-server-id');
+      });
+      assert.equal(unrefCalls, 1, 'unref() must be called exactly once on the Node.js flush timer');
+      client.unbind();
+    } finally {
+      globalThis.setInterval = savedSetInterval;
+    }
   });
 
   // ── SessionCoordinator constructor — unref?.() when setInterval returns a plain number ──
@@ -110,7 +123,11 @@ describe('CS — timer unref?.() workerd branch', { concurrency: false }, () => 
   });
 
   it('SessionCoordinator: evict-timer branch is skipped when TTL is 0', async () => {
-    globalThis.setInterval = savedSetInterval;
+    let intervalCalls = 0;
+    (globalThis as any).setInterval = (..._args: any[]) => {
+      intervalCalls++;
+      return 123 as unknown as ReturnType<typeof setInterval>;
+    };
     const savedTtl = process.env.CH1TTY_SESSION_TTL_MS;
     process.env.CH1TTY_SESSION_TTL_MS = '0';
     try {
@@ -119,8 +136,10 @@ describe('CS — timer unref?.() workerd branch', { concurrency: false }, () => 
       assert.doesNotThrow(() => {
         coordinator = new SessionCoordinator();
       });
+      assert.equal(intervalCalls, 0, 'setInterval must not be called when TTL is 0');
       await coordinator?.ledger.shutdown();
     } finally {
+      globalThis.setInterval = savedSetInterval;
       if (savedTtl === undefined) delete process.env.CH1TTY_SESSION_TTL_MS;
       else process.env.CH1TTY_SESSION_TTL_MS = savedTtl;
     }
