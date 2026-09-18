@@ -5752,3 +5752,40 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   - Pulled main.
 - **State summary:** A ✓ … CP ✓ ALL DONE. **0 open PRs.** Tests: 2694/0/3. Build: clean.
 - **Next run:** Find Workstream CQ. Candidates: remaining branch gaps in `src-stdio/` or apps/*.
+
+## Run log — 2026-09-18 (run ~1692 — PRODUCTIVE: opened PR #1344 (CU) wrangler bump)
+
+- **Workstream advanced:** CU — bump wrangler 4.132.0 → 4.134.0
+- **Branch/PR:** `auto/CU-wrangler-4.134.0` → **PR #1344** (https://github.com/chittyos/ch1tty/pull/1344)
+- **Build:** tsc clean (0 errors, ch1tty@4.1.0)
+- **Tests:** 2726 pass / 0 fail / 3 skip (2729 total, 110 suites) — no regressions
+- **npm audit:** 0 vulnerabilities
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations on main.
+- **Startup state:**
+  - Synced to origin/main (317f5bb). `npm ci` clean. `npm run build` clean. `npm test`: 2726/0/3.
+  - Found 3 open PRs: #1341 (CR: session-manager lines 89-90), #1342 (CS: timer unref workerd guard), #1343 (CT: workers-ai-brain null category/metadata/error paths). All `mergeable_state: clean`, CodeQL green.
+  - Coverage: `src-stdio/` 100%; `apps/` 100%; `packages/` 99.48% (session-manager 97.22% branch — covered by CR); `src/` meaningful files 100% except workers-ai-brain.ts lines 209/271 (covered by CT).
+  - npm audit: 0 vulns.
+  - `npm outdated`: only wrangler (4.132.0 → 4.134.0 minor patch) and major bumps (@types/node 22→26, typescript 5→7 — already at 7 in package.json, c8 12 — already at 12 in package.json).
+- **What was done:**
+  - Identified wrangler patch bump 4.132.0 → 4.134.0 as safe autonomous action (minor version, within ^4.x.x range).
+  - Updated `package.json` spec to `^4.134.0`, ran `npm install` (lockfile updated, 5 packages changed, 0 vulns).
+  - Verified: wrangler --version: 4.134.0; build clean; tests 2726/0/3.
+  - Committed, pushed `auto/CU-wrangler-4.134.0`, opened PR #1344, subscribed for CI.
+- **Workstream status updates:**
+  - [ ] **CR** — test(session-manager): 2 catch branch gap tests. PR #1341 open (CodeQL green, clean).
+  - [ ] **CS** — test(timer-unref): 4 workerd guard tests. PR #1342 open (CodeQL green, clean).
+  - [ ] **CT** — test(workers-ai-brain): 7 branch gap tests. PR #1343 open (CodeQL green, clean).
+  - [ ] **CU** — chore(deps): wrangler 4.132.0 → 4.134.0. PR #1344 open (CI pending).
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1692 runs; cron burning ~50k tokens/run
+  2. **Merge PR #1341 (CR)** — session-manager catch branch coverage (2 tests, clean)
+  3. **Merge PR #1342 (CS)** — timer unref workerd guard coverage (4 tests, clean)
+  4. **Merge PR #1343 (CT)** — workers-ai-brain null/error branch coverage (7 tests, clean)
+  5. **Merge PR #1344 (CU)** once CI green — wrangler 4.132.0 → 4.134.0 bump
+  6. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  7. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  8. **Notion workspace** out of free blocks — upgrade or clear
+  9. **Stale branch cleanup** — 1100+ remote auto/ branches
+- **PushNotification:** NOT SENT — routine dep bump, 4 open PRs (all queued, no exceptional event).
+- **Next run:** Merge CR/CS/CT/CU once CI green. Next gap: CV — if all coverage is at 100% after merges, look at worker-specific files (api-agent.ts, codemode-bridge.ts, mcp-agent.ts) for potential workerd-test harness, or other patch dep bumps.
