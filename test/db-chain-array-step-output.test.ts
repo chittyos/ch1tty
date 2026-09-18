@@ -106,7 +106,10 @@ function makeAgg(step0ResponseText: string) {
 // Scenario 1 — array of objects: first element fields ARE extracted as scalars
 // ---------------------------------------------------------------------------
 test('DB-1: chain step — JSON array output → src=parsed[0] → scalar fields extracted into step 2 args', async () => {
-  const arrayJson = JSON.stringify([{ tag: 'v2.0', build: 42 }]);
+  const arrayJson = JSON.stringify([
+    { tag: 'v2.0', build: 42 },
+    { tag: 'ignored', build: 99, extra: 'must-not-forward' },
+  ]);
   const { agg, backend } = makeAgg(arrayJson);
 
   await agg.callTool('ch1tty/cast', { intent: 'list then deploy', chain: true });
@@ -116,9 +119,11 @@ test('DB-1: chain step — JSON array output → src=parsed[0] → scalar fields
 
   const step1 = calls[1];
   assert.equal(step1.tool, 'deploy_artifact', 'step 2 is deploy_artifact');
-  assert.equal(step1.args.previousResult, arrayJson, 'raw JSON array forwarded as previousResult');
-  assert.equal(step1.args.tag, 'v2.0', 'string field extracted from parsed[0]');
-  assert.equal(step1.args.build, 42, 'number field extracted from parsed[0]');
+  assert.deepEqual(step1.args, {
+    previousResult: arrayJson,
+    tag: 'v2.0',
+    build: 42,
+  });
 
   await agg.shutdown();
 });
