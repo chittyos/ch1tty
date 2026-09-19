@@ -6777,3 +6777,21 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
 - **Next run:** Merge #1408 if CI green. Next gap: FE — execute response top-level shape (isError, content array item shape) or status response shape.
+
+---
+
+## Merge event — 2026-09-19 ~22:39 UTC
+
+**PR #1409 (FE) — MERGED** ✅
+- test(FE): freeze /api/v1/health response body exact key sets (12 tests)
+- CI: CodeQL ✅, Analyze ✅, Codex 👍 no findings
+
+**PR #1410 (FG) — MERGED** ✅
+- test(FG): freeze /api/v1/sessions response body exact shapes (8 tests)
+- CI: CodeQL ✅, Analyze ✅
+- Codex: 3 rounds addressed (FG-7 full-sequence check, FG-5 compile-time assertion removed after tsx transpile confirmed)
+
+**Status after merges:**
+- Drift guard suite now covers: EA, EB, EC, ED, EX/EY/EZ/FA (cast explain), FB (search explain), FC (server-summary), FD (topcandidates+search-keyword), FE (health key sets), FG (sessions shapes)
+- Open PRs still awaiting merge: #1407 (FD-topcandidates), #1408 (FD-search-keyword) — CI ✅
+- Next workstream (FH): api/v1/status snapshot top-level key freeze or apps-level drift guards
