@@ -6209,3 +6209,37 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
 - **Next run:** Merge #1380 if CI green. Next gap: EG — remaining cast sub-object guards (alternatives item shape for cast:executed, no-unexpected-keys guards for EA's 4 paths) OR next coverage gap.
+
+---
+
+## Run log — 2026-09-19 (run ~1714 — PRODUCTIVE: merged EF (#1380), opened EG (#1381))
+
+- **Workstream advanced:** EF closed — PR #1380 squash-merged (cast:discovered + cast:chain_executed + error path drift guard, 24 tests). EG opened — PR #1381 (cast no-unexpected-keys guards for EA's 4 paths, 16 tests).
+- **Build:** clean (tsc exit 0)
+- **Tests:** 4290 pass / 0 fail / 3 skip (was 4274; +16 from EG)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - Confirmed PR #1380 CI: 3/3 CodeQL checks green. Squash-merged.
+  - Pulled main (52b49d3). Baseline: 4274/0/3.
+  - Read `src-stdio/aggregator.ts` handleCast() lines 1364–1675 to extract all conditional fields for each cast path.
+  - Identified gap: EA checks required keys (will catch renames that remove old name) but does NOT freeze PERMITTED sets (won't catch renames that add new name). EG fills that gap.
+  - Added `test/eg-cast-no-unexpected-keys.test.ts` — 16 tests across 4 suites:
+    1. cast:executed (5): no unexpected top-level keys (PERMITTED set frozen), latencyBreakdown no unexpected keys, score type, ≥2 content items, first item type:text
+    2. cast:plan (4): no unexpected top-level keys, resolved sub-object no unexpected keys, args type (object/null), exactly 1 content item
+    3. cast:resolved/dryRun (3): no unexpected top-level keys, resolved sub-object no unexpected keys, exactly 1 content item
+    4. cast:no_match (4): no unexpected top-level keys, hint frozen string, exactly 1 content item, resolvedBy type
+  - Full suite: 4290/0/3 (+16). Build clean.
+  - Committed, pushed `auto/EG-cast-no-unexpected-keys-guards`, opened PR #1381, subscribed.
+- **Workstream status updates:**
+  - [x] **EF** — test(ef): cast:discovered + cast:chain_executed + error path drift guard — 24 tests. PR #1380 merged. DONE.
+  - [ ] **EG** — test(eg): cast no-unexpected-keys guards for 4 paths — 16 tests. PR #1381 open (CI pending).
+- **Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1714 runs; burning ~50k tokens/run
+  2. **Merge PR #1381 (EG)** once CI green — cast no-unexpected-keys drift guards
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+- **Next run:** Merge #1381 if CI green. Next gap: EH — alternatives item shape guard in cast:executed (field set: tool, score, description), or survey remaining uncovered paths.
