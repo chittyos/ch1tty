@@ -63,8 +63,21 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, test } from 'node:test';
 import { Aggregator } from '../src/aggregator.js';
+import { SessionCoordinator } from '../src/coordinator.js';
 import { FixtureBackend } from './fixture-backend.js';
+import type { RoutedTool, ToolCandidate } from '../src/ollama-brain.js';
 import type { ServerConfig } from '../src/types.js';
+
+// Keyword-only stub — never invokes OllamaBrain, keeps tests hermetic under
+// CH1TTY_USE_OLLAMA_BRAIN=1.
+class StubCoordinator extends SessionCoordinator {
+  constructor() {
+    super({}, { enabled: false });
+  }
+  override async routeIntent(_query: string, _candidates: ToolCandidate[]): Promise<RoutedTool[] | null> {
+    return null;
+  }
+}
 
 // ── Fixture setup ─────────────────────────────────────────────────────────────
 
@@ -109,6 +122,7 @@ function makeSoloAggregator(): Aggregator {
   return new Aggregator(configs, {
     backendFactory: () => backend,
     embedEnabled: false,
+    coordinator: new StubCoordinator(),
     ledgerDlqPath: dlq(),
     focusProfiles: FOCUS_PROFILES,
   });
