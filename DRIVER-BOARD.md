@@ -1,4 +1,4 @@
-[Resource from github at repo://chittyos/ch1tty/sha/49d31ef1657633370b33990805a3904db12a8f53/contents/DRIVER-BOARD.md] # ch1tty goal-driver board
+# ch1tty goal-driver board
 
 Fallback board — Notion API token invalid (401). This file is the cross-run durable state.
 Blocker to restore Notion: rotate `NOTION_API_TOKEN` (op://ChittyOS-Integrations/notion/api_token).
