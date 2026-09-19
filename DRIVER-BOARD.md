@@ -6740,3 +6740,38 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+
+---
+
+## Run 2026-09-19 (FD)
+
+**Build:** PASS | **Tests:** 10/10 new (FD suite) + full suite green
+**Branch:** `auto/FD-topcandidates-item-value-types`
+**Workstream:** FD — freeze cast explain topCandidates item VALUE TYPES
+
+### What was done
+
+- Resolved all 6 outstanding PR merge conflicts (EX #1401 → FC #1406), all merged to main this run.
+- Created `test/fd-topcandidates-item-value-types.test.ts` — 5 suites, 10 tests:
+  - FD-1: `score` is finite number ≥ 0 (low + full verbosity)
+  - FD-2: `tool` is non-empty namespaced string containing '/'
+  - FD-3: `inFocus` boolean semantics (present/absent, true/false per focus state)
+  - FD-4: topCandidates sorted descending by score; topCandidates[0].score === winnerScore
+  - FD-5: Verbosity independence — same item shape at all verbosity levels
+- Complements ET (which froze field NAMES); no new fields added — CLAUDE.md metric freeze compliant.
+
+### PRs merged this run
+- EX #1401, EY #1402, EZ #1403, FA #1404, FB #1405, FC #1406
+
+### Next recommended workstream
+- **FE**: freeze `cast` explain for `no_match` response shape (winnerScore absent, method, reason fields)
+  - OR: **FF**: freeze `ch1tty/execute` response envelope fields (content array shape, isError type)
+
+**Human-action items (persistent):**
+1. **DISABLE hourly cron** — ~1728 runs; burning ~50k tokens/run
+2. **Merge open PRs** (FD PR once CI green)
+3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+5. **Notion workspace** out of free blocks — upgrade or clear
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
