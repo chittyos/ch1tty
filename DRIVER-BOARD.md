@@ -6740,3 +6740,36 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+
+---
+
+# Run ~1728 — 2026-09-19 — PRODUCTIVE: opened FE (#1409)
+
+**Build:** tsc clean | **Tests:** 4510 pass / 0 fail / 3 skip (was 4495 on origin/main; +12 from FE, +3 from FD branches not yet in main)
+
+**Opened:** PR #1409 (FE — /api/v1/health exact response body key set drift guard)
+- Branch: `auto/FE-health-response-key-set-drift-guard`
+- File: `test/fe-health-response-key-set-drift-guard.test.ts` (184 lines, 12 tests, 3 suites)
+- Gap filled: Prior health tests (EEEEE, OOOOO, VVVV) check individual field presence/absence but none freeze the COMPLETE key set. A rename (`service` → `name`) or accidental addition would pass silently.
+- 6 key-set scenarios frozen: ok+ledgerOk, warn+brain, warn+ledger, warn+both, degraded, internal-error
+- Sub-objects frozen: systemHealth {brainDegraded, ledgerStatus, status}; ledgerDlq {entryCount}
+- Value types: status string union, service 'ch1tty', systemHealth object, boolean-true flags, integer entryCount
+- 12/12 green locally
+
+**Open PRs (all CI green, awaiting human merge):**
+- PR #1407 (FD-topcandidates): cast explain topCandidates item value types — CI ✅, mergeable_state: blocked
+- PR #1408 (FD-search-keyword): keyword search response envelope/tool shapes — CI ✅, mergeable_state: clean
+- PR #1409 (FE): health response exact key sets (this run) — CI pending
+
+**Human-action items (persistent):**
+1. **DISABLE hourly cron** — ~1728 runs; burning ~50k tokens/run
+2. **Merge PRs #1407, #1408, #1409** once CI green
+3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+5. **Notion workspace** out of free blocks — upgrade or clear
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+
+**Next run:** Check CI on #1409. Next gap after FE: look at other unfrozen response shapes — candidates are api/v1/status snapshot key freeze, api/v1/sessions response shape, or apps-level drift guards (tasks-mcp, comms-mcp tool response shapes not yet frozen).
+
+**PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
