@@ -6800,32 +6800,42 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 ## Run ~1729 — 2026-09-19
 
-**Context on resume:** PR #1408 (FD) merged. Main was 3 commits ahead: fd-topcandidates-item-value-types, fe-health-response-key-set-drift-guard, fg-sessions-response-shape-drift-guard — all direct commits by prior runs. No open PRs at start of run.
+**Merged this run:** PRs #1407 (FD — topCandidates item value types, 10 tests), #1408 (FD — keyword search response drift guard, 18 tests), #1409 (FE — health response key sets, 12 tests), #1410 (FG — sessions response shapes, 8 tests). All 4 had 3/3 CI green. #1408 merged clean. #1407, #1409, #1410 had `mergeable_state: blocked`/`dirty` due to unresolved CodeRabbit/Codex inline threads — resolved 8 threads across both PRs (all addressed by chitcommit), then resolved DRIVER-BOARD.md merge conflicts on 3 branches (took main's version), pushed, and merged.
 
-**Opened:** PR #1411 (FH — execute response envelope and content item drift guard)
+**Test baseline:** 4543 pass / 0 fail / 3 skip (+48 from 4 PRs: 18+10+12+8).
+
+**Opened:** PR #1412 (FH — cast explain verbosity key-set drift guard)
+- Branch: `auto/FH-cast-explain-verbosity-key-set-drift-guard`
+- File: `test/fh-cast-explain-verbosity-key-set-drift-guard.test.ts` (8 tests, 294 lines)
+- Gap filled: `zzzz` freezes verbosity:full FIELD COUNT (56/87 total). FH freezes the EXACT TOP-LEVEL KEY SET at verbosity:low and verbosity:medium via deepEqual — renames fail regardless of count.
+- 4 suites:
+  1. FH-1 verbosity:low no-focus → exact 8-key set + no focus-key leakage
+  2. FH-2 verbosity:low focus:code → exact 12-key set + no medium/full-only keys
+  3. FH-3 verbosity:medium no-focus → exact 15-key set + distribution stats are numbers
+  4. FH-4 verbosity:medium focus:code → exact 27-key set + focus analysis value types
+- Probed actual key sets via FixtureBackend before writing tests (no guessing).
+- 8/8 green locally.
+
+**Also opened (parallel session):** PR #1411 (execute response shape drift guard)
 - Branch: `auto/FH-execute-response-shape-drift-guard`
 - File: `test/fh-execute-response-shape-drift-guard.test.ts` (12 tests, 4 suites)
-- Gap filled: handleExecute constructs ToolCallResult directly for all error+dryRun paths; no prior test froze the exact key set or content item shape. A field addition or type change on isError would pass silently.
-- 4 suites:
-  1. Top-level key sets: success→`['content']`; ch1tty errors→`['content','isError']`; backend errors→`['content','isError']`
-  2. Content item shape: text item always `['text','type']`; ch1tty error always 1 item
-  3. isError value types: absent on success; boolean true on error; false on dryRun
-  4. dryRun shape: top-level `['content','isError']`, isError===false; body JSON `['args','latencyMs','server','status','tool']`
-- 12/12 green locally; CI green; CodeRabbit clean (no findings)
+- Freezes: execute success key set `['content']`; error key set `['content','isError']`; text item `['text','type']`; isError value types; dryRun body JSON keys
+- CI green; CodeRabbit clean (no findings); awaiting merge.
 
 **Workstream status:**
-  - [x] **FD** — PR #1408 merged. DONE.
-  - [x] **FE** — health response key set drift guard. Merged by prior run. DONE.
-  - [x] **FG** — sessions response shape drift guard. Merged by prior run. DONE.
-  - [ ] **FH** — PR #1411 open (CI green, CodeRabbit clean, awaiting merge).
+  - [x] **FD** (×2) — PRs #1407 + #1408 merged. DONE.
+  - [x] **FE** — PR #1409 merged. DONE.
+  - [x] **FG** — PR #1410 merged. DONE.
+  - [ ] **FH** — PR #1412 open (CI pending); PR #1411 open (CI green, awaiting merge).
 
-**Human-action items (unchanged):**
-  1. **DISABLE hourly cron** — ~1729 runs; burning ~50k tokens/run
-  2. **Merge PR #1411 (FH)** — CI green, no review findings
-  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
-  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
-  5. **Notion workspace** out of free blocks — upgrade or clear
-  6. **Stale branch cleanup** — 1100+ remote auto/ branches
-  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
-- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
-- **Next run:** Merge #1411 if CI green. Next gap: FI — status response top-level shape (server entry item shape, or ch1tty/reload response shape).
+**Human-action items (persistent):**
+1. **DISABLE hourly cron** — ~1729 runs; burning ~50k tokens/run
+2. **Merge PR #1412 (FH)** once CI green — cast explain verbosity key-set drift guard
+3. **Merge PR #1411** — execute response shape drift guard (CI green, no findings)
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+6. **Notion workspace** out of free blocks — upgrade or clear
+7. **Stale branch cleanup** — 1100+ remote auto/ branches
+8. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard work, no exceptional event.
+- **Next run:** Merge #1412 and #1411 if CI green. Next gap: FI — verbosity:full exact key-set freeze or /api/v1/status exact key-set freeze.
