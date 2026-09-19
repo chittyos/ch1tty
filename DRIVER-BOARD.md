@@ -6484,3 +6484,52 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   8. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
 - **Next run:** Merge #1389 if CI green. Merge #1383 if CI green. Next gap: EO — survey remaining unfrozen cast shapes (cast:plan resolved sub-object {tool,server,category,description,score,inputSchema} shape, related.prompts item shape, related.resources item shape).
+
+---
+
+## Run log — 2026-09-19 (run ~1722 — PRODUCTIVE: merged EN (#1389), opened EO)
+
+- **Workstream advanced:** EN closed — PR #1389 squash-merged (cast:resolved + cast:chain_executed sessionContext guards, 8 tests). EO next: cast:plan resolved sub-object shape + related item shapes.
+- **Build:** clean (tsc exit 0)
+- **Tests:** 4370 pass / 0 fail / 3 skip (was 4355; +15 from EH+EN landing together on main pull)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - PR #1389 CI: 3/3 checks green (CodeQL + Analyze javascript-typescript + Analyze actions).
+  - Replied to Codex P2 optional finding on PR #1389 (activeSessionFocus always absent because focus:'code' is a process default not a session-sticky focus) — stays as-is, follow-up for EO/EP. Resolved thread.
+  - Squash-merged PR #1389.
+  - Pulled main (4555a37). Test suite: 4370/0/3 (post-EH+EN). Build clean.
+- **Workstream status updates:**
+  - [x] **EH** — test(eh): alternatives array item shape in cast:executed + cast:plan — 15 tests. PR #1383 merged. DONE.
+  - [x] **EN** — test(en): cast:resolved and cast:chain_executed sessionContext sub-object shapes — 8 tests. PR #1389 merged. DONE.
+  - [ ] **EO** — survey + freeze remaining unfrozen cast shapes: cast:plan resolved sub-object {tool,server,category,description,score,inputSchema}, related.prompts item {name,description,arguments,score}, related.resources item {uri,name,description,mimeType,score}. In progress this run.
+- **Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1722 runs; burning ~50k tokens/run
+  2. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  3. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  4. **Notion workspace** out of free blocks — upgrade or clear
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **Next run:** EO — open PR freezing cast:plan resolved sub-object + related.prompts + related.resources shapes.
+
+---
+
+## Run log — 2026-09-19 (run ~1722b — PRODUCTIVE: opened EO (#1390))
+
+- **Workstream advanced:** EO opened — PR #1390 (`auto/EO-plan-resolved-related-shapes`), 9 tests across 3 suites freezing cast:plan resolved + related.prompts + related.resources item shapes.
+- **Build:** clean (tsc exit 0)
+- **Tests:** 4379 pass / 0 fail / 3 skip (4382 total, 240 suites)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done (full run):**
+  - PR #1389 (EN) CI: 3/3 checks green. Replied to Codex P2 optional finding (activeSessionFocus stays absent per established conditional guard pattern; follow-up for EO/EP). Resolved thread. Squash-merged.
+  - Pulled main (4555a37). Baseline: 4370/0/3.
+  - Identified 3 remaining unfrozen shapes in cast:plan: resolved sub-object, related.prompts items, related.resources items.
+  - Added `test/eo-plan-resolved-related-shapes.test.ts` — 9 tests across 3 suites:
+    1. resolved sub-object (3): no unexpected keys (EXACT), all exact keys, field types correct
+    2. related.prompts items (3): no unexpected keys (PERMITTED), required keys, types
+    3. related.resources items (3): no unexpected keys (PERMITTED), required keys, types
+  - Fixture: makePlanAgg() with neon backend (1 tool + 1 prompt + 1 resource), all scoring 1.0 against "list neon projects" intent. confirm:true triggers cast:plan path.
+  - Full suite: 4379/0/3 (+9). Build clean. Opened PR #1390, subscribed.
+- **Workstream status updates:**
+  - [x] **EN** — DONE (merged PR #1389 this run).
+  - [ ] **EO** — test(eo): cast:plan resolved, related.prompts, related.resources shapes — 9 tests. PR #1390 open (CI pending).
+- **Next run:** Merge #1390 if CI green. Next gap: EP — remaining unfrozen shapes: cast:executed related.prompts/resources (same related object, executed path lines 1666+), cast:discovered related.prompts/resources, cast:chain_executed alternatives item shape.
