@@ -6072,3 +6072,35 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
 - **Next run:** Merge #1376 if CI green. Next gap: EC — ch1tty/execute response shape drift guard (mirrors EB pattern for execute).
+
+---
+
+### Run ~1710 — 2026-09-19
+
+- **Branch/PR state:** PR #1376 (EB) merged successfully (all 3 CodeQL checks green, no CodeRabbit findings). EC branch `auto/EC-execute-response-shape-drift` pushed, PR #1377 open.
+- `npm test`: 3541/0/2 (280 test files, 153 suites; count reflects node:test suite-node counting).
+- **What was done:**
+  - Checked PR #1376 CI: all 3 CodeQL checks green, no review threads. Merged (squash).
+  - Pulled main. Created `auto/EC-execute-response-shape-drift`.
+  - Added `test/ec-execute-response-shape-drift.test.ts` — 32 tests across 6 suites:
+    1. Structural invariants: content (array), isError (bool/undef), every item has type, type:text items have text
+    2. Error paths: missing tool, invalid format (no /), unknown server → isError:true; single content item
+    3. Dry-run: isError:false, single item, text is JSON, required keys status/server/tool/args/latencyMs, no unexpected keys (no-session)
+    4. Success (no session): isError falsy, content ≥1 item, all items have type
+    5. Session metadata: appended item type:text, JSON with latencyMs (≥0) + sessionContext; sessionContext has recentTools (array) + callCount (number); no unexpected keys
+    6. Dry-run + session: sessionContext present; dry-run without session: no sessionContext
+  - Full suite: 3541/0/2 (+32 EC tests). Build clean.
+  - Committed, pushed `auto/EC-execute-response-shape-drift`, opened PR #1377, subscribed.
+- **Workstream status updates:**
+  - [x] **EB** — test(eb): ch1tty/search response shape drift guard — 20 tests. PR #1376 merged. DONE.
+  - [ ] **EC** — test(ec): ch1tty/execute response shape drift guard — 32 tests. PR #1377 open (CI pending).
+- **Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1710 runs; burning ~50k tokens/run
+  2. **Merge PR #1377 (EC)** once CI green — execute response shape drift guard
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+- **Next run:** Merge #1377 if CI green. Next gap: ED — `ch1tty/status` response shape drift guard (mirrors EC pattern for status).
