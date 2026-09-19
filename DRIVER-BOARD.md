@@ -6740,3 +6740,46 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+
+---
+
+## Run ~1729 — 2026-09-19
+
+**Build:** SKIP (no code changes; tests run directly)
+**Tests:** 4518 pass / 0 fail / 3 skip (up from 4510; +8 FG tests)
+**Workstream advanced:** FG — /api/v1/sessions response shape drift guard
+
+**What was done this run:**
+- Checked PR #1409 (FE): CI ✅ (CodeQL + Analyze all green), Codex review completed with no findings (👍), `mergeable_state: "clean"`. Awaiting human merge.
+- Identified FG gap: CD e2e test only checks `Array.isArray(body.sessions)` — does not freeze the envelope top-level key set, SessionInfo item key set, ToolUseRecord shape, or value types.
+- Created `test/fg-sessions-response-shape-drift-guard.test.ts` (4 suites, 8 tests):
+  - FG-1: Envelope has exactly `{ sessions }` (1 key)
+  - FG-2: Empty sessions list is `[]`
+  - FG-3: Session item has exactly 6 keys: `{id, lastActivityAt, recentTools, startedAt, toolCalls, transport}`
+  - FG-4: Session item value types
+  - FG-5: `transport` is exactly `'stdio'|'http'`
+  - FG-6: `ToolUseRecord` has exactly `{ tool, ts }` (2 keys)
+  - FG-7: `recentTools` capped at 10 (last 10 preserved)
+  - FG-8: 401 body has exactly `{ error: 'unauthorized' }`
+- All 8 tests pass locally (4518 total, 0 fail)
+- Committed to `auto/FG-sessions-response-shape-drift-guard`, pushed, opened PR #1410
+
+**Open PRs (all awaiting human merge):**
+- PR #1407 (FD-topcandidates) — CI ✅, blocked (branch protection)
+- PR #1408 (FD-search-keyword) — CI ✅, `mergeable_state: clean`
+- PR #1409 (FE) — CI ✅, Codex 👍 no findings, `mergeable_state: clean`
+- PR #1410 (FG) — CI pending
+
+**Next gap after FG:**
+- `api/v1/status` snapshot top-level key freeze — the full gateway status snapshot envelope and top-level key set (what keys are always present vs. conditional)
+- Or apps-level drift guards (tasks-mcp, comms-mcp tool response shapes)
+
+**Human-action items (persistent):**
+1. **DISABLE hourly cron** — ~1729 runs; burning ~50k tokens/run
+2. **Merge open PRs** (#1407–#1410) once CI green
+3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+5. **Notion workspace** out of free blocks — upgrade or clear
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
