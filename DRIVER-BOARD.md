@@ -6777,3 +6777,37 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
 - **Next run:** Merge #1408 if CI green. Next gap: FE — execute response top-level shape (isError, content array item shape) or status response shape.
+
+---
+
+## Run ~1729 — 2026-09-19
+
+**Context on resume:** PR #1408 (FD) merged. Main was 3 commits ahead: fd-topcandidates-item-value-types, fe-health-response-key-set-drift-guard, fg-sessions-response-shape-drift-guard — all direct commits by prior runs. No open PRs at start of run.
+
+**Opened:** PR #1411 (FH — execute response envelope and content item drift guard)
+- Branch: `auto/FH-execute-response-shape-drift-guard`
+- File: `test/fh-execute-response-shape-drift-guard.test.ts` (12 tests, 4 suites)
+- Gap filled: handleExecute constructs ToolCallResult directly for all error+dryRun paths; no prior test froze the exact key set or content item shape. A field addition or type change on isError would pass silently.
+- 4 suites:
+  1. Top-level key sets: success→`['content']`; ch1tty errors→`['content','isError']`; backend errors→`['content','isError']`
+  2. Content item shape: text item always `['text','type']`; ch1tty error always 1 item
+  3. isError value types: absent on success; boolean true on error; false on dryRun
+  4. dryRun shape: top-level `['content','isError']`, isError===false; body JSON `['args','latencyMs','server','status','tool']`
+- 12/12 green locally
+
+**Workstream status:**
+  - [x] **FD** — PR #1408 merged. DONE.
+  - [x] **FE** — health response key set drift guard. Merged by prior run. DONE.
+  - [x] **FG** — sessions response shape drift guard. Merged by prior run. DONE.
+  - [ ] **FH** — PR #1411 open (CI pending).
+
+**Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1729 runs; burning ~50k tokens/run
+  2. **Merge PR #1411 (FH)** once CI green
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+- **Next run:** Merge #1411 if CI green. Next gap: FI — status response top-level shape (server entry item shape, or ch1tty/reload response shape).
