@@ -311,15 +311,16 @@ describe('FD-4 — topCandidates ordering (descending by score)', () => {
           winnerScore,
           `topCandidates[0].score (${items[0].score}) must equal winnerScore (${winnerScore}) at ${verbosity}`,
         );
-        // topCandidates[0].tool must match the winner tool reported at the top level
-        const winnerTool = body.tool as string;
-        if (typeof winnerTool === 'string' && winnerTool.length > 0) {
-          assert.equal(
-            items[0].tool,
-            winnerTool,
-            `topCandidates[0].tool (${items[0].tool}) must equal winner tool (${winnerTool}) at ${verbosity}`,
-          );
-        }
+        // topCandidates[0].tool must match the winner tool (stored at body.resolved.tool)
+        const resolved = body.resolved as Record<string, unknown> | undefined;
+        assert.ok(resolved && typeof resolved === 'object', `body.resolved must be an object (${verbosity})`);
+        const winnerTool = resolved.tool as string;
+        assert.ok(typeof winnerTool === 'string' && winnerTool.length > 0, `resolved.tool must be a non-empty string (${verbosity})`);
+        assert.equal(
+          items[0].tool,
+          winnerTool,
+          `topCandidates[0].tool (${items[0].tool}) must equal resolved.tool (${winnerTool}) at ${verbosity}`,
+        );
       } finally {
         await agg.shutdown();
       }
