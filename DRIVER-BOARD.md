@@ -6579,3 +6579,43 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 - CLAUDE.md metric freeze observed: no new fields added
 
 **Next run:** Merge #1400 if CI green. Next gap: EX — cast explain focus value types for verbosity:medium (the medium tier's focus fields: focus/focusBoost/winnerInFocus/winnerFocusBoost/winnerScoreBase/candidatesInFocusCount/inFocusFraction/focusRank/focusRankDelta/focusDecisive/focusMargin/focusConfidence — those were added in medium but their types were never frozen).
+
+---
+
+## Run ~1726 — 2026-09-19 — PRODUCTIVE: opened FB (#1405)
+
+**Workstream advanced:** FB — freeze `ch1tty/search` explain field names and value types.
+
+**Opened:** PR #1405 (FB — search explain field name and value type drift guard)
+- Branch: `auto/FB-search-explain-field-freeze`
+- File: `test/fb-search-explain-field-names-value-types.test.ts` (251 lines, 12 tests, 5 suites)
+- Gap filled: buildSearchExplanation (src-stdio/aggregator.ts:2380) had NO field-name or value-type drift guard. Only basic presence checks existed in search-explain.test.ts. A rename, addition, or type change would have passed silently.
+- 5 suites:
+  1. Always-present field names: {matchMode, method, rationale, topCandidates} (4 fields, 3 tests)
+  2. Conditional fields: focus (focus+focusBoost present/absent, 2 tests)
+  3. Conditional fields: filterContext (server filter, category filter, 2 tests)
+  4. topCandidates item shape: no-focus → {relevanceScore,tool} only; focus → in-focus has {inFocus:true,relevanceScore,tool}, out-of-focus has {relevanceScore,tool} (2 tests)
+  5. Value types: method==='keyword', matchMode∈['and','partial'], rationale non-empty string, relevanceScore finite≥0, tool namespaced string (3 tests)
+- Key distinction documented: search explain `inFocus` is ONLY on in-focus items (absent on out-of-focus) — contrast with cast explain topCandidates where `inFocus` is on EVERY item when focus active
+- Test results: **4464 pass / 0 fail / 3 skip** (+12 from this run)
+- CLAUDE.md metric freeze observed: no new fields added to cast explain (search explain is a separate function, no freeze applies)
+
+**Workstream status updates:**
+  - [ ] **EX** — PR #1401 open (single-candidate field names, CI pending)
+  - [ ] **EY** — PR #1402 open (single-candidate full verbosity fields, CI pending)
+  - [ ] **EZ** — PR #1403 open (single-candidate value types low/medium, CI pending)
+  - [ ] **FA** — PR #1404 open (single-candidate value types full, CI pending)
+  - [ ] **FB** — PR #1405 open (search explain field names + value types, CI pending)
+
+**Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1726 runs; burning ~50k tokens/run
+  2. **Merge PRs #1401 (EX), #1402 (EY), #1403 (EZ), #1404 (FA), #1405 (FB)** once CI green
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+
+**Next run:** Merge any open PRs with CI green. Next gap: FC — if all frozen (search explain and cast explain exhausted), look for other unfrozen response shapes or unfrozen app surfaces.
+
+**PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
