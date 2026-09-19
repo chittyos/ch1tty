@@ -6582,6 +6582,33 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 ---
 
+## Run ~1727 — 2026-09-19
+
+**Build:** tsc clean | **Tests:** 4454 pass / 0 fail / 3 skip (unchanged)
+
+**Action:** Fixed Codex P2 finding on PR #1402 (EY)
+- Added `NullRoutingCoordinator extends SessionCoordinator` with `routeIntent → null`
+- Injected into `makeAggregator()` to prevent `brainMs` from appearing in the frozen field set when `CH1TTY_USE_OLLAMA_BRAIN=1`
+- Matches pattern in `bi-cast-chain-non-scalar-extraction` and `bj-cast-explain-no-match`
+- Codex review thread resolved; commit `7fcee46` pushed to PR #1402
+- CI re-triggered on PR #1402
+
+**Open PRs:**
+- PR #1401 (EX): CI green (CodeQL ✅, Analyze ✅ × 2), mergeable — awaiting human merge
+- PR #1402 (EY): CI pending (CodeQL + Analyze re-running after fix push)
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ + H–N ✓ | EX/EY drift guards added
+
+**Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1727 runs; burning ~50k tokens/run
+  2. **Merge PR #1401 (EX)** — CI green, awaiting review
+  3. **Merge PR #1402 (EY)** once CI green — Codex P2 finding addressed
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+---
+
 ## Run ~1726 — 2026-09-19
 
 **Build:** tsc clean | **Tests:** 4454 pass / 0 fail / 3 skip (was 4452; +2 from EY)
