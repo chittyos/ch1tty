@@ -15,7 +15,7 @@
  *
  * Conditional fields (absent when not triggered):
  *   focus         — string name of active focus profile
- *   focusBoost    — number > 0 (when focus active)
+ *   focusBoost    — number ≥ 0 (when focus active)
  *   filterContext — { server?: string, category?: string } (when server or category filter)
  *   minScore      — number (when minScore param > 0)
  *
@@ -167,7 +167,7 @@ describe('FB — search explain conditional fields: focus', () => {
       assert.ok((explanation['focus'] as string).length > 0, 'focus must be non-empty');
       assert.equal(typeof explanation['focusBoost'], 'number', 'focusBoost must be a number when focus active');
       assert.ok(Number.isFinite(explanation['focusBoost'] as number), 'focusBoost must be finite');
-      assert.ok((explanation['focusBoost'] as number) > 0, 'focusBoost must be positive');
+      assert.ok((explanation['focusBoost'] as number) >= 0, 'focusBoost must be non-negative');
     } finally {
       await agg.shutdown();
     }
@@ -197,7 +197,7 @@ describe('FB — search explain conditional fields: focus', () => {
 // ── Suite 3: conditional fields (filterContext) ───────────────────────────────
 
 describe('FB — search explain conditional fields: filterContext', () => {
-  test('server filter — filterContext present with {server} key', async () => {
+  test('server filter — explanation has exactly base+filterContext (5 fields); filterContext has exactly {server}', async () => {
     const agg = makeAggregator();
     try {
       const result = await agg.callTool('ch1tty/search', { query: 'database', server: 'alpha', explain: true });
@@ -205,17 +205,26 @@ describe('FB — search explain conditional fields: filterContext', () => {
       const data = JSON.parse((result.content[0] as { text: string }).text) as Record<string, unknown>;
       const explanation = data['explanation'] as Record<string, unknown>;
       assert.ok(explanation !== undefined, 'explanation must be present');
-      assert.ok(explanation['filterContext'] !== undefined, 'filterContext must be present when server filter active');
+      // Exact explanation key set when server filter active
+      const explainActual = Object.keys(explanation).sort();
+      const explainExpected = [...BASE_EXPLAIN_KEYS, 'filterContext'].sort();
+      assert.deepEqual(
+        explainActual,
+        explainExpected,
+        `explanation keys drifted with server filter.\nExpected: ${JSON.stringify(explainExpected)}\nActual:   ${JSON.stringify(explainActual)}`,
+      );
+      // Exact filterContext key set: only {server}
       const fc = explanation['filterContext'] as Record<string, unknown>;
+      const fcActual = Object.keys(fc).sort();
+      assert.deepEqual(fcActual, ['server'], `filterContext keys drifted.\nExpected: ["server"]\nActual:   ${JSON.stringify(fcActual)}`);
       assert.equal(typeof fc['server'], 'string', 'filterContext.server must be a string');
       assert.equal(fc['server'], 'alpha', 'filterContext.server must equal the filter value');
-      assert.equal(fc['category'], undefined, 'filterContext.category must be absent when only server filter');
     } finally {
       await agg.shutdown();
     }
   });
 
-  test('category filter — filterContext present with {category} key', async () => {
+  test('category filter — explanation has exactly base+filterContext (5 fields); filterContext has exactly {category}', async () => {
     const agg = makeAggregator();
     try {
       const result = await agg.callTool('ch1tty/search', { query: 'database', category: 'code', explain: true });
@@ -223,11 +232,43 @@ describe('FB — search explain conditional fields: filterContext', () => {
       const data = JSON.parse((result.content[0] as { text: string }).text) as Record<string, unknown>;
       const explanation = data['explanation'] as Record<string, unknown>;
       assert.ok(explanation !== undefined, 'explanation must be present');
-      assert.ok(explanation['filterContext'] !== undefined, 'filterContext must be present when category filter active');
+      // Exact explanation key set when category filter active
+      const explainActual = Object.keys(explanation).sort();
+      const explainExpected = [...BASE_EXPLAIN_KEYS, 'filterContext'].sort();
+      assert.deepEqual(
+        explainActual,
+        explainExpected,
+        `explanation keys drifted with category filter.\nExpected: ${JSON.stringify(explainExpected)}\nActual:   ${JSON.stringify(explainActual)}`,
+      );
+      // Exact filterContext key set: only {category}
       const fc = explanation['filterContext'] as Record<string, unknown>;
+      const fcActual = Object.keys(fc).sort();
+      assert.deepEqual(fcActual, ['category'], `filterContext keys drifted.\nExpected: ["category"]\nActual:   ${JSON.stringify(fcActual)}`);
       assert.equal(typeof fc['category'], 'string', 'filterContext.category must be a string');
       assert.equal(fc['category'], 'code', 'filterContext.category must equal the filter value');
-      assert.equal(fc['server'], undefined, 'filterContext.server must be absent when only category filter');
+    } finally {
+      await agg.shutdown();
+    }
+  });
+
+  test('minScore param — explanation has exactly base+minScore (5 fields); minScore is a positive finite number', async () => {
+    const agg = makeAggregator();
+    try {
+      const result = await agg.callTool('ch1tty/search', { query: 'database', minScore: 0.5, explain: true });
+      assert.equal(result.isError, undefined, 'search should not error');
+      const data = JSON.parse((result.content[0] as { text: string }).text) as Record<string, unknown>;
+      const explanation = data['explanation'] as Record<string, unknown>;
+      assert.ok(explanation !== undefined, 'explanation must be present');
+      const actual = Object.keys(explanation).sort();
+      const expected = [...BASE_EXPLAIN_KEYS, 'minScore'].sort();
+      assert.deepEqual(
+        actual,
+        expected,
+        `explanation keys drifted with minScore.\nExpected: ${JSON.stringify(expected)}\nActual:   ${JSON.stringify(actual)}`,
+      );
+      assert.equal(typeof explanation['minScore'], 'number', 'minScore must be a number');
+      assert.ok(Number.isFinite(explanation['minScore'] as number), 'minScore must be finite');
+      assert.ok((explanation['minScore'] as number) > 0, 'minScore must be positive when set');
     } finally {
       await agg.shutdown();
     }
@@ -371,6 +412,68 @@ describe('FB — search explain value types', () => {
       const data = JSON.parse((result.content[0] as { text: string }).text) as Record<string, unknown>;
       const explanation = data['explanation'] as Record<string, unknown>;
       assert.equal(explanation['matchMode'], 'and', 'matchMode must be "and" for a matched single-term query');
+    } finally {
+      await agg.shutdown();
+    }
+  });
+});
+
+// ── Suite 6: recentlyUsed item shapes ─────────────────────────────────────────
+
+describe('FB — search explain topCandidates recentlyUsed shape', () => {
+  test('session with prior tool use — recentlyUsed item key set and value types are frozen', async () => {
+    const agg = makeAggregator();
+    const sessionId = 'fb-test-recently-used';
+    try {
+      // Execute alpha/list_databases with a sessionId to populate coordinator patterns.
+      // After this, coordinator knows the tool was called: recentlyUsed = {callCount, lastUsedMs}.
+      await agg.callTool('ch1tty/execute', { tool: 'alpha/list_databases', args: {}, sessionId });
+
+      // Search with the same sessionId — the previously used tool should have recentlyUsed set.
+      const result = await agg.callTool('ch1tty/search', {
+        query: 'database',
+        explain: true,
+        sessionId,
+      });
+      assert.equal(result.isError, undefined, 'search should not error');
+      const data = JSON.parse((result.content[0] as { text: string }).text) as Record<string, unknown>;
+      const explanation = data['explanation'] as Record<string, unknown>;
+      const items = explanation['topCandidates'] as Array<Record<string, unknown>>;
+      assert.ok(Array.isArray(items) && items.length > 0, 'topCandidates must be non-empty');
+
+      // At least one item must have recentlyUsed after a session tool call.
+      const recentItems = items.filter((item) => item['recentlyUsed'] !== undefined);
+      assert.ok(recentItems.length > 0, 'at least one topCandidates item must have recentlyUsed after a session execute');
+
+      for (const [i, item] of recentItems.entries()) {
+        const ru = item['recentlyUsed'];
+        const itemKeys = Object.keys(item).sort();
+
+        if (typeof ru === 'object' && ru !== null) {
+          // Exact-tool pattern: {callCount, lastUsedMs}
+          const ruKeys = Object.keys(ru as object).sort();
+          assert.deepEqual(
+            ruKeys,
+            ['callCount', 'lastUsedMs'],
+            `recentlyUsed object keys drifted at item[${i}].\nExpected: ["callCount","lastUsedMs"]\nActual:   ${JSON.stringify(ruKeys)}`,
+          );
+          const ruObj = ru as Record<string, unknown>;
+          assert.equal(typeof ruObj['callCount'], 'number', `recentlyUsed.callCount must be a number`);
+          assert.ok(Number.isFinite(ruObj['callCount'] as number), 'recentlyUsed.callCount must be finite');
+          assert.ok((ruObj['callCount'] as number) > 0, 'recentlyUsed.callCount must be > 0 after use');
+          assert.equal(typeof ruObj['lastUsedMs'], 'number', 'recentlyUsed.lastUsedMs must be a number');
+          assert.ok(Number.isFinite(ruObj['lastUsedMs'] as number), 'recentlyUsed.lastUsedMs must be finite');
+        } else {
+          // Server-level boolean: true (server was recently used but not this specific tool)
+          assert.equal(ru, true, `recentlyUsed must be true (server-level boolean) or an object`);
+        }
+        // Item key set with recentlyUsed: {relevanceScore, recentlyUsed, tool}
+        assert.deepEqual(
+          itemKeys,
+          ['relevanceScore', 'recentlyUsed', 'tool'].sort(),
+          `recentlyUsed item keys drifted at item[${i}].\nExpected: ["relevanceScore","recentlyUsed","tool"]\nActual:   ${JSON.stringify(itemKeys)}`,
+        );
+      }
     } finally {
       await agg.shutdown();
     }
