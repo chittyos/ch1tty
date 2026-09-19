@@ -194,10 +194,25 @@ describe('EZ-2 — explain field value types at verbosity:medium, single-candida
       const body = parseBody(result);
       const exp = getExplanation(body);
 
-      // Low-verbosity fields still present — spot-check
-      assert.equal(typeof exp['winnerScore'], 'number', 'winnerScore must be a number');
+      // All low-verbosity fields must be present and typed correctly at medium too,
+      // because buildCastExplanation builds low and medium in independent branches.
       assert.equal(typeof exp['method'], 'string', 'method must be a string');
+      assert.ok((exp['method'] as string).length > 0, 'method must be non-empty');
+
       assert.equal(exp['candidateCount'], 1, 'candidateCount must be 1');
+
+      assert.equal(typeof exp['winnerScore'], 'number', 'winnerScore must be a number');
+      assert.ok(Number.isFinite(exp['winnerScore'] as number), 'winnerScore must be finite');
+      assert.ok((exp['winnerScore'] as number) > 0, 'winnerScore must be > 0');
+
+      assert.equal(typeof exp['winnerServer'], 'string', 'winnerServer must be a string');
+      assert.ok((exp['winnerServer'] as string).length > 0, 'winnerServer must be non-empty');
+
+      assert.ok(Array.isArray(exp['topCandidates']), 'topCandidates must be an array');
+      assert.equal((exp['topCandidates'] as unknown[]).length, 1, 'topCandidates must have length 1');
+
+      assert.equal(typeof exp['rationale'], 'string', 'rationale must be a string');
+      assert.ok((exp['rationale'] as string).length > 0, 'rationale must be non-empty');
 
       // winnerCategory: medium-verbosity addition, non-empty string
       assert.equal(typeof exp['winnerCategory'], 'string', 'winnerCategory must be a string');

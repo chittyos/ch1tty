@@ -244,6 +244,35 @@ describe('FA-1b — multi-candidate fields absent at verbosity:full, single-cand
       assert.equal(exp['topCandidatesGiniCoefficient'], undefined, 'topCandidatesGiniCoefficient must be absent');
       assert.equal(exp['topCandidatesScoreSkewness'], undefined, 'topCandidatesScoreSkewness must be absent');
       assert.equal(exp['topCandidatesKurtosis'], undefined, 'topCandidatesKurtosis must be absent');
+
+      // Remaining multi-candidate-only fields — all gated by topCandidates.length > 1
+      assert.equal(exp['candidateGiniCoefficient'], undefined, 'candidateGiniCoefficient must be absent');
+      assert.equal(exp['candidateScoreSkewness'], undefined, 'candidateScoreSkewness must be absent');
+      assert.equal(exp['candidateScoreKurtosis'], undefined, 'candidateScoreKurtosis must be absent');
+      assert.equal(exp['candidateScoreMeanRatio'], undefined, 'candidateScoreMeanRatio must be absent');
+      assert.equal(exp['candidateScoreCoefficientOfVariation'], undefined, 'candidateScoreCoefficientOfVariation must be absent');
+      assert.equal(exp['medianToMeanRatio'], undefined, 'medianToMeanRatio must be absent');
+      assert.equal(exp['winnerToMedianRatio'], undefined, 'winnerToMedianRatio must be absent');
+      assert.equal(exp['winnerScoreZScore'], undefined, 'winnerScoreZScore must be absent');
+      assert.equal(exp['runnerUpScoreZScore'], undefined, 'runnerUpScoreZScore must be absent');
+      assert.equal(exp['zScoreGap'], undefined, 'zScoreGap must be absent');
+      assert.equal(exp['candidateScoreNormalizedRange'], undefined, 'candidateScoreNormalizedRange must be absent');
+      assert.equal(exp['lowestCandidateScoreRatio'], undefined, 'lowestCandidateScoreRatio must be absent');
+      assert.equal(exp['candidateScoreLowestToMeanRatio'], undefined, 'candidateScoreLowestToMeanRatio must be absent');
+      assert.equal(exp['candidateScoreLowestToMedianRatio'], undefined, 'candidateScoreLowestToMedianRatio must be absent');
+      assert.equal(exp['scoreEntropyNormalized'], undefined, 'scoreEntropyNormalized must be absent');
+      assert.equal(exp['candidateScoreIQR'], undefined, 'candidateScoreIQR must be absent');
+      assert.equal(exp['candidateScoreIQRRatio'], undefined, 'candidateScoreIQRRatio must be absent');
+      assert.equal(exp['top2HeavinessRatio'], undefined, 'top2HeavinessRatio must be absent');
+      assert.equal(exp['winnerMeanGap'], undefined, 'winnerMeanGap must be absent');
+      assert.equal(exp['winnerRunnerUpGap'], undefined, 'winnerRunnerUpGap must be absent');
+      assert.equal(exp['winnerRunnerUpGapToSpreadRatio'], undefined, 'winnerRunnerUpGapToSpreadRatio must be absent');
+      assert.equal(exp['runnerUpLowestGapToSpreadRatio'], undefined, 'runnerUpLowestGapToSpreadRatio must be absent');
+      assert.equal(exp['runnerUpMeanGap'], undefined, 'runnerUpMeanGap must be absent');
+      assert.equal(exp['candidateScoreNonWinnerMean'], undefined, 'candidateScoreNonWinnerMean must be absent');
+      assert.equal(exp['candidateScoreWinnerFieldGap'], undefined, 'candidateScoreWinnerFieldGap must be absent');
+      assert.equal(exp['candidateScoreFieldStrengthRatio'], undefined, 'candidateScoreFieldStrengthRatio must be absent');
+      assert.equal(exp['winnerScoreRatio'], undefined, 'winnerScoreRatio must be absent');
     } finally {
       await agg.shutdown?.();
     }
