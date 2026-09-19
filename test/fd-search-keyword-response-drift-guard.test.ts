@@ -108,6 +108,7 @@ function makeAggregator(withFocus = false): Aggregator {
     backendFactory: () => backend,
     embedEnabled: false,
     ledgerDlqPath: dlq(),
+    suggestionsCatalog: {},
     ...(withFocus ? { focus: 'dev', focusProfiles: FOCUS_PROFILES } : {}),
   });
 }
