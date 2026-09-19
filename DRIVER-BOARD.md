@@ -6386,3 +6386,36 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
 - **Next run:** Merge #1386 if CI green. Next gap: EL — survey remaining uncovered shapes (cast:plan chainContinuation in executed mode, or cast:discovered sub-object shapes, or non-cast drift guards like execute content-item shapes).
+
+---
+
+## Run log — 2026-09-19 (run ~1719 — PRODUCTIVE: merged EK (#1386), opened EL (#1387))
+
+- **Workstream advanced:** EK closed — PR #1386 squash-merged (cast:resolved catalogCombo + chain_executed breakdown + executed resolvedFromCatalog sub-object shapes, 8 tests). EL opened — PR #1387 (cast:executed chainContinuation + cast:plan sessionContext shape guards, 8 tests).
+- **Build:** clean (tsc exit 0)
+- **Tests:** 4339 pass / 0 fail / 3 skip (was 4331; +8 from EL)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - Checked PR #1386 CI: 3/3 checks green. Replied to Codex P2 optional finding (comment 4052732237) explaining brainMs is already in PERMITTED. Resolved thread PRRT_kwDORhsD_s6j-XOH. Squash-merged.
+  - Pulled main (6e90c74). Baseline: 4331/0/3.
+  - Identified 2 symmetric shape gaps (EH/EI blind spots):
+    1. cast:executed chainContinuation — EH froze chainContinuation for cast:plan (line 1615) but not cast:executed (line 1664). Same variable, separate code branch.
+    2. cast:plan sessionContext — EI froze sessionContext for cast:executed. cast:plan constructs planSessionContext separately (lines 1585–1594, line 1618). Separate branch, same shape, unfrozen.
+  - Added `test/el-executed-chainContinuation-plan-sessionContext.test.ts` — 8 tests across 2 suites:
+    1. cast:executed chainContinuation (3): no unexpected keys, exact fields {hint,nextTool,remainingChain}, field types — triggered via catalog agg without chain:true
+    2. cast:plan sessionContext (5): no unexpected keys, required keys, recentTools array, callCount non-negative, activeSessionFocus type — session primed by prior cast call
+  - Full suite: 4339/0/3 (+8). Build clean.
+  - Committed, pushed `auto/EL-executed-chainContinuation-plan-sessionContext`, opened PR #1387, subscribed.
+- **Workstream status updates:**
+  - [x] **EK** — test(ek): cast:resolved catalogCombo + chain_executed breakdown + executed resolvedFromCatalog — 8 tests. PR #1386 merged. DONE.
+  - [ ] **EL** — test(el): cast:executed chainContinuation + cast:plan sessionContext shape guards — 8 tests. PR #1387 open (CI pending).
+- **Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1719 runs; burning ~50k tokens/run
+  2. **Merge PR #1387 (EL)** once CI green — cast chainContinuation + sessionContext shape guards
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+- **Next run:** Merge #1387 if CI green. Next gap: EM — survey remaining uncovered shapes (related prompts/resources item shapes in cast paths, cast:discovered sub-object details, or non-cast drift guards like execute content-item shapes).
