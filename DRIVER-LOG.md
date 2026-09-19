@@ -5580,3 +5580,28 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   6. **Stale branch cleanup** — 1100+ remote auto/ branches
   7. **Major dep bumps** — @types/node 22→26, typescript 5→7 for apps/
 - **Next run:** EFA — single-candidate VALUE TYPES at verbosity:full (parallels EZ for the larger full-verbosity field set: scoreDominanceIndex, topCandidatesMeanScore, and 15 full-verbosity-exclusive focus fields like focusRankPercentile, inFocusTopScore, winnerFocusBoostRatio).
+
+---
+
+## Run: 2026-09-19 (EZ P2 fix — Codex review response)
+
+- **Branch:** `auto/EZ-single-candidate-value-types-low-medium`
+- **PR:** #1403 (open, CI green)
+- **Commit:** f39dbde
+- **Test counts:** 4461 total / 4458 pass / 0 fail / 3 skipped
+- **Context at start:** EZ branch (#1403) open; Codex review posted P2 finding that EZ-2 and EZ-4 (medium verbosity suites) only validated new medium-specific fields, leaving inherited low-verbosity field types unchecked on the medium code path.
+- **What was done:**
+  1. EZ-2 fix (applied last run): inherited low-verbosity types (candidateCount, method, rationale, topCandidates, winnerScore, winnerServer) asserted before winnerCategory check.
+  2. EZ-4 fix (this run): same inherited low-base types + inherited low+focus types (focus, focusBoost, winnerInFocus) asserted before candidatesInFocusCount/focusRank/score-decomposition checks.
+  3. Ran full suite: 4461/4458/0/3 (3 new assertions added per inherited-fields block; test count up by 3 from 4458).
+  4. Pushed f39dbde to origin; replied to Codex review thread (#discussion_r4054086311) with fix summary.
+- **Human-action items (carried forward):**
+  1. **Merge PR #1401 (EX)** — single-candidate field names low/medium (CI green)
+  2. **Merge PR #1402 (EY)** — single-candidate field names full verbosity (CI green)
+  3. **Merge PR #1403 (EZ)** — single-candidate value types low/medium (CI green, Codex finding addressed)
+  4. **DISABLE hourly cron** — ~1717+ runs
+  5. **Enable GitHub Actions** (main npm test CI job; only CodeQL running)
+  6. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  7. **Stale branch cleanup** — 1100+ remote auto/ branches
+  8. **Major dep bumps** — @types/node 22→26, typescript 5→7 for apps/
+- **Next run:** EFA — single-candidate VALUE TYPES at verbosity:full (15 full-verbosity-exclusive focus fields: focusRankPercentile, inFocusTopScore, winnerFocusBoostRatio, etc.)
