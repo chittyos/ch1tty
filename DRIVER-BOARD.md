@@ -6579,3 +6579,39 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 - CLAUDE.md metric freeze observed: no new fields added
 
 **Next run:** Merge #1400 if CI green. Next gap: EX — cast explain focus value types for verbosity:medium (the medium tier's focus fields: focus/focusBoost/winnerInFocus/winnerFocusBoost/winnerScoreBase/candidatesInFocusCount/inFocusFraction/focusRank/focusRankDelta/focusDecisive/focusMargin/focusConfidence — those were added in medium but their types were never frozen).
+
+---
+
+## Run ~1727 — 2026-09-19
+
+**Context:** Resumed from prior context window (FC workstream). PRs #1401–#1405 opened in previous runs are pending merge. PR #1405 (FB) CI green, Codex review still running on second commit.
+
+**Opened:** PR #1406 (FC — server-summary explanation field drift guard)
+- Branch: `auto/fc-server-summary-drift-guard`
+- File: `test/fc-server-summary-explain-drift-guard.test.ts` (12 tests, 273 lines)
+- 4 suites: always-present base keys; focus conditional keys; value types; server item shape
+- Frozen base explanation keys: `['method','rationale','totalServers','totalTools']`
+- Frozen focus keys: adds `'focus'+'inFocusServers'` (6 keys total)
+- Frozen inFocusOnly keys: adds `'inFocusOnly'` (7 keys total)
+- Server item no-focus: `['category','name','server','tools']`; focus: `['category','inFocus','name','server','tools']`
+- Companion to TT (functional coverage) — adds exact deepEqual key-set freeze
+- Companion to FB (which froze buildSearchExplanation) — this freezes the separate inline server-summary path
+- 12/12 green locally
+
+**Open PRs (all awaiting merge):**
+- PR #1401 (EX) — cast explain focus value types for medium tier
+- PR #1402 (EY) — [per prior session log]
+- PR #1403 (EZ) — [per prior session log]
+- PR #1404 (FA) — [per prior session log]
+- PR #1405 (FB) — search explain field names + value types; CI green; Codex review running on 7f82f61
+- PR #1406 (FC) — server-summary explain field drift guard (this run)
+
+**Human-action items (persistent):**
+1. **DISABLE hourly cron** — ~1727 runs; burning ~50k tokens/run
+2. **Merge open PRs** (#1401–#1406) once CI green
+3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+5. **Notion workspace** out of free blocks — upgrade or clear
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
