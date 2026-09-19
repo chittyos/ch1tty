@@ -313,13 +313,16 @@ describe('ch1tty/execute success response shape (no session)', () => {
     }
   });
 
-  test('success content is passed through unmodified: exactly 1 item for list_projects (no session, no metadata appended)', async () => {
+  test('success content matches fixture response exactly (complete passthrough, no metadata appended)', async () => {
     const agg = makeAggregator();
     try {
+      const fixtureEntry = FIXTURE_SERVERS.neon.tools.find((t) => t.name === 'list_projects')!;
+      // Deep-clone BEFORE execute so subsequent session tests' in-place pushes can't affect the reference.
+      const expectedContent: ContentItem[] = JSON.parse(
+        JSON.stringify((fixtureEntry.response as { content: ContentItem[] }).content),
+      );
       const r = await execute(agg, { tool: 'neon/list_projects' });
-      // list_projects fixture returns exactly 1 text item; no session → no metadata appended.
-      assert.equal(r.content.length, 1, 'no-session content must be exactly 1 item (pure passthrough, no metadata added)');
-      assert.equal(r.content[0].type, 'text', 'no-session content[0] must be type:text');
+      assert.deepEqual(r.content, expectedContent, 'no-session content must equal fixture response exactly (unmodified passthrough)');
     } finally {
       await agg.shutdown();
     }
