@@ -6582,6 +6582,7 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 ---
 
+
 ## Run ~1725 — 2026-09-19
 
 **Context:** Continued from run ~1724 (context compaction). Branch `auto/EX-single-candidate-explain-fieldnames` was already committed + pushed with commit `6f27982`. PR creation + board update were the remaining steps.
@@ -6616,3 +6617,59 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 **Next run:** Merge #1400 (EW) and #1401 (EX) if CI green. Next gap: EY — candidate; look for multi-candidate gaps NOT yet covered. Possibilities: single-candidate VALUE TYPES (types for the 9/16 focus fields in EX), or verbosity:full single-candidate fields, or no_match with focus active field set.
 
 **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+# Run ~1727 — 2026-09-19
+
+**Build:** tsc clean | **Tests:** 4454 pass / 0 fail / 3 skip (unchanged)
+
+**Action:** Fixed Codex P2 finding on PR #1402 (EY)
+- Added `NullRoutingCoordinator extends SessionCoordinator` with `routeIntent → null`
+- Injected into `makeAggregator()` to prevent `brainMs` from appearing in the frozen field set when `CH1TTY_USE_OLLAMA_BRAIN=1`
+- Matches pattern in `bi-cast-chain-non-scalar-extraction` and `bj-cast-explain-no-match`
+- Codex review thread resolved; commit `7fcee46` pushed to PR #1402
+- CI re-triggered on PR #1402
+
+**Open PRs:**
+- PR #1401 (EX): CI green (CodeQL ✅, Analyze ✅ × 2), mergeable — awaiting human merge
+- PR #1402 (EY): CI pending (CodeQL + Analyze re-running after fix push)
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ + H–N ✓ | EX/EY drift guards added
+
+**Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1727 runs; burning ~50k tokens/run
+  2. **Merge PR #1401 (EX)** — CI green, awaiting review
+  3. **Merge PR #1402 (EY)** once CI green — Codex P2 finding addressed
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+---
+
+## Run ~1726 — 2026-09-19
+
+**Build:** tsc clean | **Tests:** 4454 pass / 0 fail / 3 skip (was 4452; +2 from EY)
+
+**Opened:** PR for EY — single-candidate field names at verbosity:full
+- Branch: `auto/EY-single-candidate-full-verbosity-fields`
+- File: `test/ey-cast-explain-single-candidate-full-verbosity.test.ts` (240 lines, 2 tests)
+- Gap filled: EX froze single-candidate field names for verbosity:low and verbosity:medium. EY extends to verbosity:full, which adds 2 full-verbosity-only core fields (scoreDominanceIndex, topCandidatesMeanScore) and 6 full-verbosity-only focus fields (outOfFocusCandidatesCount, focusRankPercentile, inFocusTopScore, inFocusMeanScore, inFocusBottomScore, winnerFocusBoostRatio).
+- EY-1: no-focus, full verbosity → 9 exact fields frozen
+- EY-2: focus:code, full verbosity → 24 exact fields frozen
+- Explicitly asserts absent: runnerUpScore, candidateScoreSpread, candidateGiniCoefficient, effectiveN, topCandidatesScoreVariance, focusDecisive, focusMargin, focusConfidence, unfocusedWinner, topOutOfFocusScore
+- CLAUDE.md metric freeze observed: no new fields added (tests only)
+
+**Open PRs:**
+- PR #1401 (EX): CI green (CodeQL ✅, Analyze ✅ × 2), mergeable — awaiting human merge
+- PR for EY: CI pending
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ + H–N ✓ + O pending | EX/EY drift guards added
+
+**Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1726 runs; burning ~50k tokens/run
+  2. **Merge PR #1401 (EX)** — single-candidate field name drift guard (CI green)
+  3. **Merge PR for EY** once CI green — single-candidate full-verbosity field name drift guard
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Enable GitHub Actions** (main npm test CI — currently CodeQL only)
+  6. **Notion workspace** out of free blocks — upgrade or clear
+  7. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run:** Merge #1401 (EX) and EY PR if CI green. Next gap: EZ — consider single-candidate value types at verbosity:full (the 9 core fields have types not yet frozen by any test), or multi-step scenario coverage gaps in D workstream scenarios.
