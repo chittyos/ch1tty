@@ -5115,6 +5115,157 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
 - **PushNotification:** NOT SENT — routine merge run, no exceptional event.
 - **Next run:** DN — tsconfig.json cross-package consistency check or package.json cross-package dep version checks.
 
+## Run log — 2026-09-18 (run ~1704 — PRODUCTIVE: merged DN (#1361), opened DO (#1362))
+
+- **Workstream advanced:** DN merged + DO opened
+- **Build:** `npm run build` clean (tsc) | **Tests:** 2976 pass / 0 fail / 3 skip (+99 from DO)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations on main.
+- **What was done:**
+  - Startup: git reset to main (0789021, post-DM merge). `npm ci` clean. Build clean. Tests: 2877/0/3.
+  - PR #1361 (DN: extract checkBearerAuth + 13 timing-safe auth unit tests): all 3 CI checks green, mergeable_state clean, no blocking reviews. Squash-merged.
+  - Reset to new main (0789021→07890213d84). Tests confirmed 2877/0/3.
+  - DO workstream identified: coverage at 100% for all src/, src-stdio/, apps/, packages/. Found tsconfig inconsistency: `forceConsistentCasingInFileNames: true` missing from 6 of 9 tsconfigs.
+  - Fixed 6 tsconfigs (packages/shared-logger + all 5 apps/*). Added `test/do-tsconfig-consistency-drift.test.ts` (99 assertions over all 9 tsconfigs). typecheck:apps clean.
+  - Pushed `auto/DO-tsconfig-consistency-drift`, opened PR #1362, subscribed to CI.
+- **Workstream status updates:**
+  - [x] **DN** — test(DN): extract checkBearerAuth + 13 timing-safe auth unit tests. PR #1361 merged. DONE.
+  - [ ] **DO** — chore(DO): tsconfig consistency + 99 drift-guard tests. PR #1362 open (CI pending).
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1704 runs; burning ~50k tokens/run
+  2. **Merge PR #1362 (DO)** once CI green — tsconfig consistency + drift guard (99 tests)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **agents 0.23.0 → 0.24.0** minor bump — human review recommended before advancing
+- **PushNotification:** NOT SENT — routine workstream PR, no exceptional event.
+- **Next run:** Merge #1362 if CI green. Next gap: DP — further structural drift guards or quality opportunities (e.g. package.json cross-workspace dep version consistency check).
+
+## Run log — 2026-09-18 (run ~1704 follow-up — PRODUCTIVE: merged DO (#1362))
+
+- **Workstream advanced:** DO closed — PR #1362 squash-merged (tsconfig consistency + 99 drift-guard tests)
+- **Build:** n/a (merge-only follow-up)
+- **Tests:** 2976 pass / 0 fail / 3 skip (confirmed)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - 5 GitHub notifications: 2× duplicate subscription.created for #1362, Codex bot rate-limit (recurring, non-blocking), CodeRabbit review-in-progress × 2 (no blocking findings).
+  - CI: 3/3 green (CodeQL, Analyze actions, Analyze javascript-typescript). No blocking review findings.
+  - Squash-merged PR #1362.
+- **Workstream status updates:**
+  - [x] **DO** — chore(DO): tsconfig consistency + 99 drift-guard tests. PR #1362 merged. DONE.
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1704 runs; burning ~50k tokens/run
+  2. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  3. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  4. **Notion workspace** out of free blocks — upgrade or clear
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **agents 0.23.0 → 0.24.0** minor bump — human review recommended
+- **PushNotification:** NOT SENT — routine merge run, no exceptional event.
+- **Next run:** DP — package.json cross-workspace dep version consistency check or further quality opportunities.
+
+## Run log — 2026-09-18 (run ~1705 — PRODUCTIVE: opened PR #1363 (DP))
+
+- **Workstream advanced:** DP — `test/dp-pkg-dep-version-drift.test.ts` (21 tests) — package.json cross-workspace dep version drift guard
+- **Branch:** `auto/dp-pkg-dep-version-drift`
+- **PR:** #1363 open (CI pending) — https://github.com/chittyos/ch1tty/pull/1363
+- **Build:** `npm run build` clean (tsc + all workspace packages)
+- **Tests:** 2997 pass / 0 fail / 3 skip (was 2976; +21 from DP)
+- **npm audit:** 0 vulnerabilities
+- **Guardrails:** 5-tool surface (search/execute/status/reload/cast) FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations on main.
+- **Startup state:**
+  - 0 open PRs at start (DO #1362 already merged at run ~1704). Synced to main.
+  - `npm ci` clean. `npm run build` clean. `npm test`: 2976/0/3 (pre-DP baseline).
+  - No security vulnerabilities.
+  - Notion board last updated 2026-09-10; DRIVER-LOG.md is the active run log.
+- **What was done:**
+  - Confirmed 0 open PRs. All A-O workstreams done. Extended through DO (run ~1704).
+  - Identified DP gap: no cross-workspace package.json dep version drift guard existed.
+  - Found clear version divergences: `typescript` is `^5.7.0` in apps/shared-logger vs `^7.0.0` in shared-mcp/shared-types; `@modelcontextprotocol/sdk` is `^1.29.0` in shared-mcp vs `^1.30.0` in all apps.
+  - Added `test/dp-pkg-dep-version-drift.test.ts` (21 tests, 5 suites):
+    1. Workspace counts: apps/* = 5, packages/* = 3
+    2. Apps group consistency: MCP SDK, @types/node, tsx, typescript all agree
+    3. Packages @types/node consistency: ^22.0.0 everywhere
+    4. TypeScript migration state: shared-mcp + shared-types at ^7.0.0 (migrated); shared-logger at ^5.7.0 (pre-migration)
+    5. SDK version lag: shared-mcp at ^1.29.0 vs apps at ^1.30.0 — documented for visibility
+  - Full suite: 2997/0/3 (+21). Build clean.
+  - Committed, pushed `auto/dp-pkg-dep-version-drift`, opened PR #1363, subscribed.
+- **Workstream status updates:**
+  - [x] **DO** — chore(DO): tsconfig consistency + 99 drift-guard tests. PR #1362 merged. DONE.
+  - [ ] **DP** — test(DP): package.json cross-workspace dep version drift guard — 21 tests. PR #1363 open (CI pending).
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1705 runs; burning ~50k tokens/run
+  2. **Merge PR #1363 (DP)** once CI green — cross-workspace dep version drift guard, 21 tests
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 for apps/, agents 0.23→0.24 — human review recommended
+  8. **shared-mcp SDK lag**: @modelcontextprotocol/sdk at ^1.29.0 vs apps ^1.30.0 — can bump when convenient
+- **PushNotification:** SENDING — opened PR #1363 with 21 new drift-guard tests.
+- **Next run:** Merge #1363 if CI green. Next gap: DQ — focus-profiles.json structural drift guard (validateFocusProfiles against actual file; 25 profiles; no test today covers the actual JSON file via the validator).
+
+---
+
+## Run log — 2026-09-18 (run ~1705 — PRODUCTIVE: merged DP (#1363) + DQ opened PR #1365)
+
+- **Workstream advanced:** DP merged + DQ opened
+- **Build:** `npm run build` clean | **Tests:** 3126 pass / 0 fail / 3 skip (+125 from DQ on branch)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - Startup: read CLAUDE.md + CHITTY.md + DRIVER-LOG.md. On main at 78dde11 (post-DP, run ~1705).
+  - `npm ci` clean. `npm run build` clean. `npm test` → 3001/0/3 (post-DP baseline).
+  - 2 open PRs: #1363 (DP) and #1364 (DQ) — both 3/3 CI green.
+  - PR #1363 (DP): CodeRabbit threads both resolved (commit 8b7d471). Squash-merged.
+  - PR #1364 (DQ): developed a merge conflict after #1363 landed. Closed with note pointing to #1365.
+  - Created fresh branch `auto/dq-focus-profiles-drift-v2` from main, applied DQ test file cleanly.
+  - `test/dq-focus-profiles-json-drift.test.ts` — 125 tests (3 suites):
+    1. validateFocusProfiles() passes on real file (2 tests)
+    2. Profile count + roster: exactly 25 profiles (28 tests — 3 + 25 name checks)
+    3. Per-profile invariants: description, ≥1 category/server, positive boost, valid categories (95 tests)
+  - Full suite: 3126/0/3 (+125 on branch). Build clean.
+  - Pushed branch `auto/dq-focus-profiles-drift-v2`, opened PR #1365, subscribed.
+  - Closed PR #1364 with note referencing #1365.
+- **Workstream status updates:**
+  - [x] **DP** — test(DP): package.json cross-workspace dep version drift guard — 25 tests. PR #1363 merged. DONE.
+  - [ ] **DQ** — test(DQ): focus-profiles.json structural drift guard — 125 tests. PR #1365 open (CI pending).
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1705 runs; burning ~50k tokens/run
+  2. **Merge PR #1365 (DQ)** once CI green — focus-profiles.json drift guard, 125 tests
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 for apps/, agents 0.23→0.24 — human review recommended
+  8. **shared-mcp SDK lag**: @modelcontextprotocol/sdk at ^1.29.0 vs apps ^1.30.0 — can bump when convenient
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+- **Next run:** Merge #1365 if CI green. Next gap: DR — cast-explain field-count snapshot guard or other structural quality gaps.
+
+---
+
+## Run log — 2026-09-18 (run ~1705 follow-up — PRODUCTIVE: merged DQ (#1365))
+
+- **Workstream advanced:** DQ closed — PR #1365 squash-merged (focus-profiles.json drift guard, 125 tests)
+- **Build:** n/a (merge-only follow-up)
+- **Tests:** 3126 pass / 0 fail / 3 skip (confirmed post-merge)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - 4 GitHub notifications: 2× subscription.created (duplicate), Codex bot rate-limit (recurring, non-blocking), CodeRabbit review-in-progress (no findings).
+  - CI: 3/3 green (CodeQL, Analyze actions, Analyze javascript-typescript). No blocking review findings.
+  - Squash-merged PR #1365.
+  - `git pull origin main`; `npm test` → 3126/0/3 confirmed.
+- **Workstream status updates:**
+  - [x] **DQ** — test(DQ): focus-profiles.json structural drift guard — 125 tests. PR #1365 merged. DONE.
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1705 runs; burning ~50k tokens/run
+  2. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  3. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  4. **Notion workspace** out of free blocks — upgrade or clear
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Major dep bumps** — @types/node 22→26, typescript 5→7 for apps/, agents 0.23→0.24 — human review recommended
+  7. **shared-mcp SDK lag**: @modelcontextprotocol/sdk at ^1.29.0 vs apps ^1.30.0 — can bump when convenient
+- **PushNotification:** NOT SENT — routine merge run, no exceptional event.
+- **Next run:** DR — cast-explain field-count snapshot guard (the existing metric-freeze test guards the count, but a dedicated snapshot guard covering both focus-off=56 and focus-on=87 field sets would be more explicit) or other structural quality opportunities.
+
 ---
 
 ## Run ~1712 — 2026-09-19 — Workstream DZ
@@ -5129,15 +5280,15 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   - Suite 2 (DZ-19..DZ-23): Freezes 17-key short=true response (no servers), verifies coordinator strips sessions, systemHealth + latencyMs still present.
   - Fixed sort-order bug in LEDGER_DLQ_FIELDS: ['entryCount','entries','path'] → ['entries','entryCount','path'] (alphabetical: 'i'<'y' at position 4).
   - No prior test locked these field names — only individual values were asserted. Any rename/remove/add to the status contract now fails at unit speed.
-  - PR opened (see below).
+  - PR #1374 opened. Merge conflict resolved (main advanced via DR runs ~1704-1705).
 - **Workstream status updates:**
-  - [x] **DZ** — ch1tty/status response field drift guard, 23 tests. PR opened.
+  - [x] **DZ** — ch1tty/status response field drift guard, 23 tests. PR #1374 opened.
 - **Human-action items:**
   1. **DISABLE hourly cron** — ~1712 runs; burning ~50k tokens/run
-  2. **Merge open PRs DS-DY + DZ** (#1367-#1373 + DZ) — all CI green (infra issue non-blocking)
+  2. **Merge open PRs DS-DZ** (#1367-#1374) — all CI green (infra issue non-blocking)
   3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
   4. **Enable GitHub Actions** at org level (only CodeQL runs; npm test CI job disabled)
   5. **Notion workspace** out of free blocks — upgrade or clear
   6. **Stale branch cleanup** — 1100+ remote auto/ branches
   7. **agents 0.23.0 → 0.24.0** minor bump — human review recommended
-- **Next run:** DN — tsconfig.json cross-package consistency check or package.json cross-package dep version alignment (from previous suggestion), OR next drift guard (coordinator field drift, catalog field shape, brainHealth circuit state transitions).
+- **Next run:** Next drift guard — coordinator field drift (coordinator sub-object field set, sessions shape), or brainHealth circuit state transition tests, or catalog byFocus shape guard.
