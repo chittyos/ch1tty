@@ -6743,33 +6743,37 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 ---
 
-# Run ~1728 — 2026-09-19 — PRODUCTIVE: opened FE (#1409)
+## Run ~1728 — 2026-09-19
 
-**Build:** tsc clean | **Tests:** 4510 pass / 0 fail / 3 skip (was 4495 on origin/main; +12 from FE, +3 from FD branches not yet in main)
+**Merged this run:** PR #1406 (FC) at 20:45:10Z; PR #1405 (FB) at 20:46:18Z (auto-merge fired after resolving 4 Codex review threads). All PRs #1401–#1406 now closed. 0 open PRs.
 
-**Opened:** PR #1409 (FE — /api/v1/health exact response body key set drift guard)
-- Branch: `auto/FE-health-response-key-set-drift-guard`
-- File: `test/fe-health-response-key-set-drift-guard.test.ts` (184 lines, 12 tests, 3 suites)
-- Gap filled: Prior health tests (EEEEE, OOOOO, VVVV) check individual field presence/absence but none freeze the COMPLETE key set. A rename (`service` → `name`) or accidental addition would pass silently.
-- 6 key-set scenarios frozen: ok+ledgerOk, warn+brain, warn+ledger, warn+both, degraded, internal-error
-- Sub-objects frozen: systemHealth {brainDegraded, ledgerStatus, status}; ledgerDlq {entryCount}
-- Value types: status string union, service 'ch1tty', systemHealth object, boolean-true flags, integer entryCount
-- 12/12 green locally
+**Opened:** PR #1408 (FD — keyword search response envelope + tool item drift guard)
+- Branch: `auto/FD-search-keyword-response-drift-guard`
+- File: `test/fd-search-keyword-response-drift-guard.test.ts` (18 tests, 7 suites; expanded from initial 12/4 after Codex P2 findings)
+- Gap filled: FC froze the server-summary path; FD freezes the keyword search response envelope and tools array item shape. No prior test asserted exact key sets on either layer.
+- 7 suites:
+  1. Top-level always-present keys: `['latencyMs','matches','total','tools']` (3 tests)
+  2. Top-level conditional keys, no-catalog path: focus → `+focus`; inFocusOnly → `+inFocusOnly` (2 tests)
+  3. Tool item shape: base `[category,description,inputSchema,score,server,serverName,tool]`; focus in-focus adds `inFocus`, out-of-focus does NOT (2 tests)
+  4. Value types: matches/total integers≥0; latencyMs finite≥0; tools array; score finite≥0; tool namespaced (5 tests)
+  5. Suggestions-present envelope: focus+catalog → 6-key; inFocusOnly+catalog → 7-key (2 tests)
+  6. Conditional pagination/score envelopes: offset>0 → offset present; minScore>0 → minScore present (2 tests)
+  7. Session-enriched tool item shapes: server-level recentlyUsed:true; tool-level {callCount,lastUsedMs} nested keys frozen (2 tests)
+- Test results: **4507 pass / 0 fail / 3 skip** (+12 from FD)
+- CLAUDE.md guardrails: 5-tool surface FIXED; metric freeze ACTIVE; no new fields added
 
-**Open PRs (all CI green, awaiting human merge):**
-- PR #1407 (FD-topcandidates): cast explain topCandidates item value types — CI ✅, mergeable_state: blocked
-- PR #1408 (FD-search-keyword): keyword search response envelope/tool shapes — CI ✅, mergeable_state: clean
-- PR #1409 (FE): health response exact key sets (this run) — CI pending
+**Workstream status:**
+  - [x] **FB** — PR #1405 merged. DONE.
+  - [x] **FC** — PR #1406 merged. DONE.
+  - [ ] **FD** — PR #1408 open (CI green, Codex P2 addressed).
 
-**Human-action items (persistent):**
-1. **DISABLE hourly cron** — ~1728 runs; burning ~50k tokens/run
-2. **Merge PRs #1407, #1408, #1409** once CI green
-3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
-4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
-5. **Notion workspace** out of free blocks — upgrade or clear
-6. **Stale branch cleanup** — 1100+ remote auto/ branches
-7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
-
-**Next run:** Check CI on #1409. Next gap after FE: look at other unfrozen response shapes — candidates are api/v1/status snapshot key freeze, api/v1/sessions response shape, or apps-level drift guards (tasks-mcp, comms-mcp tool response shapes not yet frozen).
-
-**PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+**Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1728 runs; burning ~50k tokens/run
+  2. **Merge PR #1408 (FD)** once CI green — keyword search envelope + tool item drift guard
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+- **Next run:** Merge #1408 if CI green. Next gap: FE — execute response top-level shape (isError, content array item shape) or status response shape.
