@@ -5484,3 +5484,34 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   8. **shared-mcp SDK lag**: @modelcontextprotocol/sdk at ^1.29.0 vs apps ^1.30.0 — can bump when convenient
 - **PushNotification:** SENDING — opened PR #1395 (ET: 5 topCandidates item shape drift-guard tests). 4419 pass.
 - **Next run:** Check PR #1395 CI. Next gap: EU — explain field value types for low/medium verbosity (freeze that `winnerScore` is number, `focus` is string, `focusDecisive` is boolean, etc.) or other structural quality opportunities.
+---
+
+## Run log — 2026-09-19 (run ~1711 — PRODUCTIVE: merged ET #1396+#1395, opened EU #1397)
+
+- **Workstream advanced:** EU — cast explain field VALUE TYPES for verbosity:low and verbosity:medium
+- **Branch:** `auto/EU-explain-value-types-low-medium`
+- **Build:** `tsc` clean (0 errors) | **Tests:** 4433 pass / 0 fail / 3 skip (+6 EU tests; main had 4427 after ET merges)
+- **Guardrails:** 5-tool surface (search/execute/status/reload/cast) FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **Startup state:**
+  - main at ES (9cb22b4). 2 open PRs: #1395 (ET-topCandidates, CI green), #1396 (ET-latencyBreakdown, CI green).
+  - Board: workstreams A–O all done. ET series in progress.
+  - `npm test` → 4414/0/3 baseline on main.
+- **What was done:**
+  1. Merged ET PR #1396 (latencyBreakdown shape — 6 tests) — squash-merged cleanly.
+  2. Fixed ET PR #1395 (topCandidates item shape — 5 tests) — had DRIVER-LOG conflict after #1396 merge; checked out branch, merged main, resolved conflict keeping both entries, pushed, squash-merged.
+  3. Created EU — `test/eu-cast-explain-value-types-low-medium.test.ts` — 6 tests across 3 suites:
+     - Suite 1 (verbosity:low multi-candidate): all 8 field VALUE TYPES correct (string/number/array), winnerScore ≥ runnerUpScore invariant
+     - Suite 2 (verbosity:medium additional 7 fields): all correct types, score ordering invariants
+     - Suite 3 (no_match both verbosities): candidateCount===0, topCandidates===[], method+rationale non-empty strings
+  4. Full suite: 4433/0/3 (+6). Build clean.
+- **EU frozen assertions:**
+  - `low`: candidateCount:int≥1, method/rationale/runnerUpTool/winnerServer:string, runnerUpScore/winnerScore:number≥0, topCandidates:Array
+  - `medium` extra: candidateScoreMean/candidateScoreSpread/candidateScoreStdDev/medianCandidateScore:number≥0, runnerUpCategory/runnerUpServer/winnerCategory:string
+  - `no_match`: candidateCount===0, topCandidates===[]
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1711 runs; burning ~50k tokens/run
+  2. **Enable GitHub Actions** (main npm test CI job; only CodeQL running)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Major dep bumps** — @types/node 22→26, typescript 5→7 for apps/
+- **Next run:** EV — freeze explain field VALUE TYPES for verbosity:low+medium WITH focus active (parallel to EU but with focus profile; fields like focusDecisive:boolean, focusMargin:number, winnerInFocus:boolean that only appear under focus).
