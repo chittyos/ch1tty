@@ -5344,6 +5344,43 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
 
 ---
 
+## Run ~2026-09-19 (Scheduled — EP: cast:executed and cast:discovered related.prompts/resources shapes)
+
+- **Timestamp:** 2026-09-19T (automated scheduled run)
+- **Workstream:** EP — cast:executed and cast:discovered related.prompts/resources item shape drift guards
+- **Branch:** `auto/EP-executed-discovered-related-shapes`
+- **PR:** https://github.com/chittyos/ch1tty/pull/1391
+- **Build:** `tsc` clean | **Tests:** 4391 pass / 0 fail / 3 skip (+12 vs 4379/0/3)
+- **Startup state:**
+  - main was at PR #1390 (EO, merged 2026-09-19T10:01Z). No open PRs.
+  - Workstreams A–N (original) + O + extended EA–EO all confirmed done.
+  - DRIVER-LOG.md last updated at EB; many runs since then (EB→EO) not logged here — board was stale.
+- **What was done:**
+  - Inspected aggregator.ts: `related` object spread at 3 distinct lines (1439 discovered, 1617 plan, 1666 executed).
+  - EO froze cast:plan path. EP freezes the two remaining paths.
+  - Wrote `test/ep-executed-discovered-related-shapes.test.ts` with 4 suites × 3 tests = 12 tests:
+    - cast:executed prompts item: no unexpected keys, required keys, field types
+    - cast:executed resources item: no unexpected keys, required keys, field types
+    - cast:discovered prompts item: no unexpected keys, required keys, field types
+    - cast:discovered resources item: no unexpected keys, required keys, field types
+  - cast:discovered fixture uses an intent ("retrieve neon project record") that scores 0 on the tool
+    but 1.0 on the prompt and resource, reliably reaching the `!best` code path.
+  - 12/12 tests pass. Full suite: 4391/0/3.
+  - Committed, pushed, opened PR #1391, subscribed to CI events.
+- **Workstream status updates:**
+  - [x] **EP** — 12 new drift guard tests for cast:executed + cast:discovered related shapes. PR #1391 opened.
+- **Human-action items (carried forward, unchanged):**
+  1. **DISABLE hourly cron** — burning ~50k tokens/run on a fully green codebase
+  2. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  3. **Enable GitHub Actions** (main npm test CI job; only CodeQL is running)
+  4. **Notion workspace** — token may need rotation (`chitty-mcp-token notion`)
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches (auto-cleanup workflow runs Sundays 06:00 UTC)
+  6. **Major dep bumps** — @types/node 22→26, typescript 5→7 for apps/, agents 0.23→0.24
+- **PushNotification:** NOT SENT — routine drift guard addition; no exceptional event; all green.
+- **Next run:** EQ candidate — freeze cast:executed `latencyBreakdown` full sub-object shape (keys: scoringMs, executionMs, registryMs; optional brainMs), or freeze cast:executed `resolved` field type (string vs object — executed emits string at line 1661 vs plan/resolved emit object). Check PR #1391 CI first.
+
+---
+
 ## Run log — 2026-09-19 (run ~1709 — PRODUCTIVE: opened PR #1392 EQ scope-sub-object-shape drift guard)
 
 - **Workstream advanced:** EQ — scope sub-object shape drift guard
