@@ -6449,3 +6449,38 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
 - **Next run:** Merge #1388 if CI green. Next gap: EN — survey remaining uncovered cast shapes (cast:error sub-objects, execute content-item shapes, or other unfrozen paths).
+
+---
+
+## Run log — 2026-09-19 (run ~1721 — PRODUCTIVE: merged EM (#1388), resolved EH conflict, opened EN (#1389))
+
+- **Workstream advanced:** EM closed — PR #1388 squash-merged (cast:no_match + cast:discovered sessionContext shape guards, 8 tests). EH conflict resolved (PR #1383 had merge conflict in DRIVER-BOARD.md; rebased onto main, pushed). EN opened — PR #1389 (cast:resolved and cast:chain_executed sessionContext sub-object shapes, 8 tests).
+- **Build:** clean (tsc exit 0)
+- **Tests:** 4355 pass / 0 fail / 3 skip (was 4347; +8 from EN)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - Confirmed PR #1388 CI: 3/3 checks green. Squash-merged.
+  - Resolved PR #1383 merge conflict: `DRIVER-BOARD.md` diverged between two parallel sessions; accepted origin/main's version, re-pushed branch (4362/0/3 on that branch incl. +15 eh-alternatives tests).
+  - Pulled main (0574d75). Baseline: 4347/0/3.
+  - Identified 2 remaining unfrozen sessionContext paths (EI/EL/EM covered all others):
+    1. cast:resolved (dryRun path, lines 1554–1563, 1577) — resolvedSessionContext constructed separately, never tested
+    2. cast:chain_executed (lines 1516–1525, 1543) — chainSessionContext constructed separately, never tested
+  - Added `test/en-resolved-chain-sessionContext.test.ts` — 8 tests across 2 suites:
+    1. cast:resolved sessionContext (4): no unexpected keys, all required keys, recentTools array of strings, callCount non-negative integer — triggered via dryRun:true + sessionId after primeSession
+    2. cast:chain_executed sessionContext (4): same 4 assertions — triggered via chain:true + sessionId after primeSession
+  - Full suite: 4355/0/3 (+8). Build clean.
+  - Committed, pushed `auto/EN-resolved-chain-sessionContext`, opened PR #1389, subscribed.
+- **Workstream status updates:**
+  - [x] **EM** — test(em): cast:no_match and cast:discovered sessionContext sub-object shapes — 8 tests. PR #1388 merged. DONE.
+  - [ ] **EN** — test(en): cast:resolved and cast:chain_executed sessionContext sub-object shapes — 8 tests. PR #1389 open (CI pending).
+- **Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1721 runs; burning ~50k tokens/run
+  2. **Merge PR #1383 (EH alternatives)** once CI green — 15-test alternatives item shape guard
+  3. **Merge PR #1389 (EN)** once CI green — cast:resolved + chain_executed sessionContext shape guards
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  6. **Notion workspace** out of free blocks — upgrade or clear
+  7. **Stale branch cleanup** — 1100+ remote auto/ branches
+  8. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+- **Next run:** Merge #1389 if CI green. Merge #1383 if CI green. Next gap: EO — survey remaining unfrozen cast shapes (cast:plan resolved sub-object {tool,server,category,description,score,inputSchema} shape, related.prompts item shape, related.resources item shape).
