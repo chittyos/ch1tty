@@ -141,6 +141,7 @@ describe('EQ — scope field types', () => {
     for (const c of scope['categories'] as unknown[]) {
       assert.equal(typeof c, 'string', 'each scope.categories entry must be a string');
     }
+    assert.deepEqual(scope['categories'], ['nonexistent'], 'scope.categories carries exactly the values passed');
     await agg.shutdown();
   });
 
@@ -247,6 +248,17 @@ describe('EQ — scope annotation absent when scope is not set', () => {
     const body = parseBody(result);
     assert.equal(body['cast'], 'executed');
     assert.ok(!('scope' in body), 'scope must NOT appear in cast:executed when scope is not set');
+    await agg.shutdown();
+  });
+
+  test('scope absent from cast:no_match when no scope param', async () => {
+    const agg = makeAgg();
+    const result = await agg.callTool('ch1tty/cast', {
+      intent: 'zzzzzzzzz_no_match_scope_test_xyz_9999',
+    });
+    const body = parseBody(result);
+    assert.equal(body['cast'], 'no_match');
+    assert.ok(!('scope' in body), 'scope must NOT appear in cast:no_match when scope is not set');
     await agg.shutdown();
   });
 });
