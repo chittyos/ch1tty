@@ -445,6 +445,14 @@ describe('FB — search explain topCandidates recentlyUsed shape', () => {
       const recentItems = items.filter((item) => item['recentlyUsed'] !== undefined);
       assert.ok(recentItems.length > 0, 'at least one topCandidates item must have recentlyUsed after a session execute');
 
+      // Both representations must be present:
+      //   - executed tool (alpha/list_databases) → rich object {callCount, lastUsedMs}
+      //   - server sibling (alpha/create_database) → server-level boolean true
+      const richItems = recentItems.filter((item) => typeof item['recentlyUsed'] === 'object' && item['recentlyUsed'] !== null);
+      const boolItems = recentItems.filter((item) => item['recentlyUsed'] === true);
+      assert.ok(richItems.length > 0, 'executed tool must have recentlyUsed={callCount,lastUsedMs} (rich object form)');
+      assert.ok(boolItems.length > 0, 'server sibling must have recentlyUsed===true (server-level boolean form)');
+
       for (const [i, item] of recentItems.entries()) {
         const ru = item['recentlyUsed'];
         const itemKeys = Object.keys(item).sort();
