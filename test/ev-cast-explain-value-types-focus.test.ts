@@ -288,17 +288,19 @@ describe('EV — unfocusedWinner value type at verbosity:medium with focus:code 
       const body = parseBody(result);
       const exp = getExplanation(body);
 
-      // only test unfocusedWinner type when focus actually changed the winner
-      if (exp['unfocusedWinner'] !== undefined) {
-        assert.equal(typeof exp['unfocusedWinner'], 'string', 'unfocusedWinner must be a string');
-        assert.ok((exp['unfocusedWinner'] as string).length > 0, 'unfocusedWinner must be non-empty');
-        assert.ok((exp['unfocusedWinner'] as string).includes('/'), "unfocusedWinner must be namespaced (contain '/')");
+      // The fixture intent 'retrieve account balance' + focus:code reliably produces a
+      // focus-changed winner (stripe/get_balance wins without focus; neon/list_projects wins
+      // with it). Require unfocusedWinner to be defined — a failure here means the fixture
+      // stopped producing the focus-changed-winner scenario (a regression to catch, not skip).
+      assert.ok(exp['unfocusedWinner'] !== undefined, 'unfocusedWinner must be present for the focus-changed winner scenario');
+      assert.equal(typeof exp['unfocusedWinner'], 'string', 'unfocusedWinner must be a string');
+      assert.ok((exp['unfocusedWinner'] as string).length > 0, 'unfocusedWinner must be non-empty');
+      assert.ok((exp['unfocusedWinner'] as string).includes('/'), "unfocusedWinner must be namespaced (contain '/')");
 
-        // unfocusedWinner must differ from the winner's server
-        const winnerServer = exp['winnerServer'] as string;
-        const unfocusedServer = (exp['unfocusedWinner'] as string).split('/')[0];
-        assert.notEqual(unfocusedServer, winnerServer, 'unfocusedWinner server must differ from winner server (focus changed the top spot)');
-      }
+      // unfocusedWinner must differ from the winner's server
+      const winnerServer = exp['winnerServer'] as string;
+      const unfocusedServer = (exp['unfocusedWinner'] as string).split('/')[0];
+      assert.notEqual(unfocusedServer, winnerServer, 'unfocusedWinner server must differ from winner server (focus changed the top spot)');
     } finally {
       await agg.shutdown();
     }
@@ -317,9 +319,8 @@ describe('EV — unfocusedWinner value type at verbosity:medium with focus:code 
       assert.equal(result.isError, undefined);
       const body = parseBody(result);
       const exp = getExplanation(body);
-      if (exp['unfocusedWinner'] !== undefined) {
-        assert.equal(exp['winnerInFocus'], true, 'when unfocusedWinner is present, the actual winner must be in focus');
-      }
+      assert.ok(exp['unfocusedWinner'] !== undefined, 'unfocusedWinner must be present for the focus-changed winner scenario');
+      assert.equal(exp['winnerInFocus'], true, 'when unfocusedWinner is present, the actual winner must be in focus');
     } finally {
       await agg.shutdown();
     }
