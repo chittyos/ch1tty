@@ -6484,3 +6484,29 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   8. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
 - **Next run:** Merge #1389 if CI green. Merge #1383 if CI green. Next gap: EO — survey remaining unfrozen cast shapes (cast:plan resolved sub-object {tool,server,category,description,score,inputSchema} shape, related.prompts item shape, related.resources item shape).
+
+---
+
+## Run log — 2026-09-19 (run ~1722 — PRODUCTIVE: merged EN (#1389), opened EO)
+
+- **Workstream advanced:** EN closed — PR #1389 squash-merged (cast:resolved + cast:chain_executed sessionContext guards, 8 tests). EO next: cast:plan resolved sub-object shape + related item shapes.
+- **Build:** clean (tsc exit 0)
+- **Tests:** 4370 pass / 0 fail / 3 skip (was 4355; +15 from EH+EN landing together on main pull)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - PR #1389 CI: 3/3 checks green (CodeQL + Analyze javascript-typescript + Analyze actions).
+  - Replied to Codex P2 optional finding on PR #1389 (activeSessionFocus always absent because focus:'code' is a process default not a session-sticky focus) — stays as-is, follow-up for EO/EP. Resolved thread.
+  - Squash-merged PR #1389.
+  - Pulled main (4555a37). Test suite: 4370/0/3 (post-EH+EN). Build clean.
+- **Workstream status updates:**
+  - [x] **EH** — test(eh): alternatives array item shape in cast:executed + cast:plan — 15 tests. PR #1383 merged. DONE.
+  - [x] **EN** — test(en): cast:resolved and cast:chain_executed sessionContext sub-object shapes — 8 tests. PR #1389 merged. DONE.
+  - [ ] **EO** — survey + freeze remaining unfrozen cast shapes: cast:plan resolved sub-object {tool,server,category,description,score,inputSchema}, related.prompts item {name,description,arguments,score}, related.resources item {uri,name,description,mimeType,score}. In progress this run.
+- **Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1722 runs; burning ~50k tokens/run
+  2. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  3. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  4. **Notion workspace** out of free blocks — upgrade or clear
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **Next run:** EO — open PR freezing cast:plan resolved sub-object + related.prompts + related.resources shapes.
