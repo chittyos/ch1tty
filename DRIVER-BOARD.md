@@ -6316,3 +6316,38 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
 - **Next run:** Merge #1383 if CI green. Next gap: EJ — survey remaining uncovered paths (cast:executed resolvedFromCatalog shape, or pivot to non-cast tool coverage gaps like ch1tty/search sort invariants or health endpoint drift).
+
+---
+
+## Run log — 2026-09-19 (run ~1717 — PRODUCTIVE: merged EI (#1384), opened EJ (#1385))
+
+- **Workstream advanced:** EI closed — PR #1384 squash-merged (cast suggestions + sessionContext sub-object shape guards, 13 tests). EJ opened — PR #1385 (cast:chain_executed step item shape + catalog no-unexpected-keys, 9 tests).
+- **Build:** clean (tsc exit 0)
+- **Tests:** 4323 pass / 0 fail / 3 skip (was 4314; +9 from EJ)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - Confirmed PR #1384 CI: 3/3 checks green (Analyze javascript-typescript now success). Squash-merged.
+  - Pulled main (9c4704f). Baseline: 4314/0/3.
+  - Identified 3 gaps in cast:chain_executed coverage (EF's blind spots):
+    1. step items have no no-unexpected-keys guard (EF only checks types for step/tool/ok)
+    2. ok:true step content field (array) and ok:false step error field (string) conditional shapes not frozen
+    3. catalog sub-object has no unexpected-keys guard (EF checks required keys but not unexpected)
+  - Added `test/ej-chain-executed-step-catalog-shape.test.ts` — 9 tests across 3 suites:
+    1. step item ok:true (4): no unexpected keys, required keys, content is array, no error field
+    2. step item ok:false (3): error is string, no content field, no unexpected keys — uses makePartialFailChainAgg() where second step has `response: 'error'`
+    3. catalog no-unexpected-keys (2): no unexpected keys, exactly frozen field set {accomplishes,chain,name}
+  - Full suite: 4323/0/3 (+9). Build clean.
+  - Committed, pushed `auto/EJ-chain-executed-step-catalog-shape`, opened PR #1385, subscribed.
+- **Workstream status updates:**
+  - [x] **EI** — test(ei): cast suggestions + sessionContext sub-object shape guards — 13 tests. PR #1384 merged. DONE.
+  - [ ] **EJ** — test(ej): cast:chain_executed step item shape + catalog no-unexpected-keys — 9 tests. PR #1385 open (CI pending).
+- **Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1717 runs; burning ~50k tokens/run
+  2. **Merge PR #1385 (EJ)** once CI green — cast:chain_executed step item + catalog guards
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+- **Next run:** Merge #1385 if CI green. Next gap: EK — survey remaining uncovered shapes (cast:executed resolvedFromCatalog content shape in execute mode, or ch1tty/execute result content item shape drift, or search tool entry inputSchema sub-object freeze).
