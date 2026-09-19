@@ -8,6 +8,11 @@
  * total) and 'medium' gains 12 focus fields (27 total). Those augmented sets
  * are unfrozen and can quietly regress.
  *
+ * A second medium scenario covers the focus-changed-winner branch (28 fields):
+ * 'retrieve account balance' causes focus:code to promote neon/list_projects
+ * above stripe/get_balance, so buildCastExplanation adds unfocusedWinner. This
+ * branch is absent from the in-focus-winner scenario and from low verbosity.
+ *
  * CLAUDE.md § buildCastExplanation metric freeze applies here:
  * if a test fails with an UNEXPECTED name, a rename or new field was added
  * — REJECT per the metric freeze; if it fails with a MISSING name, a field
@@ -18,14 +23,18 @@
  *   candidateCount, focus, focusBoost, focusDecisive, method, rationale,
  *   runnerUpScore, runnerUpTool, topCandidates, winnerInFocus, winnerScore,
  *   winnerServer
+ *   (unfocusedWinner absent at low verbosity even when focus changes winner)
  *
- * ── verbosity: 'medium', focus:code, multi-candidate (27 fields) ─────────────
+ * ── verbosity: 'medium', focus:code, in-focus winner (27 fields) ─────────────
  *   candidateCount, candidateScoreMean, candidateScoreSpread,
  *   candidateScoreStdDev, candidatesInFocusCount, focus, focusBoost,
  *   focusConfidence, focusDecisive, focusMargin, focusRank, focusRankDelta,
  *   inFocusFraction, medianCandidateScore, method, rationale, runnerUpCategory,
  *   runnerUpScore, runnerUpServer, runnerUpTool, topCandidates, winnerCategory,
  *   winnerFocusBoost, winnerInFocus, winnerScore, winnerScoreBase, winnerServer
+ *
+ * ── verbosity: 'medium', focus:code, focus-changed winner (28 fields) ────────
+ *   above 27 + unfocusedWinner
  *
  * ── no_match (0 candidates) — both verbosities + focus (4 fields) ────────────
  *   candidateCount, method, rationale, topCandidates
@@ -58,7 +67,8 @@ const LOW_FOCUS_MULTI: readonly string[] = [
   'winnerServer',
 ];
 
-const MEDIUM_FOCUS_MULTI: readonly string[] = [
+/** 27 fields: winner already in focus — unfocusedWinner absent */
+const MEDIUM_FOCUS_IN_FOCUS_WINNER: readonly string[] = [
   'candidateCount',
   'candidateScoreMean',
   'candidateScoreSpread',
@@ -88,6 +98,17 @@ const MEDIUM_FOCUS_MULTI: readonly string[] = [
   'winnerServer',
 ];
 
+/**
+ * 28 fields: focus boost promotes a neon tool above the pre-focus winner —
+ * unfocusedWinner names the tool that would have won without focus.
+ * Intent 'retrieve account balance': without focus stripe/get_balance wins;
+ * with focus:code neon/list_projects wins (+0.5 boost tips the outcome).
+ */
+const MEDIUM_FOCUS_CHANGED_WINNER: readonly string[] = [
+  ...MEDIUM_FOCUS_IN_FOCUS_WINNER,
+  'unfocusedWinner',
+];
+
 /** no_match — focus fields absent because there is no winner candidate */
 const NO_MATCH_FIELDS: readonly string[] = [
   'candidateCount',
@@ -99,6 +120,16 @@ const NO_MATCH_FIELDS: readonly string[] = [
 // ── Fixture setup ─────────────────────────────────────────────────────────────
 
 const DLQ = join(tmpdir(), `ch1tty-es-${Date.now()}.jsonl`);
+
+/**
+ * Inline focus profiles make the tests hermetic: CH1TTY_FOCUS_PROFILES
+ * env var cannot change the 'code' profile definition at runtime.
+ */
+const FOCUS_PROFILES = {
+  profiles: {
+    code: { categories: ['code'] as string[], servers: ['neon'] as string[], boost: 0.5 },
+  },
+};
 
 function makeAggregator(): Aggregator {
   const backend = new FixtureBackend();
@@ -114,6 +145,7 @@ function makeAggregator(): Aggregator {
     backendFactory: () => backend,
     embedEnabled: false,
     ledgerDlqPath: DLQ,
+    focusProfiles: FOCUS_PROFILES,
   });
 }
 
@@ -174,7 +206,7 @@ describe('ES — explain verbosity:low field names (focus:code)', () => {
 // ── Suite 2: verbosity:'medium' + focus:code ──────────────────────────────────
 
 describe('ES — explain verbosity:medium field names (focus:code)', () => {
-  test('verbosity:medium focus:code multi-candidate — exact frozen field set (27 names)', async () => {
+  test('verbosity:medium focus:code in-focus winner — exact frozen field set (27 names)', async () => {
     const agg = makeAggregator();
     try {
       const result = await agg.callTool('ch1tty/cast', {
@@ -188,11 +220,48 @@ describe('ES — explain verbosity:medium field names (focus:code)', () => {
       const body = JSON.parse((result.content[0] as { text: string }).text) as Record<string, unknown>;
       assert.ok(body['explanation'] !== undefined, 'explanation must be present when explain:true');
       const actual = Object.keys(body['explanation'] as object).sort();
-      const expected = [...MEDIUM_FOCUS_MULTI].sort();
+      const expected = [...MEDIUM_FOCUS_IN_FOCUS_WINNER].sort();
       assert.deepEqual(
         actual,
         expected,
-        `verbosity:medium focus:code field names drifted.\nExpected: ${JSON.stringify(expected)}\nActual:   ${JSON.stringify(actual)}`,
+        `verbosity:medium focus:code in-focus-winner field names drifted.\nExpected: ${JSON.stringify(expected)}\nActual:   ${JSON.stringify(actual)}`,
+      );
+    } finally {
+      await agg.shutdown();
+    }
+  });
+
+  test('verbosity:medium focus:code focus-changed winner — exact frozen field set (28 names)', async () => {
+    const agg = makeAggregator();
+    try {
+      // 'retrieve account balance': without focus stripe/get_balance wins;
+      // with focus:code neon/list_projects wins (boost tips outcome) →
+      // unfocusedWinner: 'stripe/get_balance' is emitted.
+      const result = await agg.callTool('ch1tty/cast', {
+        intent: 'retrieve account balance',
+        explain: true,
+        verbosity: 'medium',
+        focus: 'code',
+        dryRun: true,
+      });
+      assert.equal(result.isError, undefined, 'cast should not error');
+      const body = JSON.parse((result.content[0] as { text: string }).text) as Record<string, unknown>;
+      assert.ok(body['explanation'] !== undefined, 'explanation must be present when explain:true');
+      const explanation = body['explanation'] as Record<string, unknown>;
+      assert.ok(
+        explanation['winnerInFocus'] === true,
+        `expected winner to be in focus (focus:code won); got winnerInFocus=${explanation['winnerInFocus']}`,
+      );
+      assert.ok(
+        explanation['unfocusedWinner'] !== undefined,
+        'unfocusedWinner must be present when focus changes the winner',
+      );
+      const actual = Object.keys(explanation).sort();
+      const expected = [...MEDIUM_FOCUS_CHANGED_WINNER].sort();
+      assert.deepEqual(
+        actual,
+        expected,
+        `verbosity:medium focus:code focus-changed-winner field names drifted.\nExpected: ${JSON.stringify(expected)}\nActual:   ${JSON.stringify(actual)}`,
       );
     } finally {
       await agg.shutdown();
