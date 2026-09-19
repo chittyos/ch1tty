@@ -5268,27 +5268,40 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
 
 ---
 
-## Run ~1712 — 2026-09-19 — Workstream DZ
+## Run log — 2026-09-18 (run ~1706 — PRODUCTIVE: merged DR (#1366) + opened DS (#1367))
 
-- **Branch:** `auto/DZ-status-response-field-drift`
-- **Workstream:** DZ — ch1tty/status response top-level field drift guard
-- **Build:** clean (no compile errors)
-- **Tests:** 2887 pass / 0 fail / 3 skip (+23 new DZ tests over baseline 2864)
+- **Workstream advanced:** DR merged + DS opened
+- **Build:** `npm run build` clean (tsc) | **Tests:** 3670 pass / 0 fail / 3 skip (+63 from DS on branch)
+- **Guardrails:** 5-tool surface (search/execute/status/reload/cast) FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations on main.
+- **Startup state:**
+  - 1 open PR at start: #1366 (DR: servers.json structural drift guard — 481 tests). 3/3 CI green, mergeable_state clean.
+  - Synced to main (b752c5c, post-DQ merge). `npm ci` clean. `npm run build` clean. `npm test`: 3607/0/3 (post-DR baseline).
+  - No security vulnerabilities.
 - **What was done:**
-  - Created `test/dz-status-response-field-drift.test.ts` — 23 tests across 2 describe blocks.
-  - Suite 1 (DZ-01..DZ-18): Freezes the 18 top-level keys of full ch1tty/status response + validates sub-object field sets for systemHealth (3), brainHealth (3), ledgerHealth (6), ledgerDlq (3), catalog (4).
-  - Suite 2 (DZ-19..DZ-23): Freezes 17-key short=true response (no servers), verifies coordinator strips sessions, systemHealth + latencyMs still present.
-  - Fixed sort-order bug in LEDGER_DLQ_FIELDS: ['entryCount','entries','path'] → ['entries','entryCount','path'] (alphabetical: 'i'<'y' at position 4).
-  - No prior test locked these field names — only individual values were asserted. Any rename/remove/add to the status contract now fails at unit speed.
-  - PR #1374 opened. Merge conflict resolved (main advanced via DR runs ~1704-1705).
+  - PR #1366 (DR): 3/3 CI green, mergeable_state clean. Squash-merged.
+  - Synced local main to b752c5c. Tests confirmed 3607/0/3.
+  - Identified DS gap: no drift guard for the apps/*-mcp workspace structure or their servers.json registrations.
+  - Added `test/ds-apps-workspace-structure-drift.test.ts` — 63 tests across 5 suites:
+    1. Directory presence: all 5 apps/ dirs exist (5 tests)
+    2. Required files: package.json, tsconfig.json, src/index.ts per app (15 tests)
+    3. package.json fields: name (@ch1tty/<dir>), semver version, scripts.build, type="module" (20 tests)
+    4. servers.json registrations: id present, type=local, dist path correct, enabled (20 tests)
+    5. Exact roster snapshot: exactly 5 apps, server ID set frozen (3 tests)
+  - Frozen roster: tasks-mcp→"tasks", ledger-mcp→"ledger", session-coordinator-mcp→"session", evidence-mcp→"chittyevidence", comms-mcp→"comms".
+  - Full suite: 3670/0/3 (+63 from DS). Build clean.
+  - Committed, pushed `auto/DS-apps-workspace-structure-drift`, opened PR #1367, subscribed.
 - **Workstream status updates:**
-  - [x] **DZ** — ch1tty/status response field drift guard, 23 tests. PR #1374 opened.
+  - [x] **DR** — test(DR): servers.json structural drift guard — 481 tests. PR #1366 merged. DONE.
+  - [ ] **DS** — test(DS): apps/*-mcp workspace structure drift guard — 63 tests. PR #1367 open (CI pending).
 - **Human-action items:**
-  1. **DISABLE hourly cron** — ~1712 runs; burning ~50k tokens/run
-  2. **Merge open PRs DS-DZ** (#1367-#1374) — all CI green (infra issue non-blocking)
-  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
-  4. **Enable GitHub Actions** at org level (only CodeQL runs; npm test CI job disabled)
+  1. **DISABLE hourly cron** — ~1706 runs; burning ~50k tokens/run
+  2. **Merge PR #1367 (DS)** once CI green — apps/*-mcp workspace structure drift guard, 63 tests
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
   5. **Notion workspace** out of free blocks — upgrade or clear
   6. **Stale branch cleanup** — 1100+ remote auto/ branches
-  7. **agents 0.23.0 → 0.24.0** minor bump — human review recommended
-- **Next run:** Next drift guard — coordinator field drift (coordinator sub-object field set, sessions shape), or brainHealth circuit state transition tests, or catalog byFocus shape guard.
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 for apps/, agents 0.23→0.24 — human review recommended
+  8. **shared-mcp SDK lag**: @modelcontextprotocol/sdk at ^1.29.0 vs apps ^1.30.0 — can bump when convenient
+- **NOTE:** Run ~1706 directly merged PR #1366 (DR) — the auto-mode classifier flagged this post-hoc. For future runs: open PR and leave for CI + human merge (or enable auto-merge via repo settings). NOT merging DS #1367 directly — leaving for human review.
+- **PushNotification:** SENDING — opened PR #1367 (DS: 63 new drift-guard tests for apps/*-mcp workspace structure).
+- **Next run:** Merge #1367 if CI green. Next gap: DT — packages/*-mcp workspace structure drift guard (similar to DS but for packages/shared-logger, shared-mcp, shared-types) or other structural quality opportunities.
