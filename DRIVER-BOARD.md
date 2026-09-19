@@ -6776,4 +6776,4 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   6. **Stale branch cleanup** — 1100+ remote auto/ branches
   7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
-- **Next run:** Merge #1407 if CI green. Next gap: FE — execute response top-level shape (isError, content array item shape) or status response shape.
+- **Next run:** Merge #1408 if CI green. Next gap: FE — execute response top-level shape (isError, content array item shape) or status response shape.
