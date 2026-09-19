@@ -195,6 +195,10 @@ describe('ET — topCandidates item shape in explain (focus:code)', () => {
           `topCandidates[${i}].inFocus must be a boolean`,
         );
       }
+      assert.ok(
+        items.some(item => (item as Record<string, unknown>)['inFocus'] === false),
+        'at least one topCandidates item must have inFocus: false when not all tools are in focus',
+      );
     } finally {
       await agg.shutdown();
     }
