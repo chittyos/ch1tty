@@ -139,22 +139,24 @@ describe('ET — topCandidates item shape in explain (no focus)', () => {
     }
   });
 
-  test('no focus no_match — topCandidates is [] (empty array)', async () => {
+  test('no focus no_match — topCandidates is [] for all verbosities', async () => {
     const agg = makeAggregator();
     try {
-      const result = await agg.callTool('ch1tty/cast', {
-        intent: 'zzzzzzzzz_no_match_et_test_xyz_9999',
-        explain: true,
-        verbosity: 'low',
-      });
-      assert.equal(result.isError, undefined, 'cast should not error');
-      const body = JSON.parse((result.content[0] as { text: string }).text) as Record<string, unknown>;
-      assert.equal(body['cast'], 'no_match');
-      const explanation = body['explanation'] as Record<string, unknown>;
-      assert.ok(explanation !== undefined, 'explanation must be present on no_match when explain:true');
-      const items = explanation['topCandidates'];
-      assert.ok(Array.isArray(items), 'topCandidates must be an array on no_match');
-      assert.equal((items as unknown[]).length, 0, 'topCandidates must be [] on no_match');
+      for (const verbosity of ['low', 'medium', 'full'] as const) {
+        const result = await agg.callTool('ch1tty/cast', {
+          intent: 'zzzzzzzzz_no_match_et_test_xyz_9999',
+          explain: true,
+          verbosity,
+        });
+        assert.equal(result.isError, undefined, `cast should not error (${verbosity})`);
+        const body = JSON.parse((result.content[0] as { text: string }).text) as Record<string, unknown>;
+        assert.equal(body['cast'], 'no_match', `cast must be no_match (${verbosity})`);
+        const explanation = body['explanation'] as Record<string, unknown>;
+        assert.ok(explanation !== undefined, `explanation must be present on no_match when explain:true (${verbosity})`);
+        const items = explanation['topCandidates'];
+        assert.ok(Array.isArray(items), `topCandidates must be an array on no_match (${verbosity})`);
+        assert.equal((items as unknown[]).length, 0, `topCandidates must be [] on no_match (${verbosity})`);
+      }
     } finally {
       await agg.shutdown();
     }
@@ -185,6 +187,10 @@ describe('ET — topCandidates item shape in explain (no focus)', () => {
             expected,
             `topCandidates[${i}] keys drifted at verbosity ${verbosity}.\nExpected: ${JSON.stringify(expected)}\nActual:   ${JSON.stringify(actual)}`,
           );
+          assert.equal(typeof (item as Record<string, unknown>)['tool'], 'string', `topCandidates[${i}].tool must be a string (${verbosity})`);
+          assert.ok(((item as Record<string, unknown>)['tool'] as string).length > 0, `topCandidates[${i}].tool must be non-empty (${verbosity})`);
+          assert.equal(typeof (item as Record<string, unknown>)['score'], 'number', `topCandidates[${i}].score must be a number (${verbosity})`);
+          assert.ok(Number.isFinite((item as Record<string, unknown>)['score'] as number), `topCandidates[${i}].score must be finite (${verbosity})`);
         }
       }
     } finally {
@@ -244,23 +250,25 @@ describe('ET — topCandidates item shape in explain (focus:code)', () => {
     }
   });
 
-  test('focus:code no_match — topCandidates is [] (empty array)', async () => {
+  test('focus:code no_match — topCandidates is [] for all verbosities', async () => {
     const agg = makeAggregator(true);
     try {
-      const result = await agg.callTool('ch1tty/cast', {
-        intent: 'zzzzzzzzz_no_match_et_test_xyz_9999',
-        explain: true,
-        verbosity: 'low',
-        focus: 'code',
-      });
-      assert.equal(result.isError, undefined, 'cast should not error');
-      const body = JSON.parse((result.content[0] as { text: string }).text) as Record<string, unknown>;
-      assert.equal(body['cast'], 'no_match');
-      const explanation = body['explanation'] as Record<string, unknown>;
-      assert.ok(explanation !== undefined, 'explanation must be present on no_match when explain:true');
-      const items = explanation['topCandidates'];
-      assert.ok(Array.isArray(items), 'topCandidates must be an array on no_match');
-      assert.equal((items as unknown[]).length, 0, 'topCandidates must be [] on no_match');
+      for (const verbosity of ['low', 'medium', 'full'] as const) {
+        const result = await agg.callTool('ch1tty/cast', {
+          intent: 'zzzzzzzzz_no_match_et_test_xyz_9999',
+          explain: true,
+          verbosity,
+          focus: 'code',
+        });
+        assert.equal(result.isError, undefined, `cast should not error (${verbosity})`);
+        const body = JSON.parse((result.content[0] as { text: string }).text) as Record<string, unknown>;
+        assert.equal(body['cast'], 'no_match', `cast must be no_match (${verbosity})`);
+        const explanation = body['explanation'] as Record<string, unknown>;
+        assert.ok(explanation !== undefined, `explanation must be present on no_match when explain:true (${verbosity})`);
+        const items = explanation['topCandidates'];
+        assert.ok(Array.isArray(items), `topCandidates must be an array on no_match (${verbosity})`);
+        assert.equal((items as unknown[]).length, 0, `topCandidates must be [] on no_match (${verbosity})`);
+      }
     } finally {
       await agg.shutdown();
     }
@@ -292,7 +300,14 @@ describe('ET — topCandidates item shape in explain (focus:code)', () => {
             expected,
             `topCandidates[${i}] keys drifted at verbosity ${verbosity}.\nExpected: ${JSON.stringify(expected)}\nActual:   ${JSON.stringify(actual)}`,
           );
+          assert.equal(typeof (item as Record<string, unknown>)['inFocus'], 'boolean', `topCandidates[${i}].inFocus must be a boolean (${verbosity})`);
+          assert.equal(typeof (item as Record<string, unknown>)['tool'], 'string', `topCandidates[${i}].tool must be a string (${verbosity})`);
+          assert.ok(((item as Record<string, unknown>)['tool'] as string).length > 0, `topCandidates[${i}].tool must be non-empty (${verbosity})`);
+          assert.equal(typeof (item as Record<string, unknown>)['score'], 'number', `topCandidates[${i}].score must be a number (${verbosity})`);
+          assert.ok(Number.isFinite((item as Record<string, unknown>)['score'] as number), `topCandidates[${i}].score must be finite (${verbosity})`);
         }
+        assert.ok(items.some(item => (item as Record<string, unknown>)['inFocus'] === false), `at least one item must have inFocus: false (${verbosity})`);
+        assert.ok(items.some(item => (item as Record<string, unknown>)['inFocus'] === true), `at least one item must have inFocus: true (${verbosity})`);
       }
     } finally {
       await agg.shutdown();
