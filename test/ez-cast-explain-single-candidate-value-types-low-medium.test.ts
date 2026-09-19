@@ -202,15 +202,24 @@ describe('EZ — single-candidate value types at verbosity:medium (no focus)', (
       const body = parseBody(result);
       const exp = getExplanation(body);
 
+      // inherited low-verbosity field types must also hold on the medium code path
+      assert.equal(typeof exp['candidateCount'], 'number', 'candidateCount must be a number (inherited)');
+      assert.equal(exp['candidateCount'], 1, 'candidateCount must be exactly 1 (inherited)');
+      assert.equal(typeof exp['method'], 'string', 'method must be a string (inherited)');
+      assert.ok((exp['method'] as string).length > 0, 'method must be non-empty (inherited)');
+      assert.equal(typeof exp['rationale'], 'string', 'rationale must be a string (inherited)');
+      assert.ok((exp['rationale'] as string).length > 0, 'rationale must be non-empty (inherited)');
+      assert.ok(Array.isArray(exp['topCandidates']), 'topCandidates must be an array (inherited)');
+      assert.equal((exp['topCandidates'] as unknown[]).length, 1, 'topCandidates must have exactly 1 entry (inherited)');
+      assert.equal(typeof exp['winnerScore'], 'number', 'winnerScore must be a number (inherited)');
+      assert.ok(Number.isFinite(exp['winnerScore'] as number), 'winnerScore must be finite (inherited)');
+      assert.ok((exp['winnerScore'] as number) > 0, 'winnerScore must be > 0 (inherited)');
+      assert.equal(typeof exp['winnerServer'], 'string', 'winnerServer must be a string (inherited)');
+      assert.ok((exp['winnerServer'] as string).length > 0, 'winnerServer must be non-empty (inherited)');
+
       // winnerCategory: non-empty string (medium-verbosity addition)
       assert.equal(typeof exp['winnerCategory'], 'string', 'winnerCategory must be a string');
       assert.ok((exp['winnerCategory'] as string).length > 0, 'winnerCategory must be non-empty');
-
-      // candidateCount still === 1
-      assert.equal(exp['candidateCount'], 1, 'candidateCount must be exactly 1');
-
-      // topCandidates still length 1
-      assert.equal((exp['topCandidates'] as unknown[]).length, 1, 'topCandidates must have exactly 1 entry');
 
       // medium-only statistical fields absent for single-candidate
       assert.equal(exp['candidateScoreMean'], undefined, 'candidateScoreMean must be absent for single-candidate');
@@ -282,6 +291,30 @@ describe('EZ — single-candidate value types at verbosity:medium (focus:code ac
       assert.equal(result.isError, undefined, 'cast should not error');
       const body = parseBody(result);
       const exp = getExplanation(body);
+
+      // inherited low-verbosity base field types must hold on the medium+focus code path
+      assert.equal(typeof exp['candidateCount'], 'number', 'candidateCount must be a number (inherited)');
+      assert.equal(exp['candidateCount'], 1, 'candidateCount must be exactly 1 (inherited)');
+      assert.equal(typeof exp['method'], 'string', 'method must be a string (inherited)');
+      assert.ok((exp['method'] as string).length > 0, 'method must be non-empty (inherited)');
+      assert.equal(typeof exp['rationale'], 'string', 'rationale must be a string (inherited)');
+      assert.ok((exp['rationale'] as string).length > 0, 'rationale must be non-empty (inherited)');
+      assert.ok(Array.isArray(exp['topCandidates']), 'topCandidates must be an array (inherited)');
+      assert.equal((exp['topCandidates'] as unknown[]).length, 1, 'topCandidates must have exactly 1 entry (inherited)');
+      assert.equal(typeof exp['winnerScore'], 'number', 'winnerScore must be a number (inherited)');
+      assert.ok(Number.isFinite(exp['winnerScore'] as number), 'winnerScore must be finite (inherited)');
+      assert.ok((exp['winnerScore'] as number) > 0, 'winnerScore must be > 0 (inherited)');
+      assert.equal(typeof exp['winnerServer'], 'string', 'winnerServer must be a string (inherited)');
+      assert.ok((exp['winnerServer'] as string).length > 0, 'winnerServer must be non-empty (inherited)');
+
+      // inherited low+focus field types must hold on the medium+focus code path
+      assert.equal(typeof exp['focus'], 'string', 'focus must be a string (inherited from low+focus)');
+      assert.equal(exp['focus'], 'code', "focus must equal 'code' (inherited from low+focus)");
+      assert.equal(typeof exp['focusBoost'], 'number', 'focusBoost must be a number (inherited from low+focus)');
+      assert.ok(Number.isFinite(exp['focusBoost'] as number), 'focusBoost must be finite (inherited from low+focus)');
+      assert.ok((exp['focusBoost'] as number) >= 0, 'focusBoost must be ≥ 0 (inherited from low+focus)');
+      assert.equal(typeof exp['winnerInFocus'], 'boolean', 'winnerInFocus must be a boolean (inherited from low+focus)');
+      assert.equal(exp['winnerInFocus'], true, 'winnerInFocus must be true (inherited from low+focus)');
 
       // candidatesInFocusCount: integer === 1 (the only tool is in focus)
       assert.equal(typeof exp['candidatesInFocusCount'], 'number', 'candidatesInFocusCount must be a number');
