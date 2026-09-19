@@ -229,13 +229,8 @@ describe('FI-7..9: conditional keyword envelope keys', () => {
     });
     assert.equal(result.isError, undefined);
     const body = parseBody(result);
-    // When partial fallback occurs, mode:'partial' is present
-    if ('mode' in body) {
-      assert.equal(body.mode, 'partial', 'mode value must be exactly "partial"');
-    }
-    // Whether mode is present depends on whether AND yielded 0 results.
-    // The invariant we freeze: IF mode is present, its value is the string 'partial'
-    // (not a number, not 'keyword', not 'and')
+    assert.ok('mode' in body, 'mode key must be present for partial fallback');
+    assert.equal(body.mode, 'partial', 'mode value must be exactly "partial"');
   });
 
   // FI-8
