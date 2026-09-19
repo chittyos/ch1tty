@@ -6248,29 +6248,204 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 ## Run log — 2026-09-19 (run ~1715 — PRODUCTIVE: merged EG (#1381), opened EH (#1382))
 
-- **Workstream advanced:** EG closed — PR #1381 squash-merged (cast no-unexpected-keys guards, 16 tests). EH opened — PR #1383 (alternatives item shape guard, 15 tests).
+- **Workstream advanced:** EG closed — PR #1381 squash-merged (cast no-unexpected-keys guards, 16 tests). EH opened — PR #1382 (cast alternatives item shape + resolvedFromCatalog + chainContinuation sub-object guards, 11 tests).
 - **Build:** clean (tsc exit 0)
-- **Tests:** 4305 pass / 0 fail / 3 skip (was 4290; +15 from EH)
+- **Tests:** 4301 pass / 0 fail / 3 skip (was 4290; +11 from EH)
 - **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
 - **What was done:**
   - Confirmed PR #1381 CI: 3/3 CodeQL checks green. Squash-merged.
   - Pulled main (b328f20). Baseline: 4290/0/3.
-  - Read aggregator.ts lines 1389–1393 to extract alternatives item shape: `{ tool: string, score: number, description: string }` (slice(1,4) — max 3 items).
-  - Added `test/eh-alternatives-item-shape.test.ts` — 15 tests across 2 suites:
-    1. cast:executed (9): array type check, length ≤ 3, no unexpected keys per item, tool is non-empty string, tool is namespaced (contains /), score is number, description is string, tool differs from resolved, absent with single-tool backend
-    2. cast:plan (6): array type check, length ≤ 3, no unexpected keys per item, tool is namespaced, score is finite number, absent with single-tool backend
-  - Full suite: 4305/0/3 (+15). Build clean.
-  - Committed, pushed `auto/EH-alternatives-item-shape-guards`, opened PR #1382, subscribed.
+  - Identified 3 gaps in cast sub-object shape coverage:
+    1. EA covers alternatives item shape for cast:plan but NOT cast:executed
+    2. No test freezes resolvedFromCatalog sub-object shape (name/chain/accomplishes) in cast:plan
+    3. No test freezes chainContinuation sub-object shape (nextTool/remainingChain/hint) in cast:plan
+  - Added `test/eh-cast-alternatives-catalog-chain-shape.test.ts` — 11 tests across 3 suites:
+    1. cast:executed alternatives item shape (3): no unexpected keys, correct field types (tool=namespaced string, score=number, description=string), non-empty array when present
+    2. cast:plan resolvedFromCatalog (4): exact fields {name,chain,accomplishes}, name type, chain array of strings, accomplishes type
+    3. cast:plan chainContinuation (4): exact fields {nextTool,remainingChain,hint}, nextTool namespaced string, remainingChain array of strings, hint type
+  - makePlanCatalogAgg() uses PLAN_CATALOG (neon 2-step combo) + focus:code + KeywordOnlyCoordinator + confirm:true to trigger resolvedFromCatalog and chainContinuation.
+  - Full suite: 4301/0/3 (+11). Build clean.
+  - Committed, pushed `auto/EH-cast-subobject-shape-guards`, opened PR #1382, subscribed.
 - **Workstream status updates:**
-  - [x] **EG** — test(EG): cast no-unexpected-keys guards for 4 paths — 16 tests. PR #1381 merged. DONE.
-  - [ ] **EH** — test(EH): alternatives item shape guard — 15 tests. PR #1383 open (CI pending).
+  - [x] **EG** — test(eg): cast no-unexpected-keys guards for 4 paths — 16 tests. PR #1381 merged. DONE.
+  - [ ] **EH** — test(eh): cast alternatives + resolvedFromCatalog + chainContinuation sub-object guards — 11 tests. PR #1382 open (CI pending).
 - **Human-action items (unchanged):**
   1. **DISABLE hourly cron** — ~1715 runs; burning ~50k tokens/run
-  2. **Merge PR #1383 (EH)** once CI green — alternatives item shape drift guard
+  2. **Merge PR #1382 (EH)** once CI green — cast sub-object shape guards
   3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
   4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
   5. **Notion workspace** out of free blocks — upgrade or clear
   6. **Stale branch cleanup** — 1100+ remote auto/ branches
   7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
-- **Next run:** Merge #1382 if CI green. Next gap: EI — sessionContext sub-object shape guard (recentTools: string[], callCount: number, activeSessionFocus?: string) or chainContinuation shape guard (nextTool/remainingChain/hint).
+- **Next run:** Merge #1382 if CI green. Next gap: EI — survey remaining cast sub-object gaps (sessionContext shape, suggestions shape) or move to another tool/module.
+
+---
+
+## Run log — 2026-09-19 (run ~1716 — PRODUCTIVE: merged EH (#1382), opened EI (#1383))
+
+- **Workstream advanced:** EH closed — PR #1382 squash-merged (cast alternatives + resolvedFromCatalog + chainContinuation guards, 11 tests). EI opened — PR #1383 (cast suggestions sub-object shape + sessionContext sub-object shape guards, 13 tests).
+- **Build:** clean (tsc exit 0)
+- **Tests:** 4314 pass / 0 fail / 3 skip (was 4301; +13 from EI)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - Confirmed PR #1382 CI: 3/3 CodeQL checks green. Squash-merged.
+  - Pulled main (a0db2fb). Baseline: 4301/0/3.
+  - Identified 2 shape gaps: (1) suggestions sub-object shape unfrozen (existing tests check presence/values but no drift guard freezes field sets); (2) sessionContext sub-object shape in cast responses unfrozen (EC does it for execute but not cast).
+  - Read `src-stdio/suggestions.ts` to extract SuggestedCombo `{name,chain,accomplishes,verified,notes?}` and SuggestedPrompt `{text,resolves_to}` field sets.
+  - Added `test/ei-cast-suggestions-sessioncontext-shape.test.ts` — 13 tests across 4 suites:
+    1. suggestions top-level (3): exactly {combos,prompts}, combos is array, prompts is array
+    2. suggestions combo item (3): no unexpected keys, required keys present, field types (name=string, chain=array, accomplishes=string, verified=boolean, notes=string when present)
+    3. suggestions prompt item (2): exactly {resolves_to,text} fields, field types
+    4. sessionContext in cast (5): no unexpected keys, required keys {callCount,recentTools}, recentTools is array of strings, callCount is non-negative integer, activeSessionFocus is string when present
+  - SUGGESTIONS_CATALOG uses neon 2-step combo + 1 prompt for triggering suggestions in chain_executed.
+  - KeywordOnlyCoordinator used for deterministic scoring.
+  - sessionContext triggered by passing sessionId in cast:executed call.
+  - Full suite: 4314/0/3 (+13). Build clean.
+  - Committed, pushed `auto/EI-cast-suggestions-sessioncontext-shape`, opened PR #1383, subscribed.
+- **Workstream status updates:**
+  - [x] **EH** — test(eh): cast alternatives + resolvedFromCatalog + chainContinuation guards — 11 tests. PR #1382 merged. DONE.
+  - [ ] **EI** — test(ei): cast suggestions + sessionContext sub-object shape guards — 13 tests. PR #1383 open (CI pending).
+- **Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1716 runs; burning ~50k tokens/run
+  2. **Merge PR #1383 (EI)** once CI green — cast suggestions + sessionContext drift guards
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+- **Next run:** Merge #1383 if CI green. Next gap: EJ — survey remaining uncovered paths (cast:executed resolvedFromCatalog shape, or pivot to non-cast tool coverage gaps like ch1tty/search sort invariants or health endpoint drift).
+
+---
+
+## Run log — 2026-09-19 (run ~1717 — PRODUCTIVE: merged EI (#1384), opened EJ (#1385))
+
+- **Workstream advanced:** EI closed — PR #1384 squash-merged (cast suggestions + sessionContext sub-object shape guards, 13 tests). EJ opened — PR #1385 (cast:chain_executed step item shape + catalog no-unexpected-keys, 9 tests).
+- **Build:** clean (tsc exit 0)
+- **Tests:** 4323 pass / 0 fail / 3 skip (was 4314; +9 from EJ)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - Confirmed PR #1384 CI: 3/3 checks green (Analyze javascript-typescript now success). Squash-merged.
+  - Pulled main (9c4704f). Baseline: 4314/0/3.
+  - Identified 3 gaps in cast:chain_executed coverage (EF's blind spots):
+    1. step items have no no-unexpected-keys guard (EF only checks types for step/tool/ok)
+    2. ok:true step content field (array) and ok:false step error field (string) conditional shapes not frozen
+    3. catalog sub-object has no unexpected-keys guard (EF checks required keys but not unexpected)
+  - Added `test/ej-chain-executed-step-catalog-shape.test.ts` — 9 tests across 3 suites:
+    1. step item ok:true (4): no unexpected keys, required keys, content is array, no error field
+    2. step item ok:false (3): error is string, no content field, no unexpected keys — uses makePartialFailChainAgg() where second step has `response: 'error'`
+    3. catalog no-unexpected-keys (2): no unexpected keys, exactly frozen field set {accomplishes,chain,name}
+  - Full suite: 4323/0/3 (+9). Build clean.
+  - Committed, pushed `auto/EJ-chain-executed-step-catalog-shape`, opened PR #1385, subscribed.
+- **Workstream status updates:**
+  - [x] **EI** — test(ei): cast suggestions + sessionContext sub-object shape guards — 13 tests. PR #1384 merged. DONE.
+  - [ ] **EJ** — test(ej): cast:chain_executed step item shape + catalog no-unexpected-keys — 9 tests. PR #1385 open (CI pending).
+- **Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1717 runs; burning ~50k tokens/run
+  2. **Merge PR #1385 (EJ)** once CI green — cast:chain_executed step item + catalog guards
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+- **Next run:** Merge #1385 if CI green. Next gap: EK — survey remaining uncovered shapes (cast:executed resolvedFromCatalog content shape in execute mode, or ch1tty/execute result content item shape drift, or search tool entry inputSchema sub-object freeze).
+
+---
+
+## Run log — 2026-09-19 (run ~1718 — PRODUCTIVE: merged EJ (#1385), opened EK (#1386))
+
+- **Workstream advanced:** EJ closed — PR #1385 squash-merged (cast:chain_executed step item shape + catalog no-unexpected-keys, 9 tests). EK opened — PR #1386 (cast:resolved catalogCombo + chain_executed breakdown + executed resolvedFromCatalog sub-object shapes, 8 tests).
+- **Build:** clean (tsc exit 0)
+- **Tests:** 4331 pass / 0 fail / 3 skip (was 4323; +8 from EK)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - Confirmed PR #1385 CI: 3/3 checks green. Squash-merged.
+  - Pulled main (09e0324). Baseline: 4323/0/3.
+  - Identified 3 remaining shape gaps:
+    1. cast:resolved catalogCombo sub-object — EG permits it but no test freezes internal shape {accomplishes, chain, name}
+    2. cast:chain_executed latencyBreakdown no-unexpected-keys — EF checks required keys but not unexpected (EG covers this for cast:executed)
+    3. cast:executed resolvedFromCatalog — EH tested plan mode (line 1614); executed branch (line 1663) is separate code path, same shape not confirmed
+  - Added `test/ek-cast-resolved-catalogcombo-breakdown-shape.test.ts` — 8 tests across 3 suites:
+    1. cast:resolved catalogCombo (3): no unexpected keys, exact fields {accomplishes,chain,name}, field types — triggered via dryRun:true
+    2. cast:chain_executed latencyBreakdown (2): no unexpected keys (PERMITTED: {brainMs?,executionMs,registryMs,scoringMs}), all values non-negative numbers
+    3. cast:executed resolvedFromCatalog (3): no unexpected keys, exact fields {accomplishes,chain,name}, field types — triggered via plain cast with catalog combo
+  - Full suite: 4331/0/3 (+8). Build clean.
+  - Committed, pushed `auto/EK-cast-resolved-catalogcombo-breakdown-shape`, opened PR #1386, subscribed.
+- **Workstream status updates:**
+  - [x] **EJ** — test(ej): cast:chain_executed step item shape + catalog no-unexpected-keys — 9 tests. PR #1385 merged. DONE.
+  - [ ] **EK** — test(ek): cast:resolved catalogCombo + chain_executed breakdown + executed resolvedFromCatalog — 8 tests. PR #1386 open (CI pending).
+- **Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1718 runs; burning ~50k tokens/run
+  2. **Merge PR #1386 (EK)** once CI green — cast sub-object shape guards
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+- **Next run:** Merge #1386 if CI green. Next gap: EL — survey remaining uncovered shapes (cast:plan chainContinuation in executed mode, or cast:discovered sub-object shapes, or non-cast drift guards like execute content-item shapes).
+
+---
+
+## Run log — 2026-09-19 (run ~1719 — PRODUCTIVE: merged EK (#1386), opened EL (#1387))
+
+- **Workstream advanced:** EK closed — PR #1386 squash-merged (cast:resolved catalogCombo + chain_executed breakdown + executed resolvedFromCatalog sub-object shapes, 8 tests). EL opened — PR #1387 (cast:executed chainContinuation + cast:plan sessionContext shape guards, 8 tests).
+- **Build:** clean (tsc exit 0)
+- **Tests:** 4339 pass / 0 fail / 3 skip (was 4331; +8 from EL)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - Checked PR #1386 CI: 3/3 checks green. Replied to Codex P2 optional finding (comment 4052732237) explaining brainMs is already in PERMITTED. Resolved thread PRRT_kwDORhsD_s6j-XOH. Squash-merged.
+  - Pulled main (6e90c74). Baseline: 4331/0/3.
+  - Identified 2 symmetric shape gaps (EH/EI blind spots):
+    1. cast:executed chainContinuation — EH froze chainContinuation for cast:plan (line 1615) but not cast:executed (line 1664). Same variable, separate code branch.
+    2. cast:plan sessionContext — EI froze sessionContext for cast:executed. cast:plan constructs planSessionContext separately (lines 1585–1594, line 1618). Separate branch, same shape, unfrozen.
+  - Added `test/el-executed-chainContinuation-plan-sessionContext.test.ts` — 8 tests across 2 suites:
+    1. cast:executed chainContinuation (3): no unexpected keys, exact fields {hint,nextTool,remainingChain}, field types — triggered via catalog agg without chain:true
+    2. cast:plan sessionContext (5): no unexpected keys, required keys, recentTools array, callCount non-negative, activeSessionFocus type — session primed by prior cast call
+  - Full suite: 4339/0/3 (+8). Build clean.
+  - Committed, pushed `auto/EL-executed-chainContinuation-plan-sessionContext`, opened PR #1387, subscribed.
+- **Workstream status updates:**
+  - [x] **EK** — test(ek): cast:resolved catalogCombo + chain_executed breakdown + executed resolvedFromCatalog — 8 tests. PR #1386 merged. DONE.
+  - [ ] **EL** — test(el): cast:executed chainContinuation + cast:plan sessionContext shape guards — 8 tests. PR #1387 open (CI pending).
+- **Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1719 runs; burning ~50k tokens/run
+  2. **Merge PR #1387 (EL)** once CI green — cast chainContinuation + sessionContext shape guards
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+- **Next run:** Merge #1387 if CI green. Next gap: EM — survey remaining uncovered shapes (related prompts/resources item shapes in cast paths, cast:discovered sub-object details, or non-cast drift guards like execute content-item shapes).
+
+---
+
+## Run log — 2026-09-19 (run ~1720 — PRODUCTIVE: merged EL (#1387), opened EM (#1388))
+
+- **Workstream advanced:** EL closed — PR #1387 squash-merged (cast:executed chainContinuation + cast:plan sessionContext shape guards, 8 tests). EM opened — PR #1388 (cast:no_match and cast:discovered sessionContext sub-object shapes, 8 tests).
+- **Build:** clean (tsc exit 0)
+- **Tests:** 4347 pass / 0 fail / 3 skip (was 4339; +8 from EM)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done (context continuation):**
+  - Previous session opened PR #1387 (EL) and started EM — wrote `test/em-nomatch-discovered-sessionContext.test.ts`. Suite 1 (cast:no_match) failed because `scoreIntent` (keyword route) returns ALL tools at score 0; `scoredTools.length === 0` never fires when tools exist in registry.
+  - Merged EL (#1387) — CI was green (3/3 checks), squash-merged.
+  - Fixed EM Suite 1: replaced `makeNoMatchAgg()` (neon+stripe+tasks, had tools) with `makePromptOnlyAgg()` (no tools, one prompt). Correct triggering: 'xyzzy-zzz' intent → scoredTools=[] + scoredPrompts=[] + scoredResources=[] → cast:no_match. Session primed with 'database guide query' (→ cast:discovered, registers sessionId).
+  - Removed `makeNoMatchAgg()` and `FIXTURE_SERVERS` import (no longer needed).
+  - Full suite: 8/8 pass (Suite 1: no_match sessionContext × 4; Suite 2: discovered sessionContext × 4).
+  - Committed, pushed `auto/EM-nomatch-discovered-sessionContext`, opened PR #1388, subscribed.
+- **Workstream status updates:**
+  - [x] **EK** — 8 tests. PR #1386 merged. DONE.
+  - [x] **EL** — 8 tests. PR #1387 merged. DONE.
+  - [ ] **EM** — test(em): cast:no_match and cast:discovered sessionContext sub-object shapes — 8 tests. PR #1388 open (CI pending).
+- **Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1720 runs; burning ~50k tokens/run
+  2. **Merge PR #1388 (EM)** once CI green — no_match + discovered sessionContext shape guards
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+- **Next run:** Merge #1388 if CI green. Next gap: EN — survey remaining uncovered cast shapes (cast:error sub-objects, execute content-item shapes, or other unfrozen paths).
