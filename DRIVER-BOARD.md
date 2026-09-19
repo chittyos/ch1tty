@@ -6104,3 +6104,37 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
 - **Next run:** Merge #1377 if CI green. Next gap: ED — `ch1tty/status` response shape drift guard (mirrors EC pattern for status).
+
+---
+
+## Run log — 2026-09-19 (run ~1711 — PRODUCTIVE: merged EC (#1377), opened ED (#1378))
+
+- **Workstream advanced:** EC closed — PR #1377 squash-merged (ch1tty/execute response shape drift guard, 32 tests). ED opened — PR #1378 (ch1tty/status nested sub-object shape drift guard, 19 tests).
+- **Build:** `npm run build` clean (tsc exit 0)
+- **Tests:** 4228 pass / 0 fail / 3 skip (was 4209; +19 from ED)
+- **npm audit:** 0 vulnerabilities (confirmed)
+- **Guardrails:** 5-tool surface (search/execute/status/reload/cast) FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations on main.
+- **What was done:**
+  - Verified PR #1377 CI: 3/3 CodeQL checks green on e033db9. Squash-merged.
+  - Pulled main (b56026f). Baseline: 4209/0/3.
+  - Studied ch1tty/status response shape; identified gaps DZ leaves: coordinator sub-objects, focus field shape, catalog.activeFocusSuggestions, servers[] entry shape.
+  - Added `test/ed-status-nested-shape-drift.test.ts` — 19 tests across 4 suites:
+    1. coordinator snapshot top-level fields (10 keys frozen), coordinator.brain (8 keys), coordinator.embeddingBrain (11 keys), coordinator.ledger (8 keys), + type assertions
+    2. focus null when inactive; focus shape (4 keys + types) when active
+    3. catalog.activeFocusSuggestions null when inactive; {combos, prompts} shape when active
+    4. servers[] entry required keys, no unexpected keys, field type assertions
+  - Full suite: 4228/0/3 (+19). Build clean.
+  - Committed, pushed `auto/ED-status-nested-shape-drift`, opened PR #1378.
+- **Workstream status updates:**
+  - [x] **EC** — test(ec): ch1tty/execute response shape drift guard — 32 tests. PR #1377 merged. DONE.
+  - [ ] **ED** — test(ed): ch1tty/status nested sub-object shape drift guard — 19 tests. PR #1378 open (CI pending).
+- **Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1711 runs; burning ~50k tokens/run
+  2. **Merge PR #1378 (ED)** once CI green — status nested shape drift guard
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+- **Next run:** Merge #1378 if CI green. Next gap: EE — ch1tty/reload response shape drift guard (reload returns reloaded/added/removed/totalServers/catalog/missingEnvVars/latencyMs).
