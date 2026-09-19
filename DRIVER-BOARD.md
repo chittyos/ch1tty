@@ -6138,3 +6138,37 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
 - **Next run:** Merge #1378 if CI green. Next gap: EE — ch1tty/reload response shape drift guard (reload returns reloaded/added/removed/totalServers/catalog/missingEnvVars/latencyMs).
+
+---
+
+## Run log — 2026-09-19 (run ~1712 — PRODUCTIVE: merged ED (#1378), opened EE (#1379))
+
+- **Workstream advanced:** ED closed — PR #1378 squash-merged (ch1tty/status nested sub-object shape drift guard, 19 tests). EE opened — PR #1379 (ch1tty/reload response shape drift guard, 22 tests).
+- **Build:** clean (tsc exit 0)
+- **Tests:** 4250 pass / 0 fail / 3 skip (was 4228; +22 from EE)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - Processed 8 notifications: CodeRabbit ack on EC (#1377), CI green + merge on ED (#1378), Codex/CodeRabbit rate-limited on EE.
+  - Verified PR #1378 CI: 3/3 CodeQL checks green. Squash-merged.
+  - Pulled main (47bc288). Baseline: 4228/0/3.
+  - Added `test/ee-reload-response-shape-drift.test.ts` — 22 tests across 5 suites:
+    1. Structural invariants (5): content array, single item, type:text, valid JSON, isError absent
+    2. Success top-level shape (8): all 7 required keys present, no unexpected keys, field types
+    3. catalog sub-object shape (3): exactly 2 fields (totalCombos, phantomServerIds) + types
+    4. added/removed semantics (3): unchanged→empty, gain server→id in added, lose→id in removed
+    5. Error path (3): no configPath→isError:true, single item, type:text
+  - Full suite: 4250/0/3 (+22). Build clean.
+  - Committed, pushed `auto/EE-reload-response-shape-drift`, opened PR #1379, subscribed.
+- **Workstream status updates:**
+  - [x] **ED** — test(ed): ch1tty/status nested sub-object shape drift guard — 19 tests. PR #1378 merged. DONE.
+  - [ ] **EE** — test(ee): ch1tty/reload response shape drift guard — 22 tests. PR #1379 open (CI pending).
+- **Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1712 runs; burning ~50k tokens/run
+  2. **Merge PR #1379 (EE)** once CI green — reload response shape drift guard
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+- **Next run:** Merge #1379 if CI green. Next gap: EF — ch1tty/cast response shape drift guard (cast has multiple paths: dry-run/confirm/no_match/success/error).
