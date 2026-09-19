@@ -6780,6 +6780,24 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 ---
 
+## Merge event — 2026-09-19 ~22:39 UTC
+
+**PR #1409 (FE) — MERGED** ✅
+- test(FE): freeze /api/v1/health response body exact key sets (12 tests)
+- CI: CodeQL ✅, Analyze ✅, Codex 👍 no findings
+
+**PR #1410 (FG) — MERGED** ✅
+- test(FG): freeze /api/v1/sessions response body exact shapes (8 tests)
+- CI: CodeQL ✅, Analyze ✅
+- Codex: 3 rounds addressed (FG-7 full-sequence check, FG-5 compile-time assertion removed after tsx transpile confirmed)
+
+**Status after merges:**
+- Drift guard suite now covers: EA, EB, EC, ED, EX/EY/EZ/FA (cast explain), FB (search explain), FC (server-summary), FD (topcandidates+search-keyword), FE (health key sets), FG (sessions shapes)
+- Open PRs still awaiting merge: #1407 (FD-topcandidates), #1408 (FD-search-keyword) — CI ✅
+- Next workstream (FH): api/v1/status snapshot top-level key freeze or apps-level drift guards
+
+---
+
 ## Run ~1729 — 2026-09-19
 
 **Context on resume:** PR #1408 (FD) merged. Main was 3 commits ahead: fd-topcandidates-item-value-types, fe-health-response-key-set-drift-guard, fg-sessions-response-shape-drift-guard — all direct commits by prior runs. No open PRs at start of run.
@@ -6793,17 +6811,17 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   2. Content item shape: text item always `['text','type']`; ch1tty error always 1 item
   3. isError value types: absent on success; boolean true on error; false on dryRun
   4. dryRun shape: top-level `['content','isError']`, isError===false; body JSON `['args','latencyMs','server','status','tool']`
-- 12/12 green locally
+- 12/12 green locally; CI green; CodeRabbit clean (no findings)
 
 **Workstream status:**
   - [x] **FD** — PR #1408 merged. DONE.
   - [x] **FE** — health response key set drift guard. Merged by prior run. DONE.
   - [x] **FG** — sessions response shape drift guard. Merged by prior run. DONE.
-  - [ ] **FH** — PR #1411 open (CI pending).
+  - [ ] **FH** — PR #1411 open (CI green, CodeRabbit clean, awaiting merge).
 
 **Human-action items (unchanged):**
   1. **DISABLE hourly cron** — ~1729 runs; burning ~50k tokens/run
-  2. **Merge PR #1411 (FH)** once CI green
+  2. **Merge PR #1411 (FH)** — CI green, no review findings
   3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
   4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
   5. **Notion workspace** out of free blocks — upgrade or clear
