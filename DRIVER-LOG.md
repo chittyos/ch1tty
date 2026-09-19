@@ -5593,7 +5593,7 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
 - **What was done:**
   1. EZ-2 fix (applied last run): inherited low-verbosity types (candidateCount, method, rationale, topCandidates, winnerScore, winnerServer) asserted before winnerCategory check.
   2. EZ-4 fix (this run): same inherited low-base types + inherited low+focus types (focus, focusBoost, winnerInFocus) asserted before candidatesInFocusCount/focusRank/score-decomposition checks.
-  3. Ran full suite: 4461/4458/0/3 (3 new assertions added per inherited-fields block; test count up by 3 from 4458).
+  3. Ran full suite: 4461/4458/0/3 (test count unchanged at 4,461 — 3 assertions added inside existing EZ-4 test, not new test() calls).
   4. Pushed f39dbde to origin; replied to Codex review thread (#discussion_r4054086311) with fix summary.
 - **Human-action items (carried forward):**
   1. **Merge PR #1401 (EX)** — single-candidate field names low/medium (CI green)
