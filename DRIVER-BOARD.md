@@ -6652,3 +6652,91 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 **Next run:** Merge any open PRs with CI green. Next gap: FC — if all frozen (search explain and cast explain exhausted), look for other unfrozen response shapes or unfrozen app surfaces.
 
 **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+# Run ~1727 — 2026-09-19
+
+
+**Build:** tsc clean | **Tests:** 4454 pass / 0 fail / 3 skip (unchanged)
+
+**Action:** Fixed Codex P2 finding on PR #1402 (EY)
+- Added `NullRoutingCoordinator extends SessionCoordinator` with `routeIntent → null`
+- Injected into `makeAggregator()` to prevent `brainMs` from appearing in the frozen field set when `CH1TTY_USE_OLLAMA_BRAIN=1`
+- Matches pattern in `bi-cast-chain-non-scalar-extraction` and `bj-cast-explain-no-match`
+- Codex review thread resolved; commit `7fcee46` pushed to PR #1402
+- CI re-triggered on PR #1402
+
+**Open PRs:**
+- PR #1401 (EX): CI green (CodeQL ✅, Analyze ✅ × 2), mergeable — awaiting human merge
+- PR #1402 (EY): CI pending (CodeQL + Analyze re-running after fix push)
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ + H–N ✓ | EX/EY drift guards added
+
+**Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1727 runs; burning ~50k tokens/run
+  2. **Merge PR #1401 (EX)** — CI green, awaiting review
+  3. **Merge PR #1402 (EY)** once CI green — Codex P2 finding addressed
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+---
+
+## Run ~1726 — 2026-09-19
+
+**Build:** tsc clean | **Tests:** 4454 pass / 0 fail / 3 skip (was 4452; +2 from EY)
+
+**Opened:** PR for EY — single-candidate field names at verbosity:full
+- Branch: `auto/EY-single-candidate-full-verbosity-fields`
+- File: `test/ey-cast-explain-single-candidate-full-verbosity.test.ts` (240 lines, 2 tests)
+- Gap filled: EX froze single-candidate field names for verbosity:low and verbosity:medium. EY extends to verbosity:full, which adds 2 full-verbosity-only core fields (scoreDominanceIndex, topCandidatesMeanScore) and 6 full-verbosity-only focus fields (outOfFocusCandidatesCount, focusRankPercentile, inFocusTopScore, inFocusMeanScore, inFocusBottomScore, winnerFocusBoostRatio).
+- EY-1: no-focus, full verbosity → 9 exact fields frozen
+- EY-2: focus:code, full verbosity → 24 exact fields frozen
+- Explicitly asserts absent: runnerUpScore, candidateScoreSpread, candidateGiniCoefficient, effectiveN, topCandidatesScoreVariance, focusDecisive, focusMargin, focusConfidence, unfocusedWinner, topOutOfFocusScore
+- CLAUDE.md metric freeze observed: no new fields added (tests only)
+
+**Open PRs:**
+- PR #1401 (EX): CI green (CodeQL ✅, Analyze ✅ × 2), mergeable — awaiting human merge
+- PR for EY: CI pending
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ + H–N ✓ + O pending | EX/EY drift guards added
+
+**Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1726 runs; burning ~50k tokens/run
+  2. **Merge PR #1401 (EX)** — single-candidate field name drift guard (CI green)
+  3. **Merge PR for EY** once CI green — single-candidate full-verbosity field name drift guard
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Enable GitHub Actions** (main npm test CI — currently CodeQL only)
+  6. **Notion workspace** out of free blocks — upgrade or clear
+  7. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run:** Merge #1401 (EX) and EY PR if CI green. Next gap: EZ — consider single-candidate value types at verbosity:full (the 9 core fields have types not yet frozen by any test), or multi-step scenario coverage gaps in D workstream scenarios.
+*Context:** Resumed from prior context window (FC workstream). PRs #1401–#1405 opened in previous runs are pending merge. PR #1405 (FB) CI green, Codex review still running on second commit.
+
+**Opened:** PR #1406 (FC — server-summary explanation field drift guard)
+- Branch: `auto/fc-server-summary-drift-guard`
+- File: `test/fc-server-summary-explain-drift-guard.test.ts` (12 tests, 273 lines)
+- 4 suites: always-present base keys; focus conditional keys; value types; server item shape
+- Frozen base explanation keys: `['method','rationale','totalServers','totalTools']`
+- Frozen focus keys: adds `'focus'+'inFocusServers'` (6 keys total)
+- Frozen inFocusOnly keys: adds `'inFocusOnly'` (7 keys total)
+- Server item no-focus: `['category','name','server','tools']`; focus: `['category','inFocus','name','server','tools']`
+- Companion to TT (functional coverage) — adds exact deepEqual key-set freeze
+- Companion to FB (which froze buildSearchExplanation) — this freezes the separate inline server-summary path
+- 12/12 green locally
+
+**Open PRs (all awaiting merge):**
+- PR #1401 (EX) — cast explain focus value types for medium tier
+- PR #1402 (EY) — [per prior session log]
+- PR #1403 (EZ) — [per prior session log]
+- PR #1404 (FA) — [per prior session log]
+- PR #1405 (FB) — search explain field names + value types; CI green; Codex review running on 7f82f61
+- PR #1406 (FC) — server-summary explain field drift guard (this run)
+
+**Human-action items (persistent):**
+1. **DISABLE hourly cron** — ~1727 runs; burning ~50k tokens/run
+2. **Merge open PRs** (#1401–#1406) once CI green
+3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+5. **Notion workspace** out of free blocks — upgrade or clear
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
