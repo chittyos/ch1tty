@@ -239,7 +239,9 @@ describe('FD-3 — topCandidates[*].inFocus value types (focus active)', () => {
       // At least one item should be in-focus (neon is in the 'code' focus)
       const inFocusItems = items.filter((it) => it.inFocus === true);
       assert.ok(inFocusItems.length > 0, 'at least one in-focus item expected with code focus profile');
-      // Every item with inFocus===false must have its serverId outside the focus profile
+      // Every item must have its inFocus flag agree with the focus profile:
+      //   inFocus===true  → tool is from neon (code category)
+      //   inFocus===false → tool is NOT from neon
       for (const item of items) {
         assert.equal(typeof item.inFocus, 'boolean');
         if (item.inFocus === true) {
@@ -247,6 +249,11 @@ describe('FD-3 — topCandidates[*].inFocus value types (focus active)', () => {
           assert.ok(
             (item.tool as string).startsWith('neon/'),
             `inFocus===true item should be from neon (code category) but got: ${item.tool}`,
+          );
+        } else {
+          assert.ok(
+            !(item.tool as string).startsWith('neon/'),
+            `inFocus===false item must NOT be from neon (code category) but got: ${item.tool}`,
           );
         }
       }
@@ -282,28 +289,40 @@ describe('FD-4 — topCandidates ordering (descending by score)', () => {
     }
   });
 
-  test('topCandidates[0].score === winnerScore (winner is top item)', async () => {
-    const agg = makeAggregator();
-    try {
-      const result = await agg.callTool('ch1tty/cast', {
-        intent: 'list neon database projects',
-        explain: true,
-        verbosity: 'low',
-        dryRun: true,
-      });
-      assert.equal(result.isError, undefined);
-      const ex = getExplain(result);
-      const items = getTopCandidates(ex);
-      assert.ok(items.length > 0);
-      const winnerScore = ex.winnerScore as number;
-      assert.ok(Number.isFinite(winnerScore), 'winnerScore must be finite');
-      assert.equal(
-        items[0].score,
-        winnerScore,
-        `topCandidates[0].score (${items[0].score}) must equal winnerScore (${winnerScore})`,
-      );
-    } finally {
-      await agg.shutdown();
+  test('topCandidates[0].score === winnerScore and topCandidates[0].tool === winner tool at all verbosities', async () => {
+    for (const verbosity of ['low', 'medium', 'full'] as const) {
+      const agg = makeAggregator();
+      try {
+        const result = await agg.callTool('ch1tty/cast', {
+          intent: 'list neon database projects',
+          explain: true,
+          verbosity,
+          dryRun: true,
+        });
+        assert.equal(result.isError, undefined, `cast should not error (${verbosity})`);
+        const body = JSON.parse((result.content[0] as { text: string }).text) as Record<string, unknown>;
+        const ex = body.explanation as Record<string, unknown>;
+        const items = getTopCandidates(ex as ExplainObj);
+        assert.ok(items.length > 0, `topCandidates must be non-empty (${verbosity})`);
+        const winnerScore = ex.winnerScore as number;
+        assert.ok(Number.isFinite(winnerScore), `winnerScore must be finite (${verbosity})`);
+        assert.equal(
+          items[0].score,
+          winnerScore,
+          `topCandidates[0].score (${items[0].score}) must equal winnerScore (${winnerScore}) at ${verbosity}`,
+        );
+        // topCandidates[0].tool must match the winner tool reported at the top level
+        const winnerTool = body.tool as string;
+        if (typeof winnerTool === 'string' && winnerTool.length > 0) {
+          assert.equal(
+            items[0].tool,
+            winnerTool,
+            `topCandidates[0].tool (${items[0].tool}) must equal winner tool (${winnerTool}) at ${verbosity}`,
+          );
+        }
+      } finally {
+        await agg.shutdown();
+      }
     }
   });
 });
