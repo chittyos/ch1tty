@@ -6564,4 +6564,18 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   6. **Stale branch cleanup** — 1100+ remote auto/ branches
   7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
-- **Next run:** Merge #1398 if CI green. Next gap: EW — cast explain focus value types at verbosity:full (focus fields: winnerInFocus boolean, focusBoost/focusRank/focusRankDelta/focusMargin numbers, runnerUpInFocus boolean, etc. — 31 focus-only fields from DW need type guards).
+
+---
+
+## Run ~1724 — 2026-09-19
+
+**Merged:** PR #1399 (EV — cast explain value types for verbosity:full, 6 tests). All 3/3 CI checks green.
+
+**Opened:** PR #1400 (EW — cast explain focus value types for verbosity:full)
+- Branch: `auto/EW-cast-explain-focus-value-types-full`
+- File: `test/ew-cast-explain-focus-value-types-full.test.ts` (6 tests, 357 lines)
+- 4 describe blocks: focus identity types + partition invariant; fraction/rank ∈[0,1]; runner-up booleans + boost fields; in/out-of-focus score groups + no_match guard
+- Closes gap: DW froze 31 focus-only field NAMES; EW freezes their VALUE TYPES
+- CLAUDE.md metric freeze observed: no new fields added
+
+**Next run:** Merge #1400 if CI green. Next gap: EX — cast explain focus value types for verbosity:medium (the medium tier's focus fields: focus/focusBoost/winnerInFocus/winnerFocusBoost/winnerScoreBase/candidatesInFocusCount/inFocusFraction/focusRank/focusRankDelta/focusDecisive/focusMargin/focusConfidence — those were added in medium but their types were never frozen).
