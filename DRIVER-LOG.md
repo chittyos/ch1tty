@@ -5413,3 +5413,43 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   8. **Major dep bumps** — @types/node 22→26, typescript 5→7 for apps/, agents 0.23→0.24 — human review recommended
 - **PushNotification:** SENDING — PR #1392 (EQ: 13 scope sub-object drift-guard tests). 4392 pass.
 - **Next run:** ER — next uncharted drift-guard gap (candidates: cast:discovered shape, chain_executed shape, alternatives array item shape) or check if PR #1391/#1392 CI green and merge.
+
+---
+
+## Run log — 2026-09-19 (run ~1710 — PRODUCTIVE: opened PR #1395 ET)
+
+- **Workstream advanced:** ET opened — topCandidates item shape drift guard
+- **Build:** `npm run build` clean (tsc) | **Tests:** 4419 pass / 0 fail / 3 skip (+5 from ET)
+- **Guardrails:** 5-tool surface (search/execute/status/reload/cast) FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **Startup state:**
+  - On ES branch from prior session. Fetched main: PRs #1391 (EP), #1392 (EQ), #1393 (ER), #1394 (ES) all merged.
+  - Checked out main, pulled to `9cb22b4`. `npm test` → 4414/0/3 (post-EP+EQ+ER+ES baseline).
+  - PR #1394 (ES): already merged — `mergeable_state: "unknown"` (closed).
+  - No open PRs remaining from prior sessions.
+- **What was done:**
+  - Identified ET gap: DW/ER/ES freeze explain field NAMES but no test freezes the shape of items inside `topCandidates` array. A rename or new field on those item objects would pass all existing guards silently.
+  - `topCandidates` is built verbosity-independently (aggregator ~line 2029): `{tool, score}` no-focus; `{tool, score, inFocus: boolean}` with focus; `[]` on no_match.
+  - When focus is active, `inFocus` is present on EVERY item (not conditionally absent on out-of-focus items).
+  - Created branch `auto/ET-explain-topCandidates-item-shape`.
+  - Added `test/et-cast-explain-topCandidates-item-shape.test.ts` — 5 tests across 2 suites:
+    1. Suite 1 (no focus): keys frozen {score, tool}, field types (tool:string, score:finite number), no_match → []
+    2. Suite 2 (focus:code): keys frozen {inFocus, score, tool} + inFocus is boolean, no_match → []
+  - Full suite: 4419/0/3 (+5). Build clean.
+  - Committed, pushed branch, opened PR #1395, subscribed.
+- **Workstream status updates:**
+  - [x] **EP** — test(EP): cast:executed and cast:discovered related shapes — 12 tests. PR #1391 merged. DONE.
+  - [x] **EQ** — test(EQ): scope sub-object shape drift guard — 13 tests. PR #1392 merged. DONE.
+  - [x] **ER** — test(ER): explain verbosity:low+medium field names (no focus) — 4 tests. PR #1393 merged. DONE.
+  - [x] **ES** — test(ES): explain verbosity:low+medium field names (focus:code) — 5 tests. PR #1394 merged. DONE.
+  - [ ] **ET** — test(ET): topCandidates item shape drift guard — 5 tests. PR #1395 open (CI pending).
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1710 runs; burning ~50k tokens/run
+  2. **Merge PR #1395 (ET)** once CI green — topCandidates item shape drift guard, 5 tests
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 for apps/, agents 0.23→0.24 — human review recommended
+  8. **shared-mcp SDK lag**: @modelcontextprotocol/sdk at ^1.29.0 vs apps ^1.30.0 — can bump when convenient
+- **PushNotification:** SENDING — opened PR #1395 (ET: 5 topCandidates item shape drift-guard tests). 4419 pass.
+- **Next run:** Check PR #1395 CI. Next gap: EU — explain field value types for low/medium verbosity (freeze that `winnerScore` is number, `focus` is string, `focusDecisive` is boolean, etc.) or other structural quality opportunities.
