@@ -6248,7 +6248,7 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 ## Run log — 2026-09-19 (run ~1715 — PRODUCTIVE: merged EG (#1381), opened EH (#1382))
 
-- **Workstream advanced:** EG closed — PR #1381 squash-merged (cast no-unexpected-keys guards, 16 tests). EH opened — PR #1382 (alternatives item shape guard, 15 tests).
+- **Workstream advanced:** EG closed — PR #1381 squash-merged (cast no-unexpected-keys guards, 16 tests). EH opened — PR #1383 (alternatives item shape guard, 15 tests).
 - **Build:** clean (tsc exit 0)
 - **Tests:** 4305 pass / 0 fail / 3 skip (was 4290; +15 from EH)
 - **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
@@ -6263,10 +6263,10 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   - Committed, pushed `auto/EH-alternatives-item-shape-guards`, opened PR #1382, subscribed.
 - **Workstream status updates:**
   - [x] **EG** — test(EG): cast no-unexpected-keys guards for 4 paths — 16 tests. PR #1381 merged. DONE.
-  - [ ] **EH** — test(EH): alternatives item shape guard — 15 tests. PR #1382 open (CI pending).
+  - [ ] **EH** — test(EH): alternatives item shape guard — 15 tests. PR #1383 open (CI pending).
 - **Human-action items (unchanged):**
   1. **DISABLE hourly cron** — ~1715 runs; burning ~50k tokens/run
-  2. **Merge PR #1382 (EH)** once CI green — alternatives item shape drift guard
+  2. **Merge PR #1383 (EH)** once CI green — alternatives item shape drift guard
   3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
   4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
   5. **Notion workspace** out of free blocks — upgrade or clear
