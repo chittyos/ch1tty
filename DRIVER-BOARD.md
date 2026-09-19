@@ -6172,3 +6172,40 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
 - **Next run:** Merge #1379 if CI green. Next gap: EF — ch1tty/cast response shape drift guard (cast has multiple paths: dry-run/confirm/no_match/success/error).
+
+---
+
+## Run log — 2026-09-19 (run ~1713 — PRODUCTIVE: merged EE (#1379), opened EF (#1380))
+
+- **Workstream advanced:** EE closed — PR #1379 squash-merged (ch1tty/reload response shape drift guard, 22 tests). EF opened — PR #1380 (cast:discovered + cast:chain_executed + error path shape drift guard, 24 tests).
+- **Build:** clean (tsc exit 0)
+- **Tests:** 4274 pass / 0 fail / 3 skip (was 4250; +24 from EF)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - Confirmed PR #1379 CI: 3/3 CodeQL checks green. Squash-merged.
+  - Pulled main (21b3cbb). Baseline: 4250/0/3.
+  - Studied `handleCast()` in `src-stdio/aggregator.ts` (lines 1179–1675) to map all 7 cast paths.
+  - Identified gap: EA (`ea-cast-result-shape-drift.test.ts`) already covers executed/plan/resolved/no_match. EF fills the remaining 3 gaps.
+  - Added `test/ef-cast-discovered-chain-shape-drift.test.ts` — 24 tests across 4 suites:
+    1. Structural invariants (4): content array on discovered/chain_executed, isError absent
+    2. cast:discovered top-level shape (7): cast value, required keys, no unexpected keys (PERMITTED set), hint static string, latencyMs type, resolvedBy type, intent echo
+    3. cast:chain_executed top-level shape (9): cast value, required keys, no unexpected keys, focus always present, catalog sub-object (3 fields), catalog.chain array of strings, steps non-empty array, step entry shape (step/tool/ok), latencyBreakdown shape
+    4. Error path (4): isError:true on empty intent, isError:true on absent intent, single item, type:text
+  - KeywordOnlyCoordinator used to keep scoring deterministic (no brain routing).
+  - discovered path triggered via billing server with prompt matching "invoice" but tool with zero overlap.
+  - chain_executed triggered via neon 2-step combo under focus:code with KeywordOnlyCoordinator.
+  - Full suite: 4274/0/3 (+24). Build clean.
+  - Committed, pushed `auto/EF-cast-discovered-chain-shape-drift`, opened PR #1380, subscribed.
+- **Workstream status updates:**
+  - [x] **EE** — test(ee): ch1tty/reload response shape drift guard — 22 tests. PR #1379 merged. DONE.
+  - [ ] **EF** — test(ef): cast:discovered + cast:chain_executed + error path drift guard — 24 tests. PR #1380 open (CI pending).
+- **Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1713 runs; burning ~50k tokens/run
+  2. **Merge PR #1380 (EF)** once CI green — cast remaining path shape drift guard
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+- **Next run:** Merge #1380 if CI green. Next gap: EG — remaining cast sub-object guards (alternatives item shape for cast:executed, no-unexpected-keys guards for EA's 4 paths) OR next coverage gap.
