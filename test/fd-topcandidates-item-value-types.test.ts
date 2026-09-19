@@ -226,8 +226,10 @@ describe('FD-3 — topCandidates[*].inFocus value types (focus active)', () => {
   test('in-focus items have inFocus===true, out-of-focus items have inFocus===false', async () => {
     const agg = makeAggregator({ withFocus: true });
     try {
+      // Use a generic intent so keyword scoring surfaces tools from multiple servers
+      // (both neon/in-focus and stripe+tasks/out-of-focus), ensuring the else branch fires.
       const result = await agg.callTool('ch1tty/cast', {
-        intent: 'list neon database projects',
+        intent: 'list database projects',
         explain: true,
         verbosity: 'low',
         focus: 'code',
@@ -236,9 +238,16 @@ describe('FD-3 — topCandidates[*].inFocus value types (focus active)', () => {
       assert.equal(result.isError, undefined);
       const ex = getExplain(result);
       const items = getTopCandidates(ex);
-      // At least one item should be in-focus (neon is in the 'code' focus)
-      const inFocusItems = items.filter((it) => it.inFocus === true);
-      assert.ok(inFocusItems.length > 0, 'at least one in-focus item expected with code focus profile');
+      // Must have both in-focus (neon) and out-of-focus (stripe/tasks) candidates
+      // so that both branches of the assertion below are actually exercised.
+      assert.ok(
+        items.some((it) => it.inFocus === true),
+        'at least one inFocus===true item expected (neon is in code focus)',
+      );
+      assert.ok(
+        items.some((it) => it.inFocus === false),
+        'at least one inFocus===false item expected (stripe/tasks are out of code focus)',
+      );
       // Every item must have its inFocus flag agree with the focus profile:
       //   inFocus===true  → tool is from neon (code category)
       //   inFocus===false → tool is NOT from neon
