@@ -5114,3 +5114,30 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   6. **agents 0.23.0 → 0.24.0** minor bump — human review recommended
 - **PushNotification:** NOT SENT — routine merge run, no exceptional event.
 - **Next run:** DN — tsconfig.json cross-package consistency check or package.json cross-package dep version checks.
+
+---
+
+## Run ~1712 — 2026-09-19 — Workstream DZ
+
+- **Branch:** `auto/DZ-status-response-field-drift`
+- **Workstream:** DZ — ch1tty/status response top-level field drift guard
+- **Build:** clean (no compile errors)
+- **Tests:** 2887 pass / 0 fail / 3 skip (+23 new DZ tests over baseline 2864)
+- **What was done:**
+  - Created `test/dz-status-response-field-drift.test.ts` — 23 tests across 2 describe blocks.
+  - Suite 1 (DZ-01..DZ-18): Freezes the 18 top-level keys of full ch1tty/status response + validates sub-object field sets for systemHealth (3), brainHealth (3), ledgerHealth (6), ledgerDlq (3), catalog (4).
+  - Suite 2 (DZ-19..DZ-23): Freezes 17-key short=true response (no servers), verifies coordinator strips sessions, systemHealth + latencyMs still present.
+  - Fixed sort-order bug in LEDGER_DLQ_FIELDS: ['entryCount','entries','path'] → ['entries','entryCount','path'] (alphabetical: 'i'<'y' at position 4).
+  - No prior test locked these field names — only individual values were asserted. Any rename/remove/add to the status contract now fails at unit speed.
+  - PR opened (see below).
+- **Workstream status updates:**
+  - [x] **DZ** — ch1tty/status response field drift guard, 23 tests. PR opened.
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1712 runs; burning ~50k tokens/run
+  2. **Merge open PRs DS-DY + DZ** (#1367-#1373 + DZ) — all CI green (infra issue non-blocking)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Enable GitHub Actions** at org level (only CodeQL runs; npm test CI job disabled)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **agents 0.23.0 → 0.24.0** minor bump — human review recommended
+- **Next run:** DN — tsconfig.json cross-package consistency check or package.json cross-package dep version alignment (from previous suggestion), OR next drift guard (coordinator field drift, catalog field shape, brainHealth circuit state transitions).
