@@ -6743,35 +6743,37 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 ---
 
-## Run 2026-09-19 (FD)
+## Run ~1728 — 2026-09-19
 
-**Build:** PASS | **Tests:** 10/10 new (FD suite) + full suite green
-**Branch:** `auto/FD-topcandidates-item-value-types`
-**Workstream:** FD — freeze cast explain topCandidates item VALUE TYPES
+**Merged this run:** PR #1406 (FC) at 20:45:10Z; PR #1405 (FB) at 20:46:18Z (auto-merge fired after resolving 4 Codex review threads). All PRs #1401–#1406 now closed. 0 open PRs.
 
-### What was done
+**Opened:** PR #1408 (FD — keyword search response envelope + tool item drift guard)
+- Branch: `auto/FD-search-keyword-response-drift-guard`
+- File: `test/fd-search-keyword-response-drift-guard.test.ts` (18 tests, 7 suites; expanded from initial 12/4 after Codex P2 findings)
+- Gap filled: FC froze the server-summary path; FD freezes the keyword search response envelope and tools array item shape. No prior test asserted exact key sets on either layer.
+- 7 suites:
+  1. Top-level always-present keys: `['latencyMs','matches','total','tools']` (3 tests)
+  2. Top-level conditional keys, no-catalog path: focus → `+focus`; inFocusOnly → `+inFocusOnly` (2 tests)
+  3. Tool item shape: base `[category,description,inputSchema,score,server,serverName,tool]`; focus in-focus adds `inFocus`, out-of-focus does NOT (2 tests)
+  4. Value types: matches/total integers≥0; latencyMs finite≥0; tools array; score finite≥0; tool namespaced (5 tests)
+  5. Suggestions-present envelope: focus+catalog → 6-key; inFocusOnly+catalog → 7-key (2 tests)
+  6. Conditional pagination/score envelopes: offset>0 → offset present; minScore>0 → minScore present (2 tests)
+  7. Session-enriched tool item shapes: server-level recentlyUsed:true; tool-level {callCount,lastUsedMs} nested keys frozen (2 tests)
+- Test results: **4507 pass / 0 fail / 3 skip** (+12 from FD)
+- CLAUDE.md guardrails: 5-tool surface FIXED; metric freeze ACTIVE; no new fields added
 
-- Resolved all 6 outstanding PR merge conflicts (EX #1401 → FC #1406), all merged to main this run.
-- Created `test/fd-topcandidates-item-value-types.test.ts` — 5 suites, 10 tests:
-  - FD-1: `score` is finite number ≥ 0 (low + full verbosity)
-  - FD-2: `tool` is non-empty namespaced string containing '/'
-  - FD-3: `inFocus` boolean semantics (present/absent, true/false per focus state)
-  - FD-4: topCandidates sorted descending by score; topCandidates[0].score === winnerScore
-  - FD-5: Verbosity independence — same item shape at all verbosity levels
-- Complements ET (which froze field NAMES); no new fields added — CLAUDE.md metric freeze compliant.
+**Workstream status:**
+  - [x] **FB** — PR #1405 merged. DONE.
+  - [x] **FC** — PR #1406 merged. DONE.
+  - [ ] **FD** — PR #1408 open (CI green, Codex P2 addressed).
 
-### PRs merged this run
-- EX #1401, EY #1402, EZ #1403, FA #1404, FB #1405, FC #1406
-
-### Next recommended workstream
-- **FE**: freeze `cast` explain for `no_match` response shape (winnerScore absent, method, reason fields)
-  - OR: **FF**: freeze `ch1tty/execute` response envelope fields (content array shape, isError type)
-
-**Human-action items (persistent):**
-1. **DISABLE hourly cron** — ~1728 runs; burning ~50k tokens/run
-2. **Merge open PRs** (FD PR once CI green)
-3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
-4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
-5. **Notion workspace** out of free blocks — upgrade or clear
-6. **Stale branch cleanup** — 1100+ remote auto/ branches
-7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+**Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1728 runs; burning ~50k tokens/run
+  2. **Merge PR #1408 (FD)** once CI green — keyword search envelope + tool item drift guard
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+- **Next run:** Merge #1408 if CI green. Next gap: FE — execute response top-level shape (isError, content array item shape) or status response shape.
