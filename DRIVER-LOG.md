@@ -5540,3 +5540,43 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
   5. **Major dep bumps** — @types/node 22→26, typescript 5→7 for apps/
 - **Next run:** EW — freeze explain field VALUE TYPES for verbosity:full (spot-check the large full-verbosity field set; EV+EU cover low/medium; EW completes the verbosity tier freeze).
+
+---
+
+## Run log — 2026-09-19 (run ~1716 — PRODUCTIVE: opened EZ single-candidate value types)
+
+- **Workstream advanced:** EZ — cast explain field VALUE TYPES for verbosity:low and verbosity:medium, single-candidate
+- **Branch:** `auto/EZ-single-candidate-value-types-low-medium`
+- **Build:** `tsc` clean (0 errors) | **Tests:** 4458 pass / 0 fail / 3 skip (+6 EZ tests; main had 4452 before)
+- **Guardrails:** 5-tool surface (search/execute/status/reload/cast) FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **Startup state:**
+  - main at EW (bc671db). 2 open PRs: #1401 (EX-single-candidate-fieldnames low/medium, CI green), #1402 (EY-single-candidate-fieldnames full, CI green).
+  - `npm test` baseline on main: 4452/0/3.
+  - Auto-merge attempted on #1401/#1402 — rejected (already clean status; awaiting human merge).
+  - DRIVER-LOG.md pulled (45 commits since last local sync; last log entry was EW).
+- **What was done:**
+  1. Confirmed EX (#1401) and EY (#1402) are CI-green (CodeQL + Analyze pass) and mergeable but awaiting human merge — left for human.
+  2. Created EZ — `test/ez-cast-explain-single-candidate-value-types-low-medium.test.ts` — 6 tests across 4 suites:
+     - Suite EZ-1 (verbosity:low, no focus): candidateCount===1 exact, topCandidates.length===1, method/rationale/winnerServer:string, winnerScore:finite>0
+     - Suite EZ-1b (verbosity:low, absent fields): runnerUpScore/runnerUpTool/candidateScoreMean/candidateScoreSpread all absent
+     - Suite EZ-2 (verbosity:medium, no focus): winnerCategory:string, statistical fields absent, candidateCount===1
+     - Suite EZ-3 (verbosity:low, focus:code): focus==='code', focusBoost:number≥0, winnerInFocus===true, focusDecisive absent
+     - Suite EZ-4 (verbosity:medium, focus:code): candidatesInFocusCount===1, focusRank===1, focusRankDelta===0, inFocusFraction===1.0, winnerFocusBoost/winnerScoreBase:number≥0, score decomposition identity, focusMargin/focusConfidence/focusDecisive/unfocusedWinner absent
+     - Suite EZ-4b: focusRankDelta === focusRank - 1 identity
+  3. Full suite: 4458/0/3 (+6). Build clean.
+- **EZ frozen assertions (single-candidate invariants):**
+  - `candidateCount === 1` (exact), `topCandidates.length === 1` (exact)
+  - `runnerUpScore/runnerUpTool` absent (low); `candidateScoreMean/Spread/StdDev/medianCandidateScore/runnerUpCategory/runnerUpServer` absent (medium)
+  - `focus === 'code'`, `winnerInFocus === true`, `focusDecisive` absent (low+focus)
+  - `candidatesInFocusCount === 1`, `focusRank === 1`, `focusRankDelta === 0`, `inFocusFraction === 1.0` (medium+focus)
+  - `winnerScoreBase + winnerFocusBoost === winnerScore` decomposition
+  - `focusMargin/focusConfidence/focusDecisive/unfocusedWinner` absent (medium+focus)
+- **Human-action items (carried forward):**
+  1. **Merge PR #1401 (EX)** — single-candidate field names low/medium (4 tests, CI green)
+  2. **Merge PR #1402 (EY)** — single-candidate field names full verbosity (2 tests, CI green)
+  3. **DISABLE hourly cron** — ~1716+ runs; burning ~50k tokens/run
+  4. **Enable GitHub Actions** (main npm test CI job; only CodeQL running)
+  5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 for apps/
+- **Next run:** EFA — single-candidate VALUE TYPES at verbosity:full (parallels EZ for the larger full-verbosity field set: scoreDominanceIndex, topCandidatesMeanScore, and 15 full-verbosity-exclusive focus fields like focusRankPercentile, inFocusTopScore, winnerFocusBoostRatio).
