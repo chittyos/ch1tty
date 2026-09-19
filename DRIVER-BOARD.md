@@ -6419,3 +6419,33 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
 - **Next run:** Merge #1387 if CI green. Next gap: EM — survey remaining uncovered shapes (related prompts/resources item shapes in cast paths, cast:discovered sub-object details, or non-cast drift guards like execute content-item shapes).
+
+---
+
+## Run log — 2026-09-19 (run ~1720 — PRODUCTIVE: merged EL (#1387), opened EM (#1388))
+
+- **Workstream advanced:** EL closed — PR #1387 squash-merged (cast:executed chainContinuation + cast:plan sessionContext shape guards, 8 tests). EM opened — PR #1388 (cast:no_match and cast:discovered sessionContext sub-object shapes, 8 tests).
+- **Build:** clean (tsc exit 0)
+- **Tests:** 4347 pass / 0 fail / 3 skip (was 4339; +8 from EM)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done (context continuation):**
+  - Previous session opened PR #1387 (EL) and started EM — wrote `test/em-nomatch-discovered-sessionContext.test.ts`. Suite 1 (cast:no_match) failed because `scoreIntent` (keyword route) returns ALL tools at score 0; `scoredTools.length === 0` never fires when tools exist in registry.
+  - Merged EL (#1387) — CI was green (3/3 checks), squash-merged.
+  - Fixed EM Suite 1: replaced `makeNoMatchAgg()` (neon+stripe+tasks, had tools) with `makePromptOnlyAgg()` (no tools, one prompt). Correct triggering: 'xyzzy-zzz' intent → scoredTools=[] + scoredPrompts=[] + scoredResources=[] → cast:no_match. Session primed with 'database guide query' (→ cast:discovered, registers sessionId).
+  - Removed `makeNoMatchAgg()` and `FIXTURE_SERVERS` import (no longer needed).
+  - Full suite: 8/8 pass (Suite 1: no_match sessionContext × 4; Suite 2: discovered sessionContext × 4).
+  - Committed, pushed `auto/EM-nomatch-discovered-sessionContext`, opened PR #1388, subscribed.
+- **Workstream status updates:**
+  - [x] **EK** — 8 tests. PR #1386 merged. DONE.
+  - [x] **EL** — 8 tests. PR #1387 merged. DONE.
+  - [ ] **EM** — test(em): cast:no_match and cast:discovered sessionContext sub-object shapes — 8 tests. PR #1388 open (CI pending).
+- **Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1720 runs; burning ~50k tokens/run
+  2. **Merge PR #1388 (EM)** once CI green — no_match + discovered sessionContext shape guards
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+- **Next run:** Merge #1388 if CI green. Next gap: EN — survey remaining uncovered cast shapes (cast:error sub-objects, execute content-item shapes, or other unfrozen paths).
