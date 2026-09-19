@@ -5515,3 +5515,28 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
   5. **Major dep bumps** — @types/node 22→26, typescript 5→7 for apps/
 - **Next run:** EV — freeze explain field VALUE TYPES for verbosity:low+medium WITH focus active (parallel to EU but with focus profile; fields like focusDecisive:boolean, focusMargin:number, winnerInFocus:boolean that only appear under focus).
+
+---
+
+### Run ~1712 — 2026-09-19 (automated)
+
+- **Baseline:** 4433/0/3 (EU merged, main at 49d31ef).
+- **Workstream:** EV — freeze cast explain field VALUE TYPES for verbosity:low+medium WITH focus active.
+- **What was done:**
+  1. Pulled main (EU merged as #1397 at 49d31ef). Branched `auto/EV-explain-value-types-focus`.
+  2. Created EV — `test/ev-cast-explain-value-types-focus.test.ts` — 7 tests across 3 suites:
+     - Suite 1 (verbosity:low + focus:code): focus-specific field VALUE TYPES (focus:string, focusBoost:number>0, focusDecisive:boolean, winnerInFocus:boolean) + winner-in-focus invariant
+     - Suite 2 (verbosity:medium + focus:code, in-focus winner): 9 focus field types (candidatesInFocusCount:int≥0, focusConfidence:[0,1], focusDecisive:boolean, focusMargin:number≥0, focusRank:int≥1, focusRankDelta:int≥0, inFocusFraction:[0,1], winnerFocusBoost:number≥0, winnerScoreBase:number≥0) + focusRankDelta identity + score decomposition identity
+     - Suite 3 (verbosity:medium + focus:code, focus-changed winner): unfocusedWinner:string namespaced + winnerInFocus:true invariant
+  3. Full suite: 4440/0/3 (+7). Build clean.
+- **EV frozen assertions:**
+  - `low+focus`: focus:string==='code', focusBoost:number>0, focusDecisive:boolean, winnerInFocus:boolean
+  - `medium+focus` extra: candidatesInFocusCount:int≥0, focusConfidence:[0,1], focusMargin:number≥0, focusRank:int≥1, focusRankDelta===focusRank-1, inFocusFraction:[0,1], winnerFocusBoost:number≥0, winnerScoreBase:number≥0, winnerScoreBase+winnerFocusBoost===winnerScore
+  - `focus-changed winner`: unfocusedWinner:namespaced-string, winnerInFocus:true
+- **Human-action items (carried forward):**
+  1. **DISABLE hourly cron** — ~1712 runs; burning ~50k tokens/run
+  2. **Enable GitHub Actions** (main npm test CI job; only CodeQL running)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Major dep bumps** — @types/node 22→26, typescript 5→7 for apps/
+- **Next run:** EW — freeze explain field VALUE TYPES for verbosity:full (spot-check the large full-verbosity field set; EV+EU cover low/medium; EW completes the verbosity tier freeze).
