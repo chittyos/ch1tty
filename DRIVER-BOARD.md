@@ -6351,3 +6351,38 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
 - **Next run:** Merge #1385 if CI green. Next gap: EK — survey remaining uncovered shapes (cast:executed resolvedFromCatalog content shape in execute mode, or ch1tty/execute result content item shape drift, or search tool entry inputSchema sub-object freeze).
+
+---
+
+## Run log — 2026-09-19 (run ~1718 — PRODUCTIVE: merged EJ (#1385), opened EK (#1386))
+
+- **Workstream advanced:** EJ closed — PR #1385 squash-merged (cast:chain_executed step item shape + catalog no-unexpected-keys, 9 tests). EK opened — PR #1386 (cast:resolved catalogCombo + chain_executed breakdown + executed resolvedFromCatalog sub-object shapes, 8 tests).
+- **Build:** clean (tsc exit 0)
+- **Tests:** 4331 pass / 0 fail / 3 skip (was 4323; +8 from EK)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - Confirmed PR #1385 CI: 3/3 checks green. Squash-merged.
+  - Pulled main (09e0324). Baseline: 4323/0/3.
+  - Identified 3 remaining shape gaps:
+    1. cast:resolved catalogCombo sub-object — EG permits it but no test freezes internal shape {accomplishes, chain, name}
+    2. cast:chain_executed latencyBreakdown no-unexpected-keys — EF checks required keys but not unexpected (EG covers this for cast:executed)
+    3. cast:executed resolvedFromCatalog — EH tested plan mode (line 1614); executed branch (line 1663) is separate code path, same shape not confirmed
+  - Added `test/ek-cast-resolved-catalogcombo-breakdown-shape.test.ts` — 8 tests across 3 suites:
+    1. cast:resolved catalogCombo (3): no unexpected keys, exact fields {accomplishes,chain,name}, field types — triggered via dryRun:true
+    2. cast:chain_executed latencyBreakdown (2): no unexpected keys (PERMITTED: {brainMs?,executionMs,registryMs,scoringMs}), all values non-negative numbers
+    3. cast:executed resolvedFromCatalog (3): no unexpected keys, exact fields {accomplishes,chain,name}, field types — triggered via plain cast with catalog combo
+  - Full suite: 4331/0/3 (+8). Build clean.
+  - Committed, pushed `auto/EK-cast-resolved-catalogcombo-breakdown-shape`, opened PR #1386, subscribed.
+- **Workstream status updates:**
+  - [x] **EJ** — test(ej): cast:chain_executed step item shape + catalog no-unexpected-keys — 9 tests. PR #1385 merged. DONE.
+  - [ ] **EK** — test(ek): cast:resolved catalogCombo + chain_executed breakdown + executed resolvedFromCatalog — 8 tests. PR #1386 open (CI pending).
+- **Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1718 runs; burning ~50k tokens/run
+  2. **Merge PR #1386 (EK)** once CI green — cast sub-object shape guards
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+- **Next run:** Merge #1386 if CI green. Next gap: EL — survey remaining uncovered shapes (cast:plan chainContinuation in executed mode, or cast:discovered sub-object shapes, or non-cast drift guards like execute content-item shapes).
