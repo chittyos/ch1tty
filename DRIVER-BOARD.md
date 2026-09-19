@@ -6243,3 +6243,39 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
 - **Next run:** Merge #1381 if CI green. Next gap: EH — alternatives item shape guard in cast:executed (field set: tool, score, description), or survey remaining uncovered paths.
+
+---
+
+## Run log — 2026-09-19 (run ~1715 — PRODUCTIVE: merged EG (#1381), opened EH (#1382))
+
+- **Workstream advanced:** EG closed — PR #1381 squash-merged (cast no-unexpected-keys guards, 16 tests). EH opened — PR #1382 (cast alternatives item shape + resolvedFromCatalog + chainContinuation sub-object guards, 11 tests).
+- **Build:** clean (tsc exit 0)
+- **Tests:** 4301 pass / 0 fail / 3 skip (was 4290; +11 from EH)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - Confirmed PR #1381 CI: 3/3 CodeQL checks green. Squash-merged.
+  - Pulled main (b328f20). Baseline: 4290/0/3.
+  - Identified 3 gaps in cast sub-object shape coverage:
+    1. EA covers alternatives item shape for cast:plan but NOT cast:executed
+    2. No test freezes resolvedFromCatalog sub-object shape (name/chain/accomplishes) in cast:plan
+    3. No test freezes chainContinuation sub-object shape (nextTool/remainingChain/hint) in cast:plan
+  - Added `test/eh-cast-alternatives-catalog-chain-shape.test.ts` — 11 tests across 3 suites:
+    1. cast:executed alternatives item shape (3): no unexpected keys, correct field types (tool=namespaced string, score=number, description=string), non-empty array when present
+    2. cast:plan resolvedFromCatalog (4): exact fields {name,chain,accomplishes}, name type, chain array of strings, accomplishes type
+    3. cast:plan chainContinuation (4): exact fields {nextTool,remainingChain,hint}, nextTool namespaced string, remainingChain array of strings, hint type
+  - makePlanCatalogAgg() uses PLAN_CATALOG (neon 2-step combo) + focus:code + KeywordOnlyCoordinator + confirm:true to trigger resolvedFromCatalog and chainContinuation.
+  - Full suite: 4301/0/3 (+11). Build clean.
+  - Committed, pushed `auto/EH-cast-subobject-shape-guards`, opened PR #1382, subscribed.
+- **Workstream status updates:**
+  - [x] **EG** — test(eg): cast no-unexpected-keys guards for 4 paths — 16 tests. PR #1381 merged. DONE.
+  - [ ] **EH** — test(eh): cast alternatives + resolvedFromCatalog + chainContinuation sub-object guards — 11 tests. PR #1382 open (CI pending).
+- **Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1715 runs; burning ~50k tokens/run
+  2. **Merge PR #1382 (EH)** once CI green — cast sub-object shape guards
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+- **Next run:** Merge #1382 if CI green. Next gap: EI — survey remaining cast sub-object gaps (sessionContext shape, suggestions shape) or move to another tool/module.
