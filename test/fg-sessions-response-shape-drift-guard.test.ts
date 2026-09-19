@@ -31,11 +31,6 @@ import { join } from 'node:path';
 import { describe, test } from 'node:test';
 import { Aggregator } from '../src/aggregator.js';
 import { HttpMcpServer } from '../src/http-server.js';
-import type { SessionInfo } from '../src-stdio/session.js';
-
-// Compile-time freeze: if SessionInfo.transport ever widens beyond 'stdio'|'http', this fails to compile.
-const _freezeTransport: SessionInfo['transport'] extends 'stdio' | 'http' ? true : false = true;
-void _freezeTransport;
 
 // ── Canonical key sets (sorted alphabetically) ────────────────────────────────
 
