@@ -6243,3 +6243,34 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
 - **Next run:** Merge #1381 if CI green. Next gap: EH — alternatives item shape guard in cast:executed (field set: tool, score, description), or survey remaining uncovered paths.
+
+---
+
+## Run log — 2026-09-19 (run ~1715 — PRODUCTIVE: merged EG (#1381), opened EH (#1382))
+
+- **Workstream advanced:** EG closed — PR #1381 squash-merged (cast no-unexpected-keys guards, 16 tests). EH opened — PR #1382 (alternatives item shape guard, 15 tests).
+- **Build:** clean (tsc exit 0)
+- **Tests:** 4305 pass / 0 fail / 3 skip (was 4290; +15 from EH)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - Confirmed PR #1381 CI: 3/3 CodeQL checks green. Squash-merged.
+  - Pulled main (b328f20). Baseline: 4290/0/3.
+  - Read aggregator.ts lines 1389–1393 to extract alternatives item shape: `{ tool: string, score: number, description: string }` (slice(1,4) — max 3 items).
+  - Added `test/eh-alternatives-item-shape.test.ts` — 15 tests across 2 suites:
+    1. cast:executed (9): array type check, length ≤ 3, no unexpected keys per item, tool is non-empty string, tool is namespaced (contains /), score is number, description is string, tool differs from resolved, absent with single-tool backend
+    2. cast:plan (6): array type check, length ≤ 3, no unexpected keys per item, tool is namespaced, score is finite number, absent with single-tool backend
+  - Full suite: 4305/0/3 (+15). Build clean.
+  - Committed, pushed `auto/EH-alternatives-item-shape-guards`, opened PR #1382, subscribed.
+- **Workstream status updates:**
+  - [x] **EG** — test(EG): cast no-unexpected-keys guards for 4 paths — 16 tests. PR #1381 merged. DONE.
+  - [ ] **EH** — test(EH): alternatives item shape guard — 15 tests. PR #1382 open (CI pending).
+- **Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1715 runs; burning ~50k tokens/run
+  2. **Merge PR #1382 (EH)** once CI green — alternatives item shape drift guard
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+- **Next run:** Merge #1382 if CI green. Next gap: EI — sessionContext sub-object shape guard (recentTools: string[], callCount: number, activeSessionFocus?: string) or chainContinuation shape guard (nextTool/remainingChain/hint).
