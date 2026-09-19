@@ -31,6 +31,11 @@ import { join } from 'node:path';
 import { describe, test } from 'node:test';
 import { Aggregator } from '../src/aggregator.js';
 import { HttpMcpServer } from '../src/http-server.js';
+import type { SessionInfo } from '../src-stdio/session.js';
+
+// Compile-time freeze: if SessionInfo.transport ever widens beyond 'stdio'|'http', this fails to compile.
+const _freezeTransport: SessionInfo['transport'] extends 'stdio' | 'http' ? true : false = true;
+void _freezeTransport;
 
 // ── Canonical key sets (sorted alphabetically) ────────────────────────────────
 
@@ -186,9 +191,10 @@ describe('FG: ToolUseRecord item exact key set', () => {
       const item = (body.sessions as Record<string, unknown>[])[0]!;
       const recentTools = item.recentTools as Record<string, unknown>[];
       assert.equal(recentTools.length, 10, `recentTools must be capped at 10, got ${recentTools.length}`);
-      // Verify it's the LAST 10 (tools 5–14, not 0–9)
-      const lastTool = recentTools[9]?.tool as string;
-      assert.equal(lastTool, 'ch1tty/tool-14', `last recentTools entry must be tool-14, got ${lastTool}`);
+      // Verify it's the LAST 10 in order (tools 5–14, not 0–9 or shuffled)
+      const expectedTools = Array.from({ length: 10 }, (_, i) => `ch1tty/tool-${i + 5}`);
+      const actualTools = recentTools.map((r) => (r as Record<string, unknown>).tool as string);
+      assert.deepEqual(actualTools, expectedTools, `recentTools must be last 10 (tool-5…tool-14 in order), got ${JSON.stringify(actualTools)}`);
     } finally { await stop(s); }
   });
 });
