@@ -159,6 +159,38 @@ describe('ET — topCandidates item shape in explain (no focus)', () => {
       await agg.shutdown();
     }
   });
+
+  test('no focus multi-candidate — item shape is identical for medium and full verbosity', async () => {
+    const agg = makeAggregator();
+    try {
+      for (const verbosity of ['medium', 'full'] as const) {
+        const result = await agg.callTool('ch1tty/cast', {
+          intent: 'list database projects',
+          explain: true,
+          verbosity,
+          dryRun: true,
+        });
+        assert.equal(result.isError, undefined, `cast should not error (${verbosity})`);
+        const body = JSON.parse((result.content[0] as { text: string }).text) as Record<string, unknown>;
+        const explanation = body['explanation'] as Record<string, unknown>;
+        assert.ok(explanation !== undefined, `explanation must be present (${verbosity})`);
+        const items = explanation['topCandidates'] as unknown[];
+        assert.ok(Array.isArray(items), `topCandidates must be an array (${verbosity})`);
+        assert.ok(items.length > 0, `topCandidates must be non-empty (${verbosity})`);
+        const expected = [...NO_FOCUS_ITEM_KEYS].sort();
+        for (const [i, item] of items.entries()) {
+          const actual = Object.keys(item as object).sort();
+          assert.deepEqual(
+            actual,
+            expected,
+            `topCandidates[${i}] keys drifted at verbosity ${verbosity}.\nExpected: ${JSON.stringify(expected)}\nActual:   ${JSON.stringify(actual)}`,
+          );
+        }
+      }
+    } finally {
+      await agg.shutdown();
+    }
+  });
 });
 
 // ── Suite 2: focus:code ───────────────────────────────────────────────────────
@@ -194,10 +226,18 @@ describe('ET — topCandidates item shape in explain (focus:code)', () => {
           'boolean',
           `topCandidates[${i}].inFocus must be a boolean`,
         );
+        assert.equal(typeof (item as Record<string, unknown>)['tool'], 'string', `topCandidates[${i}].tool must be a string`);
+        assert.ok(((item as Record<string, unknown>)['tool'] as string).length > 0, `topCandidates[${i}].tool must be non-empty`);
+        assert.equal(typeof (item as Record<string, unknown>)['score'], 'number', `topCandidates[${i}].score must be a number`);
+        assert.ok(Number.isFinite((item as Record<string, unknown>)['score'] as number), `topCandidates[${i}].score must be finite`);
       }
       assert.ok(
         items.some(item => (item as Record<string, unknown>)['inFocus'] === false),
         'at least one topCandidates item must have inFocus: false when not all tools are in focus',
+      );
+      assert.ok(
+        items.some(item => (item as Record<string, unknown>)['inFocus'] === true),
+        'at least one topCandidates item must have inFocus: true when some tools are in focus',
       );
     } finally {
       await agg.shutdown();
@@ -221,6 +261,39 @@ describe('ET — topCandidates item shape in explain (focus:code)', () => {
       const items = explanation['topCandidates'];
       assert.ok(Array.isArray(items), 'topCandidates must be an array on no_match');
       assert.equal((items as unknown[]).length, 0, 'topCandidates must be [] on no_match');
+    } finally {
+      await agg.shutdown();
+    }
+  });
+
+  test('focus:code multi-candidate — item shape is identical for medium and full verbosity', async () => {
+    const agg = makeAggregator(true);
+    try {
+      for (const verbosity of ['medium', 'full'] as const) {
+        const result = await agg.callTool('ch1tty/cast', {
+          intent: 'list database projects',
+          explain: true,
+          verbosity,
+          focus: 'code',
+          dryRun: true,
+        });
+        assert.equal(result.isError, undefined, `cast should not error (${verbosity})`);
+        const body = JSON.parse((result.content[0] as { text: string }).text) as Record<string, unknown>;
+        const explanation = body['explanation'] as Record<string, unknown>;
+        assert.ok(explanation !== undefined, `explanation must be present (${verbosity})`);
+        const items = explanation['topCandidates'] as unknown[];
+        assert.ok(Array.isArray(items), `topCandidates must be an array (${verbosity})`);
+        assert.ok(items.length > 0, `topCandidates must be non-empty (${verbosity})`);
+        const expected = [...FOCUS_ITEM_KEYS].sort();
+        for (const [i, item] of items.entries()) {
+          const actual = Object.keys(item as object).sort();
+          assert.deepEqual(
+            actual,
+            expected,
+            `topCandidates[${i}] keys drifted at verbosity ${verbosity}.\nExpected: ${JSON.stringify(expected)}\nActual:   ${JSON.stringify(actual)}`,
+          );
+        }
+      }
     } finally {
       await agg.shutdown();
     }
