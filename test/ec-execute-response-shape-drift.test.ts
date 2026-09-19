@@ -313,11 +313,13 @@ describe('ch1tty/execute success response shape (no session)', () => {
     }
   });
 
-  test('success content has at least one item', async () => {
+  test('success content is passed through unmodified: exactly 1 item for list_projects (no session, no metadata appended)', async () => {
     const agg = makeAggregator();
     try {
       const r = await execute(agg, { tool: 'neon/list_projects' });
-      assert.ok(r.content.length >= 1, 'success content must have at least 1 item');
+      // list_projects fixture returns exactly 1 text item; no session → no metadata appended.
+      assert.equal(r.content.length, 1, 'no-session content must be exactly 1 item (pure passthrough, no metadata added)');
+      assert.equal(r.content[0].type, 'text', 'no-session content[0] must be type:text');
     } finally {
       await agg.shutdown();
     }
@@ -339,11 +341,20 @@ describe('ch1tty/execute success response shape (no session)', () => {
 // ── Path D: Session metadata shape (success with session) ─────────────────
 
 describe('ch1tty/execute session metadata shape (success with session)', () => {
-  test('success with session appends a second content item', async () => {
+  test('success with session: content prefix matches no-session response exactly, exactly one metadata item appended', async () => {
     const agg = makeAggregator();
     try {
-      const r = await execute(agg, { tool: 'neon/list_projects', sessionId: 'ec-test-session-1' });
-      assert.ok(r.content.length >= 2, `success+session must have at least 2 content items (backend + metadata), got ${r.content.length}`);
+      // Capture no-session content first (before any metadata push mutates the fixture array).
+      const rNoSession = await execute(agg, { tool: 'neon/list_projects' });
+      const backendContent: ContentItem[] = [...rNoSession.content]; // snapshot before push
+      const rSession = await execute(agg, { tool: 'neon/list_projects', sessionId: 'ec-test-session-1' });
+      // After push: content = [backend items..., metadata item].
+      assert.equal(rSession.content.length, backendContent.length + 1, `session content must be exactly backend length + 1 metadata item`);
+      assert.deepEqual(
+        rSession.content.slice(0, backendContent.length),
+        backendContent,
+        'session content prefix must equal backend response exactly (passthrough + append contract)',
+      );
     } finally {
       await agg.shutdown();
     }
@@ -406,6 +417,10 @@ describe('ch1tty/execute session metadata shape (success with session)', () => {
       const meta = JSON.parse(r.content[r.content.length - 1].text!) as Record<string, unknown>;
       const sc = meta.sessionContext as Record<string, unknown>;
       assert.ok(Array.isArray(sc.recentTools), 'sessionContext.recentTools must be an array');
+      assert.ok(
+        (sc.recentTools as unknown[]).every((tool) => typeof tool === 'string'),
+        'sessionContext.recentTools must contain only strings',
+      );
       assert.ok(typeof sc.callCount === 'number', 'sessionContext.callCount must be a number');
     } finally {
       await agg.shutdown();
