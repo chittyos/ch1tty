@@ -6279,3 +6279,40 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
 - **Next run:** Merge #1382 if CI green. Next gap: EI — survey remaining cast sub-object gaps (sessionContext shape, suggestions shape) or move to another tool/module.
+
+---
+
+## Run log — 2026-09-19 (run ~1716 — PRODUCTIVE: merged EH (#1382), opened EI (#1383))
+
+- **Workstream advanced:** EH closed — PR #1382 squash-merged (cast alternatives + resolvedFromCatalog + chainContinuation guards, 11 tests). EI opened — PR #1383 (cast suggestions sub-object shape + sessionContext sub-object shape guards, 13 tests).
+- **Build:** clean (tsc exit 0)
+- **Tests:** 4314 pass / 0 fail / 3 skip (was 4301; +13 from EI)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done:**
+  - Confirmed PR #1382 CI: 3/3 CodeQL checks green. Squash-merged.
+  - Pulled main (a0db2fb). Baseline: 4301/0/3.
+  - Identified 2 shape gaps: (1) suggestions sub-object shape unfrozen (existing tests check presence/values but no drift guard freezes field sets); (2) sessionContext sub-object shape in cast responses unfrozen (EC does it for execute but not cast).
+  - Read `src-stdio/suggestions.ts` to extract SuggestedCombo `{name,chain,accomplishes,verified,notes?}` and SuggestedPrompt `{text,resolves_to}` field sets.
+  - Added `test/ei-cast-suggestions-sessioncontext-shape.test.ts` — 13 tests across 4 suites:
+    1. suggestions top-level (3): exactly {combos,prompts}, combos is array, prompts is array
+    2. suggestions combo item (3): no unexpected keys, required keys present, field types (name=string, chain=array, accomplishes=string, verified=boolean, notes=string when present)
+    3. suggestions prompt item (2): exactly {resolves_to,text} fields, field types
+    4. sessionContext in cast (5): no unexpected keys, required keys {callCount,recentTools}, recentTools is array of strings, callCount is non-negative integer, activeSessionFocus is string when present
+  - SUGGESTIONS_CATALOG uses neon 2-step combo + 1 prompt for triggering suggestions in chain_executed.
+  - KeywordOnlyCoordinator used for deterministic scoring.
+  - sessionContext triggered by passing sessionId in cast:executed call.
+  - Full suite: 4314/0/3 (+13). Build clean.
+  - Committed, pushed `auto/EI-cast-suggestions-sessioncontext-shape`, opened PR #1383, subscribed.
+- **Workstream status updates:**
+  - [x] **EH** — test(eh): cast alternatives + resolvedFromCatalog + chainContinuation guards — 11 tests. PR #1382 merged. DONE.
+  - [ ] **EI** — test(ei): cast suggestions + sessionContext sub-object shape guards — 13 tests. PR #1383 open (CI pending).
+- **Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1716 runs; burning ~50k tokens/run
+  2. **Merge PR #1383 (EI)** once CI green — cast suggestions + sessionContext drift guards
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+- **Next run:** Merge #1383 if CI green. Next gap: EJ — survey remaining uncovered paths (cast:executed resolvedFromCatalog shape, or pivot to non-cast tool coverage gaps like ch1tty/search sort invariants or health endpoint drift).
