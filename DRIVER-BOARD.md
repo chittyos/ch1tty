@@ -6029,3 +6029,46 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   6. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine merge run, no exceptional event.
 - **Next run:** DF — wrangler.jsonc/wrangler.harness.jsonc structural guards, or further scenario test improvements, or other quality opportunities.
+
+## Run log — 2026-09-19 (run ~1709 — PRODUCTIVE: opened PR #1376 (EB))
+
+- **Workstream advanced:** EB — `test/eb-search-response-shape-drift.test.ts` (20 tests) — ch1tty/search response shape drift guard
+- **Branch:** `auto/EB-search-response-shape-drift`
+- **PR:** #1376 open (CI pending) — https://github.com/chittyos/ch1tty/pull/1376
+- **Build:** `npm run build` clean (tsc exit 0)
+- **Tests:** 4177 pass / 0 fail / 3 skip (was 4157; +20 from EB)
+- **npm audit:** 0 vulnerabilities
+- **Guardrails:** 5-tool surface (search/execute/status/reload/cast) FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations on main.
+- **Startup state:**
+  - 0 open PRs at start. Synced to d12a585 (run ~1708 — merged DZ+EA, 4157 tests).
+  - DRIVER-BOARD.md was stale (last entry run ~1700); commits DF–EA were done directly without board entries. Current board updated this run.
+  - `npm ci` clean. `npm run build` clean. `npm test`: 4157/0/3 (pre-EB baseline).
+- **What was done:**
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed.
+  - Confirmed 0 open PRs. Checked git log: last workstream was EA (cast result shape drift guard). Tests jumped from 2779 (run ~1700) to 4157 (DF–EA applied, runs ~1701–1708).
+  - Identified EB gap: `ch1tty/search` has two response code paths (filtered vs. discovery) — no drift guard frozen either shape.
+  - Added `test/eb-search-response-shape-drift.test.ts` — 20 tests across 6 suites:
+    1. Filtered path: required top-level keys (matches/total/latencyMs/tools)
+    2. Filtered path: no unexpected top-level keys in plain query
+    3. Filtered path: required per-tool entry keys (tool/server/serverName/category/description/inputSchema)
+    4. Filtered path: no unexpected tool entry keys in unfocused query search
+    5. score field on every tool when query given; absent when no query
+    6. focus/inFocus conditional fields with active focus profile
+    7. Discovery path: required keys (hint/latencyMs/servers/totalTools)
+    8. Discovery path: no unexpected keys, hint non-empty, servers is array, totalTools positive, focus present when active
+    9. Structural: tools is always array, matches===tools.length, total>=matches, latencyMs non-negative
+  - Full suite: 4177/0/3 (+20). Build clean.
+  - Committed, pushed `auto/EB-search-response-shape-drift`, opened PR #1376, subscribed.
+- **Workstream status updates:**
+  - [x] **EA** — test(ea): ch1tty/cast result shape drift guard — 14 tests. PR #1374 merged (run ~1708). DONE.
+  - [ ] **EB** — test(eb): ch1tty/search response shape drift guard — 20 tests. PR #1376 open (CI pending).
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1709 runs; burning ~50k tokens/run
+  2. **Merge PR #1376 (EB)** once CI green — search response shape drift guard
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  5. **Notion workspace** out of free blocks — upgrade or clear
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+- **PushNotification:** NOT SENT — routine drift guard PR, no exceptional event.
+- **Next run:** Merge #1376 if CI green. Next gap: EC — ch1tty/execute response shape drift guard (mirrors EB pattern for execute).
