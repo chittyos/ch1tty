@@ -6510,3 +6510,26 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **Next run:** EO — open PR freezing cast:plan resolved sub-object + related.prompts + related.resources shapes.
+
+---
+
+## Run log — 2026-09-19 (run ~1722b — PRODUCTIVE: opened EO (#1390))
+
+- **Workstream advanced:** EO opened — PR #1390 (`auto/EO-plan-resolved-related-shapes`), 9 tests across 3 suites freezing cast:plan resolved + related.prompts + related.resources item shapes.
+- **Build:** clean (tsc exit 0)
+- **Tests:** 4379 pass / 0 fail / 3 skip (4382 total, 240 suites)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **What was done (full run):**
+  - PR #1389 (EN) CI: 3/3 checks green. Replied to Codex P2 optional finding (activeSessionFocus stays absent per established conditional guard pattern; follow-up for EO/EP). Resolved thread. Squash-merged.
+  - Pulled main (4555a37). Baseline: 4370/0/3.
+  - Identified 3 remaining unfrozen shapes in cast:plan: resolved sub-object, related.prompts items, related.resources items.
+  - Added `test/eo-plan-resolved-related-shapes.test.ts` — 9 tests across 3 suites:
+    1. resolved sub-object (3): no unexpected keys (EXACT), all exact keys, field types correct
+    2. related.prompts items (3): no unexpected keys (PERMITTED), required keys, types
+    3. related.resources items (3): no unexpected keys (PERMITTED), required keys, types
+  - Fixture: makePlanAgg() with neon backend (1 tool + 1 prompt + 1 resource), all scoring 1.0 against "list neon projects" intent. confirm:true triggers cast:plan path.
+  - Full suite: 4379/0/3 (+9). Build clean. Opened PR #1390, subscribed.
+- **Workstream status updates:**
+  - [x] **EN** — DONE (merged PR #1389 this run).
+  - [ ] **EO** — test(eo): cast:plan resolved, related.prompts, related.resources shapes — 9 tests. PR #1390 open (CI pending).
+- **Next run:** Merge #1390 if CI green. Next gap: EP — remaining unfrozen shapes: cast:executed related.prompts/resources (same related object, executed path lines 1666+), cast:discovered related.prompts/resources, cast:chain_executed alternatives item shape.
