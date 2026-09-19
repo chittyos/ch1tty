@@ -6582,7 +6582,40 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 ---
 
-## Run ~1726 — 2026-09-19 — PRODUCTIVE: opened FB (#1405)
+
+## Run ~1725 — 2026-09-19
+
+**Context:** Continued from run ~1724 (context compaction). Branch `auto/EX-single-candidate-explain-fieldnames` was already committed + pushed with commit `6f27982`. PR creation + board update were the remaining steps.
+
+**Opened:** PR #1401 (EX — single-candidate field name freeze)
+- Branch: `auto/EX-single-candidate-explain-fieldnames`
+- File: `test/ex-cast-explain-single-candidate-fieldnames.test.ts` (285 lines, 4 tests)
+- Gap filled: ER/EU/EV/EW all use multi-candidate fixtures (≥2 tools). EX freezes the qualitatively different field sets when exactly **one** tool matches (no runner-up, no spread/stddev/median, no focusDecisive/focusMargin/focusConfidence/unfocusedWinner).
+- 4 suites: verbosity:low no-focus (6 fields), verbosity:medium no-focus (7 fields), verbosity:low focus:code (9 fields), verbosity:medium focus:code (16 fields)
+- Single-tool fixture: `solo/list_projects` — "List all Neon database projects in the account"
+- Explicitly asserts absent: focusDecisive, focusMargin, focusConfidence, unfocusedWinner, candidateScoreSpread, candidateScoreMean
+- Test results: **4456 pass / 0 fail / 3 skip** (+4 from this run)
+- CLAUDE.md metric freeze observed: no new fields added (tests only)
+
+**Note:** Board entry "Next gap: EX — cast explain focus value types for verbosity:medium" was stale — those fields were already frozen by EV (c329124). Redefined EX as the single-candidate field name freeze, which was a genuine uncovered gap.
+
+**Workstream status updates:**
+  - [x] **EV** — PR #1399 merged (DONE per run ~1724)
+  - [ ] **EW** — PR #1400 open (CI pending)
+  - [ ] **EX** — PR #1401 open (single-candidate field name freeze, CI pending)
+
+**Human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1725 runs; burning ~50k tokens/run
+  2. **Merge PR #1400 (EW)** once CI green — cast explain focus value types for verbosity:full
+  3. **Merge PR #1401 (EX)** once CI green — single-candidate field name drift guard
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  6. **Notion workspace** out of free blocks — upgrade or clear
+  7. **Stale branch cleanup** — 1100+ remote auto/ branches
+  8. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+
+**Next run:** Merge #1400 (EW) and #1401 (EX) if CI green. Next gap: EY — candidate; look for multi-candidate gaps NOT yet covered. Possibilities: single-candidate VALUE TYPES (types for the 9/16 focus fields in EX), or verbosity:full single-candidate fields, or no_match with focus active field set.
+# Run ~1726 — 2026-09-19 — PRODUCTIVE: opened FB (#1405)
 
 **Workstream advanced:** FB — freeze `ch1tty/search` explain field names and value types.
 
