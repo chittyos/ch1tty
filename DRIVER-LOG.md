@@ -5341,3 +5341,38 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   7. **shared-mcp SDK lag**: @modelcontextprotocol/sdk at ^1.29.0 vs apps ^1.30.0 — can bump when convenient
 - **PushNotification:** NOT SENT — routine merges of already-green PRs; no exceptional event.
 - **Next run:** EB — ch1tty/search result shape drift guard (freeze exact field shape of each search result item: tool/server/serverName/category/description required; optional score/recentlyUsed/inFocus) or coordinator sub-object field drift in status.
+
+---
+
+## Run log — 2026-09-19 (run ~1709 — PRODUCTIVE: opened PR #1392 EQ scope-sub-object-shape drift guard)
+
+- **Workstream advanced:** EQ — scope sub-object shape drift guard
+- **Build:** `npm run build` clean (tsc) | **Tests:** 4392 pass / 0 fail / 3 skip (+13 from EQ)
+- **Guardrails:** 5-tool surface (search/execute/status/reload/cast) FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **Startup state:**
+  - Resumed from prior context (session_01TCi969YhPrC926vi83qMKH) where EQ test file had been written with correct `backendFactory` pattern but tests had not yet been re-run after intent fix.
+  - Branch `auto/EQ-scope-sub-object-shape-drift` already checked out. PR #1391 (EP) already open, CI green.
+- **What was done:**
+  - Fixed 4 failing EQ tests: intent 'list neon database projects' → `cast:discovered` (neon prompt keyword-matches "neon"); changed to nonsense intent `zzzzzzzzz_no_match_scope_test_xyz_9999` for `no_match`-path tests.
+  - `npm test` → 4392 / 0 / 3 (was 4379, +13 EQ tests).
+  - Committed `test/eq-cast-scope-sub-object-shape.test.ts`, pushed `auto/EQ-scope-sub-object-shape-drift`, opened PR #1392.
+  - Subscribed to PR #1392.
+- **What EQ freezes:**
+  - `scope` annotation internal shape: `PERMITTED: { categories?, servers? }` — both `string[]` when present.
+  - Covers all 4 cast paths where scope annotation appears: `no_match`, `resolved`, `plan`, `executed`.
+  - Absent when scope param not passed (3 tests).
+- **Workstream status updates:**
+  - [x] **EB–EO** — merged in prior runs. Tests at 4379.
+  - [ ] **EP** — ch1tty/cast explain `verbosity` param drift guard. PR #1391 open (CI pending). OPEN.
+  - [ ] **EQ** — scope sub-object shape drift guard — 13 tests. PR #1392 open (CI pending).
+- **Human-action items:**
+  1. **DISABLE hourly cron** — ~1709 runs; burning ~50k tokens/run
+  2. **Merge PR #1391 (EP)** — CI green, clean
+  3. **Merge PR #1392 (EQ)** — CI pending
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  6. **Notion workspace** out of free blocks — upgrade or clear
+  7. **Stale branch cleanup** — 1100+ remote auto/ branches
+  8. **Major dep bumps** — @types/node 22→26, typescript 5→7 for apps/, agents 0.23→0.24 — human review recommended
+- **PushNotification:** SENDING — PR #1392 (EQ: 13 scope sub-object drift-guard tests). 4392 pass.
+- **Next run:** ER — next uncharted drift-guard gap (candidates: cast:discovered shape, chain_executed shape, alternatives array item shape) or check if PR #1391/#1392 CI green and merge.
