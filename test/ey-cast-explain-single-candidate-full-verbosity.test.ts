@@ -44,8 +44,16 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, test } from 'node:test';
 import { Aggregator } from '../src/aggregator.js';
+import { SessionCoordinator } from '../src/coordinator.js';
 import { FixtureBackend } from './fixture-backend.js';
 import type { ServerConfig } from '../src/types.js';
+
+// Stub out brain routing so tests are deterministic regardless of CH1TTY_USE_OLLAMA_BRAIN.
+// Without this, a local Ollama instance can cause castRoute==='brain', adding brainMs to
+// the full-verbosity explanation and breaking the exact frozen field-set assertions.
+class NullRoutingCoordinator extends SessionCoordinator {
+  override async routeIntent(): Promise<null> { return null; }
+}
 
 // ── Frozen field name sets ────────────────────────────────────────────────────
 
@@ -117,11 +125,13 @@ function makeAggregator(): Aggregator {
   const configs: ServerConfig[] = [
     { id: 'solo', name: 'Solo DB', type: 'remote', access: 'readwrite', category: 'code', endpoint: 'https://solo.example.com/mcp', lazy: true },
   ];
+  const dlqPath = dlq();
   return new Aggregator(configs, {
     backendFactory: () => backend,
     embedEnabled: false,
-    ledgerDlqPath: dlq(),
+    ledgerDlqPath: dlqPath,
     focusProfiles: FOCUS_PROFILES,
+    coordinator: new NullRoutingCoordinator({}, { enabled: false }, dlqPath),
   });
 }
 
