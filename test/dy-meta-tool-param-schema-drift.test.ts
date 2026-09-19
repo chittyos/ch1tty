@@ -122,7 +122,8 @@ describe('DY — meta-tool parameter schema drift guard', () => {
     const tool = tools.find((t) => t.name === 'ch1tty/reload');
     assert.ok(tool, 'ch1tty/reload must be present');
     const props = Object.keys(tool.inputSchema.properties ?? {});
-    assert.equal(props.length, 0, `ch1tty/reload must have no properties, found: ${props.join(', ')}`);
+    assert.deepEqual(props, [], `ch1tty/reload must have no properties, found: ${props.join(', ')}`);
+    assert.deepEqual(tool.inputSchema.required ?? [], [], 'ch1tty/reload must have no required fields');
   });
 
   // ── ch1tty/cast ───────────────────────────────────────────────────────────
