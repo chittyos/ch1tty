@@ -72,7 +72,7 @@ import type { ServerConfig } from '../src/types.js';
 // CH1TTY_USE_OLLAMA_BRAIN=1.
 class StubCoordinator extends SessionCoordinator {
   constructor() {
-    super({}, { enabled: false });
+    super({ enabled: false }, { enabled: false });
   }
   override async routeIntent(_query: string, _candidates: ToolCandidate[]): Promise<RoutedTool[] | null> {
     return null;
