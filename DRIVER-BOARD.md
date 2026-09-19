@@ -6816,19 +6816,26 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 - Probed actual key sets via FixtureBackend before writing tests (no guessing).
 - 8/8 green locally.
 
+**Also opened (parallel session):** PR #1411 (execute response shape drift guard)
+- Branch: `auto/FH-execute-response-shape-drift-guard`
+- File: `test/fh-execute-response-shape-drift-guard.test.ts` (12 tests, 4 suites)
+- Freezes: execute success key set `['content']`; error key set `['content','isError']`; text item `['text','type']`; isError value types; dryRun body JSON keys
+- CI green; CodeRabbit clean (no findings); awaiting merge.
+
 **Workstream status:**
   - [x] **FD** (×2) — PRs #1407 + #1408 merged. DONE.
   - [x] **FE** — PR #1409 merged. DONE.
   - [x] **FG** — PR #1410 merged. DONE.
-  - [ ] **FH** — PR #1412 open (CI pending).
+  - [ ] **FH** — PR #1412 open (CI pending); PR #1411 open (CI green, awaiting merge).
 
 **Human-action items (persistent):**
 1. **DISABLE hourly cron** — ~1729 runs; burning ~50k tokens/run
 2. **Merge PR #1412 (FH)** once CI green — cast explain verbosity key-set drift guard
-3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
-4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
-5. **Notion workspace** out of free blocks — upgrade or clear
-6. **Stale branch cleanup** — 1100+ remote auto/ branches
-7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+3. **Merge PR #1411** — execute response shape drift guard (CI green, no findings)
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+6. **Notion workspace** out of free blocks — upgrade or clear
+7. **Stale branch cleanup** — 1100+ remote auto/ branches
+8. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard work, no exceptional event.
-- **Next run:** Merge #1412 if CI green. Next gap: FI — consider verbosity:full exact key-set freeze (completes the verbosity trilogy; zzzz does count, FH does low+medium exact, FI would do full exact), or explore /api/v1/status exact key-set freeze.
+- **Next run:** Merge #1412 and #1411 if CI green. Next gap: FI — verbosity:full exact key-set freeze or /api/v1/status exact key-set freeze.
