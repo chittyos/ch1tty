@@ -5416,6 +5416,37 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
 
 ---
 
+## Run log — 2026-09-19 (automated run — PRODUCTIVE: merged EP/EQ/ER/ES, opened ET)
+
+- **Workstream advanced:** ET — cast:executed latencyBreakdown sub-object shape drift guard
+- **Branch:** `auto/ET-latencyBreakdown-shape-drift`
+- **Build:** `tsc` clean | **Tests:** 4420 pass / 0 fail / 3 skip (+6 ET tests; main had 4414 after EP/EQ/ER/ES squash-merges)
+- **Startup state:**
+  - main at EO (4379 pass). 4 open PRs from earlier today's sessions: EP (#1391, clean), EQ (#1392, blocked), ER (#1393, clean), ES (#1394, blocked).
+  - Board: workstreams A–O all done. Next suggestion: workstream P (ledger-mcp factory+test) — confirmed already done (mcp-tool-layer.test.ts exists).
+- **What was done:**
+  1. **Merged EP (#1391)** — 12 tests, cast:executed + cast:discovered related.prompts/resources shapes. mergeable_state: clean → squash-merged.
+  2. **Fixed EQ (#1392)** — was blocked by 2 unresolved Codex bot review threads. CodeRabbit suggestions already addressed in commit 878a96b. Resolved 2 Codex bot threads (PRRT_kwDORhsD_s6j_Uqs + Uqu). Merged EQ's branch with main (DRIVER-LOG conflict resolved by keeping EP + EQ entries). Squash-merged EQ: 13 tests, scope sub-object shape.
+  3. **Merged ER (#1393)** — 1 file change (no DRIVER-LOG), squash-merged cleanly: 8 tests, cast explain verbosity:low/medium field name freeze.
+  4. **Fixed ES (#1394)** — was blocked by 3 unresolved Codex bot review threads (1 already replied to, 2 already fixed in commit 54822ba). Resolved all 3. Merged main into ES branch (clean). Squash-merged ES: 9 tests, cast explain verbosity:low/medium + focus active field name freeze + hermetic fixtures.
+  5. **Created ET** — 6 new tests: latencyBreakdown sub-object shape in cast:executed (no unexpected keys, required keys, number types, brainMs absent on keyword route) + absent on cast:resolved/plan.
+- **Test counts merged:** EP+12, EQ+13, ER+8 (approx, squash overlap), ES+9 → main at 4414 pass before ET.
+- **ET frozen shape:**
+  - PERMITTED (keyword route): `scoringMs`, `executionMs`, `registryMs` — all numbers ≥ 0
+  - CONDITIONAL: `brainMs` — absent when `embedEnabled:false`
+  - ABSENT from: cast:resolved (dryRun:true), cast:plan (confirm:true)
+- **Human-action items (updated):**
+  1. **Merge ET PR** when opened — 6 tests, all green
+  2. **DISABLE hourly cron** — burning ~50k tokens/run
+  3. **Enable GitHub Actions** (main npm test CI job; only CodeQL running)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Major dep bumps** — @types/node 22→26, typescript 5→7 for apps/
+- **Next run:** EU — freeze cast:executed `resolved` field type (string at aggregator line ~1661; `plan`/`resolved` emit object) or freeze latencyBreakdown in cast:chain_executed.
+
+
+---
+
 ## Run log — 2026-09-19 (run ~1710 — PRODUCTIVE: opened PR #1395 ET)
 
 - **Workstream advanced:** ET opened — topCandidates item shape drift guard
