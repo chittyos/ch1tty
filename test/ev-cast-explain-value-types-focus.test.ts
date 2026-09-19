@@ -163,9 +163,15 @@ describe('EV — explain field value types at verbosity:medium with focus:code (
       const body = parseBody(result);
       const exp = getExplanation(body);
 
-      // Also spot-check shared low-verbosity types still hold
-      assert.equal(typeof exp['winnerScore'], 'number', 'winnerScore must be a number');
-      assert.equal(typeof exp['focus'], 'string', 'focus must be a string');
+      // Spot-check shared low-verbosity types still hold at medium verbosity
+      assert.equal(typeof exp['winnerScore'], 'number', 'winnerScore must be a number at medium verbosity');
+      assert.equal(typeof exp['focus'], 'string', 'focus must be a string at medium verbosity');
+
+      // focusBoost: finite number > 0 (present at both low and medium verbosity; asserted here so
+      // a type change in the medium path is caught independently of Suite 1's low-verbosity check)
+      assert.equal(typeof exp['focusBoost'], 'number', 'focusBoost must be a number at medium verbosity');
+      assert.ok(Number.isFinite(exp['focusBoost'] as number), 'focusBoost must be finite at medium verbosity');
+      assert.ok((exp['focusBoost'] as number) > 0, 'focusBoost must be > 0 at medium verbosity');
 
       // candidatesInFocusCount: integer ≥ 0
       assert.equal(typeof exp['candidatesInFocusCount'], 'number', 'candidatesInFocusCount must be a number');
