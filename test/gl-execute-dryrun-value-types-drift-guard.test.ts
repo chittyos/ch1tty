@@ -178,6 +178,11 @@ test('GL-5: execute dry-run with session — sessionContext.callCount is a finit
       `GL-5: sessionContext.callCount must be >= 0; got ${callCount}. ` +
         'EC checks typeof number only — GL-5 adds the >= 0 constraint.',
     );
+    assert.ok(
+      Number.isInteger(callCount),
+      `GL-5: sessionContext.callCount must be an integer; got ${callCount}. ` +
+        'EC checks typeof number only — GL-5 adds the integer constraint.',
+    );
   } finally {
     await agg.shutdown();
   }
