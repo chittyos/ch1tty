@@ -92,10 +92,13 @@ test('FZ-1: coordinator top-level primitive types and constraints', async () => 
 test('FZ-2: coordinator.topTools is a string[]', async () => {
   const agg = makeAgg();
   try {
+    // Execute a real tool so coordinator.topTools is populated (built from session call patterns).
+    await agg.callTool('ch1tty/execute', { tool: 'neon/list_projects', args: {}, sessionId: 'fz2-seed' });
     const snap = await getStatus(agg);
     const coord = snap.coordinator as Record<string, unknown>;
 
     assert.ok(Array.isArray(coord.topTools), 'coordinator.topTools must be an array');
+    assert.ok((coord.topTools as unknown[]).length >= 1, 'coordinator.topTools must be non-empty after a tool call');
     for (const entry of (coord.topTools as unknown[])) {
       assert.equal(typeof entry, 'string', 'each coordinator.topTools entry must be a string');
     }
@@ -109,11 +112,14 @@ test('FZ-2: coordinator.topTools is a string[]', async () => {
 test('FZ-3: coordinator.toolsByServer is Record<string, finite non-negative number>', async () => {
   const agg = makeAgg();
   try {
+    // Execute a real tool so toolsByServer is populated (built from session call patterns).
+    await agg.callTool('ch1tty/execute', { tool: 'neon/list_projects', args: {}, sessionId: 'fz3-seed' });
     const snap = await getStatus(agg);
     const coord = snap.coordinator as Record<string, unknown>;
 
     assert.equal(typeof coord.toolsByServer, 'object', 'coordinator.toolsByServer must be an object');
     assert.ok(coord.toolsByServer !== null && !Array.isArray(coord.toolsByServer), 'coordinator.toolsByServer must be a plain object');
+    assert.ok(Object.keys(coord.toolsByServer as Record<string, unknown>).length >= 1, 'coordinator.toolsByServer must have at least one entry after a tool call');
     for (const [key, val] of Object.entries(coord.toolsByServer as Record<string, unknown>)) {
       assert.equal(typeof key, 'string', 'each toolsByServer key must be a string');
       assertFiniteNonNeg(val, `coordinator.toolsByServer[${key}]`);
@@ -173,9 +179,10 @@ test('FZ-5: coordinator.embeddingBrain value types (EmbeddingBrainStats)', async
 test('FZ-6: coordinator.sessions[] entry primitive types', async () => {
   const agg = makeAgg();
   try {
-    // Seed one session with a focus so the loop executes and sessionFocus is exercised.
-    // callTool with sessionId creates the coordinator context; focus sets sessionFocus.
+    // Seed one session with a focus and an actual tool call so the loop executes,
+    // sessionFocus is exercised, and session.topTools is non-empty.
     await agg.callTool('ch1tty/search', { query: 'neon', focus: 'code', sessionId: 'fz6-seed' });
+    await agg.callTool('ch1tty/execute', { tool: 'neon/list_projects', args: {}, sessionId: 'fz6-seed' });
     const snap = await getStatus(agg, { sessionId: 'fz6-seed' });
     const sessions = (snap.coordinator as Record<string, unknown>).sessions as unknown[];
 
@@ -203,6 +210,7 @@ test('FZ-6: coordinator.sessions[] entry primitive types', async () => {
     ) as Record<string, unknown> | undefined;
     assert.ok(seeded !== undefined, 'fz6-seed session must appear in coordinator sessions');
     assert.equal(seeded.sessionFocus, 'code', 'fz6-seed sessionFocus must equal "code"');
+    assert.ok((seeded.topTools as unknown[]).length >= 1, 'fz6-seed session.topTools must be non-empty after a tool call');
   } finally {
     await agg.shutdown?.();
   }
