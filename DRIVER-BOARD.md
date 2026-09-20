@@ -6899,3 +6899,30 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 **Next run (FN):** After FM merges — freeze cast explain single-candidate key sets at verbosity:full (EX/EY covered low+medium for single-candidate; verbosity:full single-candidate path not yet frozen), OR freeze topCandidates per-item key set (tool, score, server fields — no deepEqual guard exists for the per-item shape).
 
+
+---
+
+## Run ~1732 — 2026-09-20
+
+**Build:** tsc clean | **Tests:** 4647 pass / 0 fail / 3 skip (+6 from FN) | **Audit:** 0 vulnerabilities
+
+**Workstream FN — OPENED PR:**
+- Branch: `auto/FN-cast-explain-remaining-focus-value-types`
+- File: `test/fn-cast-explain-remaining-focus-value-types.test.ts` (6 tests, 3 suites, 286 lines)
+- Gap filled: EW froze value types for 24 of 31 focus-only fields at verbosity:full. FN completes the set — 7 remaining fields:
+  - FN-1: `focusBias` (number ≥ 0, finite) + `focusConfidence` (∈[0,1]); both absent on no_match
+  - FN-2: `focusMarginRatio` (∈[0,1]), `rawFocusMarginRatio` (finite), `runnerUpFocusBoostRatio` (∈[0,1]); all absent on no_match
+  - FN-3: `outOfFocusMeanScore` + `outOfFocusBottomScore` (both ≥ 0, finite); triple ordering (bottom ≤ mean ≤ topOutOfFocusScore); both absent on no_match
+- CLAUDE.md: 5-tool surface unchanged; no new fields added — metric freeze compliant
+- All 31 focus-only fields at verbosity:full now have value type coverage (EW: 24, FN: 7)
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ + H–N ✓ | FM merged (PR #1417); FN → PR open (CI pending)
+
+**Human-action items (persistent):**
+1. **Merge PR (FN)** — once CI green
+2. **DISABLE hourly cron** — ~1732 runs; burning ~50k tokens/run
+3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+5. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run (FO):** After FN merges — freeze cast explain value type cross-field invariants not yet tested (e.g. winnerScore === topCandidates[0].score, scoreDominanceIndex constraints, focusConfidence + focusBias relationship across scenarios) OR begin a new domain beyond cast explain.
