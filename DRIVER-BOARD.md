@@ -6931,32 +6931,70 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 ## Run ~1733 — 2026-09-20
 
-**Build:** tsc clean | **Tests:** 4667 pass / 0 fail / 3 skip (4670 total, +20 from FP) | **Audit:** 0 vulnerabilities
+**Build:** tsc clean | **Tests:** 4671 pass / 0 fail / 3 skip (+4 FQ; baseline at run start: 4641 on origin/main) | **Audit:** 0 vulnerabilities
 
-**PR #1421 (FN) — MERGED** at 07:38Z. All 3 CI checks green on merge commit.
+**Actions taken:**
+- Read CLAUDE.md + CHITTY.md; guardrails confirmed. `npm ci` + `npm run build` clean. `npm test` on origin/main: 4641 pass.
+- Found 3 open PRs: #1418 (FN dup, dirty), #1420 (FP, clean), #1421 (FN redo, clean).
+  - Closed PR #1418 (superseded by #1421; merge conflict with main; added explanation comment).
+  - Merged PR #1421 (FN: 6 tests, 7 remaining focus-only full-verbosity value types) → squash → 2f2b1ca.
+  - Merged PR #1420 (FP: 20 tests, multi-candidate verbosity:low+medium value types) → squash → b644507.
+- Pulled updated main (4667 pass). Identified gap: single-candidate VALUE TYPES at verbosity:full (EY froze names; no type guard existed).
+- Created `test/fq-cast-explain-single-candidate-value-types-full.test.ts` — 4 tests:
+  - FQ-1: 9 scalar types for full-verbosity no-focus single-candidate; scoreDominanceIndex===1, topCandidatesMeanScore===winnerScore.
+  - FQ-1b: absence guards (runner-up, distribution, focus fields absent).
+  - FQ-2: 15 additional focus+full-verbosity field types (focusRankPercentile, inFocus{Top,Mean,Bottom}Score, outOfFocusCandidatesCount===0, winnerFocusBoostRatio).
+  - FQ-2b: cross-field invariants (score decomposition, in-focus group ordering, focusRankDelta identity).
+- All 4 FQ tests pass; full suite: 4671/0/3. Pushed `auto/FQ-single-candidate-value-types-full`; opened PR #1422.
+- Notion board update BLOCKED: workspace out of free blocks (upgrade required).
 
-**FP — merged directly to main** (commit `b644507`, no PR): freeze value types for multi-candidate verbosity:low and verbosity:medium cast explain. 4 suites (FP-1..FP-4): 8 keys at verbosity:low no-focus, +4 focus keys, 11 non-distribution keys at verbosity:medium no-focus, +12 focus keys. No new fields — metric freeze compliant.
+**PR #1422 (FQ) status:** CI pending (CodeQL); `mergeable_state: clean` expected once CI completes.
 
-**Freeze series coverage as of this run (comprehensive):**
-- Field NAMES: DW (verbosity:full multi-candidate 56/87), ER/ES (verbosity:low/medium), EX/EY (single-candidate)
-- Value TYPES verbosity:full: FM (36 no-focus fields), FN (7 focus-only fields), EW (24 focus-only fields), FA (single-candidate)
-- Value TYPES verbosity:low/medium: FP (multi-candidate), EZ (single-candidate)
-- topCandidates per-item: FD + ET + FB (key sets + types + ordering invariants)
-- topCandidates[0].score === winnerScore: FD-4 ✓
-- Other tool responses: EE (reload), FE (health), FG (sessions), DZ/ED (status), FH-execute (execute)
-- search: FB/FI/FJ/FK (envelopes + suggestions + mode keys)
-
-**Remaining gaps for FQ:**
-- Cast explain no_match path exact key set at each verbosity — BJ checks presence/absence but no test freezes the exact key set of the explain object when `cast === 'no_match'`
-- scoreDominanceIndex + effectiveN mathematical invariants (no test checks scoreDominanceIndex ∈ [0,1] or that effectiveN ≤ candidateCount)
-
-**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ + H–N ✓ | FM ✓ FN ✓ FP ✓; next: FQ
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ + H–O ✓ | FN+FP merged this run; FQ → PR #1422 (CI pending)
 
 **Human-action items (persistent):**
-1. **DISABLE hourly cron** — ~1733 runs; burning ~50k tokens/run
-2. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
-3. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
-4. **Stale branch cleanup** — 1100+ remote auto/ branches
-5. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+1. **Merge PR #1422 (FQ)** — once CI green (CodeQL check)
+2. **DISABLE hourly cron** — ~1733 runs; burning ~50k tokens/run on incremental test additions
+3. **Upgrade Notion plan** — board is out of free blocks; run logs can no longer be appended
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Enable GitHub Actions** (main npm test CI job — still only CodeQL)
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
-**Next run (FQ):** Freeze cast explain no_match path exact key sets at all verbosities (verbosity:low, medium, full — each with and without focus) OR freeze scoreDominanceIndex ∈ [0,1] and effectiveN ≤ candidateCount invariants.
+**Next run:** After FQ merges, evaluate whether full-verbosity multi-candidate+focus cross-field invariants have remaining gaps, OR shift to a new functional workstream (e.g. apps/comms-mcp coverage gaps, gateway-level scenario testing, or a new integration).
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ + H–O ✓ | FM ✓ FN ✓ FP ✓; FQ → PR #1422 (CI pending)
+
+**Human-action items (persistent):**
+1. **Merge PR #1422 (FQ)** — once CI green
+2. **DISABLE hourly cron** — ~1733 runs; burning ~50k tokens/run
+3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+5. **Stale branch cleanup** — 1100+ remote auto/ branches
+6. **Upgrade Notion plan** — workspace out of free blocks; run logs can no longer be appended to Notion board
+
+**Next run (FQ merge / FR):** After FQ merges, consider whether remaining gaps warrant more test-freeze PRs, or shift to a functional workstream.
+
+---
+
+## Run ~1734 — 2026-09-20 (this run)
+
+**Build:** tsc clean | **Tests:** 4671 pass / 0 fail / 3 skip (+4 FQ vs 4667 post-FP) | **Audit:** 0 vulnerabilities
+
+**Actions taken:**
+- Startup: read CLAUDE.md + CHITTY.md; guardrails confirmed. `npm ci` + `npm run build` clean. `npm test` on origin/main (8719c63): 4641 pass.
+- Found 3 open PRs: #1418 (FN dup, `mergeable_state: dirty`), #1420 (FP, clean), #1421 (FN redo, clean).
+- Closed PR #1418 (superseded by #1421; merge conflict; posted explanation comment).
+- Merged PR #1421 (FN: 6 tests) via squash → 2f2b1ca.
+- Merged PR #1420 (FP: 20 tests) via squash → b644507.
+- Pulled updated main (4667 pass). Identified gap: single-candidate VALUE TYPES at verbosity:full (EY froze names only).
+- Created `test/fq-cast-explain-single-candidate-value-types-full.test.ts` (4 tests, 2 suites):
+  - FQ-1/FQ-1b: 9 full-verbosity no-focus value types + absence guards (scoreDominanceIndex===1, topCandidatesMeanScore===winnerScore)
+  - FQ-2/FQ-2b: 15 focus+full field types + cross-field invariants (in-focus group ordering, score decomposition)
+- Full suite: 4671/0/3. Pushed `auto/FQ-single-candidate-value-types-full`; opened PR #1422; subscribed.
+- Notion board update BLOCKED (workspace out of free blocks); used DRIVER-BOARD.md in-repo instead.
+
+**PR #1422 (FQ) status:** CI pending (CodeQL).
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ + H–O ✓ | FN+FP merged; FQ → PR #1422 open
+
+**Next run:** After FQ merges: consider gap FQ noted above (no_match key sets, scoreDominanceIndex math invariants per run ~1733 analysis) OR shift to a functional workstream such as apps/comms-mcp coverage or gateway scenario testing.
