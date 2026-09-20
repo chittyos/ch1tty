@@ -173,10 +173,14 @@ test('FZ-5: coordinator.embeddingBrain value types (EmbeddingBrainStats)', async
 test('FZ-6: coordinator.sessions[] entry primitive types', async () => {
   const agg = makeAgg();
   try {
-    const snap = await getStatus(agg);
+    // Seed one session with a focus so the loop executes and sessionFocus is exercised.
+    // callTool with sessionId creates the coordinator context; focus sets sessionFocus.
+    await agg.callTool('ch1tty/search', { query: 'neon', focus: 'code', sessionId: 'fz6-seed' });
+    const snap = await getStatus(agg, { sessionId: 'fz6-seed' });
     const sessions = (snap.coordinator as Record<string, unknown>).sessions as unknown[];
 
     assert.ok(Array.isArray(sessions), 'coordinator.sessions must be an array');
+    assert.ok(sessions.length >= 1, 'at least one session must exist for type assertions to execute (fz6-seed)');
     for (const entry of sessions) {
       const s = entry as Record<string, unknown>;
       assert.equal(typeof s.sessionId, 'string', 'session.sessionId must be a string');
