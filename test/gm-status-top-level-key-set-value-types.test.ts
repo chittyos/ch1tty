@@ -61,6 +61,7 @@ import { FixtureBackend, FIXTURE_SERVERS } from './fixture-backend.js';
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 let _seq = 0;
+/** Returns a unique temp-file path for this test's ledger DLQ, keeping each run isolated. */
 function dlq(): string {
   return join(tmpdir(), `ch1tty-gm-${Date.now()}-${++_seq}.jsonl`);
 }
@@ -70,6 +71,7 @@ const BASE_CONFIGS: ServerConfig[] = [
   { id: 'stripe', name: 'Stripe',  type: 'remote', access: 'readwrite', category: 'ecosystem', endpoint: 'https://stripe.com/mcp', lazy: true },
 ];
 
+/** Creates a fully isolated Aggregator with two fixture servers and an injected focus profile. */
 function makeAgg(): Aggregator {
   const backend = new FixtureBackend();
   backend.defineServer('neon',   FIXTURE_SERVERS.neon);
@@ -87,6 +89,7 @@ function makeAgg(): Aggregator {
   });
 }
 
+/** Calls ch1tty/status and parses the JSON response body, failing if the tool errors. */
 async function getStatus(agg: Aggregator): Promise<Record<string, unknown>> {
   const result = await agg.callTool('ch1tty/status', {});
   assert.equal(result.isError, undefined, 'ch1tty/status must not return isError');
