@@ -6872,51 +6872,30 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 
+**Next run:** Merge #1416 (FL) if CI green. Next gap: FM — cast explain topCandidates array item shape (each item has `tool`, `score`, `server`, etc. — no test freezes the per-item key set inside the topCandidates array) or cast explain single-candidate key sets at verbosity:full (EX/EY froze low+medium for single-candidate; verbosity:full single-candidate not yet frozen).
+
+
 ---
 
 ## Run ~1731 — 2026-09-20
 
-**Build:** tsc clean | **Tests:** 4641 pass / 0 fail / 3 skip (+38 from FM; was 4607 at end of Run ~1730 — note: 4603 baseline, +4 from FL local-only)
+**Build:** tsc clean | **Tests:** 4603 pass / 0 fail / 3 skip (4606 total) | **Audit:** 0 vulnerabilities
 
-**Action taken — PR #1416 (FL) CLOSED as redundant:**
-FL (fl-cast-explain-full-verbosity-key-set-drift-guard.test.ts) attempted to freeze the exact 56/87-key sets at verbosity:full via deepEqual. Investigation revealed DW (dw-cast-explain-fieldnames-drift.test.ts, already on main) already provides logically equivalent coverage via:
-```
-assert.deepEqual(unexpected, [], 'unexpected fields')
-assert.deepEqual(missing,    [], 'missing fields')
-```
-where `unexpected` = actual − frozen and `missing` = frozen − actual. This is strictly equivalent to deepEqual on the sorted key array. FL was redundant → PR #1416 closed without merging.
+**PR #1416 (FL) — CLOSED without merging:** FL was closed at 02:48Z today. Root cause: DW already freezes the exact 56-key no-focus field name set at verbosity:full via deepEqual. FL's 4 tests were redundant — a rename at verbosity:full would already fail DW. Correct to close; FL's work is not lost.
 
-**Board correction — Run ~1730 FM gap was incorrect:**
-Run ~1730 identified FM gap as "topCandidates item shape" or "single-candidate verbosity:full key set" — BOTH already covered:
-- ET (et-cast-explain-topCandidates-item-shape.test.ts) already freezes per-item key set inside topCandidates array.
-- EY (ey-cast-explain-single-candidate-full-verbosity.test.ts) already freezes single-candidate field names at verbosity:full.
+**PR #1417 (FM) — monitoring:** open, CI 3/3 green (CodeQL ✅, Analyze(actions) ✅, Analyze(javascript-typescript) ✅). Codex: ✅ no findings on latest commit (3cf93d3). Review thread (Codex P2 — embed warmup) resolved this run — was outdated (fix already applied in 3cf93d3 by prior session). `mergeable_state: blocked` — awaiting human approval. PR is ready for merge.
+- 38 new tests in `test/fm-cast-explain-full-verbosity-remaining-value-types.test.ts`
+- Freezes value types for 36 verbosity:full fields not covered by EV (concentration/entropy, ratio/normalized, z-score/gap, distribution shape, absolute/remaining)
+- No new fields added — types of existing fields only; CLAUDE.md metric freeze compliant
 
-**True FM gap identified and filled — PR #1417 open:**
-DW freezes the exact 56-key no-focus name set at verbosity:'full'. EV covers value TYPES for ~20 of those 56 fields. The remaining ~36 fields had names frozen but types unverified by any test. FM closes this gap.
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ + H–N ✓ | FI/FJ/FK/FL(closed) merged-or-closed; FM → PR #1417 (CI green, awaiting human merge)
 
-**Opened:** PR #1417 (FM — cast explain verbosity:full remaining value types)
-- Branch: `auto/FM-cast-explain-full-verbosity-remaining-value-types`
-- File: `test/fm-cast-explain-full-verbosity-remaining-value-types.test.ts` (38 tests, 5 suites, 506 lines)
-- Gap filled: 36 verbosity:full explain fields had names frozen (DW) but value types NOT verified by any test.
-- 5 suites, all using FixtureBackend (neon+stripe+tasks) + NullRoutingCoordinator:
-  1. FM-1 Concentration/entropy (7 fields): HerfindahlIndex ∈ (0,1], topHeaviness ∈ (0,1], top2Heaviness ∈ (0,1], topCandidatesGini ∈ [0,1), nonZeroCandidateFraction ∈ [0,1], scoreEntropyNormalized ∈ [0,1], candidateScoreEntropy ≥ 0
-  2. FM-2 Ratio/normalized (10 fields): meanRatio ∈ (0,1], fieldStrengthRatio ∈ [0,1], lowestRatio ∈ [0,1], normalizedRange ≥ 0, IQRRatio ≥ 0, medianToMeanRatio > 0, winnerToMedianRatio ≥ 1, CoV ≥ 0, lowestToMeanRatio ≥ 0, lowestToMedianRatio ≥ 0
-  3. FM-3 Z-score/gap (9 fields): winnerScoreZScore ≥ 0, runnerUpScoreZScore (any sign), zScoreGap ≥ 0, winnerMeanGap ≥ 0, winnerRunnerUpGap ≥ 0, winnerScoreRatio ≥ 1, runnerUpMeanGap (any sign), conditional spread ratios ≥ 0
-  4. FM-4 Distribution shape (5 fields): skewness/kurtosis (any sign for both candidate and topCandidates sets), topCandidatesScoreStdDev ≥ 0
-  5. FM-5 Absolute/remaining (7 fields): medianCandidateScore ≥ 0, IQR ≥ 0, nonWinnerMean ≥ 0, winnerFieldGap ≥ 0, topCandidates non-empty Array; 2 cross-field consistency checks (winnerToMedianRatio = winnerScore/median, candidateScoreMeanRatio = mean/winnerScore)
-- 38/38 green locally; full suite: 4641 pass / 0 fail / 3 skip.
-- CLAUDE.md: 5-tool surface unchanged; metric freeze: no new fields added (types of existing fields only).
-
-**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ + H–N ✓ | FI/FJ/FK merged; FL closed (redundant with DW); FM open PR #1417.
-
-**Human-action items (persistent):**
-1. **DISABLE hourly cron** — ~1731 runs; burning ~50k tokens/run
-2. **Merge PR #1417 (FM)** once CI green — cast explain verbosity:full remaining value types (38 tests)
+**Human-action items:**
+1. **Merge PR #1417 (FM)** — CI green, Codex clean, all review threads resolved; ready for merge
+2. **DISABLE hourly cron** — ~1731 runs; burning ~50k tokens/run with no deliverable when FM merges
 3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
 4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
-5. **Notion workspace** out of free blocks — upgrade or clear
-6. **Stale branch cleanup** — 1100+ remote auto/ branches
-7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+5. **Stale branch cleanup** — 1100+ remote auto/ branches
 
-**Next run:** Merge #1417 (FM) if CI green. Next gap: FN — cast explain verbosity:full field coverage is now complete (DW names, EV+EW+FM types). Look to ep-series (executed/discovered/related shapes) or cast dryRun output shape at verbosity:full for remaining guards.
-- **PushNotification:** SENT — PR #1417 (FM) opened; 38 new type-freeze tests for verbosity:full explain fields.
+**Next run (FN):** After FM merges — freeze cast explain single-candidate key sets at verbosity:full (EX/EY covered low+medium for single-candidate; verbosity:full single-candidate path not yet frozen), OR freeze topCandidates per-item key set (tool, score, server fields — no deepEqual guard exists for the per-item shape).
+
