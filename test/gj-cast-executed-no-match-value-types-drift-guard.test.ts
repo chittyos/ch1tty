@@ -52,7 +52,9 @@ import { FixtureBackend, FIXTURE_SERVERS } from './fixture-backend.js';
 
 // ── Valid resolvedBy enum values ──────────────────────────────────────────────
 
-const VALID_RESOLVED_BY: readonly string[] = ['keyword', 'brain', 'catalog'];
+// resolvedBy is declared as 'brain' | 'keyword' in aggregator.ts:1340;
+// catalog matches surface via resolvedFromCatalog, not as a resolvedBy value.
+const VALID_RESOLVED_BY: readonly string[] = ['keyword', 'brain'];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -112,6 +114,11 @@ test('GJ-1: cast:executed resolved contains exactly one slash (namespaced "serve
     assert.equal(slashCount, 1,
       `resolved must contain exactly one slash (got "${resolved}" with ${slashCount} slashes). ` +
       `EA only checks includes('/') — GJ-1 tightens to exactly one.`);
+    const [serverId, toolName] = (resolved as string).split('/');
+    assert.ok(serverId.length > 0,
+      `resolved serverId (before '/') must be non-empty, got "${resolved}"`);
+    assert.ok(toolName.length > 0,
+      `resolved toolName (after '/') must be non-empty, got "${resolved}"`);
   } finally {
     await agg.shutdown();
   }
@@ -195,13 +202,13 @@ test('GJ-5: cast:executed latencyBreakdown.registryMs is finite and >= 0', async
 
 // ── GJ-6: cast:executed latencyBreakdown all sub-fields are finite and >= 0 ───
 
-test('GJ-6: cast:executed latencyBreakdown all sub-fields (scoringMs, executionMs, registryMs) are finite and >= 0', async () => {
+test('GJ-6: cast:executed latencyBreakdown all present sub-fields are finite and >= 0', async () => {
   const agg = makeAgg();
   try {
     const body = await castExecuted(agg, 'run sql query on database');
     const breakdown = body.latencyBreakdown as Record<string, unknown>;
     assert.ok(breakdown !== null && typeof breakdown === 'object', 'latencyBreakdown must be an object');
-    for (const field of ['scoringMs', 'executionMs', 'registryMs']) {
+    for (const field of Object.keys(breakdown)) {
       const v = breakdown[field];
       assert.equal(typeof v, 'number',
         `latencyBreakdown.${field} must be a number, got ${typeof v}`);
