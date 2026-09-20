@@ -5808,12 +5808,16 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
 
 ---
 
-## Run log — 2026-09-20 (automated — FW and FU/brain-varied merged, next workstream TBD)
+## Run log — 2026-09-20 (automated — FU #1428 + FW #1429 merged; all PRs closed)
 
-- **Workstream advanced:** Merged 2 open PRs (#1429 FW + #1428 FU/brain-varied); both had green CI and Codex completed with no findings
-- **PR #1429 (FW):** Merged `auto/FW-nomatch-explain-value-types` — freeze cast explain value types for no_match (4 tests: FW-1 through FW-4, route × focus)
-- **PR #1428 (FU brain-varied):** Merged `auto/FU-brain-varied-confidence-explain-key-set` — freeze brain-route key sets with varied confidence (6 tests: FU-1 through FU-6, closes z-score/kurtosis/skewness gap from FT)
-- **Build:** tsc clean | **Tests (after both merges):** 4705 pass / 0 fail / 3 skip (was 4699 before this run; +6 from FU/brain-varied)
+- **Workstream:** Monitoring + FU brain-varied-confidence (this session) + FW no_match value types (other session)
+- **FR #1423 merged** at 12:46:51Z — final quadrant close: FH/FR/FS/FT all ✓
+- **FU #1426 merged** at 12:50:54Z (other session) — fallback verbosity:full key sets (56/87), 6 tests
+- **FV #1427 closed** without merging at 12:53:51Z — made redundant by EY (single-candidate full-verbosity already covered)
+- **FW #1429 merged** at 13:04:23Z (other session) — no_match value types (route×focus), 4 tests
+- **FU #1428 merged** at 13:09:55Z (this session) — brain-route varied-confidence key sets; FU-5=57keys (DW+brainMs), FU-6=88keys; adds kurtosis/skewness/z-score + focusBias/focusConfidence that FT couldn't trigger; 6 tests
+- **No open PRs** as of 13:10 UTC
+- **Test count on main:** 4705 pass / 0 fail / 3 skip
 - **Drift-guard matrix status (cast explain coverage):**
   - FH ✓ verbosity:low/medium key sets (fallback-route resolved)
   - FU ✓ verbosity:full key sets (fallback-route resolved: 56/87 no-focus/focus)
@@ -5821,10 +5825,10 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   - FU/brain ✓ brain-route resolved key sets (varied confidence: low/medium/full × focus; z-score/kurtosis/focusBias present)
   - FR ✓ fallback no_match key sets (all 3 verbosities × focus/no-focus)
   - FS ✓ brain no_match key sets (all 3 verbosities × focus/no-focus)
-  - FW ✓ no_match value types (route × focus, verbosity:full)
-  - FM ✓ verbosity:full remaining value types (no-focus, ~36 fields)
-  - FN ✓ 7 remaining focus-only value types
-- **Open PRs:** none
+  - FW ✓ no_match value types (route × focus, all verbosities)
+  - FM/FN ✓ verbosity:full resolved value types (keyword route; ~36+7 focus-only fields)
+  - EV/EW ✓ verbosity:full value types for keyword route resolved
+  - Brain-route resolved value types at verbosity:full: NOT YET covered
 - **Human-action items (carried forward):**
   1. **DISABLE hourly cron** — ~1743+ runs; burning ~50k tokens/run
   2. **Enable GitHub Actions** (main npm test CI job; only CodeQL/CodeQL-actions running)
