@@ -202,8 +202,8 @@ test('GM-6: availableFocusProfiles is an array of strings and reflects injected 
         `each availableFocusProfiles entry must be a string, got ${typeof p} (${JSON.stringify(p)})`);
     }
     // makeAgg injects a 'code' profile — verify it is surfaced
-    assert.ok((profiles as string[]).includes('code'),
-      `injected "code" profile must appear in availableFocusProfiles, got ${JSON.stringify(profiles)}`);
+    assert.deepEqual(profiles, ['code'],
+      `availableFocusProfiles must exactly match injected profiles, got ${JSON.stringify(profiles)}`);
   } finally {
     await agg.shutdown();
   }
