@@ -6839,3 +6839,37 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 8. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 - **PushNotification:** NOT SENT — routine drift guard work, no exceptional event.
 - **Next run:** Merge #1412 and #1411 if CI green. Next gap: FI — verbosity:full exact key-set freeze or /api/v1/status exact key-set freeze.
+
+---
+
+## Run ~1730 — 2026-09-20
+
+**Build:** tsc clean | **Tests:** 4607 pass / 0 fail / 3 skip (+4 from FL; was 4603 after FI+FJ+FK merged)
+
+**Merged this run:** PRs #1413 (FI — search explain envelope, 12 tests), #1414 (FJ — mode key presence/absence, 12 tests), #1415 (FK — search suggestions sub-object shape, 16 tests). All 3 had CI green (CodeQL ✅, Analyze ✅ × 2) and resolved review threads. Merged sequentially.
+
+**Opened:** PR #1416 (FL — cast explain verbosity:full exact key-set drift guard)
+- Branch: `auto/FL-cast-explain-full-verbosity-key-set-drift-guard`
+- File: `test/fl-cast-explain-full-verbosity-key-set-drift-guard.test.ts` (4 tests, 304 lines)
+- Gap filled: FH froze exact key sets at verbosity:low and verbosity:medium. `zzzz` counts fields at verbosity:full (56 no-focus, 87 focus) but does not freeze exact names. FL freezes the exact top-level key set at verbosity:full via deepEqual — a rename at full verbosity now fails immediately.
+- 4 suites:
+  1. FL-1: verbosity:full no-focus → exact 56-key set (deepEqual)
+  2. FL-2: verbosity:full focus:code → exact 87-key set (deepEqual)
+  3. FL-3: no-focus → all 31 focus-only keys must be absent
+  4. FL-4: focus:code → all 31 focus-only keys must be present
+- Key sets probed live from FixtureBackend on 2026-09-20; match zzzz counts.
+- 4/4 green locally; full suite: 4607 pass / 0 fail / 3 skip.
+- CLAUDE.md: 5-tool surface unchanged; metric freeze: no new fields added.
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ + H–N ✓ | FI/FJ/FK merged; FL open.
+
+**Human-action items (persistent):**
+1. **DISABLE hourly cron** — ~1730 runs; burning ~50k tokens/run
+2. **Merge PR #1416 (FL)** once CI green — cast explain verbosity:full key-set drift guard
+3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+5. **Notion workspace** out of free blocks — upgrade or clear
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+
+**Next run:** Merge #1416 (FL) if CI green. Next gap: FM — cast explain topCandidates array item shape (each item has `tool`, `score`, `server`, etc. — no test freezes the per-item key set inside the topCandidates array) or cast explain single-candidate key sets at verbosity:full (EX/EY froze low+medium for single-candidate; verbosity:full single-candidate not yet frozen).
