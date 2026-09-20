@@ -221,6 +221,8 @@ test('FZ-6: coordinator.sessions[] entry primitive types', async () => {
 test('FZ-7: short mode — coordinator present without sessions; primitives retain types', async () => {
   const agg = makeAgg();
   try {
+    // Execute a tool so coordinator.topTools is populated before taking the short-mode snapshot.
+    await agg.callTool('ch1tty/execute', { tool: 'neon/list_projects', args: {}, sessionId: 'fz7-seed' });
     const snap = await getStatus(agg, { short: true });
     const coord = snap.coordinator as Record<string, unknown>;
 
@@ -232,6 +234,7 @@ test('FZ-7: short mode — coordinator present without sessions; primitives reta
     assertFiniteNonNeg(coord.evictedSessions, 'short.coordinator.evictedSessions');
     assertFiniteNonNeg(coord.sessionTtlMs, 'short.coordinator.sessionTtlMs');
     assert.ok(Array.isArray(coord.topTools), 'short.coordinator.topTools must be an array');
+    assert.ok((coord.topTools as unknown[]).length >= 1, 'short.coordinator.topTools must be non-empty after a tool call');
     for (const entry of (coord.topTools as unknown[])) {
       assert.equal(typeof entry, 'string', 'short.coordinator.topTools entries must be strings');
     }
