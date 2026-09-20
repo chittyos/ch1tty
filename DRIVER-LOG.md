@@ -5886,7 +5886,7 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
 ## Run log — 2026-09-20 (automated — GA branch opened)
 
 - **Workstream advanced:** GA — coordinator.ledger value types
-- **Branch/PR:** `auto/GA-coordinator-ledger-value-types` → PR pending push
+- **Branch/PR: `auto/GA-coordinator-ledger-value-types` → https://github.com/chittyos/ch1tty/pull/1433
 - **Build:** tsc clean | **Tests:** 4712 pass / 0 fail / 3 skip (+3 new)
 - **Prior-run status checks:**
   - PR #1431 (FY — status value types, 12 tests): CI 3/3 green, all 7 review threads resolved. Awaiting human merge.
