@@ -52,13 +52,14 @@ function makeAgg(): Aggregator {
   backend.defineServer('stripe', FIXTURE_SERVERS.stripe);
   backend.defineServer('tasks',  FIXTURE_SERVERS.tasks);
   const dlq = join(tmpdir(), `ch1tty-fl-${process.pid}-${Date.now()}.jsonl`);
-  return new Aggregator(CONFIGS, {
+  const opts: Record<string, unknown> = {
     backendFactory: () => backend,
     embedEnabled: false,
     ledgerDlqPath: dlq,
     focusProfiles: FOCUS_PROFILES,
-    coordinatorFactory: (cfg, opts) => new NullRoutingCoordinator(cfg, opts),
-  });
+    coordinator: new NullRoutingCoordinator(),
+  };
+  return new Aggregator(CONFIGS, opts as Parameters<typeof Aggregator>[1]);
 }
 
 // ── Exact key sets measured 2026-09-20 ──────────────────────────────────────
