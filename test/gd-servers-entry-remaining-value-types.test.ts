@@ -19,9 +19,12 @@
  * GD closes those gaps:
  *
  *   GD-1  toolCacheAge is null when server is not connected (lazy, no cache)
- *   GD-2  toolCacheAge is a finite non-negative number when server is connected
- *   GD-3  missingEnvVars is absent (key not present) when all envHeaders vars
- *          are satisfied (or no envHeaders are configured)
+ *   GD-2  toolCacheAge is null or a finite non-negative number (connected does NOT
+ *          guarantee a populated cache — RemoteProxy returns null when listTools
+ *          hasn't run yet; the FixtureBackend exercises the non-null path)
+ *   GD-3  missingEnvVars is absent when envHeaders is not configured
+ *   GD-3b missingEnvVars is absent when envHeaders IS configured but every
+ *          referenced env var is present in process.env
  *   GD-4  missingEnvVars is present and a non-empty array when an envHeaders
  *          env-var is unset
  *   GD-5  each entry in missingEnvVars is a non-empty string
@@ -102,9 +105,15 @@ test('GD-1: servers[] entry — toolCacheAge is null when server is not connecte
   }
 });
 
-// ── GD-2: toolCacheAge is a finite non-negative number when connected ─────────
+// ── GD-2: toolCacheAge is null or a finite non-negative number when connected ──
+//
+// RemoteProxy.getStatus() (src-stdio/remote-proxy.ts:480-485) returns
+// connected:true with toolCacheAge:null when listTools hasn't run yet — a
+// connected-but-uncached server is a valid production state. The FixtureBackend
+// returns 0 for defined servers, exercising the non-null path. The correct
+// invariant is null | finite non-negative number, NOT "number if connected".
 
-test('GD-2: servers[] entry — toolCacheAge is a finite non-negative number when connected', async () => {
+test('GD-2: servers[] entry — toolCacheAge is null or a finite non-negative number when connected', async () => {
   const configs: ServerConfig[] = [
     { id: 'neon', name: 'Neon', type: 'remote', access: 'readwrite', category: 'code', endpoint: 'https://neon.tech/mcp', lazy: true },
   ];
@@ -114,9 +123,17 @@ test('GD-2: servers[] entry — toolCacheAge is a finite non-negative number whe
     assert.equal(servers.length, 1, 'must have exactly one server entry');
     const entry = servers[0];
     assert.equal(entry.connected, true, 'server must be connected');
-    assert.equal(typeof entry.toolCacheAge, 'number', 'toolCacheAge must be a number when connected');
-    assert.ok(Number.isFinite(entry.toolCacheAge as number), 'toolCacheAge must be finite');
-    assert.ok((entry.toolCacheAge as number) >= 0, 'toolCacheAge must be non-negative (>= 0)');
+    // toolCacheAge must be null OR a finite non-negative number — both are valid
+    const age = entry.toolCacheAge;
+    if (age !== null) {
+      assert.equal(typeof age, 'number', 'toolCacheAge must be a number when non-null');
+      assert.ok(Number.isFinite(age as number), 'toolCacheAge must be finite when non-null');
+      assert.ok((age as number) >= 0, 'toolCacheAge must be non-negative when non-null');
+    }
+    assert.ok(
+      age === null || (typeof age === 'number' && Number.isFinite(age as number) && (age as number) >= 0),
+      `toolCacheAge must be null or a finite non-negative number, got ${JSON.stringify(age)}`,
+    );
   } finally {
     await agg.shutdown?.();
   }
@@ -140,6 +157,48 @@ test('GD-3: servers[] entry — missingEnvVars is absent when server has no envH
     }
   } finally {
     await agg.shutdown?.();
+  }
+});
+
+// ── GD-3b: missingEnvVars absent when envHeaders IS configured and var is set ──
+//
+// GD-3 only tests servers without envHeaders. A regression that emits
+// missingEnvVars for every server that HAS envHeaders — regardless of whether
+// the var is set — would still pass GD-3. GD-3b closes that gap.
+
+test('GD-3b: servers[] entry — missingEnvVars is absent when envHeaders var IS present in process.env', async () => {
+  const PRESENT_VAR = 'CH1TTY_GD_DRIFT_GUARD_PRESENT_ENV_VAR_001';
+  const saved = process.env[PRESENT_VAR];
+  process.env[PRESENT_VAR] = 'present-value';
+
+  const configs: ServerConfig[] = [
+    {
+      id: 'satisfied',
+      name: 'Satisfied Server',
+      type: 'remote',
+      access: 'readwrite',
+      category: 'ecosystem',
+      endpoint: 'https://satisfied.example.com/mcp',
+      envHeaders: { 'X-Satisfied': PRESENT_VAR },
+      lazy: true,
+    },
+  ];
+  const agg = makeAgg(configs, {});
+  try {
+    const servers = await getServers(agg);
+    assert.equal(servers.length, 1, 'must have exactly one server entry');
+    const entry = servers[0];
+    assert.ok(
+      !('missingEnvVars' in entry),
+      'missingEnvVars must be absent when envHeaders var IS present in process.env',
+    );
+  } finally {
+    await agg.shutdown?.();
+    if (saved === undefined) {
+      delete process.env[PRESENT_VAR];
+    } else {
+      process.env[PRESENT_VAR] = saved;
+    }
   }
 });
 
