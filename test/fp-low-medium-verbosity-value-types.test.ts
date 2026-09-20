@@ -56,7 +56,7 @@ function makeAgg(withFocus: boolean): Aggregator {
   backend.defineServer('neon',   FIXTURE_SERVERS.neon);
   backend.defineServer('stripe', FIXTURE_SERVERS.stripe);
   backend.defineServer('tasks',  FIXTURE_SERVERS.tasks);
-  const opts: Record<string, unknown> = {
+  const opts: NonNullable<ConstructorParameters<typeof Aggregator>[1]> = {
     backendFactory: () => backend,
     embedEnabled: false,
     ledgerDlqPath: join(tmpdir(), `ch1tty-fp-${Date.now()}.jsonl`),
@@ -66,7 +66,7 @@ function makeAgg(withFocus: boolean): Aggregator {
     opts.focusProfiles = FOCUS_PROFILES;
     opts.focus = 'code';
   }
-  return new Aggregator(CONFIGS, opts as Parameters<typeof Aggregator.prototype.callTool>[1]);
+  return new Aggregator(CONFIGS, opts);
 }
 
 async function castExplain(
