@@ -6874,6 +6874,7 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 **Next run:** Merge #1416 (FL) if CI green. Next gap: FM — cast explain topCandidates array item shape (each item has `tool`, `score`, `server`, etc. — no test freezes the per-item key set inside the topCandidates array) or cast explain single-candidate key sets at verbosity:full (EX/EY froze low+medium for single-candidate; verbosity:full single-candidate not yet frozen).
 
+
 ---
 
 ## Run ~1731 — 2026-09-20
@@ -6897,3 +6898,4 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 5. **Stale branch cleanup** — 1100+ remote auto/ branches
 
 **Next run (FN):** After FM merges — freeze cast explain single-candidate key sets at verbosity:full (EX/EY covered low+medium for single-candidate; verbosity:full single-candidate path not yet frozen), OR freeze topCandidates per-item key set (tool, score, server fields — no deepEqual guard exists for the per-item shape).
+
