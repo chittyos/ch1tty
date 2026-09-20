@@ -5639,3 +5639,32 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Major dep bumps** — @types/node 22→26, typescript 5→7 for apps/
 - **Next run:** FS — freeze cast explain key set for single-candidate at verbosity:full (FA freezes value TYPES at full single-candidate; no test does deepEqual key-set for single-candidate at full verbosity). Or check if #1423 is CI-green and auto-merge.
+
+
+---
+
+## Run log — 2026-09-20 (automated — MONITORING: FS #1424 confirmed open and green)
+
+- **Workstream advanced:** FS monitoring — no new work needed (PR already open from prior session)
+- **State at session start:**
+  - PR #1423 (FR, `auto/FR-nomatch-explain-key-set-drift`): open, CI 3/3 green, Codex P2 thread (brain-route gap) had reply + FS link, not yet resolved.
+  - PR #1424 (FS, `auto/FS-brain-route-nomatch-key-set`): open, CI 3/3 green, CodeRabbit clean (no actionable findings), Codex review running.
+- **What was done this session:**
+  1. Confirmed both PRs CI-green (CodeQL + Analyze(actions) + Analyze(javascript-typescript) all success).
+  2. Resolved Codex thread on #1423 (PRRT_kwDORhsD_s6kIFK8) — gap fully addressed by FS (#1424).
+  3. Subscribed to #1424 PR activity.
+  4. Appended this run entry to DRIVER-LOG.md.
+- **FS frozen key sets (8 tests in `test/fs-brain-route-nomatch-key-set-drift-guard.test.ts`):**
+  - brain no_match, verbosity:low/medium/full, no focus → 5 keys: {brainMs, candidateCount, method, rationale, topCandidates}
+  - brain no_match, verbosity:low/medium, focus:code → 5 keys (focus fields absent at low/medium)
+  - brain no_match, verbosity:full, focus:code → 8 keys: {brainMs, candidateCount, focus, focusBoost, method, rationale, topCandidates, winnerInFocus}
+- **Human-action items (carried forward):**
+  1. **DISABLE hourly cron** — ~1737+ runs; burning ~50k tokens/run
+  2. **Merge PR #1423 (FR)** — no_match explain key-set (fallback route), 7 tests, CI green
+  3. **Merge PR #1424 (FS)** — no_match explain key-set (brain route), 8 tests, CI green
+  4. **Enable GitHub Actions** (main npm test CI job; only CodeQL running)
+  5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 for apps/
+- **Next run:** FT — next drift-guard gap (to be identified). Await Codex review on #1424; if it posts findings, address them. If #1423/#1424 are merged, advance to next uncovered shape in the cast explain test matrix.
+
