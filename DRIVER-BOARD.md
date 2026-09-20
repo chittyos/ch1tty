@@ -6958,4 +6958,6 @@ Suites: FN-1 (out-of-focus triple + ordering + absent-when-all-in-focus), FN-2 (
 
 **PR #1418 (FN) final state:** CI 3/3 green, Codex clean, all threads resolved. Ready for human merge.
 
-**PushNotification:** SENT — both #1417 and #1418 are merge-ready; operator action needed.
+**PR #1418 CLOSED WITHOUT MERGING** at 07:38 UTC. Reason unknown (no comment posted). Branch `auto/FN-remaining-focus-value-types` still exists with all commits. Work is not lost — reopen or cherry-pick if intentional. Per protocol: NOT reopening unless human asks.
+
+**PushNotification:** SENT — PR #1418 (FN) closed without merging; operator action needed.
