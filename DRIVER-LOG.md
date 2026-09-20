@@ -5862,3 +5862,21 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
   5. **Upgrade Notion plan** — workspace out of free blocks
 - **Next run:** Merge #1430 (FX) when CI green + Codex clean. Then: drift-guard matrix is largely complete; next candidates are SessionCoordinator snapshot/eviction edge cases or HTTP server edge paths.
+
+---
+
+## Run log — 2026-09-20 (automated — FX #1430 merged)
+
+- **PR #1430 (FX) merged** — CI all green, Codex ✅ no findings; squash-merged `auto/FX-brain-route-fullverbosity-value-types`
+- **Tests on main:** 4709 pass / 0 fail / 3 skip
+- **Drift-guard matrix — verbosity:full value types now complete:**
+  - Fallback route: FM (no-focus, ~36 fields) + FN (7 remaining focus fields)
+  - Brain route: **FX (uniform+varied confidence; no-focus+focus:code; brainMs, method, core numeric finiteness, focusBias/focusConfidence)**
+- **Open PRs:** none
+- **Human-action items (carried forward):**
+  1. **DISABLE hourly cron** — ~1745+ runs; burning ~50k tokens/run
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Upgrade Notion plan** — workspace out of free blocks
+- **Next run:** Drift-guard matrix (explain key sets + value types) is now complete across all routing paths × verbosities × focus states. Next workstream candidates: SessionCoordinator getSnapshot() key-set drift guard, HTTP server edge paths, or config-validation coverage gaps.
