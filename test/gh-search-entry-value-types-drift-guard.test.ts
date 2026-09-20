@@ -1,5 +1,5 @@
 /**
- * GG drift guard: freeze ch1tty/search tools[] entry VALUE TYPES and
+ * GH drift guard: freeze ch1tty/search tools[] entry VALUE TYPES and
  * discovery-path servers[] entry KEY SET + VALUE TYPES.
  *
  * EB froze the key sets for tools[] entries (required + permitted fields) and
@@ -16,23 +16,23 @@
  * A rename of `server` → `id`, or `tools` → `count`, or a category changing
  * to an unrecognised string would all silently pass EB's existing guards.
  *
- * GG closes those gaps:
+ * GH closes those gaps:
  *
- *   GG-1  tools[] tool field is a non-empty string containing exactly one '/'
+ *   GH-1  tools[] tool field is a non-empty string containing exactly one '/'
  *          (namespaced "serverId/toolName" format; never just a bare tool name)
- *   GG-2  tools[] server field is a non-empty string NOT containing '/'
+ *   GH-2  tools[] server field is a non-empty string NOT containing '/'
  *          (plain serverId; must differ from the tool field)
- *   GG-3  tools[] serverName, category, description, inputSchema value types
+ *   GH-3  tools[] serverName, category, description, inputSchema value types
  *          (serverName non-empty string; category one of VALID_CATEGORIES;
  *           description is a string; inputSchema is a non-null object)
- *   GG-4  tools[] inFocus is exactly boolean true — not 1, not "true", not
+ *   GH-4  tools[] inFocus is exactly boolean true — not 1, not "true", not
  *          a truthy object — when a focus profile is active and tool is in focus
- *   GG-5  servers[] entry key set in discovery mode without focus:
+ *   GH-5  servers[] entry key set in discovery mode without focus:
  *          exactly {name, category, server, tools} (no extra keys)
- *   GG-6  servers[] entry value types in discovery mode without focus:
+ *   GH-6  servers[] entry value types in discovery mode without focus:
  *          server and name are non-empty strings; category is one of
  *          VALID_CATEGORIES; tools is a non-negative integer
- *   GG-7  servers[] entry with focus: inFocus is exactly boolean (not 0/1);
+ *   GH-7  servers[] entry with focus: inFocus is exactly boolean (not 0/1);
  *          exact key set is {name, category, server, tools, inFocus}
  *
  * Frozen 2026-09-20.
@@ -59,7 +59,7 @@ const VALID_CATEGORIES: readonly string[] = [
 
 let dlqSeq = 0;
 function dlq(): string {
-  return join(tmpdir(), `ch1tty-gg-${Date.now()}-${++dlqSeq}.jsonl`);
+  return join(tmpdir(), `ch1tty-gh-${Date.now()}-${++dlqSeq}.jsonl`);
 }
 
 const BASE_CONFIGS: ServerConfig[] = [
@@ -92,14 +92,14 @@ async function search(agg: Aggregator, args: Record<string, unknown>): Promise<R
   return JSON.parse((result.content[0] as { text: string }).text) as Record<string, unknown>;
 }
 
-// ── GG-1: tools[] tool field is namespaced ────────────────────────────────────
+// ── GH-1: tools[] tool field is namespaced ────────────────────────────────────
 
-test('GG-1: tools[] tool field is non-empty string containing exactly one slash (namespaced)', async () => {
+test('GH-1: tools[] tool field is non-empty string containing exactly one slash (namespaced)', async () => {
   const agg = makeAgg();
   try {
     const body = await search(agg, { query: 'database' });
     const tools = body.tools as Record<string, unknown>[];
-    assert.ok(Array.isArray(tools) && tools.length > 0, 'need at least one tool for GG-1');
+    assert.ok(Array.isArray(tools) && tools.length > 0, 'need at least one tool for GH-1');
     for (const entry of tools) {
       const tool = entry['tool'];
       assert.equal(typeof tool, 'string', `tool field must be a string, got ${typeof tool}`);
@@ -112,14 +112,14 @@ test('GG-1: tools[] tool field is non-empty string containing exactly one slash 
   }
 });
 
-// ── GG-2: tools[] server field is a plain serverId (no slash) ─────────────────
+// ── GH-2: tools[] server field is a plain serverId (no slash) ─────────────────
 
-test('GG-2: tools[] server field is non-empty string NOT containing a slash', async () => {
+test('GH-2: tools[] server field is non-empty string NOT containing a slash', async () => {
   const agg = makeAgg();
   try {
     const body = await search(agg, { query: 'database' });
     const tools = body.tools as Record<string, unknown>[];
-    assert.ok(Array.isArray(tools) && tools.length > 0, 'need at least one tool for GG-2');
+    assert.ok(Array.isArray(tools) && tools.length > 0, 'need at least one tool for GH-2');
     for (const entry of tools) {
       const server = entry['server'];
       const tool = entry['tool'];
@@ -133,14 +133,14 @@ test('GG-2: tools[] server field is non-empty string NOT containing a slash', as
   }
 });
 
-// ── GG-3: tools[] serverName, category, description, inputSchema value types ──
+// ── GH-3: tools[] serverName, category, description, inputSchema value types ──
 
-test('GG-3: tools[] serverName, category, description, and inputSchema are correctly typed', async () => {
+test('GH-3: tools[] serverName, category, description, and inputSchema are correctly typed', async () => {
   const agg = makeAgg();
   try {
     const body = await search(agg, { query: 'database' });
     const tools = body.tools as Record<string, unknown>[];
-    assert.ok(Array.isArray(tools) && tools.length > 0, 'need at least one tool for GG-3');
+    assert.ok(Array.isArray(tools) && tools.length > 0, 'need at least one tool for GH-3');
     for (const entry of tools) {
       // serverName: non-empty string
       assert.equal(typeof entry['serverName'], 'string',
@@ -171,18 +171,18 @@ test('GG-3: tools[] serverName, category, description, and inputSchema are corre
   }
 });
 
-// ── GG-4: tools[] inFocus is exactly boolean true ─────────────────────────────
+// ── GH-4: tools[] inFocus is exactly boolean true ─────────────────────────────
 
-test('GG-4: tools[] inFocus is exactly boolean true (not 1, not "true") when focus active and tool in focus', async () => {
+test('GH-4: tools[] inFocus is exactly boolean true (not 1, not "true") when focus active and tool in focus', async () => {
   const agg = makeAgg({ focus: 'code' });
   try {
     const body = await search(agg, { query: 'database', focus: 'code' });
     const tools = body.tools as Record<string, unknown>[];
-    assert.ok(Array.isArray(tools) && tools.length > 0, 'need at least one tool for GG-4');
+    assert.ok(Array.isArray(tools) && tools.length > 0, 'need at least one tool for GH-4');
 
     // Neon tools are in the 'code' category → must have inFocus: true (exact boolean)
     const neonTools = tools.filter((t) => (t['server'] as string) === 'neon');
-    assert.ok(neonTools.length > 0, 'need at least one neon tool in results for GG-4');
+    assert.ok(neonTools.length > 0, 'need at least one neon tool in results for GH-4');
     for (const entry of neonTools) {
       assert.ok('inFocus' in entry, `neon tool "${entry['tool']}" must have inFocus field when code focus active`);
       assert.equal(entry['inFocus'], true,
@@ -196,15 +196,15 @@ test('GG-4: tools[] inFocus is exactly boolean true (not 1, not "true") when foc
   }
 });
 
-// ── GG-5: servers[] entry key set in discovery mode without focus ─────────────
+// ── GH-5: servers[] entry key set in discovery mode without focus ─────────────
 
-test('GG-5: servers[] entry key set in discovery mode (no focus) is exactly {server, name, category, tools}', async () => {
+test('GH-5: servers[] entry key set in discovery mode (no focus) is exactly {server, name, category, tools}', async () => {
   const EXPECTED_KEYS = ['category', 'name', 'server', 'tools'];
   const agg = makeAgg();
   try {
     const body = await search(agg, {});
     const servers = body.servers as Record<string, unknown>[];
-    assert.ok(Array.isArray(servers) && servers.length > 0, 'need at least one server entry for GG-5');
+    assert.ok(Array.isArray(servers) && servers.length > 0, 'need at least one server entry for GH-5');
     for (const entry of servers) {
       const actual = Object.keys(entry).sort();
       assert.deepEqual(actual, EXPECTED_KEYS,
@@ -215,14 +215,14 @@ test('GG-5: servers[] entry key set in discovery mode (no focus) is exactly {ser
   }
 });
 
-// ── GG-6: servers[] entry value types in discovery mode ──────────────────────
+// ── GH-6: servers[] entry value types in discovery mode ──────────────────────
 
-test('GG-6: servers[] entry value types in discovery mode — server and name are non-empty strings, category is valid enum, tools is non-negative integer', async () => {
+test('GH-6: servers[] entry value types in discovery mode — server and name are non-empty strings, category is valid enum, tools is non-negative integer', async () => {
   const agg = makeAgg();
   try {
     const body = await search(agg, {});
     const servers = body.servers as Record<string, unknown>[];
-    assert.ok(Array.isArray(servers) && servers.length > 0, 'need at least one server entry for GG-6');
+    assert.ok(Array.isArray(servers) && servers.length > 0, 'need at least one server entry for GH-6');
     for (const entry of servers) {
       // server: non-empty string
       assert.equal(typeof entry['server'], 'string',
@@ -254,16 +254,16 @@ test('GG-6: servers[] entry value types in discovery mode — server and name ar
   }
 });
 
-// ── GG-7: servers[] entry with focus — inFocus is exactly boolean ─────────────
+// ── GH-7: servers[] entry with focus — inFocus is exactly boolean ─────────────
 
-test('GG-7: servers[] entry with focus active — inFocus is exactly boolean and key set is {server, name, category, tools, inFocus}', async () => {
+test('GH-7: servers[] entry with focus active — inFocus is exactly boolean and key set is {server, name, category, tools, inFocus}', async () => {
   const EXPECTED_KEYS_NO_FOCUS = ['category', 'name', 'server', 'tools'];
   const EXPECTED_KEYS_WITH_FOCUS = ['category', 'inFocus', 'name', 'server', 'tools'];
   const agg = makeAgg({ focus: 'code' });
   try {
     const body = await search(agg, { focus: 'code' });
     const servers = body.servers as Record<string, unknown>[];
-    assert.ok(Array.isArray(servers) && servers.length > 0, 'need server entries for GG-7');
+    assert.ok(Array.isArray(servers) && servers.length > 0, 'need server entries for GH-7');
 
     let sawInFocusTrue = false;
     let sawInFocusFalse = false;
