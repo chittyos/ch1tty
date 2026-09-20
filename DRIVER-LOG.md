@@ -5905,6 +5905,22 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
     FY-11: latencyMs present and >= 0
     FY-12: availableFocusProfiles is non-empty string array
 - **Open PRs:** FY (pending CI)
+
+## Run log — 2026-09-20 (automated — FZ coordinator value types)
+
+- **Startup:** Build clean (tsc 0 errors). Tests: 4709 pass / 0 fail / 3 skip (baseline).
+- **PR #1431 (FY):** Open — ch1tty/status value types (12 tests). All 6 open Codex P2 review threads had replies; resolved them all. CI failing due to persistent org-level Actions disabled blocker.
+- **FZ workstream opened:** `auto/FZ-coordinator-value-types-drift-guard`
+  - 7 tests in `test/fz-coordinator-value-types-drift-guard.test.ts`
+  - FZ-1: coordinator top-level primitives (activeSessions, boundEntity, evictedSessions, sessionTtlMs)
+  - FZ-2: coordinator.topTools string[]
+  - FZ-3: coordinator.toolsByServer Record<string, number ≥ 0>
+  - FZ-4: coordinator.brain OllamaBrainStats value types
+  - FZ-5: coordinator.embeddingBrain EmbeddingBrainStats value types (adds cache fields)
+  - FZ-6: coordinator.sessions[] entry types
+  - FZ-7: short mode — coordinator without sessions, same primitive types
+  - Local test result: **4716 pass / 0 fail / 3 skip (+7)**
+- **Open PRs:** #1431 (FY — status value types, pending merge); #FZ (opened this run)
 - **Human-action items (carried forward):**
   1. **DISABLE hourly cron** — ~1746+ runs; burning ~50k tokens/run
   2. **Enable GitHub Actions** (main npm test CI job)
