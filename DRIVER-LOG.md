@@ -5909,3 +5909,21 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
   5. **Upgrade Notion plan** — workspace out of free blocks
 - **Next run:** Watch GA PR for CI/review. If FY/FZ/GA all merge, next candidate: SessionCoordinator getSnapshot() edge-case tests (eviction, TTL expiry) or HTTP server endpoint value-type guards.
+
+---
+
+## Run log — 2026-09-20 (automated — GA-2b Codex fix)
+
+- **Workstream:** GA (continuation) — exercising non-null lastFlushAt branch
+- **Branch/PR:** `auto/GA-coordinator-ledger-value-types` → https://github.com/chittyos/ch1tty/pull/1433 (same PR, new commit 6a68f5a)
+- **Build:** tsc clean | **Tests:** GA file 4 pass (was 3; +1 GA-2b)
+- **Codex P2 finding on GA-2:** `lastFlushAt` else-branch was unreachable because fixture backend never triggers a real flush. Fixed by adding GA-2b: drives LedgerClient directly with an inline stub backend that succeeds on `chitty_ledger_record`, confirms `lastFlushAt` is a valid ISO date string after flush.
+- **Review thread PRRT_kwDORhsD_s6kKF_5:** replied with fix commit + resolved.
+- **PR #1433 status:** CI pending re-run on new commit; 0 open review threads.
+- **Human-action items (carried forward):**
+  1. **DISABLE hourly cron** — ~1747+ runs; burning ~50k tokens/run
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Upgrade Notion plan** — workspace out of free blocks
+- **Next run:** Wait for #1433 CI re-run. If green and Codex clean, PR is ready for human merge. If FY/FZ/GA all merge, next: SessionCoordinator snapshot edge-case tests or HTTP server endpoint value-type guards.
