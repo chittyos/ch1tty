@@ -48,6 +48,11 @@ import { FixtureBackend, FIXTURE_SERVERS } from './fixture-backend.js';
  * to empty (t.score>0 fails), yielding no_match with brainMs in the explanation.
  */
 class BrainZeroConfidenceCoordinator extends SessionCoordinator {
+  /**
+   * Returns a non-empty RoutedTool[] with confidence=0 so the aggregator sets
+   * castRoute='brain' (routed.length>0) while scoredTools ends up empty after
+   * the t.score>0 filter — yielding no_match with brainMs in the explanation.
+   */
   override async routeIntent(
     _query: string,
     candidates: ToolCandidate[],
@@ -72,6 +77,7 @@ function dlq(): string {
   return join(tmpdir(), `ch1tty-fs-${Date.now()}-${++dlqSeq}.jsonl`);
 }
 
+/** Creates an Aggregator backed by FixtureBackend with the zero-confidence brain coordinator. */
 function makeAgg(withFocus: boolean): Aggregator {
   const backend = new FixtureBackend();
   backend.defineServer('neon',   FIXTURE_SERVERS.neon);
@@ -107,6 +113,7 @@ const BRAIN_FULL_FOCUS_NO_MATCH_KEYS = [
   'winnerInFocus',
 ];
 
+/** Calls ch1tty/cast with explain:true and returns the sorted top-level explanation keys. */
 async function getExplainKeys(
   agg: Aggregator,
   verbosity: 'low' | 'medium' | 'full',
