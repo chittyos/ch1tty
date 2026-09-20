@@ -5805,3 +5805,30 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   - FS ✓ brain no_match key sets (all 3 verbosities × focus/no-focus)
   - FW ✓ (pending) no_match value types (route × focus, verbosity:full)
 - **Next run:** Merge #1429 (FW) when CI green. Then consider: resolved explain value type guards for FU's 56/87-key sets, or SessionCoordinator route-intent branch coverage.
+
+---
+
+## Run log — 2026-09-20 (automated — FW and FU/brain-varied merged, next workstream TBD)
+
+- **Workstream advanced:** Merged 2 open PRs (#1429 FW + #1428 FU/brain-varied); both had green CI and Codex completed with no findings
+- **PR #1429 (FW):** Merged `auto/FW-nomatch-explain-value-types` — freeze cast explain value types for no_match (4 tests: FW-1 through FW-4, route × focus)
+- **PR #1428 (FU brain-varied):** Merged `auto/FU-brain-varied-confidence-explain-key-set` — freeze brain-route key sets with varied confidence (6 tests: FU-1 through FU-6, closes z-score/kurtosis/skewness gap from FT)
+- **Build:** tsc clean | **Tests (after both merges):** 4705 pass / 0 fail / 3 skip (was 4699 before this run; +6 from FU/brain-varied)
+- **Drift-guard matrix status (cast explain coverage):**
+  - FH ✓ verbosity:low/medium key sets (fallback-route resolved)
+  - FU ✓ verbosity:full key sets (fallback-route resolved: 56/87 no-focus/focus)
+  - FT ✓ brain-route resolved key sets (uniform confidence: low/medium/full × focus)
+  - FU/brain ✓ brain-route resolved key sets (varied confidence: low/medium/full × focus; z-score/kurtosis/focusBias present)
+  - FR ✓ fallback no_match key sets (all 3 verbosities × focus/no-focus)
+  - FS ✓ brain no_match key sets (all 3 verbosities × focus/no-focus)
+  - FW ✓ no_match value types (route × focus, verbosity:full)
+  - FM ✓ verbosity:full remaining value types (no-focus, ~36 fields)
+  - FN ✓ 7 remaining focus-only value types
+- **Open PRs:** none
+- **Human-action items (carried forward):**
+  1. **DISABLE hourly cron** — ~1743+ runs; burning ~50k tokens/run
+  2. **Enable GitHub Actions** (main npm test CI job; only CodeQL/CodeQL-actions running)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Upgrade Notion plan** — workspace out of free blocks
+- **Next run:** Drift-guard matrix is substantially complete. Candidates for next workstream: (a) brain-route resolved value types (FT/FU freeze key sets; no guard on brainMs type + value), (b) SessionCoordinator route-intent branch coverage, (c) FP extends low/medium verbosity types but brain-route path not covered.
