@@ -6954,4 +6954,8 @@ Suites: FN-1 (out-of-focus triple + ordering + absent-when-all-in-focus), FN-2 (
 5. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
+**Strict bounds fix (1068f08):** Codex P2 on `51f5a3a` — `outOfFocusMeanScore` bounds were non-strict (≤). With 2 distinct OOF candidates the mean must lie strictly between bottom and top; tightened to strict `<` with 1e-10 tolerance. 4615/0/3 pass. Codex reviewed `1068f08`: no findings. CI 3/3 green on `1068f08`. All 6 review threads resolved.
+
+**PR #1418 (FN) final state:** CI 3/3 green, Codex clean, all threads resolved. Ready for human merge.
+
 **PushNotification:** SENT — both #1417 and #1418 are merge-ready; operator action needed.
