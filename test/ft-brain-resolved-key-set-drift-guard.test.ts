@@ -48,6 +48,11 @@ import { FixtureBackend, FIXTURE_SERVERS } from './fixture-backend.js';
 
 /** Returns all candidates with confidence=1 so castRoute='brain' with multi-candidate scoredTools. */
 class BrainMultiPositiveCoordinator extends SessionCoordinator {
+  constructor() {
+    // Disable embedding warmup so this stub never contacts a real Ollama endpoint.
+    super({}, { enabled: false });
+  }
+
   override async routeIntent(
     _query: string,
     candidates: ToolCandidate[],
