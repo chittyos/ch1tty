@@ -1,5 +1,5 @@
 /**
- * GE: Freeze coordinator exact key set in ch1tty/status short mode.
+ * GG: Freeze coordinator exact key set in ch1tty/status short mode.
  *
  * ED froze the coordinator key set for normal mode:
  *   {activeSessions, boundEntity, brain, embeddingBrain, evictedSessions,
@@ -10,14 +10,14 @@
  * checks that `sessions` is absent. If a new field (e.g. `serverAffinity`)
  * were added to the short-mode coordinator snapshot, nothing would catch it.
  *
- * GE closes that gap:
+ * GG closes that gap:
  *
- *   GE-1  short-mode coordinator exact key set when no sessions are active:
+ *   GG-1  short-mode coordinator exact key set when no sessions are active:
  *          exactly {activeSessions, boundEntity, brain, embeddingBrain,
  *          evictedSessions, ledger, sessionTtlMs, toolsByServer, topTools}
- *   GE-2  short-mode coordinator exact key set with an active session:
+ *   GG-2  short-mode coordinator exact key set with an active session:
  *          same 9 keys — `sessions` must NOT bleed in even when sessions exist
- *   GE-3  short-mode coordinator key set is a strict subset of the normal-mode
+ *   GG-3  short-mode coordinator key set is a strict subset of the normal-mode
  *          coordinator key set (all 9 short-mode keys are valid coordinator fields)
  *
  * Frozen 2026-09-20.
@@ -66,7 +66,7 @@ function makeAgg(): Aggregator {
   return new Aggregator(CONFIGS, {
     backendFactory: () => backend,
     embedEnabled: false,
-    ledgerDlqPath: join(tmpdir(), `ch1tty-ge-${Date.now()}-${++_seq}.jsonl`),
+    ledgerDlqPath: join(tmpdir(), `ch1tty-gg-${Date.now()}-${++_seq}.jsonl`),
   } as Parameters<typeof Aggregator.prototype.callTool>[1]);
 }
 
@@ -83,9 +83,9 @@ function sortedKeys(obj: object): string[] {
   return Object.keys(obj).sort();
 }
 
-// ── GE-1: short-mode coordinator exact key set with no active sessions ────────
+// ── GG-1: short-mode coordinator exact key set with no active sessions ────────
 
-test('GE-1: short-mode coordinator exact key set with no active sessions', async () => {
+test('GG-1: short-mode coordinator exact key set with no active sessions', async () => {
   const agg = makeAgg();
   try {
     const coord = await getShortCoord(agg);
@@ -99,9 +99,9 @@ test('GE-1: short-mode coordinator exact key set with no active sessions', async
   }
 });
 
-// ── GE-2: short-mode coordinator exact key set with an active session ─────────
+// ── GG-2: short-mode coordinator exact key set with an active session ─────────
 
-test('GE-2: short-mode coordinator exact key set with an active session (sessions must not bleed in)', async () => {
+test('GG-2: short-mode coordinator exact key set with an active session (sessions must not bleed in)', async () => {
   const agg = makeAgg();
   try {
     await agg.callTool('ch1tty/execute', { tool: 'neon/list_projects', args: {}, sessionId: 'ge2-seed' });
@@ -117,9 +117,9 @@ test('GE-2: short-mode coordinator exact key set with an active session (session
   }
 });
 
-// ── GE-3: short-mode keys are a strict subset of normal-mode keys ─────────────
+// ── GG-3: short-mode keys are a strict subset of normal-mode keys ─────────────
 
-test('GE-3: all short-mode coordinator keys are valid normal-mode coordinator keys', async () => {
+test('GG-3: all short-mode coordinator keys are valid normal-mode coordinator keys', async () => {
   const agg = makeAgg();
   try {
     const coord = await getShortCoord(agg);
