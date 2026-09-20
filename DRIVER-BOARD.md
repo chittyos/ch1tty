@@ -6926,3 +6926,37 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 5. **Stale branch cleanup** — 1100+ remote auto/ branches
 
 **Next run (FO):** After FN merges — freeze cast explain value type cross-field invariants not yet tested (e.g. winnerScore === topCandidates[0].score, scoreDominanceIndex constraints, focusConfidence + focusBias relationship across scenarios) OR begin a new domain beyond cast explain.
+
+---
+
+## Run ~1733 — 2026-09-20
+
+**Build:** tsc clean | **Tests:** 4667 pass / 0 fail / 3 skip (4670 total, +20 from FP) | **Audit:** 0 vulnerabilities
+
+**PR #1421 (FN) — MERGED** at 07:38Z. All 3 CI checks green on merge commit.
+
+**FP — merged directly to main** (commit `b644507`, no PR): freeze value types for multi-candidate verbosity:low and verbosity:medium cast explain. 4 suites (FP-1..FP-4): 8 keys at verbosity:low no-focus, +4 focus keys, 11 non-distribution keys at verbosity:medium no-focus, +12 focus keys. No new fields — metric freeze compliant.
+
+**Freeze series coverage as of this run (comprehensive):**
+- Field NAMES: DW (verbosity:full multi-candidate 56/87), ER/ES (verbosity:low/medium), EX/EY (single-candidate)
+- Value TYPES verbosity:full: FM (36 no-focus fields), FN (7 focus-only fields), EW (24 focus-only fields), FA (single-candidate)
+- Value TYPES verbosity:low/medium: FP (multi-candidate), EZ (single-candidate)
+- topCandidates per-item: FD + ET + FB (key sets + types + ordering invariants)
+- topCandidates[0].score === winnerScore: FD-4 ✓
+- Other tool responses: EE (reload), FE (health), FG (sessions), DZ/ED (status), FH-execute (execute)
+- search: FB/FI/FJ/FK (envelopes + suggestions + mode keys)
+
+**Remaining gaps for FQ:**
+- Cast explain no_match path exact key set at each verbosity — BJ checks presence/absence but no test freezes the exact key set of the explain object when `cast === 'no_match'`
+- scoreDominanceIndex + effectiveN mathematical invariants (no test checks scoreDominanceIndex ∈ [0,1] or that effectiveN ≤ candidateCount)
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ + H–N ✓ | FM ✓ FN ✓ FP ✓; next: FQ
+
+**Human-action items (persistent):**
+1. **DISABLE hourly cron** — ~1733 runs; burning ~50k tokens/run
+2. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+3. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+4. **Stale branch cleanup** — 1100+ remote auto/ branches
+5. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+
+**Next run (FQ):** Freeze cast explain no_match path exact key sets at all verbosities (verbosity:low, medium, full — each with and without focus) OR freeze scoreDominanceIndex ∈ [0,1] and effectiveN ≤ candidateCount invariants.
