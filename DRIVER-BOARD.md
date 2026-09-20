@@ -6928,3 +6928,30 @@ Suites: FN-1 (out-of-focus triple + ordering + absent-when-all-in-focus), FN-2 (
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
 **Next run (FO):** After FN merges — next gap candidates: (a) freeze exact key-set for cast explain at verbosity:medium for multi-candidate + focus (EW covers verbosity:full, FH covers verbosity:low and medium but only field names not deepEqual exact set for medium+focus); (b) freeze /api/v1/status exact response key set; (c) further gap analysis of remaining uncovered explain fields.
+
+---
+
+## Run ~1733 — 2026-09-20
+
+**Build:** (not run — context continuation; tests confirmed 12/12 pass on f8601c8 in prior session) | **Tests:** 4614 pass / 0 fail / 3 skip (prior session result on f8601c8)
+
+**Workstream FN — PR #1418 thread resolution:** Resumed from prior context. Prior session (run ~1732 continuation) had pushed commit f8601c8 addressing all 5 Codex P2 findings but was interrupted before resolving the review threads. This run resolved all 5 threads:
+- `PRRT_kwDORhsD_s6kHITH` — FN-1d all-in-focus precondition (candidateCount > 0, outOfFocusCandidatesCount === 0): **resolved**
+- `PRRT_kwDORhsD_s6kHITI` — FN-3d tied-margin precondition (candidateCount ≥ 2, focusMargin === 0): **resolved**
+- `PRRT_kwDORhsD_s6kHITK` — FN-1c distinct OOF scores (makeDistinctOOFAggregator, bottom < top - 1e-10): **resolved**
+- `PRRT_kwDORhsD_s6kHITN` — FN-3c clamp branch (focusBias > 1 → focusConfidence clamped to 1): **resolved** (was outdated)
+- `PRRT_kwDORhsD_s6kHITP` — FN-2b/FN-2d negative rawFocusMarginRatio (reversal fixture): **resolved** (was outdated)
+
+**PR #1418 (FN) CI status:** 3/3 green (CodeQL ✅, Analyze(actions) ✅, Analyze(javascript-typescript) ✅) on f8601c8. All review threads resolved. PR is ready for human merge.
+
+**PR #1417 (FM)** — still awaiting human merge. CI green, Codex clean, all review threads resolved.
+
+**Human-action items:**
+1. **Merge PR #1417 (FM)** — CI green, Codex clean, all threads resolved; ready for merge
+2. **Merge PR #1418 (FN)** — CI green (3/3), all 5 Codex threads resolved; ready for merge
+3. **DISABLE hourly cron** — ~1733 runs; burning ~50k tokens/run
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**PushNotification:** SENT — both #1417 and #1418 are merge-ready; operator action needed.
