@@ -197,6 +197,12 @@ test('FZ-6: coordinator.sessions[] entry primitive types', async () => {
         assert.equal(typeof s.sessionFocus, 'string', 'session.sessionFocus must be a string when present');
       }
     }
+    // Verify the seeded session carries the expected focus value (not just the type).
+    const seeded = sessions.find(
+      (e) => (e as Record<string, unknown>).sessionId === 'fz6-seed',
+    ) as Record<string, unknown> | undefined;
+    assert.ok(seeded !== undefined, 'fz6-seed session must appear in coordinator sessions');
+    assert.equal(seeded.sessionFocus, 'code', 'fz6-seed sessionFocus must equal "code"');
   } finally {
     await agg.shutdown?.();
   }
@@ -223,12 +229,27 @@ test('FZ-7: short mode — coordinator present without sessions; primitives reta
     }
 
     const brain = coord.brain as Record<string, unknown>;
-    assert.equal(typeof brain.circuitOpen, 'boolean', 'short.brain.circuitOpen must be boolean');
     assertFiniteNonNeg(brain.calls, 'short.brain.calls');
+    assertFiniteNonNeg(brain.successes, 'short.brain.successes');
+    assertFiniteNonNeg(brain.timeouts, 'short.brain.timeouts');
+    assertFiniteNonNeg(brain.errors, 'short.brain.errors');
+    assertFiniteNonNeg(brain.emptyResults, 'short.brain.emptyResults');
+    assertFiniteNonNeg(brain.avgLatencyMs, 'short.brain.avgLatencyMs');
+    assert.equal(typeof brain.circuitOpen, 'boolean', 'short.brain.circuitOpen must be boolean');
+    assertFiniteNonNeg(brain.circuitCooldownRemainingMs, 'short.brain.circuitCooldownRemainingMs');
 
     const eb = coord.embeddingBrain as Record<string, unknown>;
-    assert.equal(typeof eb.circuitOpen, 'boolean', 'short.embeddingBrain.circuitOpen must be boolean');
     assertFiniteNonNeg(eb.calls, 'short.embeddingBrain.calls');
+    assertFiniteNonNeg(eb.successes, 'short.embeddingBrain.successes');
+    assertFiniteNonNeg(eb.timeouts, 'short.embeddingBrain.timeouts');
+    assertFiniteNonNeg(eb.errors, 'short.embeddingBrain.errors');
+    assertFiniteNonNeg(eb.emptyResults, 'short.embeddingBrain.emptyResults');
+    assertFiniteNonNeg(eb.avgLatencyMs, 'short.embeddingBrain.avgLatencyMs');
+    assert.equal(typeof eb.circuitOpen, 'boolean', 'short.embeddingBrain.circuitOpen must be boolean');
+    assertFiniteNonNeg(eb.circuitCooldownRemainingMs, 'short.embeddingBrain.circuitCooldownRemainingMs');
+    assertFiniteNonNeg(eb.cacheSize, 'short.embeddingBrain.cacheSize');
+    assertFiniteNonNeg(eb.cacheHits, 'short.embeddingBrain.cacheHits');
+    assertFiniteNonNeg(eb.cacheMisses, 'short.embeddingBrain.cacheMisses');
   } finally {
     await agg.shutdown?.();
   }
