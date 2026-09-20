@@ -6897,3 +6897,34 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 5. **Stale branch cleanup** — 1100+ remote auto/ branches
 
 **Next run (FN):** After FM merges — freeze cast explain single-candidate key sets at verbosity:full (EX/EY covered low+medium for single-candidate; verbosity:full single-candidate path not yet frozen), OR freeze topCandidates per-item key set (tool, score, server fields — no deepEqual guard exists for the per-item shape).
+
+---
+
+## Run ~1732 — 2026-09-20
+
+**Build:** tsc clean | **Tests:** 4614 pass / 0 fail / 3 skip (4617 total) | **Audit:** 0 vulnerabilities
+
+**Workstream FN — PR #1418:** Created `test/fn-remaining-focus-value-types.test.ts` (437 lines, 11 tests, 3 suites). Freezes value types for the 7 focus-only verbosity:full fields not covered by EW:
+- `focusBias` → number ≥ 0 (= winnerFocusBoost / focusMargin)
+- `focusConfidence` → number ∈ [0,1] (= Math.min(1, focusBias))
+- `focusMarginRatio` → number ∈ [0,1] (= focusMargin / winnerScore)
+- `rawFocusMarginRatio` → number, finite (can be negative)
+- `runnerUpFocusBoostRatio` → number ∈ [0,1] (= runnerUpFocusBoost / runnerUpScore)
+- `outOfFocusMeanScore` → number ≥ 0
+- `outOfFocusBottomScore` → number ≥ 0
+
+Suites: FN-1 (out-of-focus triple + ordering + absent-when-all-in-focus), FN-2 (margin ratio + raw ratio + runner-up boost fraction), FN-3 (focusBias/focusConfidence + relationship invariant + absent-when-margin-zero). All 11/11 green locally. 4614/0/3 full suite. No new metric fields added — CLAUDE.md metric freeze compliant.
+
+**PR #1417 (FM)** — still awaiting human merge (CI green, Codex clean, all review threads resolved; `mergeable_state: blocked` requires human approval).
+
+**PR #1418 (FN)** — open, CI pending. Subscribed.
+
+**Human-action items:**
+1. **Merge PR #1417 (FM)** — CI green, Codex clean, all threads resolved; ready for merge
+2. **Merge PR #1418 (FN)** once CI green — 7 remaining focus-only value-type drift guards
+3. **DISABLE hourly cron** — ~1732 runs; burning ~50k tokens/run
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run (FO):** After FN merges — next gap candidates: (a) freeze exact key-set for cast explain at verbosity:medium for multi-candidate + focus (EW covers verbosity:full, FH covers verbosity:low and medium but only field names not deepEqual exact set for medium+focus); (b) freeze /api/v1/status exact response key set; (c) further gap analysis of remaining uncovered explain fields.
