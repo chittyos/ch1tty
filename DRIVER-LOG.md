@@ -5975,3 +5975,34 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
 - **CI:** 3/3 ✅ (CodeQL, Analyze actions, Analyze javascript-typescript)
 - **Review threads:** 0 open (both Codex P2 threads addressed and resolved)
 - **Awaiting:** Human merge of #1431 (FY), #1432 (FZ), #1433 (GA)
+
+---
+
+## Run log — 2026-09-20 (automated — GB sessions endpoint drift guard)
+
+- **Workstream advanced:** GB — `/api/v1/sessions` response key-set and value-type drift guard
+- **Branch/PR:** `auto/GB-sessions-endpoint-drift-guard` → PR pending
+- **Build:** tsc clean | **Tests:** 4739 pass / 0 fail / 3 skip (+7 from GB)
+- **Prior-run actions (this run):**
+  - FY (#1431): merged ✅
+  - FZ (#1432): conflict-resolved, merged ✅  
+  - GA (#1433): conflict-resolved, merged ✅
+  - All 3 open PRs resolved; 0 open PRs on entry to GB work
+- **What was done:**
+  - Identified gap: `/api/v1/sessions` tests only check `Array.isArray(body.sessions)`. No test freezes the complete response body key set, session entry key set, or field value types.
+  - Created `test/gb-sessions-endpoint-drift-guard.test.ts` with 7 tests:
+    - GB-1: Response body key set (empty) = `{sessions}`
+    - GB-2: Response body key set (active session) = `{sessions}`
+    - GB-3: Session entry key set = `{id, lastActivityAt, recentTools, startedAt, toolCalls, transport}`
+    - GB-4: Session entry value types (id: string, transport: 'stdio'|'http', startedAt/lastActivityAt: finite ≥ 0, toolCalls: integer ≥ 0, recentTools: array)
+    - GB-5: recentTools entry key set = `{tool, ts}`
+    - GB-6: recentTools entry value types (tool: non-empty string, ts: finite ≥ 0)
+    - GB-7: After tool call, toolCalls = 1 and recentTools entry matches tool name
+  - All 7 pass; full suite 4739/0/3
+- **Human-action items (carried forward):**
+  1. **DISABLE hourly cron** — ~1748+ runs; burning ~50k tokens/run
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Upgrade Notion plan** — workspace out of free blocks
+- **Next run:** Check GB PR for CI/review. Next candidate: freeze `/api/v1/status` coordinator.sessions[] entry key set (the `sessions` sub-array in the coordinator field — key set not frozen, only value types from FZ).
