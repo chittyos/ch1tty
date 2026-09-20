@@ -265,6 +265,8 @@ test('FY-10: ch1tty/status no-focus — servers[] entry primitive value types', 
       assert.equal(typeof s.connected, 'boolean', 'server.connected must be boolean');
       assert.equal(typeof s.toolCount, 'number', 'server.toolCount must be a number');
       assert.ok((s.toolCount as number) >= 0, 'server.toolCount must be >= 0');
+      assert.ok(s.toolCacheAge === null || (typeof s.toolCacheAge === 'number' && Number.isFinite(s.toolCacheAge as number) && (s.toolCacheAge as number) >= 0),
+        `server.toolCacheAge must be null or finite >= 0, got ${JSON.stringify(s.toolCacheAge)}`);
     }
   } finally {
     await agg.shutdown();
