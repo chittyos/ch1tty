@@ -5605,3 +5605,37 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   7. **Stale branch cleanup** — 1100+ remote auto/ branches
   8. **Major dep bumps** — @types/node 22→26, typescript 5→7 for apps/
 - **Next run:** EFA — single-candidate VALUE TYPES at verbosity:full (15 full-verbosity-exclusive focus fields: focusRankPercentile, inFocusTopScore, winnerFocusBoostRatio, etc.)
+
+---
+
+## Run log — 2026-09-20 (automated — PRODUCTIVE: opened FR #1423)
+
+- **Workstream advanced:** FR — freeze cast explain exact key set on no_match responses
+- **Branch:** `auto/FR-nomatch-explain-key-set-drift`
+- **PR:** #1423 (https://github.com/chittyos/ch1tty/pull/1423)
+- **Build:** `tsc` clean (0 errors) | **Tests:** 4674 pass / 0 fail / 3 skip (+7 FR tests; main had 4667)
+- **Guardrails:** 5-tool surface (search/execute/status/reload/cast) FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **Startup state:**
+  - main at f569ea3 (run ~1735). No open PRs.
+  - `npm test` baseline on main: 4667/0/3.
+- **What was done:**
+  1. Probed no_match explain key sets at all verbosity levels with/without focus:
+     - verbosity:low/medium/full, no focus → 4 keys: {candidateCount, method, rationale, topCandidates}
+     - verbosity:low/medium, focus:code → same 4 keys (focus fields absent at low/medium)
+     - verbosity:full, focus:code → 7 keys (adds focus, focusBoost, winnerInFocus)
+  2. Identified gap: EU/EV freeze value TYPES at no_match; DW/ZZZZ freeze key set/count at multi-candidate full; NO test does deepEqual key-set freeze at no_match. A rename or unexpected addition on no_match path passes silently.
+  3. Created `test/fr-cast-explain-nomatch-key-set-drift-guard.test.ts` — 7 tests across 6 suites (one per verbosity×focus combination).
+  4. Full suite: 4674/0/3 (+7). Build clean.
+- **FR frozen assertions:**
+  - low/medium/full + no focus + no_match: exactly {candidateCount, method, rationale, topCandidates}
+  - low/medium + focus:code + no_match: same 4 keys (focus fields absent)
+  - full + focus:code + no_match: exactly {candidateCount, focus, focusBoost, method, rationale, topCandidates, winnerInFocus}
+  - winnerInFocus === false (no winner on no_match), focusBoost > 0, focus === 'code'
+- **Human-action items (carried forward):**
+  1. **DISABLE hourly cron** — ~1736+ runs; burning ~50k tokens/run
+  2. **Merge PR #1423 (FR)** once CI green — no_match explain key-set drift guard, 7 tests
+  3. **Enable GitHub Actions** (main npm test CI job; only CodeQL running)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Major dep bumps** — @types/node 22→26, typescript 5→7 for apps/
+- **Next run:** FS — freeze cast explain key set for single-candidate at verbosity:full (FA freezes value TYPES at full single-candidate; no test does deepEqual key-set for single-candidate at full verbosity). Or check if #1423 is CI-green and auto-merge.
