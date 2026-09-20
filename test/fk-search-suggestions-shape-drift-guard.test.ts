@@ -353,9 +353,13 @@ describe('FK — search suggestions combo notes optional field', () => {
       const suggestions = data.suggestions as Record<string, unknown>;
       const combos = suggestions.combos as Array<Record<string, unknown>>;
       assert.ok(combos.length > 0, 'at least one combo returned');
-      const withNotes = combos.find((c) => 'notes' in c);
-      assert.ok(withNotes !== undefined, 'at least one combo must have notes when catalog defines it');
-      assert.equal(typeof withNotes.notes, 'string', 'notes must be a string when present');
+      const setupAndList = combos.find((c) => c.name === 'setup-and-list');
+      assert.ok(setupAndList !== undefined, 'setup-and-list combo must be present');
+      assert.ok('notes' in setupAndList, 'setup-and-list must have notes key when catalog defines it');
+      assert.equal(typeof setupAndList.notes, 'string', 'notes must be a string when present');
+      const listOnly = combos.find((c) => c.name === 'list-only');
+      assert.ok(listOnly !== undefined, 'list-only combo must be present');
+      assert.ok(!('notes' in listOnly), 'list-only must NOT have notes key when catalog omits it');
     } finally {
       await agg.shutdown();
     }
@@ -454,7 +458,7 @@ describe('FK — search suggestions value types', () => {
   });
 
   test('FK-16: combo.verified is boolean; prompt.text and prompt.resolves_to are non-empty strings', async () => {
-    const agg = makeAgg({ focus: 'dev', catalog: CATALOG_NO_NOTES });
+    const agg = makeAgg({ focus: 'dev', catalog: CATALOG_WITH_NOTES });
     try {
       const result = await agg.callTool('ch1tty/search', { query: 'database' });
       assert.equal(result.isError, undefined);
