@@ -5666,3 +5666,37 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   6. **Stale branch cleanup** — 1100+ remote auto/ branches
   7. **Major dep bumps** — @types/node 22→26, typescript 5→7 for apps/
 - **Next run:** FT — next drift-guard gap (to be identified). Await Codex review on #1424; if it posts findings, address them. If #1423/#1424 are merged, advance to next uncovered shape in the cast explain test matrix.
+
+---
+
+## Run log — 2026-09-20 (automated — FT brain-routed resolved key-set drift guard)
+
+- **Workstream advanced:** FT — freeze cast explain exact key sets for brain-routed RESOLVED responses
+- **Branch/PR:** `auto/FT-brain-resolved-key-set-drift` → https://github.com/chittyos/ch1tty/pull/1425
+- **Build:** tsc clean (0 errors) | **Tests:** 4674 pass / 0 fail / 3 skip (+7 from baseline 4667)
+- **CI on PR #1425:** CodeQL ✅ · Analyze (javascript-typescript) ✅ · Analyze (actions) ✅ — all green
+- **What was done this session:**
+  1. Fixed PR #1423 (FR) merge conflict — resolved `DRIVER-LOG.md` conflict (kept main's entry), merged+pushed.
+  2. Created `test/ft-brain-resolved-key-set-drift-guard.test.ts` (395 lines, 7 tests).
+  3. `BrainMultiPositiveCoordinator` returns all candidates with `confidence=1` → `castRoute='brain'` with multi-candidate `scoredTools`.
+  4. Froze exact key sets for all 6 scenarios (3 verbosities × 2 focus states):
+     - FT-1: verbosity:low, no focus → 9 keys (FH-1's 8 + `brainMs`)
+     - FT-2: verbosity:low, focus:code → 13 keys (FH-2's 12 + `brainMs`)
+     - FT-3: verbosity:medium, no focus → 16 keys (FH-3's 15 + `brainMs`)
+     - FT-4: verbosity:medium, focus:code → 27 keys (`focusConfidence` absent — uniform brain scores)
+     - FT-5: verbosity:full, no focus → 48 keys (kurtosis/skewness/z-score absent — uniform scores)
+     - FT-6: verbosity:full, focus:code → 86 keys (`focusBias`/`focusConfidence` absent — uniform scores)
+  5. Gap map now fully closed: FH ✓ · FR ✓ · FS ✓ · FT ✓ (all 4 route×outcome quadrants covered)
+- **Open PRs awaiting human merge:**
+  - #1423 (FR): fallback no_match key-set guard — CI re-running after conflict fix
+  - #1424 (FS): brain no_match key-set guard — CI green, CodeRabbit clean
+  - #1425 (FT): brain resolved key-set guard — CI green
+- **Notion board:** Could not update (workspace out of free blocks — upgrade required)
+- **Human-action items (carried forward):**
+  1. **Merge PR #1423, #1424, #1425** — all CI green; #1423 may need CI re-check after conflict fix
+  2. **DISABLE hourly cron** — ~1739+ runs; burning ~50k tokens/run
+  3. **Enable GitHub Actions** (main npm test CI job; only CodeQL/CodeQL-actions running)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Upgrade Notion plan** — workspace out of free blocks; run log can no longer be appended
+- **Next run:** All 4 cast explain drift-guard quadrants now covered. Consider: (a) EX full-verbosity extension (EX only covers low/medium single-candidate; full-verbosity single-candidate ungarded), (b) startup env-var validation workstream, (c) SessionCoordinator unit coverage.
