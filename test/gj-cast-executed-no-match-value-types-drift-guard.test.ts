@@ -69,6 +69,7 @@ const BASE_CONFIGS: ServerConfig[] = [
 ];
 
 let _seq = 0;
+/** Build a fresh Aggregator backed by the neon FixtureBackend for each test. */
 function makeAgg(): Aggregator {
   const backend = new FixtureBackend();
   backend.defineServer('neon', FIXTURE_SERVERS.neon);
@@ -79,6 +80,7 @@ function makeAgg(): Aggregator {
   });
 }
 
+/** Invoke cast without flags and assert the response is cast:executed. */
 async function castExecuted(agg: Aggregator, intent: string): Promise<Record<string, unknown>> {
   const result = await agg.callTool('ch1tty/cast', { intent });
   assert.equal(result.isError, undefined, `cast must not return isError for intent "${intent}"`);
@@ -87,6 +89,7 @@ async function castExecuted(agg: Aggregator, intent: string): Promise<Record<str
   return body;
 }
 
+/** Invoke cast with a gibberish intent that produces cast:no_match. */
 async function castNoMatch(agg: Aggregator): Promise<Record<string, unknown>> {
   const intent = 'zzzzzzzzz_gj_no_match_unique_99999';
   const result = await agg.callTool('ch1tty/cast', { intent });
