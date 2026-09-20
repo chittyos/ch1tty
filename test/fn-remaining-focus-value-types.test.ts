@@ -249,14 +249,16 @@ describe('FN-1 — out-of-focus score triple value types at verbosity:full, focu
         `OOF scores must be distinct (bottom ${bottom} must be strictly < top ${top}); fixture design error`,
       );
 
-      // Strict ordering: bottom < mean < top
+      // Strict ordering: bottom < mean < top (with 2 distinct OOF candidates,
+      // arithmetic mean must lie strictly between them — non-strict would let
+      // a regressed mean == bottom or mean == top pass undetected).
       assert.ok(
-        bottom <= mean + 1e-10,
-        `outOfFocusBottomScore (${bottom}) must be ≤ outOfFocusMeanScore (${mean})`,
+        bottom < mean - 1e-10,
+        `outOfFocusBottomScore (${bottom}) must be strictly < outOfFocusMeanScore (${mean}); fixture has 2 distinct OOF scores so mean must lie strictly between them`,
       );
       assert.ok(
-        mean <= top + 1e-10,
-        `outOfFocusMeanScore (${mean}) must be ≤ topOutOfFocusScore (${top})`,
+        mean < top - 1e-10,
+        `outOfFocusMeanScore (${mean}) must be strictly < outOfFocusTopScore (${top}); fixture has 2 distinct OOF scores so mean must lie strictly between them`,
       );
     } finally {
       await agg.shutdown();
