@@ -5718,3 +5718,35 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Upgrade Notion plan** — workspace out of free blocks
 - **Next run:** Merge #1423 (FR) if CI green. Then: EX full-verbosity single-candidate key-set (next uncovered shape).
+
+---
+
+## Run log — 2026-09-20 (automated — FR/FS/FT merged; FU fixed; FV opened)
+
+- **Workstream advanced:** FV — freeze cast explain exact key set at verbosity:full, single-candidate
+- **Branch/PR:** `auto/FV-single-candidate-full-verbosity-key-set` → https://github.com/chittyos/ch1tty/pull/1427
+- **Build:** tsc clean (0 errors) | **Tests (on updated main):** 4689 pass / 0 fail / 3 skip
+- **What was done this session:**
+  1. Startup: read CLAUDE.md + CHITTY.md; npm ci clean; build clean; tests 4667/0/3 (no regressions).
+  2. Read Notion board (from 2026-09-10 entry, 2026-09-20 run log). All A–N + AA workstreams confirmed done.
+  3. Confirmed 4 open PRs: FR #1423, FS #1424, FT #1425, FU #1426 — all CI green on their prior heads.
+  4. Resolved FR #1423 DRIVER-LOG.md merge conflict (trailing blank line vs FT run log in main) via merge commit → pushed → CI re-ran and passed → merged FR via squash.
+  5. Merged FS #1424 (squash, clean, CI green) and FT #1425 (squash, CI green after API branch update).
+  6. Resolved FU #1426 DRIVER-LOG.md conflict again (squash-merges of FR/FS/FT moved main) → pushed to origin/auto/FU branch; CI re-running.
+  7. Probed verbosity:full single-candidate key sets (9 no-focus, 24 focus:code) — the gap EX left at verbosity:full.
+  8. Created `test/fv-cast-explain-single-candidate-full-verbosity-key-set.test.ts` (6 tests: FV-1a/b/c + FV-2a/b/c). All 6 pass locally.
+  9. Opened PR #1427 (FV); subscribed to #1426 and #1427 for CI events.
+- **Test counts on main after FR/FS/FT squash-merged:** 4689 pass / 0 fail / 3 skip.
+- **Open PRs:**
+  - #1426 (FU): fallback-route verbosity:full multi-candidate key-set — CI re-running after DRIVER-LOG conflict fix
+  - #1427 (FV): verbosity:full single-candidate key-set — CI queued (6 tests)
+- **Notion board:** Could not update (workspace out of free blocks — upgrade required)
+- **Human-action items (carried forward):**
+  1. **Merge PR #1426 (FU)** when CI green — fallback verbosity:full multi-candidate 6 tests
+  2. **Merge PR #1427 (FV)** when CI green — verbosity:full single-candidate 6 tests
+  3. **DISABLE hourly cron** — ~1740+ runs; burning ~50k tokens/run
+  4. **Enable GitHub Actions** (main npm test CI job; only CodeQL/CodeQL-actions running)
+  5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Upgrade Notion plan** — workspace out of free blocks; run log can no longer be appended to Notion
+- **Next run:** Merge #1426 and #1427 when CI green. Then: EW full-verbosity focus → or SessionCoordinator unit coverage → or startup env-var validation.
