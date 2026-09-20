@@ -5776,3 +5776,32 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   7. **Stale branch cleanup** — 1100+ remote auto/ branches
   8. **Upgrade Notion plan** — workspace out of free blocks
 - **Next run:** Await CI on #1426/#1427/#1428. If all green, monitor for human merge. Next new workstream: FW or SessionCoordinator unit coverage or startup env-var validation.
+
+---
+
+## Run log — 2026-09-20 (automated — FV closed, FW opened)
+
+- **Workstream advanced:** FW — freeze cast explain value types for no_match responses
+- **Branch/PR:** `auto/FW-nomatch-explain-value-types` → https://github.com/chittyos/ch1tty/pull/1429
+- **Build:** tsc clean (0 errors) | **Tests (on main after FU pull):** 4695 pass / 0 fail / 3 skip
+- **What was done this session:**
+  1. Startup: received 5 notifications (FU #1426 merged; Codex review on FV #1427 with 2 P2 findings).
+  2. Pulled main (FU squash-merge commit) — fu test file now on disk, baseline 4695 pass.
+  3. Read EY test — confirmed FV was a complete duplicate (same 9/24-key sets, same NullRoutingCoordinator, same frozen 2026-09-19). Closed FV #1427 with explanation.
+  4. Identified FW gap: FR/FS freeze key sets; no test validates no_match explain VALUE TYPES.
+  5. Probed all 4 no_match combinations (fallback/brain × focus/no-focus) to confirm field values.
+  6. Wrote `test/fw-cast-explain-nomatch-value-types.test.ts` (4 tests: FW-1 through FW-4). All 4 pass locally.
+  7. Opened PR #1429 (FW); subscribed to activity.
+- **Open PRs:** #1429 (FW) — CI queued
+- **Notion board:** Could not update (workspace out of free blocks — upgrade required)
+- **Human-action items (carried forward):**
+  1. **DISABLE hourly cron** — ~1742+ runs; burning ~50k tokens/run
+  2. **Enable GitHub Actions** (main npm test CI job; only CodeQL/CodeQL-actions running)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Upgrade Notion plan** — workspace out of free blocks
+- **Drift-guard matrix status (no_match path):**
+  - FR ✓ fallback no_match key sets (all 3 verbosities × focus/no-focus)
+  - FS ✓ brain no_match key sets (all 3 verbosities × focus/no-focus)
+  - FW ✓ (pending) no_match value types (route × focus, verbosity:full)
+- **Next run:** Merge #1429 (FW) when CI green. Then consider: resolved explain value type guards for FU's 56/87-key sets, or SessionCoordinator route-intent branch coverage.
