@@ -210,6 +210,9 @@ test('FY-8: ch1tty/status focus:code — focus field is object with expected typ
     assert.equal(typeof foc.active, 'string', 'focus.active must be a string');
     assert.ok((foc.active as string).length > 0, 'focus.active must be non-empty');
     assert.ok(Array.isArray(foc.categories), 'focus.categories must be an array');
+    for (const category of (foc.categories as unknown[])) {
+      assert.equal(typeof category, 'string', 'each focus.categories entry must be a string');
+    }
     assert.ok(Array.isArray(foc.servers), 'focus.servers must be an array');
     for (const s of (foc.servers as unknown[])) {
       assert.equal(typeof s, 'string', 'each focus.servers entry must be a string');
