@@ -5883,6 +5883,45 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
 
 ---
 
+## Run log — 2026-09-20 (automated — FY workstream)
+
+- **Workstream advanced:** FY — `ch1tty/status` response VALUE TYPES drift guard
+- **Branch/PR:** `auto/FY-status-value-types-drift-guard` → PR pending
+- **Build:** tsc clean (0 errors)
+- **Tests:** 4721 pass / 0 fail / 3 skip (+12 from FY tests)
+- **What was done:**
+  - DZ+ED had frozen KEY SETS for the status response; neither froze VALUE TYPES.
+  - Added `test/fy-status-value-types-drift-guard.test.ts` (12 tests):
+    FY-1: top-level primitives (gateway, version, uptime, counts, registryCached)
+    FY-2: systemHealth.status enum, brainDegraded boolean, ledgerStatus enum
+    FY-3: brainHealth.status enum, circuitOpen booleans
+    FY-4: ledgerHealth status enum + dropped/buffered/flushErrors/dlqEntries >= 0
+    FY-5: ledgerDlq.path string, entryCount >= 0, entries array
+    FY-6: catalog.loaded boolean, totalCombos >= 0, byFocus object of numbers
+    FY-7: focus is null when no focus active
+    FY-8: focus is typed object when focus active
+    FY-9: catalog.activeFocusSuggestions is null or {combos, prompts}
+    FY-10: servers[] entry types (id, name, type enum, enabled, connected, toolCount)
+    FY-11: latencyMs present and >= 0
+    FY-12: availableFocusProfiles is non-empty string array
+- **Open PRs:** FY (pending CI)
+
+## Run log — 2026-09-20 (automated — FZ coordinator value types)
+
+- **Startup:** Build clean (tsc 0 errors). Tests: 4709 pass / 0 fail / 3 skip (baseline).
+- **PR #1431 (FY):** Open — ch1tty/status value types (12 tests). All 6 open Codex P2 review threads had replies; resolved them all. CI failing due to persistent org-level Actions disabled blocker.
+- **FZ workstream opened:** `auto/FZ-coordinator-value-types-drift-guard`
+  - 7 tests in `test/fz-coordinator-value-types-drift-guard.test.ts`
+  - FZ-1: coordinator top-level primitives (activeSessions, boundEntity, evictedSessions, sessionTtlMs)
+  - FZ-2: coordinator.topTools string[]
+  - FZ-3: coordinator.toolsByServer Record<string, number ≥ 0>
+  - FZ-4: coordinator.brain OllamaBrainStats value types
+  - FZ-5: coordinator.embeddingBrain EmbeddingBrainStats value types (adds cache fields)
+  - FZ-6: coordinator.sessions[] entry types
+  - FZ-7: short mode — coordinator without sessions, same primitive types
+  - Local test result: **4716 pass / 0 fail / 3 skip (+7)**
+- **Open PRs:** #1431 (FY — status value types, pending merge); #FZ (opened this run)
+
 ## Run log — 2026-09-20 (automated — GA branch opened)
 
 - **Workstream advanced:** GA — coordinator.ledger value types
