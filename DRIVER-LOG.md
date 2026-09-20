@@ -1,3 +1,28 @@
+## Run log — 2026-09-20 (automated — GE coordinator short-mode key set)
+
+- **Workstream advanced:** GE — freeze coordinator exact key set in `ch1tty/status` short mode
+- **Branch/PR:** `auto/GE-coordinator-short-mode-key-set` → PR #1438
+- **Build:** tsc clean | **Tests:** 4085 pass / 0 fail / 2 skip (+3 GE tests on main baseline)
+- **Prior-run actions (this run):**
+  - Found GB (#1434), GC (#1435), GD (#1436) all merged into main (3 commits ahead)
+  - Pulled main; confirmed GD was a separate workstream (servers[] toolCacheAge/missingEnvVars)
+  - Scanned drift-guard matrix: ED freezes normal-mode coordinator key set; FZ-7 checks short-mode value types but NOT the exact key set
+- **What was done:**
+  - Created `test/ge-coordinator-short-mode-key-set.test.ts` with 3 tests:
+    - GE-1: short-mode coordinator exact 9-key set with no active sessions
+    - GE-2: same 9 keys with an active session — `sessions` must not bleed in
+    - GE-3: all short-mode keys are valid normal-mode coordinator keys
+  - All 3 pass; full suite 4085/0/2
+- **Human-action items (carried forward):**
+  1. **DISABLE hourly cron** — ~1750+ runs; burning ~50k tokens/run
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Upgrade Notion plan** — workspace out of free blocks
+- **Next run:** Check GE PR #1438 CI/review. Next candidate: freeze `coordinator.ledger` key set in short mode (ED froze ledger sub-object key set in normal mode; short mode inherits same ledger but no test cross-validates it), OR freeze `catalog.byFocus` key constraints (FY-6 checks each value >= 0 but not `Number.isFinite()`).
+
+---
+
 ## Run log — 2026-09-20 (automated — GC coordinator.sessions[] entry key set)
 
 - **Workstream advanced:** GC — freeze `coordinator.sessions[]` entry exact key set in `ch1tty/status`
