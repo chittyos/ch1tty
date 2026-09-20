@@ -5750,3 +5750,29 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   6. **Stale branch cleanup** — 1100+ remote auto/ branches
   7. **Upgrade Notion plan** — workspace out of free blocks; run log can no longer be appended to Notion
 - **Next run:** Merge #1426 and #1427 when CI green. Then: EW full-verbosity focus → or SessionCoordinator unit coverage → or startup env-var validation.
+
+---
+
+## Run log — 2026-09-20 (automated — FR #1423 merged; FU brain-varied-confidence #1428 opened)
+
+- **Workstream:** FU (brain-route varied-confidence explain key-set drift guard)
+- **FR #1423 merged** at 12:46:51Z — fallback no_match key-set drift guard (7 tests); all 4 route×outcome quadrants now covered: FH ✓ · FR ✓ · FS ✓ · FT ✓
+- **Context note:** Another session already pushed `fu-cast-explain-full-verbosity-key-set-drift-guard.test.ts` (PR #1426, fallback-route verbosity:full) and `fv-cast-explain-single-candidate-full-verbosity-key-set.test.ts` (PR #1427) to main before this run executed.
+- **This run's FU gap:** FT uses uniform confidence=1 for all brain-route candidates → 9 statistical fields (kurtosis/skewness/z-score) are absent. `BrainVariedConfidenceCoordinator` (confidence 1.0/0.5/0.1) creates score variance, enabling those fields + focusBias/focusConfidence.
+- **New file:** `test/fu-brain-varied-confidence-explain-key-set-drift-guard.test.ts` — 6 tests; key new coverage:
+  - FU-4: medium+focus adds `focusConfidence` vs FT-4's 27 → 28 keys
+  - FU-5: full+no-focus = DW 56 + brainMs = 57 keys (all kurtosis/skewness/z-score present)
+  - FU-6: full+focus = DW 87 + brainMs = 88 keys (focusBias+focusConfidence present)
+- **PR #1428** opened (`auto/FU-brain-varied-confidence-explain-key-set`); merged main into branch (no conflicts); CI running
+- **Test count:** 4695 pass / 0 fail / 3 skip on FU branch with both fu-* files + fv-* file present
+- **Gap map:** FH ✓ · FR ✓ · FS ✓ · FT ✓ · FU (other session: fallback full-verbosity) · FU (this run: brain varied-confidence) — pending merge
+- **Human-action items (carried forward):**
+  1. **Merge PR #1426 (FU fallback-full)** when CI green — 6 tests
+  2. **Merge PR #1427 (FV single-candidate-full)** when CI green — 6 tests
+  3. **Merge PR #1428 (FU brain-varied)** when CI green — 6 tests
+  4. **DISABLE hourly cron** — ~1740+ runs; burning ~50k tokens/run
+  5. **Enable GitHub Actions** (main npm test CI job)
+  6. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  7. **Stale branch cleanup** — 1100+ remote auto/ branches
+  8. **Upgrade Notion plan** — workspace out of free blocks
+- **Next run:** Await CI on #1426/#1427/#1428. If all green, monitor for human merge. Next new workstream: FW or SessionCoordinator unit coverage or startup env-var validation.
