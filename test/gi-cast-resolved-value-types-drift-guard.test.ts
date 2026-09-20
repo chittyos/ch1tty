@@ -76,6 +76,7 @@ const BASE_CONFIGS: ServerConfig[] = [
 ];
 
 let _seq = 0;
+/** Build a fresh Aggregator backed by the neon FixtureBackend for each test. */
 function makeAgg(): Aggregator {
   const backend = new FixtureBackend();
   backend.defineServer('neon', FIXTURE_SERVERS.neon);
@@ -86,6 +87,7 @@ function makeAgg(): Aggregator {
   });
 }
 
+/** Invoke cast with confirm:true and assert the response is cast:plan. */
 async function castPlan(agg: Aggregator, intent: string): Promise<Record<string, unknown>> {
   const result = await agg.callTool('ch1tty/cast', { intent, confirm: true });
   assert.equal(result.isError, undefined, `cast:plan must not return isError for intent "${intent}"`);
@@ -94,6 +96,7 @@ async function castPlan(agg: Aggregator, intent: string): Promise<Record<string,
   return body;
 }
 
+/** Invoke cast with dryRun:true and assert the response is cast:resolved. */
 async function castResolved(agg: Aggregator, intent: string): Promise<Record<string, unknown>> {
   const result = await agg.callTool('ch1tty/cast', { intent, dryRun: true });
   assert.equal(result.isError, undefined, `cast:resolved must not return isError for intent "${intent}"`);
