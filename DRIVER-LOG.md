@@ -1,3 +1,28 @@
+## Run log — 2026-09-20 (automated — GC coordinator.sessions[] entry key set)
+
+- **Workstream advanced:** GC — freeze `coordinator.sessions[]` entry exact key set in `ch1tty/status`
+- **Branch/PR:** `auto/GC-coordinator-sessions-entry-key-set` → PR #1435
+- **Build:** tsc clean | **Tests:** 4068 pass / 0 fail / 2 skip (+4 GC tests on main baseline)
+- **Prior-run actions (this run):**
+  - Addressed GB PR #1434 Codex review: 3 P2 threads replied and resolved; CI all green; PR now `mergeable_state: clean`
+  - Identified GC gap: FZ-6 freezes coordinator.sessions[] value types but not key sets
+- **What was done:**
+  - Created `test/gc-coordinator-sessions-entry-key-set.test.ts` with 4 tests:
+    - GC-1: coordinator.sessions is [] when no active sessions
+    - GC-2: fresh session entry key set = `{sessionId, stagingComplete, toolPatterns, topTools}`
+    - GC-3: session entry with sessionFocus = `{sessionFocus, sessionId, stagingComplete, toolPatterns, topTools}`
+    - GC-4: all entry keys are within max set `{entity, sessionFocus, sessionId, stagingComplete, toolPatterns, topTools}`
+  - All 4 pass; full suite 4068/0/2
+- **Human-action items (carried forward):**
+  1. **DISABLE hourly cron** — ~1749+ runs; burning ~50k tokens/run
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Upgrade Notion plan** — workspace out of free blocks
+- **Next run:** Check GC PR #1435 CI/review. Next candidate: freeze `coordinator` snapshot top-level key set (ED froze sub-object shapes, but the coordinator object itself — its full key list — has not been frozen as a standalone guard).
+
+---
+
 # ch1tty goal-driver board (fallback — Notion auth blocked)
 
 Notion auth returns 401. This file is the cross-run state fallback until the token is refreshed.
