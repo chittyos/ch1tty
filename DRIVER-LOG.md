@@ -5921,10 +5921,57 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   - FZ-7: short mode — coordinator without sessions, same primitive types
   - Local test result: **4716 pass / 0 fail / 3 skip (+7)**
 - **Open PRs:** #1431 (FY — status value types, pending merge); #FZ (opened this run)
+
+## Run log — 2026-09-20 (automated — GA branch opened)
+
+- **Workstream advanced:** GA — coordinator.ledger value types
+- **Branch/PR: `auto/GA-coordinator-ledger-value-types` → https://github.com/chittyos/ch1tty/pull/1433
+- **Build:** tsc clean | **Tests:** 4712 pass / 0 fail / 3 skip (+3 new)
+- **Prior-run status checks:**
+  - PR #1431 (FY — status value types, 12 tests): CI 3/3 green, all 7 review threads resolved. Awaiting human merge.
+  - PR #1432 (FZ — coordinator value types, 7 tests): CI 3/3 green, all 8 review threads resolved (resolved 2 unresolved Codex threads this run). Awaiting human merge.
+- **What was done this session:**
+  1. Read CLAUDE.md + CHITTY.md; guardrails confirmed. `npm ci` clean. `npm run build` clean. Tests: 4709/0/3 on main (run ~1745 as last commit).
+  2. Confirmed 2 open PRs (FY #1431, FZ #1432). Both CI 3/3 green.
+  3. PR #1431 (FY): all 7 review threads already resolved by prior session.
+  4. PR #1432 (FZ): 2 Codex threads (entity optional field coverage + coordinator.ledger coverage) had scope-out replies from chitcommit but were not resolved. Resolved both this session.
+  5. Identified GA gap: ED freezes coordinator.ledger key sets + 6 numeric fields >= 0; no guard on `dlqPath` (string) or `lastFlushAt` (null | ISO string) or `flushIntervalMs > 0` constraint.
+  6. Created `test/ga-coordinator-ledger-value-types.test.ts` with 3 tests (GA-1 dlqPath string, GA-2 lastFlushAt null|ISO, GA-3 flushIntervalMs > 0). All 3 pass.
+- **Open PRs (post-run):**
+  - #1431 (FY) — CI green, all threads resolved, awaiting human merge
+  - #1432 (FZ) — CI green, all threads resolved, awaiting human merge
+  - GA PR — pushed this run, CI pending
 - **Human-action items (carried forward):**
   1. **DISABLE hourly cron** — ~1746+ runs; burning ~50k tokens/run
   2. **Enable GitHub Actions** (main npm test CI job)
   3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
   5. **Upgrade Notion plan** — workspace out of free blocks
-- **Next run:** FY in CI review. After merge, next candidates: SessionCoordinator getSnapshot() key-set + value-type drift guard; HTTP server edge paths; config-validation gaps.
+- **Next run:** Watch GA PR for CI/review. If FY/FZ/GA all merge, next candidate: SessionCoordinator getSnapshot() edge-case tests (eviction, TTL expiry) or HTTP server endpoint value-type guards.
+
+---
+
+## Run log — 2026-09-20 (automated — GA-2b Codex fix)
+
+- **Workstream:** GA (continuation) — exercising non-null lastFlushAt branch
+- **Branch/PR:** `auto/GA-coordinator-ledger-value-types` → https://github.com/chittyos/ch1tty/pull/1433 (same PR, new commit 6a68f5a)
+- **Build:** tsc clean | **Tests:** GA file 4 pass (was 3; +1 GA-2b)
+- **Codex P2 finding on GA-2:** `lastFlushAt` else-branch was unreachable because fixture backend never triggers a real flush. Fixed by adding GA-2b: drives LedgerClient directly with an inline stub backend that succeeds on `chitty_ledger_record`, confirms `lastFlushAt` is a valid ISO date string after flush.
+- **Review thread PRRT_kwDORhsD_s6kKF_5:** replied with fix commit + resolved.
+- **PR #1433 status:** CI pending re-run on new commit; 0 open review threads.
+- **Human-action items (carried forward):**
+  1. **DISABLE hourly cron** — ~1747+ runs; burning ~50k tokens/run
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Upgrade Notion plan** — workspace out of free blocks
+- **Next run:** Wait for #1433 CI re-run. If green and Codex clean, PR is ready for human merge. If FY/FZ/GA all merge, next: SessionCoordinator snapshot edge-case tests or HTTP server endpoint value-type guards.
+
+---
+
+## Run log — 2026-09-20 (automated — GA #1433 CI green, ready to merge)
+
+- **Status:** PR #1433 fully green on head `3132aa6`
+- **CI:** 3/3 ✅ (CodeQL, Analyze actions, Analyze javascript-typescript)
+- **Review threads:** 0 open (both Codex P2 threads addressed and resolved)
+- **Awaiting:** Human merge of #1431 (FY), #1432 (FZ), #1433 (GA)
