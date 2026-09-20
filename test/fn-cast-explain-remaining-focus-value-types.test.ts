@@ -129,10 +129,11 @@ describe('FN-1 — focusBias and focusConfidence value types at verbosity:full (
       assert.ok((focusConfidence as number) >= 0, `focusConfidence must be ≥ 0, got ${focusConfidence}`);
       assert.ok((focusConfidence as number) <= 1, `focusConfidence must be ≤ 1, got ${focusConfidence}`);
 
-      // focusConfidence is Math.min(1, focusBias) — always ≤ focusBias
-      assert.ok(
-        (focusConfidence as number) <= (focusBias as number) || (focusConfidence as number) === 1,
-        `focusConfidence (${focusConfidence}) must be ≤ focusBias (${focusBias}) or equal 1`,
+      // focusConfidence is exactly Math.min(1, focusBias) — assert the clamp directly
+      assert.equal(
+        focusConfidence,
+        Math.min(1, focusBias as number),
+        `focusConfidence must equal Math.min(1, focusBias) = ${Math.min(1, focusBias as number)}, got ${focusConfidence}`,
       );
     } finally {
       await agg.shutdown();
