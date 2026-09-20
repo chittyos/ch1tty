@@ -5700,3 +5700,21 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Upgrade Notion plan** — workspace out of free blocks; run log can no longer be appended
 - **Next run:** All 4 cast explain drift-guard quadrants now covered. Consider: (a) EX full-verbosity extension (EX only covers low/medium single-candidate; full-verbosity single-candidate ungarded), (b) startup env-var validation workstream, (c) SessionCoordinator unit coverage.
+
+---
+
+## Run log — 2026-09-20 (automated — FS #1424 + FT #1425 merged; #1423 CI running)
+
+- **Workstream:** Monitoring — no new code; FS and FT merges confirmed
+- **FS #1424 merged** at 12:44:27Z — brain no_match key-set drift guard (8 tests)
+- **FT #1425 merged** at 12:44:30Z — brain resolved key-set drift guard (7 tests)
+- **FR #1423**: still open; CI running on merge commit `7c18516` (brought main up through FT driver-log)
+- **Gap map status:** FH ✓ · FR (pending merge) · FS ✓ · FT ✓ — all 4 route×outcome quadrants covered
+- **Human-action items:**
+  1. **Merge PR #1423 (FR)** — once CI green; 7 tests, no conflicts with FS/FT files
+  2. **DISABLE hourly cron** — ~1740+ runs
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Upgrade Notion plan** — workspace out of free blocks
+- **Next run:** Merge #1423 (FR) if CI green. Then: EX full-verbosity single-candidate key-set (next uncovered shape).
