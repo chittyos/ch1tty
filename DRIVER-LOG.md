@@ -5883,6 +5883,29 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
 
 ---
 
+## Run log — 2026-09-20 (automated — FY workstream)
+
+- **Workstream advanced:** FY — `ch1tty/status` response VALUE TYPES drift guard
+- **Branch/PR:** `auto/FY-status-value-types-drift-guard` → PR pending
+- **Build:** tsc clean (0 errors)
+- **Tests:** 4721 pass / 0 fail / 3 skip (+12 from FY tests)
+- **What was done:**
+  - DZ+ED had frozen KEY SETS for the status response; neither froze VALUE TYPES.
+  - Added `test/fy-status-value-types-drift-guard.test.ts` (12 tests):
+    FY-1: top-level primitives (gateway, version, uptime, counts, registryCached)
+    FY-2: systemHealth.status enum, brainDegraded boolean, ledgerStatus enum
+    FY-3: brainHealth.status enum, circuitOpen booleans
+    FY-4: ledgerHealth status enum + dropped/buffered/flushErrors/dlqEntries >= 0
+    FY-5: ledgerDlq.path string, entryCount >= 0, entries array
+    FY-6: catalog.loaded boolean, totalCombos >= 0, byFocus object of numbers
+    FY-7: focus is null when no focus active
+    FY-8: focus is typed object when focus active
+    FY-9: catalog.activeFocusSuggestions is null or {combos, prompts}
+    FY-10: servers[] entry types (id, name, type enum, enabled, connected, toolCount)
+    FY-11: latencyMs present and >= 0
+    FY-12: availableFocusProfiles is non-empty string array
+- **Open PRs:** FY (pending CI)
+
 ## Run log — 2026-09-20 (automated — FZ coordinator value types)
 
 - **Startup:** Build clean (tsc 0 errors). Tests: 4709 pass / 0 fail / 3 skip (baseline).
@@ -5904,4 +5927,4 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
   5. **Upgrade Notion plan** — workspace out of free blocks
-- **Next run:** Merge FY (#1431) when CI unblocked. FZ will open. Next candidates after FZ: HTTP server edge paths (cj/ck series gaps), or config-validation coverage gaps.
+- **Next run:** FY in CI review. After merge, next candidates: SessionCoordinator getSnapshot() key-set + value-type drift guard; HTTP server edge paths; config-validation gaps.
