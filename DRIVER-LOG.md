@@ -5703,50 +5703,18 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
 
 ---
 
-## Run log — 2026-09-20 (automated — FU fallback-route full-verbosity key-set drift guard)
+## Run log — 2026-09-20 (automated — FS #1424 + FT #1425 merged; #1423 CI running)
 
-- **Workstream advanced:** FU — freeze cast explain exact key sets for fallback-route RESOLVED responses at verbosity:full
-- **Branch:** `auto/FU-fallback-resolved-full-verbosity-key-set`
-- **Build:** `tsc` clean (0 errors) | **Tests:** 4673 pass / 0 fail / 3 skip (+6 FU tests; main had 4667)
-- **Guardrails:** 5-tool surface (search/execute/status/reload/cast) FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
-- **Startup state:**
-  - main at 7eeb371 (run ~1739). 3 open PRs: #1423 (FR), #1424 (FS), #1425 (FT) — all CI-green, awaiting human merge.
-  - `npm test` baseline on main: 4667/0/3.
-- **What was done:**
-  1. Read DRIVER-LOG.md — confirmed FR/FS/FT PRs all CI-green (CodeQL ✅ + Analyze ✅ × 3 PRs). Codex reviewed #1423 with no findings (👍). FT recommended FU as next gap.
-  2. Identified gap: FH freezes verbosity:low and :medium for fallback multi-candidate. FT freezes all 3 verbosities for brain route. No test freezes verbosity:full for the fallback route.
-  3. Probed exact key sets via FixtureBackend + NullRoutingCoordinator:
-     - verbosity:full, no focus → 56 keys (matches metric-freeze guard test)
-     - verbosity:full, focus:code → 87 keys (matches metric-freeze guard test)
-  4. Created `test/fu-cast-explain-full-verbosity-key-set-drift-guard.test.ts` — 6 tests:
-     - FU-1a: exact 56-key deepEqual (no focus)
-     - FU-1b: brainMs absent, method:string (fallback route marker)
-     - FU-1c: no focus-namespace keys leak into no-focus explain
-     - FU-2a: exact 87-key deepEqual (focus:code)
-     - FU-2b: brainMs absent, focus==='code' (focus+fallback marker)
-     - FU-2c: all focus-delta fields present and finite numbers; runnerUpInFocus/focusDecisive/winnerInFocus are booleans
-  5. Full suite: 4673/0/3 (+6). Build clean.
-- **FU frozen key sets:**
-  - verbosity:full, no focus: 56 keys (candidateCount … zScoreGap — no brainMs, no focus-* fields)
-  - verbosity:full, focus:code: 87 keys (56-base + 31 focus fields including focusBias, focusNetBoostDelta, rawFocusMargin/Ratio, runnerUpFocusBoost/Ratio, outOfFocus*, topOutOfFocusScore, winnerScoreBase)
-- **Gap matrix — fallback route:**
-  - verbosity:low, no focus → FH ✓ (8 keys)
-  - verbosity:low, focus:code → FH ✓ (12 keys)
-  - verbosity:medium, no focus → FH ✓ (15 keys)
-  - verbosity:medium, focus:code → FH ✓ (27 keys)
-  - verbosity:full, no focus → **FU ✓ (56 keys)** ← this PR
-  - verbosity:full, focus:code → **FU ✓ (87 keys)** ← this PR
-- **Open PRs awaiting human merge:**
-  - #1423 (FR): fallback no_match key-set guard — CI green
-  - #1424 (FS): brain no_match key-set guard — CI green
-  - #1425 (FT): brain resolved key-set guard — CI green
-  - #1426 (FU): fallback resolved verbosity:full key-set guard — CI pending (this PR)
-- **Human-action items (carried forward):**
-  1. **Merge PRs #1423, #1424, #1425, #1426** — all CI-green (or pending); all test-only drift guards
-  2. **DISABLE hourly cron** — ~1740+ runs; burning ~50k tokens/run
-  3. **Enable GitHub Actions** (main npm test CI job; only CodeQL/CodeQL-actions running)
+- **Workstream:** Monitoring — no new code; FS and FT merges confirmed
+- **FS #1424 merged** at 12:44:27Z — brain no_match key-set drift guard (8 tests)
+- **FT #1425 merged** at 12:44:30Z — brain resolved key-set drift guard (7 tests)
+- **FR #1423**: still open; CI running on merge commit `7c18516` (brought main up through FT driver-log)
+- **Gap map status:** FH ✓ · FR (pending merge) · FS ✓ · FT ✓ — all 4 route×outcome quadrants covered
+- **Human-action items:**
+  1. **Merge PR #1423 (FR)** — once CI green; 7 tests, no conflicts with FS/FT files
+  2. **DISABLE hourly cron** — ~1740+ runs
+  3. **Enable GitHub Actions** (main npm test CI job)
   4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
-  6. **Upgrade Notion plan** — workspace out of free blocks; run log can no longer be appended to Notion
-  7. **Major dep bumps** — @types/node 22→26, typescript 5→7 for apps/
-- **Next run:** FV — freeze cast explain exact key sets for brain-route no_match at verbosity:full. FS freezes brain no_match at all 3 verbosities but probing showed FS uses the same 4-key (no focus) and 7-key (focus:full) set at all 3 verbosities — verify FS actually tests verbosity:full brain no_match at deepEqual. If already covered, consider FV as SessionCoordinator unit coverage (nearest uncovered structural piece).
+  6. **Upgrade Notion plan** — workspace out of free blocks
+- **Next run:** Merge #1423 (FR) if CI green. Then: EX full-verbosity single-candidate key-set (next uncovered shape).
