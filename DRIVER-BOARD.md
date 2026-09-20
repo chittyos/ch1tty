@@ -6873,3 +6873,27 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 7. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 
 **Next run:** Merge #1416 (FL) if CI green. Next gap: FM — cast explain topCandidates array item shape (each item has `tool`, `score`, `server`, etc. — no test freezes the per-item key set inside the topCandidates array) or cast explain single-candidate key sets at verbosity:full (EX/EY froze low+medium for single-candidate; verbosity:full single-candidate not yet frozen).
+
+---
+
+## Run ~1731 — 2026-09-20
+
+**Build:** tsc clean | **Tests:** 4603 pass / 0 fail / 3 skip (4606 total) | **Audit:** 0 vulnerabilities
+
+**PR #1416 (FL) — CLOSED without merging:** FL was closed at 02:48Z today. Root cause: DW already freezes the exact 56-key no-focus field name set at verbosity:full via deepEqual. FL's 4 tests were redundant — a rename at verbosity:full would already fail DW. Correct to close; FL's work is not lost.
+
+**PR #1417 (FM) — monitoring:** open, CI 3/3 green (CodeQL ✅, Analyze(actions) ✅, Analyze(javascript-typescript) ✅). Codex: ✅ no findings on latest commit (3cf93d3). Review thread (Codex P2 — embed warmup) resolved this run — was outdated (fix already applied in 3cf93d3 by prior session). `mergeable_state: blocked` — awaiting human approval. PR is ready for merge.
+- 38 new tests in `test/fm-cast-explain-full-verbosity-remaining-value-types.test.ts`
+- Freezes value types for 36 verbosity:full fields not covered by EV (concentration/entropy, ratio/normalized, z-score/gap, distribution shape, absolute/remaining)
+- No new fields added — types of existing fields only; CLAUDE.md metric freeze compliant
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ + H–N ✓ | FI/FJ/FK/FL(closed) merged-or-closed; FM → PR #1417 (CI green, awaiting human merge)
+
+**Human-action items:**
+1. **Merge PR #1417 (FM)** — CI green, Codex clean, all review threads resolved; ready for merge
+2. **DISABLE hourly cron** — ~1731 runs; burning ~50k tokens/run with no deliverable when FM merges
+3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+5. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run (FN):** After FM merges — freeze cast explain single-candidate key sets at verbosity:full (EX/EY covered low+medium for single-candidate; verbosity:full single-candidate path not yet frozen), OR freeze topCandidates per-item key set (tool, score, server fields — no deepEqual guard exists for the per-item shape).
