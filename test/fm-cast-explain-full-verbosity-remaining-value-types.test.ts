@@ -50,7 +50,10 @@ function makeAgg(): Aggregator {
     backendFactory: () => backend,
     embedEnabled: false,
     ledgerDlqPath: join(tmpdir(), `ch1tty-fm-${Date.now()}.jsonl`),
-    coordinator: new NullRoutingCoordinator(),
+    // Pass { enabled: false } so the coordinator's EmbeddingBrain skips warmup.
+    // embedEnabled:false only applies when Aggregator creates the coordinator itself,
+    // not when a pre-built instance is injected via the coordinator option.
+    coordinator: new NullRoutingCoordinator({}, { enabled: false }),
   } as Parameters<typeof Aggregator>[1]);
 }
 
