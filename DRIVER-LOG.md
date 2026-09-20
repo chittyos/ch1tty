@@ -5832,3 +5832,29 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
   5. **Upgrade Notion plan** — workspace out of free blocks
 - **Next run:** Drift-guard matrix is substantially complete. Candidates for next workstream: (a) brain-route resolved value types (FT/FU freeze key sets; no guard on brainMs type + value), (b) SessionCoordinator route-intent branch coverage, (c) FP extends low/medium verbosity types but brain-route path not covered.
+
+---
+
+## Run log — 2026-09-20 (automated — FX #1430 opened)
+
+- **Workstream advanced:** FX — freeze brain-route verbosity:full value types
+- **Branch/PR:** `auto/FX-brain-route-fullverbosity-value-types` → https://github.com/chittyos/ch1tty/pull/1430
+- **Build:** tsc clean | **Tests (on FX branch):** 4709 pass / 0 fail / 3 skip
+- **What was done this session:**
+  1. Pulled main — confirmed FW (#1429) + FU/brain-varied (#1428) both merged during prior wake: 4705 pass on main.
+  2. Merged PR #1429 (FW — no_match value types, 4 tests) and PR #1428 (FU/brain-varied — brain-route key sets with score variance, 6 tests); CI all green, Codex no findings on both.
+  3. Identified FX gap: FT/FU freeze brain-route KEY SETS at verbosity:full; FM/FN freeze FALLBACK-ROUTE value types; no test validates brain-route resolved VALUE TYPES at verbosity:full.
+  4. Wrote `test/fx-brain-route-fullverbosity-value-types.test.ts` (4 tests: FX-1 through FX-4). All 4 pass.
+  5. Opened PR #1430 (FX); subscribed to activity.
+- **Drift-guard matrix — verbosity:full coverage:**
+  - Key sets: FH/FU (fallback), FT/FU-brain (brain)
+  - Value types: FM/FN (fallback), **FX (brain — pending PR #1430)**
+  - No-match: FR/FS (key sets), FW (value types)
+- **Open PRs:** #1430 (FX) — CI queued
+- **Human-action items (carried forward):**
+  1. **DISABLE hourly cron** — ~1744+ runs; burning ~50k tokens/run
+  2. **Enable GitHub Actions** (main npm test CI job; only CodeQL/CodeQL-actions running)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Upgrade Notion plan** — workspace out of free blocks
+- **Next run:** Merge #1430 (FX) when CI green + Codex clean. Then: drift-guard matrix is largely complete; next candidates are SessionCoordinator snapshot/eviction edge cases or HTTP server edge paths.
