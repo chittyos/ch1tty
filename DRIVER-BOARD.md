@@ -6998,3 +6998,36 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 **Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ + H–O ✓ | FN+FP merged; FQ → PR #1422 open
 
 **Next run:** After FQ merges: consider gap FQ noted above (no_match key sets, scoreDominanceIndex math invariants per run ~1733 analysis) OR shift to a functional workstream such as apps/comms-mcp coverage or gateway scenario testing.
+
+---
+
+## Run ~1735 — 2026-09-20
+
+**Build:** (not run — no code changes) | **Tests:** 4671 pass / 0 fail / 3 skip (origin/main unchanged) | **Audit:** unchanged
+
+**Actions taken:**
+- Context resumed from run ~1734. PR #1422 (FQ) was open with CI green (CodeQL ✓) but `mergeable_state: blocked`.
+- Codex review posted P2 finding on PR #1422: `test/fa-cast-explain-single-candidate-value-types-full.test.ts` already covers the same ground as FQ — FA has 5 tests (FA-1, FA-1b, FA-2, FA-2b, FA-2c) vs FQ's 4 tests, with more comprehensive absence guards.
+- Verified: FA was already merged before this session series started; it covers all 4 FQ scenarios (scoreDominanceIndex, topCandidatesMeanScore, inFocus{Top,Mean,Bottom}Score, outOfFocusCandidatesCount, winnerFocusBoostRatio, cross-field identity invariants, absence guards for runner-up/distribution/focus-decisiveness fields).
+- Replied to Codex comment acknowledging the duplicate, then **closed PR #1422**.
+- Audited "FO" cross-field invariants cited in run ~1732 board: all already covered by existing tests (fd-topcandidates covers `topCandidates[0].score===winnerScore`; ew covers `candidatesInFocusCount+outOfFocusCandidatesCount===candidateCount`; fn covers `focusConfidence===Math.min(1,focusBias)`).
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ + H–O ✓ | FN ✓ FP ✓ FA ✓ (FA was pre-existing); FQ → closed (duplicate)
+
+**Cast explain test-freeze series assessment:** Essentially complete.
+- Field names: ER (low/med), ES (low/med+focus), EY (full single-candidate), FH (verbosity key sets)
+- Value types: EU (low/med), EV (full multi-candidate), EW (full focus), FA (full single-candidate), EZ (single-candidate low/med), FM (full remaining 36 fields), FN (remaining 7 focus fields), FP (multi-candidate low/med)
+- Cross-field invariants: FD (topCandidates[0] identity), EW (focus partition), FA-2c (score decomposition), FN-1 (focusBias/focusConfidence clamp)
+- No genuine gaps identified.
+
+**Next run:** Shift away from cast explain test-freeze to a new workstream:
+  Option A — `apps/comms-mcp` coverage (comms MCP surface tests)
+  Option B — Gateway scenario integration tests (multi-step cast-chain, reload behavior under live traffic)
+  Option C — `topCandidates` array ordering invariants across all verbosity levels (not frozen yet)
+
+**Human-action items (persistent):**
+1. **DISABLE hourly cron** — ~1735 runs; this run produced no new code; consider stopping or reducing frequency
+2. **Upgrade Notion plan** — workspace out of free blocks; run logs can no longer be appended to Notion board
+3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+5. **Stale branch cleanup** — 1100+ remote auto/ branches
