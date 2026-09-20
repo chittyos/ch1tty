@@ -83,6 +83,7 @@ test('GA-2: coordinator.ledger.lastFlushAt is null or a valid ISO date string', 
       assert.equal(typeof v, 'string', 'coordinator.ledger.lastFlushAt must be a string when set');
       const d = new Date(v as string);
       assert.ok(!Number.isNaN(d.getTime()), `coordinator.ledger.lastFlushAt must parse as a valid date, got "${v}"`);
+      assert.equal(v, d.toISOString(), `coordinator.ledger.lastFlushAt must be a canonical ISO 8601 string, got "${v}"`);
     }
   } finally {
     await agg.shutdown?.();
@@ -117,6 +118,7 @@ test('GA-2b: coordinator.ledger.lastFlushAt is a valid ISO date string after a f
     assert.equal(typeof stats.lastFlushAt, 'string', 'lastFlushAt must be a string after a successful flush');
     const d = new Date(stats.lastFlushAt as string);
     assert.ok(!Number.isNaN(d.getTime()), `lastFlushAt must be a valid ISO date after flush, got "${stats.lastFlushAt}"`);
+    assert.equal(stats.lastFlushAt, d.toISOString(), `lastFlushAt must be a canonical ISO 8601 string after flush, got "${stats.lastFlushAt}"`);
   } finally {
     client.unbind();
     await client.shutdown();
