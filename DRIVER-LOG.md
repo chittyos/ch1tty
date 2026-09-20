@@ -5880,3 +5880,32 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
   5. **Upgrade Notion plan** — workspace out of free blocks
 - **Next run:** Drift-guard matrix (explain key sets + value types) is now complete across all routing paths × verbosities × focus states. Next workstream candidates: SessionCoordinator getSnapshot() key-set drift guard, HTTP server edge paths, or config-validation coverage gaps.
+
+---
+
+## Run log — 2026-09-20 (automated — GA branch opened)
+
+- **Workstream advanced:** GA — coordinator.ledger value types
+- **Branch/PR:** `auto/GA-coordinator-ledger-value-types` → PR pending push
+- **Build:** tsc clean | **Tests:** 4712 pass / 0 fail / 3 skip (+3 new)
+- **Prior-run status checks:**
+  - PR #1431 (FY — status value types, 12 tests): CI 3/3 green, all 7 review threads resolved. Awaiting human merge.
+  - PR #1432 (FZ — coordinator value types, 7 tests): CI 3/3 green, all 8 review threads resolved (resolved 2 unresolved Codex threads this run). Awaiting human merge.
+- **What was done this session:**
+  1. Read CLAUDE.md + CHITTY.md; guardrails confirmed. `npm ci` clean. `npm run build` clean. Tests: 4709/0/3 on main (run ~1745 as last commit).
+  2. Confirmed 2 open PRs (FY #1431, FZ #1432). Both CI 3/3 green.
+  3. PR #1431 (FY): all 7 review threads already resolved by prior session.
+  4. PR #1432 (FZ): 2 Codex threads (entity optional field coverage + coordinator.ledger coverage) had scope-out replies from chitcommit but were not resolved. Resolved both this session.
+  5. Identified GA gap: ED freezes coordinator.ledger key sets + 6 numeric fields >= 0; no guard on `dlqPath` (string) or `lastFlushAt` (null | ISO string) or `flushIntervalMs > 0` constraint.
+  6. Created `test/ga-coordinator-ledger-value-types.test.ts` with 3 tests (GA-1 dlqPath string, GA-2 lastFlushAt null|ISO, GA-3 flushIntervalMs > 0). All 3 pass.
+- **Open PRs (post-run):**
+  - #1431 (FY) — CI green, all threads resolved, awaiting human merge
+  - #1432 (FZ) — CI green, all threads resolved, awaiting human merge
+  - GA PR — pushed this run, CI pending
+- **Human-action items (carried forward):**
+  1. **DISABLE hourly cron** — ~1746+ runs; burning ~50k tokens/run
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Upgrade Notion plan** — workspace out of free blocks
+- **Next run:** Watch GA PR for CI/review. If FY/FZ/GA all merge, next candidate: SessionCoordinator getSnapshot() edge-case tests (eviction, TTL expiry) or HTTP server endpoint value-type guards.
