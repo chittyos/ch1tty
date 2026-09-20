@@ -6909,24 +6909,21 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test` (on origin/main): 4603 pass / 0 fail / 3 skip.
 - **PR #1417 (FM):** Found `mergeable_state: dirty` (merge conflict in DRIVER-BOARD.md). Fixed: fetched FM branch, merged origin/main, resolved conflict (took main's run ~1731 entry), pushed. PR #1417 now clean and mergeable.
 - **PR #1418 (FN):** Already `mergeable_state: clean`, CI green — no action needed.
-- **FO test:** Created `test/fo-topCandidates-item-shape.test.ts` — 12 tests across 3 suites freezing the topCandidates per-item key set:
-  - FO-1 (no focus): items have exactly `{tool, score}` — 4 tests
-  - FO-2 (focus:code): items have exactly `{tool, score, inFocus}` with boolean inFocus, neon=true, stripe/tasks=false — 6 tests
-  - FO-3 (ordering): scores non-increasing in both focus and no-focus paths — 2 tests
-  - All 12 pass; full suite: 4615/0/3.
-- Branch `auto/FO-topCandidates-item-shape` pushed; PR #1419 opened.
+- **FO test:** Created `test/fo-topCandidates-item-shape.test.ts` — 12 tests, all passing. Codex CI review found these were duplicate of `et-cast-explain-topCandidates-item-shape.test.ts` (deepEqual key guards) and `fd-topcandidates-item-value-types.test.ts` (types + ordering). **Retracted:** test file deleted from branch; PR #1419 will close as empty board-only update.
+- Branch `auto/FO-topCandidates-item-shape` pushed; PR #1419 opened then test file retracted.
 
 **PR #1417 (FM) status:** conflict resolved this run — now `mergeable_state: clean`. CI was and remains green. Ready for human merge.
 **PR #1418 (FN) status:** `mergeable_state: clean`, CI green. Ready for human merge.
-**PR #1419 (FO) status:** opened this run, awaiting CI.
+**PR #1419 (FO) status:** RETRACTED — FO tests were duplicate of ET+FD; test file removed. PR contains only this board update.
 
-**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ + H–N ✓ | FI/FJ/FK merged; FL closed; FM → #1417 (conflict fixed, clean); FN → #1418 (clean); FO → #1419 (new this run)
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ + H–N ✓ | FI/FJ/FK merged; FL closed; FM → #1417 (conflict fixed, clean); FN → #1418 (clean); FO → RETRACTED (duplicate of ET+FD)
 
 **Human-action items (unchanged):**
 1. **Merge PR #1417 (FM)** — conflict resolved; CI green; ready for merge
 2. **Merge PR #1418 (FN)** — CI green; ready for merge
-3. **DISABLE hourly cron** — ~1732 runs; burning tokens with marginal test additions
-4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
-5. **Stale branch cleanup** — 1100+ remote auto/ branches
+3. **Close PR #1419 (FO)** — FO tests were duplicate; test file removed from branch
+4. **DISABLE hourly cron** — ~1732 runs; burning tokens with marginal test additions
+5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
-**Next run:** Merge FM/FN/FO if CI green. Next gap after FO: cast explain single-candidate verbosity:full key set (EX/EY covered low+medium for single-candidate; verbosity:full single-candidate path not yet frozen). Can also look at cast dryRun output shape at verbosity:full.
+**Next run:** After FM/FN merge, next gap: cast explain single-candidate verbosity:full key set (EX/EY covered low+medium for single-candidate; verbosity:full single-candidate path not yet frozen). ET/FD already guard topCandidates; no further FO work needed.
