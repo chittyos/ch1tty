@@ -25,6 +25,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
 import { Aggregator } from '../src/aggregator.js';
+import { LedgerClient } from '../src/ledger.js';
 import type { ServerConfig } from '../src/types.js';
 import { FixtureBackend, FIXTURE_SERVERS } from './fixture-backend.js';
 
@@ -85,6 +86,40 @@ test('GA-2: coordinator.ledger.lastFlushAt is null or a valid ISO date string', 
     }
   } finally {
     await agg.shutdown?.();
+  }
+});
+
+// ── GA-2b: lastFlushAt is an ISO date string after a real flush ──────────────
+//
+// GA-2 only exercises the null path (no flush occurs through the Aggregator
+// fixture). GA-2b drives LedgerClient directly with a minimal stub backend so
+// the post-flush non-null branch is also covered.
+
+test('GA-2b: coordinator.ledger.lastFlushAt is a valid ISO date string after a flush', async () => {
+  // Minimal stub — only callTool is exercised by LedgerClient.flush()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const stubBackend = {
+    callTool: async (_serverId: string, toolName: string) => {
+      if (toolName === 'chitty_ledger_record') {
+        return { content: [{ type: 'text', text: 'ok' }] };
+      }
+      return { isError: true, content: [{ type: 'text', text: 'not found' }] };
+    },
+  } as any;
+
+  const client = new LedgerClient(join(tmpdir(), `ch1tty-ga2b-${Date.now()}-${++_seq}.jsonl`));
+  try {
+    client.bind(stubBackend, 'echo');
+    client.record('sess-ga2b', 'test_event', { x: 1 });
+    await client.flush();
+
+    const stats = client.getStats();
+    assert.equal(typeof stats.lastFlushAt, 'string', 'lastFlushAt must be a string after a successful flush');
+    const d = new Date(stats.lastFlushAt as string);
+    assert.ok(!Number.isNaN(d.getTime()), `lastFlushAt must be a valid ISO date after flush, got "${stats.lastFlushAt}"`);
+  } finally {
+    client.unbind();
+    await client.shutdown();
   }
 });
 
