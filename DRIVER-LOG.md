@@ -5805,3 +5805,27 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   - FS ✓ brain no_match key sets (all 3 verbosities × focus/no-focus)
   - FW ✓ (pending) no_match value types (route × focus, verbosity:full)
 - **Next run:** Merge #1429 (FW) when CI green. Then consider: resolved explain value type guards for FU's 56/87-key sets, or SessionCoordinator route-intent branch coverage.
+
+---
+
+## Run log — 2026-09-20 (automated — FU #1428 merged; all open PRs now merged/closed)
+
+- **Workstream:** Monitoring + FU brain-varied-confidence
+- **FR #1423 merged** at 12:46:51Z (confirmed) — final quadrant close: FH/FR/FS/FT all ✓
+- **FU #1426 merged** at 12:50:54Z (other session) — fallback verbosity:full key sets (56/87), 6 tests
+- **FV #1427 closed** without merging at 12:53:51Z — single-candidate verbosity:full; made redundant by EY (already covered)
+- **FU #1428 merged** at 13:09:55Z (this session) — brain-route varied-confidence key sets; FU-5=57keys (DW+brainMs), FU-6=88keys; adds kurtosis/skewness/z-score + focusBias/focusConfidence that FT couldn't trigger; 6 tests
+- **FW #1429 merged** at 13:04:23Z (other session) — no_match value types (route×focus), 4 tests
+- **No open PRs** as of 13:10 UTC
+- **Test count on main:** 4705 pass / 0 fail / 3 skip
+- **Gap-map summary:**
+  - Key-set guards: FH ✓ · FR ✓ · FS ✓ · FT ✓ · FU-fallback ✓ · FU-brain-varied ✓ · FV (covered by EY)
+  - Value-type guards: FW ✓ (no_match path, all routes × focus)
+  - Full-verbosity resolved value types on brain route: NOT YET covered (EV/EW use keyword fallback route)
+- **Human-action items (carried forward):**
+  1. **DISABLE hourly cron** — ~1742+ runs; burning ~50k tokens/run
+  2. **Enable GitHub Actions** (main npm test CI job; only CodeQL/CodeQL-actions running)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Upgrade Notion plan** — workspace out of free blocks
+- **Next run:** FX — freeze brain-route full-verbosity RESOLVED value types (EV/EW cover keyword route; brain route value types at full verbosity unguarded). Or SessionCoordinator unit coverage.
