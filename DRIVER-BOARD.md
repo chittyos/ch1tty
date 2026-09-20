@@ -7031,3 +7031,21 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
 4. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
 5. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+---
+
+## Run ~1736 — 2026-09-20
+
+**Build:** clean (tsc exit 0) | **Tests:** 4756 pass / 0 fail / 3 skip (post-GE) | **Audit:** 0 vulns
+
+**Actions taken:**
+- Synced to origin/main (1819815). `npm ci` clean. `npm run build` clean. `npm test`: 4732 pass / 0 fail / 3 skip.
+- Found 3 open PRs from prior run: #1434 (GB — 7 tests), #1435 (GC — 4 tests), #1436 (GD — 6 tests). All CI-green, `mergeable_state: clean`.
+- **Merged #1434, #1435, #1436** squash → main (4750 pass post-merge).
+- Identified GE gap: FE froze `systemHealth` key set but no guard froze VALUE TYPES of `systemHealth.brainDegraded` (boolean), `systemHealth.ledgerStatus` (enum), `systemHealth.status` (nested enum), or top-level `body.status === systemHealth.status` consistency.
+- Created `auto/GE-systemhealth-value-types` with 6 new tests (GE-1 through GE-6); full suite 4756 pass / 0 fail.
+- Pushed and opened **PR #1437** (https://github.com/chittyos/ch1tty/pull/1437). Subscribed.
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ + GB ✓ GC ✓ GD ✓ | GE → PR #1437 open
+
+**Next run:** Merge PR #1437 if CI green; identify GF gap (candidates: `latencyMs` value-type constraints across meta-tool responses, or `coordinator.brain` key-set stability under circuit-open state).
