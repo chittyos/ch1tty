@@ -6056,3 +6056,29 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
   5. **Upgrade Notion plan** — workspace out of free blocks
 - **Next run:** Check GB PR for CI/review. Next candidate: freeze `/api/v1/status` coordinator.sessions[] entry key set (the `sessions` sub-array in the coordinator field — key set not frozen, only value types from FZ).
+
+---
+
+## Run log — 2026-09-21 (automated — merge GI–GQ; open GR)
+
+- **Workstream advanced:** G-series (coordinator value types) — merged 9 backlogged PRs (GI–GQ) + opened GR
+- **Branch/PR:** `auto/GR-coordinator-brain-primitive-value-types` → https://github.com/chittyos/ch1tty/pull/1450 (open, CI pending)
+- **Build:** tsc clean | **Tests:** 4846 pass / 0 fail / 3 skip (+8 from GR; was 4838 post-GI–GQ merges)
+- **What was done this session:**
+  1. Read CLAUDE.md + CHITTY.md; guardrails confirmed.
+  2. Synced local main to origin/main (reset --hard from diverged state).
+  3. `npm ci` clean. `npm run build` clean. `npm test`: 4772/0/3 (pre-merge baseline).
+  4. Found 9 open G-series PRs (GI #1441 – GQ #1449). All CI green (CodeQL ✓), mergeable_state: clean, each independently branched off main. Merged all 9 via squash.
+  5. Post-merge test count: 4838/0/3 (+66 tests).
+  6. Identified GR gap: GG froze coordinator key set; GA froze ledger sub-fields; GC froze sessions[] entry key set. No test froze coordinator.brain (OllamaBrainStats 8 keys) or coordinator.embeddingBrain (EmbeddingBrainStats 11 keys) key sets or value types, nor coordinator primitive fields (activeSessions, boundEntity, evictedSessions, sessionTtlMs).
+  7. Created `test/gr-coordinator-brain-primitive-value-types.test.ts` with 8 tests (GR-1 through GR-8). All 8 pass. Full suite: 4846/0/3.
+  8. Pushed `auto/GR-coordinator-brain-primitive-value-types`; opened PR #1450. Subscribed.
+- **Open PRs (post-run):**
+  - #1450 (GR) — CI pending (CodeQL expected)
+- **Human-action items (carried forward):**
+  1. **DISABLE hourly cron** — ~1755+ runs; burning ~50k tokens/run
+  2. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Upgrade Notion plan** — workspace out of free blocks
+- **Next run:** Merge GR if CI green. Next GS candidate: freeze coordinator.toolsByServer value types (each value is a non-negative integer) + topTools value types (each entry is a non-empty string) — PP and V cover behavior but not type-freeze.
