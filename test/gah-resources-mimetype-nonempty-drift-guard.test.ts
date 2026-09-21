@@ -180,11 +180,7 @@ test('GAH-3: cast:executed resource without fixture mimeType does not expose mim
     const resources = body['resources'] as unknown[];
     assert.ok(Array.isArray(resources) && resources.length > 0, 'resources must be non-empty array');
     const item = resources[0] as Record<string, unknown>;
-    const mt = item['mimeType'];
-    assert.ok(
-      mt === undefined || mt === null,
-      `mimeType must be absent (undefined/null) when fixture has none, got "${mt}"`,
-    );
+    assert.ok(!('mimeType' in item), 'mimeType key must be absent when fixture has none');
   } finally {
     await agg.shutdown();
   }
