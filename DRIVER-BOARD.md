@@ -7153,10 +7153,10 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
     - GX-4: cast:plan multi-tool: alternatives non-empty, items have exactly {description, score, tool}
   - Full suite: 4860/0/3. Pushed branch, opened PR.
 
-**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → PR #1453 CI green | GU → PR #1454 CI green | GV → PR #1455 CI green | GW → PR #1456 CI green | GX → PR #1457 open (CI pending)
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → PR #1453 CI green | GU → PR #1454 CI green | GV → PR #1455 CI green | GW → PR #1456 CI green | GX → PR #1457 CI green
 
 **Human-action items (persistent):**
-1. **Merge PRs #1453, #1454, #1455, #1456** — all CI green, no blockers; #1457 CI pending
+1. **Merge PRs #1453, #1454, #1455, #1456, #1457** — all CI green, no blockers
 2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
 3. **DISABLE hourly cron** — ~1741 runs; consider stopping or reducing frequency
 4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
