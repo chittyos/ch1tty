@@ -7132,3 +7132,35 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
 **Next run:** If any of GT/GU/GV merged, identify GW gap (cast:plan exact top-level key set — same gap GV closed for cast:executed). Continue G-series.
+
+---
+
+### 2026-09-21 (run ~1742 — G-series advance: GY resources exact key set)
+
+- **Workstream**: G-series test-freeze (resources item exact key set)
+- **Branch/PR**: `auto/GY-resources-item-exact-keyset` → **PR #1458** (https://github.com/chittyos/ch1tty/pull/1458)
+- **Build**: clean (tsc exit 0) | **Tests**: 4864 total (4861 pass / 0 fail / 3 skip) — +5 GY tests
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE. 0 violations on main.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 4856/0/3 (pre-GY baseline on main).
+  - Open PRs: #1453 (GT), #1454 (GU), #1455 (GV), #1456 (GW), #1457 (GX) — all CI green (3/3 checks), waiting human merge.
+  - Identified GY gap: EO (cast:plan) and EP (cast:executed, cast:discovered) use PERMITTED+REQUIRED for resources items — `description` and `mimeType` are PERMITTED but NOT REQUIRED. `listSuggestionResources()` always provides both; removing them from the resources map() call would pass EO/EP silently.
+  - GY-1: cast:executed resources items exact key set = {description, mimeType, name, score, uri}
+  - GY-2: cast:plan resources items exact key set
+  - GY-3: cast:discovered resources items exact key set (empty tool registry, intent 'suggestions catalog index')
+  - GY-4: resources item.description always a non-empty string
+  - GY-5: resources item.mimeType always 'application/json' for catalog resources
+  - Full suite: 4861/0/3. Pushed and opened PR #1458. Subscribed.
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → #1453 CI green | GU → #1454 CI green | GV → #1455 CI green | GW → #1456 CI green | GX → #1457 CI green | GY → PR #1458 open (CI pending)
+
+**Human-action items (persistent):**
+1. **Merge PRs #1453–#1458** — GT through GX are CI green; GY CI pending
+2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
+3. **DISABLE hourly cron** — ~1742 runs; consider stopping or reducing frequency
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run:** Verify PR #1458 CI green. If any GT–GX PRs merged, identify GZ gap (prompts items exact key set is the likely candidate — same EO/EP gap for description/arguments field presence in prompts items). Continue G-series.
+
