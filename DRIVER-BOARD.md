@@ -7222,3 +7222,34 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 5. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
 
 **Next run:** Workstream Q — same output-shape freeze pattern for `apps/session-coordinator-mcp` (SessionEntry, ListSessionsResult key sets + value types).
+
+---
+
+### Run ~1752 (2026-09-21)
+
+**Workstream Q** — session-coordinator-mcp output-shape freeze tests
+
+- **Branch**: `auto/Q-session-coordinator-mcp-output-shape-freeze`
+- **PR**: #1467
+- **Tests added** (`apps/session-coordinator-mcp/test/q-output-shape-freeze.test.ts`): 7 tests
+    - Q-1: `list_sessions` Session required keys `{id, channel, status, event_count, created_at, updated_at}`
+    - Q-2: `list_sessions` Session field value types
+    - Q-3: `get_session` Session required keys + value types
+    - Q-4: `create_session` response is Session with required keys
+    - Q-5: `append_event` SessionEvent required keys `{id, session_id, type, created_at}`
+    - Q-6: `append_event` SessionEvent field value types
+    - Q-7: `list_events` result key set `{events, has_more}`, events array, has_more boolean
+  - All 7 pass locally. Pushed branch, opened PR #1467. Subscribed to PR activity.
+  - Notion board update blocked — workspace out of free blocks (persistent blocker).
+- **Open PRs**: #1453–#1466 (P-series and G-series, all waiting human merge) + **#1467 (Q, this run)**
+
+**Workstream status:** Q → PR #1467 (CI pending)
+
+**Human-action items (persistent):**
+1. **Merge PRs #1453–#1467** — no blockers (CI pending on latest)
+2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
+3. **Disable or reduce hourly cron** — ~1752 runs; all meaningful workstreams complete
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+
+**Next run:** Workstream R — output-shape freeze for `apps/tasks-mcp` (Task and related response types).
