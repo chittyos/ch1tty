@@ -1528,3 +1528,40 @@
   7. **Major dep updates deferred**: typescript 5→7, @types/node 22→26, c8 11→12 — human review needed.
 - **PushNotification**: NOT sent (escalation #7 at ~998, post-escalation at ~999; nothing new; next escalation #8 at ~1008, 6 runs away).
 - **Next run**: Same idle state expected. Next escalation #8 at ~1008.
+
+---
+
+### 2026-09-21 (run ~1759 — PRODUCTIVE: GAK CI fix PR #1473)
+
+- **Workstream advanced:** GAK — fix apps-build-and-test CI workspace symlink failure
+- **Build:** tsc clean | **Tests:** 4876 pass / 0 fail / 3 skip (4879 total, 348 suites)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+
+**What was done (this run):**
+- Startup: git reset --hard origin/main (1808fbf, run ~1758). npm ci clean. npm run build clean. Tests: 4876/0/3 ✓
+- Open PRs: #1470 (GAH), #1471 (GAI), #1472 (GAJ) — all showing CI conclusion:failure.
+- Diagnosed root cause: `apps-build-and-test` CI job ran only per-app `npm ci` in matrix step, which created only a partial root `node_modules/@ch1tty/` (only `comms-mcp` + `shared-mcp` symlinked, not `shared-logger`/`shared-types`). Tests in `apps/comms-mcp/test/bk-*.test.ts` import from root `src/workers-ai-brain.js` → `src/logger.ts` → `src-stdio/logger.ts` → `@ch1tty/shared-logger` — fails without the workspace symlink.
+- Confirmed pre-existing: `bk-recent-log-server-gaps.test.ts` was merged in PR #1426, well before GAH/GAI/GAJ.
+- Fix: replace per-app `npm ci` with root `npm ci` in `apps-build-and-test`. Root workspace install creates all symlinks + installs all app deps (tsx etc.). Per-app npm ci was redundant and actively undid root workspace setup.
+- Validated: comms-mcp 202/0/1 ✓ | tasks-mcp 0 fail ✓ | ledger-mcp 0 fail ✓
+- Committed `.github/workflows/ci.yml` fix to `auto/GAK-fix-apps-ci-root-workspace`, pushed, opened **PR #1473**.
+
+**Open PRs:**
+- **PR #1473 (GAK):** CI fix — apps-build-and-test workspace symlinks ← THIS RUN
+- PR #1472 (GAJ): resources uri/name value types + namespacing (CI should pass once #1473 merges)
+- PR #1471 (GAI): prompts score range/finitude/sort order
+- PR #1470 (GAH): resources mimeType non-empty drift guard
+
+**Workstream status:**
+- [x] A–E, F (all phases), H–L, GT–GAJ: done
+- [ ] **GAK: PR #1473 open** — waiting CI + human merge
+
+**Human-action items (persistent):**
+1. **Merge PR #1473 (GAK first!)** — unblocks GAH/GAI/GAJ CI
+2. Then **merge PRs #1470, #1471, #1472** (GAH/GAI/GAJ) — each needs rebase onto new main after #1473 merges
+3. **DISABLE hourly cron** — ~1759 runs
+4. **Enable GitHub Actions npm test CI** (currently only CodeQL on main)
+5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run:** Verify GAK (#1473) CI green. If green and waiting merge, rebase GAH/GAI/GAJ onto origin/main and push updates (since GAK changes ci.yml). Then advance to GAL (next unfrozen invariant in G-series drift guards).
