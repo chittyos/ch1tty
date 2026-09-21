@@ -3167,3 +3167,29 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 - **CI**: All 3 checks green on `5c65045` (CodeQL + 2× Analyze). No open review threads.
 - **PR #1258**: Ready to merge (awaiting human review/approval).
 - **Build**: tsc clean | tests 4/4 pass on BI file.
+
+---
+
+### run ~1746 — 2026-09-21T~UTC — Workstream GAA: prompts plan/discovered key sets
+
+- **Build**: tsc clean (0 errors, ch1tty@4.1.0) | **Tests**: 4861 pass / 0 fail / 3 skip (+5 GAA vs 4856 main baseline)
+- **Workstream advanced**: **GAA** — cast:plan without-args prompts exact key set + cast:discovered prompts exact key sets
+- **Branch/PR**: `auto/GAA-prompts-plan-discovered-keysets` → PR opened this run
+- **Open PRs before run**: 7 (#1453–#1459, GT–GZ) — all CI green (verified: CodeQL ✅, Analyze javascript-typescript ✅, Analyze actions ✅ on both oldest #1453 and newest #1459)
+- **What was done**:
+  - Confirmed 7 open PRs CI green. Identified GAA gap: GZ froze cast:plan WITH-arguments and cast:executed (both paths), but missed cast:plan WITHOUT-arguments key set; EP's cast:discovered prompts were only PERMITTED-not-REQUIRED (exact key sets never frozen in discovered path).
+  - Created 5 tests in test/gaa-prompts-plan-discovered-keyset-drift-guard.test.ts:
+    - GAA-1: cast:plan without-args prompts → exact key set {description, name, score}
+    - GAA-2: cast:discovered prompts description always non-empty
+    - GAA-3: cast:discovered with-args prompts → exact key set {arguments, description, name, score}
+    - GAA-4: cast:discovered without-args prompts → exact key set {description, name, score}
+    - GAA-5: cast:discovered arguments field is Array when present
+  - All 5 pass independently. Full suite 4861/0/3.
+- **Blockers (unchanged)**:
+  1. Enable GitHub Actions npm test CI (currently CodeQL only)
+  2. Merge PRs #1453–#1459 (GT–GZ all CI green)
+  3. DISABLE hourly cron (~1746 runs)
+  4. Prod env vars: GITHUB_MCP_AUTHORIZATION, CF_ACCESS creds
+  5. Notion workspace out of free blocks
+  6. Stale branch cleanup (1100+ auto/ branches)
+- **Next run**: Verify GAA PR CI green. Identify GAB — candidates: cast:discovered resources item.description non-empty (GY froze key set but not description presence in :discovered path), or cast:plan resources item.description non-empty. Continue G-series.

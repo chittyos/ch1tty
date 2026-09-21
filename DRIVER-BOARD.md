@@ -7132,3 +7132,36 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
 **Next run:** If any of GT/GU/GV merged, identify GW gap (cast:plan exact top-level key set — same gap GV closed for cast:executed). Continue G-series.
+
+---
+
+### 2026-09-21 (run ~1746 — GAA: prompts plan/discovered key sets)
+
+- **Workstream**: G-series test-freeze (GAA — cast:plan WITHOUT-args prompts + cast:discovered prompts key sets)
+- **Branch/PR**: `auto/GAA-prompts-plan-discovered-keysets` → PR opened this run
+- **Build**: clean (tsc exit 0) | **Tests**: 4861 pass / 0 fail / 3 skip (+5 GAA tests)
+- **State verified**:
+  - All 7 open PRs (#1453–#1459, GT–GZ) confirmed CI green (3/3 checks each)
+  - PR #1453 (GT) and #1454 (GU) had conflict fixes merged from prior runs
+  - main tests: 4856/0/3 baseline
+- **What was done**:
+  - Identified GAA gap: GZ-5 froze cast:plan WITH-arguments prompts key set, but NOT the without-arguments mirror; EP's cast:discovered prompts use PERMITTED-not-REQUIRED (key sets never frozen).
+  - Created test/gaa-prompts-plan-discovered-keyset-drift-guard.test.ts (5 tests):
+    - GAA-1: cast:plan prompts WITHOUT-arguments exact key set = {description, name, score}
+    - GAA-2: cast:discovered prompts item.description always non-empty string
+    - GAA-3: cast:discovered prompts WITH-arguments exact key set = {arguments, description, name, score}
+    - GAA-4: cast:discovered prompts WITHOUT-arguments exact key set = {description, name, score}
+    - GAA-5: cast:discovered prompts item.arguments, when present, is an Array (not plain object)
+  - All 5 tests pass (confirmed with node --import tsx --test).
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → #1453 | GU → #1454 | GV → #1455 | GW → #1456 | GX → #1457 | GY → #1458 | GZ → #1459 | GAA → PR open
+
+**Human-action items (persistent):**
+1. **Merge PRs #1453–#1459 + new GAA PR** — all CI green (GT-GZ confirmed)
+2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
+3. **DISABLE hourly cron** — ~1746 runs; consider stopping or reducing frequency
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run:** Verify GAA PR CI green. Identify GAB gap (candidates: cast:discovered resources item description non-empty (GY covers key set but not description presence in :discovered), or cast:executed resources item description non-empty in :discovered path). Continue G-series.
