@@ -7189,3 +7189,36 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 **Next run:** Verify GAE (#1464) CI green. Next gap = GAF (prompts score value type and range — EP checks `typeof p['score'] === 'number'` but not finitude or range ≥ 0). Continue G-series.
 
+
+---
+
+### 2026-09-21 (run ~1751 — Workstream P: ledger-mcp output shape freeze)
+
+- **Workstream**: P — `apps/ledger-mcp` tool response output shape freeze (6 tests)
+- **Branch/PR**: `auto/P-ledger-mcp-output-shape-freeze` → **PR #1466** (https://github.com/chittyos/ch1tty/pull/1466)
+- **Tests**: 4862 pass / 0 fail / 3 skip (full suite); 6 new from this run
+- **Actions**:
+  - Read board (stale since 2026-09-10, 11 days). Main has grown from ~1907 to 4862 passing tests via G-series runs.
+  - 13 open PRs (#1453–#1465) from G-series still awaiting human merge.
+  - Chose Workstream P per board suggestion: freeze `apps/ledger-mcp` tool response shapes.
+  - Created `apps/ledger-mcp/test/p-output-shape-freeze.test.ts` with 6 freeze tests covering:
+    - P-1: `list_namespaces` Namespace required key set `{name, entry_count, created_at}`
+    - P-2: `list_namespaces` Namespace value types (string, number, string)
+    - P-3: `list_entries` result key set `{entries, has_more}` + type guards
+    - P-4: `get_entry` LedgerEntry required key set `{id, namespace, payload, sequence, created_at}`
+    - P-5: `get_entry` LedgerEntry field value types (strings, number, non-null object)
+    - P-6: `append_entry` response is LedgerEntry with required key set
+  - All 6 pass locally. Full suite 4862/4865 (0 fail). Pushed branch, opened PR #1466. Subscribed to PR activity.
+  - Notion board update blocked — workspace out of free blocks (persistent blocker).
+- **Open PRs**: #1453–#1465 (G-series, all waiting human merge) + **#1466 (P, this run)**
+
+**Workstream status:** P → PR #1466 (CI pending)
+
+**Human-action items (persistent):**
+1. **Merge PRs #1453–#1466** — no blockers (CI pending on latest)
+2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
+3. **Disable or reduce hourly cron** — ~1751 runs; all meaningful workstreams complete
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+
+**Next run:** Workstream Q — same output-shape freeze pattern for `apps/session-coordinator-mcp` (SessionEntry, ListSessionsResult key sets + value types).
