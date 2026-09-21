@@ -7253,3 +7253,14 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 5. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
 
 **Next run:** Workstream R — output-shape freeze for `apps/tasks-mcp` (Task and related response types).
+
+---
+
+### Note (2026-09-21T16:49 UTC)
+
+**PR #1466 and PR #1467 closed without merging** by repository owner.
+
+- PR #1466 (`auto/P-ledger-mcp-output-shape-freeze`) — Workstream P — closed
+- PR #1467 (`auto/Q-session-coordinator-mcp-output-shape-freeze`) — Workstream Q — closed
+
+Not reopened per policy. If the workstreams should be resumed, the user needs to ask explicitly. The test files remain on their respective branches.
