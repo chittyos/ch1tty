@@ -7132,3 +7132,35 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
 **Next run:** If any of GT/GU/GV merged, identify GW gap (cast:plan exact top-level key set — same gap GV closed for cast:executed). Continue G-series.
+
+---
+
+### 2026-09-21 (run ~1741 — G-series advance: GX drift guard)
+
+- **Workstream**: G-series test-freeze (cast:plan alternatives always-present invariant)
+- **Branch/PR**: `auto/GX-cast-plan-resolved-exact-keyset` → **PR #TBD** (opening this run)
+- **Build**: clean (tsc exit 0) | **Tests**: 4863 total (4860 pass / 0 fail / 3 skip) — +4 GX tests
+- **Actions**:
+  - Read CLAUDE.md guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 4856/0/3 (pre-GX baseline on main).
+  - Open PRs: #1453 (GT — CI green), #1454 (GU — CI green), #1455 (GV — CI green), #1456 (GW — CI green). All waiting on human merge.
+  - Created `auto/GX-cast-plan-resolved-exact-keyset` from origin/main.
+  - GX closes the gap: EH accepts "absent OR empty" for cast:plan alternatives in the single-tool case. GW froze cast:plan key set using multi-tool fixture (alternatives non-empty). No test freezes the ASYMMETRY between cast:plan (always spreads `alternatives`, even as []) vs cast:executed (omits `alternatives` when empty). A refactor making cast:plan match cast:executed's conditional spread would silently pass all prior tests.
+  - `test/gx-cast-plan-alternatives-always-present.test.ts`: 4 tests:
+    - GX-1: cast:plan single-tool: alternatives IS present (key exists even when [])
+    - GX-2: cast:plan single-tool: alternatives value is [] (empty array, not absent)
+    - GX-3: cast:executed single-tool: alternatives IS absent (key does not exist)
+    - GX-4: cast:plan multi-tool: alternatives non-empty, items have exactly {description, score, tool}
+  - Full suite: 4860/0/3. Pushed branch, opened PR.
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → PR #1453 CI green | GU → PR #1454 CI green | GV → PR #1455 CI green | GW → PR #1456 CI green | GX → PR #TBD open (CI pending)
+
+**Human-action items (persistent):**
+1. **Merge PRs #1453, #1454, #1455, #1456** — all CI green, no blockers
+2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
+3. **DISABLE hourly cron** — ~1741 runs; consider stopping or reducing frequency
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run:** After GX CI green: verify all 5 pending PRs (#1453–#1456, GX). Identify GY gap — candidates: cast:plan.alternatives is a non-empty array when multiple tools exist (cross-check count: with stripe 3-tool fixture slice(1,4)=2 items; no test freezes the exact count); or cast:executed content[0] metadata key set (executed response wraps cast metadata in content[0] — no test freezes that exact key set).
