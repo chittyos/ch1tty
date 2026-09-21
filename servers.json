@@ -637,9 +637,9 @@
       "id": "market",
       "name": "Market Intelligence",
       "type": "remote",
-      "access": "read",
+      "access": "readwrite",
       "category": "ecosystem",
-      "endpoint": "https://market.chitty.cc/mcp",
+      "endpoint": "https://agent.chitty.cc/market/mcp",
       "authTokenKey": "chittymcp",
       "lazy": true,
       "enabled": true
