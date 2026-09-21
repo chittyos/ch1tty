@@ -149,6 +149,7 @@ test('GAN-1: cast:executed prompts item arguments is an Array when present', asy
     assert.equal(body['cast'], 'executed', `expected cast:executed, got ${body['cast']}`);
     const prompts = body['prompts'] as unknown[];
     assert.ok(Array.isArray(prompts) && prompts.length > 0, 'prompts must be a non-empty array');
+    let foundArguments = false;
     for (const item of prompts) {
       const p = item as Record<string, unknown>;
       if ('arguments' in p && p['arguments'] !== undefined) {
@@ -156,8 +157,10 @@ test('GAN-1: cast:executed prompts item arguments is an Array when present', asy
           Array.isArray(p['arguments']),
           `prompts item arguments must be an Array, got ${typeof p['arguments']}: ${JSON.stringify(p['arguments'])}`,
         );
+        foundArguments = true;
       }
     }
+    assert.ok(foundArguments, 'at least one prompts item must carry an arguments array');
   } finally {
     await agg.shutdown();
   }
@@ -208,12 +211,14 @@ test('GAN-3: cast:executed prompts argument required is boolean when present', a
     assert.equal(body['cast'], 'executed', `expected cast:executed, got ${body['cast']}`);
     const prompts = body['prompts'] as unknown[];
     assert.ok(Array.isArray(prompts) && prompts.length > 0, 'prompts must be non-empty');
+    let foundRequired = false;
     for (const item of prompts) {
       const p = item as Record<string, unknown>;
       if (Array.isArray(p['arguments'])) {
         for (const arg of p['arguments'] as unknown[]) {
           const a = arg as Record<string, unknown>;
           if ('required' in a && a['required'] !== undefined) {
+            foundRequired = true;
             assert.equal(
               typeof a['required'],
               'boolean',
@@ -223,6 +228,7 @@ test('GAN-3: cast:executed prompts argument required is boolean when present', a
         }
       }
     }
+    assert.ok(foundRequired, 'at least one argument item must carry a required field');
   } finally {
     await agg.shutdown();
   }
