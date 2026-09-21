@@ -7141,15 +7141,15 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 - **Build**: tsc clean (0 errors) | **Tests**: 4861/0/3 (4864 total, +5 GW)
 - **Workstream**: GW — freeze cast:plan exact top-level key set (5 tests)
 - **Rationale**: GV closed this gap for cast:executed; GU for no_match/resolved; GW is the symmetric close for cast:plan (confirm:true). No prior test froze the exact key set — a regression adding latencyBreakdown or score at the plan root would pass all prior tests silently.
-- **Branch/PR**: `auto/GW-cast-plan-exact-keyset` → PR #TBD (opening this run)
+- **Branch/PR**: `auto/GW-cast-plan-exact-keyset` → PR #1456
 - **New file**: `test/gw-cast-plan-exact-keyset-drift-guard.test.ts` (200 lines, 5 tests)
 - **All 5 tests pass**: GW-1 base key set, GW-2 +sessionContext, GW-3 explanation absent, GW-4 +explanation, GW-5 absent keys
-- **Open PRs**: #1453 (GT), #1454 (GU), #1455 (GV) — all CI green, still awaiting human merge; + new GW PR
+- **Open PRs**: #1453 (GT), #1454 (GU), #1455 (GV), #1456 (GW) — all CI green, awaiting human merge
 
-**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT #1453 CI green | GU #1454 CI green | GV #1455 CI green | GW → PR open
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT #1453 CI green | GU #1454 CI green | GV #1455 CI green | GW #1456 CI green
 
 **Human-action items (persistent):**
-1. **Merge PRs #1453, #1454, #1455, GW** — all CI green, no blockers
+1. **Merge PRs #1453, #1454, #1455, #1456** — all CI green, no blockers
 2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
 3. **DISABLE hourly cron** — ~1741 runs; consider stopping or reducing frequency
 4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
