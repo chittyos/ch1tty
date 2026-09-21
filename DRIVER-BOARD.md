@@ -7280,3 +7280,37 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 - No review findings. No merge conflicts. **Waiting on human merge.**
 
 **Next run:** Open GAH workstream (resources `mimeType` value type — EO/EP permit mimeType key but never assert it is a string when present). Continue G-series.
+
+---
+
+### 2026-09-21 (run ~1755 — PR #1468 CI green re-confirmed; GAH PR opened)
+
+- **Trigger**: scheduled run
+- **PR #1468 (GAG)**: CI green (3/3) — waiting on human merge
+- **PR #1469 (bulk-recover DN-Q)**: CI green (3/3) — waiting on human merge
+- **Gap audit**: Board noted mimeType type as GAH gap, but EO/EP already check
+  `typeof r['mimeType'] === 'string'` (ep-executed-discovered-related-shapes.test.ts:289).
+  Actual next gap = **prompts score finitude/upper bound/sort order** (EO/EP check `>= 0`
+  but not `Number.isFinite`, not `<= 1.0`, not non-increasing order, not filter > 0.1).
+- **Workstream**: GAH — cast prompts score range, finitude, and sort order (5 tests)
+- **Branch/PR**: `auto/GAH-prompts-score-range-order` → **PR #1470**
+- **Tests**: 5 pass / 0 fail (node --import tsx --test)
+- **Frozen invariants**:
+  - GAH-1: cast:executed prompts scores finite and ≤ 1.0
+  - GAH-2: cast:executed prompts items in non-increasing score order
+  - GAH-3: cast:executed zero-score prompts absent (filter threshold > 0.1)
+  - GAH-4: cast:discovered same finitude/upper bound/order invariants
+  - GAH-5: cast:plan same invariants
+- **Open PRs**: #1468 (GAG), #1469 (bulk-recover DN-Q), #1470 (GAH) — all waiting human merge
+
+**Workstream status:** GAG → PR #1468 CI green | bulk-recover → PR #1469 CI green | **GAH → PR #1470**
+
+**Human-action items (persistent):**
+1. **Merge PRs #1468, #1469, #1470** — all CI green (except #1470 CI pending), no blockers
+2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
+3. **DISABLE hourly cron** — ~1755 runs; consider stopping or reducing frequency
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run:** Verify GAH (#1470) CI green. Next gap = GAI (resources/prompts `description` non-empty when present — EP checks `typeof === 'string'` but not `length > 0`; bulk PR #1469 covers prompts side via GAD so GAI targets resources description non-empty). Continue G-series.
