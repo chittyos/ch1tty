@@ -7161,3 +7161,31 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 **Next run:** Verify GAD (#1463) CI green. Next gap = GAE (prompts `arguments` array items value types — EP checks `Array.isArray` but not item shapes). Continue G-series.
 
+---
+
+### 2026-09-21 (run ~1750 — GAD CI confirmed green; GAE PR opened)
+
+- **Workstream**: GAE — cast prompts arguments item key set and value types (5 drift-guard tests)
+- **Branch/PR**: `auto/GAE-prompts-arguments-item-shapes` → **PR #1464** (https://github.com/chittyos/ch1tty/pull/1464)
+- **Tests**: 5 pass / 0 fail (node --import tsx --test)
+- **Actions**:
+  - Confirmed PR #1462 (GAC) CI green (all 3 checks passed; CodeRabbit threads resolved).
+  - Confirmed PR #1463 (GAD) CI green (all 3 checks passed).
+  - GAE gap identified: EP/EO check `Array.isArray(p['arguments'])` but not item key sets or value types within the array. Extra keys, wrong types, or missing `name` field would pass EO/EP silently.
+  - Wrote `test/gae-prompts-arguments-item-shapes-drift-guard.test.ts` — 5 tests (GAE-1 through GAE-5).
+  - Frozen invariants: permitted keys `{name, description, required}`; `name` non-empty string; `description` string when present; `required` boolean when present. GAE-5 freezes exact value preservation.
+  - All 5 pass locally. Pushed branch, opened PR #1464. Subscribed to PR activity.
+- **Open PRs**: #1453 (GT), #1454 (GU), #1455 (GV), #1456 (GW), #1457 (GX), #1458 (GY), #1459 (GZ), #1460 (GAA), #1461 (GAB), #1462 (GAC), #1463 (GAD), #1464 (GAE) — all waiting on human merge
+
+**Workstream status:** GAA → PR #1460 | GAB → PR #1461 | GAC → PR #1462 CI green | GAD → PR #1463 CI green | **GAE → PR #1464**
+
+**Human-action items (persistent):**
+1. **Merge PRs #1453–#1464** — all CI green (except #1464 CI pending), no blockers
+2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
+3. **DISABLE hourly cron** — ~1750 runs; consider stopping or reducing frequency
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run:** Verify GAE (#1464) CI green. Next gap = GAF (prompts score value type and range — EP checks `typeof p['score'] === 'number'` but not finitude or range ≥ 0). Continue G-series.
+

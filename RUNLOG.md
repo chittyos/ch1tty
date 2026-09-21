@@ -3183,3 +3183,25 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 - **PR**: #1463 opened (https://github.com/chittyos/ch1tty/pull/1463). CI pending.
 - **Open PRs**: 11 open (#1453–#1463), all waiting human merge.
 - **Next**: GAD CI should pass (same CodeQL-only checks). Next gap = GAE (prompts arguments[] item shapes).
+
+---
+
+## Run ~1750 — 2026-09-21 (GAD CI confirmed; GAE PR #1464 opened)
+
+- **Trigger**: scheduled hourly run
+- **PRs checked**: #1462 (GAC) — CI green, CodeRabbit threads resolved; #1463 (GAD) — CI green
+- **Workstream**: GAE — `cast:plan/executed/discovered` prompts `arguments[]` item key set and value types
+- **File**: `test/gae-prompts-arguments-item-shapes-drift-guard.test.ts`
+- **Tests**:
+  - GAE-1: cast:plan — arguments items have only permitted keys `{name, description, required}`; `name` always present
+  - GAE-2: cast:plan — value types: `name` non-empty string; `description` string when present; `required` boolean when present
+  - GAE-3: cast:executed — same key set and value types
+  - GAE-4: cast:discovered — same key set and value types
+  - GAE-5: cast:executed — fixture argument fields preserved exactly (`name`, `description`, `required` values pass through unchanged)
+- **Gap source**: EP/EO check `Array.isArray(p['arguments'])` but not item key sets or value types.
+  Source line: `aggregator.ts ~1402 (arguments: p.arguments)` — passed through unchanged from fixture.
+  Key design: `assertArgumentsItemShape()` helper consolidates all 4 invariants; reused across all 5 tests.
+- **Tests**: 5/5 pass locally. All Ollama errors are expected (embedEnabled: false).
+- **PR**: #1464 opened (https://github.com/chittyos/ch1tty/pull/1464). CI pending.
+- **Open PRs**: 12 open (#1453–#1464), all waiting human merge.
+- **Next**: GAE CI should pass. Next gap = GAF (prompts score value type and range — EP checks `typeof p['score'] === 'number'` but not finitude or `>= 0`).
