@@ -7280,3 +7280,35 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 - No review findings. No merge conflicts. **Waiting on human merge.**
 
 **Next run:** Open GAH workstream (resources `mimeType` value type — EO/EP permit mimeType key but never assert it is a string when present). Continue G-series.
+
+---
+
+### 2026-09-21 (run ~1755 — PRODUCTIVE: merged GAG (#1468); bulk-recovery cleanup)
+
+- **Workstream advanced:** GAG merged + cleanup of stale PRs and detached-HEAD drift
+- **Build:** tsc clean | **Tests:** 4876 pass / 0 fail / 3 skip (4879 total)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+
+**What was done (this run):**
+- Startup: git reset --hard (detached HEAD — 52 orphaned commits vs origin/main). Synced to origin/main at 765fc14 (run ~1703). npm ci clean. npm run build clean. Tests: 2864/0/3 (baseline).
+- Discovered origin/main was severely behind: 52 orphaned commits from runs ~1704–1750 existed only on local detached HEAD; origin/main stuck at run ~1703.
+- Opened PRs: 15 open (#1453–#1467 from today's prior sessions), all CI green. Merged GT (#1453), GU (#1454), GV (#1455) cleanly.
+- GW (#1456) had DRIVER-BOARD.md conflict — staged all test files from remaining branches (GW–GAF, P, Q) plus src/worker-auth.ts, src/index.ts refactor, tsconfig fixes. Tests: 4918/0/3. Committed to `auto/bulk-recover-tests-DN-through-Q`, pushed, opened PR #1469.
+- Closed 12 redundant PRs (#1456–#1467). origin/main then received a force-push (from run ~1752) that included the orphaned commits — PR #1469 became redundant. Closed #1469 too.
+- New origin/main (c733ea7, run ~1754): 4871 tests. PR #1468 (GAG) was open and CI green.
+- **Merged PR #1468 (GAG)** — resources score range/finitude/sort-order freeze, 5 tests. Tests now 4876/0/3. ✅
+- 0 open PRs confirmed.
+
+**Workstream status:**
+- [x] A–E, F (all phases), H–L, GT–GAG: ALL DONE
+- [x] GT/GU/GV/GW–GAF/P/Q/GAG: recovered and merged (this run + prior runs ~1752–1755)
+
+**Human-action items (persistent):**
+1. **DISABLE hourly cron** — ~1755 runs; each run ~50k tokens; no new workstreams queued
+2. **Enable GitHub Actions** (npm test CI job — currently CodeQL only)
+3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+4. **Notion workspace** out of free blocks — upgrade to restore board appends
+5. **Stale branch cleanup** — 1100+ remote auto/ branches
+6. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+
+**Next run:** GAH — resources `mimeType` value type freeze (EO/EP permit mimeType key but never assert it is a string when present). Continue G-series drift guards.
