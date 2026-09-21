@@ -7074,3 +7074,43 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
 **Next run:** If PR #1453 merged, identify GU gap and open GU PR. If not yet merged, remain on watch.
+
+---
+
+## Run ~1739 — 2026-09-21 (this run)
+
+**Build:** tsc clean | **Tests:** 4861 pass / 0 fail / 3 skip (+5 GU vs 4856 main) | **Audit:** 0 vulnerabilities
+
+**Actions taken:**
+- Startup: read CLAUDE.md + CHITTY.md; guardrails confirmed. `npm ci` + `npm run build` clean. `npm test` on origin/main (475da78): 4856 pass.
+- Found 1 open PR: #1453 (GT — latencyBreakdown exact key sets, 5 tests); CI green; `mergeable_state` not checked; waiting on human merge.
+- Read Notion board (subagent): all A–E + F–N + AA complete; workstream O (evidence-mcp) done. Last board entry was run ~1541 (2026-09-10).
+- Read DRIVER-BOARD.md run log: last entry was run ~1738 (2026-09-21) — CI follow-up for PR #1453, no code changes.
+- Board says "If PR #1453 merged, identify GU gap; if not yet merged, remain on watch." GT still open, so advanced GU workstream.
+- Probed actual key sets returned by `cast:no_match` and `cast:resolved` (both with and without sessionId).
+- Identified GU gap: EA froze required key PRESENCE only (missing-keys check); GJ froze value types for specific no_match fields. Neither EA nor GJ freezes the EXACT key set (no extra-key guard). The conditional `sessionContext` in `cast:no_match` was also unfrozen.
+- Actual shapes: no_match(no session)={cast,hint,intent,latencyMs,resolvedBy}; no_match+session adds sessionContext; resolved(no session)={cast,intent,latencyMs,resolved,resolvedBy}; resolved+session adds sessionContext.
+- Wrote `test/gu-nomatch-resolved-exact-keysets-drift-guard.test.ts` (5 tests):
+  - GU-1: cast:no_match (no session) exact key set
+  - GU-2: cast:no_match (with session) exact key set + sessionContext frozen
+  - GU-3: cast:resolved (no session) exact key set
+  - GU-4: cast:resolved (with session) exact key set + sessionContext frozen
+  - GU-5: cast:no_match without session does NOT contain sessionContext (explicit absence guard)
+- All 5 GU tests pass; full suite 4861/0/3 (+5). Metric-freeze guards: 56/87 — 0 violations.
+- Pushed `auto/GU-nomatch-resolved-exact-keysets`; opened PR #1454; subscribed.
+
+**PR #1454 (GU) status:** CI pending (CodeQL).
+**PR #1453 (GT) status:** Still open, CI green — waiting on human merge.
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GT ✓ (PR #1453 open) | GU → PR #1454 open
+
+**Human-action items (persistent):**
+1. **Merge PR #1453** (GT) — CI green, no blockers; been open since 06:44 UTC today
+2. **Merge PR #1454** (GU) — CI pending (CodeQL); 5 tests, 4861/0/3
+3. **Notion workspace** out of free blocks — upgrade plan to restore board appends
+4. **DISABLE hourly cron** — ~1739 runs; consider stopping or reducing frequency
+5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+6. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+7. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run:** Merge PR #1454 if CI green + PR #1453 if still open; identify GV gap (candidates: cast:no_match sessionContext VALUE TYPES frozen by GR/GS pattern for no_match path; OR cast:executed exact top-level key set without/with session — EA's required-keys check leaves the same exact-set gap for cast:executed).
