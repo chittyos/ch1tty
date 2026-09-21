@@ -3167,3 +3167,49 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 - **CI**: All 3 checks green on `5c65045` (CodeQL + 2× Analyze). No open review threads.
 - **PR #1258**: Ready to merge (awaiting human review/approval).
 - **Build**: tsc clean | tests 4/4 pass on BI file.
+
+## Run ~1748 — 2026-09-21 (GAC workstream)
+
+**Trigger**: scheduled hourly run
+
+**Build/test**: npm ci clean. Build pass (tsc). Tests: 4856 pass / 0 fail / 3 skip (pre-change baseline).
+
+**CI checks (open PRs — all green)**:
+- PR #1461 (GAB): CodeQL ✅, Analyze (js-ts) ✅, Analyze (actions) ✅ — CI green, waiting on human merge.
+- PR #1453 (GT): CI green — waiting on human merge.
+All 9 open G-series PRs (GT–GAB, #1453–#1461) are CI-green.
+
+**Workstream advanced: GAC**
+
+Gap identified (per GAB NEXT note + diff of EO/EP vs GAB):
+- EO (test/eo-plan-resolved-related-shapes.test.ts:289) checks `typeof r['description'] === 'string'` when present.
+- EP (test/ep-executed-discovered-related-shapes.test.ts:285) same check.
+- GAB froze exact key sets confirming `description` is always in the key set when defined.
+- Neither EO, EP, nor GAB checks that `description` is non-empty (length > 0).
+- A refactor emitting `description: ''` for resources that have a real description would pass EO/EP/GAB silently.
+
+New file: `test/gac-resources-description-nonempty-drift-guard.test.ts`
+
+5 tests:
+- GAC-1: cast:plan resources, description when present is non-empty string (typeof 'string' && length > 0)
+- GAC-2: cast:plan resources, fixture description value preserved exactly in output (not transformed)
+- GAC-3: cast:executed resources, description when present is non-empty string
+- GAC-4: cast:discovered resources, description when present is non-empty string
+- GAC-5: cast:executed resources, fixture description preserved exactly
+
+Implementation note: aggregator prefixes resource URIs with server ID; GAC-2/GAC-5 filter by URI
+substring (`.includes('project://.../')`) to isolate fixture resources from prepended suggestions catalog.
+
+All 5 pass locally. PR opened on branch `auto/GAC-resources-description-nonempty`.
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → PR #1453 | GU → PR #1454 | GV → PR #1455 | GW → PR #1456 | GX → PR #1457 | GY → PR #1458 | GZ → PR #1459 | GAA → PR #1460 | GAB → PR #1461 | GAC → PR #TBD (this run)
+
+**Human-action items (persistent):**
+1. **Merge PRs #1453–#1461** — all CI green; 9 open G-series PRs waiting human merge
+2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
+3. **DISABLE hourly cron** — ~1748 runs; consider stopping or reducing frequency
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run:** Verify GAC PR CI green. Identify GAD gap — cast:plan/executed/discovered prompts description non-empty (EP checks typeof only when present; same gap as GAC but for prompts instead of resources). Continue G-series.

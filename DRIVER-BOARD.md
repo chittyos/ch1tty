@@ -7132,3 +7132,28 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
 **Next run:** If any of GT/GU/GV merged, identify GW gap (cast:plan exact top-level key set — same gap GV closed for cast:executed). Continue G-series.
+
+---
+
+### 2026-09-21 (run ~1748 — GAC workstream)
+
+- **Trigger**: scheduled hourly run
+- **Build**: tsc clean. Tests: 4856 pass / 0 fail / 3 skip (baseline).
+- **CI check (PRs #1453–#1461 — all G-series)**: CI green on all 9 open PRs. Waiting on human merge.
+- **New workstream: GAC** — freeze that cast:plan/executed/discovered resources description is non-empty when present.
+  - Gap: EO/EP each check `typeof r['description'] === 'string'` when present. GAB froze key sets. Neither checks `length > 0`. A refactor emitting `description: ''` would pass EO/EP/GAB silently.
+  - File: `test/gac-resources-description-nonempty-drift-guard.test.ts`
+  - 5 tests: GAC-1 (plan description non-empty), GAC-2 (plan description exact value), GAC-3 (executed description non-empty), GAC-4 (discovered description non-empty), GAC-5 (executed description exact value)
+  - All 5 pass locally. Branch pushed, PR opened.
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → PR #1453 | GU → PR #1454 | GV → PR #1455 | GW → PR #1456 | GX → PR #1457 | GY → PR #1458 | GZ → PR #1459 | GAA → PR #1460 | GAB → PR #1461 | GAC → PR #TBD
+
+**Human-action items (persistent):**
+1. **Merge PRs #1453–#1461** — all CI green; 9 open G-series PRs
+2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
+3. **DISABLE hourly cron** — ~1748 runs; consider stopping or reducing frequency
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run:** Verify GAC CI green. GAD gap = prompts description non-empty when present (same gap as GAC but for prompts[] items). Continue G-series.
