@@ -7153,14 +7153,17 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
     - GX-4: cast:plan multi-tool: alternatives non-empty, items have exactly {description, score, tool}
   - Full suite: 4860/0/3. Pushed branch, opened PR.
 
-**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → PR #1453 CI green | GU → PR #1454 CI green | GV → PR #1455 CI green | GW → PR #1456 CI green | GX → PR #1457 CI green
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → PR #1453 CI green | GU → PR #1454 CI green | GV → PR #1455 CI green | GW → PR #1456 CLOSED (not merged) | GX → PR #1457 CLOSED (not merged)
+
+**⚠️ NOTE (2026-09-21 ~16:50 UTC):** PRs #1456 (GW — cast:plan exact top-level key set) and #1457 (GX — cast:plan alternatives always-present) were closed without merging by human action. Both were CI-green. Their test files remain only on closed branches (`auto/GW-cast-plan-exact-keyset`, `auto/GX-cast-plan-resolved-exact-keyset`). Do NOT reopen unless explicitly asked.
 
 **Human-action items (persistent):**
-1. **Merge PRs #1453, #1454, #1455, #1456, #1457** — all CI green, no blockers
-2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
-3. **DISABLE hourly cron** — ~1741 runs; consider stopping or reducing frequency
-4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
-5. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
-6. **Stale branch cleanup** — 1100+ remote auto/ branches
+1. **Merge PRs #1453, #1454, #1455** — all CI green, no blockers
+2. **Clarify intent for GW/GX** — PRs #1456 and #1457 were closed without merging; if the GW/GX drift guards are still wanted, they need to be re-opened or re-submitted
+3. **Notion workspace** out of free blocks — upgrade plan to restore board appends
+4. **DISABLE hourly cron** — ~1741 runs; consider stopping or reducing frequency
+5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+6. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+7. **Stale branch cleanup** — 1100+ remote auto/ branches
 
-**Next run:** After GX CI green: verify all 5 pending PRs (#1453–#1456, GX). Identify GY gap — candidates: cast:plan.alternatives is a non-empty array when multiple tools exist (cross-check count: with stripe 3-tool fixture slice(1,4)=2 items; no test freezes the exact count); or cast:executed content[0] metadata key set (executed response wraps cast metadata in content[0] — no test freezes that exact key set).
+**Next run:** Await human direction on whether to re-submit GW/GX or advance to GY. If advancing: GY candidates — (1) cast:plan.alternatives count invariant (with stripe 3-tool fixture, slice(1,4) yields exactly 2 items — count not yet frozen); (2) cast:executed content[0] metadata key set (executed response wraps cast metadata in content[0] — exact key set not frozen).
