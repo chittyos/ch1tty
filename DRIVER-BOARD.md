@@ -7106,7 +7106,7 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 **Human-action items (persistent):**
 1. **Merge PR #1453** (GT) — CI green, no blockers; been open since 06:44 UTC today
-2. **Merge PR #1454** (GU) — CI pending (CodeQL); 5 tests, 4861/0/3
+2. **Merge PR #1454** (GU) — CI green ✓; 5 tests, 4861/0/3
 3. **Notion workspace** out of free blocks — upgrade plan to restore board appends
 4. **DISABLE hourly cron** — ~1739 runs; consider stopping or reducing frequency
 5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
