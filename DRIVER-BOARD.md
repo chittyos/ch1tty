@@ -7138,7 +7138,7 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 ### 2026-09-21 (run ~1741 — G-series advance: GX drift guard)
 
 - **Workstream**: G-series test-freeze (cast:plan alternatives always-present invariant)
-- **Branch/PR**: `auto/GX-cast-plan-resolved-exact-keyset` → **PR #TBD** (opening this run)
+- **Branch/PR**: `auto/GX-cast-plan-resolved-exact-keyset` → **PR #1457** (https://github.com/chittyos/ch1tty/pull/1457)
 - **Build**: clean (tsc exit 0) | **Tests**: 4863 total (4860 pass / 0 fail / 3 skip) — +4 GX tests
 - **Actions**:
   - Read CLAUDE.md guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE.
@@ -7153,10 +7153,10 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
     - GX-4: cast:plan multi-tool: alternatives non-empty, items have exactly {description, score, tool}
   - Full suite: 4860/0/3. Pushed branch, opened PR.
 
-**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → PR #1453 CI green | GU → PR #1454 CI green | GV → PR #1455 CI green | GW → PR #1456 CI green | GX → PR #TBD open (CI pending)
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → PR #1453 CI green | GU → PR #1454 CI green | GV → PR #1455 CI green | GW → PR #1456 CI green | GX → PR #1457 open (CI pending)
 
 **Human-action items (persistent):**
-1. **Merge PRs #1453, #1454, #1455, #1456** — all CI green, no blockers
+1. **Merge PRs #1453, #1454, #1455, #1456** — all CI green, no blockers; #1457 CI pending
 2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
 3. **DISABLE hourly cron** — ~1741 runs; consider stopping or reducing frequency
 4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
