@@ -7099,7 +7099,7 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 - All 5 GU tests pass; full suite 4861/0/3 (+5). Metric-freeze guards: 56/87 — 0 violations.
 - Pushed `auto/GU-nomatch-resolved-exact-keysets`; opened PR #1454; subscribed.
 
-**PR #1454 (GU) status:** CI pending (CodeQL).
+**PR #1454 (GU) status:** CI GREEN ✓ — CodeQL ✓, Analyze (javascript-typescript) ✓, Analyze (actions) ✓ (completed 07:43–07:45 UTC 2026-09-21). Ready for human merge.
 **PR #1453 (GT) status:** Still open, CI green — waiting on human merge.
 
 **Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GT ✓ (PR #1453 open) | GU → PR #1454 open
@@ -7113,4 +7113,6 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 6. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
 7. **Stale branch cleanup** — 1100+ remote auto/ branches
 
-**Next run:** Merge PR #1454 if CI green + PR #1453 if still open; identify GV gap (candidates: cast:no_match sessionContext VALUE TYPES frozen by GR/GS pattern for no_match path; OR cast:executed exact top-level key set without/with session — EA's required-keys check leaves the same exact-set gap for cast:executed).
+**CI update (07:47 UTC 2026-09-21):** PR #1454 CodeQL completed — all 3 checks green. Both PR #1453 (GT) and PR #1454 (GU) are now CI-green and ready for human merge.
+
+**Next run:** Both PRs waiting on human merge. Identify GV gap: cast:executed exact top-level key set (no session) and with-session variant — EA's required-presence check leaves the exact-set gap for cast:executed just as it did for cast:no_match (now frozen by GU). GV would freeze {cast, executed, intent, latencyMs, resolvedBy, server, tool} (and +sessionContext when sessionId given).
