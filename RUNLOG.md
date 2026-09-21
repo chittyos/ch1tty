@@ -3202,7 +3202,7 @@ substring (`.includes('project://.../')`) to isolate fixture resources from prep
 
 All 5 pass locally. PR opened on branch `auto/GAC-resources-description-nonempty`.
 
-**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → PR #1453 | GU → PR #1454 | GV → PR #1455 | GW → PR #1456 | GX → PR #1457 | GY → PR #1458 | GZ → PR #1459 | GAA → PR #1460 | GAB → PR #1461 | GAC → PR #TBD (this run)
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → PR #1453 | GU → PR #1454 | GV → PR #1455 | GW → PR #1456 | GX → PR #1457 | GY → PR #1458 | GZ → PR #1459 | GAA → PR #1460 | GAB → PR #1461 | GAC → PR #1462 (this run)
 
 **Human-action items (persistent):**
 1. **Merge PRs #1453–#1461** — all CI green; 9 open G-series PRs waiting human merge

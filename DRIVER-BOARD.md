@@ -7146,7 +7146,7 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   - 5 tests: GAC-1 (plan description non-empty), GAC-2 (plan description exact value), GAC-3 (executed description non-empty), GAC-4 (discovered description non-empty), GAC-5 (executed description exact value)
   - All 5 pass locally. Branch pushed, PR opened.
 
-**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → PR #1453 | GU → PR #1454 | GV → PR #1455 | GW → PR #1456 | GX → PR #1457 | GY → PR #1458 | GZ → PR #1459 | GAA → PR #1460 | GAB → PR #1461 | GAC → PR #TBD
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → PR #1453 | GU → PR #1454 | GV → PR #1455 | GW → PR #1456 | GX → PR #1457 | GY → PR #1458 | GZ → PR #1459 | GAA → PR #1460 | GAB → PR #1461 | GAC → PR #1462
 
 **Human-action items (persistent):**
 1. **Merge PRs #1453–#1461** — all CI green; 9 open G-series PRs
