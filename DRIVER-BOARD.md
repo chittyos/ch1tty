@@ -7132,3 +7132,27 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
 **Next run:** If any of GT/GU/GV merged, identify GW gap (cast:plan exact top-level key set — same gap GV closed for cast:executed). Continue G-series.
+
+---
+
+### 2026-09-21 (run ~1747 — GAB workstream)
+
+- **Trigger**: scheduled hourly run
+- **PR #1460** (GAA) — confirmed CI green (all 3 checks: CodeQL success, Analyze js-ts success, Analyze actions success). Waiting on human merge.
+- **New workstream: GAB** — freeze exact key sets for cast:plan and cast:discovered resources items.
+  - Gap: EO froze PERMITTED set for cast:plan resources; EP froze PERMITTED set for cast:discovered resources. Neither froze exact key sets, so a refactor emitting `mimeType:null` (serialised present) would pass EO/EP silently.
+  - File: `test/gab-resources-plan-discovered-keyset-drift-guard.test.ts`
+  - 5 tests: GAB-1 (plan+mimeType exact), GAB-2 (plan-no-mimeType exact), GAB-3 (disc+mimeType exact), GAB-4 (disc-no-mimeType exact), GAB-5 (disc mimeType non-empty)
+  - All 5 pass locally. Branch pushed, PR #1461 opened (ready for review). Subscribed to CI.
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → PR #1453 | GU → PR #1454 | GV → PR #1455 | GW → PR #1456 | GX → PR #1457 | GY → PR #1458 | GZ → PR #1459 | GAA → PR #1460 | GAB → PR #1461 (CI pending)
+
+**Human-action items (persistent):**
+1. **Merge PRs #1453–#1461** — all CI green or pending; 9 open G-series PRs
+2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
+3. **DISABLE hourly cron** — ~1747 runs; consider stopping or reducing frequency
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run:** Verify GAB PR #1461 CI green. Identify GAC gap (likely cast:plan/cast:discovered resources description non-empty — EP checks typeof only when present; source provides description directly from fixture without allPrompts() fallback). Continue G-series.

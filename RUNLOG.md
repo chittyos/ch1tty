@@ -3167,3 +3167,32 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 - **CI**: All 3 checks green on `5c65045` (CodeQL + 2× Analyze). No open review threads.
 - **PR #1258**: Ready to merge (awaiting human review/approval).
 - **Build**: tsc clean | tests 4/4 pass on BI file.
+
+## Run ~1747 — 2026-09-21 (GAB workstream)
+
+**Trigger**: scheduled hourly run
+
+**Build/test**: npm ci clean. Tests not run (no source changes).
+
+**CI check (PR #1460 — GAA)**:
+- CodeQL: success
+- Analyze (javascript-typescript): success
+- Analyze (actions): success
+- PR #1460 is CI-green, waiting on human merge.
+
+**Workstream advanced: GAB**
+
+Gap identified: EO froze PERMITTED set for cast:plan resources; EP froze PERMITTED set for cast:discovered resources. Neither froze exact key sets. A refactor emitting `mimeType: null` (serialised as `{"mimeType":null}`, not omitted) would pass both EO and EP but be caught by GAB.
+
+New file: `test/gab-resources-plan-discovered-keyset-drift-guard.test.ts`
+
+5 tests:
+- GAB-1: cast:plan resources WITH mimeType → exact {description,mimeType,name,score,uri}
+- GAB-2: cast:plan resources WITHOUT mimeType → exact {description,name,score,uri}
+- GAB-3: cast:discovered resources WITH mimeType → exact {description,mimeType,name,score,uri}
+- GAB-4: cast:discovered resources WITHOUT mimeType → exact {description,name,score,uri}
+- GAB-5: cast:discovered resources mimeType, when present, is a non-empty string (EP checks typeof only)
+
+All 5 pass locally. PR #1461 opened: https://github.com/chittyos/ch1tty/pull/1461
+
+**Next**: GAC gap = cast:plan resources description always present and non-empty (or cast:executed resources equivalent). Continue G-series.
