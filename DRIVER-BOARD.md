@@ -7312,3 +7312,35 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 6. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
 
 **Next run:** GAH — resources `mimeType` value type freeze (EO/EP permit mimeType key but never assert it is a string when present). Continue G-series drift guards.
+
+---
+
+### 2026-09-21 (run ~1756 — PRODUCTIVE: GAH drift guard)
+
+- **Workstream advanced:** GAH — resources mimeType non-empty freeze
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (baseline after PR merge)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+
+**What was done (this run):**
+- Startup: continued from compacted context. Branch `auto/GAH-resources-mimetype-nonempty` already created from origin/main.
+- Identified the correct GAH gap: EO (line 293) and EP (line 289) both check `typeof r['mimeType'] === 'string'` but never `.length > 0`. An empty string `""` passes both — identical to the gap GAC closed for `description`.
+- Wrote `test/gah-resources-mimetype-nonempty-drift-guard.test.ts` (5 tests: GAH-1..5).
+- Local run: **5 pass / 0 fail**.
+- Committed + pushed + opened PR #1470.
+
+**Open PRs (all CI pending/green, waiting human merge):**
+- PR #1470 (GAH): resources mimeType non-empty drift guard (5 tests)
+
+**Workstream status:**
+- [x] A–E, F (all phases), H–L, GT–GAG: ALL DONE
+- [ ] GAH: PR #1470 open — waiting human merge
+
+**Human-action items (persistent):**
+1. **DISABLE hourly cron** — ~1756 runs; each run ~50k tokens; no new workstreams queued after GAH
+2. **Enable GitHub Actions** (npm test CI job — currently CodeQL only)
+3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+4. **Notion workspace** out of free blocks — upgrade to restore board appends
+5. **Stale branch cleanup** — 1100+ remote auto/ branches
+6. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+
+**Next run:** Identify GAI gap (next unfrozen invariant in G-series drift guards). Continue G-series.
