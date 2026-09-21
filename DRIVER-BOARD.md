@@ -7164,3 +7164,26 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 **Next run:** Verify PR #1458 CI green. If any GT–GX PRs merged, identify GZ gap (prompts items exact key set is the likely candidate — same EO/EP gap for description/arguments field presence in prompts items). Continue G-series.
 
+
+### 2026-09-21 (run ~1744 — GY CodeRabbit findings addressed)
+
+- **Workstream**: G-series test-freeze (resources item exact key set — PR #1458 review)
+- **Branch/PR**: `auto/GY-resources-item-exact-keyset` → **PR #1458**
+- **Actions**:
+  - Read 2 CodeRabbit review threads on PR #1458
+  - **Finding 1 (false positive, line 96)**: CodeRabbit claimed `makeEmptyAgg()` would produce `cast:no_match`. Verified this is incorrect — `listSuggestionResources()` provides catalog resources independently of server configs. GY-3 passes 5/5. Replied with explanation on review thread.
+  - **Finding 2 (valid, lines 162–194)**: GY-4 and GY-5 only covered `cast:executed` for description/mimeType value assertions. Extended both tests to cover all 3 cast paths (cast:executed, cast:plan, cast:discovered). All 5 GY tests pass. Pushed to branch. Replied to CodeRabbit thread.
+  - **PR #1459 (GZ)**: All 3 CI checks green (CodeQL + 2× Analyze). Awaiting human merge.
+  - **PR #1458 CI**: Running (2/3 checks in_progress after new push).
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → #1453 | GU → #1454 | GV → #1455 | GW → #1456 | GX → #1457 | GY → PR #1458 CI running | GZ → PR #1459 CI green
+
+**Human-action items (persistent):**
+1. **Merge PRs #1453–#1459** — GT/GU/GV/GW/GX/GZ CI green; GY CI running (will be green)
+2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
+3. **DISABLE hourly cron** — ~1744 runs; consider stopping or reducing frequency
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run:** Confirm PR #1458 CI green. Advance to next G-series gap.

@@ -3167,3 +3167,13 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 - **CI**: All 3 checks green on `5c65045` (CodeQL + 2× Analyze). No open review threads.
 - **PR #1258**: Ready to merge (awaiting human review/approval).
 - **Build**: tsc clean | tests 4/4 pass on BI file.
+
+### run ~1744 — 2026-09-21 — GY CodeRabbit findings addressed; GZ CI green
+
+- **Build**: tsc clean | **Tests**: 4861 pass / 0 fail / 3 skip (GY suite: 5/5)
+- **Workstream**: G-series test-freeze — PR #1458 (GY) review
+- **Actions**:
+  - CodeRabbit Finding 1 (false positive): `makeEmptyAgg()` correctly triggers `cast:discovered` because `listSuggestionResources()` provides catalog resources independently of registered server configs. Replied to review thread with explanation.
+  - CodeRabbit Finding 2 (valid): extended GY-4/GY-5 from `cast:executed`-only to all 3 cast paths (cast:executed, cast:plan, cast:discovered). All 5 GY tests pass.
+  - Pushed fix to `auto/GY-resources-item-exact-keyset` (commit f03e0f1). PR #1458 CI running.
+  - PR #1459 (GZ — prompts item exact key set): all 3 CI checks green (CodeQL + 2× Analyze). Awaiting human merge.
