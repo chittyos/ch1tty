@@ -7074,3 +7074,38 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
 **Next run:** If PR #1453 merged, identify GU gap and open GU PR. If not yet merged, remain on watch.
+
+---
+
+### 2026-09-21 (run ~1739 — G-series advance: GV drift guard)
+
+- **Workstream**: G-series test-freeze (cast:executed exact top-level key set)
+- **Branch/PR**: `auto/GV-executed-toplevel-keysets` → **PR #1455** (https://github.com/chittyos/ch1tty/pull/1455)
+- **Build**: clean (tsc exit 0) | **Tests**: 4864 total (4861 pass / 0 fail / 3 skip) — +5 GV tests
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 2854/2855 enforce 56/87 fields). 0 violations on main.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 4861/0/3 (pre-GV baseline: 4856 pass).
+  - Open PRs: #1453 (GT — CI green, waiting human merge), #1454 (GU — CI green, waiting human merge).
+  - Checked CI on both: all 3 checks (CodeQL + Analyze JS/TS + Analyze Actions) completed/success.
+  - Created `auto/GV-executed-toplevel-keysets` from origin/main.
+  - GV closes the gap: GJ/GK/GR/GT froze cast:executed field value types and latencyBreakdown sub-keys; GU froze cast:no_match and cast:resolved exact top-level key sets; but NO test froze the cast:executed outer top-level key set. GV fills that.
+  - `test/gv-executed-toplevel-keyset-drift-guard.test.ts`: 5 tests:
+    - GV-1: base key set exactly {cast, resolvedBy, intent, latencyMs, latencyBreakdown, resolved, score, alternatives, resources}
+    - GV-2: WITH sessionId adds exactly sessionContext
+    - GV-3: explanation absent when explain not set
+    - GV-4: WITH explain:true adds exactly explanation
+    - GV-5: focus, scope, suggestions, resolvedFromCatalog, prompts absent when not applicable
+  - Note: `resources` in base key set because listSuggestionResources() prepends suggestions catalog; finance/billing entries score > 0.1 against 'list stripe payments' intent.
+  - Pushed branch, opened PR #1455 (ready for review, not draft). Subscribed to PR activity.
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → PR #1453 CI green | GU → PR #1454 CI green | GV → PR #1455 open (CI pending)
+
+**Human-action items (persistent):**
+1. **Merge PRs #1453, #1454, #1455** — CI green (GT and GU); #1455 CI pending
+2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
+3. **DISABLE hourly cron** — ~1739 runs; consider stopping or reducing frequency
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run:** Verify PR #1455 CI green. If GT (#1453) or GU (#1454) merged, identify next gap (GW — cast:plan exact top-level key set likely candidate). Continue G-series.
