@@ -7049,3 +7049,28 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 **Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ + GB ✓ GC ✓ GD ✓ | GE → PR #1437 open
 
 **Next run:** Merge PR #1437 if CI green; identify GF gap (candidates: `latencyMs` value-type constraints across meta-tool responses, or `coordinator.brain` key-set stability under circuit-open state).
+
+---
+
+## Run ~1738 — 2026-09-21 (CI follow-up for PR #1453)
+
+**Build:** N/A (CI follow-up; no new code) | **Tests:** 4856/0/3 on main | **Audit:** 0 vulns
+
+**Actions taken:**
+- Woke to check CI status on PR #1453 (auto/GT-latencybreakdown-keysets — 5 GT drift-guard tests).
+- All 3 CI checks passed: CodeQL ✓, Analyze (javascript-typescript) ✓, Analyze (actions) ✓.
+- 0 review threads open. CodeRabbit: "No actionable comments" — docstring coverage ⚠️ warning (50% < 80%). Replied: test-file helpers are self-documenting by name; stays as-is (consistent with all prior G-series guards).
+- PR #1453 is CI-green, no blocking issues. **Waiting on human merge.**
+- Direct commit to main (run log only).
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → PR #1453 waiting on human merge (CI green)
+
+**Human-action items (persistent):**
+1. **Merge PR #1453** — CI green, no blockers
+2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
+3. **DISABLE hourly cron** — ~1738 runs; consider stopping or reducing frequency
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run:** If PR #1453 merged, identify GU gap and open GU PR. If not yet merged, remain on watch.
