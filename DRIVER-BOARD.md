@@ -7283,34 +7283,96 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 ---
 
-### 2026-09-21 (run ~1755 — PR #1468 CI green re-confirmed; GAH PR opened)
+### 2026-09-21 (run ~1755 — PRODUCTIVE: merged GAG (#1468); bulk-recovery cleanup)
 
-- **Trigger**: scheduled run
-- **PR #1468 (GAG)**: CI green (3/3) — waiting on human merge
-- **PR #1469 (bulk-recover DN-Q)**: CI green (3/3) — waiting on human merge
-- **Gap audit**: Board noted mimeType type as GAH gap, but EO/EP already check
-  `typeof r['mimeType'] === 'string'` (ep-executed-discovered-related-shapes.test.ts:289).
-  Actual next gap = **prompts score finitude/upper bound/sort order** (EO/EP check `>= 0`
-  but not `Number.isFinite`, not `<= 1.0`, not non-increasing order, not filter > 0.1).
-- **Workstream**: GAH — cast prompts score range, finitude, and sort order (5 tests)
-- **Branch/PR**: `auto/GAH-prompts-score-range-order` → **PR #1471**
-- **Tests**: 5 pass / 0 fail (node --import tsx --test)
-- **Frozen invariants**:
-  - GAH-1: cast:executed prompts scores finite and ≤ 1.0
-  - GAH-2: cast:executed prompts items in non-increasing score order
-  - GAH-3: cast:executed zero-score prompts absent (filter threshold > 0.1)
-  - GAH-4: cast:discovered same finitude/upper bound/order invariants
-  - GAH-5: cast:plan same invariants
-- **Open PRs**: #1468 (GAG), #1469 (bulk-recover DN-Q), #1471 (GAH) — all waiting human merge
+- **Workstream advanced:** GAG merged + cleanup of stale PRs and detached-HEAD drift
+- **Build:** tsc clean | **Tests:** 4876 pass / 0 fail / 3 skip (4879 total)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
 
-**Workstream status:** GAG → PR #1468 CI green | bulk-recover → PR #1469 CI green | **GAH → PR #1471**
+**What was done (this run):**
+- Startup: git reset --hard (detached HEAD — 52 orphaned commits vs origin/main). Synced to origin/main at 765fc14 (run ~1703). npm ci clean. npm run build clean. Tests: 2864/0/3 (baseline).
+- Discovered origin/main was severely behind: 52 orphaned commits from runs ~1704–1750 existed only on local detached HEAD; origin/main stuck at run ~1703.
+- Opened PRs: 15 open (#1453–#1467 from today's prior sessions), all CI green. Merged GT (#1453), GU (#1454), GV (#1455) cleanly.
+- GW (#1456) had DRIVER-BOARD.md conflict — staged all test files from remaining branches (GW–GAF, P, Q) plus src/worker-auth.ts, src/index.ts refactor, tsconfig fixes. Tests: 4918/0/3. Committed to `auto/bulk-recover-tests-DN-through-Q`, pushed, opened PR #1469.
+- Closed 12 redundant PRs (#1456–#1467). origin/main then received a force-push (from run ~1752) that included the orphaned commits — PR #1469 became redundant. Closed #1469 too.
+- New origin/main (c733ea7, run ~1754): 4871 tests. PR #1468 (GAG) was open and CI green.
+- **Merged PR #1468 (GAG)** — resources score range/finitude/sort-order freeze, 5 tests. Tests now 4876/0/3. ✅
+- 0 open PRs confirmed.
+
+**Workstream status:**
+- [x] A–E, F (all phases), H–L, GT–GAG: ALL DONE
+- [x] GT/GU/GV/GW–GAF/P/Q/GAG: recovered and merged (this run + prior runs ~1752–1755)
 
 **Human-action items (persistent):**
-1. **Merge PRs #1468, #1469, #1471** — all CI green (except #1471 CI pending), no blockers
-2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
-3. **DISABLE hourly cron** — ~1755 runs; consider stopping or reducing frequency
+1. **DISABLE hourly cron** — ~1755 runs; each run ~50k tokens; no new workstreams queued
+2. **Enable GitHub Actions** (npm test CI job — currently CodeQL only)
+3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+4. **Notion workspace** out of free blocks — upgrade to restore board appends
+5. **Stale branch cleanup** — 1100+ remote auto/ branches
+6. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+
+**Next run:** GAH — resources `mimeType` value type freeze (EO/EP permit mimeType key but never assert it is a string when present). Continue G-series drift guards.
+
+---
+
+### 2026-09-21 (run ~1756 — PRODUCTIVE: GAH drift guard)
+
+- **Workstream advanced:** GAH — resources mimeType non-empty freeze
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (baseline after PR merge)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+
+**What was done (this run):**
+- Startup: continued from compacted context. Branch `auto/GAH-resources-mimetype-nonempty` already created from origin/main.
+- Identified the correct GAH gap: EO (line 293) and EP (line 289) both check `typeof r['mimeType'] === 'string'` but never `.length > 0`. An empty string `""` passes both — identical to the gap GAC closed for `description`.
+- Wrote `test/gah-resources-mimetype-nonempty-drift-guard.test.ts` (5 tests: GAH-1..5).
+- Local run: **5 pass / 0 fail**.
+- Committed + pushed + opened PR #1470.
+
+**Open PRs (all CI pending/green, waiting human merge):**
+- PR #1470 (GAH): resources mimeType non-empty drift guard (5 tests)
+
+**Workstream status:**
+- [x] A–E, F (all phases), H–L, GT–GAG: ALL DONE
+- [ ] GAH: PR #1470 open — waiting human merge
+
+**Human-action items (persistent):**
+1. **DISABLE hourly cron** — ~1756 runs; each run ~50k tokens; no new workstreams queued after GAH
+2. **Enable GitHub Actions** (npm test CI job — currently CodeQL only)
+3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+4. **Notion workspace** out of free blocks — upgrade to restore board appends
+5. **Stale branch cleanup** — 1100+ remote auto/ branches
+6. **Major dep bumps** — @types/node 22→26, typescript 5→7 (apps/) await human review
+
+**Next run:** Identify GAI gap (next unfrozen invariant in G-series drift guards). Continue G-series.
+
+---
+
+### 2026-09-21 (run ~1757 — GAI PR #1471 opened)
+
+- **Trigger**: scheduled run
+- **PR #1470 (GAH)**: CI pending — resources mimeType non-empty drift guard
+- **Gap identified**: GAI = prompts score finitude/upper bound/sort order (EO/EP check
+  `typeof p['score'] === 'number' && p['score'] >= 0` but not `Number.isFinite`,
+  not `<= 1.0`, not non-increasing order, not filter threshold > 0.1). Parallel to GAG
+  (resources) and GAH (resources mimeType).
+- **Workstream**: GAI — cast prompts score range, finitude, and sort order (5 tests)
+- **Branch/PR**: `auto/GAH-prompts-score-range-order` → **PR #1471** (retitled GAI)
+- **Tests**: 5 pass / 0 fail
+  - GAI-1: cast:executed — prompts scores finite and ≤ 1.0
+  - GAI-2: cast:executed — prompts items in non-increasing score order
+  - GAI-3: cast:executed — zero-score prompts absent (filter > 0.1)
+  - GAI-4: cast:discovered — same finitude/upper-bound/order invariants
+  - GAI-5: cast:plan — same invariants
+- **Open PRs**: #1470 (GAH), #1471 (GAI) — CI pending/waiting human merge
+
+**Workstream status:** GAH → PR #1470 | **GAI → PR #1471**
+
+**Human-action items (persistent):**
+1. **Merge PRs #1470, #1471** — CI pending, no blockers
+2. **DISABLE hourly cron** — ~1757 runs
+3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
 4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
-5. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+5. **Notion workspace** out of free blocks — upgrade plan
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
-**Next run:** Verify GAH (#1470) CI green. Next gap = GAI (resources/prompts `description` non-empty when present — EP checks `typeof === 'string'` but not `length > 0`; bulk PR #1469 covers prompts side via GAD so GAI targets resources description non-empty). Continue G-series.
+**Next run:** Verify GAI (#1471) CI green. Next gap = GAJ (resources description non-empty — EP checks `typeof r['description'] === 'string'` but not `length > 0`). Continue G-series.
