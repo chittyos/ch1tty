@@ -1565,3 +1565,47 @@
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
 **Next run:** Verify GAK (#1473) CI green. If green and waiting merge, rebase GAH/GAI/GAJ onto origin/main and push updates (since GAK changes ci.yml). Then advance to GAL (next unfrozen invariant in G-series drift guards).
+
+---
+
+### 2026-09-21 (run ~1760 — PRODUCTIVE: GAM count-cap drift guard PR #1475)
+
+- **Workstream advanced:** GAM — freeze resources and prompts count cap at 5 items
+- **Build:** tsc clean | **Tests:** 4876 pass / 0 fail / 3 skip (4879 total, 348 suites; 4881 with GAM)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+
+**What was done (this run):**
+- Startup: git reset --hard origin/main (d3ebfe2, run ~1759). npm ci clean. npm run build clean. Tests: 4876/0/3 ✓
+- Open PRs: #1470 (GAH) ✓ CI green | #1471 (GAI) ✓ CI green | #1472 (GAJ) ✓ CI green | #1473 (GAK) ✓ CI green | #1474 (GAL) ✓ CI green — all 5 waiting human merge.
+- Gap identified: GAM = both `scoredPrompts.slice(0, 5)` and `scoredResources.slice(0, 5)` in aggregator (lines ~1325, ~1337) — no prior G-series test exercises > 5 matching items on either surface.
+- Created `auto/GAM-count-cap-drift-guard` from origin/main.
+- Wrote `test/gam-prompts-resources-count-cap.test.ts` — 5 tests (GAM-1..5):
+  - GAM-1: cast:executed — 8 matching resources, ≤ 5 returned
+  - GAM-2: cast:executed — 8 matching prompts, ≤ 5 returned
+  - GAM-3: cast:discovered — 8 matching resources, ≤ 5 returned
+  - GAM-4: cast:discovered — 8 matching prompts, ≤ 5 returned
+  - GAM-5: cast:plan — 8 of each, both capped at ≤ 5
+- Local run: **5 pass / 0 fail** ✓. Full suite: 4881/0/3.
+- Pushed branch, opened **PR #1475**. Subscribed to activity.
+
+**Open PRs (all CI green, waiting human merge):**
+- PR #1470 (GAH): resources mimeType non-empty
+- PR #1471 (GAI): prompts score range/finitude/sort order
+- PR #1472 (GAJ): resources uri/name value types + namespacing
+- PR #1473 (GAK): CI apps-build-and-test workspace symlink fix
+- PR #1474 (GAL): prompts name/description value types + namespacing
+- **PR #1475 (GAM): resources and prompts count cap (5 tests) ← THIS RUN**
+
+**Workstream status:**
+- [x] A–E, F (all phases), H–L, GT–GAL: done (pending PRs #1470–#1474)
+- [ ] **GAM: PR #1475 open** — CI pending
+
+**Human-action items (persistent):**
+1. **Merge PRs #1470–#1475** — #1473 (GAK CI fix) first, then #1470/#1471/#1472 may need rebase; #1474 and #1475 are independent of GAK
+2. **DISABLE hourly cron** — ~1760 runs; each run ~50k tokens
+3. **Enable GitHub Actions npm test CI** (currently only CodeQL)
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Stale branch cleanup** — 1100+ remote auto/ branches
+6. **Notion workspace** out of free blocks — upgrade plan
+
+**Next run:** Identify GAN gap (next unfrozen invariant in G-series drift guards). Candidates: resources `description` value type (typeof string when present); prompts `arguments` is an array when present. Continue G-series.
