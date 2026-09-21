@@ -7052,25 +7052,83 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 ---
 
-## Run ~1737 — 2026-09-21
+## Run ~1738 — 2026-09-21 (CI follow-up for PR #1453)
 
-**Build:** clean (tsc exit 0) | **Tests:** 4861 pass / 0 fail / 3 skip (+5 vs 4856 on main) | **Audit:** 0 vulns
+**Build:** N/A (CI follow-up; no new code) | **Tests:** 4856/0/3 on main | **Audit:** 0 vulns
 
 **Actions taken:**
-- Synced to origin/main (14055ba). `npm ci` clean. `npm run build` clean. `npm test`: 4856/0/3 ✓
-- Read Notion board: workspace out of free blocks (can't append). Read DRIVER-BOARD.md fallback.
-- All A–E workstreams confirmed complete. Prior run (1736) left PR #1437 open — now merged; GE–GS all merged to main since Sept 10 last Notion entry. 0 open PRs at run start.
-- Identified GT gap: GJ-5/-6 froze latencyBreakdown VALUE TYPES but never asserted scoringMs/executionMs individually present, never froze the key set (unknown keys pass GJ-6), never asserted brainMs absent on keyword route, and GK never asserted cast:plan lacks latencyBreakdown.
-- Created `auto/GT-latencybreakdown-keysets` with 5 new tests (GT-1 through GT-5); full suite 4861/0/3 (+5).
-- Pushed and opened **PR #1453** (https://github.com/chittyos/ch1tty/pull/1453). Subscribed.
+- Woke to check CI status on PR #1453 (auto/GT-latencybreakdown-keysets — 5 GT drift-guard tests).
+- All 3 CI checks passed: CodeQL ✓, Analyze (javascript-typescript) ✓, Analyze (actions) ✓.
+- 0 review threads open. CodeRabbit: "No actionable comments" — docstring coverage ⚠️ warning (50% < 80%). Replied: test-file helpers are self-documenting by name; stays as-is (consistent with all prior G-series guards).
+- PR #1453 is CI-green, no blocking issues. **Waiting on human merge.**
+- Direct commit to main (run log only).
 
-**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → PR #1453 open
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → PR #1453 waiting on human merge (CI green)
 
 **Human-action items (persistent):**
-1. **Notion workspace** out of free blocks — upgrade plan to restore board appends
-2. **DISABLE hourly cron** — ~1737 runs; consider stopping or reducing frequency
-3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
-4. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
-5. **Stale branch cleanup** — 1100+ remote auto/ branches
+1. **Merge PR #1453** — CI green, no blockers
+2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
+3. **DISABLE hourly cron** — ~1738 runs; consider stopping or reducing frequency
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
-**Next run:** Merge PR #1453 if CI green; identify GU gap (candidates: cast:executed `resolved` field — the `resolved` STRING in executed vs the `resolved` OBJECT in plan; cast:no_match `hint` string type; status `servers[]` access/enabled value types).
+**Next run:** If PR #1453 merged, identify GU gap and open GU PR. If not yet merged, remain on watch.
+
+---
+
+### 2026-09-21 (run ~1739 — G-series advance: GV drift guard)
+
+- **Workstream**: G-series test-freeze (cast:executed exact top-level key set)
+- **Branch/PR**: `auto/GV-executed-toplevel-keysets` → **PR #1455** (https://github.com/chittyos/ch1tty/pull/1455)
+- **Build**: clean (tsc exit 0) | **Tests**: 4864 total (4861 pass / 0 fail / 3 skip) — +5 GV tests
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 2854/2855 enforce 56/87 fields). 0 violations on main.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 4861/0/3 (pre-GV baseline: 4856 pass).
+  - Open PRs: #1453 (GT — CI green, waiting human merge), #1454 (GU — CI green, waiting human merge).
+  - Checked CI on both: all 3 checks (CodeQL + Analyze JS/TS + Analyze Actions) completed/success.
+  - Created `auto/GV-executed-toplevel-keysets` from origin/main.
+  - GV closes the gap: GJ/GK/GR/GT froze cast:executed field value types and latencyBreakdown sub-keys; GU froze cast:no_match and cast:resolved exact top-level key sets; but NO test froze the cast:executed outer top-level key set. GV fills that.
+  - `test/gv-executed-toplevel-keyset-drift-guard.test.ts`: 5 tests:
+    - GV-1: base key set exactly {cast, resolvedBy, intent, latencyMs, latencyBreakdown, resolved, score, alternatives, resources}
+    - GV-2: WITH sessionId adds exactly sessionContext
+    - GV-3: explanation absent when explain not set
+    - GV-4: WITH explain:true adds exactly explanation
+    - GV-5: focus, scope, suggestions, resolvedFromCatalog, prompts absent when not applicable
+  - Note: `resources` in base key set because listSuggestionResources() prepends suggestions catalog; finance/billing entries score > 0.1 against 'list stripe payments' intent.
+  - Pushed branch, opened PR #1455 (ready for review, not draft). Subscribed to PR activity.
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → PR #1453 CI green | GU → PR #1454 CI green | GV → PR #1455 open (CI pending)
+
+**Human-action items (persistent):**
+1. **Merge PRs #1453, #1454, #1455** — CI green (GT and GU); #1455 CI pending
+2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
+3. **DISABLE hourly cron** — ~1739 runs; consider stopping or reducing frequency
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run:** Verify PR #1455 CI green. If GT (#1453) or GU (#1454) merged, identify next gap (GW — cast:plan exact top-level key set likely candidate). Continue G-series.
+
+---
+
+### 2026-09-21 (run ~1740 — CI confirmation wake: PR #1455 green)
+
+- **Trigger**: check_suite.completed event for PR #1455 (GV — `auto/GV-executed-toplevel-keysets`)
+- **PR #1455** `mergeable_state: clean`, CI green — confirmed by GitHub API
+- **PR #1454** (GU) open, CI green — still waiting on human merge
+- **PR #1453** (GT) open, CI green — still waiting on human merge
+- No new failures, no review threads, no merge conflicts on any open PR
+- No new workstream opened (wake was CI confirmation only)
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → PR #1453 CI green | GU → PR #1454 CI green | GV → PR #1455 CI green
+
+**Human-action items (persistent):**
+1. **Merge PRs #1453, #1454, #1455** — all CI green, no blockers
+2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
+3. **DISABLE hourly cron** — ~1740 runs; consider stopping or reducing frequency
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run:** If any of GT/GU/GV merged, identify GW gap (cast:plan exact top-level key set — same gap GV closed for cast:executed). Continue G-series.
