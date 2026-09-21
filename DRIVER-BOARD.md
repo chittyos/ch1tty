@@ -7189,3 +7189,37 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 **Next run:** Verify GAE (#1464) CI green. Next gap = GAF (prompts score value type and range — EP checks `typeof p['score'] === 'number'` but not finitude or range ≥ 0). Continue G-series.
 
+---
+
+### 2026-09-21 (run ~1751 — GAE CI confirmed green; GAF PR opened)
+
+- **Workstream**: GAF — cast prompts score finitude, upper bound ≤ 1.0, descending sort order, and filter threshold (5 drift-guard tests)
+- **Branch/PR**: `auto/GAF-prompts-score-range-order` → **PR #1465** (https://github.com/chittyos/ch1tty/pull/1465)
+- **Build**: clean (tsc exit 0) | **Tests**: 4856 pass / 0 fail / 3 skip (4859 total, 348 suites) | **Audit**: 0 vulns
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE.
+  - `npm ci` clean. `npm run build` clean. `npm test`: 4856/0/3 on origin/main. 0 failures.
+  - Confirmed PR #1464 (GAE) CI green — all 3 checks passed (CodeQL, Analyze js-ts, Analyze actions).
+  - GAF gap identified: EO/EP check `score >= 0` and `typeof number` but NOT `isFinite(score)`, NOT `score <= 1.0` upper bound, NOT descending sort order, NOT `score > 0.1` filter threshold.
+  - Score formula (src-stdio/aggregator.ts ~1320): `Math.round((matchCount / terms.length) * 100) / 100` — always in [0, 1.0], always finite, filtered to > 0.1, sorted descending.
+  - Wrote `test/gaf-prompts-score-range-order-drift-guard.test.ts` — 5 tests (GAF-1 through GAF-5):
+    - GAF-1: cast:executed — `isFinite(score)` + `score <= 1.0` for all prompts items
+    - GAF-2: cast:executed — two prompts at different scores in non-increasing order
+    - GAF-3: cast:executed — zero-match prompt absent; all present items have `score > 0.1`
+    - GAF-4: cast:discovered — finitude + upper bound + ordering
+    - GAF-5: cast:plan — finitude + upper bound + ordering on confirm:true path
+  - All 5 pass locally. Pushed branch, opened PR #1465. Subscribed to PR activity.
+- **Open PRs**: #1453 (GT), #1454 (GU), #1455 (GV), #1456 (GW), #1457 (GX), #1458 (GY), #1459 (GZ), #1460 (GAA), #1461 (GAB), #1462 (GAC), #1463 (GAD), #1464 (GAE), #1465 (GAF) — all waiting on human merge
+
+**Workstream status:** GAC ✓ (CI green) | GAD ✓ (CI green) | GAE ✓ (CI green) | **GAF → PR #1465 (CI pending)**
+
+**Human-action items (persistent):**
+1. **Merge PRs #1453–#1465** — all CI green (except #1465 CI pending), no blockers
+2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
+3. **DISABLE hourly cron** — ~1751 runs; consider stopping or reducing frequency
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run:** Verify GAF (#1465) CI green. Next gap = GAG (resources score finitude + upper bound + ordering — EP checks `score >= 0` but not `isFinite` or `<= 1.0` or descending order; same gaps as GAF but for resources items). Continue G-series.
+
