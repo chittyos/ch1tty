@@ -7077,42 +7077,58 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 ---
 
-## Run ~1739 — 2026-09-21 (this run)
+### 2026-09-21 (run ~1739 — G-series advance: GV drift guard)
 
-**Build:** tsc clean | **Tests:** 4861 pass / 0 fail / 3 skip (+5 GU vs 4856 main) | **Audit:** 0 vulnerabilities
+- **Workstream**: G-series test-freeze (cast:executed exact top-level key set)
+- **Branch/PR**: `auto/GV-executed-toplevel-keysets` → **PR #1455** (https://github.com/chittyos/ch1tty/pull/1455)
+- **Build**: clean (tsc exit 0) | **Tests**: 4864 total (4861 pass / 0 fail / 3 skip) — +5 GV tests
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE (tests 2854/2855 enforce 56/87 fields). 0 violations on main.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 4861/0/3 (pre-GV baseline: 4856 pass).
+  - Open PRs: #1453 (GT — CI green, waiting human merge), #1454 (GU — CI green, waiting human merge).
+  - Checked CI on both: all 3 checks (CodeQL + Analyze JS/TS + Analyze Actions) completed/success.
+  - Created `auto/GV-executed-toplevel-keysets` from origin/main.
+  - GV closes the gap: GJ/GK/GR/GT froze cast:executed field value types and latencyBreakdown sub-keys; GU froze cast:no_match and cast:resolved exact top-level key sets; but NO test froze the cast:executed outer top-level key set. GV fills that.
+  - `test/gv-executed-toplevel-keyset-drift-guard.test.ts`: 5 tests:
+    - GV-1: base key set exactly {cast, resolvedBy, intent, latencyMs, latencyBreakdown, resolved, score, alternatives, resources}
+    - GV-2: WITH sessionId adds exactly sessionContext
+    - GV-3: explanation absent when explain not set
+    - GV-4: WITH explain:true adds exactly explanation
+    - GV-5: focus, scope, suggestions, resolvedFromCatalog, prompts absent when not applicable
+  - Note: `resources` in base key set because listSuggestionResources() prepends suggestions catalog; finance/billing entries score > 0.1 against 'list stripe payments' intent.
+  - Pushed branch, opened PR #1455 (ready for review, not draft). Subscribed to PR activity.
 
-**Actions taken:**
-- Startup: read CLAUDE.md + CHITTY.md; guardrails confirmed. `npm ci` + `npm run build` clean. `npm test` on origin/main (475da78): 4856 pass.
-- Found 1 open PR: #1453 (GT — latencyBreakdown exact key sets, 5 tests); CI green; `mergeable_state` not checked; waiting on human merge.
-- Read Notion board (subagent): all A–E + F–N + AA complete; workstream O (evidence-mcp) done. Last board entry was run ~1541 (2026-09-10).
-- Read DRIVER-BOARD.md run log: last entry was run ~1738 (2026-09-21) — CI follow-up for PR #1453, no code changes.
-- Board says "If PR #1453 merged, identify GU gap; if not yet merged, remain on watch." GT still open, so advanced GU workstream.
-- Probed actual key sets returned by `cast:no_match` and `cast:resolved` (both with and without sessionId).
-- Identified GU gap: EA froze required key PRESENCE only (missing-keys check); GJ froze value types for specific no_match fields. Neither EA nor GJ freezes the EXACT key set (no extra-key guard). The conditional `sessionContext` in `cast:no_match` was also unfrozen.
-- Actual shapes: no_match(no session)={cast,hint,intent,latencyMs,resolvedBy}; no_match+session adds sessionContext; resolved(no session)={cast,intent,latencyMs,resolved,resolvedBy}; resolved+session adds sessionContext.
-- Wrote `test/gu-nomatch-resolved-exact-keysets-drift-guard.test.ts` (5 tests):
-  - GU-1: cast:no_match (no session) exact key set
-  - GU-2: cast:no_match (with session) exact key set + sessionContext frozen
-  - GU-3: cast:resolved (no session) exact key set
-  - GU-4: cast:resolved (with session) exact key set + sessionContext frozen
-  - GU-5: cast:no_match without session does NOT contain sessionContext (explicit absence guard)
-- All 5 GU tests pass; full suite 4861/0/3 (+5). Metric-freeze guards: 56/87 — 0 violations.
-- Pushed `auto/GU-nomatch-resolved-exact-keysets`; opened PR #1454; subscribed.
-
-**PR #1454 (GU) status:** CI GREEN ✓ — CodeQL ✓, Analyze (javascript-typescript) ✓, Analyze (actions) ✓ (completed 07:43–07:45 UTC 2026-09-21). Ready for human merge.
-**PR #1453 (GT) status:** Still open, CI green — waiting on human merge.
-
-**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GT ✓ (PR #1453 open) | GU → PR #1454 open
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → PR #1453 CI green | GU → PR #1454 CI green | GV → PR #1455 open (CI pending)
 
 **Human-action items (persistent):**
-1. **Merge PR #1453** (GT) — CI green, no blockers; been open since 06:44 UTC today
-2. **Merge PR #1454** (GU) — CI green ✓; 5 tests, 4861/0/3
-3. **Notion workspace** out of free blocks — upgrade plan to restore board appends
-4. **DISABLE hourly cron** — ~1739 runs; consider stopping or reducing frequency
-5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
-6. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
-7. **Stale branch cleanup** — 1100+ remote auto/ branches
+1. **Merge PRs #1453, #1454, #1455** — CI green (GT and GU); #1455 CI pending
+2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
+3. **DISABLE hourly cron** — ~1739 runs; consider stopping or reducing frequency
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
-**CI update (07:47 UTC 2026-09-21):** PR #1454 CodeQL completed — all 3 checks green. Both PR #1453 (GT) and PR #1454 (GU) are now CI-green and ready for human merge.
+**Next run:** Verify PR #1455 CI green. If GT (#1453) or GU (#1454) merged, identify next gap (GW — cast:plan exact top-level key set likely candidate). Continue G-series.
 
-**Next run:** Both PRs waiting on human merge. Identify GV gap: cast:executed exact top-level key set (no session) and with-session variant — EA's required-presence check leaves the exact-set gap for cast:executed just as it did for cast:no_match (now frozen by GU). GV would freeze {cast, executed, intent, latencyMs, resolvedBy, server, tool} (and +sessionContext when sessionId given).
+---
+
+### 2026-09-21 (run ~1740 — CI confirmation wake: PR #1455 green)
+
+- **Trigger**: check_suite.completed event for PR #1455 (GV — `auto/GV-executed-toplevel-keysets`)
+- **PR #1455** `mergeable_state: clean`, CI green — confirmed by GitHub API
+- **PR #1454** (GU) open, CI green — still waiting on human merge
+- **PR #1453** (GT) open, CI green — still waiting on human merge
+- No new failures, no review threads, no merge conflicts on any open PR
+- No new workstream opened (wake was CI confirmation only)
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → PR #1453 CI green | GU → PR #1454 CI green | GV → PR #1455 CI green
+
+**Human-action items (persistent):**
+1. **Merge PRs #1453, #1454, #1455** — all CI green, no blockers
+2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
+3. **DISABLE hourly cron** — ~1740 runs; consider stopping or reducing frequency
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run:** If any of GT/GU/GV merged, identify GW gap (cast:plan exact top-level key set — same gap GV closed for cast:executed). Continue G-series.
