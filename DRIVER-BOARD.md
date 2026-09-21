@@ -7223,3 +7223,39 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
 **Next run:** Check if any of the 10 open PRs have merged; if all merged, identify next gap (GW was opened; check what letter follows GAF in the series). If not, remain idle.
+
+---
+
+### 2026-09-21 (run ~1752 — GV merged; GAF/GAE CI green confirmed; GAG PR #1468 opened)
+
+- **Trigger**: pull_request.closed (merged) event for PR #1455 (GV)
+- **PR #1455 (GV)**: MERGED ✓
+- **PR #1464 (GAE)**: CI green — all 3 checks completed/success (CodeQL ✓, Analyze JS/TS ✓, Analyze actions ✓)
+- **PR #1465 (GAF)**: CI green — all 3 checks completed/success
+- **Build**: clean (tsc exit 0) | **Tests**: 4876 pass / 0 fail / 3 skip (+5 GAG tests vs 4871 baseline)
+- **Gap identified**: EO/EP check `r['score'] >= 0` but not finitude, upper bound (≤ 1.0), sort order, or filter threshold (> 0.1) for resources items — same 4 gaps GAF closed for prompts items
+- **Workstream opened**: GAG — freeze resources score range, finitude, and sort order
+- **Actions**:
+  - Pulled main (fast-forward through 6 commits: GV/GU/GT merges + runs ~1749/~1750/~1751 board updates)
+  - Checked GAF branch (PR #1465): CI green, resources score invariants not covered by GAF (GAF covers prompts only)
+  - Created `auto/GAG-resources-score-range-order` from origin/main
+  - Wrote `test/gag-resources-score-range-order-drift-guard.test.ts` — 5 tests (GAG-1 through GAG-5):
+    - GAG-1: cast:executed resources scores finite and ≤ 1.0
+    - GAG-2: cast:executed resources in non-increasing score order
+    - GAG-3: cast:executed zero-score resource absent (filter threshold > 0.1)
+    - GAG-4: cast:discovered resources finite, ≤ 1.0, non-increasing
+    - GAG-5: cast:plan resources finite, ≤ 1.0, non-increasing
+  - All 5 pass; full suite 4876/0/3. Pushed branch, opened **PR #1468**. Subscribed to activity.
+- **Open PRs**: #1453 (GT), #1454 (GU), #1456 (GW), #1457 (GX), #1458 (GY), #1459 (GZ), #1460 (GAA), #1461 (GAB), #1462 (GAC), #1463 (GAD), #1464 (GAE), #1465 (GAF), #1468 (GAG) — all waiting on human merge
+
+**Workstream status:** GV ✓ merged | GAE → #1464 CI green | GAF → #1465 CI green | **GAG → #1468 open (CI pending)**
+
+**Human-action items (persistent):**
+1. **Merge open PRs #1453–#1468** — most CI green; #1468 CI pending
+2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
+3. **DISABLE hourly cron** — ~1752 runs; consider stopping or reducing frequency
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run:** Verify GAG (#1468) CI green. Next gap = GAH (resources `mimeType` value type — EO/EP permit mimeType key but never assert it is a string when present). Continue G-series.
