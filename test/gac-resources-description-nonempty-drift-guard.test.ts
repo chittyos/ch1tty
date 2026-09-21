@@ -267,9 +267,8 @@ test('GAC-3: cast:executed resources description, when present, is a non-empty s
     assert.equal(body['cast'], 'executed',
       `expected cast:executed, got cast:${String(body['cast'])}`);
     const resources = body['resources'] as Array<Record<string, unknown>> | undefined;
-    if (!Array.isArray(resources) || resources.length === 0) {
-      return; // No resources in output — description constraint is vacuously satisfied.
-    }
+    assert.ok(Array.isArray(resources) && resources.length > 0,
+      'cast:executed must include at least one resources item (fixture defines one resource)');
 
     for (const item of resources) {
       if ('description' in item) {
@@ -357,15 +356,16 @@ test('GAC-5: cast:executed resources: fixture description is preserved exactly i
     assert.equal(body['cast'], 'executed',
       `expected cast:executed, got cast:${String(body['cast'])}`);
     const resources = body['resources'] as Array<Record<string, unknown>> | undefined;
-    if (!Array.isArray(resources) || resources.length === 0) {
-      return; // No resources in output — value-preservation is vacuously satisfied.
-    }
+    assert.ok(Array.isArray(resources) && resources.length > 0,
+      'cast:executed must include the configured fixture resource');
 
     // Filter to fixture resources by URI substring; suggestions catalog resources are also
     // prepended by listSuggestionResources(). The aggregator prefixes URIs with server ID.
     const fixtureResources = resources.filter(
       (r) => typeof r['uri'] === 'string' && (r['uri'] as string).includes('project://exec2/'),
     );
+    assert.ok(fixtureResources.length > 0,
+      'expected the configured project://exec2/ fixture resource in cast:executed output');
     for (const item of fixtureResources) {
       if ('description' in item) {
         assert.equal(item['description'], EXEC_RESOURCE_DESCRIPTION,
