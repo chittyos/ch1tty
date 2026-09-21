@@ -3230,5 +3230,5 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   always ≤ 1.0, always sorted — these invariants are now frozen.
 - **Fixture domain**: "list cosmos blockchain validators" (4 terms); 1.0/0.5-scored prompts.
 - **Tests**: 5/5 pass locally. All Ollama errors are expected (embedEnabled: false).
-- **PR**: #1470 opened. CI pending.
-- **Open PRs**: #1468 (GAG), #1469 (bulk-recover DN-Q), #1470 (GAH).
+- **PR**: #1471 opened. CI pending.
+- **Open PRs**: #1468 (GAG), #1469 (bulk-recover DN-Q), #1471 (GAH).

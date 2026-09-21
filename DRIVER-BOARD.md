@@ -7293,7 +7293,7 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   Actual next gap = **prompts score finitude/upper bound/sort order** (EO/EP check `>= 0`
   but not `Number.isFinite`, not `<= 1.0`, not non-increasing order, not filter > 0.1).
 - **Workstream**: GAH — cast prompts score range, finitude, and sort order (5 tests)
-- **Branch/PR**: `auto/GAH-prompts-score-range-order` → **PR #1470**
+- **Branch/PR**: `auto/GAH-prompts-score-range-order` → **PR #1471**
 - **Tests**: 5 pass / 0 fail (node --import tsx --test)
 - **Frozen invariants**:
   - GAH-1: cast:executed prompts scores finite and ≤ 1.0
@@ -7301,12 +7301,12 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   - GAH-3: cast:executed zero-score prompts absent (filter threshold > 0.1)
   - GAH-4: cast:discovered same finitude/upper bound/order invariants
   - GAH-5: cast:plan same invariants
-- **Open PRs**: #1468 (GAG), #1469 (bulk-recover DN-Q), #1470 (GAH) — all waiting human merge
+- **Open PRs**: #1468 (GAG), #1469 (bulk-recover DN-Q), #1471 (GAH) — all waiting human merge
 
-**Workstream status:** GAG → PR #1468 CI green | bulk-recover → PR #1469 CI green | **GAH → PR #1470**
+**Workstream status:** GAG → PR #1468 CI green | bulk-recover → PR #1469 CI green | **GAH → PR #1471**
 
 **Human-action items (persistent):**
-1. **Merge PRs #1468, #1469, #1470** — all CI green (except #1470 CI pending), no blockers
+1. **Merge PRs #1468, #1469, #1471** — all CI green (except #1471 CI pending), no blockers
 2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
 3. **DISABLE hourly cron** — ~1755 runs; consider stopping or reducing frequency
 4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
