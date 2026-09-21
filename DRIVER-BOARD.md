@@ -7132,3 +7132,32 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
 **Next run:** If any of GT/GU/GV merged, identify GW gap (cast:plan exact top-level key set — same gap GV closed for cast:executed). Continue G-series.
+
+---
+
+### 2026-09-21 (run ~1749 — GAC CI confirmed green; GAD PR opened)
+
+- **Workstream**: GAD — cast prompts description non-empty (5 drift-guard tests)
+- **Branch/PR**: `auto/GAD-prompts-description-nonempty` → **PR #1463** (https://github.com/chittyos/ch1tty/pull/1463)
+- **Tests**: 5 pass / 0 fail (node --import tsx --test)
+- **Actions**:
+  - Confirmed PR #1462 (GAC) CI green — all 3 checks passed (CodeQL, Analyze js-ts, Analyze actions).
+  - Note: run ~1748 board update was committed to GAC branch, not main — combined here.
+  - GAD gap identified: EP checks `typeof p['description'] === 'string'` for prompts items but not `length > 0`.
+  - Wrote `test/gad-prompts-description-nonempty-drift-guard.test.ts` — 5 tests (GAD-1 through GAD-5).
+  - Key difference from GAC: `listAllPrompts()` wraps descriptions as `[ServerName] desc` (always non-empty), so GAD-2/GAD-5 use `.includes()` substring check instead of exact equality.
+  - All 5 pass locally. Pushed branch, opened PR #1463. Subscribed to PR activity.
+- **Open PRs**: #1453 (GT), #1454 (GU), #1455 (GV), #1456 (GW), #1457 (GX), #1458 (GY), #1459 (GZ), #1460 (GAA), #1461 (GAB), #1462 (GAC), #1463 (GAD) — all waiting on human merge
+
+**Workstream status:** GAA → PR #1460 | GAB → PR #1461 | GAC → PR #1462 CI green | **GAD → PR #1463**
+
+**Human-action items (persistent):**
+1. **Merge PRs #1453–#1463** — all CI green (except #1463 CI pending), no blockers
+2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
+3. **DISABLE hourly cron** — ~1749 runs; consider stopping or reducing frequency
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run:** Verify GAD (#1463) CI green. Next gap = GAE (prompts `arguments` array items value types — EP checks `Array.isArray` but not item shapes). Continue G-series.
+

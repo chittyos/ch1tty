@@ -3167,3 +3167,19 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 - **CI**: All 3 checks green on `5c65045` (CodeQL + 2× Analyze). No open review threads.
 - **PR #1258**: Ready to merge (awaiting human review/approval).
 - **Build**: tsc clean | tests 4/4 pass on BI file.
+
+### run ~1749 — 2026-09-21 — GAD: cast prompts description non-empty drift guard
+- **Trigger**: Scheduled run; prior run (~1748) opened GAC PR #1462 (confirmed CI green this run).
+- **Action**: Wrote `test/gad-prompts-description-nonempty-drift-guard.test.ts` — 5 tests (GAD-1..5).
+  - GAD-1: cast:plan prompts description, when present, is non-empty string
+  - GAD-2: cast:plan fixture description preserved as substring of output description
+  - GAD-3: cast:executed prompts description non-empty
+  - GAD-4: cast:discovered prompts description non-empty
+  - GAD-5: cast:executed fixture description preserved as substring
+- **Gap source**: EP checks `typeof === 'string'` for prompts description but not `length > 0`.
+  Note: aggregator's `listAllPrompts()` always generates `[ServerName] desc` (never empty).
+  GAD-2/GAD-5 use `.includes()` instead of `===` (like GAC-2/GAC-5) due to prefix.
+- **Tests**: 5/5 pass locally. All Ollama errors are expected (embedEnabled: false).
+- **PR**: #1463 opened (https://github.com/chittyos/ch1tty/pull/1463). CI pending.
+- **Open PRs**: 11 open (#1453–#1463), all waiting human merge.
+- **Next**: GAD CI should pass (same CodeQL-only checks). Next gap = GAE (prompts arguments[] item shapes).
