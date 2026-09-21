@@ -3167,3 +3167,33 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 - **CI**: All 3 checks green on `5c65045` (CodeQL + 2× Analyze). No open review threads.
 - **PR #1258**: Ready to merge (awaiting human review/approval).
 - **Build**: tsc clean | tests 4/4 pass on BI file.
+
+---
+
+### run ~1742/1743 — 2026-09-21 — test(GZ): freeze prompts item exact key set (5 tests) + PR #1458 (GY) CI green
+
+- **Build**: tsc clean | **Tests**: 4861 pass / 0 fail / 3 skip (baseline 4856 on main + 5 GZ tests)
+- **Workstream advanced**: **GZ — prompts item exact key set** → `auto/GZ-prompts-item-exact-keyset` → PR #1459
+- **What was done (this run)**:
+  - Confirmed PR #1458 (GY) CI all green: CodeQL ✅, Analyze javascript-typescript ✅, Analyze actions ✅.
+  - Fixed merge conflicts: GT (#1453) and GU (#1454) had dirty mergeable_state due to DRIVER-BOARD.md conflict with main's run ~1738–1740 commits. Resolved by merging origin/main into each branch (keeping main's board), pushed both branches.
+  - Identified GZ gap: EO/EP PERMITTED-not-REQUIRED approach for prompts items — `description` is permitted but never asserted present. Source (`allPrompts()` line ~1959) always produces non-empty description via `[config.name] ${p.description || p.name}` fallback. `arguments` in map() is undefined-dropped by JSON.stringify; exact key sets never frozen.
+  - Created `test/gz-prompts-item-exact-keyset-drift-guard.test.ts` (5 tests):
+    - GZ-1: cast:executed prompts item.description always non-empty string
+    - GZ-2: cast:plan prompts item.description always non-empty string
+    - GZ-3: cast:executed with-arguments items — exact key set {arguments, description, name, score}
+    - GZ-4: cast:executed without-arguments items — exact key set {description, name, score}
+    - GZ-5: cast:plan with-arguments items — exact key set {arguments, description, name, score}
+  - Fixture: custom 'gz-svc' server (1 tool + 2 prompts), intent 'list catalog entries'.
+  - Tests: 5/5 pass in isolation. Full suite: 4861/0/3 (+5 vs 4856 baseline). PR #1459 opened.
+- **Branch/PR**: `auto/GZ-prompts-item-exact-keyset` → PR #1459 (CI pending)
+- **Open PRs**: #1453 (GT) conflict-fixed | #1454 (GU) conflict-fixed | #1455 (GV) CI green | #1456 (GW) CI green | #1457 (GX) CI green | #1458 (GY) CI green | #1459 (GZ) CI pending
+- **Blockers (unchanged — all require human action)**:
+  1. **Merge queued PRs #1453–#1459** — GT/GU conflict-fixed, GV–GY CI green, GZ CI pending
+  2. **Enable GitHub Actions** — npm test CI disabled (currently CodeQL only)
+  3. **DISABLE hourly cron** — ~1743 runs
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks — upgrade plan to restore board appends
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+- **Next run**: Verify PR #1459 CI green. Identify GAA gap. Continue G-series.
+

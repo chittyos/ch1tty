@@ -7132,3 +7132,49 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
 **Next run:** If any of GT/GU/GV merged, identify GW gap (cast:plan exact top-level key set — same gap GV closed for cast:executed). Continue G-series.
+
+---
+
+### 2026-09-21 (run ~1742 — G-series advance: GY resources exact key set; PR #1458 CI green)
+
+- **Workstream**: G-series test-freeze (resources item exact key set — GY)
+- **Branch/PR**: `auto/GY-resources-item-exact-keyset` → **PR #1458** — CI ✅ (CodeQL + 2×Analyze, all 3 green)
+- **Build**: clean (tsc exit 0) | **Tests**: 4861 pass / 0 fail / 3 skip (+5 GY tests on GY branch)
+- **Actions (previous session, confirmed this run)**:
+  - GY identified: EO/EP treat `description` and `mimeType` as PERMITTED-not-REQUIRED for resources items; source always sets both.
+  - GY tests (5): cast:executed/plan/discovered resources exact key set = {description, mimeType, name, score, uri}; description always non-empty; mimeType always 'application/json'.
+  - PR #1458 CI confirmed green (3/3 checks: CodeQL ✅, Analyze javascript-typescript ✅, Analyze actions ✅).
+  - Merge conflict fixes: GT (#1453) and GU (#1454) were dirty (DRIVER-BOARD.md conflict); resolved by merging origin/main into each branch, keeping main's board. Both branches pushed clean.
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → PR #1453 (merged conflict fixed) | GU → PR #1454 (merged conflict fixed) | GV → PR #1455 CI green | GW → PR #1456 CI green | GX → PR #1457 CI green | GY → PR #1458 CI green ✅
+
+---
+
+### 2026-09-21 (run ~1743 — G-series advance: GZ prompts item exact key set)
+
+- **Workstream**: G-series test-freeze (prompts item exact key set)
+- **Branch/PR**: `auto/GZ-prompts-item-exact-keyset` → **PR #1459** (opening this run)
+- **Build**: clean (tsc exit 0) | **Tests**: 4861 pass / 0 fail / 3 skip (+5 GZ tests)
+- **Actions**:
+  - Identified GZ gap: EO/EP treat `description` as PERMITTED (not REQUIRED) for prompts items. `allPrompts()` at line ~1959 always produces a non-empty `description` via `[${config.name}] ${p.description || p.name}`. A refactor removing description from the prompts map() would pass EO/EP silently.
+  - Also: `arguments` is in the prompts map() always, but JSON-serialized away when undefined. Exact key set never frozen for with-args vs without-args cases.
+  - GZ-1: cast:executed prompts item.description always a non-empty string
+  - GZ-2: cast:plan prompts item.description always a non-empty string
+  - GZ-3: cast:executed prompts items WITH arguments — exact key set = {arguments, description, name, score}
+  - GZ-4: cast:executed prompts items WITHOUT arguments — exact key set = {description, name, score}
+  - GZ-5: cast:plan prompts items WITH arguments — exact key set = {arguments, description, name, score}
+  - Fixture: single 'gz-svc' server with one tool + one prompt with args + one prompt without args. Intent 'list catalog entries'.
+  - Full suite: 4861/0/3 (4856 baseline on main + 5 GZ tests). PR #1459 opened.
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → #1453 conflict-fixed | GU → #1454 conflict-fixed | GV → #1455 CI green | GW → #1456 CI green | GX → #1457 CI green | GY → #1458 CI green ✅ | GZ → #1459 CI pending
+
+**Human-action items (persistent):**
+1. **Merge PRs #1453–#1459** — GT/GU conflict-fixed and CI should recover; GV/GW/GX/GY all CI green; GZ CI pending
+2. **Notion workspace** out of free blocks — upgrade plan to restore board appends
+3. **DISABLE hourly cron** — ~1743 runs; consider stopping or reducing frequency
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run:** Verify PR #1459 CI green. Identify GAA gap (the next prompts/resources related shape not yet frozen). Continue G-series.
+
