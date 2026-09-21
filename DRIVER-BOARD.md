@@ -7049,3 +7049,28 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 **Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ + GB ✓ GC ✓ GD ✓ | GE → PR #1437 open
 
 **Next run:** Merge PR #1437 if CI green; identify GF gap (candidates: `latencyMs` value-type constraints across meta-tool responses, or `coordinator.brain` key-set stability under circuit-open state).
+
+---
+
+## Run ~1737 — 2026-09-21
+
+**Build:** clean (tsc exit 0) | **Tests:** 4861 pass / 0 fail / 3 skip (+5 vs 4856 on main) | **Audit:** 0 vulns
+
+**Actions taken:**
+- Synced to origin/main (14055ba). `npm ci` clean. `npm run build` clean. `npm test`: 4856/0/3 ✓
+- Read Notion board: workspace out of free blocks (can't append). Read DRIVER-BOARD.md fallback.
+- All A–E workstreams confirmed complete. Prior run (1736) left PR #1437 open — now merged; GE–GS all merged to main since Sept 10 last Notion entry. 0 open PRs at run start.
+- Identified GT gap: GJ-5/-6 froze latencyBreakdown VALUE TYPES but never asserted scoringMs/executionMs individually present, never froze the key set (unknown keys pass GJ-6), never asserted brainMs absent on keyword route, and GK never asserted cast:plan lacks latencyBreakdown.
+- Created `auto/GT-latencybreakdown-keysets` with 5 new tests (GT-1 through GT-5); full suite 4861/0/3 (+5).
+- Pushed and opened **PR #1453** (https://github.com/chittyos/ch1tty/pull/1453). Subscribed.
+
+**Workstream status:** A ✓ B ✓ C ✓ D ✓ E ✓ + GG–GS ✓ | GT → PR #1453 open
+
+**Human-action items (persistent):**
+1. **Notion workspace** out of free blocks — upgrade plan to restore board appends
+2. **DISABLE hourly cron** — ~1737 runs; consider stopping or reducing frequency
+3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+4. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+5. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run:** Merge PR #1453 if CI green; identify GU gap (candidates: cast:executed `resolved` field — the `resolved` STRING in executed vs the `resolved` OBJECT in plan; cast:no_match `hint` string type; status `servers[]` access/enabled value types).
