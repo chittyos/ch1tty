@@ -1,8 +1,9 @@
 /**
- * Workstream P: freeze ledger-mcp tool response output shapes.
+ * Workstream P: freeze ledger-mcp tool response required key presence and value types.
  *
- * These tests freeze the exact key sets and value types returned by each
- * ledger-mcp tool so that API contract drift is caught at the test layer.
+ * These tests verify that each ledger-mcp tool response includes all required
+ * keys with the correct value types. Optional fields (last_entry_at, metadata,
+ * next_cursor) are not asserted here — only required presence and types are frozen.
  */
 
 import test from 'node:test';
