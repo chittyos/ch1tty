@@ -159,36 +159,90 @@ test('GY-3: cast:discovered resources items have exactly {description, mimeType,
   }
 });
 
-test('GY-4: resources item.description is always a non-empty string in cast:executed', async () => {
-  // EO/EP assert typeof === 'string' when present; GY-4 asserts presence + non-emptiness.
-  const agg = makeStripeAgg();
-  try {
-    const result = await agg.callTool('ch1tty/cast', { intent: 'list stripe payments' });
-    const body = JSON.parse((result.content[0] as { text: string }).text) as Record<string, unknown>;
-    const resources = body['resources'] as Array<Record<string, unknown>>;
-    assert.ok(Array.isArray(resources) && resources.length > 0, 'test requires at least one resource');
+test('GY-4: resources item.description is always a non-empty string across cast:executed, cast:plan, and cast:discovered', async () => {
+  // EO/EP assert typeof === 'string' when present; GY-4 asserts presence + non-emptiness on all cast paths.
+  const assertDescriptions = (resources: Array<Record<string, unknown>>, path: string): void => {
+    assert.ok(Array.isArray(resources) && resources.length > 0, `${path}: test requires at least one resource`);
     for (const item of resources) {
-      assert.equal(typeof item['description'], 'string', 'resources item.description must be a string');
-      assert.ok((item['description'] as string).length > 0, 'resources item.description must be non-empty');
+      assert.equal(typeof item['description'], 'string', `${path}: resources item.description must be a string`);
+      assert.ok((item['description'] as string).length > 0, `${path}: resources item.description must be non-empty`);
     }
+  };
+
+  // cast:executed
+  const aggEx = makeStripeAgg();
+  try {
+    const r = await aggEx.callTool('ch1tty/cast', { intent: 'list stripe payments' });
+    const body = JSON.parse((r.content[0] as { text: string }).text) as Record<string, unknown>;
+    assert.equal(body['cast'], 'executed', `expected cast:executed, got cast:${String(body['cast'])}`);
+    assertDescriptions(body['resources'] as Array<Record<string, unknown>>, 'cast:executed');
   } finally {
-    await agg.shutdown();
+    await aggEx.shutdown();
+  }
+
+  // cast:plan
+  const aggPlan = makeStripeAgg();
+  try {
+    const r = await aggPlan.callTool('ch1tty/cast', { intent: 'list stripe payments', confirm: true });
+    const body = JSON.parse((r.content[0] as { text: string }).text) as Record<string, unknown>;
+    assert.equal(body['cast'], 'plan', `expected cast:plan, got cast:${String(body['cast'])}`);
+    assertDescriptions(body['resources'] as Array<Record<string, unknown>>, 'cast:plan');
+  } finally {
+    await aggPlan.shutdown();
+  }
+
+  // cast:discovered
+  const aggDisc = makeEmptyAgg();
+  try {
+    const r = await aggDisc.callTool('ch1tty/cast', { intent: 'suggestions catalog index' });
+    const body = JSON.parse((r.content[0] as { text: string }).text) as Record<string, unknown>;
+    assert.equal(body['cast'], 'discovered', `expected cast:discovered, got cast:${String(body['cast'])}`);
+    assertDescriptions(body['resources'] as Array<Record<string, unknown>>, 'cast:discovered');
+  } finally {
+    await aggDisc.shutdown();
   }
 });
 
-test('GY-5: resources item.mimeType is always \'application/json\' for catalog resources in cast:executed', async () => {
+test('GY-5: resources item.mimeType is always \'application/json\' for catalog resources across cast:executed, cast:plan, and cast:discovered', async () => {
   // listSuggestionResources() hard-codes mimeType: 'application/json' for all catalog entries.
-  // EO/EP only assert typeof === 'string' when present; GY-5 freezes the exact MIME value.
-  const agg = makeStripeAgg();
-  try {
-    const result = await agg.callTool('ch1tty/cast', { intent: 'list stripe payments' });
-    const body = JSON.parse((result.content[0] as { text: string }).text) as Record<string, unknown>;
-    const resources = body['resources'] as Array<Record<string, unknown>>;
-    assert.ok(Array.isArray(resources) && resources.length > 0, 'test requires at least one resource');
+  // EO/EP only assert typeof === 'string' when present; GY-5 freezes the exact MIME value on all cast paths.
+  const assertMimeTypes = (resources: Array<Record<string, unknown>>, path: string): void => {
+    assert.ok(Array.isArray(resources) && resources.length > 0, `${path}: test requires at least one resource`);
     for (const item of resources) {
-      assert.equal(item['mimeType'], 'application/json', 'catalog resource item.mimeType must be \'application/json\'');
+      assert.equal(item['mimeType'], 'application/json', `${path}: catalog resource item.mimeType must be 'application/json'`);
     }
+  };
+
+  // cast:executed
+  const aggEx = makeStripeAgg();
+  try {
+    const r = await aggEx.callTool('ch1tty/cast', { intent: 'list stripe payments' });
+    const body = JSON.parse((r.content[0] as { text: string }).text) as Record<string, unknown>;
+    assert.equal(body['cast'], 'executed', `expected cast:executed, got cast:${String(body['cast'])}`);
+    assertMimeTypes(body['resources'] as Array<Record<string, unknown>>, 'cast:executed');
   } finally {
-    await agg.shutdown();
+    await aggEx.shutdown();
+  }
+
+  // cast:plan
+  const aggPlan = makeStripeAgg();
+  try {
+    const r = await aggPlan.callTool('ch1tty/cast', { intent: 'list stripe payments', confirm: true });
+    const body = JSON.parse((r.content[0] as { text: string }).text) as Record<string, unknown>;
+    assert.equal(body['cast'], 'plan', `expected cast:plan, got cast:${String(body['cast'])}`);
+    assertMimeTypes(body['resources'] as Array<Record<string, unknown>>, 'cast:plan');
+  } finally {
+    await aggPlan.shutdown();
+  }
+
+  // cast:discovered
+  const aggDisc = makeEmptyAgg();
+  try {
+    const r = await aggDisc.callTool('ch1tty/cast', { intent: 'suggestions catalog index' });
+    const body = JSON.parse((r.content[0] as { text: string }).text) as Record<string, unknown>;
+    assert.equal(body['cast'], 'discovered', `expected cast:discovered, got cast:${String(body['cast'])}`);
+    assertMimeTypes(body['resources'] as Array<Record<string, unknown>>, 'cast:discovered');
+  } finally {
+    await aggDisc.shutdown();
   }
 });
