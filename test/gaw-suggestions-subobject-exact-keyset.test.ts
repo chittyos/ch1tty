@@ -187,7 +187,7 @@ test('GAW-1: suggestions top-level keyset is exactly {combos, prompts} in cast:e
   assertExactKeys(suggestions, SUGGESTIONS_KEYS, 'GAW-1 suggestions');
 });
 
-test('GAW-2: combos item WITHOUT notes has exactly {name, chain, accomplishes, verified}', async () => {
+test('GAW-2: every combos item WITHOUT notes has exactly {name, chain, accomplishes, verified}', async () => {
   const agg = makeAggWithFocus();
   const body = await castExecuted(agg);
   assert.ok(
@@ -196,15 +196,16 @@ test('GAW-2: combos item WITHOUT notes has exactly {name, chain, accomplishes, v
   );
   const { combos } = body['suggestions'] as { combos: unknown[] };
   assert.ok(Array.isArray(combos) && combos.length > 0, 'combos must be a non-empty array');
-  // COMBO_WITHOUT_NOTES is the first combo (highest-scoring: 3 terms match in name/accomplishes)
-  const withoutNotes = combos.find(
+  const withoutNotes = combos.filter(
     (c) => !Object.prototype.hasOwnProperty.call(c, 'notes'),
   );
-  assert.ok(withoutNotes !== undefined, 'at least one combo without notes must be present');
-  assertExactKeys(withoutNotes, COMBO_KEYS_BASE, 'GAW-2 combo without notes');
+  assert.ok(withoutNotes.length > 0, 'at least one combo without notes must be present');
+  for (const combo of withoutNotes) {
+    assertExactKeys(combo, COMBO_KEYS_BASE, 'GAW-2 combo without notes');
+  }
 });
 
-test('GAW-3: combos item WITH notes has exactly {name, chain, accomplishes, verified, notes}', async () => {
+test('GAW-3: every combos item WITH notes has exactly {name, chain, accomplishes, verified, notes}', async () => {
   const agg = makeAggWithFocus();
   const body = await castExecuted(agg);
   assert.ok(
@@ -213,11 +214,13 @@ test('GAW-3: combos item WITH notes has exactly {name, chain, accomplishes, veri
   );
   const { combos } = body['suggestions'] as { combos: unknown[] };
   assert.ok(Array.isArray(combos) && combos.length > 0, 'combos must be a non-empty array');
-  const withNotes = combos.find(
+  const withNotes = combos.filter(
     (c) => Object.prototype.hasOwnProperty.call(c, 'notes'),
   );
-  assert.ok(withNotes !== undefined, 'at least one combo with notes must be present');
-  assertExactKeys(withNotes, COMBO_KEYS_WITH_NOTES, 'GAW-3 combo with notes');
+  assert.ok(withNotes.length > 0, 'at least one combo with notes must be present');
+  for (const combo of withNotes) {
+    assertExactKeys(combo, COMBO_KEYS_WITH_NOTES, 'GAW-3 combo with notes');
+  }
 });
 
 test('GAW-4: each prompts item has exactly {text, resolves_to}', async () => {
