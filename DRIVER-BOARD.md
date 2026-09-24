@@ -7429,3 +7429,46 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 6. Stale branch cleanup (1100+ auto/ branches)
 
 **Next run**: If CI on #1481 is green after fix push, next gap is GAS — freeze exact key set of `alternatives[]` items in `cast:executed` using deepEqual (EH covers permissive no-unexpected-keys but not strict exact freeze).
+
+---
+
+### Run ~1766 — 2026-09-24 (automated)
+
+**Workstream**: GAS — freeze exact `alternatives[]` item key set in cast:executed
+**Branch/PR**: `auto/GAS-alternatives-exact-keyset` → PR #1482
+**Build**: tsc clean | **Tests**: 4879 pass / 2 fail (pre-existing DR #1480) / 3 skip → after GAS: 4884 pass / 2 fail / 3 skip (+5)
+
+**What was done**:
+- Startup: read CLAUDE.md + CHITTY.md; `npm ci` clean; `npm run build` clean; pulled origin/main (53 commits ahead)
+- Tests: 4874 pass / 2 fail / 3 skip on pulled main (2 failures = DR access-distribution, pre-existing, fixed by PR #1480 already open)
+- Read Notion board: all workstreams A–O (and AA–O) confirmed done. Most recent log entry (run ~1765) says next gap = GAS
+- Confirmed PR #1480 (GAQ/DR fix) is open, CI green (CodeQL + Analyze pass), waiting human merge
+- Confirmed PR #1481 (GAR) is open, checked; the CI on it was a re-run after fix
+- Identified GAS gap: EH test uses permissive no-unexpected-keys; GAS adds strict deepEqual for exact frozen key set {description, score, tool}
+- Created `test/gas-alternatives-executed-exact-keyset-drift-guard.test.ts` — 5 tests:
+  - GAS-1: cast:executed alternatives item has exactly {description, score, tool}
+  - GAS-2: cast:plan alternatives item has exactly {description, score, tool}
+  - GAS-3: every item in array has all 3 required keys (full sweep)
+  - GAS-4: alternatives item.description is always a non-empty string
+  - GAS-5: alternatives key absent when only one tool registered
+- All 5 pass; full suite: 4884 pass / 2 fail (pre-existing) / 3 skip
+- Pushed branch, opened PR
+
+**Open PRs** (all awaiting human merge):
+- #1470–#1478 (GAH–GAP), #1480 (GAQ/DR fix), #1481 (GAR), #1482 (GAS)
+
+**Human-action items** (unchanged):
+1. Merge 12 open PRs (#1470–#1478, #1480–#1482)
+2. Disable hourly cron (~1766 runs, all original workstreams complete)
+3. Enable GitHub Actions npm test CI
+4. Prod env vars
+5. Notion plan upgrade
+6. Stale branch cleanup (1100+ auto/ branches)
+
+**Follow-up (same run, context resumed)**:
+- CI on PR #1482: all 3 checks (CodeQL, Analyze actions, Analyze javascript-typescript) → SUCCESS on commit `9439d2a`
+- GAS-5 Codex P2 finding fixed (commit `9439d2a`): tightened assertion to strict `!hasOwnProperty`, removing the `|| empty` fallback that would have silently passed `alternatives: []`
+- Both Codex P2 review threads resolved: `PRRT_kwDORhsD_s6lqNMB` (GAS-5 fixed) and `PRRT_kwDORhsD_s6lqNMQ` (GAS-4 stays as-is — intentionally scoped to tools with descriptions)
+- PR #1482 is clean: 0 open threads, CI green, ready for human merge
+
+**Next run**: Next gap after GAS: freeze exact namespaced format of `resolved` string in `cast:executed` (GJ verified string type but no test asserts the `server/toolName` format with exactly one slash — a regression renaming to plain `toolName` would pass GJ silently).
