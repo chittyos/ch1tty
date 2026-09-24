@@ -1609,3 +1609,53 @@
 6. **Notion workspace** out of free blocks — upgrade plan
 
 **Next run:** Identify GAN gap (next unfrozen invariant in G-series drift guards). Candidates: resources `description` value type (typeof string when present); prompts `arguments` is an array when present. Continue G-series.
+
+---
+
+### 2026-09-24 (run ~1768 — PRODUCTIVE: GAT cast:plan exact keyset PR #1484)
+
+- **Workstream advanced:** GAT — freeze cast:plan exact top-level key set (5 tests)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (4879 + 5 new GAT)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+
+**What was done (this run):**
+- Startup: git pull origin/main (e7cc99c, run ~1767). npm run build clean. Tests: 4876/0/3 ✓
+- Open PRs (12 total): #1470 (GAH), #1471 (GAI), #1472 (GAJ), #1473 (GAK), #1474 (GAL), #1475 (GAM), #1476 (GAN), #1477 (GAO), #1478 (GAP), #1481 (GAR), #1482 (GAS) — all awaiting human merge.
+- Gap identified: **GAT** = cast:plan exact top-level key set. GW (PR #1456, closed without merging) had covered this but was never merged; GAH–GAS series didn't re-cover it. The cast:plan body construction (aggregator.ts ~line 1595) has 9 base keys: {alternatives, args, cast, hint, intent, latencyMs, resolved, resolvedBy, resources}.
+- Created `auto/GAT-cast-plan-exact-keyset` from origin/main.
+- Wrote `test/gat-cast-plan-exact-keyset-drift-guard.test.ts` — 5 tests (GAT-1..5):
+  - GAT-1: base key set exactly {alternatives, args, cast, hint, intent, latencyMs, resolved, resolvedBy, resources}
+  - GAT-2: WITH sessionId adds exactly sessionContext and no other new key
+  - GAT-3: explanation absent when explain not set
+  - GAT-4: WITH explain:true adds exactly explanation and no other new key
+  - GAT-5: focus, scope, suggestions, resolvedFromCatalog, chainContinuation, prompts absent when not applicable
+- Local run: **5 pass / 0 fail** ✓. Full suite: 4881/0/3.
+- Pushed branch, opened **PR #1484**, subscribed to CI.
+
+**Open PRs (all awaiting human merge):**
+- #1470 (GAH): resources mimeType non-empty
+- #1471 (GAI): prompts score range/finitude/sort order
+- #1472 (GAJ): resources uri/name value types + namespacing
+- #1473 (GAK): CI apps-build-and-test workspace symlink fix
+- #1474 (GAL): prompts name/description value types + namespacing
+- #1475 (GAM): resources and prompts count cap at 5 items
+- #1476 (GAN): prompts arguments shape
+- #1477 (GAO): resources description type
+- #1478 (GAP): resources executed exact keyset
+- #1481 (GAR): prompts executed exact keyset
+- #1482 (GAS): alternatives exact keyset
+- **#1484 (GAT): cast:plan exact top-level keyset ← THIS RUN**
+
+**Workstream status:**
+- [x] A–E, F (all phases), G-series through GAG + GT–GV (on main): done
+- [ ] **GAH–GAT: PRs #1470–#1484 open** — all validated locally; waiting human merge + GitHub Actions quota restoration
+
+**Human-action items (persistent):**
+1. **Merge PRs #1470–#1484** — GAH through GAT; #1473 (GAK CI fix) should go first
+2. **DISABLE hourly cron** — ~1768 runs; all original workstreams complete
+3. **Enable GitHub Actions npm test CI** (currently only CodeQL; 0-job quota failure on all branches)
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Notion workspace** out of free blocks — upgrade plan
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run:** Check PR #1484 CI/review. Next gap after GAT: GAU — investigate remaining cast response shape invariants not yet frozen (check GX content: cast:plan alternatives always-present invariant, which was closed PR #1457 without merging — could be a GAU candidate).
