@@ -7458,3 +7458,15 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
 **Next run**: PR #1480 (GAQ) CI should now be clean. Next gap after GAS (#1482): GAT — investigate what cast:executed shape property has not yet been frozen (check GAS and prior test coverage to find the next uncovered field/structure in cast responses).
+
+---
+
+### Run ~1766 follow-up — 2026-09-24T19:44Z — PR #1480 closed without merging
+
+**Event**: PR #1480 (`auto/GAQ-dr-access-counts-market-fix`) was closed without merging at ~19:44Z. CI was fully green (CodeQL ✅, Analyze ✅, CodeRabbit ✅, Codex ✅ no findings). No review comments were pending.
+
+**Impact**: The 2 failing tests on `main` (`access distribution: readwrite 44→45, read 14→13`) are still failing. The fix exists on branch `auto/GAQ-dr-access-counts-market-fix` (commit `61e75bc`) but the PR was not merged.
+
+**Action taken**: None — per system rules, closed PRs are not reopened or recreated without explicit user instruction.
+
+**Next run**: If the 2 test failures are still present on main, DO NOT create a new fix PR until the user explicitly asks. The fix branch is `auto/GAQ-dr-access-counts-market-fix` at `61e75bc`. If the user wants this applied, they can reopen PR #1480 or instruct the driver to create a new PR.
