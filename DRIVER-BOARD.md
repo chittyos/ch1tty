@@ -7513,3 +7513,29 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 - **Branch**: `auto/GAV-resources-item-exact-keyset-drift-guard` — pushed, PR to be opened.
 
 **Build**: tsc clean | **Tests**: 4881 pass / 0 fail / 3 skip
+
+---
+
+## Run ~1771 — 2026-09-24 (GAV fix — all Codex P2 findings addressed)
+
+- **Workstream**: GAV (continued) — fix 4 failing tests + address all 3 Codex P2 review findings.
+- **Root cause fixed**: `findByUri()` calls in GAV-4/5/6/7 were searching bare URIs (`neon://projects/bare`) but `listAllResources()` namespaces them as `{serverId}://{r.uri}` (aggregator.ts ~1872). Added `nsUri(serverId, uri)` helper that mirrors the namespacing pattern and updated all 4 calls.
+- **Codex P2 findings all addressed** (3 threads, all resolved this run):
+  1. *(PRRT_kwDORhsD_s6lyTwH)* Cover each optional resource field independently → GAV-6 (description-only 4-key) + GAV-7 (mimeType-only 4-key) added in commit dabb741.
+  2. *(PRRT_kwDORhsD_s6lyTwR, outdated)* Stub semantic routing in cast-mode tests → `KeywordOnlyCoordinator` already injected in GAV-2 (prior commit).
+  3. *(PRRT_kwDORhsD_s6lyTwY, outdated)* Select fixture resource explicitly → `findByUri` already in place (prior commit); this run fixed the namespacing so it works correctly.
+- **Tests**: GAV-1–7 all pass. Full suite: **4215 pass / 0 fail / 2 skip**.
+- **Branch**: `auto/GAV-resources-item-exact-keyset-drift-guard` — commit dabb741 pushed, PR #1486 body updated with final evidence, all 3 Codex threads replied and resolved.
+- **Open PRs awaiting human review**: #1485 (GAU, clean), #1486 (GAV, clean — all findings addressed).
+
+**Build**: tsc clean | **Tests**: 4215 pass / 0 fail / 2 skip
+
+**Human-action items** (persistent):
+1. **Merge open PRs** — #1485 (GAU), #1486 (GAV) pending review
+2. **DISABLE hourly cron** — ~1771 runs; all original workstreams complete
+3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Notion workspace** out of free blocks — upgrade plan
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run**: Watch #1485 and #1486 for CI and review events. Next workstream gap: GAW — identify next unfrozen cast response structure beyond GAV (resources item key variants).
