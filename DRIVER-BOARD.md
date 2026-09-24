@@ -7435,7 +7435,7 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 ### Run ~1766 — 2026-09-24 (automated)
 
 **Workstream**: GAS — freeze exact `alternatives[]` item key set in cast:executed
-**Branch/PR**: `auto/GAS-alternatives-exact-keyset` → PR #TBD (opening this run)
+**Branch/PR**: `auto/GAS-alternatives-exact-keyset` → PR #1482
 **Build**: tsc clean | **Tests**: 4879 pass / 2 fail (pre-existing DR #1480) / 3 skip → after GAS: 4884 pass / 2 fail / 3 skip (+5)
 
 **What was done**:
@@ -7455,10 +7455,10 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 - Pushed branch, opened PR
 
 **Open PRs** (all awaiting human merge):
-- #1470–#1478 (GAH–GAP), #1480 (GAQ/DR fix), #1481 (GAR), #TBD (GAS)
+- #1470–#1478 (GAH–GAP), #1480 (GAQ/DR fix), #1481 (GAR), #1482 (GAS)
 
 **Human-action items** (unchanged):
-1. Merge 12 open PRs (#1470–#1478, #1480, #1481, new GAS PR)
+1. Merge 12 open PRs (#1470–#1478, #1480–#1482)
 2. Disable hourly cron (~1766 runs, all original workstreams complete)
 3. Enable GitHub Actions npm test CI
 4. Prod env vars
