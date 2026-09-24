@@ -239,12 +239,10 @@ test('GAR-4: cast:plan prompt item with arguments has exactly keys {arguments, d
 // ── GAR-5: description is always a non-empty string in cast:executed
 
 test('GAR-5: cast:executed prompt item description is always a non-empty string (aggregator injection)', async () => {
-  // Use a prompt with NO description field — aggregator must still inject "[id] name"
-  const PROMPT_NO_DESC = { name: 'neon-list-projects' };
-  const agg = makeAgg('gar-exec-5', [TOOL_EXEC], [{
-    name: PROMPT_NO_DESC.name,
-    description: 'List neon database projects template',  // needed for haystack score
-  }]);
+  // Prompt with NO description field. Name covers all 4 intent terms so it scores,
+  // and the aggregator must fall back to `[serverName] ${p.name}` for description.
+  const PROMPT_NO_DESC = { name: 'list-neon-database-projects' };
+  const agg = makeAgg('gar-exec-5', [TOOL_EXEC], [PROMPT_NO_DESC]);
   try {
     const body = await cast(agg, { intent: INTENT });
     assert.equal(body['cast'], 'executed', `expected cast:executed, got ${body['cast']}`);
@@ -258,6 +256,11 @@ test('GAR-5: cast:executed prompt item description is always a non-empty string 
     assert.ok(
       typeof desc === 'string' && desc.length > 0,
       `description must be a non-empty string, got ${JSON.stringify(desc)}`,
+    );
+    assert.equal(
+      desc,
+      `[gar-exec-5] ${PROMPT_NO_DESC.name}`,
+      `description must be the exact name-fallback injection "[gar-exec-5] ${PROMPT_NO_DESC.name}", got ${JSON.stringify(desc)}`,
     );
   } finally {
     await agg.shutdown();
