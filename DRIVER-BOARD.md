@@ -7470,3 +7470,31 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 **Action taken**: None — per system rules, closed PRs are not reopened or recreated without explicit user instruction.
 
 **Next run**: If the 2 test failures are still present on main, DO NOT create a new fix PR until the user explicitly asks. The fix branch is `auto/GAQ-dr-access-counts-market-fix` at `61e75bc`. If the user wants this applied, they can reopen PR #1480 or instruct the driver to create a new PR.
+
+---
+
+### Run ~1767 — 2026-09-24 — Rebase PR #1473 (GAK CI workspace fix); confirm 2 test failures resolved
+
+**Workstream**: GAK (PR #1473 rebase) + state validation
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean (tsc exit 0). `npm test`: **4876 pass / 0 fail / 3 skip**
+- **Key finding**: The "2 test failures remain on main" logged by run ~1766 follow-up is INCORRECT. PR #1479 (`fix(drift): reconcile access-distribution snapshot after market read→readwrite`) already merged the fix. Tests are fully clean on main HEAD (`95e99f5`).
+- Verified 10 open PRs (#1470–#1478, #1481, #1482). Selected PR #1473 (GAK, CI workspace fix) as highest-value to advance — it fixes the `apps-build-and-test` CI job's `ERR_MODULE_NOT_FOUND` issue for workspace packages.
+- Checked: `.github/workflows/ci.yml` was NOT modified between PR #1473 base (`1808fbf`) and current main HEAD (`95e99f5`). Rebase applied cleanly (1 commit).
+- Ran full test suite on rebased branch: 4876 pass / 0 fail / 3 skip. Build clean.
+- Force-pushed `auto/GAK-fix-apps-ci-root-workspace` → PR #1473 updated with rebase evidence.
+
+**Build**: tsc clean | **Tests (main + rebased branch)**: 4876 pass / 0 fail / 3 skip
+
+**Open PRs** (all awaiting human merge): #1470–#1478, #1481, #1482 (10 total; #1473 rebased this run)
+
+**Human-action items** (persistent):
+1. **Merge open PRs** — #1470–#1478, #1481–#1482 pending review (GAH–GAS drift-guard tests + GAK CI fix)
+2. **DISABLE hourly cron** — ~1767 runs; all original workstreams complete
+3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Notion workspace** out of free blocks — upgrade plan
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run**: Tests confirmed clean (0 failures — PR #1479 fixed the access-distribution issue). Next gap: GAT — find next unfrozen cast response field/structure after GAS (alternatives exact key set). Check test/gas-*.test.ts + prior drift-guard test coverage to identify the next uncovered shape invariant.
