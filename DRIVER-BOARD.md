@@ -7399,3 +7399,33 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Notion workspace** out of free blocks — upgrade plan
   6. **Stale branch cleanup** — 1100+ remote auto/ branches
 - **Next run**: Check PR #1481 CI/review. Next gap: freeze exact key set of `alternatives[]` items in `cast:executed` using the GAP/GAR exact-deepEqual approach (EH uses permissive no-unexpected-keys check, not a deepEqual exact freeze; a GAS test would be the strict companion).
+
+---
+
+### Run ~1765 — 2026-09-24T14:58–15:15Z
+
+**Workstream**: GAR (follow-up fix — PR #1481)
+**Branch**: `auto/GAR-prompts-executed-exact-keyset`
+**Commit pushed**: `01f65ba`
+
+**What happened**:
+- CodeRabbit review completed with 1 Minor finding (same as Codex P2): GAR-5 registered a prompt WITH description, so the `p.name` fallback path was never exercised
+- Fixed by using `{ name: 'list-neon-database-projects' }` (no description, name covers all 4 intent terms) and strengthening assertion to check exact injected value `[gar-exec-5] list-neon-database-projects`
+- All 5 GAR tests pass after fix
+- Replied to CodeRabbit inline comment on line 247 (comment #4095090773)
+- Docstring Coverage ❌ warning from CodeRabbit pre-merge check: not fixing — CLAUDE.md says "Default to writing no comments" and docstrings in test files violate project standards
+
+**Test counts**: 4879 pass / 2 fail (pre-existing DR access-distribution; fixed by PR #1480) / 3 skip
+
+**Open PRs** (all awaiting human merge):
+- #1470–#1478 (GAH–GAP), #1480 (GAQ/DR fix), #1481 (GAR — CI pending re-run after fix push)
+
+**Human-action items** (unchanged):
+1. Merge 11 open PRs (#1470–#1478, #1480, #1481)
+2. Disable hourly cron (~1765 runs, all original workstreams complete)
+3. Enable GitHub Actions npm test CI
+4. Prod env vars
+5. Notion plan upgrade
+6. Stale branch cleanup (1100+ auto/ branches)
+
+**Next run**: If CI on #1481 is green after fix push, next gap is GAS — freeze exact key set of `alternatives[]` items in `cast:executed` using deepEqual (EH covers permissive no-unexpected-keys but not strict exact freeze).
