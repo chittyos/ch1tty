@@ -7429,3 +7429,32 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 6. Stale branch cleanup (1100+ auto/ branches)
 
 **Next run**: If CI on #1481 is green after fix push, next gap is GAS — freeze exact key set of `alternatives[]` items in `cast:executed` using deepEqual (EH covers permissive no-unexpected-keys but not strict exact freeze).
+
+---
+
+### Run ~1766 — 2026-09-24T~15:51Z — Fix: rebase PR #1480 onto current main
+
+**Workstream**: GAQ follow-up — rebased `auto/GAQ-dr-access-counts-market-fix` onto current main HEAD
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean, `npm test` → 4874 pass / **2 fail** / 3 skip (pre-existing DR access-distribution failures)
+- Confirmed PR #1480 already contains the correct fix (`readwrite:45, read:13`) but was 2 board commits behind main
+- Attempted rebase; DRIVER-BOARD.md conflicted on the board-update commit (2e5b83a) — resolved by `git rebase --skip` (board entry superseded by main's run ~1764/~1765 entries)
+- Result: single fix commit `61e75bc` cleanly on top of main HEAD
+- Re-ran `npm test` on the rebased branch: 4876 pass / **0 fail** / 3 skip — both failures resolved
+- Force-pushed `auto/GAQ-dr-access-counts-market-fix` → PR #1480 updated; subscribed to CI
+- Switched back to main
+
+**Build**: tsc clean | **Tests (rebased branch)**: 4876 pass / 0 fail / 3 skip
+
+**Open PRs** (all awaiting human merge): #1470–#1478 (GAH–GAP), #1480 (GAQ DR fix), #1481 (GAR), #1482 (GAS)
+
+**Human-action items** (persistent):
+1. **Merge open PRs** — #1470–#1478, #1480–#1482 pending review
+2. **DISABLE hourly cron** — ~1766 runs; all original workstreams complete long ago
+3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Notion workspace** out of free blocks — upgrade plan
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run**: PR #1480 (GAQ) CI should now be clean. Next gap after GAS (#1482): GAT — investigate what cast:executed shape property has not yet been frozen (check GAS and prior test coverage to find the next uncovered field/structure in cast responses).
