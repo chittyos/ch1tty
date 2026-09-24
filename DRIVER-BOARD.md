@@ -7376,3 +7376,26 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
 **Next run:** Verify GAI (#1471) CI green. Next gap = GAJ (resources description non-empty — EP checks `typeof r['description'] === 'string'` but not `length > 0`). Continue G-series.
+
+---
+
+### 2026-09-24 (run ~1764 — GAR: freeze prompts item exact key set; 5 new tests)
+
+- **Workstream**: GAR — freeze exact key set of `related.prompts` items in `cast:executed` and `cast:plan` (symmetric companion to GAP which did resources)
+- **Branch/PR**: `auto/GAR-prompts-executed-exact-keyset` → **PR #1481** (https://github.com/chittyos/ch1tty/pull/1481)
+- **Build**: tsc clean | **Tests**: 4879 pass / 2 fail (pre-existing DR access-count failures fixed by open PR #1480) / 3 skip (+5 vs prior)
+- **What was done**:
+  - Confirmed PR #1480 (GAQ DR fix) is still open, CI green (CodeQL + Analyze pass). No reviews.
+  - Key discovery: the aggregator ALWAYS injects a description for prompts (`[serverName] ${p.description || p.name}`), so description is never absent from output. Only `arguments` is optional.
+  - Frozen key sets: prompt-without-arguments → {description, name, score}; prompt-with-arguments → {arguments, description, name, score}.
+  - 5 tests: GAR-1..4 (cast:executed + cast:plan × without/with arguments) + GAR-5 (description always non-empty string).
+  - Pushed branch, opened PR #1481, subscribed to CI.
+- **Open PRs**: #1470 (GAH), #1471 (GAI), #1472 (GAJ), #1473 (GAK), #1474 (GAL), #1475 (GAM), #1476 (GAN), #1477 (GAO), #1478 (GAP), #1480 (GAQ), #1481 (GAR)
+- **Human-action items (persistent)**:
+  1. **Merge open PRs** — GAH–GAQ + GAR (#1470–#1478, #1480–#1481) pending review
+  2. **DISABLE hourly cron** — ~1764 runs; burning compute on each run
+  3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Notion workspace** out of free blocks — upgrade plan
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+- **Next run**: Check PR #1481 CI/review. Next gap: freeze exact key set of `alternatives[]` items in `cast:executed` using the GAP/GAR exact-deepEqual approach (EH uses permissive no-unexpected-keys check, not a deepEqual exact freeze; a GAS test would be the strict companion).
