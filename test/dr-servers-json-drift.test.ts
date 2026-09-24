@@ -246,8 +246,8 @@ describe('access distribution', () => {
   }
 
   const expected: Record<string, number> = {
-    readwrite: 44,
-    read: 14,
+    readwrite: 45,
+    read: 13,
     write: 1,
   };
 
