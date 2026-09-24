@@ -7465,4 +7465,10 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 5. Notion plan upgrade
 6. Stale branch cleanup (1100+ auto/ branches)
 
-**Next run**: Check GAS PR CI/review. Next gap after GAS: freeze exact key set of `resolved` tool item inside `cast:executed` (GV froze outer top-level; GAS freezes alternatives items; no test freezes the `resolved` string type assertion — it's verified as a string in GJ but the test doesn't assert it's a non-empty namespaced string with exactly one slash).
+**Follow-up (same run, context resumed)**:
+- CI on PR #1482: all 3 checks (CodeQL, Analyze actions, Analyze javascript-typescript) → SUCCESS on commit `9439d2a`
+- GAS-5 Codex P2 finding fixed (commit `9439d2a`): tightened assertion to strict `!hasOwnProperty`, removing the `|| empty` fallback that would have silently passed `alternatives: []`
+- Both Codex P2 review threads resolved: `PRRT_kwDORhsD_s6lqNMB` (GAS-5 fixed) and `PRRT_kwDORhsD_s6lqNMQ` (GAS-4 stays as-is — intentionally scoped to tools with descriptions)
+- PR #1482 is clean: 0 open threads, CI green, ready for human merge
+
+**Next run**: Next gap after GAS: freeze exact namespaced format of `resolved` string in `cast:executed` (GJ verified string type but no test asserts the `server/toolName` format with exactly one slash — a regression renaming to plain `toolName` would pass GJ silently).
