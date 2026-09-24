@@ -222,9 +222,8 @@ test('GAS-5: cast:executed has no alternatives key when only one tool is registe
     const body = await cast(agg, { intent: INTENT });
     assert.equal(body['cast'], 'executed', `expected cast:executed, got ${body['cast']}`);
     assert.ok(
-      !Object.prototype.hasOwnProperty.call(body, 'alternatives') ||
-        (body['alternatives'] as unknown[]).length === 0,
-      `alternatives must be absent (or empty) when only one tool is registered, got ${JSON.stringify(body['alternatives'])}`,
+      !Object.prototype.hasOwnProperty.call(body, 'alternatives'),
+      `alternatives key must be absent when only one tool is registered, got ${JSON.stringify(body['alternatives'])}`,
     );
   } finally {
     await agg.shutdown();
