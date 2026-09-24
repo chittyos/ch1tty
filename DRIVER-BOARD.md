@@ -7498,3 +7498,33 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
 **Next run**: Tests confirmed clean (0 failures — PR #1479 fixed the access-distribution issue). Next gap: GAT — find next unfrozen cast response field/structure after GAS (alternatives exact key set). Check test/gas-*.test.ts + prior drift-guard test coverage to identify the next uncovered shape invariant.
+
+---
+
+### Run ~1769 — 2026-09-24 — GAU: cast:discovered exact top-level keyset drift guard
+
+**Workstream**: GA* series continuation — cast response keyset freeze
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean (tsc exit 0). `npm test` on origin/main: **4876 pass / 0 fail / 3 skip** (confirmed).
+- Read Notion board: all original workstreams A–E ✓. Recent runs (1761–1768) working through GA* series of cast-response drift-guard tests.
+- Identified gap: GU froze no_match/resolved keysets; GV froze executed; GAT (PR #1484, open) froze plan. **cast:discovered had no exact top-level keyset freeze.**
+- Wrote `test/gau-discovered-toplevel-keyset-drift-guard.test.ts` — 5 tests: base keyset {cast, hint, intent, latencyMs, resolvedBy, resources}; +sessionId; explanation absence; +explain:true; conditional-key absence.
+- Validated: `node --import tsx --test test/gau-discovered-toplevel-keyset-drift-guard.test.ts` → 5 pass / 0 fail.
+- Full `npm test`: **4881 pass / 0 fail / 3 skip** (+5 vs baseline 4876).
+- Committed, pushed, opened PR #1485, subscribed to CI events.
+- Notion board update failed: workspace out of free blocks (upgrade needed).
+
+**Build**: clean | **Tests**: 4881 pass / 0 fail / 3 skip (+5)
+
+**Branch/PR**: `auto/GAU-discovered-toplevel-keyset-drift-guard` → https://github.com/chittyos/ch1tty/pull/1485
+
+**Human-action items** (persistent):
+1. **Merge open PRs** — #1470–#1478, #1481–#1482, #1484, #1485 (13 total) pending review
+2. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+4. **Notion workspace** out of free blocks — upgrade plan to resume board updates
+5. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run**: GAV — cast:discovered prompts-present variant keyset (when prompts also match alongside resources), OR find next unfrozen shape invariant in cast responses.
+
