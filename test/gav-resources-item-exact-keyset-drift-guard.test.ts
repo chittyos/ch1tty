@@ -28,28 +28,49 @@
  * are undefined and the serialized+parsed resources item has only 3 keys
  * {name, score, uri}. When the source HAS description and mimeType, the
  * serialized item has exactly 5 keys {description, mimeType, name, score, uri}.
+ * description and mimeType are independently optional (ResourceEntry); the
+ * four-key cases (description only / mimeType only) also produce exact key sets.
+ *
+ * Coordinator note: cast:discovered tests inject KeywordOnlyCoordinator to
+ * stub the brain/Ollama router. Without the stub, embedEnabled:false disables
+ * EmbeddingBrain but the default coordinator can still call a configured Ollama
+ * router — if reachable, it may select the sole tool and return cast:executed
+ * instead. The stub mirrors the pattern used by EP and GAG-4 for discovered-path
+ * tests and ensures deterministic keyword-only resolution.
  *
  * Invariants frozen by GAV:
  *
- *   GAV-1  cast:executed: when source resource has description and mimeType,
+ *   GAV-1  cast:executed: when source resource has description AND mimeType,
  *          every resources item has EXACTLY {description, mimeType, name, score, uri}.
  *          (DROP gap: EO/EP would silently pass if description/mimeType were
  *           removed from construction — they're PERMITTED but not REQUIRED.)
  *
- *   GAV-2  cast:discovered: same 5-key guarantee when source has optional fields.
- *          (EP analogous DROP gap on discovered path.)
+ *   GAV-2  cast:discovered: same 5-key guarantee when source has both optional fields.
+ *          (EP analogous DROP gap on discovered path; coordinator stubbed for
+ *           deterministic keyword routing.)
  *
- *   GAV-3  cast:plan (confirm:true): same 5-key guarantee when source has optional
- *          fields. (EO DROP gap on plan path.)
+ *   GAV-3  cast:plan (confirm:true): same 5-key guarantee when source has both.
+ *          (EO DROP gap on plan path.)
  *
- *   GAV-4  when source resource has no description and no mimeType, the resources
+ *   GAV-4  when source resource has NO description and NO mimeType, the resources
  *          item has EXACTLY {name, score, uri} — exactly the 3 required keys, no
- *          more, no less. (INJECT gap: EO/EP would silently pass if a regression
- *          unconditionally injected `description: ''` or `mimeType: null`.)
+ *          more, no less. Item found by URI, not positional index, to avoid fragility
+ *          from catalog-prepended items. (INJECT gap: EO/EP would silently pass if
+ *          a regression injected default values for absent optional fields.)
  *
  *   GAV-5  resources item description and mimeType echo the source string values
- *          exactly — not coerced, not truncated, not defaulted.
+ *          exactly — not coerced, not truncated, not defaulted. Item found by URI.
  *          (No prior test asserts value equality for these optional fields.)
+ *
+ *   GAV-6  when source resource has description but NO mimeType, the item has
+ *          EXACTLY {description, name, score, uri} (4 keys; mimeType absent).
+ *          (description and mimeType are independently optional; a regression
+ *           conditionalizing one on the presence of the other would pass
+ *           GAV-1–5 silently.)
+ *
+ *   GAV-7  when source resource has mimeType but NO description, the item has
+ *          EXACTLY {mimeType, name, score, uri} (4 keys; description absent).
+ *          (Symmetric to GAV-6 for the mimeType field.)
  *
  * Source: src-stdio/aggregator.ts line ~1407
  *
@@ -65,6 +86,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
 import { Aggregator } from '../src/aggregator.js';
+import { SessionCoordinator } from '../src/coordinator.js';
 import type { ServerConfig } from '../src/types.js';
 import { FixtureBackend } from './fixture-backend.js';
 
@@ -80,11 +102,28 @@ const RESOURCE_ITEM_BASE_KEYS: readonly string[] = [
   'name', 'score', 'uri',
 ];
 
+// When source resource has description but NO mimeType.
+const RESOURCE_ITEM_DESC_ONLY_KEYS: readonly string[] = [
+  'description', 'name', 'score', 'uri',
+];
+
+// When source resource has mimeType but NO description.
+const RESOURCE_ITEM_MIME_ONLY_KEYS: readonly string[] = [
+  'mimeType', 'name', 'score', 'uri',
+];
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 let _seq = 0;
 function dlq(): string {
   return join(tmpdir(), `ch1tty-gav-${Date.now()}-${++_seq}.jsonl`);
+}
+
+// Stubs the brain/Ollama router so cast mode is determined by keyword scoring
+// alone. Without this, embedEnabled:false disables EmbeddingBrain but a
+// configured Ollama router can still run, making cast:discovered non-deterministic.
+class KeywordOnlyCoordinator extends SessionCoordinator {
+  override async routeIntent(): Promise<null> { return null; }
 }
 
 // Intent: "list neon database projects"
@@ -103,6 +142,23 @@ function makeConfig(serverId: string, endpoint: string): ServerConfig[] {
       lazy: true,
     },
   ];
+}
+
+function makeAgg(
+  serverId: string,
+  tools: unknown[],
+  resources: unknown[],
+  stub = false,
+): Aggregator {
+  const backend = new FixtureBackend();
+  backend.defineServer(serverId, { tools, prompts: [], resources });
+  const path = dlq();
+  return new Aggregator(makeConfig(serverId, `https://${serverId}.fixture.test/mcp`), {
+    backendFactory: () => backend,
+    embedEnabled: false,
+    ledgerDlqPath: path,
+    ...(stub ? { coordinator: new KeywordOnlyCoordinator({}, { enabled: false }, path) } : {}),
+  });
 }
 
 function assertExactKeys(
@@ -125,6 +181,27 @@ function assertExactKeys(
   }
 }
 
+/** Find a resources item by its URI. Fails the test if not found. */
+function findByUri(
+  resources: unknown[],
+  uri: string,
+  label: string,
+): Record<string, unknown> {
+  const item = resources.find((r) => (r as Record<string, unknown>)['uri'] === uri);
+  assert.ok(item !== undefined,
+    `${label}: could not find resources item with uri="${uri}"; ` +
+    `got uris: ${JSON.stringify(resources.map((r) => (r as Record<string, unknown>)['uri']))}`);
+  return item as Record<string, unknown>;
+}
+
+/**
+ * Compute the namespaced URI that listAllResources() assigns to a backend
+ * resource. src-stdio/aggregator.ts line ~1872: `uri: \`${config.id}://${r.uri}\``
+ */
+function nsUri(serverId: string, uri: string): string {
+  return `${serverId}://${uri}`;
+}
+
 async function castBody(
   agg: Aggregator,
   extra: Record<string, unknown> = {},
@@ -134,33 +211,34 @@ async function castBody(
   return JSON.parse((result.content[0] as { text: string }).text) as Record<string, unknown>;
 }
 
-// ── GAV-1: cast:executed 5-key set when source has description + mimeType ────
+// ── Shared fixture definitions ────────────────────────────────────────────────
 
-test('GAV-1: cast:executed resources item has exactly {description,mimeType,name,score,uri} when source has optional fields', async () => {
-  const backend = new FixtureBackend();
-  backend.defineServer('gav1', {
-    tools: [
-      {
-        name: 'list_neon_db_projects',
-        description: 'List neon database projects',
-        inputSchema: { type: 'object', properties: {} },
-        response: { content: [{ type: 'text', text: '["p1"]' }] },
-      },
-    ],
-    resources: [
-      {
-        uri: 'neon://projects/list',
-        name: 'Neon DB Projects',
-        description: 'List neon database projects overview',
-        mimeType: 'application/json',
-      },
-    ],
-  });
-  const agg = new Aggregator(makeConfig('gav1', 'https://gav1.fixture.test/mcp'), {
-    backendFactory: () => backend,
-    embedEnabled: false,
-    ledgerDlqPath: dlq(),
-  });
+const EXEC_TOOL = {
+  name: 'list_neon_db_projects',
+  description: 'List neon database projects',
+  inputSchema: { type: 'object', properties: {} },
+  response: { content: [{ type: 'text', text: '["p1"]' }] },
+};
+
+// Tool with 0/4 term overlap — triggers cast:discovered when used alone
+const DISC_TOOL = {
+  name: 'write_bytes_to_disk',
+  description: 'Write bytes to a disk file',
+  inputSchema: { type: 'object', properties: { path: { type: 'string' } } },
+  response: { content: [{ type: 'text', text: '{"ok":true}' }] },
+};
+
+const FULL_RESOURCE = {
+  uri: 'neon://projects/list',
+  name: 'Neon DB Projects',
+  description: 'List neon database projects overview',
+  mimeType: 'application/json',
+};
+
+// ── GAV-1: cast:executed 5-key set when source has both optional fields ───────
+
+test('GAV-1: cast:executed resources item has exactly {description,mimeType,name,score,uri} when source has both optional fields', async () => {
+  const agg = makeAgg('gav1', [EXEC_TOOL], [FULL_RESOURCE]);
   try {
     const body = await castBody(agg);
     assert.equal(body['cast'], 'executed', `expected cast:executed, got ${body['cast']}`);
@@ -170,71 +248,26 @@ test('GAV-1: cast:executed resources item has exactly {description,mimeType,name
   }
 });
 
-// ── GAV-2: cast:discovered 5-key set when source has description + mimeType ──
+// ── GAV-2: cast:discovered 5-key set when source has both optional fields ─────
 
-test('GAV-2: cast:discovered resources item has exactly {description,mimeType,name,score,uri} when source has optional fields', async () => {
-  const backend = new FixtureBackend();
-  backend.defineServer('gav2', {
-    tools: [
-      {
-        // Tool has 0 overlap with intent → best === undefined → cast:discovered
-        name: 'write_bytes_to_disk',
-        description: 'Write bytes to a disk file',
-        inputSchema: { type: 'object', properties: { path: { type: 'string' } } },
-        response: { content: [{ type: 'text', text: '{"ok":true}' }] },
-      },
-    ],
-    resources: [
-      {
-        uri: 'neon://projects/list',
-        name: 'Neon DB Projects',
-        description: 'List neon database projects overview',
-        mimeType: 'application/json',
-      },
-    ],
-  });
-  const agg = new Aggregator(makeConfig('gav2', 'https://gav2.fixture.test/mcp'), {
-    backendFactory: () => backend,
-    embedEnabled: false,
-    ledgerDlqPath: dlq(),
-  });
+test('GAV-2: cast:discovered resources item has exactly {description,mimeType,name,score,uri} when source has both optional fields', async () => {
+  // stub=true: KeywordOnlyCoordinator disables Ollama router so 0-overlap tool
+  // reliably produces best===undefined and triggers cast:discovered.
+  const agg = makeAgg('gav2', [DISC_TOOL], [FULL_RESOURCE], true);
   try {
     const body = await castBody(agg);
     assert.equal(body['cast'], 'discovered',
-      `expected cast:discovered, got ${body['cast']} — fixture may not trigger the discovered path`);
+      `expected cast:discovered, got ${body['cast']} — fixture may not trigger discovered path`);
     assertExactKeys(body['resources'] as unknown[], RESOURCE_ITEM_FULL_KEYS, 'cast:discovered resources');
   } finally {
     await agg.shutdown();
   }
 });
 
-// ── GAV-3: cast:plan 5-key set when source has description + mimeType ────────
+// ── GAV-3: cast:plan 5-key set when source has both optional fields ───────────
 
-test('GAV-3: cast:plan resources item has exactly {description,mimeType,name,score,uri} when source has optional fields', async () => {
-  const backend = new FixtureBackend();
-  backend.defineServer('gav3', {
-    tools: [
-      {
-        name: 'list_neon_db_projects',
-        description: 'List neon database projects',
-        inputSchema: { type: 'object', properties: {} },
-        response: { content: [{ type: 'text', text: '["p1"]' }] },
-      },
-    ],
-    resources: [
-      {
-        uri: 'neon://projects/list',
-        name: 'Neon DB Projects',
-        description: 'List neon database projects overview',
-        mimeType: 'application/json',
-      },
-    ],
-  });
-  const agg = new Aggregator(makeConfig('gav3', 'https://gav3.fixture.test/mcp'), {
-    backendFactory: () => backend,
-    embedEnabled: false,
-    ledgerDlqPath: dlq(),
-  });
+test('GAV-3: cast:plan (confirm:true) resources item has exactly {description,mimeType,name,score,uri} when source has both optional fields', async () => {
+  const agg = makeAgg('gav3', [EXEC_TOOL], [FULL_RESOURCE]);
   try {
     const body = await castBody(agg, { confirm: true });
     assert.equal(body['cast'], 'plan', `expected cast:plan, got ${body['cast']}`);
@@ -250,59 +283,34 @@ test('GAV-4: resources item has exactly {name,score,uri} when source resource ha
   // ResourceEntry allows description and mimeType to be absent.
   // JSON.stringify drops undefined values, so the serialised item for a
   // bare resource has exactly the 3 required keys {name, score, uri}.
-  // A regression unconditionally injecting description/mimeType (e.g.
-  // `description: r.description ?? ''`) would add extra keys and break
-  // this assertion, which EO/EP (PERMITTED check) would silently pass.
-  const backend = new FixtureBackend();
-  backend.defineServer('gav4', {
-    tools: [
-      {
-        name: 'list_neon_database_projects',
-        description: 'List neon database projects',
-        inputSchema: { type: 'object', properties: {} },
-        response: { content: [{ type: 'text', text: '[]' }] },
-      },
-    ],
-    resources: [
-      // Deliberately omits description and mimeType — only required fields
-      {
-        uri: 'neon://projects/list',
-        name: 'Neon Database Projects',
-      },
-    ],
-  });
-  const agg = new Aggregator(makeConfig('gav4', 'https://gav4.fixture.test/mcp'), {
-    backendFactory: () => backend,
-    embedEnabled: false,
-    ledgerDlqPath: dlq(),
-  });
+  // Item is found by its URI to avoid positional fragility from catalog-prepended
+  // items (listSuggestionResources may add matching catalog resources first).
+  const BARE_URI = 'neon://projects/bare';
+  const bareResource = { uri: BARE_URI, name: 'Neon Database Projects' };
+  const agg = makeAgg('gav4', [EXEC_TOOL], [bareResource]);
   try {
     const body = await castBody(agg);
-    // Tool 4/4 overlap (list, neon, database, projects) → cast:executed
     assert.equal(body['cast'], 'executed', `expected cast:executed, got ${body['cast']}`);
     const resources = body['resources'] as unknown[];
     assert.ok(Array.isArray(resources) && resources.length > 0,
       'resources must be non-empty to test the bare-item shape');
-    const item = resources[0] as Record<string, unknown>;
+    const item = findByUri(resources, nsUri('gav4', BARE_URI), 'GAV-4');
     const actual = Object.keys(item).sort();
     const expected = [...RESOURCE_ITEM_BASE_KEYS].sort();
     assert.deepEqual(
       actual,
       expected,
-      `resources item for a source without description/mimeType must have ` +
-      `exactly ${JSON.stringify(expected)} (JSON.stringify drops undefined); ` +
-      `got ${JSON.stringify(actual)}. A regression injecting default values ` +
-      `for absent optional fields would silently pass EO/EP's PERMITTED check.`,
+      `bare resource item must have exactly ${JSON.stringify(expected)} ` +
+      `(JSON.stringify drops undefined); got ${JSON.stringify(actual)}. ` +
+      `A regression injecting default values for absent optional fields ` +
+      `would silently pass EO/EP's PERMITTED check.`,
     );
-    // Explicitly verify the optional keys are absent (INJECT regression guard)
     assert.equal(
-      Object.prototype.hasOwnProperty.call(item, 'description'),
-      false,
+      Object.prototype.hasOwnProperty.call(item, 'description'), false,
       'description must be absent when source resource has no description',
     );
     assert.equal(
-      Object.prototype.hasOwnProperty.call(item, 'mimeType'),
-      false,
+      Object.prototype.hasOwnProperty.call(item, 'mimeType'), false,
       'mimeType must be absent when source resource has no mimeType',
     );
   } finally {
@@ -313,38 +321,22 @@ test('GAV-4: resources item has exactly {name,score,uri} when source resource ha
 // ── GAV-5: description and mimeType echo source string values exactly ─────────
 
 test('GAV-5: resources item description and mimeType echo source resource string values exactly', async () => {
+  const FULL_URI = 'neon://projects/full';
   const srcDescription = 'List neon database projects overview';
   const srcMimeType = 'application/vnd.neon+json';
-  const backend = new FixtureBackend();
-  backend.defineServer('gav5', {
-    tools: [
-      {
-        name: 'list_neon_db_projects',
-        description: 'List neon database projects',
-        inputSchema: { type: 'object', properties: {} },
-        response: { content: [{ type: 'text', text: '["p1"]' }] },
-      },
-    ],
-    resources: [
-      {
-        uri: 'neon://projects/list',
-        name: 'Neon DB Projects',
-        description: srcDescription,
-        mimeType: srcMimeType,
-      },
-    ],
-  });
-  const agg = new Aggregator(makeConfig('gav5', 'https://gav5.fixture.test/mcp'), {
-    backendFactory: () => backend,
-    embedEnabled: false,
-    ledgerDlqPath: dlq(),
-  });
+  const fullResource = {
+    uri: FULL_URI,
+    name: 'Neon DB Projects',
+    description: srcDescription,
+    mimeType: srcMimeType,
+  };
+  const agg = makeAgg('gav5', [EXEC_TOOL], [fullResource]);
   try {
     const body = await castBody(agg);
     assert.equal(body['cast'], 'executed', `expected cast:executed, got ${body['cast']}`);
     const resources = body['resources'] as unknown[];
     assert.ok(Array.isArray(resources) && resources.length > 0, 'resources must be non-empty');
-    const item = resources[0] as Record<string, unknown>;
+    const item = findByUri(resources, nsUri('gav5', FULL_URI), 'GAV-5');
     assert.equal(typeof item['description'], 'string',
       'resources item.description must be typeof string when source provides a string');
     assert.equal(item['description'], srcDescription,
@@ -353,6 +345,70 @@ test('GAV-5: resources item description and mimeType echo source resource string
       'resources item.mimeType must be typeof string when source provides a string');
     assert.equal(item['mimeType'], srcMimeType,
       'resources item.mimeType must echo the source value exactly');
+  } finally {
+    await agg.shutdown();
+  }
+});
+
+// ── GAV-6: 4-key set when source has description but no mimeType ─────────────
+
+test('GAV-6: resources item has exactly {description,name,score,uri} when source has description but no mimeType', async () => {
+  // description and mimeType are independently optional. A regression that
+  // conditionalizes one on the presence of the other would pass GAV-1–5 but
+  // fail this test (which has description present, mimeType absent).
+  const DESC_ONLY_URI = 'neon://projects/desc-only';
+  const descOnlyResource = {
+    uri: DESC_ONLY_URI,
+    name: 'Neon DB Projects',
+    description: 'List neon database projects overview',
+    // no mimeType
+  };
+  const agg = makeAgg('gav6', [EXEC_TOOL], [descOnlyResource]);
+  try {
+    const body = await castBody(agg);
+    assert.equal(body['cast'], 'executed', `expected cast:executed, got ${body['cast']}`);
+    const resources = body['resources'] as unknown[];
+    assert.ok(Array.isArray(resources) && resources.length > 0,
+      'resources must be non-empty');
+    const item = findByUri(resources, nsUri('gav6', DESC_ONLY_URI), 'GAV-6');
+    const actual = Object.keys(item).sort();
+    const expected = [...RESOURCE_ITEM_DESC_ONLY_KEYS].sort();
+    assert.deepEqual(actual, expected,
+      `description-only resource item must have exactly ${JSON.stringify(expected)}; ` +
+      `got ${JSON.stringify(actual)}`);
+    assert.equal(Object.prototype.hasOwnProperty.call(item, 'mimeType'), false,
+      'mimeType must be absent when source resource has no mimeType');
+  } finally {
+    await agg.shutdown();
+  }
+});
+
+// ── GAV-7: 4-key set when source has mimeType but no description ─────────────
+
+test('GAV-7: resources item has exactly {mimeType,name,score,uri} when source has mimeType but no description', async () => {
+  // Symmetric to GAV-6 for the mimeType field.
+  const MIME_ONLY_URI = 'neon://projects/mime-only';
+  const mimeOnlyResource = {
+    uri: MIME_ONLY_URI,
+    name: 'Neon DB Projects',
+    // no description
+    mimeType: 'application/json',
+  };
+  const agg = makeAgg('gav7', [EXEC_TOOL], [mimeOnlyResource]);
+  try {
+    const body = await castBody(agg);
+    assert.equal(body['cast'], 'executed', `expected cast:executed, got ${body['cast']}`);
+    const resources = body['resources'] as unknown[];
+    assert.ok(Array.isArray(resources) && resources.length > 0,
+      'resources must be non-empty');
+    const item = findByUri(resources, nsUri('gav7', MIME_ONLY_URI), 'GAV-7');
+    const actual = Object.keys(item).sort();
+    const expected = [...RESOURCE_ITEM_MIME_ONLY_KEYS].sort();
+    assert.deepEqual(actual, expected,
+      `mimeType-only resource item must have exactly ${JSON.stringify(expected)}; ` +
+      `got ${JSON.stringify(actual)}`);
+    assert.equal(Object.prototype.hasOwnProperty.call(item, 'description'), false,
+      'description must be absent when source resource has no description');
   } finally {
     await agg.shutdown();
   }
