@@ -157,6 +157,9 @@ function makeAgg(
     backendFactory: () => backend,
     embedEnabled: false,
     ledgerDlqPath: path,
+    // Empty catalog: prevents suggestion items from competing with fixture
+    // items in the resources .slice(0, 5) cut (aggregator.ts line ~1337).
+    suggestionsCatalog: {},
     ...(stub ? { coordinator: new KeywordOnlyCoordinator({}, { enabled: false }, path) } : {}),
   });
 }
