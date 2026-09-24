@@ -7498,3 +7498,18 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
 **Next run**: Tests confirmed clean (0 failures — PR #1479 fixed the access-distribution issue). Next gap: GAT — find next unfrozen cast response field/structure after GAS (alternatives exact key set). Check test/gas-*.test.ts + prior drift-guard test coverage to identify the next uncovered shape invariant.
+
+---
+
+## Run ~1770 — 2026-09-24 (GAV)
+
+- **PR watched**: #1485 (GAU) — Codex review completed with no findings (👍 thumbs-up, "Completed" status, no suggestion comments). CodeQL passing. PR clean, waiting on human reviewers.
+- **Startup**: `npm test` on main: **4876 pass / 0 fail / 3 skip** (baseline confirmed).
+- **Workstream advanced**: GAV — freeze resources[] item exact key set across cast modes.
+- **Gap closed**: EO/EP use PERMITTED+REQUIRED for resources items (`description` and `mimeType` PERMITTED but not REQUIRED). Two gaps silently pass EO/EP: (1) DROP gap — removing `description`/`mimeType` from item construction when source has them; (2) INJECT gap — unconditionally injecting default values for sources without those fields.
+- **Key finding in GAV-4**: Verified that `JSON.stringify` drops `undefined` values — so resources items for bare sources (no description/mimeType) have exactly `{name, score, uri}`, not 5 keys. Fixed initial test assumption.
+- **Tests**: 5 new (GAV-1 through GAV-5) covering cast:executed, cast:discovered, cast:plan, bare-source path, and exact value echo.
+- **Result**: 4881 pass / 0 fail / 3 skip (+5 vs baseline).
+- **Branch**: `auto/GAV-resources-item-exact-keyset-drift-guard` — pushed, PR to be opened.
+
+**Build**: tsc clean | **Tests**: 4881 pass / 0 fail / 3 skip
