@@ -7561,3 +7561,26 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 **Status**: PR #1490 is green and clean; waiting on human review + merge. No action needed.
 
+
+---
+
+### Run ~1772 follow-up 2 — 2026-09-25T~02:53Z (Codex review findings)
+
+**Event**: Codex review posted 2 P2 (yellow/optional) findings on PR #1490
+
+**Finding 1** (correct): GAY-1/GAY-4/GAY-5 duplicated GI-1/GI-8/EA exact-keyset assertions
+**Finding 2** (correct): GAY-3 `<= 1.0` score bound is false — aggregator adds affinity+bonus, max = 1.5
+
+**Action**: Pushed commit `3a3af43` on branch `auto/GAY-resolved-subobject-exact-keyset`:
+- Removed GAY-1 (dup GI-1), GAY-4 (dup GI-8), GAY-5 (dup EA)
+- Replaced false-invariant GAY-3 with GAY-2: inputSchema deepEquals fixture (verbatim pass-through — GI-7 only checks type/null/array)
+- Kept GAY-1 (renumbered from old GAY-2): exact-equality namespacing (unique vs GI-2/3 structural checks)
+
+**Revised tests**: 2 (was 5) | **Suite**: 4878 pass / 0 fail / 3 skip (+2 vs 4876 baseline)
+
+**Both Codex threads replied to and resolved.**
+
+**PR #1490 updated**: new title + description reflecting 2-test structure.
+
+**CI**: awaiting new check run on commit `3a3af43`
+
