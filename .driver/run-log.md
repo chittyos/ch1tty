@@ -1659,3 +1659,42 @@
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
 **Next run:** Check PR #1484 CI/review. Next gap after GAT: GAU — investigate remaining cast response shape invariants not yet frozen (check GX content: cast:plan alternatives always-present invariant, which was closed PR #1457 without merging — could be a GAU candidate).
+
+### 2026-09-25 — run ~1769 — GAU PR #1504 opened
+
+**What was done (this run):**
+- Startup: main at bea9239 (run ~1768). npm run build clean. Tests: 4876/0/3 ✓
+- Notification: PR #1484 (GAT) was CLOSED without merging. Per protocol, not reopened.
+- Open PRs (22 total): #1470–#1482, #1486–#1502 series (GAH–GAS, GAV–GBD, PQ, R) — all awaiting human merge.
+- Gap identified: **GAU** = cast:plan always-present vs cast:executed conditional `alternatives` asymmetry.
+  - aggregator.ts ~line 1616: `alternatives,` (unconditional — always present in cast:plan, even as [])
+  - aggregator.ts ~line 1665: `...(alternatives.length > 0 ? { alternatives } : {})` (conditional — absent in cast:executed when empty)
+  - No prior test exercises the single-tool edge case. GV/GBD both use stripe fixture (3 tools → always non-empty).
+- Created `auto/GAU-alternatives-present-absent-asymmetry` from origin/main.
+- Wrote `test/gau-alternatives-present-absent-asymmetry.test.ts` — 5 tests (GAU-1..5):
+  - GAU-1: cast:plan + single-tool backend → alternatives: [] always present
+  - GAU-2: cast:plan + multi-tool backend → alternatives non-empty always present
+  - GAU-3: cast:executed + single-tool backend → alternatives KEY ABSENT
+  - GAU-4: cast:executed + multi-tool backend → alternatives key present, non-empty
+  - GAU-5: cast:plan alternatives is always Array.isArray regardless of tool count
+- Local run: **5 pass / 0 fail** ✓. Full suite: 4881/0/3.
+- Pushed branch, opened **PR #1504**, subscribed to CI.
+
+**Open PRs (all awaiting human merge):**
+- #1470 (GAH) through #1482 (GAS): GAH–GAS drift guards
+- #1473 (GAK): CI apps-build-and-test workspace symlink fix (should go first)
+- #1486 (GAV) through #1502 (R): GAV–GAZ, GBA–GBD, PQ, R drift guards
+- **#1504 (GAU): cast:plan/executed alternatives asymmetry ← THIS RUN**
+
+**Workstream status:**
+- [x] A–E, F (all phases), G-series through GAG + GT–GV (on main): done
+- [ ] **GAH–GAU, GAV–GBD, PQ, R: PRs open** — all validated locally; waiting human merge + GitHub Actions quota restoration
+
+**Human-action items (persistent):**
+1. **Merge PRs #1470–#1504** — GAH through GAU + later series; #1473 (GAK CI fix) should go first
+2. **DISABLE hourly cron** — ~1769 runs; all original workstreams complete
+3. **Enable GitHub Actions npm test CI** (currently only CodeQL; 0-job quota failure on all branches)
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Notion workspace** out of free blocks — upgrade plan
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
