@@ -7623,3 +7623,26 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
 - **Next run:** Check GBC PR #1500 CI/review. Next candidate: freeze `cast:plan` exact top-level key set (GAT PR #1484 mentioned in logs but not in open list — may have been closed; EF uses PERMITTED for plan too).
 
+---
+
+### Run ~1780 — 2026-09-25T15:00Z
+
+- **Workstream advanced:** GBD — freeze `cast:plan` exact top-level key set
+- **Branch/PR:** `auto/GBD-plan-toplevel-keyset-drift-guard` → **PR #1501**
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline)
+- **Actions this run:**
+  - Checked PR #1500 (GBC): CodeQL + Analyze checks ✅; Codex and CodeRabbit reviews still running (no findings yet).
+  - Identified gap: EG uses PLAN_PERMITTED (16-key superset) for cast:plan; no test exact-freezes the keyset.
+  - Created `test/gbd-plan-toplevel-keyset-drift-guard.test.ts` (5 tests: base exact, +sessionId, explanation absent, +explain, absent keys).
+  - Key frozen set: {alternatives, args, cast, hint, intent, latencyMs, resolved, resolvedBy, resources}
+  - Notable: `alternatives` always present in plan (unconditional spread); no `score`/`latencyBreakdown` at top level.
+  - All 5 new tests pass. Full suite 4881/0/3. Pushed and opened PR #1501.
+  - Notion board unavailable (401); DRIVER-BOARD.md is durable state.
+- **Human-action items (carried forward):**
+  1. **DISABLE hourly cron** — ~1780+ runs; burning compute
+  2. **Enable GitHub Actions** (main npm test CI job — 0-queue non-blocking recurring)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+- **Next run:** Check GBD PR #1501 and GBC PR #1500 CI/review. Next candidate: freeze `cast:resolved` exact top-level key set (GU froze no_match+resolved but EG RESOLVED_PERMITTED is still a superset) or freeze alternatives[] scoring for cast:plan (GO-1 froze plan alternatives keyset but not the ordering/score range across alternatives).
+
