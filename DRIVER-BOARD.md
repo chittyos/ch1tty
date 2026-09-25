@@ -7599,3 +7599,53 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 **Status**: PR #1490 is fully ready for human review and merge.
 
+
+
+---
+
+### Run ~1773 — 2026-09-25T~hourly
+
+**Workstream**: GAZ — freeze `resolved.inputSchema` verbatim pass-through in cast:plan
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean (tsc exit 0)
+- `npm test` baseline: **4876 pass / 0 fail / 3 skip**
+- Read DRIVER-BOARD.md: all workstreams A–E done; recent series = drift-guard tests (GAH–GAY); 17 open PRs awaiting human review/merge (#1470–#1490)
+- Identified GAZ gap: GI-7 checks resolved.inputSchema is a non-null non-array object but does NOT assert content fidelity (no deepEqual against fixture). A regression stripping properties/required or returning wrong tool schema passes GI-7 silently.
+- Wrote `test/gaz-resolved-inputschema-verbatim-passthrough.test.ts` — 5 tests (GAZ-1 through GAZ-5)
+- All 5 GAZ tests pass. Full suite: **4881 pass / 0 fail / 3 skip** (+5 vs baseline)
+- Committed to `auto/GAZ-resolved-inputschema-verbatim-passthrough`, pushed, opened PR #1491
+
+**Build**: tsc clean | **Tests**: 4881 pass / 0 fail / 3 skip (+5)
+
+**PR**: https://github.com/chittyos/ch1tty/pull/1491
+
+**Open PRs** (all awaiting human merge): #1470–#1491 (18 total; all CI: CodeQL only)
+
+**Human-action items** (persistent):
+1. **Merge open PRs** — #1470–#1491 pending review (GAH–GAZ drift-guard tests + GAK CI fix + run-log)
+2. **DISABLE hourly cron** — ~1773 runs; all original workstreams complete long ago
+3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Notion workspace** out of free blocks — upgrade plan
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run**: GAA (or next letter in series) — next unfrozen cast response field. Candidates: (a) `alternatives` item exact key set in cast:plan (EH freezes items in some paths but GI/EG only permit-check; a full sweep across all alternatives items freezing exact keyset); (b) `scope` sub-object exact keyset in cast:plan vs cast:executed (EQ covers scope but may have paths not tested); (c) cast:no_match top-level exact keyset (GJ covers value types but not exact keyset vs only permitted).
+
+---
+
+### Run ~1773 follow-up — 2026-09-25T03:50Z (CI pass on fix commit)
+
+**Codex review on `6225bd1`**: Completed — no findings (👍)
+
+**CI on `6225bd1`**: check_suite.completed — all checks passed
+
+**CodeRabbit**: still rate-limited (~10 min cooldown from PR open), reviewing `6225bd1`
+
+**PR #1491 final state**: `mergeable_state: blocked` — waiting on human review/approval only. No open threads, no conflicts, CI green, Codex clean.
+
+Two Codex P2 findings on `1adb887` were addressed in `6225bd1`:
+1. Schema aliasing (GAZ-1–4): `structuredClone` now used when registering fixture schemas
+2. GAZ-5 winner ordering: `charge_payment` (ALT_SCHEMA) now registered first + explicit tool name assertion
+
+**Status**: PR #1491 fully ready for human merge.
