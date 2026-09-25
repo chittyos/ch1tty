@@ -1698,3 +1698,43 @@
 5. **Notion workspace** out of free blocks — upgrade plan
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
+
+### 2026-09-25 — run ~1785 — GBF PR #1506 opened
+
+**What was done (this run):**
+- Startup: pulled main (was at c783f53, run ~1784). npm run build clean. Tests: 4876/0/3 ✓
+- Confirmed 5-tool surface invariant; buildCastExplanation metric freeze active (56/87 fields)
+- Open PRs (21 total): #1475–#1505 — all drift guard test additions, CI-green (CodeQL), awaiting human merge
+- Notion board update failed — workspace hit free-plan block limit (see Human-action item #5)
+- Gap identified: **GBF** = cast:plan conditional top-level key set
+  - No test on main freezes the exact top-level key set OR conditional additions for cast:plan
+  - GK covers value types (resolvedBy/latencyMs/intent); GS covers sessionContext value types
+  - A regression leaking annotation key or always including focus/explanation would pass all prior tests silently
+  - aggregator.ts ~1599: `...(focusName ? { focus } : {})`, `...(explanation ? { explanation } : {})`, `...(planSessionContext ? { sessionContext } : {})`
+- Created `auto/GBF-plan-conditional-keys-drift-guard` from origin/main
+- Wrote `test/gbf-plan-conditional-keys-drift-guard.test.ts` — 5 tests (GBF-1..5):
+  - GBF-1: cast:plan base has EXACTLY {alternatives,args,cast,hint,intent,latencyMs,resolved,resolvedBy} (8 keys)
+  - GBF-2: cast:plan WITH focus:'finance' adds exactly `focus` (base+1=9 keys)
+  - GBF-3: cast:plan WITH focus+explain:true adds exactly `focus`+`explanation` (base+2=10 keys)
+  - GBF-4: cast:plan WITH sessionId (no focus) adds exactly `sessionContext` (base+1=9 keys)
+  - GBF-5: cast:plan base does NOT contain scope/suggestions/resolvedFromCatalog/chainContinuation
+- Local run: **5 pass / 0 fail** ✓. Full suite: 4881/0/3 (+5 vs main).
+- Pushed branch, opened **PR #1506**, subscribed to CI.
+
+**Open PRs (all awaiting human merge):**
+- #1475 (GAM) through #1505 (GVF): 21 drift guard PRs, all CI-green (CodeQL)
+- **#1506 (GBF): cast:plan conditional keys ← THIS RUN**
+
+**Workstream status:**
+- [x] A–E, F (all phases), G-series through GV (on main): done
+- [ ] **GAM–GVF, GBF: PRs open** — all validated locally; waiting human merge
+
+**Human-action items (persistent):**
+1. **Merge PRs #1475–#1506** — GAM through GBF; all CI-green
+2. **DISABLE hourly cron** — ~1785 runs; all original workstreams complete
+3. **Enable GitHub Actions npm test CI** (currently only CodeQL)
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Upgrade Notion plan** — workspace out of free blocks (board updates failing)
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run:** Watch PR #1506 for CI/review. Next gap candidate: GBG — cast:discovered conditional key set (same pattern: no test on main freezes exact key set for discovered mode). Or apply Workstream L/O pattern to apps/session-coordinator-mcp tool layer.
