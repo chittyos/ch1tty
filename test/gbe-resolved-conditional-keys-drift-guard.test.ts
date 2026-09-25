@@ -118,6 +118,7 @@ function makeAgg(): Aggregator {
     backendFactory: () => backend,
     embedEnabled: false,
     ledgerDlqPath: dlq(),
+    suggestionsCatalog: {},
   });
 }
 
