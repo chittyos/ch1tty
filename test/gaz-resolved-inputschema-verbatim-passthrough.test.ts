@@ -133,11 +133,13 @@ async function getResolved(agg: Aggregator, intent: string): Promise<Record<stri
 
 test('GAZ-1: cast:plan resolved.inputSchema deep-equals fixture rich schema (verbatim pass-through)', async () => {
   const backend = new FixtureBackend();
+  // Clone when registering so RICH_SCHEMA stays pristine; any in-place mutation by the
+  // aggregator would diverge the fixture copy from the original, making deepEqual fail.
   backend.defineServer('neon', {
     tools: [{
       name: 'list_projects',
       description: 'list neon database projects in the account',
-      inputSchema: RICH_SCHEMA,
+      inputSchema: structuredClone(RICH_SCHEMA),
       response: { content: [{ type: 'text', text: '["proj-1","proj-2"]' }] },
     }],
   });
@@ -166,7 +168,7 @@ test('GAZ-2: cast:plan resolved.inputSchema deep-equals fixture minimal schema (
     tools: [{
       name: 'list_projects',
       description: 'list neon database projects in the account',
-      inputSchema: MINIMAL_SCHEMA,
+      inputSchema: structuredClone(MINIMAL_SCHEMA),
       response: { content: [{ type: 'text', text: '["proj-1"]' }] },
     }],
   });
@@ -195,7 +197,7 @@ test('GAZ-3: cast:plan resolved.inputSchema preserves deeply nested property def
     tools: [{
       name: 'list_projects',
       description: 'list neon database projects in the account',
-      inputSchema: NESTED_SCHEMA,
+      inputSchema: structuredClone(NESTED_SCHEMA),
       response: { content: [{ type: 'text', text: '["proj-1"]' }] },
     }],
   });
@@ -232,7 +234,7 @@ test('GAZ-4: cast:plan resolved.inputSchema preserves additionalProperties: fals
     tools: [{
       name: 'list_projects',
       description: 'list neon database projects in the account',
-      inputSchema: STRICT_SCHEMA,
+      inputSchema: structuredClone(STRICT_SCHEMA),
       response: { content: [{ type: 'text', text: '["proj-1"]' }] },
     }],
   });
@@ -263,19 +265,21 @@ test('GAZ-4: cast:plan resolved.inputSchema preserves additionalProperties: fals
 
 test('GAZ-5: resolved.inputSchema matches winning tool schema, not any other tool in registry', async () => {
   const backend = new FixtureBackend();
+  // charge_payment (ALT_SCHEMA) is registered FIRST so a registry[0]-always bug
+  // would return ALT_SCHEMA and fail the assertions below.
   backend.defineServer('neon', {
     tools: [
       {
-        name: 'list_projects',
-        description: 'list neon database projects in the account',
-        inputSchema: RICH_SCHEMA,
-        response: { content: [{ type: 'text', text: '["proj-1"]' }] },
-      },
-      {
         name: 'charge_payment',
         description: 'charge stripe payment card billing transaction',
-        inputSchema: ALT_SCHEMA,
+        inputSchema: structuredClone(ALT_SCHEMA),
         response: { content: [{ type: 'text', text: '{"status":"ok"}' }] },
+      },
+      {
+        name: 'list_projects',
+        description: 'list neon database projects in the account',
+        inputSchema: structuredClone(RICH_SCHEMA),
+        response: { content: [{ type: 'text', text: '["proj-1"]' }] },
       },
     ],
   });
@@ -285,8 +289,14 @@ test('GAZ-5: resolved.inputSchema matches winning tool schema, not any other too
     ledgerDlqPath: dlq(),
   });
   try {
-    // Intent resolves to list_projects (database/projects terms dominate)
+    // Intent resolves to list_projects (database/projects terms dominate over stripe/payment)
     const resolved = await getResolved(agg, 'list database projects neon');
+    // Confirm winner is list_projects, not the first-registered charge_payment
+    assert.equal(
+      resolved['tool'],
+      'neon/list_projects',
+      'winning tool must be neon/list_projects (not the first-registered charge_payment)',
+    );
     assert.deepEqual(
       resolved['inputSchema'],
       RICH_SCHEMA,
@@ -295,7 +305,7 @@ test('GAZ-5: resolved.inputSchema matches winning tool schema, not any other too
     assert.notDeepEqual(
       resolved['inputSchema'],
       ALT_SCHEMA,
-      'resolved.inputSchema must NOT be the non-winning tool schema',
+      'resolved.inputSchema must NOT be the non-winning tool (charge_payment) schema',
     );
   } finally {
     await agg.shutdown();
