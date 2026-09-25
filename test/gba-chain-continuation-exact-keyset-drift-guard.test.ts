@@ -1,5 +1,6 @@
 /**
- * GBA drift guard: freeze chainContinuation sub-object exact key set.
+ * GBA drift guard: freeze chainContinuation sub-object exact key set for
+ * cast:executed.
  *
  * `cast-chain-continuation.test.ts` confirms that chainContinuation is
  * present with the correct values for nextTool, remainingChain, and hint,
@@ -19,23 +20,13 @@
  *
  * GBA-1  cast:executed multi-step — Object.keys(chainContinuation).sort()
  *         === ['hint', 'nextTool', 'remainingChain'].
- *         Complementary to cast-chain-continuation #1 which checks individual
- *         values but not the full keyset.
+ *         cast-chain-continuation.test.ts checks individual values but not
+ *         the full keyset; a regression adding a key passes silently.
  *
- * GBA-2  cast:plan (confirm:true) multi-step — same exact key set.
- *         cast-chain-continuation #4 checks presence and cast mode but not
- *         the keyset.
- *
- * GBA-3  nextTool is a string, not an object or array.
- *         Freezes the primitive type so a regression wrapping it in
- *         { tool, server } would fail here before the integration tests.
- *
- * GBA-4  remainingChain is an Array and every element is a string.
- *         Freezes that the chain slice is flat strings, not tool-descriptor
- *         objects.
- *
- * GBA-5  hint is a non-empty string (typeof === 'string' && .length > 0).
- *         Symmetric to GBA-3/GBA-4 for the hint field.
+ * cast:plan keyset + all three value types are already frozen by
+ * eh-cast-alternatives-catalog-chain-shape.test.ts Suite 3 (EH lines
+ * ~269-328). GBA covers only the cast:executed path which has no prior
+ * Object.keys() guard.
  *
  * Frozen 2026-09-25.
  */
@@ -129,112 +120,6 @@ test('GBA-1: cast:executed chainContinuation has EXACTLY {hint, nextTool, remain
       actualKeys,
       [...CHAIN_CONTINUATION_KEYS].sort(),
       `chainContinuation key set must be exactly ${JSON.stringify(CHAIN_CONTINUATION_KEYS)} — got ${JSON.stringify(actualKeys)}`,
-    );
-  } finally {
-    await agg.shutdown();
-  }
-});
-
-// ── GBA-2: cast:plan exact keyset ────────────────────────────────────────────
-
-test('GBA-2: cast:plan chainContinuation has EXACTLY {hint, nextTool, remainingChain}', async () => {
-  const agg = makeAgg({ focus: 'finance' });
-  try {
-    const result = await agg.callTool('ch1tty/cast', { intent: 'list invoices billing', confirm: true });
-    assert.equal(result.isError, undefined, 'cast should not error');
-
-    const meta = JSON.parse(result.content[0].text as string);
-    assert.equal(meta.cast, 'plan', 'expected cast:plan mode');
-
-    const cc = meta.chainContinuation as Record<string, unknown>;
-    assert.ok(cc != null, 'chainContinuation must be present in cast:plan for multi-step combo');
-
-    const actualKeys = Object.keys(cc).sort();
-    assert.deepEqual(
-      actualKeys,
-      [...CHAIN_CONTINUATION_KEYS].sort(),
-      `chainContinuation key set must be exactly ${JSON.stringify(CHAIN_CONTINUATION_KEYS)} — got ${JSON.stringify(actualKeys)}`,
-    );
-  } finally {
-    await agg.shutdown();
-  }
-});
-
-// ── GBA-3: nextTool is a string ───────────────────────────────────────────────
-
-test('GBA-3: chainContinuation.nextTool is a string, not an object or array', async () => {
-  const agg = makeAgg({ focus: 'finance' });
-  try {
-    const result = await agg.callTool('ch1tty/cast', { intent: 'list invoices billing' });
-    assert.equal(result.isError, undefined);
-
-    const meta = JSON.parse(result.content[0].text as string);
-    const cc = meta.chainContinuation as Record<string, unknown>;
-    assert.ok(cc != null, 'chainContinuation must be present');
-
-    assert.equal(
-      typeof cc['nextTool'],
-      'string',
-      `nextTool must be typeof string — got ${typeof cc['nextTool']}`,
-    );
-    assert.ok(
-      !Array.isArray(cc['nextTool']),
-      'nextTool must not be an array',
-    );
-  } finally {
-    await agg.shutdown();
-  }
-});
-
-// ── GBA-4: remainingChain is Array<string> ────────────────────────────────────
-
-test('GBA-4: chainContinuation.remainingChain is an Array and every element is a string', async () => {
-  const agg = makeAgg({ focus: 'finance' });
-  try {
-    const result = await agg.callTool('ch1tty/cast', { intent: 'list invoices billing' });
-    assert.equal(result.isError, undefined);
-
-    const meta = JSON.parse(result.content[0].text as string);
-    const cc = meta.chainContinuation as Record<string, unknown>;
-    assert.ok(cc != null, 'chainContinuation must be present');
-
-    const rc = cc['remainingChain'];
-    assert.ok(Array.isArray(rc), `remainingChain must be an Array — got ${typeof rc}`);
-
-    const chain = rc as unknown[];
-    assert.ok(chain.length > 0, 'remainingChain must have at least one element for a multi-step combo');
-    for (let i = 0; i < chain.length; i++) {
-      assert.equal(
-        typeof chain[i],
-        'string',
-        `remainingChain[${i}] must be a string — got ${typeof chain[i]}`,
-      );
-    }
-  } finally {
-    await agg.shutdown();
-  }
-});
-
-// ── GBA-5: hint is a non-empty string ─────────────────────────────────────────
-
-test('GBA-5: chainContinuation.hint is a non-empty string', async () => {
-  const agg = makeAgg({ focus: 'finance' });
-  try {
-    const result = await agg.callTool('ch1tty/cast', { intent: 'list invoices billing' });
-    assert.equal(result.isError, undefined);
-
-    const meta = JSON.parse(result.content[0].text as string);
-    const cc = meta.chainContinuation as Record<string, unknown>;
-    assert.ok(cc != null, 'chainContinuation must be present');
-
-    assert.equal(
-      typeof cc['hint'],
-      'string',
-      `hint must be typeof string — got ${typeof cc['hint']}`,
-    );
-    assert.ok(
-      (cc['hint'] as string).length > 0,
-      'hint must be non-empty',
     );
   } finally {
     await agg.shutdown();
