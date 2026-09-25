@@ -140,6 +140,7 @@ test('S-5: update_task returns Task with required keys {id, title, status, creat
     const task = parseText<Task>(result);
     for (const k of ['id', 'title', 'status', 'created_at', 'updated_at']) {
       assert.ok(Object.prototype.hasOwnProperty.call(task, k), `updated Task missing required key: ${k}`);
+      assert.equal(typeof (task as Record<string, unknown>)[k], 'string', `${k} must be string`);
     }
   } finally {
     await cleanup();
