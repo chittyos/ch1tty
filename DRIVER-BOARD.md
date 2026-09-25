@@ -7544,3 +7544,20 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
 **Next run**: GAZ — next unfrozen cast response field. Candidates: (a) `resolved.inputSchema` exact shape in cast:plan (it passes through the raw inputSchema — freeze that it matches the fixture); (b) `catalogCombo`/`resolvedFromCatalog` sub-object exact keyset (appears when focus catalog matches); (c) `chainContinuation` sub-object keyset.
+
+---
+
+### Run ~1772 follow-up — 2026-09-25T02:44Z (CI completion wake)
+
+**Event**: `check_suite.completed` for PR #1490 commit `24a6b44`
+
+**CI result**: All 3 checks passed — CodeQL ✓, Analyze (javascript-typescript) ✓, Analyze (actions) ✓
+
+**PR #1490 state**: `mergeable_state: clean` — no conflicts, no blocking review findings
+
+**Codex review**: still running as of wake time (no findings posted yet)
+
+**CodeRabbit**: rate-limited at PR open (~12 min cooldown from 02:40Z)
+
+**Status**: PR #1490 is green and clean; waiting on human review + merge. No action needed.
+
