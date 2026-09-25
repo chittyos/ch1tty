@@ -7510,3 +7510,37 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 - **Gap closed:** EP used PERMITTED check for cast:discovered prompts items; GAR added EXACT checks for cast:executed/cast:plan; GAX completes the third mode (cast:discovered)
 - **Open PRs in GA* series:** GAR (#1481), GAU (#1485), GAX (#1489)
 - **Next run:** GAY or next drift-guard gap
+
+---
+
+### Run ~1772 — 2026-09-25T~hourly
+
+**Workstream**: GAY — freeze `resolved` sub-object exact key set across cast modes
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean (tsc exit 0)
+- `npm test` baseline: **4876 pass / 0 fail / 3 skip**
+- Read DRIVER-BOARD.md: all workstreams A–E done; recent series = drift-guard tests (GAH–GAX); 16 open PRs awaiting human review/merge
+- Identified gap: no test freezes the exact inner key set of `resolved` across cast modes
+  - `cast:plan` (confirm:true): `resolved` = object `{tool, server, category, description, score, inputSchema}` (6 keys)
+  - `cast:resolved` (dryRun:true): `resolved` = object `{tool, score}` (2 keys)
+  - `cast:executed` (default): `resolved` = STRING (namespaced tool name)
+- Wrote `test/gay-resolved-subobject-exact-keyset.test.ts` — 5 tests (GAY-1 through GAY-5)
+- All 5 GAY tests pass. Full suite: **4881 pass / 0 fail / 3 skip** (+5 vs baseline)
+- Committed to `auto/GAY-resolved-subobject-exact-keyset`, pushed, opened PR #1490
+
+**Build**: tsc clean | **Tests**: 4881 pass / 0 fail / 3 skip (+5)
+
+**PR**: https://github.com/chittyos/ch1tty/pull/1490
+
+**Open PRs** (all awaiting human merge): #1470–#1489, #1490 (17 total; all CI: CodeQL only)
+
+**Human-action items** (persistent):
+1. **Merge open PRs** — #1470–#1490 pending review (GAH–GAY drift-guard tests + GAK CI fix + run-log)
+2. **DISABLE hourly cron** — ~1772 runs; all original workstreams complete long ago
+3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Notion workspace** out of free blocks — upgrade plan
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run**: GAZ — next unfrozen cast response field. Candidates: (a) `resolved.inputSchema` exact shape in cast:plan (it passes through the raw inputSchema — freeze that it matches the fixture); (b) `catalogCombo`/`resolvedFromCatalog` sub-object exact keyset (appears when focus catalog matches); (c) `chainContinuation` sub-object keyset.
