@@ -7599,3 +7599,27 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 **Status**: PR #1490 is fully ready for human review and merge.
 
+---
+
+### Run ~1779 — 2026-09-25T14:00Z
+
+- **Workstream advanced:** GBC — freeze `cast:discovered` exact top-level key set
+- **Branch/PR:** `auto/GBC-discovered-toplevel-keyset-drift-guard` → **PR #1500**
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline)
+- **Actions this run:**
+  - Synced to `origin/main` (6e6add8). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Closed 4 stale run-log PRs: #1488, #1495, #1497, #1498.
+  - 6 meaningful open PRs remain: #1489 (GAX), #1490 (GAY), #1491 (GAZ), #1494 (GBA), #1496 (GBB), #1499 (PQ).
+  - All 6 open PRs: CodeQL + Analyze checks ✅ (CI main job still 0-queue non-blocking known issue).
+  - Identified gap: EF uses PERMITTED superset for cast:discovered; no test exact-freezes the top-level keyset.
+  - Created `test/gbc-discovered-toplevel-keyset-drift-guard.test.ts` (5 tests: prompts-only, resources-only, +session, +explain, absent-keys).
+  - All 5 new tests pass. Full suite 4881/0/3. Pushed and opened PR #1500.
+  - Notion board unavailable (401); DRIVER-BOARD.md is durable state.
+- **Human-action items (carried forward):**
+  1. **DISABLE hourly cron** — ~1779+ runs; burning compute
+  2. **Enable GitHub Actions** (main npm test CI job — 0-queue non-blocking recurring)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+- **Next run:** Check GBC PR #1500 CI/review. Next candidate: freeze `cast:plan` exact top-level key set (GAT PR #1484 mentioned in logs but not in open list — may have been closed; EF uses PERMITTED for plan too).
+
