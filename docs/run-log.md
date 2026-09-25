@@ -719,14 +719,14 @@ Runs ~1234–1239 were idle (same state: 1438/0/3, 0 open PRs). Run ~1240 raised
 - **Most useful thing for next run**: Advance Workstream R — `packages/shared-types` has no tests (type-only exports; tests could validate shape guards/narrowing), OR check if PRs #1314–#1316 merged and find the next untested path. Check open PRs first.
 
 ## Run ~1776 — 2026-09-25T~09:40 UTC
-- **Workstream**: None advanced (all A–E + extended F–O done; no new workstreams in prompt)
+- **Workstream**: None advanced (all A–E + extended F–P done; no new workstreams in prompt)
 - **Branch/PR**: `auto/run-log-2026-09-25-b` (this run)
 - **Build**: tsc clean (ch1tty@4.1.0, 0 errors)
-- **Tests**: 4876 total — 4876 pass / 0 fail / 3 skip (main baseline)
+- **Tests**: 4879 total — 4876 pass / 0 fail / 3 skip (main baseline)
 - **Apps (all 5)**: tasks-mcp 90, ledger-mcp 81, session-coordinator-mcp 112, evidence-mcp 94, comms-mcp 202 — all 579 pass / 0 fail (local, root-workspace install)
 - **Guardrails**: 5-tool surface confirmed. `buildCastExplanation` freeze guards: 56 (no-focus) / 87 (focus:code) ✓
-- **Open PRs**: 22 (#1470–#1496) — all stuck at CI conclusion=failure with **0 jobs run** (GitHub Actions disabled at org level; CodeQL/Analyze pass via code-scanning separately)
-- **State**: A ✓ B ✓ C ✓ D ✓ E ✓ + extended through O ✓. PR queue at 22 open; CI blocked.
+- **Open PRs**: 22 (#1470–#1496) — main CI stuck at conclusion=failure with **0 jobs run** (main ci.yml workflow blocked at org level; CodeQL/Analyze continue as separate code-scanning checks, not part of the blocked workflow)
+- **State**: A ✓ B ✓ C ✓ D ✓ E ✓ + extended through P ✓. PR queue at 22 open; CI blocked.
 - **New finding this run**:
   - Confirmed GAK fix (PR #1473) is locally correct: root `npm ci` fixes workspace-symlink failure for `@ch1tty/shared-logger`; all 5 apps verified 579/0.
   - **Notion workspace hit block limit** — `notion-update-page` returns "used all of its free blocks" (new blocker; board cannot be updated).
