@@ -717,3 +717,26 @@ Runs ~1234–1239 were idle (same state: 1438/0/3, 0 open PRs). Run ~1240 raised
 - **State**: A ✓ B ✓ C ✓ D ✓ E ✓ + extended workstreams through P ✓. Q opened this run.
 - **Action taken**: Created 20 unit tests for `packages/shared-logger`'s `Logger` class covering level filtering, JSON/text format, `setLevel()`, and `childStderr()`. All green. Committed to `auto/Q-shared-logger-unit-tests`, pushed, opened PR #1316.
 - **Most useful thing for next run**: Advance Workstream R — `packages/shared-types` has no tests (type-only exports; tests could validate shape guards/narrowing), OR check if PRs #1314–#1316 merged and find the next untested path. Check open PRs first.
+
+## Run ~1778 — 2026-09-25T10:10 UTC
+- **Workstream**: None — A–P+ all complete. No new workstreams defined.
+- **Branch/PR**: `auto/run-log-2026-09-25-c` (this run-log entry only)
+- **Build**: tsc clean (ch1tty@4.1.0, 0 errors)
+- **Tests**: 4876 pass / 0 fail / 3 skip (4879 total)
+- **Guardrails**: 5-tool surface confirmed. `buildCastExplanation` freeze guards: 56 (no-focus) / 87 (focus:code) ✓
+- **Open PRs**: 22 (#1473–#1497) — all locally green, all blocked on CI
+- **State**: All workstreams done. Critical blockers unchanged from prior runs.
+
+### Key findings this run:
+1. **CI permanently broken**: GitHub Actions `ci.yml` has produced **0 jobs per run** since at least 2026-09-16 (5000+ runs, all `conclusion=failure`, 0 jobs). Root cause: GitHub Actions disabled at org level. All 22 open PRs cannot auto-merge.
+2. **Notion board at block limit**: Free workspace block limit reached — cannot append new entries to the board. Upgrade plan or create a new board.
+3. **PRs accumulating**: 22 open PRs (GAK–GBB plus 3 run-log entries) are locally valid but idle.
+
+### Human actions required (escalated — unresolved across many consecutive runs):
+1. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions and reusable workflows"
+2. **Upgrade Notion plan** (or create fresh board) — free block limit hit
+3. **Merge or close 22 open PRs** — after Actions enabled, auto-merge proceeds; priority: #1473 (CI fix), #1496 (GBB health keyset), #1494 (GBA chain_executed keyset)
+4. **Disable hourly cron or define new workstreams** — all A–P+ exhausted; idle runs burn ~50k tokens each with no actionable output
+
+### Most useful thing for next run:
+No code work remains until human enables GitHub Actions. Once enabled, 22 PRs should auto-merge. Cron should then be disabled or redirected to new workstreams.
