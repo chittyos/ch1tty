@@ -7530,9 +7530,46 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 **Build**: tsc clean | **Tests**: 4215 pass / 0 fail / 2 skip
 
+---
+
+**Run ~1771 | 2026-09-25 | GAX**
+- **Build:** clean
+- **Tests:** 4881 pass / 0 fail / 3 skip
+- **Workstream:** GAX — freeze prompts item exact key set in cast:discovered
+- **Branch:** `auto/GAX-prompts-discovered-exact-keyset`
+- **PR:** https://github.com/chittyos/ch1tty/pull/1489
+- **File:** `test/gax-prompts-discovered-exact-keyset-drift-guard.test.ts` (5 tests: GAX-1 through GAX-5)
+- **Gap closed:** EP used PERMITTED check for cast:discovered prompts items; GAR added EXACT checks for cast:executed/cast:plan; GAX completes the third mode (cast:discovered)
+- **Open PRs in GA* series:** GAR (#1481), GAU (#1485), GAX (#1489)
+- **Next run:** GAY or next drift-guard gap
+
+---
+
+### Run ~1772 — 2026-09-25T~hourly
+
+**Workstream**: GAY — freeze `resolved` sub-object exact key set across cast modes
+
+**What was done**:
+- Startup: `npm ci` clean, `npm run build` clean (tsc exit 0)
+- `npm test` baseline: **4876 pass / 0 fail / 3 skip**
+- Read DRIVER-BOARD.md: all workstreams A–E done; recent series = drift-guard tests (GAH–GAX); 16 open PRs awaiting human review/merge
+- Identified gap: no test freezes the exact inner key set of `resolved` across cast modes
+  - `cast:plan` (confirm:true): `resolved` = object `{tool, server, category, description, score, inputSchema}` (6 keys)
+  - `cast:resolved` (dryRun:true): `resolved` = object `{tool, score}` (2 keys)
+  - `cast:executed` (default): `resolved` = STRING (namespaced tool name)
+- Wrote `test/gay-resolved-subobject-exact-keyset.test.ts` — 5 tests (GAY-1 through GAY-5)
+- All 5 GAY tests pass. Full suite: **4881 pass / 0 fail / 3 skip** (+5 vs baseline)
+- Committed to `auto/GAY-resolved-subobject-exact-keyset`, pushed, opened PR #1490
+
+**Build**: tsc clean | **Tests**: 4881 pass / 0 fail / 3 skip (+5)
+
+**PR**: https://github.com/chittyos/ch1tty/pull/1490
+
+**Open PRs** (all awaiting human merge): #1470–#1489, #1490 (17 total; all CI: CodeQL only)
+
 **Human-action items** (persistent):
-1. **Merge open PRs** — #1485 (GAU), #1486 (GAV) pending review
-2. **DISABLE hourly cron** — ~1771 runs; all original workstreams complete
+1. **Merge open PRs** — #1470–#1490 pending review (GAH–GAY drift-guard tests + GAK CI fix + run-log)
+2. **DISABLE hourly cron** — ~1772 runs; all original workstreams complete long ago
 3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
 4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
 5. **Notion workspace** out of free blocks — upgrade plan
@@ -7548,11 +7585,105 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 - **PR #1486 (GAV)**: All 4 Codex P2 threads resolved; CI fully green on current head `2689e0a` (CodeQL success, all analyses pass); no new Codex findings in ~20h. **Clean, waiting on human review/merge.**
 - **Action**: None — loop standing down. PR #1486 subscription stays active; will wake if new events arrive.
 
-**Human-action items** (persistent):
-1. **Review/merge or close PR #1486** — GAV drift-guard tests (7 tests, all Codex P2 findings addressed, CI green)
-2. **Clarify PR #1485 (GAU) close intent** — was it intentional? If drift-guard series should continue, reopen; if not, close #1486 too.
-3. **DISABLE hourly cron** — ~1772 runs; all original workstreams complete
-4. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
-5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
-6. **Notion workspace** out of free blocks — upgrade plan
-7. **Stale branch cleanup** — 1100+ remote auto/ branches
+**Next run**: GAZ — next unfrozen cast response field. Candidates: (a) `resolved.inputSchema` exact shape in cast:plan (it passes through the raw inputSchema — freeze that it matches the fixture); (b) `catalogCombo`/`resolvedFromCatalog` sub-object exact keyset (appears when focus catalog matches); (c) `chainContinuation` sub-object keyset.
+
+---
+
+### Run ~1772 follow-up — 2026-09-25T02:44Z (CI completion wake)
+
+**Event**: `check_suite.completed` for PR #1490 commit `24a6b44`
+
+**CI result**: All 3 checks passed — CodeQL ✓, Analyze (javascript-typescript) ✓, Analyze (actions) ✓
+
+**PR #1490 state**: `mergeable_state: clean` — no conflicts, no blocking review findings
+
+**Codex review**: still running as of wake time (no findings posted yet)
+
+**CodeRabbit**: rate-limited at PR open (~12 min cooldown from 02:40Z)
+
+**Status**: PR #1490 is green and clean; waiting on human review + merge. No action needed.
+
+
+---
+
+### Run ~1772 follow-up 2 — 2026-09-25T~02:53Z (Codex review findings)
+
+**Event**: Codex review posted 2 P2 (yellow/optional) findings on PR #1490
+
+**Finding 1** (correct): GAY-1/GAY-4/GAY-5 duplicated GI-1/GI-8/EA exact-keyset assertions
+**Finding 2** (correct): GAY-3 `<= 1.0` score bound is false — aggregator adds affinity+bonus, max = 1.5
+
+**Action**: Pushed commit `3a3af43` on branch `auto/GAY-resolved-subobject-exact-keyset`:
+- Removed GAY-1 (dup GI-1), GAY-4 (dup GI-8), GAY-5 (dup EA)
+- Replaced false-invariant GAY-3 with GAY-2: inputSchema deepEquals fixture (verbatim pass-through — GI-7 only checks type/null/array)
+- Kept GAY-1 (renumbered from old GAY-2): exact-equality namespacing (unique vs GI-2/3 structural checks)
+
+**Revised tests**: 2 (was 5) | **Suite**: 4878 pass / 0 fail / 3 skip (+2 vs 4876 baseline)
+
+**Both Codex threads replied to and resolved.**
+
+**PR #1490 updated**: new title + description reflecting 2-test structure.
+
+**CI**: awaiting new check run on commit `3a3af43`
+
+
+---
+
+### Run ~1772 follow-up 3 — 2026-09-25T03:00Z (final clean state)
+
+**CodeRabbit review on 3a3af43**: "No actionable comments" + merge risk ⚪ Minimal
+
+**CI on 3a3af43**: All 3 checks ✅ (CodeQL, Analyze javascript-typescript, Analyze actions)
+
+**Codex review on 3a3af43**: Completed — no findings
+
+**PR #1490 final state**: `mergeable_state: clean` — all reviewers done, no open threads, no conflicts
+
+**Status**: PR #1490 is fully ready for human review and merge.
+
+---
+
+### Run ~1779 — 2026-09-25T14:00Z
+
+- **Workstream advanced:** GBC — freeze `cast:discovered` exact top-level key set
+- **Branch/PR:** `auto/GBC-discovered-toplevel-keyset-drift-guard` → **PR #1500**
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline)
+- **Actions this run:**
+  - Synced to `origin/main` (6e6add8). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Closed 4 stale run-log PRs: #1488, #1495, #1497, #1498.
+  - 6 meaningful open PRs remain: #1489 (GAX), #1490 (GAY), #1491 (GAZ), #1494 (GBA), #1496 (GBB), #1499 (PQ).
+  - All 6 open PRs: CodeQL + Analyze checks ✅ (CI main job still 0-queue non-blocking known issue).
+  - Identified gap: EF uses PERMITTED superset for cast:discovered; no test exact-freezes the top-level keyset.
+  - Created `test/gbc-discovered-toplevel-keyset-drift-guard.test.ts` (5 tests: prompts-only, resources-only, +session, +explain, absent-keys).
+  - All 5 new tests pass. Full suite 4881/0/3. Pushed and opened PR #1500.
+  - Notion board unavailable (401); DRIVER-BOARD.md is durable state.
+- **Human-action items (carried forward):**
+  1. **DISABLE hourly cron** — ~1779+ runs; burning compute
+  2. **Enable GitHub Actions** (main npm test CI job — 0-queue non-blocking recurring)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+- **Next run:** Check GBC PR #1500 CI/review. Next candidate: freeze `cast:plan` exact top-level key set (GAT PR #1484 mentioned in logs but not in open list — may have been closed; EF uses PERMITTED for plan too).
+
+---
+
+### Run ~1780 — 2026-09-25T15:00Z
+
+- **Workstream advanced:** GBD — freeze `cast:plan` exact top-level key set
+- **Branch/PR:** `auto/GBD-plan-toplevel-keyset-drift-guard` → **PR #1501**
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline)
+- **Actions this run:**
+  - Checked PR #1500 (GBC): CodeQL + Analyze checks ✅; Codex and CodeRabbit reviews still running (no findings yet).
+  - Identified gap: EG uses PLAN_PERMITTED (16-key superset) for cast:plan; no test exact-freezes the keyset.
+  - Created `test/gbd-plan-toplevel-keyset-drift-guard.test.ts` (5 tests: base exact, +sessionId, explanation absent, +explain, absent keys).
+  - Key frozen set: {alternatives, args, cast, hint, intent, latencyMs, resolved, resolvedBy, resources}
+  - Notable: `alternatives` always present in plan (unconditional spread); no `score`/`latencyBreakdown` at top level.
+  - All 5 new tests pass. Full suite 4881/0/3. Pushed and opened PR #1501.
+  - Notion board unavailable (401); DRIVER-BOARD.md is durable state.
+- **Human-action items (carried forward):**
+  1. **DISABLE hourly cron** — ~1780+ runs; burning compute
+  2. **Enable GitHub Actions** (main npm test CI job — 0-queue non-blocking recurring)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+- **Next run:** Check GBD PR #1501 and GBC PR #1500 CI/review. Next candidate: freeze `cast:resolved` exact top-level key set (GU froze no_match+resolved but EG RESOLVED_PERMITTED is still a superset) or freeze alternatives[] scoring for cast:plan (GO-1 froze plan alternatives keyset but not the ordering/score range across alternatives).
