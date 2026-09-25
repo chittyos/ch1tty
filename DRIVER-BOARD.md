@@ -7539,3 +7539,20 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
 **Next run**: Watch #1485 and #1486 for CI and review events. Next workstream gap: GAW — identify next unfrozen cast response structure beyond GAV (resources item key variants).
+
+---
+
+## Run ~1772 — 2026-09-25 (PR #1485 closed; GAV clean)
+
+- **Event**: PR #1485 (GAU — freeze cast:discovered top-level keyset) was **closed without merging** by a human at 2026-09-25T18:38:47Z. NOT reopening per policy. May signal the human does not want this drift-guard series, or was cleaning stale PRs.
+- **PR #1486 (GAV)**: All 4 Codex P2 threads resolved; CI fully green on current head `2689e0a` (CodeQL success, all analyses pass); no new Codex findings in ~20h. **Clean, waiting on human review/merge.**
+- **Action**: None — loop standing down. PR #1486 subscription stays active; will wake if new events arrive.
+
+**Human-action items** (persistent):
+1. **Review/merge or close PR #1486** — GAV drift-guard tests (7 tests, all Codex P2 findings addressed, CI green)
+2. **Clarify PR #1485 (GAU) close intent** — was it intentional? If drift-guard series should continue, reopen; if not, close #1486 too.
+3. **DISABLE hourly cron** — ~1772 runs; all original workstreams complete
+4. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+6. **Notion workspace** out of free blocks — upgrade plan
+7. **Stale branch cleanup** — 1100+ remote auto/ branches
