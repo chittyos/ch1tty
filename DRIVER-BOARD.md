@@ -7672,3 +7672,33 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
 - **Next run:** Check GBE PR #1503 and GBC #1500, GBD #1501 CI/review. Next candidate: freeze `cast:executed` conditional key set WITH focus/explain (GV froze base+session+explain+focus for executed but may have gaps for combo cases — verify) OR freeze `cast:plan` WITH focus/explain (GBD covers base; similar GBE treatment for plan conditional fields).
+
+---
+
+## Run ~1784 — 2026-09-25T18:53Z
+
+**Workstream:** D — Scenario testing (drift guards)
+**Branch/PR:** `auto/GVF-executed-conditional-keys-drift-guard` → PR #1505
+**Test counts:** 4886 pass / 0 fail / 3 skip (+5 vs baseline)
+**Actions taken:**
+- Resumed from CI notification for PR #1503 (GBE); confirmed 3 CI checks ✅, Codex P2 resolved, no CodeRabbit yet (rate-limited)
+- Identified next gap: GV froze cast:executed base/session/explain but NOT the +focus keyset; GVF fills this
+- Probed actual keysets (empty catalog): base=8 keys, +focus=9, +focus+explain=10, +focus+session=10
+- Wrote `test/gvf-executed-conditional-keys-drift-guard.test.ts` (5 tests: GVF-1 base empty-catalog, GVF-2 +focus, GVF-3 +focus+explain, GVF-4 +focus+session, GVF-5 absence guards)
+- Committed (947fe0f), pushed, created PR #1505, subscribed for activity
+
+**Open PRs waiting on review:**
+- #1505 (GVF) — CI pending
+- #1503 (GBE) — CI ✅, CodeRabbit pending, Codex ✅
+- #1502 (R comms) — CI ✅
+- #1501 (GBD cast:plan keyset) — CI ✅
+- #1500 (GBC cast:discovered keyset) — CI ✅
+- #1499, #1496, #1494, #1491, #1490, #1489, #1487, #1486, ... (all CI ✅, waiting on merge)
+
+**Human-action items (carry-forward):**
+1. **DISABLE hourly cron** — burning compute at ~1784+ runs
+2. **Enable GitHub Actions** (main npm test CI job — 0-queue non-blocking recurring)
+3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+4. **Stale branch cleanup** — 1100+ remote auto/ branches
+5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+- **Next run:** Check GVF #1505 CI/Codex. Next candidate: freeze `cast:plan` conditional key set WITH focus/explain (GBD covers cast:plan base; GBF treatment for plan conditional fields — same pattern as GBE/GVF). OR freeze `cast:discovered` WITH focus/explain (GBC covers discovered base).
