@@ -7631,3 +7631,21 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
 **Next run**: GAA (or next letter in series) — next unfrozen cast response field. Candidates: (a) `alternatives` item exact key set in cast:plan (EH freezes items in some paths but GI/EG only permit-check; a full sweep across all alternatives items freezing exact keyset); (b) `scope` sub-object exact keyset in cast:plan vs cast:executed (EQ covers scope but may have paths not tested); (c) cast:no_match top-level exact keyset (GJ covers value types but not exact keyset vs only permitted).
+
+---
+
+### Run ~1773 follow-up — 2026-09-25T03:50Z (CI pass on fix commit)
+
+**Codex review on `6225bd1`**: Completed — no findings (👍)
+
+**CI on `6225bd1`**: check_suite.completed — all checks passed
+
+**CodeRabbit**: still rate-limited (~10 min cooldown from PR open), reviewing `6225bd1`
+
+**PR #1491 final state**: `mergeable_state: blocked` — waiting on human review/approval only. No open threads, no conflicts, CI green, Codex clean.
+
+Two Codex P2 findings on `1adb887` were addressed in `6225bd1`:
+1. Schema aliasing (GAZ-1–4): `structuredClone` now used when registering fixture schemas
+2. GAZ-5 winner ordering: `charge_payment` (ALT_SCHEMA) now registered first + explicit tool name assertion
+
+**Status**: PR #1491 fully ready for human merge.
