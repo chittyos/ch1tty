@@ -7687,3 +7687,30 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
 - **Next run:** Check GBD PR #1501 and GBC PR #1500 CI/review. Next candidate: freeze `cast:resolved` exact top-level key set (GU froze no_match+resolved but EG RESOLVED_PERMITTED is still a superset) or freeze alternatives[] scoring for cast:plan (GO-1 froze plan alternatives keyset but not the ordering/score range across alternatives).
+
+
+---
+
+### Run ~1783 — 2026-09-25T~16:00Z
+
+- **Workstream advanced:** GBE — freeze `cast:resolved` conditional key set (focus, explain, absent scope/catalogCombo)
+- **Branch/PR:** `auto/GBE-resolved-conditional-keys-drift-guard` → **PR #1503**
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline)
+- **Actions this run:**
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed.
+  - Synced to origin/main (c70b39d). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Checked open PRs: 20 open. PR #1502 (R comms-shape-freeze) CI ✅ all 3 checks; 2 P2 Codex threads resolved.
+  - Closed PR #1484 (GAT) as superseded by #1501 (GBD) — both "cast:plan exact keyset".
+  - Closed PR #1485 (GAU) as superseded by #1500 (GBC) — both "cast:discovered exact keyset".
+  - Identified GBE gap: GU-3/GU-4 froze cast:resolved for base+session only; focus/explain/scope/catalogCombo conditional fields unfrozen.
+  - Read src-stdio/aggregator.ts line ~1564 to confirm exact conditional structure.
+  - Created `test/gbe-resolved-conditional-keys-drift-guard.test.ts` (5 tests: GBE-1 thru GBE-5).
+  - All 5 new tests pass. Full suite 4881/0/3. Pushed and opened PR #1503.
+  - Notion board unavailable (401); DRIVER-BOARD.md is durable state.
+- **Human-action items (carried forward):**
+  1. **DISABLE hourly cron** — ~1783+ runs; burning compute
+  2. **Enable GitHub Actions** (main npm test CI job — 0-queue non-blocking recurring)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+- **Next run:** Check GBE PR #1503 and GBC #1500, GBD #1501 CI/review. Next candidate: freeze `cast:executed` conditional key set WITH focus/explain (GV froze base+session+explain+focus for executed but may have gaps for combo cases — verify) OR freeze `cast:plan` WITH focus/explain (GBD covers base; similar GBE treatment for plan conditional fields).
