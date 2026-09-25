@@ -41,9 +41,14 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
 import { Aggregator } from '../src/aggregator.js';
+import { SessionCoordinator } from '../src/coordinator.js';
 import type { FocusSuggestions } from '../src/suggestions.js';
 import type { ServerConfig } from '../src/types.js';
 import { FixtureBackend } from './fixture-backend.js';
+
+class KeywordOnlyCoordinator extends SessionCoordinator {
+  override async routeIntent(): Promise<null> { return null; }
+}
 
 // ── Frozen exact key sets ──────────────────────────────────────────────────────
 
@@ -132,11 +137,13 @@ function makeBackend(): FixtureBackend {
 }
 
 function makeAgg(catalog: Record<string, FocusSuggestions> = {}): Aggregator {
+  const path = dlq();
   return new Aggregator(BILLING_CONFIG, {
     backendFactory: () => makeBackend(),
     embedEnabled: false,
-    ledgerDlqPath: dlq(),
+    ledgerDlqPath: path,
     suggestionsCatalog: catalog,
+    coordinator: new KeywordOnlyCoordinator({}, { enabled: false }, path),
   });
 }
 
