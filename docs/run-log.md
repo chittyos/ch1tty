@@ -736,4 +736,4 @@ Runs ~1234–1239 were idle (same state: 1438/0/3, 0 open PRs). Run ~1240 raised
   2. Upgrade Notion plan (workspace block limit reached; board cannot be updated).
   3. Merge PR #1473 (GAK) — valid, locally verified; unblocks apps-build-and-test CI job once Actions are enabled.
   4. Disable hourly cron (`/cron delete`) or define new workstreams — all A–O done, cron burning ~50k tokens/run idle.
-- **Most useful thing for next run**: Same state until GitHub Actions re-enabled. Highest-priority merges: #1473 (CI fix), then #1488, then #1470–#1494.
+- **Most useful thing for next run**: Same state until GitHub Actions re-enabled. Highest-priority merges: #1473 (CI fix), then #1488, then remaining open PRs in #1470–#1496 (excluding #1479 merged, #1480 closed).
