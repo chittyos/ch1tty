@@ -7702,3 +7702,27 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 4. **Stale branch cleanup** — 1100+ remote auto/ branches
 5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
 - **Next run:** Check GVF #1505 CI/Codex. Next candidate: freeze `cast:plan` conditional key set WITH focus/explain (GBD covers cast:plan base; GBF treatment for plan conditional fields — same pattern as GBE/GVF). OR freeze `cast:discovered` WITH focus/explain (GBC covers discovered base).
+
+---
+
+### Run ~1787 — 2026-09-25T (automated run)
+
+- **Workstream advanced:** GBH — freeze `cast:discovered` conditional key set (explain/session/scope additions)
+- **Branch/PR:** `auto/GBH-discovered-conditional-keys-drift-guard` → **PR #1509**
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline)
+- **Actions this run:**
+  - Startup: pulled main to d134da6 (run ~1786). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 ✓
+  - Read DRIVER-BOARD.md (Notion board at 401). Confirmed all workstreams A–E done.
+  - Checked open PRs: 23 open (#1470–#1508), all drift guard test additions awaiting human merge.
+  - Surveyed 4 new non-auto branches: `refactor/backend-interface` (old unify refactor), `register-chittyconnect-mcp` (108-pass catalog), `workstream-bd` (candidateFromMetadata tests), `workstream-bl-ledger-bind-idempotency` (ledger tests) — all on open PRs or stale.
+  - Identified GBH gap: EF froze PERMITTED key sets for cast:discovered; no test on main freezes the exact key set additions for explain/session/scope params. GBG (PR #1507) covers suggestions conditional; GBH covers the remaining three conditionals.
+  - Probed actual key sets live via tsx: BASE=6 keys, +explain=7, +session=7, +scope=7.
+  - Wrote `test/gbh-discovered-conditional-keys-drift-guard.test.ts` (5 tests: GBH-1..5).
+  - All 5 tests pass; full suite 4881/0/3. Pushed and opened PR #1509.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1787 runs; burning compute
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+- **Next run:** Check GBH PR #1509 CI/review. Next candidate: GBI — cast:chain_executed conditional key set (GBA froze exact top-level base; no test freezes what +explain/+session/+scope add to chain_executed).
