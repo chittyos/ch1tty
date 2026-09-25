@@ -99,7 +99,7 @@ test('P-2: list_namespaces Namespace field value types: name string, entry_count
 
 // ── list_entries: ListEntriesResult key set ───────────────────────────────────
 
-test('P-3: list_entries result has required keys {entries, has_more} and entries is an array', async () => {
+test('P-3: list_entries result has required keys {entries, has_more} and entries items have required LedgerEntry keys + types', async () => {
   const { client, cleanup } = await setup();
   try {
     const result = await client.callTool({ name: 'list_entries', arguments: { namespace: 'events' } });
@@ -109,6 +109,17 @@ test('P-3: list_entries result has required keys {entries, has_more} and entries
     assert.ok(Object.prototype.hasOwnProperty.call(body, 'has_more'), 'missing key: has_more');
     assert.ok(Array.isArray(body.entries), 'entries must be an array');
     assert.equal(typeof body.has_more, 'boolean', 'has_more must be boolean');
+    assert.ok(body.entries.length > 0, 'fixture must return at least one entry');
+    const entry = body.entries[0];
+    const requiredKeys: (keyof LedgerEntry)[] = ['id', 'namespace', 'payload', 'sequence', 'created_at'];
+    for (const k of requiredKeys) {
+      assert.ok(Object.prototype.hasOwnProperty.call(entry, k), `entries[0] missing required key: ${k}`);
+    }
+    assert.equal(typeof entry.id, 'string', 'entries[0].id must be string');
+    assert.equal(typeof entry.namespace, 'string', 'entries[0].namespace must be string');
+    assert.equal(typeof entry.created_at, 'string', 'entries[0].created_at must be string');
+    assert.equal(typeof entry.sequence, 'number', 'entries[0].sequence must be number');
+    assert.ok(entry.payload !== null && typeof entry.payload === 'object' && !Array.isArray(entry.payload), 'entries[0].payload must be a non-null object');
   } finally {
     await cleanup();
   }
@@ -165,7 +176,10 @@ test('P-6: append_entry response is a LedgerEntry with required keys {id, namesp
       assert.ok(Object.prototype.hasOwnProperty.call(entry, k), `append_entry response missing required key: ${k}`);
     }
     assert.equal(typeof entry.id, 'string', 'id must be string');
+    assert.equal(typeof entry.namespace, 'string', 'namespace must be string');
+    assert.equal(typeof entry.created_at, 'string', 'created_at must be string');
     assert.equal(typeof entry.sequence, 'number', 'sequence must be number');
+    assert.ok(entry.payload !== null && typeof entry.payload === 'object' && !Array.isArray(entry.payload), 'payload must be a non-null object');
   } finally {
     await cleanup();
   }

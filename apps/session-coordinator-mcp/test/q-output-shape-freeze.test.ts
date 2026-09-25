@@ -110,7 +110,11 @@ test('Q-3: get_session Session has required keys {id, channel, status, event_cou
       assert.ok(Object.prototype.hasOwnProperty.call(s, k), `Session missing required key: ${k}`);
     }
     assert.equal(typeof s.id, 'string', 'id must be string');
+    assert.equal(typeof s.channel, 'string', 'channel must be string');
+    assert.equal(typeof s.status, 'string', 'status must be string');
     assert.equal(typeof s.event_count, 'number', 'event_count must be number');
+    assert.equal(typeof s.created_at, 'string', 'created_at must be string');
+    assert.equal(typeof s.updated_at, 'string', 'updated_at must be string');
   } finally {
     await cleanup();
   }
@@ -130,6 +134,10 @@ test('Q-4: create_session response is a Session with required keys {id, channel,
     }
     assert.equal(typeof s.id, 'string', 'id must be string');
     assert.equal(typeof s.channel, 'string', 'channel must be string');
+    assert.equal(typeof s.status, 'string', 'status must be string');
+    assert.equal(typeof s.event_count, 'number', 'event_count must be number');
+    assert.equal(typeof s.created_at, 'string', 'created_at must be string');
+    assert.equal(typeof s.updated_at, 'string', 'updated_at must be string');
   } finally {
     await cleanup();
   }
@@ -177,7 +185,7 @@ test('Q-6: append_event SessionEvent field value types: id/session_id/type/creat
 
 // ── list_events: ListEventsResult shape ───────────────────────────────────────
 
-test('Q-7: list_events result has required keys {events, has_more} and events is an array', async () => {
+test('Q-7: list_events result has required keys {events, has_more} and event items have required SessionEvent keys + types', async () => {
   const { client, cleanup } = await setup();
   try {
     const result = await client.callTool({ name: 'list_events', arguments: { session_id: 'sid-001' } });
@@ -187,6 +195,62 @@ test('Q-7: list_events result has required keys {events, has_more} and events is
     assert.ok(Object.prototype.hasOwnProperty.call(body, 'has_more'), 'missing key: has_more');
     assert.ok(Array.isArray(body.events), 'events must be an array');
     assert.equal(typeof body.has_more, 'boolean', 'has_more must be boolean');
+    assert.ok(body.events.length > 0, 'fixture must return at least one event');
+    const ev = body.events[0];
+    const requiredKeys: (keyof SessionEvent)[] = ['id', 'session_id', 'type', 'created_at'];
+    for (const k of requiredKeys) {
+      assert.ok(Object.prototype.hasOwnProperty.call(ev, k), `events[0] missing required key: ${k}`);
+    }
+    assert.equal(typeof ev.id, 'string', 'events[0].id must be string');
+    assert.equal(typeof ev.session_id, 'string', 'events[0].session_id must be string');
+    assert.equal(typeof ev.type, 'string', 'events[0].type must be string');
+    assert.equal(typeof ev.created_at, 'string', 'events[0].created_at must be string');
+  } finally {
+    await cleanup();
+  }
+});
+
+// ── update_session: response is Session with required keys + value types ──────
+
+test('Q-8: update_session response is a Session with required keys {id, channel, status, event_count, created_at, updated_at} and correct value types', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.callTool({ name: 'update_session', arguments: { id: 'sid-001', status: 'idle' } });
+    assert.ok(!result.isError, 'expected success');
+    const s = parseText<Session>(result);
+    const requiredKeys: (keyof Session)[] = ['id', 'channel', 'status', 'event_count', 'created_at', 'updated_at'];
+    for (const k of requiredKeys) {
+      assert.ok(Object.prototype.hasOwnProperty.call(s, k), `update_session response missing required key: ${k}`);
+    }
+    assert.equal(typeof s.id, 'string', 'id must be string');
+    assert.equal(typeof s.channel, 'string', 'channel must be string');
+    assert.equal(typeof s.status, 'string', 'status must be string');
+    assert.equal(typeof s.event_count, 'number', 'event_count must be number');
+    assert.equal(typeof s.created_at, 'string', 'created_at must be string');
+    assert.equal(typeof s.updated_at, 'string', 'updated_at must be string');
+  } finally {
+    await cleanup();
+  }
+});
+
+// ── close_session: response is Session with required keys + value types ───────
+
+test('Q-9: close_session response is a Session with required keys {id, channel, status, event_count, created_at, updated_at} and correct value types', async () => {
+  const { client, cleanup } = await setup();
+  try {
+    const result = await client.callTool({ name: 'close_session', arguments: { id: 'sid-001' } });
+    assert.ok(!result.isError, 'expected success');
+    const s = parseText<Session>(result);
+    const requiredKeys: (keyof Session)[] = ['id', 'channel', 'status', 'event_count', 'created_at', 'updated_at'];
+    for (const k of requiredKeys) {
+      assert.ok(Object.prototype.hasOwnProperty.call(s, k), `close_session response missing required key: ${k}`);
+    }
+    assert.equal(typeof s.id, 'string', 'id must be string');
+    assert.equal(typeof s.channel, 'string', 'channel must be string');
+    assert.equal(typeof s.status, 'string', 'status must be string');
+    assert.equal(typeof s.event_count, 'number', 'event_count must be number');
+    assert.equal(typeof s.created_at, 'string', 'created_at must be string');
+    assert.equal(typeof s.updated_at, 'string', 'updated_at must be string');
   } finally {
     await cleanup();
   }
