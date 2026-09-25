@@ -7498,3 +7498,15 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
 **Next run**: Tests confirmed clean (0 failures — PR #1479 fixed the access-distribution issue). Next gap: GAT — find next unfrozen cast response field/structure after GAS (alternatives exact key set). Check test/gas-*.test.ts + prior drift-guard test coverage to identify the next uncovered shape invariant.
+
+---
+**Run ~1771 | 2026-09-25 | GAX**
+- **Build:** clean
+- **Tests:** 4881 pass / 0 fail / 3 skip
+- **Workstream:** GAX — freeze prompts item exact key set in cast:discovered
+- **Branch:** `auto/GAX-prompts-discovered-exact-keyset`
+- **PR:** https://github.com/chittyos/ch1tty/pull/1489
+- **File:** `test/gax-prompts-discovered-exact-keyset-drift-guard.test.ts` (5 tests: GAX-1 through GAX-5)
+- **Gap closed:** EP used PERMITTED check for cast:discovered prompts items; GAR added EXACT checks for cast:executed/cast:plan; GAX completes the third mode (cast:discovered)
+- **Open PRs in GA* series:** GAR (#1481), GAU (#1485), GAX (#1489)
+- **Next run:** GAY or next drift-guard gap
