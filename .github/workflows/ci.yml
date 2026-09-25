@@ -63,10 +63,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
-          cache-dependency-path: apps/${{ matrix.app }}/package-lock.json
+          cache-dependency-path: package-lock.json
 
-      - name: Install dependencies (${{ matrix.app }})
-        working-directory: apps/${{ matrix.app }}
+      - name: Install dependencies (root workspace)
         run: npm ci
 
       - name: Build (${{ matrix.app }})
