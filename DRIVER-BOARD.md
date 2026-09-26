@@ -8011,3 +8011,28 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GBW PR #1526 CI/review. Next candidate: GBX — freeze `status.servers[]` entry count matches active config count (number of entries = number of activeConfigs; regression guard for servers being silently dropped or duplicated).
+
+---
+
+### Run ~1809 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GCB — freeze `cast:no_match` top-level key set when focus profile is active (5 tests)
+- **Branch/PR:** `auto/GCB-nomatch-focus-active-keyset` → **PR #1533** (https://github.com/chittyos/ch1tty/pull/1533)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skipped (+5 from 4876 baseline)
+- **Actions this run:**
+  - Startup: main at 736977b (run ~1803). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Read DRIVER-BOARD.md; all workstreams A–F done. GCA branch (PR #1532) has run ~1808 log; GBX/GBY/GBZ/GCA branches open but not merged.
+  - GCB gap: GBK froze no_match+scope; GBK-4 tested scope+focus together. No test froze the exact key set for cast:no_match when focus is active WITHOUT scope. A regression leaking `focus`, dropping `suggestions`, or adding a new key in this path would pass GU, GBK, GBL silently.
+  - Source: `src-stdio/aggregator.ts` lines ~1344–1379 — `focusSuggestions` computed BEFORE the no-match early return; conditionally adds `suggestions` to no_match response.
+  - Wrote `test/gcb-nomatch-focus-active-keyset-drift-guard.test.ts` (5 tests: GCB-1..5).
+    - GCB-5 key design: warm session via `ch1tty/status` (not cast) to create coordinator context without building server affinity — prevents focus+affinity boost from pushing neon tools above no_match threshold.
+  - All 5 tests pass locally. Full suite: 4881/0/3. Pushed and opened PR #1533.
+  - Notion board: still unavailable (plan limit hit). DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1809 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 29 open drift-guard test PRs (#1505–#1533), all CI green (pending on latest), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GCB PR #1533 CI/review. Next candidate: GCC — freeze `cast:no_match` exact key set when session is active WITHOUT focus (complement of GCB but focus-free; completes the session-only no_match keyset coverage since GBK/GBL only tested session in the scope+session combos).
