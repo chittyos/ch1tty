@@ -172,6 +172,7 @@ test('GBR-5: absence guards — scope w/o session omits sessionContext; session 
     const content = (result as { content: Array<{ type: string; text?: string }> }).content;
     return JSON.parse(content[0]!.text!) as Record<string, unknown>;
   })();
+  assert.equal(scopeOnly['cast'], 'executed', `GBR-5 scopeOnly must be cast:executed, got "${String(scopeOnly['cast'])}"`);
   assert.ok(
     !Object.prototype.hasOwnProperty.call(scopeOnly, 'sessionContext'),
     'sessionContext must be absent when scope is set but no sessionId is passed',
@@ -183,6 +184,7 @@ test('GBR-5: absence guards — scope w/o session omits sessionContext; session 
     const content = (result as { content: Array<{ type: string; text?: string }> }).content;
     return JSON.parse(content[0]!.text!) as Record<string, unknown>;
   })();
+  assert.equal(sessionOnly['cast'], 'executed', `GBR-5 sessionOnly must be cast:executed, got "${String(sessionOnly['cast'])}"`);
   assert.ok(
     !Object.prototype.hasOwnProperty.call(sessionOnly, 'scope'),
     'scope must be absent when sessionId is set but no scope param is passed',
