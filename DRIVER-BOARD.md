@@ -7963,3 +7963,27 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
   5. **Notion plan limit hit** — workspace has no more free blocks; upgrade or clean to resume board updates
 - **Next run:** Check GBU PR #1524 CI/review. Next candidate: GBV — freeze `status.availableFocusProfiles` element values (each must be a non-empty string matching a known profile name in the injected focusProfiles map; absence guard when profiles is empty).
+
+---
+
+### Run ~1802 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GBV — freeze `availableFocusProfiles` exact element values (5 tests)
+- **Branch/PR:** `auto/GBV-available-focus-profiles-exact-values-drift-guard` → **PR #1525** (https://github.com/chittyos/ch1tty/pull/1525)
+- **Build:** tsc clean | **Tests:** 4876/0/3 baseline (GBV adds 5; CI will confirm 4881/0/3)
+- **Actions this run:**
+  - Startup: pulled main to 8d064f0 (run ~1801). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Read DRIVER-BOARD.md; all workstreams A–F done. 21 open PRs (#1505–#1524) all CI green, awaiting human merge.
+  - Checked PR #1524 (GBU): all 3 CI checks ✅ (CodeQL + Analyze (actions) + Analyze (javascript-typescript)); CI completed 2026-09-26T12:39Z. Mergeable, waiting on human.
+  - FY-12 already asserts `availableFocusProfiles` is a non-empty string array. GBV gap: no test asserts values exactly match injected focusProfiles map keys — phantom profiles, missing entries, or duplicates would pass FY-12 undetected.
+  - Wrote `test/gbv-available-focus-profiles-exact-values-drift-guard.test.ts` (5 tests: GBV-1..5). All 5 pass locally. Pushed and opened PR #1525.
+  - Notion board: still unavailable (plan limit hit — no free blocks). DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1802 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 21 open drift-guard test PRs (#1505–#1525), all CI green, awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GBV PR #1525 CI/review. Next candidate: GBW — freeze `status.servers[]` entry exact key set (each element in the `servers` array has exactly the same keys regardless of connected/disconnected state; regression guard for key additions/removals on the server status entry).
+
