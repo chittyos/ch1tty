@@ -7939,3 +7939,27 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
   5. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Wait for PR #1521 CI re-run on bea9f6a (Codex fix push). If green + no new review findings → PR is waiting on human merge. Next candidate: GBU — freeze `status.focus.categories` element type (each must be a valid `ServerCategory` literal, not an arbitrary string).
+
+---
+
+### Run ~1801 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GBU — freeze `status.focus.categories` element type (5 tests)
+- **Branch/PR:** `auto/GBU-focus-categories-element-type-drift-guard` → **PR #1524** (https://github.com/chittyos/ch1tty/pull/1524)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline)
+- **Actions this run:**
+  - Startup: pulled main to a8e3c12 (run ~1800). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Read DRIVER-BOARD.md; confirmed all workstreams A–F done. Found 30+ open PRs, all drift guard test additions awaiting human merge.
+  - Checked PR #1521 (GBT): all 3 CI checks ✅ (CodeQL + Analyze js-typescript + Analyze actions); mergeable_state: clean. Waiting on human merge.
+  - Identified GBU gap: GBT-4 froze `status.focus.categories` is an array but NOT element type. A regression serialising objects or arbitrary strings would pass GBT silently.
+  - Verified `ServerCategory` closed union in packages/shared-types/src/index.ts: `'ecosystem'|'code'|'search'|'reasoning'|'desktop'|'documents'|'communication'`.
+  - Read `activeFocusSnapshot()` at aggregator.ts:189 to confirm structure.
+  - Wrote `test/gbu-focus-categories-element-type-drift-guard.test.ts` (5 tests: GBU-1..5). All 5 pass. Full suite 4881/0/3. Pushed and opened PR #1524.
+  - Notion board unavailable (plan limit hit — no free blocks); DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1801 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Notion plan limit hit** — workspace has no more free blocks; upgrade or clean to resume board updates
+- **Next run:** Check GBU PR #1524 CI/review. Next candidate: GBV — freeze `status.availableFocusProfiles` element values (each must be a non-empty string matching a known profile name in the injected focusProfiles map; absence guard when profiles is empty).
