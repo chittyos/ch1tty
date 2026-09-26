@@ -169,6 +169,7 @@ test('GBR-5: absence guards — scope w/o session omits sessionContext; session 
   // scope only (no sessionId) → sessionContext absent
   const scopeOnly = await (async () => {
     const result = await agg.callTool('ch1tty/cast', { intent: INTENT, scope: { servers: ['stripe'] } });
+    assert.equal((result as { isError?: unknown }).isError, undefined, 'GBR-5 scopeOnly must not return isError');
     const content = (result as { content: Array<{ type: string; text?: string }> }).content;
     return JSON.parse(content[0]!.text!) as Record<string, unknown>;
   })();
@@ -181,6 +182,7 @@ test('GBR-5: absence guards — scope w/o session omits sessionContext; session 
   // sessionId only (no scope) → scope absent
   const sessionOnly = await (async () => {
     const result = await agg.callTool('ch1tty/cast', { intent: INTENT, sessionId: SESSION });
+    assert.equal((result as { isError?: unknown }).isError, undefined, 'GBR-5 sessionOnly must not return isError');
     const content = (result as { content: Array<{ type: string; text?: string }> }).content;
     return JSON.parse(content[0]!.text!) as Record<string, unknown>;
   })();
