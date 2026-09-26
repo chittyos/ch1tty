@@ -8011,3 +8011,37 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GBW PR #1526 CI/review. Next candidate: GBX — freeze `status.servers[]` entry count matches active config count (number of entries = number of activeConfigs; regression guard for servers being silently dropped or duplicated).
+
+---
+
+### Run ~1811 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GCD — freeze `cast:no_match` exact top-level key set when BOTH session and focus are active simultaneously (5 tests, completing the 2×2 session/focus matrix)
+- **Branch/PR:** `auto/GCD-nomatch-session-focus-keyset` → **PR #1535** (https://github.com/chittyos/ch1tty/pull/1535)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skipped (+5 from 4876 baseline on main)
+- **Actions this run:**
+  - Startup: main at 736977b (run ~1803 — runs ~1804–~1810 opened PRs but not merged, so DRIVER-BOARD.md on main is at ~1803). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Read DRIVER-BOARD.md; all original workstreams A–E done. 30 open PRs (#1505–#1534) awaiting human merge (all CI green per sampled #1534: CodeQL ✅, Analyze (actions) ✅, Analyze (js-ts) ✅).
+  - Checked PR #1534 (GCC): all 3 CI checks ✅; no review comments; mergeable — waiting on human.
+  - Confirmed GCD gap: GCC-5 tested session+focus+catalog-match as a one-off supplement; GCB tested focus-only; no dedicated 5-test freeze covers ALL permutations of the session+focus joint path (no-catalog, scope, explain, scope+explain).
+  - 2×2 matrix GCD closes:
+    - GU: no session, no focus (base)
+    - GCB: focus-only (no session)
+    - GCC: session-only (no focus)
+    - **GCD: both session + focus** ← this run
+  - Wrote `test/gcd-nomatch-session-focus-active-keyset-drift-guard.test.ts` (5 tests: GCD-1..5):
+    - GCD-1: session + focus + catalog match → base + sessionContext + suggestions
+    - GCD-2: session + focus + empty catalog (no match) → base + sessionContext (no suggestions)
+    - GCD-3: session + focus + catalog match + scope → base + sessionContext + scope + suggestions
+    - GCD-4: session + focus + catalog match + explain → base + sessionContext + explanation + suggestions
+    - GCD-5: session + focus + catalog match + scope + explain → base + sessionContext + scope + explanation + suggestions
+  - All 5 pass locally. Full suite: 4881/0/3. Pushed and opened PR.
+  - Notion board: still unavailable (plan limit hit — no free blocks). DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1811 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 30+ open drift-guard test PRs (#1505–#1534 + this GCD PR), all CI green, awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GCD PR CI/review. Next candidate: GCE — freeze `cast:no_match` exact key set for **session + focus + empty catalog + scope** → `base + sessionContext + scope`, **no** `suggestions`. GCD-2 covered no-catalog without scope; GCD-3/GCD-5 covered catalog-match with scope; the no-catalog + scope path (scope key appears but suggestions stays absent) is untested.
