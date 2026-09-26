@@ -7652,7 +7652,7 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 ### Run ~1813 — 2026-09-26T (automated)
 
 - **Workstream advanced:** GCG — freeze `cast:plan` exact top-level key set when BOTH session AND focus are active
-- **Branch/PR:** `auto/GCG-plan-session-focus-keyset` → PR pending push
+- **Branch/PR:** `auto/GCG-plan-session-focus-keyset` → PR #1539
 - **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline on main)
 - **Actions this run:**
   - Synced to `origin/main`. `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed on main.
