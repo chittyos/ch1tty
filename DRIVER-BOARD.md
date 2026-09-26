@@ -8011,3 +8011,31 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GBW PR #1526 CI/review. Next candidate: GBX — freeze `status.servers[]` entry count matches active config count (number of entries = number of activeConfigs; regression guard for servers being silently dropped or duplicated).
+
+---
+
+### Run ~1810 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GCC — freeze `cast:no_match` top-level key set when session is active, no focus (5 tests)
+- **Branch/PR:** `auto/GCC-nomatch-session-only-keyset` → **PR #TBD** (opening now)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skipped (+5 from 4876 baseline)
+- **Actions this run:**
+  - Startup: PR #1533 (GCB) all CI green (CodeQL ✅, Analyze actions ✅, Analyze js-ts ✅). No blocking reviews. Waiting on human merge.
+  - GCC gap: GBL froze no_match for scope+session combos. GCB froze no_match when focus is active. Neither test covered the EXACT key set for cast:no_match when session is active WITHOUT focus. A regression leaking a session annotation, silently dropping `sessionContext`, or adding a new field next to it would pass GU, GBK, GBL, and GCB silently.
+  - Source: `src-stdio/aggregator.ts` lines ~1354–1363 — `noMatchSessionContext` is always non-null when the session coordinator has the session registered (even a freshly-warmed session with no tool calls produces `{recentTools:[], callCount:0}`).
+  - Wrote `test/gcc-nomatch-session-only-keyset-drift-guard.test.ts` (5 tests: GCC-1..5).
+    - GCC-1: session active, no focus → base + sessionContext
+    - GCC-2: no session → base only
+    - GCC-3: session + scope → base + sessionContext + scope
+    - GCC-4: session + explain → base + sessionContext + explanation
+    - GCC-5: session + focus (catalog match) → base + sessionContext + suggestions
+  - All 5 tests pass locally. Full suite: 4881/0/3. Pushed and opened PR.
+  - Notion board: still unavailable (plan limit hit). DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1810 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 30 open drift-guard test PRs (#1505–#1534), all CI green (pending on latest), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GCC PR CI/review. Next candidate: GCD — freeze `cast:no_match` exact key set when BOTH session and focus are active (completing the 2×2 session/focus matrix: GCB=focus-only, GCC=session-only, GCD=both).
