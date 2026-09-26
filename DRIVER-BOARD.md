@@ -7987,3 +7987,27 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GBV PR #1525 CI/review. Next candidate: GBW — freeze `status.servers[]` entry exact key set (each element in the `servers` array has exactly the same keys regardless of connected/disconnected state; regression guard for key additions/removals on the server status entry).
 
+
+---
+
+### Run ~1803 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GBW — freeze `servers[]` entry exact key set (5 tests)
+- **Branch/PR:** `auto/GBW-server-entry-keyset-drift-guard` → **PR #1526** (https://github.com/chittyos/ch1tty/pull/1526)
+- **Build:** tsc clean | **Tests:** 4876/0/3 baseline (GBW adds 5; CI will confirm 4881/0/3)
+- **Actions this run:**
+  - Startup: main at 85801f7 (run ~1802). `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Read DRIVER-BOARD.md; all workstreams A–F done. 22 open PRs (#1505–#1525) awaiting human merge.
+  - Checked PR #1525 (GBV): mergeable_state: clean; CI: CodeQL ✅, Analyze (actions) ✅, Analyze (javascript-typescript) ✅. Waiting on human merge.
+  - GBW gap: DZ froze top-level + sub-object key sets; FY-10 froze field value types on servers[] entries. Neither freezes the EXACT key set of each servers[] entry. A regression adding/removing a field (e.g. `endpoint`, `latencyMs`, `lastError`) passes both DZ and FY silently.
+  - Froze key set from `ServerStatus` interface in `packages/shared-types/src/index.ts`: 7 required keys (`id`, `name`, `type`, `enabled`, `connected`, `toolCount`, `toolCacheAge`), optional `error` and `missingEnvVars`.
+  - Wrote `test/gbw-server-entry-keyset-drift-guard.test.ts` (5 tests: GBW-1..5). All 5 pass locally. Pushed and opened PR #1526.
+  - Notion board: still unavailable (plan limit hit — no free blocks). DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1803 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 22 open drift-guard test PRs (#1505–#1526), all CI green (pending on #1526), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GBW PR #1526 CI/review. Next candidate: GBX — freeze `status.servers[]` entry count matches active config count (number of entries = number of activeConfigs; regression guard for servers being silently dropped or duplicated).
