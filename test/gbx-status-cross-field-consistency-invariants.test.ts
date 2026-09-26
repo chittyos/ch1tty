@@ -1,0 +1,215 @@
+/**
+ * GBX drift guard: freeze ch1tty/status cross-field consistency invariants.
+ *
+ * DZ froze the top-level key set (18 fields). FY froze value types. GBW (PR
+ * #1526) froze each servers[] entry's exact key set. None of these tests
+ * freeze the RELATIONSHIPS between the derived aggregate fields and the
+ * servers[] array they summarise:
+ *
+ *   - `totalServers` is computed as `statuses.length` (core.ts line ~816)
+ *   - `connectedServers` is computed as `statuses.filter(s => s.connected).length`
+ *   - `totalTools` is computed as `statuses.reduce((sum, s) => sum + s.toolCount, 0)`
+ *
+ * A refactor that changes one side of these derivations without updating the
+ * other (e.g. filtering out disabled servers from `servers[]` but not from
+ * `totalServers`, or rewriting `connectedServers` as a cached field that
+ * diverges from the live array) would pass DZ, FY, and GBW silently.
+ *
+ * GBX freezes these cross-field consistency invariants:
+ *
+ *   GBX-1  `totalServers` === `servers.length` (aggregate matches source array)
+ *   GBX-2  `connectedServers` === `servers.filter(s => s.connected).length`
+ *             (aggregate matches live connected count in source array)
+ *   GBX-3  `totalTools` === `servers.reduce((sum, s) => sum + s.toolCount, 0)`
+ *             (aggregate matches sum of per-server tool counts)
+ *   GBX-4  `connectedServers` <= `totalServers`
+ *             (connected count can never exceed total count)
+ *   GBX-5  `servers.length` equals the number of active (enabled) configs
+ *             (no server entry silently dropped or duplicated)
+ *
+ * Fixture: stripe (3 tools, connected) + neon (4 tools, connected) + github
+ *   (active config, listToolsError → connected: false, toolCount: 0). This
+ *   ensures connectedServers < totalServers, so GBX-2 and GBX-4 catch a
+ *   regression that hard-codes connectedServers === totalServers.
+ *   A fourth explicitly disabled config verifies it is excluded from servers[].
+ *
+ * Frozen 2026-09-26.
+ *
+ * CLAUDE.md compliance:
+ *   - 5-tool public surface: unchanged (test-only file)
+ *   - buildCastExplanation metric freeze: not applicable (status, not cast explain)
+ */
+import assert from 'node:assert/strict';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { test } from 'node:test';
+import { Aggregator } from '../src/aggregator.js';
+import type { ServerConfig } from '../src/types.js';
+import { FixtureBackend, FIXTURE_SERVERS } from './fixture-backend.js';
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+let _seq = 0;
+function dlq(): string {
+  return join(tmpdir(), `ch1tty-gbx-${Date.now()}-${++_seq}.jsonl`);
+}
+
+// Three active configs (enabled) + one explicitly disabled config.
+// github is active but its backend returns listToolsError, so connected:false.
+// GBX-4 is meaningful because connectedServers (2) < totalServers (3).
+// GBX-5 verifies the disabled entry does NOT appear in servers[].
+const ACTIVE_CONFIGS: ServerConfig[] = [
+  {
+    id: 'stripe',
+    name: 'Stripe',
+    type: 'remote',
+    access: 'readwrite',
+    category: 'ecosystem',
+    endpoint: 'https://stripe.com/mcp',
+    lazy: true,
+  },
+  {
+    id: 'neon',
+    name: 'Neon',
+    type: 'remote',
+    access: 'readwrite',
+    category: 'data',
+    endpoint: 'https://neon.tech/mcp',
+    lazy: true,
+  },
+  {
+    id: 'github',
+    name: 'GitHub',
+    type: 'remote',
+    access: 'readwrite',
+    category: 'ecosystem',
+    endpoint: 'https://api.github.com/mcp',
+    lazy: true,
+  },
+];
+
+const DISABLED_CONFIG: ServerConfig = {
+  id: 'disabled-server',
+  name: 'Disabled Server',
+  type: 'remote',
+  access: 'read',
+  category: 'ecosystem',
+  endpoint: 'https://disabled.example.com/mcp',
+  lazy: true,
+  enabled: false,
+};
+
+const ALL_CONFIGS: ServerConfig[] = [...ACTIVE_CONFIGS, DISABLED_CONFIG];
+
+function makeAgg(): Aggregator {
+  const backend = new FixtureBackend();
+  backend.defineServer('stripe', FIXTURE_SERVERS.stripe);
+  backend.defineServer('neon', FIXTURE_SERVERS.neon);
+  // github is active but reports a connection error so connected:false.
+  // This ensures connectedServers < totalServers for GBX-2 and GBX-4.
+  backend.defineServer('github', { tools: [], listToolsError: true });
+  return new Aggregator(ALL_CONFIGS, {
+    backendFactory: () => backend,
+    embedEnabled: false,
+    ledgerDlqPath: dlq(),
+  });
+}
+
+async function getStatus(agg: Aggregator): Promise<Record<string, unknown>> {
+  const result = await agg.callTool('ch1tty/status', {});
+  assert.equal(result.isError, undefined, 'status must not return isError');
+  const content = (result as { content: Array<{ type: string; text?: string }> }).content;
+  assert.ok(Array.isArray(content) && content.length >= 1);
+  assert.equal(content[0]!.type, 'text');
+  return JSON.parse(content[0]!.text!) as Record<string, unknown>;
+}
+
+// ── Tests ─────────────────────────────────────────────────────────────────────
+
+test('GBX-1: status.totalServers === status.servers.length (aggregate matches source array length)', async () => {
+  const agg = makeAgg();
+  try {
+    const snap = await getStatus(agg);
+    const totalServers = snap['totalServers'] as number;
+    const servers = snap['servers'] as unknown[];
+    assert.equal(
+      totalServers,
+      servers.length,
+      `totalServers (${totalServers}) must equal servers.length (${servers.length})`,
+    );
+  } finally {
+    await agg.shutdown();
+  }
+});
+
+test('GBX-2: status.connectedServers === servers[].filter(s => s.connected).length (aggregate matches live array)', async () => {
+  const agg = makeAgg();
+  try {
+    const snap = await getStatus(agg);
+    const connectedServers = snap['connectedServers'] as number;
+    const servers = snap['servers'] as Array<Record<string, unknown>>;
+    const derivedConnected = servers.filter((s) => s['connected'] === true).length;
+    assert.equal(
+      connectedServers,
+      derivedConnected,
+      `connectedServers (${connectedServers}) must equal servers[].filter(connected).length (${derivedConnected})`,
+    );
+  } finally {
+    await agg.shutdown();
+  }
+});
+
+test('GBX-3: status.totalTools === servers[].reduce(sum + toolCount, 0) (aggregate matches per-server tool counts)', async () => {
+  const agg = makeAgg();
+  try {
+    const snap = await getStatus(agg);
+    const totalTools = snap['totalTools'] as number;
+    const servers = snap['servers'] as Array<Record<string, unknown>>;
+    const derivedTotal = servers.reduce((sum, s) => sum + (s['toolCount'] as number), 0);
+    assert.equal(
+      totalTools,
+      derivedTotal,
+      `totalTools (${totalTools}) must equal sum of servers[].toolCount (${derivedTotal})`,
+    );
+  } finally {
+    await agg.shutdown();
+  }
+});
+
+test('GBX-4: status.connectedServers <= status.totalServers (connected count cannot exceed total)', async () => {
+  const agg = makeAgg();
+  try {
+    const snap = await getStatus(agg);
+    const connectedServers = snap['connectedServers'] as number;
+    const totalServers = snap['totalServers'] as number;
+    assert.ok(
+      connectedServers <= totalServers,
+      `connectedServers (${connectedServers}) must be <= totalServers (${totalServers})`,
+    );
+  } finally {
+    await agg.shutdown();
+  }
+});
+
+test('GBX-5: status.servers.length equals enabled-config count (disabled configs excluded; no silent drop or duplicate)', async () => {
+  const agg = makeAgg();
+  try {
+    const snap = await getStatus(agg);
+    const servers = snap['servers'] as Array<Record<string, unknown>>;
+    const actualIds = servers.map((s) => String(s['id'])).sort();
+    const expectedIds = ACTIVE_CONFIGS.map((c) => c.id).sort();
+    // Compare sorted ID sets so a drop+duplicate (same count, different ids) is caught.
+    assert.deepEqual(
+      actualIds,
+      expectedIds,
+      `servers[].ids must be exactly ${JSON.stringify(expectedIds)}; got ${JSON.stringify(actualIds)}`,
+    );
+    // Belt-and-suspenders: disabled config must not appear
+    assert.ok(
+      !actualIds.includes('disabled-server'),
+      `disabled-server must not appear in servers[]`,
+    );
+  } finally {
+    await agg.shutdown();
+  }
+});
