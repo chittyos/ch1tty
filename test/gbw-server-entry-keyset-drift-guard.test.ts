@@ -11,13 +11,16 @@
  * GBW closes that gap by asserting:
  *
  *   GBW-1  connected server entry has exactly the 7 required keys and no more
- *   GBW-2  disconnected server entry (listToolsError) has the same 7-key set
+ *   GBW-2  disconnected server entry (listToolsError) has exactly the same 7-key
+ *          set — no extra keys emitted only on disconnected entries
  *   GBW-3  no phantom keys appear in any entry (no key outside the allowed set)
- *   GBW-4  key set is consistent across all entries in a multi-server config
+ *   GBW-4  key set is consistent across all entries in a multi-server config,
+ *          covering both remote and local (type:'local') server config variants
  *   GBW-5  optional missingEnvVars key absent when no env vars are missing
  *
- * Allowed optional keys (missingEnvVars, error) are present only in specific
- * conditions and are never unexpected phantoms.
+ * The fixture includes both a remote and a local server so neither config
+ * variant can escape the exact-key-set assertion. Optional keys (missingEnvVars,
+ * error) never appear in the fixture environment.
  *
  * Frozen 2026-09-26.
  *
@@ -45,8 +48,9 @@ const REQUIRED_KEYS = ['id', 'name', 'type', 'enabled', 'connected', 'toolCount'
 // 7-key set so a regression emitting `error` on healthy entries is caught immediately.
 
 const CONFIGS: ServerConfig[] = [
-  { id: 'neon',   name: 'Neon',   type: 'remote', access: 'readwrite', category: 'code',      endpoint: 'https://neon.tech/mcp',   lazy: true },
-  { id: 'stripe', name: 'Stripe', type: 'remote', access: 'readwrite', category: 'ecosystem', endpoint: 'https://stripe.com/mcp',  lazy: true },
+  { id: 'neon',       name: 'Neon',       type: 'remote', access: 'readwrite', category: 'code',      endpoint: 'https://neon.tech/mcp',  lazy: true },
+  { id: 'stripe',     name: 'Stripe',     type: 'remote', access: 'readwrite', category: 'ecosystem', endpoint: 'https://stripe.com/mcp', lazy: true },
+  { id: 'local-test', name: 'Local Test', type: 'local',  access: 'readwrite', category: 'code',      command: 'local-mcp',               lazy: true },
 ];
 
 const FOCUS_PROFILES: FocusProfiles = {
@@ -58,10 +62,11 @@ const FOCUS_PROFILES: FocusProfiles = {
 let _seq = 0;
 function makeAgg(disconnectStripe = false): Aggregator {
   const backend = new FixtureBackend();
-  backend.defineServer('neon',   FIXTURE_SERVERS.neon);
-  backend.defineServer('stripe', disconnectStripe
+  backend.defineServer('neon',       FIXTURE_SERVERS.neon);
+  backend.defineServer('stripe',     disconnectStripe
     ? { ...FIXTURE_SERVERS.stripe, listToolsError: true }
     : FIXTURE_SERVERS.stripe);
+  backend.defineServer('local-test', FIXTURE_SERVERS.neon);
   return new Aggregator(CONFIGS, {
     backendFactory: () => backend,
     embedEnabled: false,
@@ -95,19 +100,24 @@ test('GBW-1: servers[] entry has all 7 required keys when server is connected', 
   }
 });
 
-// ── GBW-2: disconnected server entry has the same 7 required keys ─────────────
+// ── GBW-2: disconnected server entry has exactly the 7 required keys ──────────
 
-test('GBW-2: servers[] entry has all 7 required keys when server is disconnected', async () => {
+test('GBW-2: servers[] entry has EXACTLY the 7 required keys when server is disconnected', async () => {
   const agg = makeAgg(true);  // stripe is disconnected (listToolsError)
   try {
     const servers = await getServers(agg);
     const disconnected = servers.filter((s) => s.connected === false);
     assert.ok(disconnected.length > 0,
       'at least one disconnected server must be present in this fixture');
+    const exact = new Set(REQUIRED_KEYS);
     for (const s of disconnected) {
       for (const k of REQUIRED_KEYS) {
         assert.ok(Object.prototype.hasOwnProperty.call(s, k),
-          `disconnected entry for "${s.id}" must still have required key "${k}"`);
+          `disconnected entry for "${s.id}" must have required key "${k}"`);
+      }
+      for (const k of Object.keys(s)) {
+        assert.ok(exact.has(k),
+          `disconnected entry for "${s.id}" has unexpected key "${k}" — expected only: ${REQUIRED_KEYS.join(', ')}`);
       }
     }
   } finally {
