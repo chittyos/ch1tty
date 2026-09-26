@@ -8040,3 +8040,27 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GCE PR #1536 CI/review. Next candidate: GCF — freeze `cast:executed` top-level key set when session is active (no focus): base + sessionContext. GBZ froze executed+focus (no session); GCF closes the session-only executed path.
+
+---
+
+### Run ~1813 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GCF — freeze `cast:executed` key set when session+focus are both active (5 tests)
+- **Branch/PR:** `auto/GCF-executed-session-focus-keyset` → **PR #1537** (https://github.com/chittyos/ch1tty/pull/1537)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline)
+- **Actions this run:**
+  - Startup: pulled main to b0cef9c (run ~1812). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Read DRIVER-BOARD.md; all workstreams A–F done. 31 open PRs (#1505–#1536) awaiting human merge.
+  - Checked PR #1536 (GCE): confirmed open, awaiting CI + human merge.
+  - Identified GCF gap: GV-2 froze session-only executed; GBZ-1 froze focus-only executed; no test froze the exact key set when BOTH session AND focus are active. A regression adding `sessionFocus` or dropping `focus` when session is active would pass GV-2 and GBZ-1 silently.
+  - Verified source: `src-stdio/aggregator.ts` lines ~1648–1672 — `focus` and `sessionContext` are independent conditional spreads; their co-presence is untested.
+  - Wrote `test/gcf-executed-session-focus-toplevel-keyset-drift-guard.test.ts` (5 tests: GCF-1..5). All 5 pass. Full suite 4881/0/3. Pushed and opened PR #1537.
+  - Notion board: still unavailable (plan limit hit). DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1813 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 32 open drift-guard test PRs (#1505–#1537), all CI green, awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GCF PR #1537 CI/review. Next candidate: GCG — freeze `cast:executed` key set when scope is passed with session active (no focus); or GCH — freeze `cast:plan` key set when session active (no focus), complementing GCA (plan+focus, no session).
