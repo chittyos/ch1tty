@@ -7800,3 +7800,28 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
 - **Next run:** Check GBJ PR #1511 CI/review after 54de1b1. Next candidate: GBK — freeze `cast:no_match` scope key set (when servers=/categories= param adds `scope` to the response).
+
+---
+
+### Run ~1792 — 2026-09-26T (automated run)
+
+- **Workstream:** GBL drift guard — freeze cast:no_match scope+session combo key sets
+- **Branch/PR:** `auto/GBL-nomatch-scope-session-combo-keyset-drift-guard` → **PR #1513** (pending open)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 main baseline)
+- **Actions this run:**
+  - Checked PR #1512 (GBK): all 3 CI checks ✅ success, `mergeable_state: clean`, ready for human merge.
+  - Identified GBL gap: GBK covered scope-only combos (+scope, +scope+explain, +scope+focus, absence). No test froze the key set when scope is present AND sessionId is given, nor the triple (+scope+focus+explain) or the maximal all-four combo.
+  - Created `test/gbl-nomatch-scope-session-combo-keyset-drift-guard.test.ts` (5 tests):
+    - GBL-1: +scope+session → base + scope + sessionContext
+    - GBL-2: +scope+focus+explain → base + scope + explanation + suggestions (triple)
+    - GBL-3: +scope+focus+session → base + scope + suggestions + sessionContext
+    - GBL-4: +scope+explain+session → base + scope + explanation + sessionContext
+    - GBL-5: maximal (+scope+focus+explain+session) → 9-field frozen key set
+  - Build clean, all 5 new tests pass. Pushed to branch; PR opened.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1792 runs; burning compute
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+- **Next run:** Check GBL PR #1513 CI/review. Next candidate: GBM — drift guard for cast:resolved exact key set with scope+session combos (mirrors GBL but for resolved mode).
