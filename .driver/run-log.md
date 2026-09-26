@@ -1767,3 +1767,30 @@
 4. Hourly cron still firing — all original workstreams done; consider adding GBN+ to prompt
 
 **Next run:** GBN candidate — `cast:plan` or `cast:executed` exact key set when scope param set (same pattern applied to the next cast outcome type).
+
+---
+
+## Run ~1797 — 2026-09-26T (automated)
+
+**Workstream:** D-extended (cast output-shape drift-guard series — GBR)
+**Branch/PR:** `auto/GBR-executed-scope-session-keyset-drift-guard` → PR to be opened
+
+**Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 from 4876 baseline)
+
+**What was done:**
+- Added `test/gbr-executed-scope-session-keyset-drift-guard.test.ts` — 5 tests (GBR-1..5)
+- Freezes exact top-level key set of cast:executed when BOTH scope AND sessionId are present
+- GBR-1/2: scope(servers/categories)+sessionId → exactly base + scope + sessionContext (11 keys)
+- GBR-3: +explain → 12 keys; GBR-4: +focus → 13 keys (focus + suggestions)
+- GBR-5: absence guards — scope w/o session → no sessionContext; session w/o scope → no scope
+- Parallel to GBN (resolved scope+session) and GBO (plan scope+session); closes the executed gap
+- Confirmed all 30 open PRs (#1478–#1518) have green CI (CodeQL + CodeQL Analyze)
+
+**Standing blockers (human action required):**
+1. GitHub Actions npm test CI disabled at org level (only CodeQL runs)
+2. Prod env vars missing (GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, etc.)
+3. Stale branch cleanup — 1100+ remote auto/ branches
+4. Hourly cron still firing — all original workstreams done; consider disabling
+5. Rotate Notion token — `op://ChittyOS-Integrations/notion/api_token`
+
+**Next run:** GBS — cast:chain_executed exact key set when scope param is set (scope-only; parallel gap to GBK for no_match, GBQ for executed).
