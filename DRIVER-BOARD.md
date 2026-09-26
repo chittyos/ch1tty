@@ -8040,3 +8040,32 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GCE PR #1536 CI/review. Next candidate: GCF — freeze `cast:executed` top-level key set when session is active (no focus): base + sessionContext. GBZ froze executed+focus (no session); GCF closes the session-only executed path.
+
+
+---
+
+### Run ~1814 — 2026-09-26T (automated)
+
+- **Workstream advanced:** GCH — freeze `cast:resolved` exact top-level key set when focus is active (with and without session)
+- **Branch/PR:** `auto/GCH-resolved-focus-session-keyset` → PR (to be opened)
+- **Build:** tsc clean | **Tests:** 4881/0/3 (+5 vs 4876 baseline on main)
+- **Actions this run:**
+  - Synced to `origin/main` (b0cef9c, run ~1812). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed on main.
+  - Read DRIVER-BOARD.md: last recorded run was ~1812 (GCE). Open PRs: #1537 (GCF), #1538 (GCF runlog), #1539 (GCG) — all from the previous session (~1813), CI blocked, awaiting human merge.
+  - Identified GCH gap: GU-3/GU-4 froze cast:resolved with no focus; GBM/GBN froze resolved+scope. No test freezes the exact key set when focus is active (with or without session). A regression dropping `focus` from the resolved response, or injecting a stray annotation, would pass silently.
+  - Wrote `test/gch-resolved-focus-session-toplevel-keyset-drift-guard.test.ts` (5 tests: GCH-1..5):
+    - GCH-1: focus active, no session → {cast, focus, intent, latencyMs, resolved, resolvedBy}
+    - GCH-2: focus + session → GCH-1 + sessionContext
+    - GCH-3: focus + session + scope → GCH-2 + scope
+    - GCH-4: focus + session + explain → GCH-2 + explanation
+    - GCH-5: sessionContext sub-keys when focus from constructor → exactly {callCount, recentTools}
+  - All 5 pass in isolation and full suite. Full suite: 4881/0/3. Pushed and opened PR.
+  - Notion board: still unavailable (plan limit). DRIVER-BOARD.md is durable state.
+- **Human-action items (carried forward):**
+  1. **DISABLE hourly cron** — ~1814+ runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — ~34 open drift-guard test PRs (#1505–#1539 + GCH), CI blocked (Actions disabled), awaiting human.
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Next candidate: GCI — freeze `cast:discovered` exact top-level key set when focus+session active (GBS froze discovered+scope+session; no test freezes discovered+focus or discovered+focus+session). Or GCJ — freeze `cast:chain_executed` key set when focus+session active (GBI froze chain_executed conditional keys without focus context).
