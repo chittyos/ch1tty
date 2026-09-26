@@ -145,11 +145,17 @@ test('GBW-3: servers[] entry has EXACTLY the 7 required keys — no extras in fi
 
 // ── GBW-4: key set is consistent across all entries in a multi-server config ──
 
-test('GBW-4: key set is consistent across all servers[] entries', async () => {
+test('GBW-4: key set is consistent across all servers[] entries including local type', async () => {
   const agg = makeAgg(false);
   try {
     const servers = await getServers(agg);
-    assert.ok(servers.length >= 2, 'must have at least 2 server entries to compare');
+    assert.ok(servers.length >= 3, 'must have at least 3 server entries (2 remote + 1 local)');
+    // Verify the local variant is actually present — if status omits local configs,
+    // the 3-entry check above and the loop below would still pass with only remote servers.
+    assert.ok(
+      servers.some((s) => s.id === 'local-test' && s.type === 'local'),
+      'local-test (type:local) must appear in servers[] — local config variant coverage required',
+    );
     const keysets = servers.map((s) => JSON.stringify(Object.keys(s).sort()));
     const first = keysets[0];
     for (let i = 1; i < keysets.length; i++) {
