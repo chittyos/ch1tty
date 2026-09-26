@@ -39,11 +39,10 @@ import { FixtureBackend, FIXTURE_SERVERS } from './fixture-backend.js';
 // Required keys always present in every servers[] entry regardless of state.
 const REQUIRED_KEYS = ['id', 'name', 'type', 'enabled', 'connected', 'toolCount', 'toolCacheAge'];
 
-// Optional keys that may appear under specific conditions (fixture env = no envHeaders).
-const ALLOWED_OPTIONAL_KEYS = ['error', 'missingEnvVars'];
-
-// Full allowed key universe.
-const ALLOWED_KEYS = new Set([...REQUIRED_KEYS, ...ALLOWED_OPTIONAL_KEYS]);
+// In production, `error` (string) and `missingEnvVars` (string[]) may optionally appear.
+// The FixtureBackend never emits `error` and the test CONFIGS have no envHeaders, so
+// neither optional key appears in the fixture environment. GBW-3 asserts exactly the
+// 7-key set so a regression emitting `error` on healthy entries is caught immediately.
 
 const CONFIGS: ServerConfig[] = [
   { id: 'neon',   name: 'Neon',   type: 'remote', access: 'readwrite', category: 'code',      endpoint: 'https://neon.tech/mcp',   lazy: true },
@@ -116,16 +115,17 @@ test('GBW-2: servers[] entry has all 7 required keys when server is disconnected
   }
 });
 
-// ── GBW-3: no phantom keys beyond the allowed set ─────────────────────────────
+// ── GBW-3: exact 7-key set — no phantom keys, no optional extras ──────────────
 
-test('GBW-3: no phantom keys appear in any servers[] entry', async () => {
+test('GBW-3: servers[] entry has EXACTLY the 7 required keys — no extras in fixture env', async () => {
   const agg = makeAgg(false);
   try {
     const servers = await getServers(agg);
+    const exact = new Set(REQUIRED_KEYS);
     for (const s of servers) {
       for (const k of Object.keys(s)) {
-        assert.ok(ALLOWED_KEYS.has(k),
-          `servers[] entry for "${s.id}" has unexpected key "${k}" — not in allowed set`);
+        assert.ok(exact.has(k),
+          `servers[] entry for "${s.id}" has unexpected key "${k}" — expected only: ${REQUIRED_KEYS.join(', ')}`);
       }
     }
   } finally {
