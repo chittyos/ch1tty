@@ -7896,3 +7896,26 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
   5. **Notion plan limit hit** — workspace has no more free blocks; upgrade plan or clean blocks to resume board updates
 - **Next run:** GBT candidate — if any scope+session combo remains after GBS merges. Check open PRs CI first. Likely the scope series is now complete (all cast modes covered: no_match GBL, resolved GBN, plan GBO, executed GBR, discovered GBS). Next logical workstream: apps-level output shape freeze tests (PQ #1499, ST #1508 are open — check CI and drive to merge).
+
+---
+
+### Run ~1799 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GBT — freeze `status.focus` sub-object exact key set (5 tests)
+- **Branch/PR:** `auto/GBT-status-focus-subobject-keyset-drift-guard` → **PR #1521** (https://github.com/chittyos/ch1tty/pull/1521)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline)
+- **Actions this run:**
+  - Startup: pulled main to 403fc8f (run ~1798). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Read DRIVER-BOARD.md; confirmed all workstreams A–F+ done. 30 open PRs (#1491–#1520), all drift guard test additions awaiting human merge.
+  - Checked open PRs by page (3 pages): PQ #1499 (ledger+session shape freeze, 15 tests after Codex fixes), R #1502 (comms shape freeze), ST #1508 (tasks+evidence shape freeze), plus GBx scope series PRs. All 5 apps covered.
+  - Scope series confirmed complete: no_match GBL, resolved GBN, plan GBO, executed GBR, discovered GBS.
+  - Identified GBT gap: GM-1 asserts `status.focus` is in the top-level key set, but no test freezes (a) `status.focus === null` when no default focus, (b) exact 4-key sub-object `{active, categories, servers, boost}` when focus IS active, (c) value types. `activeFocusSnapshot()` at aggregator.ts line ~189 returns this structure.
+  - Wrote `test/gbt-status-focus-subobject-keyset-drift-guard.test.ts` (5 tests: GBT-1..5). All 5 pass; full suite 4881/0/3. Pushed and opened PR #1521.
+  - Notion board unavailable (plan limit hit — no free blocks); DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1799 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Notion plan limit hit** — workspace has no more free blocks; upgrade or clean to resume board updates
+- **Next run:** Check GBT PR #1521 CI/review. Next candidate: GBU — freeze `status.focus.categories` value types more tightly (each element is a valid `ServerCategory` string, not just any string); OR `status.focus` absent-when-focus-is-an-unknown-profile (focus name set but unknown → null). Alternatively: `cast:no_match` absent-suggestions when focus active but catalog empty.
