@@ -8047,7 +8047,7 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 ### Run ~1814 — 2026-09-26T (automated)
 
 - **Workstream advanced:** GCH — freeze `cast:resolved` exact top-level key set when focus is active (with and without session)
-- **Branch/PR:** `auto/GCH-resolved-focus-session-keyset` → PR (to be opened)
+- **Branch/PR:** `auto/GCH-resolved-focus-session-keyset` → **PR #1540** (https://github.com/chittyos/ch1tty/pull/1540)
 - **Build:** tsc clean | **Tests:** 4881/0/3 (+5 vs 4876 baseline on main)
 - **Actions this run:**
   - Synced to `origin/main` (b0cef9c, run ~1812). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed on main.
