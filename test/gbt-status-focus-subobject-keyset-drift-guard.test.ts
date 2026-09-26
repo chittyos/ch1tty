@@ -74,6 +74,7 @@ function makeAgg(defaultFocus?: string): Aggregator {
     backendFactory: () => new FixtureBackend([]),
     focusProfiles: FOCUS_PROFILES,
     suggestionsCatalog: {},
+    embedEnabled: false,
     ...(defaultFocus !== undefined ? { focus: defaultFocus } : {}),
   });
 }
@@ -89,76 +90,100 @@ async function statusFocus(agg: Aggregator): Promise<unknown> {
 
 test('GBT-1: no process default focus → status.focus is exactly null', async () => {
   const agg = makeAgg(); // no focus option
-  const focusVal = await statusFocus(agg);
-  assert.equal(focusVal, null,
-    `status.focus must be null when no default focus is configured, got ${JSON.stringify(focusVal)}`);
+  try {
+    const focusVal = await statusFocus(agg);
+    assert.equal(focusVal, null,
+      `status.focus must be null when no default focus is configured, got ${JSON.stringify(focusVal)}`);
+  } finally {
+    await agg.shutdown();
+  }
 });
 
 // ── GBT-2: default focus active → status.focus has exactly {active,categories,servers,boost} ──
 
 test('GBT-2: process default focus active → status.focus has exactly 4 keys: active, categories, servers, boost', async () => {
   const agg = makeAgg('finance');
-  const focusVal = await statusFocus(agg);
-  assert.notEqual(focusVal, null, 'status.focus must be a non-null object when default focus is set');
-  assert.ok(typeof focusVal === 'object' && focusVal !== null && !Array.isArray(focusVal),
-    'status.focus must be a plain object');
-  const keys = Object.keys(focusVal as object).sort();
-  assert.deepEqual(keys, ['active', 'boost', 'categories', 'servers'],
-    `status.focus must have exactly {active, categories, servers, boost}, got [${keys.join(', ')}]`);
+  try {
+    const focusVal = await statusFocus(agg);
+    assert.notEqual(focusVal, null, 'status.focus must be a non-null object when default focus is set');
+    assert.ok(typeof focusVal === 'object' && focusVal !== null && !Array.isArray(focusVal),
+      'status.focus must be a plain object');
+    const keys = Object.keys(focusVal as object).sort();
+    assert.deepEqual(keys, ['active', 'boost', 'categories', 'servers'],
+      `status.focus must have exactly {active, categories, servers, boost}, got [${keys.join(', ')}]`);
+  } finally {
+    await agg.shutdown();
+  }
 });
 
 // ── GBT-3: status.focus.active equals the configured profile name ─────────────
 
 test('GBT-3: status.focus.active is a non-empty string equal to the profile name', async () => {
   const agg = makeAgg('code');
-  const focusVal = await statusFocus(agg) as Record<string, unknown>;
-  assert.ok(focusVal !== null && typeof focusVal === 'object',
-    'status.focus must be non-null when default focus is set');
-  assert.equal(typeof focusVal['active'], 'string',
-    `status.focus.active must be a string, got ${typeof focusVal['active']}`);
-  assert.ok((focusVal['active'] as string).length > 0,
-    'status.focus.active must be a non-empty string');
-  assert.equal(focusVal['active'], 'code',
-    `status.focus.active must equal the configured profile name 'code', got '${focusVal['active']}'`);
+  try {
+    const focusVal = await statusFocus(agg) as Record<string, unknown>;
+    assert.ok(focusVal !== null && typeof focusVal === 'object',
+      'status.focus must be non-null when default focus is set');
+    assert.equal(typeof focusVal['active'], 'string',
+      `status.focus.active must be a string, got ${typeof focusVal['active']}`);
+    assert.ok((focusVal['active'] as string).length > 0,
+      'status.focus.active must be a non-empty string');
+    assert.equal(focusVal['active'], 'code',
+      `status.focus.active must equal the configured profile name 'code', got '${focusVal['active']}'`);
+  } finally {
+    await agg.shutdown();
+  }
 });
 
 // ── GBT-4: status.focus.categories and servers are arrays ────────────────────
 
 test('GBT-4: status.focus.categories and status.focus.servers are both arrays', async () => {
   const agg = makeAgg('finance');
-  const focusVal = await statusFocus(agg) as Record<string, unknown>;
-  assert.ok(focusVal !== null && typeof focusVal === 'object',
-    'status.focus must be non-null when default focus is set');
-  assert.ok(Array.isArray(focusVal['categories']),
-    `status.focus.categories must be an array, got ${typeof focusVal['categories']}`);
-  assert.ok(Array.isArray(focusVal['servers']),
-    `status.focus.servers must be an array, got ${typeof focusVal['servers']}`);
-  // Verify values match the fixture profile
-  assert.deepEqual(focusVal['categories'], ['ecosystem'],
-    `status.focus.categories must equal the profile's categories`);
-  assert.deepEqual(focusVal['servers'], ['stripe'],
-    `status.focus.servers must equal the profile's servers`);
+  try {
+    const focusVal = await statusFocus(agg) as Record<string, unknown>;
+    assert.ok(focusVal !== null && typeof focusVal === 'object',
+      'status.focus must be non-null when default focus is set');
+    assert.ok(Array.isArray(focusVal['categories']),
+      `status.focus.categories must be an array, got ${typeof focusVal['categories']}`);
+    assert.ok(Array.isArray(focusVal['servers']),
+      `status.focus.servers must be an array, got ${typeof focusVal['servers']}`);
+    // Verify values match the fixture profile
+    assert.deepEqual(focusVal['categories'], ['ecosystem'],
+      `status.focus.categories must equal the profile's categories`);
+    assert.deepEqual(focusVal['servers'], ['stripe'],
+      `status.focus.servers must equal the profile's servers`);
+  } finally {
+    await agg.shutdown();
+  }
 });
 
 // ── GBT-5: status.focus.boost is a finite positive number matching the profile ─
 
 test('GBT-5: status.focus.boost is a finite positive number matching the configured profile boost', async () => {
   const aggFinance = makeAgg('finance');
-  const focusFinance = await statusFocus(aggFinance) as Record<string, unknown>;
-  assert.ok(focusFinance !== null && typeof focusFinance === 'object',
-    'status.focus must be non-null for finance profile');
-  assert.equal(typeof focusFinance['boost'], 'number',
-    `status.focus.boost must be a number, got ${typeof focusFinance['boost']}`);
-  assert.ok(Number.isFinite(focusFinance['boost'] as number),
-    `status.focus.boost must be finite, got ${focusFinance['boost']}`);
-  assert.ok((focusFinance['boost'] as number) > 0,
-    `status.focus.boost must be positive, got ${focusFinance['boost']}`);
-  assert.equal(focusFinance['boost'], 0.7,
-    `status.focus.boost must equal the profile's configured 0.7, got ${focusFinance['boost']}`);
+  try {
+    const focusFinance = await statusFocus(aggFinance) as Record<string, unknown>;
+    assert.ok(focusFinance !== null && typeof focusFinance === 'object',
+      'status.focus must be non-null for finance profile');
+    assert.equal(typeof focusFinance['boost'], 'number',
+      `status.focus.boost must be a number, got ${typeof focusFinance['boost']}`);
+    assert.ok(Number.isFinite(focusFinance['boost'] as number),
+      `status.focus.boost must be finite, got ${focusFinance['boost']}`);
+    assert.ok((focusFinance['boost'] as number) > 0,
+      `status.focus.boost must be positive, got ${focusFinance['boost']}`);
+    assert.equal(focusFinance['boost'], 0.7,
+      `status.focus.boost must equal the profile's configured 0.7, got ${focusFinance['boost']}`);
+  } finally {
+    await aggFinance.shutdown();
+  }
 
   // Also verify the code profile has a different boost value, confirming per-profile fidelity
   const aggCode = makeAgg('code');
-  const focusCode = await statusFocus(aggCode) as Record<string, unknown>;
-  assert.equal(focusCode?.['boost'], 0.5,
-    `status.focus.boost for 'code' profile must equal 0.5, got ${focusCode?.['boost']}`);
+  try {
+    const focusCode = await statusFocus(aggCode) as Record<string, unknown>;
+    assert.equal(focusCode?.['boost'], 0.5,
+      `status.focus.boost for 'code' profile must equal 0.5, got ${focusCode?.['boost']}`);
+  } finally {
+    await aggCode.shutdown();
+  }
 });
