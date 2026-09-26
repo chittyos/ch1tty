@@ -31,6 +31,11 @@
  *   GBJ-3  +focus+explain adds exactly `explanation` + `suggestions` to the base key set
  *   GBJ-4  +focus+session adds exactly `suggestions` + `sessionContext` to the base key set
  *   GBJ-5  absence guards — no `explanation` without explain; no `suggestions` without focus
+ *   GBJ-6  +explain+session adds exactly `explanation` + `sessionContext` to the base key set
+ *   GBJ-7  per-call focus arg (not constructor default) activates `suggestions`
+ *
+ * Catalog isolation: focusProfiles and suggestionsCatalog are injected inline —
+ * no dependency on focus-profiles.json or focus-suggestions.json at CWD.
  *
  * CLAUDE.md compliance:
  *   - 5-tool public surface: unchanged (test-only file)
@@ -44,6 +49,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
 import { Aggregator } from '../src/aggregator.js';
+import type { FocusSuggestions } from '../src/suggestions.js';
+import type { FocusProfile } from '../src/focus.js';
 import type { ServerConfig } from '../src/types.js';
 import { FixtureBackend, FIXTURE_SERVERS } from './fixture-backend.js';
 
@@ -68,6 +75,35 @@ const NO_MATCH_FOCUS_EXPLAIN: readonly string[] = [
 const NO_MATCH_FOCUS_SESSION: readonly string[] = [
   'cast', 'hint', 'intent', 'latencyMs', 'resolvedBy', 'sessionContext', 'suggestions',
 ];
+
+const NO_MATCH_EXPLAIN_SESSION: readonly string[] = [
+  'cast', 'explanation', 'hint', 'intent', 'latencyMs', 'resolvedBy', 'sessionContext',
+];
+
+// ── Inline catalog fixtures (avoid CWD dependency on focus-suggestions.json) ──
+
+const CODE_FOCUS_PROFILE: FocusProfile = {
+  description: 'Software development tools',
+  categories: ['code'],
+  servers: ['neon'],
+  boost: 0.5,
+};
+
+const CODE_SUGGESTIONS_CATALOG: Record<string, FocusSuggestions> = {
+  code: {
+    description: 'Code search, database, filesystem, and quality metrics tools.',
+    combos: [{
+      name: 'code-search-with-docs',
+      chain: ['neon/list-projects', 'neon/get-connection-string'],
+      accomplishes: 'Find a Neon project and get its connection string.',
+      verified: false,
+    }],
+    prompts: [{
+      text: 'List all Neon projects',
+      resolves_to: 'neon/list-projects',
+    }],
+  },
+};
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -106,6 +142,8 @@ function makeAgg(opts: { focus?: string } = {}): Aggregator {
     backendFactory: () => backend,
     embedEnabled: false,
     ledgerDlqPath: dlq(),
+    focusProfiles: { profiles: { code: CODE_FOCUS_PROFILE } },
+    suggestionsCatalog: CODE_SUGGESTIONS_CATALOG,
     ...(opts.focus ? { focus: opts.focus } : {}),
   });
 }
@@ -208,6 +246,35 @@ test('GBJ-5: cast:no_match base has no explanation and no suggestions', async ()
       false,
       'cast:no_match without active focus must not include suggestions',
     );
+  } finally {
+    await agg.shutdown();
+  }
+});
+
+// ── GBJ-6: +explain+session adds exactly `explanation` + `sessionContext` ─────
+
+test('GBJ-6: cast:no_match +explain+session has exactly base keys + explanation + sessionContext', async () => {
+  const agg = makeAgg();
+  try {
+    const body = await castNoMatch(agg, { explain: true, sessionId: 'gbj-session-explain' });
+    assertExactKeys(body, NO_MATCH_EXPLAIN_SESSION, 'cast:no_match +explain +session');
+    assert.equal(typeof body.explanation, 'object', 'explanation must be an object');
+    assert.notEqual(body.explanation, null, 'explanation must not be null');
+    assert.equal(typeof body.sessionContext, 'object', 'sessionContext must be an object');
+  } finally {
+    await agg.shutdown();
+  }
+});
+
+// ── GBJ-7: per-call `focus` arg activates suggestions (constructor has no focus) ─
+
+test('GBJ-7: cast:no_match per-call focus arg adds exactly `suggestions`', async () => {
+  const agg = makeAgg(); // no constructor-level focus
+  try {
+    const body = await castNoMatch(agg, { focus: 'code' });
+    assertExactKeys(body, NO_MATCH_FOCUS, 'cast:no_match per-call focus:code');
+    assert.equal(typeof body.suggestions, 'object', 'suggestions must be an object');
+    assert.notEqual(body.suggestions, null, 'suggestions must not be null');
   } finally {
     await agg.shutdown();
   }
