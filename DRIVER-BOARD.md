@@ -7919,3 +7919,23 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
   5. **Notion plan limit hit** — workspace has no more free blocks; upgrade or clean to resume board updates
 - **Next run:** Check GBT PR #1521 CI/review. Next candidate: GBU — freeze `status.focus.categories` value types more tightly (each element is a valid `ServerCategory` string, not just any string); OR `status.focus` absent-when-focus-is-an-unknown-profile (focus name set but unknown → null). Alternatively: `cast:no_match` absent-suggestions when focus active but catalog empty.
+
+---
+
+### Run ~1800 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GBT follow-up — addressed Codex P2 review finding on PR #1521
+- **Branch/PR:** `auto/GBT-status-focus-subobject-keyset-drift-guard` → **PR #1521** (https://github.com/chittyos/ch1tty/pull/1521)
+- **Build:** tsc clean | **Tests:** 5/0/0 (GBT file only; GBT-1..5 all pass with shutdown fix)
+- **Actions this run:**
+  - Resumed from run ~1799. PR #1521 CI: CodeQL success, Analyze (javascript-typescript) success, Analyze (actions) success — all green.
+  - Codex review posted 1 finding (P2): `makeAgg()` missing `embedEnabled: false`, and test aggregators not shut down via `try/finally { await agg.shutdown() }`.
+  - Fixed: added `embedEnabled: false` to `makeAgg()`, wrapped each test body in `try/finally { await agg.shutdown() }`. GBT-5 creates 2 aggregators — each gets its own block. Commit: bea9f6a.
+  - Pushed to `auto/GBT-status-focus-subobject-keyset-drift-guard`, replied on and resolved the Codex review thread.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1800 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Wait for PR #1521 CI re-run on bea9f6a (Codex fix push). If green + no new review findings → PR is waiting on human merge. Next candidate: GBU — freeze `status.focus.categories` element type (each must be a valid `ServerCategory` literal, not an arbitrary string).
