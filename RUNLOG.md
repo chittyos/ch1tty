@@ -3253,7 +3253,7 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   - Notion update attempted; blocked: "workspace has used all of its free blocks"
   - No code changes made this run
 - **Blockers (require human action)**:
-  1. **20 open drift-guard PRs (#1503–#1521) awaiting human review/merge** — CodeQL CI is green on these PRs; they need a human approver to merge
+  1. **20 open drift-guard PRs (#1503–#1522) awaiting human review/merge** — CodeQL CI is green on these PRs; they need a human approver to merge
   2. `GITHUB_MCP_AUTHORIZATION` not set → GitHub MCP backend fails at runtime
   3. `CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET` not set → ledger DLQ accumulates
   4. `CHITTY_TASKS_TOKEN` not set → tasks backend refuses at runtime
