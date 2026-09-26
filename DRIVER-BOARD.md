@@ -8058,9 +8058,9 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   - Notion board: still unavailable (plan limit hit). DRIVER-BOARD.md is durable state.
 - **Human-action items (persistent):**
   1. **DISABLE hourly cron** — ~1813 runs; burning compute. Disable via `/cron delete` in Claude Code.
-  2. **MERGE open PRs** — 32 open drift-guard test PRs (#1505–#1537), all CI green, awaiting human merge.
+  2. **MERGE open PRs** — 32 open drift-guard test PRs (#1505–#1537), all reviews passing (Codex ✅, CodeRabbit ✅); CI blocked at org level (GitHub Actions disabled).
   3. **Enable GitHub Actions** (main npm test CI job)
   4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
-- **Next run:** Check GCF PR #1537 CI/review. Next candidate: GCG — freeze `cast:executed` key set when scope is passed with session active (no focus); or GCH — freeze `cast:plan` key set when session active (no focus), complementing GCA (plan+focus, no session).
+- **Next run:** GCF PR #1537 reviews clean (Codex ✅, CodeRabbit ✅). Next candidate: GCH — freeze `cast:plan` key set when session active (no focus), complementing GCA (plan+focus, no session) and GCF (executed+session+focus). Note: GCG (scope+session executed) is duplicate of GBR (`auto/GBR-executed-scope-session-keyset-drift-guard`) — skip.
