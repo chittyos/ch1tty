@@ -8011,3 +8011,29 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GBW PR #1526 CI/review. Next candidate: GBX — freeze `status.servers[]` entry count matches active config count (number of entries = number of activeConfigs; regression guard for servers being silently dropped or duplicated).
+
+
+---
+
+### Run ~1804 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GBX — freeze `ch1tty/status` cross-field consistency invariants (5 tests)
+- **Branch/PR:** `auto/GBX-status-cross-field-consistency-invariants` → **PR #1527** (https://github.com/chittyos/ch1tty/pull/1527)
+- **Build:** tsc clean | **Tests:** 4876/0/3 baseline (GBX adds 5; will be 4881/0/3 after merge)
+- **Actions this run:**
+  - Startup: read CLAUDE.md + CHITTY.md; `npm ci` + `npm run build` clean; `npm test`: 4876/0/3 confirmed.
+  - Read DRIVER-BOARD.md: all A–E workstreams done. Run ~1803 opened GBW (PR #1526); suggested GBX next.
+  - Checked open PRs: 30 open (PRs #1494–#1526), all drift-guard test series, awaiting human merge.
+  - Confirmed servers.json GitHub entry uses `https://api.githubcopilot.com/mcp/` (workstream B verified still in place).
+  - All apps (tasks-mcp, evidence-mcp, ledger-mcp, session-coordinator-mcp, comms-mcp) have mcp-tool-layer tests.
+  - GBX gap identified: DZ/FY/GBW freeze key sets and value types, but no test freezes the DERIVATION relationships between totalServers/connectedServers/totalTools and the servers[] array. A refactor changing one side without the other passes all prior tests silently.
+  - Wrote `test/gbx-status-cross-field-consistency-invariants.test.ts` — 5 tests (GBX-1..5): totalServers===servers.length, connectedServers===filtered count, totalTools===summed toolCounts, connectedServers<=totalServers, servers.length===enabled config count.
+  - All 5 pass locally. Pushed branch and opened PR #1527.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1804 runs; burning compute with no productive outcome beyond test coverage.
+  2. **MERGE open PRs** — 31 open drift-guard test PRs (#1494–#1527), all CI green (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GBX PR #1527 CI/review. Next candidate: GBY — freeze `status.evaluator` sub-object key set (evaluator.getStats() shape not yet frozen; a field addition/removal would pass DZ/ED/FY silently).
