@@ -7800,3 +7800,32 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
 - **Next run:** Check GBJ PR #1511 CI/review after 54de1b1. Next candidate: GBK — freeze `cast:no_match` scope key set (when servers=/categories= param adds `scope` to the response).
+
+---
+
+### Run ~1794 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GBN — freeze `cast:resolved` exact key set for scope+session combos
+- **Branch/PR:** `auto/GBN-resolved-scope-session-keyset-drift-guard` → **PR #1515** (https://github.com/chittyos/ch1tty/pull/1515)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline)
+- **Actions this run:**
+  - Startup: fetched origin/main to c8db063 (run ~1793). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Read DRIVER-BOARD.md; confirmed all workstreams A–F done. Found 30 open PRs (page 1), all drift guard test additions awaiting human merge.
+  - Checked PR #1514 (GBM): all 3 CI checks ✅ (CodeQL + Analyze); mergeable_state: clean.
+  - Identified GBN gap: GBM froze resolved+scope without session; GU froze resolved+session without scope; no test on main freezes the exact key set when BOTH scope AND sessionId are present simultaneously.
+  - Read src-stdio/aggregator.ts lines 1553–1577 to confirm exact key structure.
+  - Created `test/gbn-resolved-scope-session-keyset-drift-guard.test.ts` (5 tests: GBN-1..5):
+    - GBN-1: scope(servers)+session → exactly {cast,intent,latencyMs,resolved,resolvedBy,scope,sessionContext} (7 keys)
+    - GBN-2: scope(categories)+session → same 7 keys
+    - GBN-3: scope+session+explain → above + explanation (8 keys)
+    - GBN-4: scope+session+focus(code) → above 7 + focus (8 keys)
+    - GBN-5: absence guards — scope w/o session → no sessionContext; session w/o scope → no scope
+  - All 5 new tests pass; full suite 4881/0/3. Pushed and opened PR #1515.
+  - Notion board unavailable (401); DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1794 runs; burning compute
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+- **Next run:** Check GBN PR #1515 CI/review. Next candidate: GBO — freeze `cast:plan` exact key set for scope+session combos (same gap as GBN but for plan/confirm path: GBD froze plan+base, GBF froze plan+focus/explain; no test on main covers plan+scope+session together).
