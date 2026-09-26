@@ -7646,3 +7646,25 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
 - **Next run:** Check GBD PR #1501 and GBC PR #1500 CI/review. Next candidate: freeze `cast:resolved` exact top-level key set (GU froze no_match+resolved but EG RESOLVED_PERMITTED is still a superset) or freeze alternatives[] scoring for cast:plan (GO-1 froze plan alternatives keyset but not the ordering/score range across alternatives).
 
+
+---
+
+### Run ~1813 — 2026-09-26T (automated)
+
+- **Workstream advanced:** GCG — freeze `cast:plan` exact top-level key set when BOTH session AND focus are active
+- **Branch/PR:** `auto/GCG-plan-session-focus-keyset` → PR pending push
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline on main)
+- **Actions this run:**
+  - Synced to `origin/main`. `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed on main.
+  - Read DRIVER-BOARD.md: last run was GBD (~1780). Many open PRs (GBK–GCF = #1512–#1537) — CI disabled so all sit open.
+  - Identified gap: GCA froze cast:plan+focus (no session); GCF froze cast:executed with session+focus. Symmetric gap: cast:plan with session+focus not yet frozen.
+  - Created `test/gcg-plan-session-focus-toplevel-keyset-drift-guard.test.ts` (5 tests: base+focus+sessionContext, +catalog, +scope, +explain, sessionContext sub-keys).
+  - All 5 new tests pass. Full suite 4881/0/3. Pushed and opened PR.
+  - Notion board unavailable (401); DRIVER-BOARD.md is durable state.
+- **Human-action items (carried forward):**
+  1. **DISABLE hourly cron** — ~1813+ runs; burning compute
+  2. **Enable GitHub Actions** (main npm test CI job — 0-queue non-blocking recurring)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+- **Next run:** Next candidate: freeze `cast:resolved` exact top-level key set when session+focus active (GBN froze resolved+scope+session; no test freezes resolved+focus or resolved+session+focus), or freeze `cast:discovered` with session+focus (GBS froze discovered+scope+session).
