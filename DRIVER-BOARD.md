@@ -7875,3 +7875,30 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
 - **Next run:** Check GBQ PR #1518 CI/review. Next candidate: GBR — freeze `cast:executed` exact key set for scope+session combos (scope+sessionId together; GBN covered resolved scope+session, GBO covered plan scope+session — same gap for executed).
+
+---
+
+### Run ~1797 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GBR — freeze `cast:executed` exact key set for scope+session combos
+- **Branch/PR:** `auto/GBR-executed-scope-session-keyset-drift-guard` → **PR #1519** (https://github.com/chittyos/ch1tty/pull/1519)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline)
+- **Actions this run:**
+  - Startup: pulled main to d723556 (run ~1796). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Read DRIVER-BOARD.md; confirmed all workstreams A–F done. Checked open PRs: 30 open (#1478–#1518), all drift guard test additions awaiting human merge. All CI-green (CodeQL + Analyze js-typescript + Analyze actions).
+  - Identified GBR gap: GBQ (PR #1518, open) froze cast:executed + scope (no session). GBN covered resolved scope+session; GBO covered plan scope+session. No test on main freezes the exact key set when BOTH scope AND sessionId are present together in cast:executed — a regression adding/dropping a key there would pass all prior tests silently.
+  - Wrote `test/gbr-executed-scope-session-keyset-drift-guard.test.ts` (5 tests: GBR-1..5):
+    - GBR-1: scope(servers)+sessionId → exactly base + scope + sessionContext (11 keys)
+    - GBR-2: scope(categories)+sessionId → same 11 keys
+    - GBR-3: scope+session+explain → 12 keys (+explanation)
+    - GBR-4: scope+session+focus → 13 keys (+focus + suggestions)
+    - GBR-5: absence guards — scope w/o session → no sessionContext; session w/o scope → no scope
+  - All 5 new tests pass; full suite 4881/0/3. Build clean.
+  - Notion board unavailable (401); DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1797 runs; burning compute
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+- **Next run:** Check GBR PR CI/review. Next candidate: GBS — freeze `cast:chain_executed` exact key set when scope param is set (scope-only, no session); parallel to GBK (no_match) and GBQ (executed) for the chain_executed cast mode.
