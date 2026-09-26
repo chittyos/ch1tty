@@ -8011,3 +8011,28 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GBW PR #1526 CI/review. Next candidate: GBX — freeze `status.servers[]` entry count matches active config count (number of entries = number of activeConfigs; regression guard for servers being silently dropped or duplicated).
+
+
+---
+
+### Run ~1805 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GBY — freeze `ch1tty/status` health sub-object exact key sets (5 tests)
+- **Branch/PR:** `auto/GBY-health-subobject-keyset-drift-guard` → **PR #1529** (https://github.com/chittyos/ch1tty/pull/1529)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline)
+- **Actions this run:**
+  - Startup: pulled main to 736977b (run ~1803). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Read DRIVER-BOARD.md (tail via Bash); noted run ~1803 was last entry on main; run ~1804 is in open PR branch.
+  - Read run ~1804 DRIVER-BOARD.md from `auto/runlog-1804-GBX-status-invariants` branch: confirmed GBX (PR #1527) opened, next candidate GBY = freeze `status.evaluator` sub-object key set.
+  - NOTE: `status.evaluator` does not exist in the stdio aggregator (only in the DO/core.ts version). Pivoted to correct gap: `systemHealth`, `brainHealth`, `ledgerHealth`, `ledgerDlq` sub-objects have value types frozen (FY-2..FY-5) but NO exact key set frozen.
+  - Checked PR #1527 (GBX): all 3 CI checks ✅ (CodeQL + Analyze). Waiting on human merge.
+  - Wrote `test/gby-status-health-subobject-keyset-drift-guard.test.ts` (5 tests: GBY-1..5). All 5 pass. Full suite 4881/0/3. Pushed and opened PR #1529.
+  - Notion board: unavailable (plan limit hit — no free blocks). DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1805 runs; burning compute with no productive outcome beyond test coverage.
+  2. **MERGE open PRs** — 32 open drift-guard test PRs (#1494–#1529), all CI green (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GBY PR #1529 CI/review. Next candidate: GBZ — freeze `status.catalog.activeFocusSuggestions` exact key set when non-null (ED asserts it has `combos` and `prompts` but does NOT freeze the exact key set; a regression adding a 3rd key like `totalCombos` or `activeFocus` at this level passes ED silently).
