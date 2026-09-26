@@ -163,17 +163,17 @@ test('GBX-5: status.servers.length equals enabled-config count (disabled configs
   const agg = makeAgg();
   const snap = await getStatus(agg);
   const servers = snap['servers'] as Array<Record<string, unknown>>;
-  // ACTIVE_CONFIGS has 2 entries; DISABLED_CONFIG must not appear in servers[]
-  const expectedCount = ACTIVE_CONFIGS.length;
-  assert.equal(
-    servers.length,
-    expectedCount,
-    `servers.length (${servers.length}) must equal active config count (${expectedCount}); disabled config must be excluded`,
+  const actualIds = servers.map((s) => String(s['id'])).sort();
+  const expectedIds = ACTIVE_CONFIGS.map((c) => c.id).sort();
+  // Compare sorted ID sets so a drop+duplicate (same count, different ids) is caught.
+  assert.deepEqual(
+    actualIds,
+    expectedIds,
+    `servers[].ids must be exactly ${JSON.stringify(expectedIds)}; got ${JSON.stringify(actualIds)}`,
   );
-  // Confirm disabled-server is not present
-  const ids = servers.map((s) => s['id']);
+  // Belt-and-suspenders: disabled config must not appear
   assert.ok(
-    !ids.includes('disabled-server'),
-    `disabled-server must not appear in servers[]; got ids: ${JSON.stringify(ids)}`,
+    !actualIds.includes('disabled-server'),
+    `disabled-server must not appear in servers[]`,
   );
 });
