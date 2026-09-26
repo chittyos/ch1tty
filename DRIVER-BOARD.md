@@ -8036,3 +8036,32 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GBY PR #1529 CI/review. Next candidate: GBZ — freeze `status.catalog.activeFocusSuggestions` exact key set when non-null (ED asserts it has `combos` and `prompts` but does NOT freeze the exact key set; a regression adding a 3rd key like `totalCombos` or `activeFocus` at this level passes ED silently).
+
+
+---
+
+### Run ~1806 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GBZ — freeze `cast:executed` top-level key set when a focus profile is active (5 tests)
+- **Branch/PR:** `auto/GBZ-cast-executed-focus-active-keyset` → **PR #1531** (https://github.com/chittyos/ch1tty/pull/1531)
+- **Build:** tsc clean | **Tests:** 5 new GW tests pass locally; full suite baseline on main 4881/0/3
+- **Actions this run:**
+  - Woke to 7 notifications: PR #1529 (GBY) CI ✅; PR #1530 (run log) Codex review completed — 3 P2 findings.
+  - Codex P2 finding 1: GBZ candidate (activeFocusSuggestions key set) already frozen by ED lines 391-395 (`deepEqual` against `ACTIVE_FOCUS_SUGGESTIONS_FIELDS`). **Finding correct.**
+  - Codex P2 finding 2: GBY claim incorrect — DZ-06..DZ-12 already freeze all four health sub-object key sets with `deepEqual`. GBY (PR #1529) is **duplicate** of existing DZ coverage. **Finding correct.**
+  - Codex P2 finding 3: run 1805 appended before 1804 (branch ordering gap). **Acknowledged — inherent in concurrent auto/ branches; merging in PR number order resolves conflicts.**
+  - Verified Codex findings by reading DZ test file (DZ-06..DZ-12 freeze systemHealth/brainHealth/ledgerHealth/ledgerDlq key sets) and ED test (lines 391-395 deep-equal activeFocusSuggestions to `ACTIVE_FOCUS_SUGGESTIONS_FIELDS`).
+  - Replied to all 3 P2 Codex threads on PR #1530 acknowledging findings; threads addressed per optional-finding rules.
+  - Identified genuine GBZ gap: GV froze `cast:executed` key set for non-focus path (GV-5 asserts focus/suggestions absent); no test freezes the key set when focus IS active. Source: `src-stdio/aggregator.ts` lines ~1658, ~1668.
+  - Verified `coordinator.topTools[]` is `string[]` (not objects) → no object key set gap there.
+  - Wrote `test/gw-cast-executed-focus-active-toplevel-keyset-drift-guard.test.ts` (5 tests: GW-1..GW-5). First run: GW-1/GW-2 failed — frozen key sets wrong (no `resources` when catalog is empty; catalog-active path adds `chainContinuation` + `resolvedFromCatalog`). Corrected key sets from actual output. Second run: all 5 pass.
+  - PR #1529 (GBY) CI: all 3 checks ✅; Codex 0 findings; CodeRabbit minimal. Redundant of DZ but harmless as belt-and-suspenders coverage; waiting human merge or close decision.
+- **Correction to run ~1805 entry:** GBY was identified as redundant coverage (DZ-06..DZ-12 already exist on main); the stated GBZ candidate (activeFocusSuggestions key set) was also already covered by ED. The genuine GBZ target is the focus-active `cast:executed` key set, now addressed by GBZ/GW tests in PR #1531.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1806 runs; burning compute.
+  2. **MERGE open PRs** — 33 open drift-guard test PRs (#1494–#1531), all CI green (CodeQL), awaiting human merge. PR #1529 (GBY) may be closed as duplicate of DZ-06..DZ-12 at human discretion.
+  3. **Enable GitHub Actions** (main `npm test` CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GBZ PR #1531 CI/review. Next candidate: GHZ+1 (two-letter prefix `gx`) — freeze `cast:executed` key set when `scope` param is passed (GV excluded scope; when a scope annotation is non-null, `scope` key appears in response alongside the base set; no test freezes that exact key set).
