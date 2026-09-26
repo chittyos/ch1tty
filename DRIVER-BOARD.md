@@ -7875,3 +7875,24 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
 - **Next run:** Check GBQ PR #1518 CI/review. Next candidate: GBR — freeze `cast:executed` exact key set for scope+session combos (scope+sessionId together; GBN covered resolved scope+session, GBO covered plan scope+session — same gap for executed).
+
+---
+
+### Run ~1798 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GBS — freeze `cast:discovered` exact key set for scope+session combos (5 tests)
+- **Branch/PR:** `auto/GBS-discovered-scope-session-keyset-drift-guard` → **PR #1520** (https://github.com/chittyos/ch1tty/pull/1520)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline)
+- **Actions this run:**
+  - Startup: `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Read DRIVER-BOARD.md and Notion board; all workstreams A–F+ done. 20 open PRs (#1500–#1519) all CI-green (CodeQL+Analyze), awaiting human merge.
+  - Identified GBS gap: GBH-4 froze discovered+scope-only (7 keys); no test froze the exact key set when scope+sessionId are both present. Verified chain_executed has NO scope annotation spread (aggregator ~line 1527–1548) — no chain_executed scope gap exists.
+  - Wrote `test/gbs-discovered-scope-session-keyset-drift-guard.test.ts` (5 tests: GBS-1..5). All 5 pass; full suite 4881/0/3. Pushed and opened PR #1520.
+  - Notion update failed: "workspace has used all of its free blocks" (plan limit, not token issue). DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1798 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Notion plan limit hit** — workspace has no more free blocks; upgrade plan or clean blocks to resume board updates
+- **Next run:** GBT candidate — if any scope+session combo remains after GBS merges. Check open PRs CI first. Likely the scope series is now complete (all cast modes covered: no_match GBL, resolved GBN, plan GBO, executed GBR, discovered GBS). Next logical workstream: apps-level output shape freeze tests (PQ #1499, ST #1508 are open — check CI and drive to merge).
