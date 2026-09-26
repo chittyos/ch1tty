@@ -1738,3 +1738,32 @@
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
 **Next run:** Watch PR #1506 for CI/review. Next gap candidate: GBG — cast:discovered conditional key set (same pattern: no test on main freezes exact key set for discovered mode). Or apply Workstream L/O pattern to apps/session-coordinator-mcp tool layer.
+
+---
+
+## Run ~1793 — 2026-09-26T~03:45Z
+
+**Workstream:** D-extended (cast output-shape drift-guard series — GBM)
+**Branch/PR:** `auto/GBM-resolved-scope-keyset-drift-guard` → PR #1514
+
+**Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 from 4876)
+
+**What was done:**
+- Added `test/gbm-resolved-scope-keyset-drift-guard.test.ts` — 5 tests (GBM-1..5)
+- Freezes exact top-level key set of `cast:resolved` (dryRun:true) when `scope` param is set
+- Closes the gap complementary to GBK (cast:no_match +scope) for the resolved cast mode
+- GBM-1: +scope(servers:neon) → base + scope; GBM-2: +scope(categories:code) → base + scope
+- GBM-3: +scope+explain → base + scope + explanation; GBM-4: +scope+focus → base + scope + focus
+- GBM-5: absence guard — no scope without scope param; base matches GU-3 exactly
+- Catalog isolation: `suggestionsCatalog: {}` prevents non-deterministic catalogCombo addition
+
+**Open PRs (all awaiting human merge):**
+- #1504 (GAU) through #1514 (GBM): 11 drift guard PRs
+
+**Standing blockers (human action required):**
+1. GitHub Actions npm test CI disabled at org level (only CodeQL runs)
+2. Prod env vars missing (GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, etc.)
+3. Stale branch cleanup — 1100+ remote auto/ branches
+4. Hourly cron still firing — all original workstreams done; consider adding GBN+ to prompt
+
+**Next run:** GBN candidate — `cast:plan` or `cast:executed` exact key set when scope param set (same pattern applied to the next cast outcome type).
