@@ -7829,3 +7829,26 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
 - **Next run:** Check GBN PR #1515 CI/review. Next candidate: GBO — freeze `cast:plan` exact key set for scope+session combos (same gap as GBN but for plan/confirm path: GBD froze plan+base, GBF froze plan+focus/explain; no test on main covers plan+scope+session together).
+
+---
+
+### Run ~1795 — 2026-09-26
+- Startup: fetched origin/main to 7d57de0 (run ~1794). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed (GBN test on PR branch, not main).
+- Checked PR #1515 (GBN): all 3 CI checks ✅ (CodeQL + Analyze js-typescript + Analyze actions); mergeable_state: clean. Codex review completed with no findings. CodeRabbit rate-limited.
+- Identified GBO gap: GBD froze cast:plan base keys; GBF froze cast:plan conditional keys (focus/explain); no test on main freezes the exact key set when BOTH scope AND sessionId are present simultaneously in cast:plan (confirm:true).
+- Read src-stdio/aggregator.ts lines 1595–1625 to confirm exact plan key structure.
+- Created `test/gbo-plan-scope-session-keyset-drift-guard.test.ts` (5 tests: GBO-1..5):
+  - GBO-1: scope(servers)+session → exactly {alternatives,args,cast,hint,intent,latencyMs,resolved,resolvedBy,scope,sessionContext} (10 keys)
+  - GBO-2: scope(categories)+session → same 10 keys
+  - GBO-3: scope+session+explain → above + explanation (11 keys)
+  - GBO-4: scope+session+focus(code) → above 10 + focus (11 keys)
+  - GBO-5: absence guards — scope w/o session → no sessionContext; session w/o scope → no scope
+- All 5 new tests pass; full suite 4881/0/3 (+5 from 4876 baseline). Build clean. Pushed and opened PR #1516.
+- Notion board unavailable (401); DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1795 runs; burning compute
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+- **Next run:** Check GBO PR #1516 CI/review. Next candidate: GBP — freeze `cast:executed` exact key set for scope+session combos (parallel gap to GBN for resolved, GBO for plan — GV froze executed base; no test covers executed+scope+session together).
