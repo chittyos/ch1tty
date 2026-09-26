@@ -8017,7 +8017,7 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 ### Run ~1811 — 2026-09-26T (automated run)
 
 - **Workstream advanced:** GCD — freeze `cast:no_match` exact top-level key set when BOTH session and focus are active simultaneously (5 tests, completing the 2×2 session/focus matrix)
-- **Branch/PR:** `auto/GCD-nomatch-session-focus-keyset` → **PR TBD** (opened this run)
+- **Branch/PR:** `auto/GCD-nomatch-session-focus-keyset` → **PR #1535** (https://github.com/chittyos/ch1tty/pull/1535)
 - **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skipped (+5 from 4876 baseline on main)
 - **Actions this run:**
   - Startup: main at 736977b (run ~1803 — runs ~1804–~1810 opened PRs but not merged, so DRIVER-BOARD.md on main is at ~1803). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
