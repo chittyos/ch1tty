@@ -7800,3 +7800,32 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
 - **Next run:** Check GBJ PR #1511 CI/review after 54de1b1. Next candidate: GBK — freeze `cast:no_match` scope key set (when servers=/categories= param adds `scope` to the response).
+
+---
+
+### Run ~1791 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GBK — freeze `cast:no_match` exact top-level key set when scope param is set
+- **Branch/PR:** `auto/GBK-nomatch-scope-keyset-drift-guard` → **PR #1512** (https://github.com/chittyos/ch1tty/pull/1512)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline)
+- **Actions this run:**
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE.
+  - Pulled main to 5f74600 (run ~1790). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - PR #1511 (GBJ): CI ✅ all 3 checks (CodeQL + Analyze x2); 4/4 review threads addressed (3 resolved, 1 standing-down reply).
+  - Identified GBK gap: EQ froze scope sub-object shape + presence/absence; GBJ froze +explain/+focus/+session conditionals; but no test froze the EXACT top-level key set of cast:no_match when scope param is present.
+  - Probed source (aggregator.ts ~line 1364): confirmed scope is a conditional spread before explain/focus/session.
+  - Created `test/gbk-nomatch-scope-keyset-drift-guard.test.ts` (5 tests: GBK-1..5).
+    - GBK-1: +scope(servers) → base + scope
+    - GBK-2: +scope(categories) → base + scope
+    - GBK-3: +scope+explain → base + scope + explanation
+    - GBK-4: +scope+focus → base + scope + suggestions
+    - GBK-5: absence guard — no scope without scope param (base matches GU exactly)
+  - All 5 tests pass (4881/0/3). Pushed and opened PR #1512. Subscribed to activity.
+  - Notion board unavailable (401); DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1791 runs; burning compute
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+- **Next run:** Check GBK PR #1512 CI/review. Next candidate: GBL — freeze `cast:no_match` exact top-level key set for scope+focus+explain combo (triple conditional) OR freeze scope key set for another cast mode (plan/resolved/discovered).
