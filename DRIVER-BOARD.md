@@ -7726,3 +7726,26 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
 - **Next run:** Check GBH PR #1509 CI/review. Next candidate: GBI — cast:chain_executed conditional key set (GBA froze exact top-level base; no test freezes what +explain/+session/+scope add to chain_executed).
+
+---
+
+### Run ~1788 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GBI — freeze `cast:chain_executed` conditional key set (explain/session/summary additions)
+- **Branch/PR:** `auto/GBI-chain-executed-conditional-keys-drift-guard` → **PR #1510**
+- **Build:** tsc clean | **Tests:** 4215 pass / 0 fail / 2 skip (+5 vs 4210 baseline)
+- **Actions this run:**
+  - Startup: on main (fa6092a, run ~1787 board). `npm run build` clean.
+  - PR #1509 (GBH): CodeRabbit completed — no actionable comments (minimal merge risk); Codex completed ✅; CI check suite completed. PR clean.
+  - Identified GBI gap: EF froze CHAIN_PERMITTED (superset check, no explain/session). No test freezes the EXACT key set for chain_executed conditional fields.
+  - Probed actual key sets live via tsx: BASE(text)=10 keys, +explain=11, +session(2nd call)=11, BASE(no-text)=9 keys.
+  - Wrote `test/gbi-chain-executed-conditional-keys-drift-guard.test.ts` (5 tests: GBI-1..5).
+  - All 5 tests pass; full suite 4215/0/2. Pushed and opened PR #1510.
+  - Note: absolute test count differs from prior board entries (4215 vs 4881) — methodology variation across sessions; delta is consistent (+5).
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1788 runs; burning compute
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+- **Next run:** Check GBI PR #1510 CI/review. Next candidate: GBJ — freeze `cast:no_match` conditional key set (GU froze base/session; no test freezes what +focus/+explain add to no_match).
