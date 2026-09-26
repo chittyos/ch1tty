@@ -130,6 +130,7 @@ function makeAgg(): Aggregator {
     ledgerDlqPath: dlq(),
     focus: 'code',
     focusProfiles: FOCUS_PROFILES,
+    suggestionsCatalog: {},
   });
 }
 
