@@ -7749,3 +7749,31 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
 - **Next run:** Check GBI PR #1510 CI/review. Next candidate: GBJ — freeze `cast:no_match` conditional key set (GU froze base/session; no test freezes what +focus/+explain add to no_match).
+
+---
+
+### Run ~1789 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GBJ — freeze `cast:no_match` conditional key set (explain/focus/suggestions)
+- **Branch/PR:** `auto/GBJ-nomatch-conditional-keys-drift-guard` → **PR #1511** (https://github.com/chittyos/ch1tty/pull/1511)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline)
+- **Actions this run:**
+  - Startup: pulled main to 1044158 (run ~1788). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Read DRIVER-BOARD.md; confirmed all workstreams A–F done. Checked 10 open PRs (#1501–#1510), all drift guard test additions awaiting human merge.
+  - Identified GBJ gap: GU froze cast:no_match base/session key sets; no test freezes what +explain adds (`explanation`) or +focus adds (`suggestions`).
+  - Read src-stdio/aggregator.ts ~line 1364 to confirm exact conditional structure.
+  - Created `test/gbj-nomatch-conditional-keys-drift-guard.test.ts` (5 tests: GBJ-1..5):
+    - GBJ-1: +explain → base + explanation
+    - GBJ-2: +focus (code) → base + suggestions
+    - GBJ-3: +focus+explain → base + explanation + suggestions
+    - GBJ-4: +focus+session → base + suggestions + sessionContext
+    - GBJ-5: absence guards — no explanation without explain; no suggestions without focus
+  - All 5 new tests pass; full suite 4881/0/3. Pushed and opened PR #1511.
+  - Notion board unavailable (401); DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1789 runs; burning compute
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+- **Next run:** Check GBJ PR #1511 CI/review. Next candidate: GBK — freeze `cast:no_match` scope key set (scopeAnnotation conditional: when servers= or categories= param is passed, adds `scope` to no_match; no existing test covers this).
