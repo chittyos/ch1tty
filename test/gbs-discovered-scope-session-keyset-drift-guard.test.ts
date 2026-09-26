@@ -108,6 +108,7 @@ function makeAgg(): Aggregator {
     embedEnabled: false,
     ledgerDlqPath: dlq(),
     coordinator: new KeywordOnlyCoordinator({}, { enabled: false }, dlq()),
+    suggestionsCatalog: {},
   });
 }
 
