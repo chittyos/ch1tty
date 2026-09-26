@@ -8017,7 +8017,7 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 ### Run ~1810 — 2026-09-26T (automated run)
 
 - **Workstream advanced:** GCC — freeze `cast:no_match` top-level key set when session is active, no focus (5 tests)
-- **Branch/PR:** `auto/GCC-nomatch-session-only-keyset` → **PR #TBD** (opening now)
+- **Branch/PR:** `auto/GCC-nomatch-session-only-keyset` → **PR #1534** (https://github.com/chittyos/ch1tty/pull/1534)
 - **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skipped (+5 from 4876 baseline)
 - **Actions this run:**
   - Startup: PR #1533 (GCB) all CI green (CodeQL ✅, Analyze actions ✅, Analyze js-ts ✅). No blocking reviews. Waiting on human merge.
