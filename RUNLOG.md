@@ -3248,16 +3248,16 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   - npm ci + npm run build + npm test — build clean, 4876/0/3
   - Read Notion board: all A–E workstreams confirmed done; RUNLOG last entry was ~Run 1757 (GAI, PR #1471)
   - Checked 20 open PRs: all are drift-guard test PRs (#1503–#1522), all opened 2026-09-26
-  - PR #1522 (previous run) confirms: all workstreams done, 30+ drift-guard PRs stuck without CI
+  - PR #1522 (previous run) claimed 30+ PRs with CI disabled — corrected: only 20 open PRs; CI (CodeQL) IS running and green on checked PRs (#1521: 3/3 checks pass)
   - All apps (tasks-mcp, evidence-mcp, ledger-mcp, session-coordinator-mcp, comms-mcp) have mcp-tool-layer tests
   - Notion update attempted; blocked: "workspace has used all of its free blocks"
   - No code changes made this run
 - **Blockers (require human action)**:
-  1. **GitHub Actions CI disabled** at org level → 30+ PRs (#1486–#1521) cannot get CI checks and cannot merge. Fix: GitHub org Settings → Actions → General → "Allow all actions"
+  1. **20 open drift-guard PRs (#1503–#1521) awaiting human review/merge** — CodeQL CI is green on these PRs; they need a human approver to merge
   2. `GITHUB_MCP_AUTHORIZATION` not set → GitHub MCP backend fails at runtime
   3. `CHITTY_CF_ACCESS_CLIENT_ID` / `CHITTY_CF_ACCESS_CLIENT_SECRET` not set → ledger DLQ accumulates
   4. `CHITTY_TASKS_TOKEN` not set → tasks backend refuses at runtime
   5. Dependabot PR #1155 (qs + fast-uri security bump) needs human merge
   6. Notion workspace out of free blocks → board can't be updated; RUNLOG.md used as fallback
-- **Recommendation**: All defined workstreams (A–E plus extended F–O, GA-GAI, GBA–GBT) are exhausted. Cron is burning ~50k tokens/run with no productive output. Consider: (a) `/cron delete` to stop the hourly loop, or (b) re-enabling GitHub Actions CI to unblock and merge the 30+ pending test PRs, or (c) adding new workstream goals to the scheduled prompt.
-- **Open PRs**: 20 open (#1503–#1522), all drift-guard tests, all awaiting CI + human merge
+- **Recommendation**: All defined workstreams (A–E plus extended F–O, GA-GAI, GBA–GBT) are exhausted. Cron is burning ~50k tokens/run with no productive output. Consider: (a) `/cron delete` to stop the hourly loop, or (b) reviewing and merging the 20 pending test PRs (CI is green), or (c) adding new workstream goals to the scheduled prompt.
+- **Open PRs**: 20 open (#1503–#1522), all drift-guard tests, CI green, awaiting human merge
