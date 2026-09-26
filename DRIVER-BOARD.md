@@ -7881,7 +7881,7 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 ### Run ~1797 — 2026-09-26T (automated run)
 
 - **Workstream advanced:** GBR — freeze `cast:executed` exact key set for scope+session combos
-- **Branch/PR:** `auto/GBR-executed-scope-session-keyset-drift-guard` → PR to be opened
+- **Branch/PR:** `auto/GBR-executed-scope-session-keyset-drift-guard` → **PR #1519** (https://github.com/chittyos/ch1tty/pull/1519)
 - **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline)
 - **Actions this run:**
   - Startup: pulled main to d723556 (run ~1796). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.

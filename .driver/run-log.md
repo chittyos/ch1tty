@@ -1773,7 +1773,7 @@
 ## Run ~1797 — 2026-09-26T (automated)
 
 **Workstream:** D-extended (cast output-shape drift-guard series — GBR)
-**Branch/PR:** `auto/GBR-executed-scope-session-keyset-drift-guard` → PR to be opened
+**Branch/PR:** `auto/GBR-executed-scope-session-keyset-drift-guard` → **PR #1519** (https://github.com/chittyos/ch1tty/pull/1519)
 
 **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 from 4876 baseline)
 
