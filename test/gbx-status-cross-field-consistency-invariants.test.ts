@@ -27,9 +27,11 @@
  *   GBX-5  `servers.length` equals the number of active (enabled) configs
  *             (no server entry silently dropped or duplicated)
  *
- * Fixture: stripe (3 tools) + neon (6 tools), both enabled. Both use
- * FixtureBackend so they are "connected" in tests (backend always responds).
- * A third disabled config is included to verify it is excluded from servers[].
+ * Fixture: stripe (3 tools, connected) + neon (4 tools, connected) + github
+ *   (active config, listToolsError → connected: false, toolCount: 0). This
+ *   ensures connectedServers < totalServers, so GBX-2 and GBX-4 catch a
+ *   regression that hard-codes connectedServers === totalServers.
+ *   A fourth explicitly disabled config verifies it is excluded from servers[].
  *
  * Frozen 2026-09-26.
  *
@@ -52,7 +54,9 @@ function dlq(): string {
   return join(tmpdir(), `ch1tty-gbx-${Date.now()}-${++_seq}.jsonl`);
 }
 
-// Two enabled servers + one explicitly disabled server.
+// Three active configs (enabled) + one explicitly disabled config.
+// github is active but its backend returns listToolsError, so connected:false.
+// GBX-4 is meaningful because connectedServers (2) < totalServers (3).
 // GBX-5 verifies the disabled entry does NOT appear in servers[].
 const ACTIVE_CONFIGS: ServerConfig[] = [
   {
@@ -71,6 +75,15 @@ const ACTIVE_CONFIGS: ServerConfig[] = [
     access: 'readwrite',
     category: 'data',
     endpoint: 'https://neon.tech/mcp',
+    lazy: true,
+  },
+  {
+    id: 'github',
+    name: 'GitHub',
+    type: 'remote',
+    access: 'readwrite',
+    category: 'ecosystem',
+    endpoint: 'https://api.github.com/mcp',
     lazy: true,
   },
 ];
@@ -92,6 +105,9 @@ function makeAgg(): Aggregator {
   const backend = new FixtureBackend();
   backend.defineServer('stripe', FIXTURE_SERVERS.stripe);
   backend.defineServer('neon', FIXTURE_SERVERS.neon);
+  // github is active but reports a connection error so connected:false.
+  // This ensures connectedServers < totalServers for GBX-2 and GBX-4.
+  backend.defineServer('github', { tools: [], listToolsError: true });
   return new Aggregator(ALL_CONFIGS, {
     backendFactory: () => backend,
     embedEnabled: false,
@@ -112,68 +128,88 @@ async function getStatus(agg: Aggregator): Promise<Record<string, unknown>> {
 
 test('GBX-1: status.totalServers === status.servers.length (aggregate matches source array length)', async () => {
   const agg = makeAgg();
-  const snap = await getStatus(agg);
-  const totalServers = snap['totalServers'] as number;
-  const servers = snap['servers'] as unknown[];
-  assert.equal(
-    totalServers,
-    servers.length,
-    `totalServers (${totalServers}) must equal servers.length (${servers.length})`,
-  );
+  try {
+    const snap = await getStatus(agg);
+    const totalServers = snap['totalServers'] as number;
+    const servers = snap['servers'] as unknown[];
+    assert.equal(
+      totalServers,
+      servers.length,
+      `totalServers (${totalServers}) must equal servers.length (${servers.length})`,
+    );
+  } finally {
+    await agg.shutdown();
+  }
 });
 
 test('GBX-2: status.connectedServers === servers[].filter(s => s.connected).length (aggregate matches live array)', async () => {
   const agg = makeAgg();
-  const snap = await getStatus(agg);
-  const connectedServers = snap['connectedServers'] as number;
-  const servers = snap['servers'] as Array<Record<string, unknown>>;
-  const derivedConnected = servers.filter((s) => s['connected'] === true).length;
-  assert.equal(
-    connectedServers,
-    derivedConnected,
-    `connectedServers (${connectedServers}) must equal servers[].filter(connected).length (${derivedConnected})`,
-  );
+  try {
+    const snap = await getStatus(agg);
+    const connectedServers = snap['connectedServers'] as number;
+    const servers = snap['servers'] as Array<Record<string, unknown>>;
+    const derivedConnected = servers.filter((s) => s['connected'] === true).length;
+    assert.equal(
+      connectedServers,
+      derivedConnected,
+      `connectedServers (${connectedServers}) must equal servers[].filter(connected).length (${derivedConnected})`,
+    );
+  } finally {
+    await agg.shutdown();
+  }
 });
 
 test('GBX-3: status.totalTools === servers[].reduce(sum + toolCount, 0) (aggregate matches per-server tool counts)', async () => {
   const agg = makeAgg();
-  const snap = await getStatus(agg);
-  const totalTools = snap['totalTools'] as number;
-  const servers = snap['servers'] as Array<Record<string, unknown>>;
-  const derivedTotal = servers.reduce((sum, s) => sum + (s['toolCount'] as number), 0);
-  assert.equal(
-    totalTools,
-    derivedTotal,
-    `totalTools (${totalTools}) must equal sum of servers[].toolCount (${derivedTotal})`,
-  );
+  try {
+    const snap = await getStatus(agg);
+    const totalTools = snap['totalTools'] as number;
+    const servers = snap['servers'] as Array<Record<string, unknown>>;
+    const derivedTotal = servers.reduce((sum, s) => sum + (s['toolCount'] as number), 0);
+    assert.equal(
+      totalTools,
+      derivedTotal,
+      `totalTools (${totalTools}) must equal sum of servers[].toolCount (${derivedTotal})`,
+    );
+  } finally {
+    await agg.shutdown();
+  }
 });
 
 test('GBX-4: status.connectedServers <= status.totalServers (connected count cannot exceed total)', async () => {
   const agg = makeAgg();
-  const snap = await getStatus(agg);
-  const connectedServers = snap['connectedServers'] as number;
-  const totalServers = snap['totalServers'] as number;
-  assert.ok(
-    connectedServers <= totalServers,
-    `connectedServers (${connectedServers}) must be <= totalServers (${totalServers})`,
-  );
+  try {
+    const snap = await getStatus(agg);
+    const connectedServers = snap['connectedServers'] as number;
+    const totalServers = snap['totalServers'] as number;
+    assert.ok(
+      connectedServers <= totalServers,
+      `connectedServers (${connectedServers}) must be <= totalServers (${totalServers})`,
+    );
+  } finally {
+    await agg.shutdown();
+  }
 });
 
 test('GBX-5: status.servers.length equals enabled-config count (disabled configs excluded; no silent drop or duplicate)', async () => {
   const agg = makeAgg();
-  const snap = await getStatus(agg);
-  const servers = snap['servers'] as Array<Record<string, unknown>>;
-  const actualIds = servers.map((s) => String(s['id'])).sort();
-  const expectedIds = ACTIVE_CONFIGS.map((c) => c.id).sort();
-  // Compare sorted ID sets so a drop+duplicate (same count, different ids) is caught.
-  assert.deepEqual(
-    actualIds,
-    expectedIds,
-    `servers[].ids must be exactly ${JSON.stringify(expectedIds)}; got ${JSON.stringify(actualIds)}`,
-  );
-  // Belt-and-suspenders: disabled config must not appear
-  assert.ok(
-    !actualIds.includes('disabled-server'),
-    `disabled-server must not appear in servers[]`,
-  );
+  try {
+    const snap = await getStatus(agg);
+    const servers = snap['servers'] as Array<Record<string, unknown>>;
+    const actualIds = servers.map((s) => String(s['id'])).sort();
+    const expectedIds = ACTIVE_CONFIGS.map((c) => c.id).sort();
+    // Compare sorted ID sets so a drop+duplicate (same count, different ids) is caught.
+    assert.deepEqual(
+      actualIds,
+      expectedIds,
+      `servers[].ids must be exactly ${JSON.stringify(expectedIds)}; got ${JSON.stringify(actualIds)}`,
+    );
+    // Belt-and-suspenders: disabled config must not appear
+    assert.ok(
+      !actualIds.includes('disabled-server'),
+      `disabled-server must not appear in servers[]`,
+    );
+  } finally {
+    await agg.shutdown();
+  }
 });
