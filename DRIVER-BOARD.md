@@ -8044,4 +8044,4 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
-- **Next run:** Check GCD PR CI/review. Next candidate: GCE — freeze `cast:no_match` exact key set when both session and focus are active but the scope param is set to an unknown server (verifies scope key appears even when it scopes to nothing, session and focus contributions unchanged).
+- **Next run:** Check GCD PR CI/review. Next candidate: GCE — freeze `cast:no_match` exact key set for **session + focus + empty catalog + scope** → `base + sessionContext + scope`, **no** `suggestions`. GCD-2 covered no-catalog without scope; GCD-3/GCD-5 covered catalog-match with scope; the no-catalog + scope path (scope key appears but suggestions stays absent) is untested.
