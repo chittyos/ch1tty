@@ -159,7 +159,7 @@ function makeAgg(opts: { textTools?: boolean } = {}): Aggregator {
     embedEnabled: false,
     ledgerDlqPath: dlq(),
     suggestionsCatalog: CATALOG,
-    coordinator: new KeywordOnlyCoordinator('gbi', dlq()),
+    coordinator: new KeywordOnlyCoordinator({}, { enabled: false }, dlq()),
   });
 }
 
@@ -216,9 +216,8 @@ describe('GBI — cast:chain_executed conditional key set', () => {
   test('GBI-3: active sessionId adds exactly sessionContext — 11 keys', async () => {
     const agg = makeAgg({ textTools: true });
     const SESSION = 'gbi-session-probe';
-    // First call registers the session in the coordinator
-    await chainExecuted(agg, { sessionId: SESSION });
-    // Second call has the session registered so sessionContext is populated
+    // Aggregator lazily calls onSessionStart before the cast handler (lines 588-592),
+    // so the first call with a new sessionId already includes sessionContext.
     const body = await chainExecuted(agg, { sessionId: SESSION });
     assertExactKeys(body, CHAIN_KEYS_WITH_SESSION, 'GBI-3');
     const sc = body['sessionContext'] as Record<string, unknown>;
