@@ -7777,3 +7777,26 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
 - **Next run:** Check GBJ PR #1511 CI/review. Next candidate: GBK — freeze `cast:no_match` scope key set (scopeAnnotation conditional: when servers= or categories= param is passed, adds `scope` to no_match; no existing test covers this).
+
+---
+
+### Run ~1790 — 2026-09-26T (automated run)
+
+- **Workstream:** GBJ follow-up — address Codex P2 review findings on PR #1511
+- **Branch/PR:** `auto/GBJ-nomatch-conditional-keys-drift-guard` → **PR #1511** (updated, commit 54de1b1)
+- **Build:** tsc clean | **Tests:** 4883 pass / 0 fail / 3 skip (+2 vs 4881 baseline: GBJ-6 + GBJ-7)
+- **Actions this run:**
+  - Resumed on GBJ branch; read 4 Codex P2 findings from PR #1511 review threads.
+  - **Finding #1 (catalog injection):** Fixed — `makeAgg` now injects `focusProfiles` and `suggestionsCatalog` inline; no CWD dependency.
+  - **Finding #2 (coordinator isolation):** Standing down — GU suite also has no coordinator injection; `CH1TTY_USE_OLLAMA_BRAIN=1` not set in CI; nonsense intent won't match fixture tools.
+  - **Finding #3 (+explain+session):** Fixed — added `NO_MATCH_EXPLAIN_SESSION` frozen key set and GBJ-6 test.
+  - **Finding #4 (per-call focus arg):** Fixed — added GBJ-7 test using per-call `focus: 'code'` arg on a no-constructor-focus aggregator.
+  - Replied to all 4 review threads; resolved threads for #1, #3, #4.
+  - Pushed commit 54de1b1; CI running (CodeQL checks).
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1790 runs; burning compute
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+- **Next run:** Check GBJ PR #1511 CI/review after 54de1b1. Next candidate: GBK — freeze `cast:no_match` scope key set (when servers=/categories= param adds `scope` to the response).
