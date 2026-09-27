@@ -8040,3 +8040,29 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GCE PR #1536 CI/review. Next candidate: GCF — freeze `cast:executed` top-level key set when session is active (no focus): base + sessionContext. GBZ froze executed+focus (no session); GCF closes the session-only executed path.
+
+---
+
+### Run ~1815 — 2026-09-27T (automated run)
+
+- **Workstream advanced:** GCL — freeze `search tools[]` entry minimum required key set and value types (5 tests)
+- **Branch/PR:** `auto/GCL-search-tools-entry-required-keyset` → **PR #1545** (https://github.com/chittyos/ch1tty/pull/1545)
+- **Build:** tsc clean | **Tests:** GCL adds 5; CI pending on PR #1545
+- **Actions this run:**
+  - Startup: continued from prior context. Branch `auto/GCL-search-tools-entry-required-keyset` at commit a07a28f.
+  - Applied 3 Codex P2 fixes to `test/gcl-search-tools-entry-required-keyset-drift-guard.test.ts`:
+    1. `makeAgg()`: added `focusProfiles: FINANCE_FOCUS_PROFILES` → GCL-5 now deterministic
+    2. GCL-2 no-query loop: added `REQUIRED_WITHOUT_QUERY` key assertions alongside score-absent check
+    3. GCL-4: separated `description` from non-empty check (type-only assertion; MCP ToolEntry allows `''`)
+  - All 5 GCL tests pass locally after fixes. Pushed commit 052e8b3.
+  - Replied to all 3 Codex review threads on PR #1545. Subscribed to PR activity.
+  - CI in progress (CodeQL + Analyze checks running).
+  - Notion board: still unavailable (plan limit hit). DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1815 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 32 open drift-guard test PRs (#1505–#1545), all CI green (pending on #1545), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GCL PR #1545 CI/review. Next candidate: GCM — freeze `search` top-level response key set when focus is active (base + focus + suggestions conditional keys; complement to GCL's per-entry freeze).
