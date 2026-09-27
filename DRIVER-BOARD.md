@@ -8162,3 +8162,35 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GCO PR #1548 CI/review. Next candidate: GCP — freeze `ch1tty/search` top-level `focus` field: present (string = active profile name) when a focus param is given; absent when no focus. Complements GCK (tools[] top-level keyset) and GCO (per-entry inFocus conditional).
+
+---
+
+### Run ~1819 — 2026-09-27T (automated run)
+
+- **Workstream advanced:** GCP — freeze `ch1tty/search` top-level `mode` and `offset` conditionals (5 tests)
+- **Branch/PR:** `auto/GCP-search-mode-offset-conditionals` → **PR #1549** (https://github.com/chittyos/ch1tty/pull/1549)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 from 4876 baseline on main)
+- **Actions this run:**
+  - Startup: pulled main to eef0110 (run ~1818). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Read DRIVER-BOARD.md + CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE (56/87 fields). 0 violations on main.
+  - Checked open PRs: 20 open (#1529–#1548), all GC* drift-guard test additions awaiting human merge.
+  - Previous GCO (PR #1548) froze `inFocus` field conditional in search tools[] entries.
+  - Identified GCP gap: No test on main freezes two remaining top-level search response conditionals after GCK–GCO:
+    - `mode` conditional: emitted as exactly the string `'partial'` when OR/partial-fallback fires (multi-term query, AND = 0, OR > 0); absent on AND match. Source: `src-stdio/aggregator.ts:861`.
+    - `offset` conditional: emitted with caller-supplied numeric value when `offset > 0`; absent when 0/default. Source: `src-stdio/aggregator.ts:860`.
+  - Wrote `test/gcp-search-mode-offset-conditionals.test.ts` (5 tests: GCP-1..5):
+    - GCP-1: AND query matching ≥ 1 tool → `mode` key ABSENT
+    - GCP-2: multi-term query with 0 AND matches → `mode === 'partial'` (OR fallback fires)
+    - GCP-3: `mode` value is exactly the string `'partial'` (not `'or'`, `true`, or `1`)
+    - GCP-4: search with no explicit offset → `offset` key ABSENT
+    - GCP-5: search with offset:N (N > 0) → `offset` key present and equals N exactly
+  - All 5 pass. Full suite: 4881/0/3 (+5). Pushed and opened PR #1549.
+  - Notion board: still unavailable (plan limit hit). DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1819 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 36 open drift-guard test PRs (#1514–#1549), all CI-green (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GCP PR #1549 CI/review. Next candidate: GCQ — freeze `ch1tty/search` top-level `focus` field value: present as a string equal to the active profile name when focus is given; absent when no focus. Complements GCK (keyset with focus present) by asserting the value type and exact equality. Also candidate: GCR — freeze `ch1tty/search` top-level `inFocusOnly` conditional: present as `true` only when both `inFocusOnly: true` and a focus profile are active; absent otherwise.
