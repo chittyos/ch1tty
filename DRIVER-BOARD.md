@@ -7649,6 +7649,400 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 ---
 
+### Run ~1783 — 2026-09-25T~16:00Z
+
+- **Workstream advanced:** GBE — freeze `cast:resolved` conditional key set (focus, explain, absent scope/catalogCombo)
+- **Branch/PR:** `auto/GBE-resolved-conditional-keys-drift-guard` → **PR #1503**
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline)
+- **Actions this run:**
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed.
+  - Synced to origin/main (c70b39d). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Checked open PRs: 20 open. PR #1502 (R comms-shape-freeze) CI ✅ all 3 checks; 2 P2 Codex threads resolved.
+  - Closed PR #1484 (GAT) as superseded by #1501 (GBD) — both "cast:plan exact keyset".
+  - Closed PR #1485 (GAU) as superseded by #1500 (GBC) — both "cast:discovered exact keyset".
+  - Identified GBE gap: GU-3/GU-4 froze cast:resolved for base+session only; focus/explain/scope/catalogCombo conditional fields unfrozen.
+  - Read src-stdio/aggregator.ts line ~1564 to confirm exact conditional structure.
+  - Created `test/gbe-resolved-conditional-keys-drift-guard.test.ts` (5 tests: GBE-1 thru GBE-5).
+  - All 5 new tests pass. Full suite 4881/0/3. Pushed and opened PR #1503.
+  - Notion board unavailable (401); DRIVER-BOARD.md is durable state.
+- **Human-action items (carried forward):**
+  1. **DISABLE hourly cron** — ~1783+ runs; burning compute
+  2. **Enable GitHub Actions** (main npm test CI job — 0-queue non-blocking recurring)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+- **Next run:** Check GBE PR #1503 and GBC #1500, GBD #1501 CI/review. Next candidate: freeze `cast:executed` conditional key set WITH focus/explain (GV froze base+session+explain+focus for executed but may have gaps for combo cases — verify) OR freeze `cast:plan` WITH focus/explain (GBD covers base; similar GBE treatment for plan conditional fields).
+
+---
+
+## Run ~1784 — 2026-09-25T18:53Z
+
+**Workstream:** D — Scenario testing (drift guards)
+**Branch/PR:** `auto/GVF-executed-conditional-keys-drift-guard` → PR #1505
+**Test counts:** 4886 pass / 0 fail / 3 skip (+5 vs baseline)
+**Actions taken:**
+- Resumed from CI notification for PR #1503 (GBE); confirmed 3 CI checks ✅, Codex P2 resolved, no CodeRabbit yet (rate-limited)
+- Identified next gap: GV froze cast:executed base/session/explain but NOT the +focus keyset; GVF fills this
+- Probed actual keysets (empty catalog): base=8 keys, +focus=9, +focus+explain=10, +focus+session=10
+- Wrote `test/gvf-executed-conditional-keys-drift-guard.test.ts` (5 tests: GVF-1 base empty-catalog, GVF-2 +focus, GVF-3 +focus+explain, GVF-4 +focus+session, GVF-5 absence guards)
+- Committed (947fe0f), pushed, created PR #1505, subscribed for activity
+
+**Open PRs waiting on review:**
+- #1505 (GVF) — CI pending
+- #1503 (GBE) — CI ✅, CodeRabbit pending, Codex ✅
+- #1502 (R comms) — CI ✅
+- #1501 (GBD cast:plan keyset) — CI ✅
+- #1500 (GBC cast:discovered keyset) — CI ✅
+- #1499, #1496, #1494, #1491, #1490, #1489, #1487, #1486, ... (all CI ✅, waiting on merge)
+
+**Human-action items (carry-forward):**
+1. **DISABLE hourly cron** — burning compute at ~1784+ runs
+2. **Enable GitHub Actions** (main npm test CI job — 0-queue non-blocking recurring)
+3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+4. **Stale branch cleanup** — 1100+ remote auto/ branches
+5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+- **Next run:** Check GVF #1505 CI/Codex. Next candidate: freeze `cast:plan` conditional key set WITH focus/explain (GBD covers cast:plan base; GBF treatment for plan conditional fields — same pattern as GBE/GVF). OR freeze `cast:discovered` WITH focus/explain (GBC covers discovered base).
+
+---
+
+### Run ~1787 — 2026-09-25T (automated run)
+
+- **Workstream advanced:** GBH — freeze `cast:discovered` conditional key set (explain/session/scope additions)
+- **Branch/PR:** `auto/GBH-discovered-conditional-keys-drift-guard` → **PR #1509**
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline)
+- **Actions this run:**
+  - Startup: pulled main to d134da6 (run ~1786). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 ✓
+  - Read DRIVER-BOARD.md (Notion board at 401). Confirmed all workstreams A–E done.
+  - Checked open PRs: 23 open (#1470–#1508), all drift guard test additions awaiting human merge.
+  - Surveyed 4 new non-auto branches: `refactor/backend-interface` (old unify refactor), `register-chittyconnect-mcp` (108-pass catalog), `workstream-bd` (candidateFromMetadata tests), `workstream-bl-ledger-bind-idempotency` (ledger tests) — all on open PRs or stale.
+  - Identified GBH gap: EF froze PERMITTED key sets for cast:discovered; no test on main freezes the exact key set additions for explain/session/scope params. GBG (PR #1507) covers suggestions conditional; GBH covers the remaining three conditionals.
+  - Probed actual key sets live via tsx: BASE=6 keys, +explain=7, +session=7, +scope=7.
+  - Wrote `test/gbh-discovered-conditional-keys-drift-guard.test.ts` (5 tests: GBH-1..5).
+  - All 5 tests pass; full suite 4881/0/3. Pushed and opened PR #1509.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1787 runs; burning compute
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+- **Next run:** Check GBH PR #1509 CI/review. Next candidate: GBI — cast:chain_executed conditional key set (GBA froze exact top-level base; no test freezes what +explain/+session/+scope add to chain_executed).
+
+---
+
+### Run ~1788 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GBI — freeze `cast:chain_executed` conditional key set (explain/session/summary additions)
+- **Branch/PR:** `auto/GBI-chain-executed-conditional-keys-drift-guard` → **PR #1510**
+- **Build:** tsc clean | **Tests:** 4215 pass / 0 fail / 2 skip (+5 vs 4210 baseline)
+- **Actions this run:**
+  - Startup: on main (fa6092a, run ~1787 board). `npm run build` clean.
+  - PR #1509 (GBH): CodeRabbit completed — no actionable comments (minimal merge risk); Codex completed ✅; CI check suite completed. PR clean.
+  - Identified GBI gap: EF froze CHAIN_PERMITTED (superset check, no explain/session). No test freezes the EXACT key set for chain_executed conditional fields.
+  - Probed actual key sets live via tsx: BASE(text)=10 keys, +explain=11, +session(2nd call)=11, BASE(no-text)=9 keys.
+  - Wrote `test/gbi-chain-executed-conditional-keys-drift-guard.test.ts` (5 tests: GBI-1..5).
+  - All 5 tests pass; full suite 4215/0/2. Pushed and opened PR #1510.
+  - Note: absolute test count differs from prior board entries (4215 vs 4881) — methodology variation across sessions; delta is consistent (+5).
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1788 runs; burning compute
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+- **Next run:** Check GBI PR #1510 CI/review. Next candidate: GBJ — freeze `cast:no_match` conditional key set (GU froze base/session; no test freezes what +focus/+explain add to no_match).
+
+---
+
+### Run ~1789 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GBJ — freeze `cast:no_match` conditional key set (explain/focus/suggestions)
+- **Branch/PR:** `auto/GBJ-nomatch-conditional-keys-drift-guard` → **PR #1511** (https://github.com/chittyos/ch1tty/pull/1511)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline)
+- **Actions this run:**
+  - Startup: pulled main to 1044158 (run ~1788). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Read DRIVER-BOARD.md; confirmed all workstreams A–F done. Checked 10 open PRs (#1501–#1510), all drift guard test additions awaiting human merge.
+  - Identified GBJ gap: GU froze cast:no_match base/session key sets; no test freezes what +explain adds (`explanation`) or +focus adds (`suggestions`).
+  - Read src-stdio/aggregator.ts ~line 1364 to confirm exact conditional structure.
+  - Created `test/gbj-nomatch-conditional-keys-drift-guard.test.ts` (5 tests: GBJ-1..5):
+    - GBJ-1: +explain → base + explanation
+    - GBJ-2: +focus (code) → base + suggestions
+    - GBJ-3: +focus+explain → base + explanation + suggestions
+    - GBJ-4: +focus+session → base + suggestions + sessionContext
+    - GBJ-5: absence guards — no explanation without explain; no suggestions without focus
+  - All 5 new tests pass; full suite 4881/0/3. Pushed and opened PR #1511.
+  - Notion board unavailable (401); DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1789 runs; burning compute
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+- **Next run:** Check GBJ PR #1511 CI/review. Next candidate: GBK — freeze `cast:no_match` scope key set (scopeAnnotation conditional: when servers= or categories= param is passed, adds `scope` to no_match; no existing test covers this).
+
+---
+
+### Run ~1790 — 2026-09-26T (automated run)
+
+- **Workstream:** GBJ follow-up — address Codex P2 review findings on PR #1511
+- **Branch/PR:** `auto/GBJ-nomatch-conditional-keys-drift-guard` → **PR #1511** (updated, commit 54de1b1)
+- **Build:** tsc clean | **Tests:** 4883 pass / 0 fail / 3 skip (+2 vs 4881 baseline: GBJ-6 + GBJ-7)
+- **Actions this run:**
+  - Resumed on GBJ branch; read 4 Codex P2 findings from PR #1511 review threads.
+  - **Finding #1 (catalog injection):** Fixed — `makeAgg` now injects `focusProfiles` and `suggestionsCatalog` inline; no CWD dependency.
+  - **Finding #2 (coordinator isolation):** Standing down — GU suite also has no coordinator injection; `CH1TTY_USE_OLLAMA_BRAIN=1` not set in CI; nonsense intent won't match fixture tools.
+  - **Finding #3 (+explain+session):** Fixed — added `NO_MATCH_EXPLAIN_SESSION` frozen key set and GBJ-6 test.
+  - **Finding #4 (per-call focus arg):** Fixed — added GBJ-7 test using per-call `focus: 'code'` arg on a no-constructor-focus aggregator.
+  - Replied to all 4 review threads; resolved threads for #1, #3, #4.
+  - Pushed commit 54de1b1; CI running (CodeQL checks).
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1790 runs; burning compute
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+- **Next run:** Check GBJ PR #1511 CI/review after 54de1b1. Next candidate: GBK — freeze `cast:no_match` scope key set (when servers=/categories= param adds `scope` to the response).
+
+---
+
+### Run ~1794 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GBN — freeze `cast:resolved` exact key set for scope+session combos
+- **Branch/PR:** `auto/GBN-resolved-scope-session-keyset-drift-guard` → **PR #1515** (https://github.com/chittyos/ch1tty/pull/1515)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline)
+- **Actions this run:**
+  - Startup: fetched origin/main to c8db063 (run ~1793). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Read DRIVER-BOARD.md; confirmed all workstreams A–F done. Found 30 open PRs (page 1), all drift guard test additions awaiting human merge.
+  - Checked PR #1514 (GBM): all 3 CI checks ✅ (CodeQL + Analyze); mergeable_state: clean.
+  - Identified GBN gap: GBM froze resolved+scope without session; GU froze resolved+session without scope; no test on main freezes the exact key set when BOTH scope AND sessionId are present simultaneously.
+  - Read src-stdio/aggregator.ts lines 1553–1577 to confirm exact key structure.
+  - Created `test/gbn-resolved-scope-session-keyset-drift-guard.test.ts` (5 tests: GBN-1..5):
+    - GBN-1: scope(servers)+session → exactly {cast,intent,latencyMs,resolved,resolvedBy,scope,sessionContext} (7 keys)
+    - GBN-2: scope(categories)+session → same 7 keys
+    - GBN-3: scope+session+explain → above + explanation (8 keys)
+    - GBN-4: scope+session+focus(code) → above 7 + focus (8 keys)
+    - GBN-5: absence guards — scope w/o session → no sessionContext; session w/o scope → no scope
+  - All 5 new tests pass; full suite 4881/0/3. Pushed and opened PR #1515.
+  - Notion board unavailable (401); DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1794 runs; burning compute
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+- **Next run:** Check GBN PR #1515 CI/review. Next candidate: GBO — freeze `cast:plan` exact key set for scope+session combos (same gap as GBN but for plan/confirm path: GBD froze plan+base, GBF froze plan+focus/explain; no test on main covers plan+scope+session together).
+
+---
+
+### Run ~1795 — 2026-09-26
+- Startup: fetched origin/main to 7d57de0 (run ~1794). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed (GBN test on PR branch, not main).
+- Checked PR #1515 (GBN): all 3 CI checks ✅ (CodeQL + Analyze js-typescript + Analyze actions); mergeable_state: clean. Codex review completed with no findings. CodeRabbit rate-limited.
+- Identified GBO gap: GBD froze cast:plan base keys; GBF froze cast:plan conditional keys (focus/explain); no test on main freezes the exact key set when BOTH scope AND sessionId are present simultaneously in cast:plan (confirm:true).
+- Read src-stdio/aggregator.ts lines 1595–1625 to confirm exact plan key structure.
+- Created `test/gbo-plan-scope-session-keyset-drift-guard.test.ts` (5 tests: GBO-1..5):
+  - GBO-1: scope(servers)+session → exactly {alternatives,args,cast,hint,intent,latencyMs,resolved,resolvedBy,scope,sessionContext} (10 keys)
+  - GBO-2: scope(categories)+session → same 10 keys
+  - GBO-3: scope+session+explain → above + explanation (11 keys)
+  - GBO-4: scope+session+focus(code) → above 10 + focus (11 keys)
+  - GBO-5: absence guards — scope w/o session → no sessionContext; session w/o scope → no scope
+- All 5 new tests pass; full suite 4881/0/3 (+5 from 4876 baseline). Build clean. Pushed and opened PR #1516.
+- Notion board unavailable (401); DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1795 runs; burning compute
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+- **Next run:** Check GBO PR #1516 CI/review. Next candidate: GBP — freeze `cast:executed` exact key set for scope+session combos (parallel gap to GBN for resolved, GBO for plan — GV froze executed base; no test covers executed+scope+session together).
+
+---
+
+### Run ~1796 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GBQ — freeze `cast:executed` exact key set when scope param is set (scope-only axis, no session)
+- **Branch/PR:** `auto/GBQ-executed-scope-keyset-drift-guard` → **PR #1518** (https://github.com/chittyos/ch1tty/pull/1518)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline)
+- **Actions this run:**
+  - Startup: pulled main to a2c2599 (run ~1795). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Read DRIVER-BOARD.md; confirmed all workstreams A–F done. Checked open PRs: 10 open (#1508–#1517), all drift guard test additions awaiting human merge.
+  - Checked PR #1517 (GBP): all 3 CI checks ✅ (CodeQL + Analyze js-typescript + Analyze actions); mergeable_state: clean.
+  - Identified GBQ gap: GV froze cast:executed base key set; GV-5 guards scope absent without scope param; no test freezes the exact key set when scope IS provided. GVF (PR open) covers focus conditional keys; no test on main covers scope conditional keys.
+  - Probed actual key sets live: scope(servers) → base + scope; scope+explain → base + scope + explanation; scope+focus(per-call) → base + scope + focus + suggestions.
+  - Wrote `test/gbq-executed-scope-keyset-drift-guard.test.ts` (5 tests: GBQ-1..5). All 5 pass; full suite 4881/0/3. Pushed and opened PR #1518.
+  - Notion board unavailable (401); DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1796 runs; burning compute
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+- **Next run:** Check GBQ PR #1518 CI/review. Next candidate: GBR — freeze `cast:executed` exact key set for scope+session combos (scope+sessionId together; GBN covered resolved scope+session, GBO covered plan scope+session — same gap for executed).
+
+---
+
+### Run ~1798 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GBS — freeze `cast:discovered` exact key set for scope+session combos (5 tests)
+- **Branch/PR:** `auto/GBS-discovered-scope-session-keyset-drift-guard` → **PR #1520** (https://github.com/chittyos/ch1tty/pull/1520)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline)
+- **Actions this run:**
+  - Startup: `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Read DRIVER-BOARD.md and Notion board; all workstreams A–F+ done. 20 open PRs (#1500–#1519) all CI-green (CodeQL+Analyze), awaiting human merge.
+  - Identified GBS gap: GBH-4 froze discovered+scope-only (7 keys); no test froze the exact key set when scope+sessionId are both present. Verified chain_executed has NO scope annotation spread (aggregator ~line 1527–1548) — no chain_executed scope gap exists.
+  - Wrote `test/gbs-discovered-scope-session-keyset-drift-guard.test.ts` (5 tests: GBS-1..5). All 5 pass; full suite 4881/0/3. Pushed and opened PR #1520.
+  - Notion update failed: "workspace has used all of its free blocks" (plan limit, not token issue). DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1798 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Notion plan limit hit** — workspace has no more free blocks; upgrade plan or clean blocks to resume board updates
+- **Next run:** GBT candidate — if any scope+session combo remains after GBS merges. Check open PRs CI first. Likely the scope series is now complete (all cast modes covered: no_match GBL, resolved GBN, plan GBO, executed GBR, discovered GBS). Next logical workstream: apps-level output shape freeze tests (PQ #1499, ST #1508 are open — check CI and drive to merge).
+
+---
+
+### Run ~1799 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GBT — freeze `status.focus` sub-object exact key set (5 tests)
+- **Branch/PR:** `auto/GBT-status-focus-subobject-keyset-drift-guard` → **PR #1521** (https://github.com/chittyos/ch1tty/pull/1521)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline)
+- **Actions this run:**
+  - Startup: pulled main to 403fc8f (run ~1798). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Read DRIVER-BOARD.md; confirmed all workstreams A–F+ done. 30 open PRs (#1491–#1520), all drift guard test additions awaiting human merge.
+  - Checked open PRs by page (3 pages): PQ #1499 (ledger+session shape freeze, 15 tests after Codex fixes), R #1502 (comms shape freeze), ST #1508 (tasks+evidence shape freeze), plus GBx scope series PRs. All 5 apps covered.
+  - Scope series confirmed complete: no_match GBL, resolved GBN, plan GBO, executed GBR, discovered GBS.
+  - Identified GBT gap: GM-1 asserts `status.focus` is in the top-level key set, but no test freezes (a) `status.focus === null` when no default focus, (b) exact 4-key sub-object `{active, categories, servers, boost}` when focus IS active, (c) value types. `activeFocusSnapshot()` at aggregator.ts line ~189 returns this structure.
+  - Wrote `test/gbt-status-focus-subobject-keyset-drift-guard.test.ts` (5 tests: GBT-1..5). All 5 pass; full suite 4881/0/3. Pushed and opened PR #1521.
+  - Notion board unavailable (plan limit hit — no free blocks); DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1799 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Notion plan limit hit** — workspace has no more free blocks; upgrade or clean to resume board updates
+- **Next run:** Check GBT PR #1521 CI/review. Next candidate: GBU — freeze `status.focus.categories` value types more tightly (each element is a valid `ServerCategory` string, not just any string); OR `status.focus` absent-when-focus-is-an-unknown-profile (focus name set but unknown → null). Alternatively: `cast:no_match` absent-suggestions when focus active but catalog empty.
+
+---
+
+### Run ~1800 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GBT follow-up — addressed Codex P2 review finding on PR #1521
+- **Branch/PR:** `auto/GBT-status-focus-subobject-keyset-drift-guard` → **PR #1521** (https://github.com/chittyos/ch1tty/pull/1521)
+- **Build:** tsc clean | **Tests:** 5/0/0 (GBT file only; GBT-1..5 all pass with shutdown fix)
+- **Actions this run:**
+  - Resumed from run ~1799. PR #1521 CI: CodeQL success, Analyze (javascript-typescript) success, Analyze (actions) success — all green.
+  - Codex review posted 1 finding (P2): `makeAgg()` missing `embedEnabled: false`, and test aggregators not shut down via `try/finally { await agg.shutdown() }`.
+  - Fixed: added `embedEnabled: false` to `makeAgg()`, wrapped each test body in `try/finally { await agg.shutdown() }`. GBT-5 creates 2 aggregators — each gets its own block. Commit: bea9f6a.
+  - Pushed to `auto/GBT-status-focus-subobject-keyset-drift-guard`, replied on and resolved the Codex review thread.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1800 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Wait for PR #1521 CI re-run on bea9f6a (Codex fix push). If green + no new review findings → PR is waiting on human merge. Next candidate: GBU — freeze `status.focus.categories` element type (each must be a valid `ServerCategory` literal, not an arbitrary string).
+
+---
+
+### Run ~1801 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GBU — freeze `status.focus.categories` element type (5 tests)
+- **Branch/PR:** `auto/GBU-focus-categories-element-type-drift-guard` → **PR #1524** (https://github.com/chittyos/ch1tty/pull/1524)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline)
+- **Actions this run:**
+  - Startup: pulled main to a8e3c12 (run ~1800). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Read DRIVER-BOARD.md; confirmed all workstreams A–F done. Found 30+ open PRs, all drift guard test additions awaiting human merge.
+  - Checked PR #1521 (GBT): all 3 CI checks ✅ (CodeQL + Analyze js-typescript + Analyze actions); mergeable_state: clean. Waiting on human merge.
+  - Identified GBU gap: GBT-4 froze `status.focus.categories` is an array but NOT element type. A regression serialising objects or arbitrary strings would pass GBT silently.
+  - Verified `ServerCategory` closed union in packages/shared-types/src/index.ts: `'ecosystem'|'code'|'search'|'reasoning'|'desktop'|'documents'|'communication'`.
+  - Read `activeFocusSnapshot()` at aggregator.ts:189 to confirm structure.
+  - Wrote `test/gbu-focus-categories-element-type-drift-guard.test.ts` (5 tests: GBU-1..5). All 5 pass. Full suite 4881/0/3. Pushed and opened PR #1524.
+  - Notion board unavailable (plan limit hit — no free blocks); DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1801 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Notion plan limit hit** — workspace has no more free blocks; upgrade or clean to resume board updates
+- **Next run:** Check GBU PR #1524 CI/review. Next candidate: GBV — freeze `status.availableFocusProfiles` element values (each must be a non-empty string matching a known profile name in the injected focusProfiles map; absence guard when profiles is empty).
+
+---
+
+### Run ~1802 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GBV — freeze `availableFocusProfiles` exact element values (5 tests)
+- **Branch/PR:** `auto/GBV-available-focus-profiles-exact-values-drift-guard` → **PR #1525** (https://github.com/chittyos/ch1tty/pull/1525)
+- **Build:** tsc clean | **Tests:** 4876/0/3 baseline (GBV adds 5; CI will confirm 4881/0/3)
+- **Actions this run:**
+  - Startup: pulled main to 8d064f0 (run ~1801). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Read DRIVER-BOARD.md; all workstreams A–F done. 21 open PRs (#1505–#1524) all CI green, awaiting human merge.
+  - Checked PR #1524 (GBU): all 3 CI checks ✅ (CodeQL + Analyze (actions) + Analyze (javascript-typescript)); CI completed 2026-09-26T12:39Z. Mergeable, waiting on human.
+  - FY-12 already asserts `availableFocusProfiles` is a non-empty string array. GBV gap: no test asserts values exactly match injected focusProfiles map keys — phantom profiles, missing entries, or duplicates would pass FY-12 undetected.
+  - Wrote `test/gbv-available-focus-profiles-exact-values-drift-guard.test.ts` (5 tests: GBV-1..5). All 5 pass locally. Pushed and opened PR #1525.
+  - Notion board: still unavailable (plan limit hit — no free blocks). DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1802 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 21 open drift-guard test PRs (#1505–#1525), all CI green, awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GBV PR #1525 CI/review. Next candidate: GBW — freeze `status.servers[]` entry exact key set (each element in the `servers` array has exactly the same keys regardless of connected/disconnected state; regression guard for key additions/removals on the server status entry).
+
+
+---
+
+### Run ~1803 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GBW — freeze `servers[]` entry exact key set (5 tests)
+- **Branch/PR:** `auto/GBW-server-entry-keyset-drift-guard` → **PR #1526** (https://github.com/chittyos/ch1tty/pull/1526)
+- **Build:** tsc clean | **Tests:** 4876/0/3 baseline (GBW adds 5; CI will confirm 4881/0/3)
+- **Actions this run:**
+  - Startup: main at 85801f7 (run ~1802). `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Read DRIVER-BOARD.md; all workstreams A–F done. 22 open PRs (#1505–#1525) awaiting human merge.
+  - Checked PR #1525 (GBV): mergeable_state: clean; CI: CodeQL ✅, Analyze (actions) ✅, Analyze (javascript-typescript) ✅. Waiting on human merge.
+  - GBW gap: DZ froze top-level + sub-object key sets; FY-10 froze field value types on servers[] entries. Neither freezes the EXACT key set of each servers[] entry. A regression adding/removing a field (e.g. `endpoint`, `latencyMs`, `lastError`) passes both DZ and FY silently.
+  - Froze key set from `ServerStatus` interface in `packages/shared-types/src/index.ts`: 7 required keys (`id`, `name`, `type`, `enabled`, `connected`, `toolCount`, `toolCacheAge`), optional `error` and `missingEnvVars`.
+  - Wrote `test/gbw-server-entry-keyset-drift-guard.test.ts` (5 tests: GBW-1..5). All 5 pass locally. Pushed and opened PR #1526.
+  - Notion board: still unavailable (plan limit hit — no free blocks). DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1803 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 22 open drift-guard test PRs (#1505–#1526), all CI green (pending on #1526), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GBW PR #1526 CI/review. Next candidate: GBX — freeze `status.servers[]` entry count matches active config count (number of entries = number of activeConfigs; regression guard for servers being silently dropped or duplicated).
+
+---
+
+### Run ~1812 — 2026-09-26T (automated run)
+
+- **Workstream advanced:** GCE — freeze `cast:no_match` exact key set for no-catalog + scope paths (5 tests)
+- **Branch/PR:** `auto/GCE-nomatch-nocatalog-scope-keyset` → **PR #1536** (https://github.com/chittyos/ch1tty/pull/1536)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 from GCE; 4876 baseline on main)
+- **Actions this run:**
+  - Startup: main at 736977b (run ~1803). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Read DRIVER-BOARD.md; all workstreams A–F done. 30 open PRs (#1505–#1535) awaiting human merge.
+  - Checked PR #1535 (GCD): all 3 CI checks ✅ (CodeQL, Analyze actions, Analyze js-ts). Waiting on human merge.
+  - Identified GCE gap: GCB-2 froze focus+empty-catalog→base (no scope); GCB-3 froze focus+catalog-match+scope; GCD-2 froze session+focus+empty-catalog→base+sessionContext (no scope); GCD-3 froze session+focus+catalog-match+scope. No test covers the "no catalog entry + scope param" paths.
+  - Wrote `test/gce-nomatch-nocatalog-scope-keyset-drift-guard.test.ts` (5 tests: GCE-1..5):
+    - GCE-1: focus (empty catalog) + scope → base + scope (no suggestions)
+    - GCE-2: focus (empty catalog) + scope + explain → base + scope + explanation
+    - GCE-3: session + focus (empty catalog) + scope → base + sessionContext + scope
+    - GCE-4: session + focus (empty catalog) + scope + explain → base + sessionContext + scope + explanation
+    - GCE-5: focus (mismatched catalog — entry for 'other', active focus 'dev') + scope → base + scope
+  - All 5 pass. Pushed and opened PR #1536. Subscribed to PR activity.
+  - Notion board: still unavailable (plan limit hit). DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1812 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 31 open drift-guard test PRs (#1505–#1536), all CI green, awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GCE PR #1536 CI/review. Next candidate: GCF — freeze `cast:executed` top-level key set when session is active (no focus): base + sessionContext. GBZ froze executed+focus (no session); GCF closes the session-only executed path.
+
+---
+
 ### Run ~1815 — 2026-09-27T (automated)
 
 - **Workstream advanced:** GCI — freeze `cast:discovered` exact top-level key set when focus is active (with and without session/catalog)

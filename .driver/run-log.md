@@ -1659,3 +1659,111 @@
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
 
 **Next run:** Check PR #1484 CI/review. Next gap after GAT: GAU — investigate remaining cast response shape invariants not yet frozen (check GX content: cast:plan alternatives always-present invariant, which was closed PR #1457 without merging — could be a GAU candidate).
+
+### 2026-09-25 — run ~1769 — GAU PR #1504 opened
+
+**What was done (this run):**
+- Startup: main at bea9239 (run ~1768). npm run build clean. Tests: 4876/0/3 ✓
+- Notification: PR #1484 (GAT) was CLOSED without merging. Per protocol, not reopened.
+- Open PRs (22 total): #1470–#1482, #1486–#1502 series (GAH–GAS, GAV–GBD, PQ, R) — all awaiting human merge.
+- Gap identified: **GAU** = cast:plan always-present vs cast:executed conditional `alternatives` asymmetry.
+  - aggregator.ts ~line 1616: `alternatives,` (unconditional — always present in cast:plan, even as [])
+  - aggregator.ts ~line 1665: `...(alternatives.length > 0 ? { alternatives } : {})` (conditional — absent in cast:executed when empty)
+  - No prior test exercises the single-tool edge case. GV/GBD both use stripe fixture (3 tools → always non-empty).
+- Created `auto/GAU-alternatives-present-absent-asymmetry` from origin/main.
+- Wrote `test/gau-alternatives-present-absent-asymmetry.test.ts` — 5 tests (GAU-1..5):
+  - GAU-1: cast:plan + single-tool backend → alternatives: [] always present
+  - GAU-2: cast:plan + multi-tool backend → alternatives non-empty always present
+  - GAU-3: cast:executed + single-tool backend → alternatives KEY ABSENT
+  - GAU-4: cast:executed + multi-tool backend → alternatives key present, non-empty
+  - GAU-5: cast:plan alternatives is always Array.isArray regardless of tool count
+- Local run: **5 pass / 0 fail** ✓. Full suite: 4881/0/3.
+- Pushed branch, opened **PR #1504**, subscribed to CI.
+
+**Open PRs (all awaiting human merge):**
+- #1470 (GAH) through #1482 (GAS): GAH–GAS drift guards
+- #1473 (GAK): CI apps-build-and-test workspace symlink fix (should go first)
+- #1486 (GAV) through #1502 (R): GAV–GAZ, GBA–GBD, PQ, R drift guards
+- **#1504 (GAU): cast:plan/executed alternatives asymmetry ← THIS RUN**
+
+**Workstream status:**
+- [x] A–E, F (all phases), G-series through GAG + GT–GV (on main): done
+- [ ] **GAH–GAU, GAV–GBD, PQ, R: PRs open** — all validated locally; waiting human merge + GitHub Actions quota restoration
+
+**Human-action items (persistent):**
+1. **Merge PRs #1470–#1504** — GAH through GAU + later series; #1473 (GAK CI fix) should go first
+2. **DISABLE hourly cron** — ~1769 runs; all original workstreams complete
+3. **Enable GitHub Actions npm test CI** (currently only CodeQL; 0-job quota failure on all branches)
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Notion workspace** out of free blocks — upgrade plan
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+
+### 2026-09-25 — run ~1785 — GBF PR #1506 opened
+
+**What was done (this run):**
+- Startup: pulled main (was at c783f53, run ~1784). npm run build clean. Tests: 4876/0/3 ✓
+- Confirmed 5-tool surface invariant; buildCastExplanation metric freeze active (56/87 fields)
+- Open PRs (21 total): #1475–#1505 — all drift guard test additions, CI-green (CodeQL), awaiting human merge
+- Notion board update failed — workspace hit free-plan block limit (see Human-action item #5)
+- Gap identified: **GBF** = cast:plan conditional top-level key set
+  - No test on main freezes the exact top-level key set OR conditional additions for cast:plan
+  - GK covers value types (resolvedBy/latencyMs/intent); GS covers sessionContext value types
+  - A regression leaking annotation key or always including focus/explanation would pass all prior tests silently
+  - aggregator.ts ~1599: `...(focusName ? { focus } : {})`, `...(explanation ? { explanation } : {})`, `...(planSessionContext ? { sessionContext } : {})`
+- Created `auto/GBF-plan-conditional-keys-drift-guard` from origin/main
+- Wrote `test/gbf-plan-conditional-keys-drift-guard.test.ts` — 5 tests (GBF-1..5):
+  - GBF-1: cast:plan base has EXACTLY {alternatives,args,cast,hint,intent,latencyMs,resolved,resolvedBy} (8 keys)
+  - GBF-2: cast:plan WITH focus:'finance' adds exactly `focus` (base+1=9 keys)
+  - GBF-3: cast:plan WITH focus+explain:true adds exactly `focus`+`explanation` (base+2=10 keys)
+  - GBF-4: cast:plan WITH sessionId (no focus) adds exactly `sessionContext` (base+1=9 keys)
+  - GBF-5: cast:plan base does NOT contain scope/suggestions/resolvedFromCatalog/chainContinuation
+- Local run: **5 pass / 0 fail** ✓. Full suite: 4881/0/3 (+5 vs main).
+- Pushed branch, opened **PR #1506**, subscribed to CI.
+
+**Open PRs (all awaiting human merge):**
+- #1475 (GAM) through #1505 (GVF): 21 drift guard PRs, all CI-green (CodeQL)
+- **#1506 (GBF): cast:plan conditional keys ← THIS RUN**
+
+**Workstream status:**
+- [x] A–E, F (all phases), G-series through GV (on main): done
+- [ ] **GAM–GVF, GBF: PRs open** — all validated locally; waiting human merge
+
+**Human-action items (persistent):**
+1. **Merge PRs #1475–#1506** — GAM through GBF; all CI-green
+2. **DISABLE hourly cron** — ~1785 runs; all original workstreams complete
+3. **Enable GitHub Actions npm test CI** (currently only CodeQL)
+4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+5. **Upgrade Notion plan** — workspace out of free blocks (board updates failing)
+6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run:** Watch PR #1506 for CI/review. Next gap candidate: GBG — cast:discovered conditional key set (same pattern: no test on main freezes exact key set for discovered mode). Or apply Workstream L/O pattern to apps/session-coordinator-mcp tool layer.
+
+---
+
+## Run ~1793 — 2026-09-26T~03:45Z
+
+**Workstream:** D-extended (cast output-shape drift-guard series — GBM)
+**Branch/PR:** `auto/GBM-resolved-scope-keyset-drift-guard` → PR #1514
+
+**Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 from 4876)
+
+**What was done:**
+- Added `test/gbm-resolved-scope-keyset-drift-guard.test.ts` — 5 tests (GBM-1..5)
+- Freezes exact top-level key set of `cast:resolved` (dryRun:true) when `scope` param is set
+- Closes the gap complementary to GBK (cast:no_match +scope) for the resolved cast mode
+- GBM-1: +scope(servers:neon) → base + scope; GBM-2: +scope(categories:code) → base + scope
+- GBM-3: +scope+explain → base + scope + explanation; GBM-4: +scope+focus → base + scope + focus
+- GBM-5: absence guard — no scope without scope param; base matches GU-3 exactly
+- Catalog isolation: `suggestionsCatalog: {}` prevents non-deterministic catalogCombo addition
+
+**Open PRs (all awaiting human merge):**
+- #1504 (GAU) through #1514 (GBM): 11 drift guard PRs
+
+**Standing blockers (human action required):**
+1. GitHub Actions npm test CI disabled at org level (only CodeQL runs)
+2. Prod env vars missing (GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, etc.)
+3. Stale branch cleanup — 1100+ remote auto/ branches
+4. Hourly cron still firing — all original workstreams done; consider adding GBN+ to prompt
+
+**Next run:** GBN candidate — `cast:plan` or `cast:executed` exact key set when scope param set (same pattern applied to the next cast outcome type).
