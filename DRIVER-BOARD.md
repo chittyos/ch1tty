@@ -8100,3 +8100,34 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GCM PR #1546 CI/review. Next candidate: GCN — freeze `search tools[]` entry `score` field conditional: present (finite number in [0, 1.3]) when a query is given; absent when filtering by server or category only (no query). Closes the gap where silently dropping score on a query result, or adding score to a non-query result, would pass CI undetected.
+
+---
+
+### Run ~1817 — 2026-09-27T (automated run)
+
+- **Workstream advanced:** GCN — freeze `ch1tty/search` tools[] entry `score` field conditional (5 tests)
+- **Branch/PR:** `auto/GCN-search-score-conditional-drift-guard` → **PR #1547** (https://github.com/chittyos/ch1tty/pull/1547)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 from 4876 baseline on main)
+- **Actions this run:**
+  - Startup: pulled main to ca776da (run ~1816). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Read DRIVER-BOARD.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations on main.
+  - Checked open PRs: 10 open (#1537–#1546), all drift guard test additions awaiting human merge.
+  - Previous GCM (PR #1546) froze `recentlyUsed` conditional shapes in search tools[] entries.
+  - Identified GCN gap: No existing test freezes the `score` field conditional — silently dropping `score` on a query result, or adding `score` to a no-query filter result, would pass CI. `search-filters.test.ts` declares `score?: number` but asserts nothing about presence/absence.
+  - Source verified: `aggregator.ts:837` — `...(relevanceMap.size > 0 ? { score: ... } : {})` — score only present when relevanceMap is populated (i.e., query is given).
+  - Wrote `test/gcn-search-score-conditional-drift-guard.test.ts` (5 tests: GCN-1..5):
+    - GCN-1: query given → every entry has score key
+    - GCN-2: query given → score is finite number in [0, 1.3]
+    - GCN-3: category-only filter (no query) → score absent
+    - GCN-4: server-only filter (no query) → score absent
+    - GCN-5: query + category filter combined → score present
+  - All 5 pass. Full suite: 4881/0/3. Pushed and opened PR #1547. Subscribed to CI.
+  - Notion board: unavailable (plan limit hit). DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1817 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 34 open drift-guard test PRs (#1514–#1547), all CI green (pending on #1547), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GCN PR #1547 CI/review. Next candidate: GCO — freeze `ch1tty/search` tools[] entry `inFocus` field conditional: present (boolean true) when focus is active and the tool's server/category matches the active focus profile; absent when no focus is active; absent when focus is active but tool is out-of-focus.
