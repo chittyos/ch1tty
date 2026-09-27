@@ -1767,3 +1767,39 @@
 4. Hourly cron still firing — all original workstreams done; consider adding GBN+ to prompt
 
 **Next run:** GBN candidate — `cast:plan` or `cast:executed` exact key set when scope param set (same pattern applied to the next cast outcome type).
+
+---
+
+## Run ~1828 — 2026-09-27T~current
+
+**Workstream:** D-extended (search output-shape drift-guard series — GCZ)
+**Branch/PR:** `auto/GCZ-search-sessioncontext-exact-keyset` → PR #1560
+
+**Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 from 4876)
+
+**What was done:**
+- Added `test/gcz-search-sessioncontext-exact-keyset-drift-guard.test.ts` — 5 tests (GCZ-1..5)
+- Closes the gap in FF (`search-session-context.test.ts`): FF checks sessionContext field VALUES but NOT:
+  - Exact key set of sessionContext (a new field like `lastCallMs` would silently pass)
+  - Value type of callCount (a float/Infinity would pass FF's `=== 3` exact-count assertion)
+  - Element type of recentTools (FF checks inclusion/length, not namespaced `serverId/toolName` format)
+  - That callCount actually advances after real execute calls (not stuck at pre-session value)
+- GCZ-1: without activeSessionFocus → exactly {callCount, recentTools}
+- GCZ-2: with activeSessionFocus → exactly {activeSessionFocus, callCount, recentTools}
+- GCZ-3: recentTools items each contain exactly one '/' (namespaced format)
+- GCZ-4: callCount is a finite non-negative integer (Number.isInteger + isFinite + >= 0)
+- GCZ-5: callCount > 0 after at least one successful ch1tty/execute call
+- Source: src-stdio/aggregator.ts handleSearch + coordinator.getSessionContext
+
+**Open PRs (all awaiting human merge):**
+- #1504 (GAU) through #1514 (GBM): 11 earlier drift guard PRs
+- **#1560 (GCZ): sessionContext exact key set + value types ← THIS RUN**
+
+**Standing blockers (human action required):**
+1. GitHub Actions npm test CI disabled at org level (only CodeQL runs on all branches)
+2. Prod env vars missing (GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, etc.)
+3. Stale branch cleanup — 1100+ remote auto/ branches
+4. Hourly cron still firing — all original workstreams done; consider disabling or reducing cadence
+5. 20+ open PRs awaiting human merge (all CI-green on CodeQL, locally validated)
+
+**Next run:** GDA candidate — `ch1tty/execute` response exact top-level key set (similar gap pattern: existing tests verify content of execute response but no drift guard freezes its exact key set or value types).
