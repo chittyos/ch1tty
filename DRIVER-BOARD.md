@@ -8515,3 +8515,30 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GDG PR #1567 CI/review. Next GDH candidate: freeze `ch1tty/execute` `dryRun` response exact key sets — `dryRun:true` embeds sessionContext inside the dry_run JSON rather than as a separate appended item; the exact keys inside dry_run are not frozen by any prior test (GDC froze the non-dryRun key sets).
+
+---
+
+### Run ~1832 — 2026-09-27T (automated run)
+- **Workstream advanced:** GDI — freeze `ch1tty/search` tools[] `recentlyUsed` field — presence semantics and value types (5 tests)
+- **Branch/PR:** `auto/GDI-search-recentlyused-field-drift-guard` → **PR #1569** (https://github.com/chittyos/ch1tty/pull/1569)
+- **Build:** tsc clean | **Tests (main):** 4879 total / 4876 pass / 0 fail / 3 skip; GDI adds 5 (→ 4884/4881/0/3 on branch)
+- **Actions this run:**
+  - Startup: resumed from context compaction; git pull clean; build clean; tests 4876/0/3 on main.
+  - Read DRIVER-BOARD.md tail — prior run (~1831) was GDG (recentTools count-vs-recency ordering); 11 open PRs (#1556–#1567).
+  - Identified gap: `recentlyUsed` field in `ch1tty/search` tools[] has a three-way contract (object / boolean true / absent) completely unprotected by any prior test. EB only checks required keys; GH covers fixed fields only; GCN/GCO cover score/inFocus only.
+  - Verified source: `src-stdio/aggregator.ts` lines 820–841 — `recentlyUsed` is object `{callCount,lastUsedMs}` when `coordinator.getToolPattern()` returns a result, `true` when `recentServerIds.has(serverId)`, absent otherwise.
+  - Wrote `test/gdi-search-recentlyused-field-drift-guard.test.ts` (5 tests: GDI-1..5):
+    - GDI-1: No session → recentlyUsed absent from every tools[] entry
+    - GDI-2: Fresh session (no prior execute calls) → recentlyUsed absent
+    - GDI-3: After calling neon/list_projects → that entry has object form {callCount,lastUsedMs} with exactly those two keys
+    - GDI-4: After calling neon/list_projects → neon/run_sql gets exactly boolean true (server-level affinity)
+    - GDI-5: callCount is finite integer >=1; lastUsedMs is finite non-negative integer
+  - All 5 pass locally (ok 1545–1549). Full suite: 4884/4881/0/3. Pushed branch, opened PR #1569, subscribed to activity.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1832 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 12 open drift-guard test PRs (#1556–#1569), all CI-green (CodeQL), awaiting human merge. #1473 (GAK CI fix) should go first if still open.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GDI PR #1569 CI/review. Next GDJ candidate: freeze `ch1tty/execute` `dryRun` response exact key sets — `dryRun:true` returns a single-item content array with a JSON object whose top-level keys are not frozen by any prior test (GDC froze the non-dryRun execute key sets; GL froze dryRun tool/server value types but not the key set).
