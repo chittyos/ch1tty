@@ -8408,3 +8408,33 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GCX PR #1558 CI/review. Next GCY candidate: freeze search suggestions **count** exactly (when catalog has exactly N≤3 combos, all N are returned — i.e. no premature truncation). Alternatively: freeze that search does NOT include suggestions when query is empty-string "" (distinct from no query / undefined — check whether the search handler treats "" as a query or as no-query).
+
+---
+
+### Run ~1827 — 2026-09-27T (automated run)
+
+- **Workstream advanced:** GCY — freeze `ch1tty/search` suggestions count — no premature truncation when N < maxCombos/maxPrompts (5 tests)
+- **Branch/PR:** `auto/gcy-search-suggestions-count` → **PR #1559** (https://github.com/chittyos/ch1tty/pull/1559)
+- **Build:** tsc clean | **Tests (main):** 4879 pass / 0 fail / 3 skip; GCY adds 5 (→ 4884 on branch)
+- **Actions this run:**
+  - Startup: checked out main, pulled (d4f0ca7, run ~1826). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 4876/0/3 baseline confirmed on main.
+  - Read DRIVER-BOARD.md tail; guardrails confirmed: 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+  - 20 open PRs confirmed (GitHub MCP list). GCX PR #1558 open, awaiting review.
+  - Identified GCY gap: FK-6/FK-7 confirm combos/prompts are arrays but never assert their lengths. GCX (PR #1558, not on main) freezes upper bound (N > 3 → ≤ 3). suggestion-ranking.test.ts tests unit function, not search API path. No test on main freezes the lower bound (N < 3 → all N returned).
+  - Source verified: `suggestions.ts` — `combos.slice(0, maxCombos)` / `prompts.slice(0, maxPrompts)` (defaults 3). When N < 3, slice returns all N.
+  - Wrote `test/gcy-search-suggestions-count.test.ts` (5 tests: GCY-1..5):
+    - GCY-1: 1 combo in catalog → suggestions.combos.length === 1
+    - GCY-2: 2 combos in catalog → suggestions.combos.length === 2
+    - GCY-3: 3 combos (= maxCombos boundary) → suggestions.combos.length === 3
+    - GCY-4: 2 prompts in catalog → suggestions.prompts.length === 2
+    - GCY-5: 0 combos + 2 prompts → combos is [] (empty array), prompts has length 2
+  - All 5 pass. Full suite on branch: 4884/0/3 (+5). Pushed and opened PR #1559. Subscribed to PR activity.
+  - Notion board: still unavailable (plan limit hit). DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1827 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 44 open drift-guard test PRs (#1473, #1514–#1559), all CI-green (CodeQL), awaiting human merge. #1473 (GAK CI fix) should go first.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GCY PR #1559 CI/review. Next GCZ candidate: freeze that `ch1tty/search` returns suggestions when `args.query = ""` (empty string) on the server-summary path — confirm absent (same as FK-3 but explicit empty-string rather than omitted query). Or pivot to cast path: verify EI covers cast suggestions count the same way GCY now covers search.
