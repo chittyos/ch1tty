@@ -1767,3 +1767,35 @@
 4. Hourly cron still firing — all original workstreams done; consider adding GBN+ to prompt
 
 **Next run:** GBN candidate — `cast:plan` or `cast:executed` exact key set when scope param set (same pattern applied to the next cast outcome type).
+
+---
+
+## Run log — 2026-09-27T~UTC (automated, run ~1829)
+
+**Workstream advanced:** GDE — execute error path + session no-metadata drift guard (5 tests)
+
+**Branch/PR:** `auto/GDE-execute-error-no-session-metadata` → [https://github.com/chittyos/ch1tty/pull/1565](https://github.com/chittyos/ch1tty/pull/1565)
+
+**Build:** tsc clean (0 errors)
+
+**Tests:** 4881 pass / 0 fail / 3 skip (was 4876/0/3 on main, +5 new)
+
+**What was done:**
+- Read CLAUDE.md + CHITTY.md; confirmed 5-tool surface invariant
+- Checked Notion board (last updated 2026-09-10, run ~1541-O): all A–E workstreams done; board stale, 20+ open drift-guard PRs (GCK–GDD, PR #1543–1564) unmerged due to CI disabled
+- npm ci clean; build clean; tests 4876 pass / 0 fail / 3 skip baseline
+- Added `test/gde-execute-error-no-session-metadata.test.ts` — 5 tests covering execute error paths (unknown server, missing arg, bad format) with active sessionId — verifies the isError guard at aggregator.ts:601 prevents metadata append on error
+- GDE-1/2/3: content.length === 1 (no metadata appended on error with session)
+- GDE-4: isError still === true (session path doesn't clear it)
+- GDE-5: content[0] is plain error text, not a session-metadata JSON blob
+
+**Open PRs (all awaiting human merge — CI disabled):**
+- #1543 (GCK) through #1565 (GDE): 21+ drift guard PRs
+
+**Standing blockers (human action required):**
+1. GitHub Actions npm test CI disabled at org level (only CodeQL runs)
+2. Prod env vars missing (GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, etc.)
+3. Stale branch cleanup — 1100+ remote auto/ branches
+4. Notion board stale since 2026-09-10 (hourly runs not updating it due to page size limit)
+
+**Next run:** GDF candidate — freeze `recentTools` array contents across successive execute calls in same session (verify tool tracking accumulates correctly, verify callCount increments), OR freeze cast:executed error shape with sessionId active (mirror of GDE for the cast path).
