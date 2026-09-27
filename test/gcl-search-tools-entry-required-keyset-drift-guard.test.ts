@@ -113,6 +113,7 @@ function makeAgg(configs: ServerConfig[] = [STRIPE_CONFIG]): Aggregator {
     embedEnabled: false,
     ledgerDlqPath: dlq(),
     suggestionsCatalog: {},
+    focusProfiles: FINANCE_FOCUS_PROFILES,
   });
 }
 
@@ -165,9 +166,15 @@ test('GCL-2: score present (number) when query given; absent when server filter 
       assert.equal(typeof entry['score'], 'number', `score must be a number; got ${typeof entry['score']}`);
     }
 
-    // Without query (server filter only) → score must be absent on every entry
+    // Without query (server filter only) → required keys present, score absent
     const withoutQuery = await searchTools(agg, { server: 'stripe' });
     for (const entry of withoutQuery) {
+      for (const key of REQUIRED_WITHOUT_QUERY) {
+        assert.ok(
+          key in entry,
+          `no-query entry missing required key '${key}'; keys: ${JSON.stringify(Object.keys(entry).sort())}`,
+        );
+      }
       assert.ok(
         !('score' in entry),
         `score must be absent when no query; entry keys: ${JSON.stringify(Object.keys(entry).sort())}`,
@@ -213,11 +220,13 @@ test('GCL-4: value type invariants — string fields non-empty, inputSchema is o
   try {
     const tools = await searchTools(agg, { query: 'stripe payments' });
     for (const entry of tools) {
-      for (const key of ['tool', 'server', 'serverName', 'category', 'description'] as const) {
+      for (const key of ['tool', 'server', 'serverName', 'category'] as const) {
         const val = entry[key];
         assert.equal(typeof val, 'string', `${key} must be a string; got ${typeof val}`);
         assert.ok((val as string).length > 0, `${key} must be non-empty`);
       }
+      // description: string type only (MCP ToolEntry allows empty string)
+      assert.equal(typeof entry['description'], 'string', `description must be a string; got ${typeof entry['description']}`);
 
       const schema = entry['inputSchema'];
       assert.ok(
