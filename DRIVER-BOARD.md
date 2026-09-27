@@ -7646,3 +7646,32 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
 - **Next run:** Check GBD PR #1501 and GBC PR #1500 CI/review. Next candidate: freeze `cast:resolved` exact top-level key set (GU froze no_match+resolved but EG RESOLVED_PERMITTED is still a superset) or freeze alternatives[] scoring for cast:plan (GO-1 froze plan alternatives keyset but not the ordering/score range across alternatives).
 
+
+---
+
+### Run ~1815 — 2026-09-27T (automated)
+
+- **Workstream advanced:** GCI — freeze `cast:discovered` exact top-level key set when focus is active (with and without session/catalog)
+- **Branch/PR:** `auto/GCI-discovered-focus-keyset` → PR pending push
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline on main)
+- **Actions this run:**
+  - Confirmed main baseline: npm ci clean, npm run build clean, npm test: 4876/0/3.
+  - Read Notion board (page 36e94de4): all workstreams A–E checked done; last board entry 2026-09-10.
+  - Read DRIVER-BOARD.md: last recorded run on main ~1780 (GBD). Open PRs #1511–#1540 are GBJ–GCH keyset drift guards pending human merge.
+  - Identified GCI gap: no test freezes cast:discovered key set when focus is active. Unlike plan/executed/resolved, the discovered path does NOT include a `focus` key. Also discovered that a non-empty suggestionsCatalog injects suggestion resources via `listSuggestionResources()`, adding `resources` to the discovered response.
+  - Wrote `test/gci-discovered-focus-keyset-drift-guard.test.ts` (5 tests: GCI-1..5):
+    - GCI-1: focus active, no session, no catalog → base 6 keys; `focus` absent
+    - GCI-2: focus active, WITH catalog → base + resources + suggestions (8 keys); `focus` absent
+    - GCI-3: focus + catalog + session → base + resources + sessionContext + suggestions (9 keys)
+    - GCI-4: focus + session, no catalog → base + sessionContext (7 keys)
+    - GCI-5: absence guard — `focus` key NEVER present in cast:discovered (constructor or per-call)
+  - All 5 pass in isolation and full suite: 4881/0/3. Pushed and opened PR.
+  - Notion board: unavailable (server connection failed). DRIVER-BOARD.md is durable state.
+- **Human-action items (carried forward):**
+  1. **DISABLE hourly cron** — ~1815+ runs; burning compute. Use `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — ~35 open drift-guard test PRs (#1511–#1540 + GCI), CI blocked (Actions disabled)
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion token** — `op://ChittyOS-Integrations/notion/api_token` (currently 404/connection-failed)
+- **Next run:** GCJ — freeze `cast:discovered` key set when scope+focus are BOTH active (no prior test combines scope and focus on the discovered path — GBS had scope+session, GCI has focus only). Or GCK — freeze `cast:chain_executed` key set when focus is active (GBI froze chain_executed conditional keys without focus context).
