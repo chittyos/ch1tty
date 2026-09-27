@@ -8131,3 +8131,34 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GCN PR #1547 CI/review. Next candidate: GCO — freeze `ch1tty/search` tools[] entry `inFocus` field conditional: present (boolean true) when focus is active and the tool's server/category matches the active focus profile; absent when no focus is active; absent when focus is active but tool is out-of-focus.
+
+---
+
+### Run ~1818 — 2026-09-27T (automated run)
+
+- **Workstream advanced:** GCO — freeze `ch1tty/search` tools[] entry `inFocus` field conditional (5 tests)
+- **Branch/PR:** `auto/GCO-search-infocus-conditional-drift-guard` → **PR #1548** (https://github.com/chittyos/ch1tty/pull/1548)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 from 4876 baseline on main)
+- **Actions this run:**
+  - Startup: pulled main to bed9da3 (run ~1817). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Read DRIVER-BOARD.md + CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE (56/87 fields). 0 violations on main.
+  - Checked open PRs: 16 open (#1532–#1547), all GC* drift guard test additions awaiting human merge.
+  - Previous GCN (PR #1547) froze `score` field conditional in search tools[] entries.
+  - Identified GCO gap: GCL-5 (open PR #1545) tests per-entry in/out distinction but no test on main freezes: (a) exact-value strictness (`=== true`, not truthy), (b) absence-vs-false distinction for out-of-focus tools, (c) no-focus-active path for all tools, (d) cross-profile specificity.
+  - Source verified: `src/core.ts:581` — `...(focus && focused(t) ? { inFocus: true } : {})` — value always exactly `true` or absent; never `false`.
+  - Wrote `test/gco-search-infocus-conditional-drift-guard.test.ts` (5 tests: GCO-1..5):
+    - GCO-1: in-focus tools → inFocus === true (strictly, not 1/"true"/truthy)
+    - GCO-2: out-of-focus tools when focus active → inFocus key ABSENT (not false/0)
+    - GCO-3: no focus active → inFocus absent on ALL tools
+    - GCO-4: cross-profile (code vs finance) → each profile flips which server has inFocus:true
+    - GCO-5: inFocus NEVER emitted with falsy value across both focus and no-focus responses
+  - All 5 pass. Full suite: 4881/0/3. Pushed and opened PR #1548.
+  - Notion board: still unavailable (plan limit hit). DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1818 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 35 open drift-guard test PRs (#1514–#1548), all CI green (pending on #1548), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GCO PR #1548 CI/review. Next candidate: GCP — freeze `ch1tty/search` top-level `focus` field: present (string = active profile name) when a focus param is given; absent when no focus. Complements GCK (tools[] top-level keyset) and GCO (per-entry inFocus conditional).
