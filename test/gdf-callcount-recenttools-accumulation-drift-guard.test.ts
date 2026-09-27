@@ -128,20 +128,23 @@ test('GDF-3: recentTools sorted by frequency — tool with 2 calls precedes tool
   const agg = makeAgg();
   try {
     const sid = 'gdf-s3';
-    // neon/list_projects called twice, stripe/list_payments called once
-    await execWithSession(agg, 'neon/list_projects',   sid);
+    // stripe inserted first (count=1), neon second (count=2), tasks last (count=1).
+    // Insertion order → [stripe, neon, tasks]; last-call order → [tasks, neon, stripe].
+    // Frequency order → [neon, stripe, tasks] — neon must be index 0.
     await execWithSession(agg, 'stripe/list_payments', sid);
-    const meta = await execWithSession(agg, 'neon/list_projects', sid);
+    await execWithSession(agg, 'neon/list_projects',   sid);
+    await execWithSession(agg, 'neon/list_projects',   sid);
+    const meta = await execWithSession(agg, 'tasks/list_tasks', sid);
     const rt = sc(meta).recentTools as string[];
-    assert.ok(rt.length >= 2, `GDF-3: recentTools must have ≥ 2 entries; got ${rt.length}`);
+    assert.ok(rt.length >= 3, `GDF-3: recentTools must have ≥ 3 entries; got ${rt.length}`);
     const neonIdx   = rt.indexOf('neon/list_projects');
     const stripeIdx = rt.indexOf('stripe/list_payments');
     assert.ok(neonIdx   >= 0, 'GDF-3: neon/list_projects must be in recentTools');
     assert.ok(stripeIdx >= 0, 'GDF-3: stripe/list_payments must be in recentTools');
-    assert.ok(neonIdx < stripeIdx,
-      `GDF-3: neon/list_projects (count=2) must precede stripe/list_payments (count=1) in recentTools ` +
-      `(got neonIdx=${neonIdx}, stripeIdx=${stripeIdx}). ` +
-      'getToolPatterns sorts by count descending before slicing to 5.');
+    assert.equal(neonIdx, 0,
+      `GDF-3: neon/list_projects (count=2) must be at index 0 in recentTools; got ${neonIdx}. ` +
+      'Insertion order would put stripe first; last-call order would put tasks first. ' +
+      'Only frequency-desc order places neon (highest count) first.');
   } finally {
     await agg.shutdown();
   }
