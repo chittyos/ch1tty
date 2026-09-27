@@ -375,6 +375,9 @@ test('GCI-5: cast:discovered never includes `focus` key regardless of focus sour
   try {
     const body = await castDiscovered(aggPerCall, undefined, { focus: 'billing' });
     assert.equal(body['cast'], 'discovered', 'GCI-5 per-call: must be cast:discovered');
+    assert.equal(typeof body['suggestions'], 'object',
+      'GCI-5 (per-call focus): `suggestions` must be present — confirms per-call focus arg was applied, not silently ignored');
+    assert.notEqual(body['suggestions'], null, 'GCI-5 (per-call focus): suggestions must not be null');
     assert.equal(
       Object.prototype.hasOwnProperty.call(body, 'focus'),
       false,
