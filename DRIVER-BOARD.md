@@ -8435,3 +8435,29 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GDA PR #1561 CI/review. Next GDB candidate: freeze hint-path `servers[]` entry exact key set with and without focus active (each item is `{server, name, category, tools}` without focus; `{server, name, category, tools, inFocus}` with focus). FC froze those key sets in the EXPLANATION sub-object, but not the servers array items in the ENVELOPE itself.
+
+---
+
+### Run ~1828 — 2026-09-27T (automated run)
+- **Workstream advanced:** GDB — freeze `ch1tty/search` sessionContext exact key set + value types (5 tests)
+- **Branch/PR:** `auto/gdb-search-sessioncontext-keyset-valuetypes` → **PR #1562** (https://github.com/chittyos/ch1tty/pull/1562)
+- **Build:** tsc clean | **Tests (main):** 4879 total / 4876 pass / 0 fail / 3 skip; GDB adds 5 (→ 4884/4881/0/3 on branch)
+- **Actions this run:**
+  - Startup: CLAUDE.md + CHITTY.md read; npm ci clean; build clean; tests 4876/0/3 on main.
+  - Checked PR #1561 (GDA): CI green (3/3), state clean, awaiting human merge.
+  - Identified next gap: board candidate (hint-path servers[] entry key sets) already covered by GH-5/6/7. Surveyed search sessionContext coverage — FF (search-session-context.test.ts) freezes BEHAVIOUR but not exact key set or value types. GR does this for cast, GN for execute; no parallel guard existed for search.
+  - Wrote `test/gdb-search-sessioncontext-keyset-valuetypes-drift-guard.test.ts` (5 tests: GDB-1..5):
+    - GDB-1: no sticky focus → sessionContext exactly {callCount, recentTools}
+    - GDB-2: sticky focus active → exactly {activeSessionFocus, callCount, recentTools}
+    - GDB-3: callCount is finite integer >= 0
+    - GDB-4: each recentTools item contains exactly one '/' (namespaced serverId/toolName)
+    - GDB-5: activeSessionFocus is typeof string and non-empty when present
+  - All 5 pass locally. Full suite: 4884/4881/0/3. Pushed branch and opened PR #1562.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1828 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 45 open drift-guard test PRs (#1473, #1514–#1562), all CI-green (CodeQL), awaiting human merge. #1473 (GAK CI fix) should go first.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GDB PR #1562 CI/review. Next GDC candidate: freeze the `ch1tty/search` keyword-path response `sessionId` field — keyword path echoes it (`...(effectiveSessionId ? { sessionId: effectiveSessionId } : {})`), but no test freezes its exact type (must be a non-empty string when present) or that it equals the passed sessionId. Alternatively: freeze the `mode` field in keyword-path response — GP-4 asserts it is exactly the string 'partial' when present, but does not freeze that it is always absent when no partial-match occurs.
