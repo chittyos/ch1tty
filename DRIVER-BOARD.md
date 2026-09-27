@@ -8363,3 +8363,20 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GCW PR #1557 CI/review. Next GCX candidate: freeze `suggestions.combos[n].chain` value types (each element must be a string, non-empty) — or `suggestions` absence when focus is active but catalog has no entry for that focus (the `getSuggestionsForFocus` null-return path, distinct from no-focus).
+
+---
+
+### Run ~1825 continuation — 2026-09-27T (automated run)
+- **Workstream:** GCW — PR #1557 CLOSED as fully redundant
+- **Actions this run:**
+  - Codex review completed with P2 finding: `test/fk-search-suggestions-shape-drift-guard.test.ts` (frozen 2026-09-20, FK-1/FK-5–FK-16) already covers every assertion GCW makes — suggestions presence/absence, exact top-level keys `['combos','prompts']`, array types, combo required/permitted fields + optional `notes`, prompt exact fields, and all value types. GCW adds zero new coverage.
+  - Verified FK file locally: FK-4 also covers the "focus active, no catalog entry" case (the GCX candidate from the prior run). Both GCW and the planned GCX target are pre-empted by FK.
+  - Replied on Codex thread confirming finding is correct. Closed PR #1557.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1825 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 42 open drift-guard test PRs (#1473, #1514–#1556), all CI-green (CodeQL), awaiting human merge. #1473 (GAK CI fix) should go first.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** FK pre-empts both GCW and GCX. New GCX target must be something FK does NOT cover. Candidates (verify against FK before writing): (a) **intent-ranked ordering** — when query terms match one combo better, does it sort first? FK freezes presence/shape but not ordering; (b) **maxCombos slice** — are results limited to 3 by default? FK doesn't test truncation; (c) **cast `suggestions` shape** — check whether EI covers the same ground for cast as FK does for search; if not, write a cast counterpart.
