@@ -38,15 +38,17 @@ const FS_CFG: ServerConfig = {
   endpoint: 'https://fs.test/mcp',
 };
 
+// All descriptions include "service" so GCM-5 can issue one broad query
+// that returns tools from every backend in a single response.
 const STRIPE_TOOLS: ToolEntry[] = [
-  { name: 'create_payment', description: 'Create a new Stripe payment intent', inputSchema: { type: 'object', properties: {} } },
-  { name: 'list_payments', description: 'List recent Stripe payment intents', inputSchema: { type: 'object', properties: {} } },
+  { name: 'create_payment', description: 'Create a new Stripe payment service intent', inputSchema: { type: 'object', properties: {} } },
+  { name: 'list_payments', description: 'List recent Stripe payment service intents', inputSchema: { type: 'object', properties: {} } },
 ];
 const NEON_TOOLS: ToolEntry[] = [
-  { name: 'run_sql', description: 'Execute SQL on Neon database', inputSchema: { type: 'object', properties: {} } },
+  { name: 'run_sql', description: 'Execute SQL on Neon database service', inputSchema: { type: 'object', properties: {} } },
 ];
 const FS_TOOLS: ToolEntry[] = [
-  { name: 'read_file', description: 'Read a file from the filesystem', inputSchema: { type: 'object', properties: {} } },
+  { name: 'read_file', description: 'Read a file from the filesystem service', inputSchema: { type: 'object', properties: {} } },
 ];
 
 function makeBackend(tools: ToolEntry[]): Backend {
@@ -181,20 +183,27 @@ test('GCM-5: mixed recentlyUsed shapes in same search response (object + true + 
   // neon/run_sql: no affinity for neon at all → absent
   // (fs has no affinity either — will remain absent)
 
-  // Search stripe tools — returns create_payment (tool-level) and list_payments (server-level)
-  const stripeResult = await agg.callTool('ch1tty/search', { server: 'stripe' }, sid);
-  assert.ok(!stripeResult.isError, 'stripe search must not error');
-  const stripeBody = JSON.parse((stripeResult.content[0] as { text: string }).text);
-  assert.ok(Array.isArray(stripeBody.tools), 'stripe search must return a tools array');
+  // Single search across all servers — query 'service' matches every tool description
+  // so the response contains all three recentlyUsed shapes in one tools[] array.
+  // This validates the cross-server case: a bug that applies stripe's affinity to neon
+  // tools would show recentlyUsed on neon/run_sql, caught here but not by separate searches.
+  const result = await agg.callTool('ch1tty/search', { query: 'service' }, sid);
+  assert.ok(!result.isError, 'broad service query must not error');
+  const body = JSON.parse((result.content[0] as { text: string }).text);
+  assert.ok(Array.isArray(body.tools), 'tools must be an array');
 
-  const stripeMap = new Map<string, Record<string, unknown>>();
-  for (const entry of stripeBody.tools as Record<string, unknown>[]) {
-    stripeMap.set(entry.tool as string, entry);
+  const byTool = new Map<string, Record<string, unknown>>();
+  for (const entry of body.tools as Record<string, unknown>[]) {
+    byTool.set(entry.tool as string, entry);
   }
 
-  // stripe/create_payment must have tool-level object
-  const calledTool = stripeMap.get('stripe/create_payment');
-  assert.ok(calledTool !== undefined, 'stripe/create_payment must appear in stripe server search');
+  // All four tools must appear in the single response
+  assert.ok(byTool.has('stripe/create_payment'), 'stripe/create_payment must appear');
+  assert.ok(byTool.has('stripe/list_payments'), 'stripe/list_payments must appear');
+  assert.ok(byTool.has('neon/run_sql'), 'neon/run_sql must appear');
+
+  // stripe/create_payment: tool-level → object with {callCount, lastUsedMs}
+  const calledTool = byTool.get('stripe/create_payment')!;
   const ruObj = calledTool.recentlyUsed;
   assert.ok(
     typeof ruObj === 'object' && ruObj !== null && ruObj !== true,
@@ -202,26 +211,19 @@ test('GCM-5: mixed recentlyUsed shapes in same search response (object + true + 
   );
   assert.ok('callCount' in (ruObj as object), 'tool-level recentlyUsed must include callCount');
 
-  // stripe/list_payments must have server-level true
-  const serverOnlyTool = stripeMap.get('stripe/list_payments');
-  assert.ok(serverOnlyTool !== undefined, 'stripe/list_payments must appear in stripe server search');
+  // stripe/list_payments: server-level only → exactly true
+  const serverOnlyTool = byTool.get('stripe/list_payments')!;
   assert.strictEqual(
     serverOnlyTool.recentlyUsed,
     true,
-    'stripe/list_payments must have recentlyUsed===true (server-level affinity, not exact tool)',
+    'stripe/list_payments must have recentlyUsed===true (server-level, not tool-level)',
   );
 
-  // Search neon tools — no neon affinity, so recentlyUsed absent from all neon tools
-  const neonResult = await agg.callTool('ch1tty/search', { server: 'neon' }, sid);
-  assert.ok(!neonResult.isError, 'neon search must not error');
-  const neonBody = JSON.parse((neonResult.content[0] as { text: string }).text);
-  assert.ok(Array.isArray(neonBody.tools), 'neon search must return a tools array');
-
-  const noAffinityTool = (neonBody.tools as Record<string, unknown>[]).find((t) => t.tool === 'neon/run_sql');
-  assert.ok(noAffinityTool !== undefined, 'neon/run_sql must appear in neon server search');
+  // neon/run_sql: no affinity → absent (verifies affinity does NOT cross server boundaries)
+  const noAffinityTool = byTool.get('neon/run_sql')!;
   assert.equal(
     noAffinityTool.recentlyUsed,
     undefined,
-    'neon/run_sql must NOT have recentlyUsed (neon has no session affinity)',
+    'neon/run_sql must NOT have recentlyUsed — stripe affinity must not leak to neon tools',
   );
 });
