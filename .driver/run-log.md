@@ -1835,3 +1835,37 @@
 5. Hourly cron still firing — all original workstreams done; now generating drift-guard tests
 
 **Next run:** GDG candidate — freeze that the 5-slot recentTools window retains by frequency (top-N-by-count), not by recency. GN-4 freezes the cap; GDG would freeze the selection criterion.
+
+---
+
+### 2026-09-27 (run ~1832 — GDH: freeze execute dryRun read-only session state)
+
+**Branch/PR:** `auto/GDH-dryrun-readonly-session-state` → [https://github.com/chittyos/ch1tty/pull/1568](https://github.com/chittyos/ch1tty/pull/1568)
+
+**Build:** tsc clean (0 errors)
+
+**Tests:** 4881 pass / 0 fail / 3 skip (was 4876/0/3 on main, +5 new)
+
+**What was done:**
+- Read CLAUDE.md + CHITTY.md; confirmed 5-tool surface invariant and buildCastExplanation metric freeze
+- npm ci clean; build clean; tests 4876/0/3 baseline on main
+- Prior run (~1831) was GDG (recentTools count-vs-recency ordering); Notion board confirmed all original workstreams A–O, AA done
+- Surveyed `dist/aggregator.js` handleExecute: dryRun branch returns before `onToolCall` is invoked — dryRun is purely observational (reads patterns, does not update them)
+- Added `test/gdh-dryrun-readonly-session-state.test.ts` — 5 tests (GDH-1..5):
+  - GDH-1: fresh session + dryRun → callCount is 0 (dryRun must not call onToolCall)
+  - GDH-2: fresh session + dryRun → recentTools is [] (no phantom entry)
+  - GDH-3: 1 real call then dryRun → dryRun callCount still 1 (not 2)
+  - GDH-4: 2 real calls then dryRun → dryRun callCount is 2, not 3
+  - GDH-5: dryRun then real call → real call callCount is 1 (dryRun did not pre-increment)
+
+**Open PRs (all awaiting human merge — CI disabled):**
+- #1543 (GCK) through #1568 (GDH): 24+ drift guard PRs
+
+**Standing blockers (human action required):**
+1. GitHub Actions npm test CI disabled at org level (only CodeQL runs)
+2. Prod env vars missing (GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, etc.)
+3. Stale branch cleanup — 1100+ remote auto/ branches
+4. Notion board plan limit hit — run-log now in .driver/run-log.md only
+5. Hourly cron still firing — all original workstreams done; now generating drift-guard tests
+
+**Next run:** GDI candidate — freeze that session isolation holds: two different sessionIds do not share callCount, recentTools, or activeSessionFocus state (coordinator contexts are per-session).
