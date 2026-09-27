@@ -82,148 +82,168 @@ function makeAgg(label: string) {
 // GCM-1: Tool-level affinity → recentlyUsed is an object with exactly {callCount, lastUsedMs}
 test('GCM-1: tool-level affinity → recentlyUsed is {callCount,lastUsedMs} object (not true, not absent)', async () => {
   const agg = makeAgg('gcm1');
-  const sid = 'gcm-session-1';
-  await agg.coordinator.onSessionStart(sid, 'stdio');
-  agg.coordinator.onToolCall(sid, 'stripe/create_payment');
+  try {
+    const sid = 'gcm-session-1';
+    await agg.coordinator.onSessionStart(sid, 'stdio');
+    agg.coordinator.onToolCall(sid, 'stripe/create_payment');
 
-  const result = await agg.callTool('ch1tty/search', { query: 'payment', server: 'stripe' }, sid);
-  assert.ok(!result.isError, 'search must not error');
-  const body = JSON.parse((result.content[0] as { text: string }).text);
-  assert.ok(Array.isArray(body.tools), 'body.tools must be an array');
+    const result = await agg.callTool('ch1tty/search', { query: 'payment', server: 'stripe' }, sid);
+    assert.ok(!result.isError, 'search must not error');
+    const body = JSON.parse((result.content[0] as { text: string }).text);
+    assert.ok(Array.isArray(body.tools), 'body.tools must be an array');
 
-  const entry = (body.tools as Record<string, unknown>[]).find((t) => t.tool === 'stripe/create_payment');
-  assert.ok(entry !== undefined, 'stripe/create_payment must appear in results');
+    const entry = (body.tools as Record<string, unknown>[]).find((t) => t.tool === 'stripe/create_payment');
+    assert.ok(entry !== undefined, 'stripe/create_payment must appear in results');
 
-  const ru = entry.recentlyUsed;
-  assert.notEqual(ru, undefined, 'recentlyUsed must be present for a called tool');
-  assert.notStrictEqual(ru, true, 'recentlyUsed must NOT be the boolean true for a tool-level pattern');
-  assert.equal(typeof ru, 'object', 'recentlyUsed must be an object for tool-level affinity');
-  assert.ok(ru !== null, 'recentlyUsed must not be null');
+    const ru = entry.recentlyUsed;
+    assert.notEqual(ru, undefined, 'recentlyUsed must be present for a called tool');
+    assert.notStrictEqual(ru, true, 'recentlyUsed must NOT be the boolean true for a tool-level pattern');
+    assert.equal(typeof ru, 'object', 'recentlyUsed must be an object for tool-level affinity');
+    assert.ok(ru !== null, 'recentlyUsed must not be null');
 
-  const obj = ru as Record<string, unknown>;
-  assert.ok('callCount' in obj, 'recentlyUsed must have callCount');
-  assert.ok('lastUsedMs' in obj, 'recentlyUsed must have lastUsedMs');
-  // No extra keys beyond the two required ones
-  const keys = Object.keys(obj).sort();
-  assert.deepEqual(keys, ['callCount', 'lastUsedMs'], 'recentlyUsed object must have exactly {callCount,lastUsedMs}');
+    const obj = ru as Record<string, unknown>;
+    assert.ok('callCount' in obj, 'recentlyUsed must have callCount');
+    assert.ok('lastUsedMs' in obj, 'recentlyUsed must have lastUsedMs');
+    // No extra keys beyond the two required ones
+    const keys = Object.keys(obj).sort();
+    assert.deepEqual(keys, ['callCount', 'lastUsedMs'], 'recentlyUsed object must have exactly {callCount,lastUsedMs}');
+  } finally {
+    await agg.shutdown();
+  }
 });
 
 // GCM-2: Multiple calls to same tool → callCount equals the number of onToolCall invocations
 test('GCM-2: multiple onToolCall invocations → callCount increments correctly', async () => {
   const agg = makeAgg('gcm2');
-  const sid = 'gcm-session-2';
-  await agg.coordinator.onSessionStart(sid, 'stdio');
-  agg.coordinator.onToolCall(sid, 'neon/run_sql');
-  agg.coordinator.onToolCall(sid, 'neon/run_sql');
-  agg.coordinator.onToolCall(sid, 'neon/run_sql');
+  try {
+    const sid = 'gcm-session-2';
+    await agg.coordinator.onSessionStart(sid, 'stdio');
+    agg.coordinator.onToolCall(sid, 'neon/run_sql');
+    agg.coordinator.onToolCall(sid, 'neon/run_sql');
+    agg.coordinator.onToolCall(sid, 'neon/run_sql');
 
-  const result = await agg.callTool('ch1tty/search', { query: 'sql', server: 'neon' }, sid);
-  assert.ok(!result.isError);
-  const body = JSON.parse((result.content[0] as { text: string }).text);
-  const entry = (body.tools as Record<string, unknown>[]).find((t) => t.tool === 'neon/run_sql');
-  assert.ok(entry !== undefined, 'neon/run_sql must appear');
+    const result = await agg.callTool('ch1tty/search', { query: 'sql', server: 'neon' }, sid);
+    assert.ok(!result.isError);
+    const body = JSON.parse((result.content[0] as { text: string }).text);
+    const entry = (body.tools as Record<string, unknown>[]).find((t) => t.tool === 'neon/run_sql');
+    assert.ok(entry !== undefined, 'neon/run_sql must appear');
 
-  const ru = entry.recentlyUsed as { callCount: number; lastUsedMs: number };
-  assert.ok(typeof ru === 'object' && ru !== null && ru !== true, 'recentlyUsed must be an object');
-  assert.equal(ru.callCount, 3, 'callCount must equal the number of onToolCall invocations (3)');
-  assert.equal(typeof ru.lastUsedMs, 'number', 'lastUsedMs must be a number');
-  assert.ok(ru.lastUsedMs > 0, 'lastUsedMs must be a positive timestamp');
+    const ru = entry.recentlyUsed as { callCount: number; lastUsedMs: number };
+    assert.ok(typeof ru === 'object' && ru !== null && ru !== true, 'recentlyUsed must be an object');
+    assert.equal(ru.callCount, 3, 'callCount must equal the number of onToolCall invocations (3)');
+    assert.equal(typeof ru.lastUsedMs, 'number', 'lastUsedMs must be a number');
+    assert.ok(ru.lastUsedMs > 0, 'lastUsedMs must be a positive timestamp');
+  } finally {
+    await agg.shutdown();
+  }
 });
 
 // GCM-3: Server-level only (different tool on same server was called) → recentlyUsed === true
 test('GCM-3: server-level-only affinity → recentlyUsed is exactly true (not an object)', async () => {
   const agg = makeAgg('gcm3');
-  const sid = 'gcm-session-3';
-  await agg.coordinator.onSessionStart(sid, 'stdio');
-  // Called create_payment, but we will search for list_payments (different tool, same server)
-  agg.coordinator.onToolCall(sid, 'stripe/create_payment');
+  try {
+    const sid = 'gcm-session-3';
+    await agg.coordinator.onSessionStart(sid, 'stdio');
+    // Called create_payment, but we will search for list_payments (different tool, same server)
+    agg.coordinator.onToolCall(sid, 'stripe/create_payment');
 
-  const result = await agg.callTool('ch1tty/search', { query: 'payments list', server: 'stripe' }, sid);
-  assert.ok(!result.isError);
-  const body = JSON.parse((result.content[0] as { text: string }).text);
-  const entry = (body.tools as Record<string, unknown>[]).find((t) => t.tool === 'stripe/list_payments');
-  assert.ok(entry !== undefined, 'stripe/list_payments must appear in results');
+    const result = await agg.callTool('ch1tty/search', { query: 'payments list', server: 'stripe' }, sid);
+    assert.ok(!result.isError);
+    const body = JSON.parse((result.content[0] as { text: string }).text);
+    const entry = (body.tools as Record<string, unknown>[]).find((t) => t.tool === 'stripe/list_payments');
+    assert.ok(entry !== undefined, 'stripe/list_payments must appear in results');
 
-  const ru = entry.recentlyUsed;
-  assert.notEqual(ru, undefined, 'recentlyUsed must be present (server affinity exists for stripe)');
-  assert.strictEqual(ru, true, 'recentlyUsed must be exactly true for server-level-only affinity');
+    const ru = entry.recentlyUsed;
+    assert.notEqual(ru, undefined, 'recentlyUsed must be present (server affinity exists for stripe)');
+    assert.strictEqual(ru, true, 'recentlyUsed must be exactly true for server-level-only affinity');
+  } finally {
+    await agg.shutdown();
+  }
 });
 
 // GCM-4: No session affinity for a server → recentlyUsed absent from that server's tools
 test('GCM-4: no session affinity for a server → recentlyUsed absent from its tools', async () => {
   const agg = makeAgg('gcm4');
-  const sid = 'gcm-session-4';
-  await agg.coordinator.onSessionStart(sid, 'stdio');
-  // Establish affinity only for stripe — not for neon or fs
-  agg.coordinator.onToolCall(sid, 'stripe/create_payment');
+  try {
+    const sid = 'gcm-session-4';
+    await agg.coordinator.onSessionStart(sid, 'stdio');
+    // Establish affinity only for stripe — not for neon or fs
+    agg.coordinator.onToolCall(sid, 'stripe/create_payment');
 
-  const result = await agg.callTool('ch1tty/search', { server: 'neon' }, sid);
-  assert.ok(!result.isError);
-  const body = JSON.parse((result.content[0] as { text: string }).text);
-  assert.ok(Array.isArray(body.tools) && body.tools.length > 0, 'neon tools must be returned');
+    const result = await agg.callTool('ch1tty/search', { server: 'neon' }, sid);
+    assert.ok(!result.isError);
+    const body = JSON.parse((result.content[0] as { text: string }).text);
+    assert.ok(Array.isArray(body.tools) && body.tools.length > 0, 'neon tools must be returned');
 
-  for (const entry of body.tools as Record<string, unknown>[]) {
-    assert.equal(entry.server, 'neon', 'all returned tools must be from neon');
-    assert.equal(
-      entry.recentlyUsed,
-      undefined,
-      `neon tool ${entry.tool} must NOT have recentlyUsed (no neon affinity in session)`,
-    );
+    for (const entry of body.tools as Record<string, unknown>[]) {
+      assert.equal(entry.server, 'neon', 'all returned tools must be from neon');
+      assert.equal(
+        entry.recentlyUsed,
+        undefined,
+        `neon tool ${entry.tool} must NOT have recentlyUsed (no neon affinity in session)`,
+      );
+    }
+  } finally {
+    await agg.shutdown();
   }
 });
 
 // GCM-5: Mixed result — tool-level object, server-level true, and absent — all in the same response
 test('GCM-5: mixed recentlyUsed shapes in same search response (object + true + absent)', async () => {
   const agg = makeAgg('gcm5');
-  const sid = 'gcm-session-5';
-  await agg.coordinator.onSessionStart(sid, 'stdio');
-  // stripe/create_payment: called → tool-level object
-  agg.coordinator.onToolCall(sid, 'stripe/create_payment');
-  // stripe/list_payments: same server, not called → server-level true
-  // neon/run_sql: no affinity for neon at all → absent
-  // (fs has no affinity either — will remain absent)
+  try {
+    const sid = 'gcm-session-5';
+    await agg.coordinator.onSessionStart(sid, 'stdio');
+    // stripe/create_payment: called → tool-level object
+    agg.coordinator.onToolCall(sid, 'stripe/create_payment');
+    // stripe/list_payments: same server, not called → server-level true
+    // neon/run_sql: no affinity for neon at all → absent
+    // (fs has no affinity either — will remain absent)
 
-  // Single search across all servers — query 'service' matches every tool description
-  // so the response contains all three recentlyUsed shapes in one tools[] array.
-  // This validates the cross-server case: a bug that applies stripe's affinity to neon
-  // tools would show recentlyUsed on neon/run_sql, caught here but not by separate searches.
-  const result = await agg.callTool('ch1tty/search', { query: 'service' }, sid);
-  assert.ok(!result.isError, 'broad service query must not error');
-  const body = JSON.parse((result.content[0] as { text: string }).text);
-  assert.ok(Array.isArray(body.tools), 'tools must be an array');
+    // Single search across all servers — query 'service' matches every tool description
+    // so the response contains all three recentlyUsed shapes in one tools[] array.
+    // This validates the cross-server case: a bug that applies stripe's affinity to neon
+    // tools would show recentlyUsed on neon/run_sql, caught here but not by separate searches.
+    const result = await agg.callTool('ch1tty/search', { query: 'service' }, sid);
+    assert.ok(!result.isError, 'broad service query must not error');
+    const body = JSON.parse((result.content[0] as { text: string }).text);
+    assert.ok(Array.isArray(body.tools), 'tools must be an array');
 
-  const byTool = new Map<string, Record<string, unknown>>();
-  for (const entry of body.tools as Record<string, unknown>[]) {
-    byTool.set(entry.tool as string, entry);
+    const byTool = new Map<string, Record<string, unknown>>();
+    for (const entry of body.tools as Record<string, unknown>[]) {
+      byTool.set(entry.tool as string, entry);
+    }
+
+    // All four tools must appear in the single response
+    assert.ok(byTool.has('stripe/create_payment'), 'stripe/create_payment must appear');
+    assert.ok(byTool.has('stripe/list_payments'), 'stripe/list_payments must appear');
+    assert.ok(byTool.has('neon/run_sql'), 'neon/run_sql must appear');
+
+    // stripe/create_payment: tool-level → object with {callCount, lastUsedMs}
+    const calledTool = byTool.get('stripe/create_payment')!;
+    const ruObj = calledTool.recentlyUsed;
+    assert.ok(
+      typeof ruObj === 'object' && ruObj !== null && ruObj !== true,
+      'stripe/create_payment must have tool-level recentlyUsed object (not true, not absent)',
+    );
+    assert.ok('callCount' in (ruObj as object), 'tool-level recentlyUsed must include callCount');
+
+    // stripe/list_payments: server-level only → exactly true
+    const serverOnlyTool = byTool.get('stripe/list_payments')!;
+    assert.strictEqual(
+      serverOnlyTool.recentlyUsed,
+      true,
+      'stripe/list_payments must have recentlyUsed===true (server-level, not tool-level)',
+    );
+
+    // neon/run_sql: no affinity → absent (verifies affinity does NOT cross server boundaries)
+    const noAffinityTool = byTool.get('neon/run_sql')!;
+    assert.equal(
+      noAffinityTool.recentlyUsed,
+      undefined,
+      'neon/run_sql must NOT have recentlyUsed — stripe affinity must not leak to neon tools',
+    );
+  } finally {
+    await agg.shutdown();
   }
-
-  // All four tools must appear in the single response
-  assert.ok(byTool.has('stripe/create_payment'), 'stripe/create_payment must appear');
-  assert.ok(byTool.has('stripe/list_payments'), 'stripe/list_payments must appear');
-  assert.ok(byTool.has('neon/run_sql'), 'neon/run_sql must appear');
-
-  // stripe/create_payment: tool-level → object with {callCount, lastUsedMs}
-  const calledTool = byTool.get('stripe/create_payment')!;
-  const ruObj = calledTool.recentlyUsed;
-  assert.ok(
-    typeof ruObj === 'object' && ruObj !== null && ruObj !== true,
-    'stripe/create_payment must have tool-level recentlyUsed object (not true, not absent)',
-  );
-  assert.ok('callCount' in (ruObj as object), 'tool-level recentlyUsed must include callCount');
-
-  // stripe/list_payments: server-level only → exactly true
-  const serverOnlyTool = byTool.get('stripe/list_payments')!;
-  assert.strictEqual(
-    serverOnlyTool.recentlyUsed,
-    true,
-    'stripe/list_payments must have recentlyUsed===true (server-level, not tool-level)',
-  );
-
-  // neon/run_sql: no affinity → absent (verifies affinity does NOT cross server boundaries)
-  const noAffinityTool = byTool.get('neon/run_sql')!;
-  assert.equal(
-    noAffinityTool.recentlyUsed,
-    undefined,
-    'neon/run_sql must NOT have recentlyUsed — stripe affinity must not leak to neon tools',
-  );
 });
