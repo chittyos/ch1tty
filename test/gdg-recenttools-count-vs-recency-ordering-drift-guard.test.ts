@@ -94,21 +94,27 @@ test('GDG-1: recentTools[0] is the highest-count tool, not the most-recently-cal
 });
 
 // ── GDG-2: count-desc ordering for all adjacent pairs (all-distinct counts) ──
+// Tools are inserted in ASCENDING count order (lowest-count first) so that
+// insertion order opposes the expected output. A stable-sort-by-insertion-order
+// implementation would produce [D,C,B,A] — the opposite of the required [A,B,C,D].
 
 test('GDG-2: recentTools is sorted count-desc for all adjacent pairs (distinct counts)', async () => {
   const agg = makeAgg();
   try {
     const sid = 'gdg-s2';
-    // Make all-distinct frequencies: A=4, B=3, C=2, D=1
+    // Insert tools in ASCENDING count order so insertion order is the REVERSE
+    // of the expected output. A broken implementation that returns insertion order
+    // would give [D,C,B,A] — failing the assertions below.
     const schedule: [string, number][] = [
-      ['neon/list_projects',         4],   // A — highest
-      ['neon/run_sql',               3],   // B
+      ['neon/create_project',        1],   // D — lowest, inserted FIRST
       ['neon/describe_table_schema', 2],   // C
-      ['neon/create_project',        1],   // D — lowest
+      ['neon/run_sql',               3],   // B
+      ['neon/list_projects',         4],   // A — highest, inserted LAST
     ];
     for (const [tool, n] of schedule) {
       for (let i = 0; i < n; i++) await agg.callTool('ch1tty/execute', { tool, sessionId: sid });
     }
+    // Final call increments A (neon/list_projects) to 5×
     const result = await agg.callTool('ch1tty/execute', { tool: 'neon/list_projects', sessionId: sid });
     const content = (result as { content: Array<{ type: string; text?: string }> }).content;
     const meta = JSON.parse(content[content.length - 1].text!) as Record<string, unknown>;
@@ -117,19 +123,19 @@ test('GDG-2: recentTools is sorted count-desc for all adjacent pairs (distinct c
 
     assert.ok(rt.length >= 4,
       `GDG-2: expected at least 4 tools in recentTools; got ${rt.length}`);
-    // Expected order by count: A(5 after the extra call), B(3), C(2), D(1)
-    // Note: A was called 4× in schedule + 1× for the final callTool above = 5×
+    // Expected order by count: A(5), B(3), C(2), D(1) — reverse of insertion order
     const expected = [
-      'neon/list_projects',         // 5× (4 + final call)
+      'neon/list_projects',         // 5× (inserted last, highest count)
       'neon/run_sql',               // 3×
       'neon/describe_table_schema', // 2×
-      'neon/create_project',        // 1×
+      'neon/create_project',        // 1× (inserted first, lowest count)
     ];
     for (let i = 0; i < expected.length; i++) {
       assert.equal(
         rt[i], expected[i],
         `GDG-2: recentTools[${i}] must be '${expected[i]}' (count-desc order); got '${rt[i]}'. ` +
-        `Full recentTools: [${rt.join(', ')}]`,
+        `Full recentTools: [${rt.join(', ')}]. ` +
+        'Insertion order is the reverse of expected — a stable-sort-only bug would produce opposite ordering.',
       );
     }
   } finally {
@@ -171,6 +177,46 @@ test('GDG-3: most-recently-called tool is absent when 5 higher-count tools fill 
   }
 });
 
+// ── GDG-3b: late-inserted high-count tool is PROMOTED into top-5, displacing a low-count tool ──
+
+test('GDG-3b: a late-inserted tool with high count is promoted into recentTools, displacing a lower-count entry', async () => {
+  const agg = makeAgg();
+  try {
+    const sid = 'gdg-s3b';
+    // Insert 5 tools at count=1 each (all tied, fill the cap)
+    const initial5 = [
+      'neon/list_projects',
+      'neon/run_sql',
+      'neon/describe_table_schema',
+      'neon/create_project',
+      'stripe/list_payments',
+    ];
+    for (const tool of initial5) {
+      await agg.callTool('ch1tty/execute', { tool, sessionId: sid });
+    }
+    // The 6th tool is called 3× — count=3 > 1, so it must displace the lowest-count slot
+    const promotedTool = 'tasks/list_tasks';
+    for (let i = 0; i < 2; i++) await agg.callTool('ch1tty/execute', { tool: promotedTool, sessionId: sid });
+    const rt = await recentToolsFor(agg, promotedTool, sid);
+
+    assert.ok(rt.includes(promotedTool),
+      `GDG-3b: '${promotedTool}' (late-inserted, count=3) MUST appear in recentTools ` +
+      `because its count beats all 5 initial tools (count=1). Got recentTools: [${rt.join(', ')}]. ` +
+      'A recency-only implementation would keep the original 5 and ignore the high count.',
+    );
+    assert.equal(rt.length, 5,
+      `GDG-3b: recentTools must still be capped at 5 after promotion; got ${rt.length}`,
+    );
+    // The promoted tool must be at [0] since count=3 is strictly highest
+    assert.equal(rt[0], promotedTool,
+      `GDG-3b: '${promotedTool}' (count=3) must be at recentTools[0] as the highest-count tool. ` +
+      `Got recentTools[0]='${rt[0]}'. Full list: [${rt.join(', ')}].`,
+    );
+  } finally {
+    await agg.shutdown();
+  }
+});
+
 // ── GDG-4: repeat call promotes a tool above an earlier-called single-call tool ──
 
 test('GDG-4: a repeat call promotes a tool to recentTools[0] above an earlier single-call tool', async () => {
@@ -199,41 +245,50 @@ test('GDG-5: equal-count tools are ordered by first call (insertion order) as ti
   const agg = makeAgg();
   try {
     const sid = 'gdg-s5';
-    // Call A, B, C once each (insertion order: A first) — then again in same order
-    // so all have count=2, but A was inserted first, B second, C third
+    // Insertion order is REVERSE-alphabetical (t > s > n) so that:
+    //   - alphabetical sort would produce [neon/list_projects, stripe/list_payments, tasks/list_tasks]
+    //   - insertion-order sort would produce [tasks/list_tasks, stripe/list_payments, neon/list_projects]
+    // Only a stable count-sort that preserves insertion order on ties passes.
     const tools = [
-      'neon/list_projects',   // A — inserted first
-      'stripe/list_payments', // B — inserted second
-      'tasks/list_tasks',     // C — inserted third
+      'tasks/list_tasks',     // A — inserted first (t, reverse-alpha first)
+      'stripe/list_payments', // B — inserted second (s)
+      'neon/list_projects',   // C — inserted third  (n, reverse-alpha last)
     ];
-    // Round 1: insert all in order
+    // Round 1: insert all in reverse-alpha order
     for (const tool of tools) {
       await agg.callTool('ch1tty/execute', { tool, sessionId: sid });
     }
-    // Round 2: increment all counts in same order → all count=2
+    // Round 2: increment all counts in same order → all count=2, insertion order preserved
     for (const tool of tools) {
       await agg.callTool('ch1tty/execute', { tool, sessionId: sid });
     }
-    const result = await agg.callTool('ch1tty/execute', { tool: tools[0], sessionId: sid });
+    // Observe via a DIFFERENT tool (stripe/get_balance, count=1) so all 3 tied tools stay at count=2.
+    // Using tools[0] as the observation call would bump it to count=3, breaking the tie.
+    const observeTool = 'stripe/get_balance';
+    const result = await agg.callTool('ch1tty/execute', { tool: observeTool, sessionId: sid });
     const content = (result as { content: Array<{ type: string; text?: string }> }).content;
     const meta = JSON.parse(content[content.length - 1].text!) as Record<string, unknown>;
     const rt = (meta.sessionContext as Record<string, unknown>).recentTools as string[];
 
-    // All 3 tools are present (cap=5 > 3 distinct)
+    // All 3 tied tools are present (cap=5 > 4 distinct including observeTool)
     assert.ok(tools.every(t => rt.includes(t)),
       `GDG-5: all 3 equal-count tools must be present in recentTools; got [${rt.join(', ')}]`,
     );
-    // Stable sort preserves insertion order for equal counts
-    const idxA = rt.indexOf(tools[0]);
-    const idxB = rt.indexOf(tools[1]);
-    const idxC = rt.indexOf(tools[2]);
+    // Stable sort must preserve insertion order for equal counts.
+    // Insertion order: A(tasks) first, B(stripe), C(neon) last.
+    // Alphabetical order would be: C(neon), B(stripe), A(tasks) — the OPPOSITE.
+    const idxA = rt.indexOf(tools[0]); // tasks/list_tasks
+    const idxB = rt.indexOf(tools[1]); // stripe/list_payments
+    const idxC = rt.indexOf(tools[2]); // neon/list_projects
     assert.ok(idxA < idxB,
-      `GDG-5: '${tools[0]}' (inserted first, count=3) must precede '${tools[1]}' (inserted second). ` +
-      `Got indices: A=${idxA}, B=${idxB}. Stable sort should preserve insertion order for equal counts.`,
+      `GDG-5: '${tools[0]}' (inserted first, count=2) must precede '${tools[1]}' (inserted second). ` +
+      `Got indices: A=${idxA}, B=${idxB}. ` +
+      `Alphabetical sort would put neon before stripe before tasks — the opposite of insertion order. ` +
+      `Full recentTools: [${rt.join(', ')}].`,
     );
     assert.ok(idxB < idxC,
       `GDG-5: '${tools[1]}' (inserted second, count=2) must precede '${tools[2]}' (inserted third). ` +
-      `Got indices: B=${idxB}, C=${idxC}.`,
+      `Got indices: B=${idxB}, C=${idxC}. Full recentTools: [${rt.join(', ')}].`,
     );
   } finally {
     await agg.shutdown();
