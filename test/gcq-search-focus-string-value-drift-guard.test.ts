@@ -11,11 +11,12 @@
  *      internal representation.
  *   3. `focus` value is exactly a `string` — not a boolean, object, or anything else.
  *   4. `focus` value exact equality: the returned string matches the input character
- *      for character (case-sensitive, no trimming artefacts visible to the caller).
- *   5. `focus: 'none'` explicitly suppresses focus → `focus` key absent from response.
+ *      for character — a non-canonical casing like 'Code' is echoed unchanged.
+ *   5. `focus: 'none'` / `''` override an active process-default focus → key absent.
  *
- * Source: src-stdio/aggregator.ts ~862
- *   ...(focusName ? { focus: focusName } : {}),
+ * Source: src-stdio/aggregator.ts — two independent serializers:
+ *   ~862 (query path)       ...(focusName ? { focus: focusName } : {}),
+ *   ~765 (no-query summary) ...(focusName ? { focus: focusName } : {}),
  *
  * `focusName` is set by resolveActiveFocus (lines ~165–185):
  *   - truthy string arg   → name = trimmed string (persisted as session focus)
@@ -28,10 +29,10 @@
  * GCQ freezes:
  *
  *   GCQ-1  no focus arg, no process default → `focus` key absent
- *   GCQ-2  focus: 'code' → `focus` key present with value 'code'
+ *   GCQ-2  focus: 'code' → value 'code' on both query and no-query paths
  *   GCQ-3  `focus` value is typeof 'string' (not boolean / object / number)
- *   GCQ-4  `focus` echoes the exact caller-supplied name string
- *   GCQ-5  focus: 'none' → `focus` key absent (explicit suppression)
+ *   GCQ-4  `focus` echoes the exact caller-supplied name string, including mixed case
+ *   GCQ-5  default focus 'code' + focus: 'none' / '' → `focus` key absent
  *
  * Frozen 2026-09-27.
  *
@@ -87,11 +88,12 @@ function dlq(): string {
   return join(tmpdir(), `ch1tty-gcq-${Date.now()}-${++_seq}.jsonl`);
 }
 
-function makeAgg(): Aggregator {
+function makeAgg(defaultFocus?: string): Aggregator {
   const backend = new FixtureBackend();
   backend.defineServer('neon', FIXTURE_SERVERS.neon);
   return new Aggregator([NEON_CONFIG], {
     focusProfiles: FOCUS_PROFILES,
+    focus: defaultFocus,
     backendFactory: () => backend,
     embedEnabled: false,
     ledgerDlqPath: dlq(),
@@ -118,13 +120,21 @@ test('GCQ-1: no focus arg, no process default → focus key absent from top-leve
   await agg.shutdown();
 });
 
-test('GCQ-2: focus: "code" → focus key present with value "code"', async () => {
+test('GCQ-2: focus: "code" → focus key present with value "code" on both query and no-query paths', async () => {
   const agg = makeAgg();
   const resp = await search(agg, { query: 'neon', focus: 'code' });
   assert.ok(Object.prototype.hasOwnProperty.call(resp, 'focus'),
     'focus should be present when a named profile is supplied');
   assert.strictEqual(resp.focus, 'code',
     `focus should equal 'code', got ${JSON.stringify(resp.focus)}`);
+  // No-query server-summary path serializes `focus` independently (aggregator.ts ~765)
+  const summary = await search(agg, { focus: 'code' });
+  assert.ok(Array.isArray(summary.servers), 'expected server-summary response shape');
+  assert.strictEqual(summary.focus, 'code',
+    `no-query path: focus should equal 'code', got ${JSON.stringify(summary.focus)}`);
+  const summaryNoFocus = await search(agg, { focus: 'none' });
+  assert.ok(!Object.prototype.hasOwnProperty.call(summaryNoFocus, 'focus'),
+    'no-query path: focus should be absent when suppressed');
   await agg.shutdown();
 });
 
@@ -157,15 +167,19 @@ test('GCQ-4: focus echoes the exact caller-supplied name string (case-sensitive)
   // Verify they are distinct — not the same value regardless of which profile was given
   assert.notStrictEqual(respCode.focus, respFinance.focus,
     'code and finance focus values should differ');
+  // Non-canonical casing is echoed unchanged, not lowercased to the profile key
+  const respMixed = await search(agg, { query: 'neon', focus: 'Code' });
+  assert.strictEqual(respMixed.focus, 'Code',
+    `expected mixed-case focus echoed unchanged, got ${JSON.stringify(respMixed.focus)}`);
   await agg.shutdown();
 });
 
-test('GCQ-5: focus: "none" explicitly suppresses focus → focus key absent from response', async () => {
-  const agg = makeAgg();
-  // Confirm active focus emits the key first
-  const respWithFocus = await search(agg, { query: 'neon', focus: 'code' });
-  assert.ok(Object.prototype.hasOwnProperty.call(respWithFocus, 'focus'),
-    'expected focus key present when code profile active');
+test('GCQ-5: focus: "none" / "" override an active default focus → focus key absent', async () => {
+  // Default focus 'code' means an omitted arg falls back to 'code'
+  const agg = makeAgg('code');
+  const respDefault = await search(agg, { query: 'neon' });
+  assert.strictEqual(respDefault.focus, 'code',
+    `expected default focus 'code' when arg omitted, got ${JSON.stringify(respDefault.focus)}`);
   // Suppress with 'none' — focusName becomes undefined → key absent
   const respNone = await search(agg, { query: 'neon', focus: 'none' });
   assert.ok(!Object.prototype.hasOwnProperty.call(respNone, 'focus'),
