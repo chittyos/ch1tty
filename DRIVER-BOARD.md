@@ -8255,3 +8255,26 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GCS PR #1553 CI/review. Next candidate: GCT — freeze `ch1tty/search` top-level `suggestions[]` array conditional: present when suggestions catalog has entries for the active focus; absent when no focus or no matching suggestions. Complements FK (shape) and GCQ (focus string value) without duplicating them.
+
+### Run ~1822 — 2026-09-27T (automated run)
+- Workstream advanced: GCT — freeze ch1tty/search explanation conditional in keyword-search path (5 tests)
+  - Gap: FB freezes explanation presence/structure when explain:true (keyword path); FC-3 freezes
+    absence in server-summary path; FD covers keyword envelope keys. No test froze explanation
+    ABSENT in keyword-search path when explain is not set.
+  - Tests: GCT-1 (absent, no param), GCT-2 (absent, explicit false), GCT-3 (absent with focus),
+    GCT-4 (absent with sessionId), GCT-5 (present when explain:true — symmetric)
+  - All 5 tests pass. Full suite: 4881/0/3 (+5 from 4876 main baseline). Pushed and opened PR #1554.
+  - Note: GCT suggestion from ~1821 was suggestions[] conditional, but FK already covers that
+    (FK-1–FK-4). Correctly pivoted to the genuine gap: explanation conditional in keyword-search path.
+  - Notion board: still unavailable (plan limit hit). DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1822 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 40 open drift-guard test PRs (#1514–#1554), all CI-green, awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GCT PR #1554 CI/review. Next candidate: GCU — freeze ch1tty/search `sessionId`
+  echo conditional: key is emitted in the envelope when effectiveSessionId is truthy, absent otherwise.
+  (search-session-context.test.ts covers sessionContext sub-object content; FD covers envelope key sets
+  but the base set has no sessionId; no test asserts the top-level sessionId key conditional directly.)
