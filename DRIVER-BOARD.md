@@ -8040,3 +8040,33 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GCE PR #1536 CI/review. Next candidate: GCF — freeze `cast:executed` top-level key set when session is active (no focus): base + sessionContext. GBZ froze executed+focus (no session); GCF closes the session-only executed path.
+
+---
+
+### Run ~1815 — 2026-09-27T (automated run)
+
+- **Workstream advanced:** GCL — freeze `search tools[]` entry minimum required key set and value types (5 tests)
+- **Branch/PR:** `auto/GCL-search-tools-entry-required-keyset` → **PR #1545** (https://github.com/chittyos/ch1tty/pull/1545)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 from 4876 baseline on main)
+- **Actions this run:**
+  - Startup: pulled main to b0cef9c (run ~1814). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Read DRIVER-BOARD.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE (56/87 fields). 0 violations on main.
+  - Checked open PRs: 20 open (#1525–#1544), all drift guard test additions awaiting human merge. Most recent: GCK (PR #1543) freeze ch1tty/search response top-level key set.
+  - Identified GCL gap: GCK-5 (open PR) guards the MAX key set per tools[] entry — no rogue key outside the max set. But no test on main freezes the MINIMUM required keys. Silently dropping `serverName`, `description`, or `inputSchema` from every entry would pass GCK-5. Also: `score` conditional, `serverName` value, per-entry `inFocus` conditional all unfrozen.
+  - Source verified at src-stdio/aggregator.ts ~820–841: tools[] entry always includes `{tool, server, serverName, category, description, inputSchema}` plus conditionals.
+  - Wrote `test/gcl-search-tools-entry-required-keyset-drift-guard.test.ts` (5 tests: GCL-1..5):
+    - GCL-1: every entry has minimum required keys {tool,server,serverName,category,description,inputSchema,score} when query present
+    - GCL-2: score present (number) when query given; absent on server-filter-only call
+    - GCL-3: serverName equals configured display name (not serverId, not empty)
+    - GCL-4: type invariants — string fields non-empty, inputSchema is non-null object, score is finite in [0, 1.3]
+    - GCL-5: inFocus:true per-entry for in-focus tools (stripe/ecosystem), absent for out-of-focus (neon/code) in same two-server response
+  - All 5 pass. Full suite: 4881/0/3. Pushed and opened PR #1545. Subscribed to CI.
+  - Notion board: unavailable (plan limit hit). DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1815 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 32 open drift-guard test PRs (#1514–#1545), all CI green (pending on #1545), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GCL PR #1545 CI/review. Next candidate: GCM — freeze `search tools[]` entry conditional key behavior more precisely: (a) `recentlyUsed` exact shape ({callCount,lastUsedMs} or `true`) when session has tool-level vs server-level affinity; (b) absence guard when session has no affinity for that tool's server.
