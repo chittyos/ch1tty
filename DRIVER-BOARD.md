@@ -8064,11 +8064,16 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
     - GCJ-5: sessionContext absent when no sessionId passed (no bleed from prior session call)
   - All 5 pass locally. Full suite 4881/0/3. Pushed and opened PR.
   - Notion board unavailable (plan limit hit — no free blocks); DRIVER-BOARD.md is durable state.
+- **PR #1542 CI result (2026-09-27T ~01:43Z):**
+  - CodeQL: ✅ success | Analyze (javascript-typescript): ✅ success | Analyze (actions): ✅ success
+  - Codex: ✅ Completed — no findings
+  - CodeRabbit: rate-limited (processed files, no review posted — free OSS limit reset needed)
+  - PR is clean — waiting on human merge.
 - **Human-action items (persistent):**
   1. **DISABLE hourly cron** — ~1817 runs; burning compute. Disable via `/cron delete` in Claude Code.
-  2. **MERGE open PRs** — 36 open drift-guard test PRs (#1505–#1541 + GCJ), all CI green (pending on new GCJ PR), awaiting human merge.
+  2. **MERGE open PRs** — 37 open drift-guard test PRs (#1505–#1542), all CI green, awaiting human merge.
   3. **Enable GitHub Actions** (main npm test CI job)
   4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
-- **Next run:** Check GCJ PR CI/review. Next candidate: GCK — freeze cast:plan exact key set when session is active (no focus): base + sessionContext. OR GCK could cover the exact `resolved` sub-object key set on cast:plan (tool, server, category, description, score, inputSchema).
+- **Next run:** GCK — freeze cast:plan exact key set when session is active (no focus): base + sessionContext. OR freeze exact `resolved` sub-object key set on cast:plan (tool, server, category, description, score, inputSchema).
