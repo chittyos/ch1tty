@@ -1799,3 +1799,39 @@
 4. Notion board stale since 2026-09-10 (hourly runs not updating it due to page size limit)
 
 **Next run:** GDF candidate — freeze `recentTools` array contents across successive execute calls in same session (verify tool tracking accumulates correctly, verify callCount increments), OR freeze cast:executed error shape with sessionId active (mirror of GDE for the cast path).
+
+---
+
+## Run log — 2026-09-27T~UTC (automated, run ~1830)
+
+**Workstream advanced:** GDF — execute callCount accumulation + recentTools ordering drift guard (5 tests)
+
+**Branch/PR:** `auto/GDF-callcount-recenttools-accumulation` → [https://github.com/chittyos/ch1tty/pull/1566](https://github.com/chittyos/ch1tty/pull/1566)
+
+**Build:** tsc clean (0 errors)
+
+**Tests:** 4881 pass / 0 fail / 3 skip (was 4876/0/3 on main, +5 new)
+
+**What was done:**
+- Read CLAUDE.md + CHITTY.md; confirmed 5-tool surface invariant
+- npm ci clean; build clean; tests 4876/0/3 baseline on main
+- Prior run (~1829) was GDE; DRIVER-BOARD.md confirmed 22 open drift-guard PRs awaiting human merge
+- Surveyed coordinator.js to confirm: getToolPatterns sorts by count desc; callCount = sum of counts across all unique tools (not per-tool or most-recent)
+- Added `test/gdf-callcount-recenttools-accumulation-drift-guard.test.ts` — 5 tests (GDF-1..5):
+  - GDF-1: callCount increments by 1 per successive call (1→1, 2nd→2); GN-5 only checked >0
+  - GDF-2: recentTools de-duplicates — same tool 3× appears exactly once (Map key)
+  - GDF-3: recentTools sorted by frequency — 2-call tool precedes 1-call tool
+  - GDF-4: callCount sums across tools — 2 neon + 1 stripe → callCount=3
+  - GDF-5: newly invoked tool appears in recentTools immediately on first call
+
+**Open PRs (all awaiting human merge — CI disabled):**
+- #1543 (GCK) through #1566 (GDF): 22 drift guard PRs
+
+**Standing blockers (human action required):**
+1. GitHub Actions npm test CI disabled at org level (only CodeQL runs)
+2. Prod env vars missing (GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, etc.)
+3. Stale branch cleanup — 1100+ remote auto/ branches
+4. Notion board stale (plan limit hit — can't write to board)
+5. Hourly cron still firing — all original workstreams done; now generating drift-guard tests
+
+**Next run:** GDG candidate — freeze that the 5-slot recentTools window retains by frequency (top-N-by-count), not by recency. GN-4 freezes the cap; GDG would freeze the selection criterion.

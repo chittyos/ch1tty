@@ -8461,3 +8461,30 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GDB PR #1562 CI/review. Next GDC candidate: freeze the `ch1tty/search` keyword-path response `sessionId` field — keyword path echoes it (`...(effectiveSessionId ? { sessionId: effectiveSessionId } : {})`), but no test freezes its exact type (must be a non-empty string when present) or that it equals the passed sessionId. Alternatively: freeze the `mode` field in keyword-path response — GP-4 asserts it is exactly the string 'partial' when present, but does not freeze that it is always absent when no partial-match occurs.
+
+---
+
+### Run ~1830 — 2026-09-27T (automated run)
+- **Workstream advanced:** GDF — freeze `ch1tty/execute` callCount accumulation + recentTools ordering (5 tests)
+- **Branch/PR:** `auto/GDF-callcount-recenttools-accumulation` → **PR #1566** (https://github.com/chittyos/ch1tty/pull/1566)
+- **Build:** tsc clean | **Tests (main):** 4879 total / 4876 pass / 0 fail / 3 skip; GDF adds 5 (→ 4884/4881/0/3 on branch)
+- **Actions this run:**
+  - Startup: read CLAUDE.md + CHITTY.md; npm ci clean; build clean; tests 4876/0/3 on main (after pulling 36-commit gap).
+  - Read DRIVER-BOARD.md + .driver/run-log.md — prior run (~1829) was GDE (execute error path + session no-metadata); 21 open drift-guard PRs (#1543–#1565) awaiting human merge.
+  - Next candidate from run ~1829: GDF — freeze recentTools accumulation + callCount increment semantics.
+  - Surveyed coordinator.js: getToolPatterns sorts by count desc; callCount = sum of all pattern counts. GN froze types/caps; GDF freezes accumulation semantics and ordering.
+  - Wrote `test/gdf-callcount-recenttools-accumulation-drift-guard.test.ts` (5 tests: GDF-1..5):
+    - GDF-1: callCount increments per successive same-tool call (1→1, 2nd→2)
+    - GDF-2: recentTools de-duplicates (same tool 3× appears exactly once)
+    - GDF-3: recentTools sorted by frequency (2-call tool precedes 1-call tool)
+    - GDF-4: callCount sums across tools (2 neon + 1 stripe → 3)
+    - GDF-5: new tool appears in recentTools immediately on first call
+  - All 5 pass locally. Full suite: 4884/4881/0/3. Pushed branch and opened PR #1566.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1830 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 22 open drift-guard test PRs (#1543–#1566), all CI-green (CodeQL), awaiting human merge. #1473 (GAK CI fix) should go first.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GDF PR #1566 CI/review. Next GDG candidate: freeze the `ch1tty/execute` `recentTools` sliding-window ordering — after >5 distinct calls, the 5 retained tools should be the 5 most-frequently-called (not the 5 most-recently-called). GN-4 freezes the cap; GDG would freeze that it's the top-N-by-count window, not a recency window.
