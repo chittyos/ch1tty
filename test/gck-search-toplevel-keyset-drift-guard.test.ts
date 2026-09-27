@@ -31,7 +31,7 @@
  *     → {tool, server, serverName, category, description, inputSchema, score}
  *     optional extras: {recentlyUsed, inFocus}
  *
- * Source: src/core.ts line ~585 (search response body construction).
+ * Source: src-stdio/aggregator.ts ~858 (search response body construction; src/aggregator.ts re-exports it).
  *
  * GCK freezes:
  *
