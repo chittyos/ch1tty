@@ -8194,3 +8194,33 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GCP PR #1549 CI/review. Next candidate: GCQ — freeze `ch1tty/search` top-level `focus` field value: present as a string equal to the active profile name when focus is given; absent when no focus. Complements GCK (keyset with focus present) by asserting the value type and exact equality. Also candidate: GCR — freeze `ch1tty/search` top-level `inFocusOnly` conditional: present as `true` only when both `inFocusOnly: true` and a focus profile are active; absent otherwise.
+
+---
+
+### Run ~1820 — 2026-09-27T (automated run)
+
+- **Workstream advanced:** GCQ — freeze `ch1tty/search` top-level `focus` string value (5 tests)
+- **Branch/PR:** `auto/GCQ-search-focus-string-value` → **PR #1550** (https://github.com/chittyos/ch1tty/pull/1550)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 from 4876 baseline on main)
+- **Actions this run:**
+  - Startup: on main at 562b144 (run ~1819). Build clean. Tests: 4876/0/3 baseline confirmed on main.
+  - Read DRIVER-BOARD.md + CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations on main.
+  - Received PR #1549 review events: CodeRabbit posted no actionable comments (Merge Risk: ⚪ Minimal). CI check suite completed — all 3 checks green (CodeQL + 2x Analyze). PR #1549 is waiting on human merge.
+  - Identified GCQ gap: GCK (open PR) checks `focus` appears in the top-level key set; no test on main asserts the value contract: type is `string`, exact value equals the supplied profile name, absent when no focus, absent when `focus: 'none'`.
+  - Source verified: `src-stdio/aggregator.ts:862` — `...(focusName ? { focus: focusName } : {})` — value is `focusName` (the string passed by the caller), absent when focusName is undefined.
+  - Wrote `test/gcq-search-focus-string-value-drift-guard.test.ts` (5 tests: GCQ-1..5):
+    - GCQ-1: no focus arg, no process default → `focus` key absent
+    - GCQ-2: `focus: 'code'` → `focus` key present with value `'code'`
+    - GCQ-3: `focus` value is typeof `'string'` (not boolean, object, or number)
+    - GCQ-4: `focus` echoes exact caller-supplied name (case-sensitive; code vs finance are distinct)
+    - GCQ-5: `focus: 'none'` / `''` explicitly suppresses focus → key absent
+  - All 5 pass. Full suite: 4881/0/3 (+5). Pushed `auto/GCQ-search-focus-string-value`, opened PR #1550.
+  - Notion board: still unavailable (plan limit hit). DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1820 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 37 open drift-guard test PRs (#1514–#1550), all CI-green (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GCQ PR #1550 CI/review. Next candidate: GCR — freeze `ch1tty/search` top-level `inFocusOnly` conditional: present as `true` only when both `inFocusOnly: true` param and a focus profile are active; absent when `inFocusOnly` param not given or focus is inactive.
