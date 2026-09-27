@@ -196,7 +196,7 @@ describe('GCX-2 — search suggestions ordering: best-matching prompt sorts firs
 // ── GCX-3: catalog has 4 combos → search returns ≤3 (maxCombos default) ──────
 
 describe('GCX-3 — search suggestions truncation: combos limited to maxCombos (default 3)', () => {
-  test('catalog with 4 combos → suggestions.combos.length is at most 3', async () => {
+  test('catalog with 4 combos → suggestions.combos.length is exactly 3', async () => {
     const agg = makeAgg();
     try {
       // Use an unrelated query so ranking is purely verified-first + catalog order
@@ -206,9 +206,10 @@ describe('GCX-3 — search suggestions truncation: combos limited to maxCombos (
       assert.ok('suggestions' in data, 'suggestions must be present');
       const suggestions = data.suggestions as Record<string, unknown>;
       const combos = suggestions.combos as Array<Record<string, unknown>>;
-      assert.ok(
-        combos.length <= 3,
-        `suggestions.combos must be ≤ 3 (maxCombos default), got ${combos.length}`,
+      assert.equal(
+        combos.length,
+        3,
+        `suggestions.combos must be exactly 3 (maxCombos default applied to 4-item catalog), got ${combos.length}`,
       );
     } finally {
       await agg.shutdown();
@@ -219,7 +220,7 @@ describe('GCX-3 — search suggestions truncation: combos limited to maxCombos (
 // ── GCX-4: catalog has 4 prompts → search returns ≤3 (maxPrompts default) ────
 
 describe('GCX-4 — search suggestions truncation: prompts limited to maxPrompts (default 3)', () => {
-  test('catalog with 4 prompts → suggestions.prompts.length is at most 3', async () => {
+  test('catalog with 4 prompts → suggestions.prompts.length is exactly 3', async () => {
     const agg = makeAgg();
     try {
       const result = await agg.callTool('ch1tty/search', { query: 'database' });
@@ -228,9 +229,10 @@ describe('GCX-4 — search suggestions truncation: prompts limited to maxPrompts
       assert.ok('suggestions' in data, 'suggestions must be present');
       const suggestions = data.suggestions as Record<string, unknown>;
       const prompts = suggestions.prompts as Array<Record<string, unknown>>;
-      assert.ok(
-        prompts.length <= 3,
-        `suggestions.prompts must be ≤ 3 (maxPrompts default), got ${prompts.length}`,
+      assert.equal(
+        prompts.length,
+        3,
+        `suggestions.prompts must be exactly 3 (maxPrompts default applied to 4-item catalog), got ${prompts.length}`,
       );
     } finally {
       await agg.shutdown();
@@ -250,27 +252,20 @@ describe('GCX-5 — search suggestions ordering: verified combos before unverifi
       const result = await agg.callTool('ch1tty/search', { query: 'xyzzy' });
       assert.equal(result.isError, undefined, `search must not error: ${JSON.stringify(result.content)}`);
       const data = parseData(result);
-      // suggestions may be absent if query produces no matches (FK-4 analogous case)
-      // but with an active focus + any query string (even non-matching), suggestions should appear
-      // if the catalog entry exists — the query is used for ranking, not for filtering suggestions
-      if (!('suggestions' in data)) return; // no catalog match for this focus → skip ordering check
+      // With active focus + catalog entry, suggestions are present regardless of query relevance
+      // (query is used for ranking combos/prompts, not for gating their presence)
+      assert.ok('suggestions' in data, 'search must return suggestions for active focus with catalog entry');
 
       const suggestions = data.suggestions as Record<string, unknown>;
       const combos = suggestions.combos as Array<Record<string, unknown>>;
-      if (combos.length < 2) return; // need at least 2 to test ordering
-
-      // Find where verified flips to false in the returned list
-      let verifiedSectionEnded = false;
-      for (const combo of combos) {
-        if (combo.verified === true) {
-          assert.ok(
-            !verifiedSectionEnded,
-            `verified combo "${combo.name}" appears after an unverified combo — ordering violated`,
-          );
-        } else {
-          verifiedSectionEnded = true;
-        }
-      }
+      // Catalog has 4 combos, maxCombos=3. Zero-score sort: verified desc, then catalog index asc.
+      // combo-sql(T,i=1) → combo-list(T,i=2) → combo-ddl(F,i=0) → [combo-drop(F,i=3) truncated]
+      assert.equal(combos.length, 3, 'search must return exactly 3 combos (maxCombos default)');
+      assert.deepEqual(
+        combos.map((c) => c.verified),
+        [true, true, false],
+        'verified flags must be [true, true, false] — verified combos before unverified',
+      );
     } finally {
       await agg.shutdown();
     }
