@@ -8380,3 +8380,31 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** FK pre-empts both GCW and GCX. New GCX target must be something FK does NOT cover. Candidates (verify against FK before writing): (a) **intent-ranked ordering** — when query terms match one combo better, does it sort first? FK freezes presence/shape but not ordering; (b) **maxCombos slice** — are results limited to 3 by default? FK doesn't test truncation; (c) **cast `suggestions` shape** — check whether EI covers the same ground for cast as FK does for search; if not, write a cast counterpart.
+
+---
+
+### Run ~1826 — 2026-09-27T (automated run)
+- **Workstream advanced:** GCX — freeze `ch1tty/search` suggestions ordering + truncation (5 tests)
+- **Branch/PR:** `auto/gcx-search-suggestions-ordering-truncation` → **PR #1558** (https://github.com/chittyos/ch1tty/pull/1558)
+- **Build:** tsc clean | **Tests (main):** 4882 / pass 4879 / fail 0 / skip 3; GCX adds 5 (→ 4887 on branch)
+- **Actions this run:**
+  - Startup: read CLAUDE.md; npm ci clean; build clean; tests 4882/4879/0/3 on main (no regressions).
+  - Read DRIVER-BOARD.md tail — prior run (~1825 continuation) identified GCX candidates: (a) intent-ranked ordering, (b) maxCombos slice, (c) cast suggestions (covered by EI).
+  - Verified suggestion-ranking.test.ts (HH) covers maxCombos + ordering via unit + cast:plan; confirmed it does NOT cover the search API path.
+  - Verified FK covers search suggestions shape but NOT ordering or truncation.
+  - New gap confirmed: `ch1tty/search` passes `query` as `intent` to `getSuggestionsForFocus` (aggregator.ts ~L846) — ordering and truncation on this path are unfrozen.
+  - Wrote `test/gcx-search-suggestions-ordering-truncation.test.ts` (5 tests: GCX-1..5):
+    - GCX-1: query matching one combo → that combo is first in suggestions.combos
+    - GCX-2: query matching one prompt → that prompt is first in suggestions.prompts
+    - GCX-3: catalog with 4 combos → suggestions.combos.length ≤ 3 (maxCombos default)
+    - GCX-4: catalog with 4 prompts → suggestions.prompts.length ≤ 3 (maxPrompts default)
+    - GCX-5: zero-score query → verified combos before unverified (tiebreaker)
+  - All 5 pass locally. Committed and pushed; opened PR #1558.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1826 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 43 open drift-guard test PRs (#1473, #1514–#1558), all CI-green (CodeQL), awaiting human merge. #1473 (GAK CI fix) should go first.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GCX PR #1558 CI/review. Next GCY candidate: freeze search suggestions **count** exactly (when catalog has exactly N≤3 combos, all N are returned — i.e. no premature truncation). Alternatively: freeze that search does NOT include suggestions when query is empty-string "" (distinct from no query / undefined — check whether the search handler treats "" as a query or as no-query).
