@@ -8306,4 +8306,32 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
-- **Next run:** Check GCU PR #1555 CI/review. Next candidate: GCV — freeze `ch1tty/search` top-level `minScore` echo conditional: `...(minScore > 0 ? { minScore } : {})` emits minScore when > 0, absent otherwise. No test freezes absence when minScore is 0 or not provided, value-type strictness, or edge value boundary (0.0 → absent, 0.01 → present).
+- **Next run:** GCV PR #1556 opened. GCU PR #1555 got CodeRabbit nitpick (GCU-4b added, pushed, comment left on PR). Check GCV PR #1556 CI/review. Next candidate: GCW — freeze another `ch1tty/search` conditional echo field (offset, mode=partial boundary, inFocusOnly, or the focus name conditional).
+
+---
+
+### Run ~1824 — 2026-09-27T (automated run)
+- **Workstream advanced:** GCV — freeze `ch1tty/search` top-level `minScore` echo conditional (5 tests)
+- **Branch/PR:** `auto/GCV-minscore-echo-conditional` → **PR #1556** (https://github.com/chittyos/ch1tty/pull/1556)
+- **Build:** tsc clean | **Tests:** 4884 pass / 0 fail / 3 skip (+5 from 4879 baseline on main; +3 total including GCU-4b on #1555 branch)
+- **Actions this run:**
+  - Startup: checked PR #1555 (GCU) reviews. CodeRabbit found one nitpick: GCU-4b missing (empty `args.sessionId` with a non-empty callTool sessionId → should fall back to callTool value). Finding is valid.
+  - Added GCU-4b to `test/gcu-search-sessionid-echo-conditional.test.ts`: tests that `args.sessionId = ''` + callTool sessionId present → response echoes callTool value. All 6 tests pass. Committed and pushed to #1555 branch. Left PR comment explaining the fix + docstring warning dismissal.
+  - Identified GCV gap: FD-3 (absent-when-omitted) and FD-16 (key-present when >0) leave uncovered: explicit-zero→absent, negative→absent, echoed-value-equals-arg (not just key-present), and non-number→absent.
+  - Source verified: `src-stdio/aggregator.ts:651` — `typeof args.minScore === 'number' && args.minScore > 0 ? args.minScore : 0`; line 864 — `...(minScore > 0 ? { minScore } : {})`.
+  - Wrote `test/gcv-search-minscore-echo-conditional.test.ts` (5 tests: GCV-1..5):
+    - GCV-1: `minScore: 0` (explicit zero) → key absent
+    - GCV-2: `minScore: -1` (negative) → key absent
+    - GCV-3: `minScore: 0.5` → echoed value equals `0.5` exactly (value type + exact value)
+    - GCV-4: `minScore: 1.3` → echoed value equals `1.3` (schema max boundary)
+    - GCV-5: `minScore: 'high'` (string) → key absent (typeof guard)
+  - All 5 tests pass. Full suite: 4884/0/3. Pushed and opened PR #1556. Subscribed to PR activity.
+  - Updated DRIVER-BOARD.md run log.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1824 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 42 open drift-guard test PRs (#1473, #1514–#1556), all CI-green (CodeQL), awaiting human merge. #1473 (GAK CI fix) should go first.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GCV PR #1556 CI/review. Next candidate: GCW — freeze another `ch1tty/search` conditional echo field (offset conditional: `...(offset > 0 ? { offset } : {})`; explicit `offset: 0` → absent not yet tested with value-type strictness; or `inFocusOnly` conditional).
