@@ -8278,3 +8278,32 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   echo conditional: key is emitted in the envelope when effectiveSessionId is truthy, absent otherwise.
   (search-session-context.test.ts covers sessionContext sub-object content; FD covers envelope key sets
   but the base set has no sessionId; no test asserts the top-level sessionId key conditional directly.)
+
+### Run ~1823 — 2026-09-27T (automated run)
+- **Workstream advanced:** GCU — freeze `ch1tty/search` top-level `sessionId` echo conditional (5 tests)
+- **Branch/PR:** `auto/GCU-coverage-typeonly-exclusion` → **PR #1555** (https://github.com/chittyos/ch1tty/pull/1555)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 from 4876 baseline on main)
+- **Actions this run:**
+  - Startup: pulled to 4655506 (run ~1822). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed on main.
+  - Read DRIVER-BOARD.md + CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+  - Checked GCT PR #1554: open, CI-green (CodeQL). 40 total open PRs awaiting human merge.
+  - Checked `apps/comms-mcp/src/_schema-type-guards.ts`: 0% coverage in `coverage:apps` output — investigated and confirmed it's a type-only compile-time file (0 JS statements); passes threshold without change. Not a real gap.
+  - Investigated PR backlog and checked GAK (#1473 CI fix), GAQ (already on main), and other open branches. No new PRs needed for existing branches.
+  - Identified GCU gap per ~1822 recommendation: top-level `sessionId` echo conditional in keyword-search path. `aaa-execute-status-orphan-search-sessionid.test.ts` test 6 covers PRESENCE (callTool path) only. No test covers: absence, args.sessionId path, args-vs-callTool priority, empty-string falsy, or discovery-path asymmetry.
+  - Source verified: `src-stdio/aggregator.ts:865` — `...(effectiveSessionId ? { sessionId: effectiveSessionId } : {})` in keyword path; discovery path (lines ~758–773) has NO sessionId field.
+  - Wrote `test/gcu-search-sessionid-echo-conditional.test.ts` (5 tests: GCU-1..5):
+    - GCU-1: keyword search, no session → sessionId KEY ABSENT
+    - GCU-2: keyword search + args.sessionId → sessionId echoes args value
+    - GCU-3: args.sessionId takes priority over callTool sessionId parameter
+    - GCU-4: empty-string args.sessionId (falsy) → sessionId ABSENT
+    - GCU-5: discovery path + args.sessionId → sessionId ABSENT (asymmetry: discovery path never emits it)
+  - All 5 tests pass. Full suite: 4881/0/3 (+5). Pushed and opened PR #1555.
+  - Notion board: still unavailable (plan limit hit). DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1823 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 41 open drift-guard test PRs (#1473, #1514–#1555), all CI-green (CodeQL), awaiting human merge. #1473 (GAK CI fix) should go first.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GCU PR #1555 CI/review. Next candidate: GCV — freeze `ch1tty/search` top-level `minScore` echo conditional: `...(minScore > 0 ? { minScore } : {})` emits minScore when > 0, absent otherwise. No test freezes absence when minScore is 0 or not provided, value-type strictness, or edge value boundary (0.0 → absent, 0.01 → present).
