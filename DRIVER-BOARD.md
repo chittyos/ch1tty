@@ -8488,3 +8488,19 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GDF PR #1566 CI/review. Next GDG candidate: freeze the `ch1tty/execute` `recentTools` sliding-window ordering — after >5 distinct calls, the 5 retained tools should be the 5 most-frequently-called (not the 5 most-recently-called). GN-4 freezes the cap; GDG would freeze that it's the top-N-by-count window, not a recency window.
+
+---
+## Run ~1832 — 2026-09-27
+
+**Status**: Codex P2 fixes applied, PR #1567 unblocked
+
+**Actions**:
+- Fixed GDG-2: schedule reversed to ascending count order so insertion order opposes expected output (a broken stable-insertion-order impl now fails)
+- Fixed GDG-3b (new sub-test): 5 initial tools at count=1, then a 6th called 3× — asserts high-count late-inserted tool enters recentTools[0] and displaces a lower-count slot
+- Fixed GDG-5: insertion order changed to reverse-alphabetical (tasks→stripe→neon) so alphabetical ≠ insertion order; observation via `stripe/get_balance` (count=1) keeps tied trio at equal counts=2
+- All 6 GDG tests pass (6/6)
+- Committed c703187, pushed, replied on all 3 Codex P2 threads, resolved all 3 threads
+
+**PR #1567** (`auto/GDG-recenttools-count-vs-recency-ordering`): All Codex P2 threads resolved. Awaiting CI + human merge.
+
+**Next**: Continue drift-guard series (next label after GDG).
