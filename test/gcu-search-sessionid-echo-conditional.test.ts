@@ -156,6 +156,23 @@ test('GCU-4: empty-string args.sessionId → sessionId absent (empty string is f
   }
 });
 
+// ── GCU-4b: empty-string args.sessionId falls back to callTool sessionId ────────
+
+test('GCU-4b: empty-string args.sessionId falls back to the callTool sessionId', async () => {
+  const agg = makeAgg();
+  const callToolSessionId = 'gcu-calltool-fallback';
+  try {
+    const body = await search(agg, { query: 'database', sessionId: '' }, callToolSessionId);
+    assert.equal(
+      body['sessionId'],
+      callToolSessionId,
+      `empty args.sessionId must fall back to callTool sessionId "${callToolSessionId}", got: ${JSON.stringify(body['sessionId'])}`,
+    );
+  } finally {
+    await agg.shutdown();
+  }
+});
+
 // ── GCU-5: discovery path (no query) + args.sessionId → sessionId ABSENT ─────
 
 test('GCU-5: discovery path (no query) never echoes sessionId even when args.sessionId is active', async () => {
