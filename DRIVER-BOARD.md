@@ -8070,3 +8070,26 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GCL PR #1545 CI/review. Next candidate: GCM — freeze `search tools[]` entry conditional key behavior more precisely: (a) `recentlyUsed` exact shape ({callCount,lastUsedMs} or `true`) when session has tool-level vs server-level affinity; (b) absence guard when session has no affinity for that tool's server.
+
+---
+
+### 2026-09-27 (run ~1817) — GCM: recentlyUsed shutdown fix (Codex P2 address)
+
+- **Workstream:** GCM — `search tools[]` entry `recentlyUsed` conditional key shape drift guard
+- **Branch/PR:** `auto/GCM-search-recentlyused-shape-drift-guard` → **PR #1546** (open, CI pending)
+- **Build:** tsc clean | **Tests:** 5/5 pass (GCM drift-guard tests, run in isolation)
+- **Actions this run:**
+  - Resumed from prior run (context compacted). GCM-1 already had try/finally; GCM-2–5 still leaked Aggregator instances.
+  - Wrapped GCM-2, GCM-3, GCM-4, and GCM-5 bodies in `try/finally { await agg.shutdown(); }` — each Aggregator starts ledger flush + coordinator eviction timers; shutdown cleanup prevents resource leaks across the full test process.
+  - Ran `test/gcm-search-recentlyused-shape-drift-guard.test.ts` directly: 5/5 pass.
+  - Committed as d43c622. Pushed to branch. Replied to Codex P2 thread (comment_id 4114119657) with fix reference.
+  - Subscribed to PR #1546 activity.
+  - Notion board: unavailable (plan limit). DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1817 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 33 open drift-guard test PRs (#1514–#1546), all CI green (pending on #1546), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Watch CI on PR #1546 (GCM). On CI green + Codex P2 clear → ready for human merge. Next candidate after GCM: GCN (next unfrozen conditional shape in search response).
