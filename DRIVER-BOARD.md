@@ -8070,3 +8070,33 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GCL PR #1545 CI/review. Next candidate: GCM — freeze `search tools[]` entry conditional key behavior more precisely: (a) `recentlyUsed` exact shape ({callCount,lastUsedMs} or `true`) when session has tool-level vs server-level affinity; (b) absence guard when session has no affinity for that tool's server.
+
+---
+
+### Run ~1816 — 2026-09-27T (automated run)
+
+- **Workstream advanced:** GCM — freeze `search tools[]` entry `recentlyUsed` conditional key shapes (5 tests)
+- **Branch/PR:** `auto/GCM-search-recentlyused-shape-drift-guard` → **PR #1546** (https://github.com/chittyos/ch1tty/pull/1546)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 from 4876 baseline on main)
+- **Actions this run:**
+  - Startup: pulled main to de9cd5a (run ~1815). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Read DRIVER-BOARD.md; all workstreams A–F done. 10 open PRs (#1536–#1545) awaiting human merge.
+  - Continued GC* drift-guard series. GCL (PR #1545) froze search tools[] entry minimum required key set.
+  - Identified GCM gap: no test froze the three distinct `recentlyUsed` shapes emitted per tool entry when a session is active. Silently swapping `{callCount,lastUsedMs}` for `true`, or forgetting the absent case, would pass CI.
+  - Source verified at src-stdio/aggregator.ts ~820–841: (1) exact tool pattern → object, (2) server affinity only → true, (3) no affinity → absent.
+  - Wrote `test/gcm-search-recentlyused-shape-drift-guard.test.ts` (5 tests: GCM-1..5):
+    - GCM-1: tool-level affinity → recentlyUsed is {callCount,lastUsedMs} object (not true, not absent)
+    - GCM-2: multiple onToolCall invocations → callCount equals invocation count (not hardcoded 1)
+    - GCM-3: server-level-only affinity (different tool on same server called) → recentlyUsed===true
+    - GCM-4: no session affinity for server → recentlyUsed absent from that server's tools
+    - GCM-5: mixed result — object + true + absent — all in the same two-server-search response
+  - All 5 pass. Full suite: 4881/0/3. Pushed and opened PR #1546. Subscribed to CI.
+  - Notion board: still unavailable (plan limit hit). DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1816 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 33 open drift-guard test PRs (#1514–#1546), all CI green (pending on #1546), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GCM PR #1546 CI/review. Next candidate: GCN — freeze `search tools[]` entry `score` field conditional: present (finite number in [0, 1.3]) when a query is given; absent when filtering by server or category only (no query). Closes the gap where silently dropping score on a query result, or adding score to a non-query result, would pass CI undetected.
