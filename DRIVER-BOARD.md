@@ -8224,3 +8224,34 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GCQ PR #1550 CI/review. Next candidate: GCR — freeze `ch1tty/search` top-level `inFocusOnly` conditional: present as `true` only when both `inFocusOnly: true` param and a focus profile are active; absent when `inFocusOnly` param not given or focus is inactive.
+
+---
+
+### Run ~1821 — 2026-09-27T (automated run)
+
+- **Workstream advanced:** GCS — freeze `ch1tty/search` top-level `inFocusOnly` conditional (5 tests)
+- **Branch/PR:** `auto/GCS-search-infocusonly-conditional-drift-guard` → **PR #1553** (https://github.com/chittyos/ch1tty/pull/1553)
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 from 4876 baseline on main)
+- **Actions this run:**
+  - Startup: pulled to 161464a (run ~1820). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed on main (4881 on branch with GCQ added).
+  - Read DRIVER-BOARD.md + CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+  - Checked GCQ PR #1550: no new events. Checked GW (search sessionContext) PR #1552: CI green (CodeQL ✅, Analyze ✅×2). PRs #1551 (GCR) was closed — redundant with FK. GW is open, CI green.
+  - Open PRs: 39 total open (#1514–#1552 + various run-log PRs), all CI-green (CodeQL).
+  - Identified GCS gap: `search-in-focus-only.test.ts` test R-4 checks `data.inFocusOnly === true` (one scenario), but no test on main freezes ABSENCE (not false/null/0) when conditions not met, or value-type strictness.
+  - Source verified: `dist/aggregator.js:645,657,747` — `...(inFocusOnly && focus ? { inFocusOnly: true } : {})` — field emitted as boolean `true` only; NEVER emitted as `false`; absent when either condition is false.
+  - Wrote `test/gcs-search-infocusonly-conditional-drift-guard.test.ts` (5 tests: GCS-1..5):
+    - GCS-1: `inFocusOnly:true` + focus active → field present AND `=== true` (strict boolean, filtered path)
+    - GCS-2: `inFocusOnly:true` + NO focus active → field ABSENT (no-op path)
+    - GCS-3: `inFocusOnly:false` + focus active → field ABSENT (never emitted as false)
+    - GCS-4: no `inFocusOnly` param + focus active → field ABSENT (default off)
+    - GCS-5: `inFocusOnly:true` + focus active, discovery path (no query) → field present AND `=== true`
+  - All 5 tests pass. Full suite: 4881/0/3 (+5). Pushed and opened PR #1553.
+  - Notion board: still unavailable (plan limit hit). DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1821 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 39 open drift-guard test PRs (#1514–#1553), all CI-green (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GCS PR #1553 CI/review. Next candidate: GCT — freeze `ch1tty/search` top-level `suggestions[]` array conditional: present when suggestions catalog has entries for the active focus; absent when no focus or no matching suggestions. Complements FK (shape) and GCQ (focus string value) without duplicating them.
