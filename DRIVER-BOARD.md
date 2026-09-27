@@ -8488,3 +8488,30 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GDF PR #1566 CI/review. Next GDG candidate: freeze the `ch1tty/execute` `recentTools` sliding-window ordering — after >5 distinct calls, the 5 retained tools should be the 5 most-frequently-called (not the 5 most-recently-called). GN-4 freezes the cap; GDG would freeze that it's the top-N-by-count window, not a recency window.
+
+---
+
+### Run ~1831 — 2026-09-27T (automated run)
+- **Workstream advanced:** GDG — freeze `ch1tty/execute` recentTools count-vs-recency ordering (5 tests)
+- **Branch/PR:** `auto/GDG-recenttools-count-vs-recency-ordering` → **PR #1567** (https://github.com/chittyos/ch1tty/pull/1567)
+- **Build:** tsc clean | **Tests (main):** 4879 total / 4876 pass / 0 fail / 3 skip; GDG adds 5 (→ 4884/4881/0/3 on branch)
+- **Actions this run:**
+  - Startup: read CLAUDE.md + CHITTY.md; npm ci clean; build clean; tests 4876/0/3 on main.
+  - Read DRIVER-BOARD.md tail — prior run (~1830) was GDF (execute callCount accumulation + recentTools ordering); 10 open drift-guard test PRs (#1556–#1566) confirmed via GitHub MCP.
+  - Next candidate from run ~1830: GDG — freeze recentTools top-N-by-count (count-desc window, not recency window). GN-4 froze the cap; GDG freezes SELECTION + ORDERING semantics.
+  - Verified source: `src-stdio/coordinator.ts getToolPatterns()` sorts by `b.count - a.count` (stable), slices to 5; aggregator maps `patterns.slice(0,5).map(p=>p.tool)` to recentTools.
+  - Wrote `test/gdg-recenttools-count-vs-recency-ordering-drift-guard.test.ts` (5 tests: GDG-1..5):
+    - GDG-1: highest-count tool at recentTools[0] (not most-recently-called)
+    - GDG-2: count-desc ordering holds for all adjacent pairs (all-distinct counts 5×, 3×, 2×, 1×)
+    - GDG-3: most-recently-called tool is ABSENT when 5 higher-count tools fill the cap
+    - GDG-4: repeat call promotes a tool above an earlier-inserted single-call tool
+    - GDG-5: equal-count tiebreaking preserves first-call (insertion) order — stable sort
+  - All 5 pass locally. Pushed branch, opened PR #1567, subscribed to activity.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1831 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 11 open drift-guard test PRs (#1556–#1567), all CI-green (CodeQL), awaiting human merge. #1473 (GAK CI fix) should go first if still open.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GDG PR #1567 CI/review. Next GDH candidate: freeze `ch1tty/execute` `dryRun` response exact key sets — `dryRun:true` embeds sessionContext inside the dry_run JSON rather than as a separate appended item; the exact keys inside dry_run are not frozen by any prior test (GDC froze the non-dryRun key sets).
