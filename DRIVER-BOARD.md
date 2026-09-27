@@ -8408,3 +8408,30 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GCX PR #1558 CI/review. Next GCY candidate: freeze search suggestions **count** exactly (when catalog has exactly N≤3 combos, all N are returned — i.e. no premature truncation). Alternatively: freeze that search does NOT include suggestions when query is empty-string "" (distinct from no query / undefined — check whether the search handler treats "" as a query or as no-query).
+
+---
+
+### Run ~1827 — 2026-09-27T (automated run)
+- **Workstream advanced:** GDA — freeze `ch1tty/search` hint-path (no-query) envelope exact key sets (5 tests)
+- **Branch/PR:** `auto/GDA-hint-path-envelope-exact-keyset` → **PR #1561** (https://github.com/chittyos/ch1tty/pull/1561)
+- **Build:** tsc clean | **Tests (main):** 4884 / pass 4881 / fail 0 / skip 3; GDA adds 5 (→ 4884+5 on branch)
+- **Actions this run:**
+  - Startup: read CLAUDE.md + CHITTY.md; npm ci clean; build clean; tests 4876/0/3 on main (after pulling 33-commit gap).
+  - Read DRIVER-BOARD.md tail — prior run (~1826) done; open PRs: #1558 (GCX), #1559 (GCY), #1560 (GCZ), plus 40+ earlier. Identified GCY (#1559) and GCZ (#1560) as already written by prior runs (not yet in DRIVER-BOARD). GCZ has a resolved Codex P2 review (segment validation strengthened in 7bea7c1).
+  - Surveyed EB (hint path required-field guard) — confirmed it uses `DISCOVERY_REQUIRED.filter(...)` (presence only, not exact-set). No existing test freezes hint path exact key set in session+focus combinations.
+  - Confirmed source: hint path diverges from keyword path — does NOT echo `sessionId` even when session active (keyword path does).
+  - Wrote `test/gda-hint-path-envelope-exact-keyset-drift-guard.test.ts` (5 tests: GDA-1..5):
+    - GDA-1: no session, no focus → exactly {hint, latencyMs, servers, totalTools}
+    - GDA-2: session active, no focus → exactly {hint, latencyMs, servers, sessionContext, totalTools}
+    - GDA-3: session + focus → exactly {focus, hint, latencyMs, servers, sessionContext, totalTools}
+    - GDA-4: session + focus + inFocusOnly → exactly {focus, hint, inFocusOnly, latencyMs, servers, sessionContext, totalTools}
+    - GDA-5: `sessionId` ABSENT from hint path; keyword path with same session DOES include it (paired control)
+  - All 5 pass locally. Full suite: 4884/4881/0/3. Pushed branch and opened PR #1561.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1827 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 44 open drift-guard test PRs (#1473, #1514–#1561), all CI-green (CodeQL), awaiting human merge. #1473 (GAK CI fix) should go first.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GDA PR #1561 CI/review. Next GDB candidate: freeze hint-path `servers[]` entry exact key set with and without focus active (each item is `{server, name, category, tools}` without focus; `{server, name, category, tools, inFocus}` with focus). FC froze those key sets in the EXPLANATION sub-object, but not the servers array items in the ENVELOPE itself.
