@@ -8335,3 +8335,31 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GCV PR #1556 CI/review. Next candidate: GCW — freeze another `ch1tty/search` conditional echo field (offset conditional: `...(offset > 0 ? { offset } : {})`; explicit `offset: 0` → absent not yet tested with value-type strictness; or `inFocusOnly` conditional).
+
+---
+
+### Run ~1825 — 2026-09-27T (automated run)
+- **Workstream advanced:** GCW — freeze `ch1tty/search` `suggestions` field internal shape (5 tests)
+- **Branch/PR:** `auto/GCW-search-suggestions-shape` → **PR #1557** (https://github.com/chittyos/ch1tty/pull/1557)
+- **Build:** tsc clean | **Tests (main):** tests 4879 / pass 4876 / fail 0 / skip 3; GCW adds 5 (→ 4884 on branch)
+- **Actions this run:**
+  - Startup: read CLAUDE.md + CHITTY.md; npm ci clean; build clean; tests 4876/0/3 on main (no regressions).
+  - Read DRIVER-BOARD.md (Notion unavailable — plan limit): all workstreams A–E + F–N + O–GCV confirmed complete or in-progress; 43 open drift-guard test PRs.
+  - Identified GCW gap: FD-2/FD-13 freeze `suggestions` presence/absence at the envelope level only. No test freezes the internal shape of the `suggestions` object (`{ combos, prompts }` — note: `description` from the FocusSuggestions interface is NOT returned by getSuggestionsForFocus).
+  - Source verified: `src-stdio/aggregator.ts:845–867` (focusSuggestions conditional), `src-stdio/suggestions.ts:106` (getSuggestionsForFocus return type `{ combos, prompts } | null`).
+  - Wrote `test/gcw-search-suggestions-shape.test.ts` (5 tests: GCW-1..5):
+    - GCW-1: focus+catalog+query → `suggestions` key is present
+    - GCW-2: `suggestions` is a plain object (not null, not array, not primitive)
+    - GCW-3: `suggestions` has exactly keys `combos` and `prompts` (`description` absent — function returns subset)
+    - GCW-4: `suggestions.combos` is Array; each entry has `name` (str), `chain` (arr), `accomplishes` (str), `verified` (bool)
+    - GCW-5: `suggestions.prompts` is Array; each entry has `text` (str) and `resolves_to` (str)
+  - All 5 tests pass locally (node --import tsx --test). Full suite on main: 4876/0/3.
+  - Committed and pushed to branch; opened PR #1557.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1825 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 43 open drift-guard test PRs (#1473, #1514–#1557), all CI-green (CodeQL), awaiting human merge. #1473 (GAK CI fix) should go first.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GCW PR #1557 CI/review. Next GCX candidate: freeze `suggestions.combos[n].chain` value types (each element must be a string, non-empty) — or `suggestions` absence when focus is active but catalog has no entry for that focus (the `getSuggestionsForFocus` null-return path, distinct from no-focus).
