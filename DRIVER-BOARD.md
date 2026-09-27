@@ -7646,3 +7646,34 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
 - **Next run:** Check GBD PR #1501 and GBC PR #1500 CI/review. Next candidate: freeze `cast:resolved` exact top-level key set (GU froze no_match+resolved but EG RESOLVED_PERMITTED is still a superset) or freeze alternatives[] scoring for cast:plan (GO-1 froze plan alternatives keyset but not the ordering/score range across alternatives).
 
+
+---
+
+### Run ~1829 — 2026-09-27T~hourly
+
+- **Workstream advanced:** GDC — freeze ch1tty/execute exact key sets (dryRun no-session, dryRun with-session, session metadata)
+- **Branch/PR:** `auto/GDC-execute-exact-keysets-drift-guard` → PR to be opened
+- **Build:** tsc clean | **Tests:** 4881 pass / 0 fail / 3 skip (+5 vs 4876 baseline)
+- **Actions this run:**
+  - Startup: `npm ci` clean, `npm run build` clean (tsc exit 0)
+  - `npm test` baseline: **4876 pass / 0 fail / 3 skip** — confirmed main green
+  - Read DRIVER-BOARD.md (main) + Notion board (still 401 — token rotation still needed)
+  - Reviewed 20+ open PRs (GCI–GDB, #1541–#1562): all awaiting human merge; CI CodeQL-only (Actions main job 0-queue non-blocking)
+  - Identified gap: EC uses PERMITTED superset checks for execute response JSON, not exact key sets. Key finding from aggregator: `callTool` wrapper injects `latencyMs` into dryRun JSON AFTER `handleExecute` returns; EC's PERMITTED wrongly includes `latencyMs` in the no-session slot (latencyMs IS there, injected by wrapper). Both paths (dryRun with/without session, live execute with session) lacked exact key set freeze.
+  - Discovered and fixed FixtureBackend cross-test mutation bug: `FIXTURE_SERVERS` returns shared response objects; `execResult.content.push()` accumulates items. Fixed by deep-cloning fixture per `makeAgg()` call with `freshNeonDef()`.
+  - Wrote `test/gdc-execute-exact-keysets-drift-guard.test.ts` — 5 tests (GDC-1 through GDC-5):
+    - GDC-1: dryRun no-session exact keys = {status, server, tool, args, latencyMs}
+    - GDC-2: dryRun with-session exact keys = {status, server, tool, args, latencyMs, sessionContext}
+    - GDC-3: session-metadata appended item exact keys = {latencyMs, sessionContext}
+    - GDC-4: execute+session content has exactly 2 items (backend + metadata)
+    - GDC-5: dryRun `status` value is exactly 'dry_run'
+  - All 5 new tests pass. Full suite: **4881 pass / 0 fail / 3 skip** (+5)
+  - Notion board unavailable (401); DRIVER-BOARD.md is durable state.
+- **Human-action items (carried forward):**
+  1. **DISABLE hourly cron** — ~1829+ runs; burning compute
+  2. **Enable GitHub Actions** (main npm test CI job — 0-queue non-blocking recurring)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches (20+ new ones added since last cleanup)
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+  6. **Merge open PRs** — 20+ open PRs from GCI–GDB series plus new GDC; CI CodeQL-only, all should be green
+- **Next run:** GDD candidate — freeze ch1tty/execute no-session content passthrough (no metadata appended without session); or freeze `cast:resolved` exact top-level key set (GU froze no_match+resolved but EG RESOLVED_PERMITTED is still a superset).
