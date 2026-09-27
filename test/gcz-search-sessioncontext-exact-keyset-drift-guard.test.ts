@@ -185,11 +185,13 @@ test('GCZ-3: sessionContext.recentTools items each contain exactly one "/" (name
     assert.ok(sc.recentTools.length > 0, 'recentTools must be non-empty after execute calls');
     for (const item of sc.recentTools as unknown[]) {
       assert.equal(typeof item, 'string', `Each recentTools element must be a string, got: ${typeof item}`);
-      const slashCount = (item as string).split('/').length - 1;
-      assert.equal(slashCount, 1,
+      const parts = (item as string).split('/');
+      assert.equal(parts.length, 2,
         `recentTools item "${item}" must contain exactly one '/' (namespaced "serverId/toolName")`);
-      assert.ok((item as string).length > 2,
-        `recentTools item "${item}" must be a non-empty namespaced name`);
+      assert.ok(parts[0].length > 0,
+        `recentTools item "${item}": serverId segment (before '/') must be non-empty`);
+      assert.ok(parts[1].length > 0,
+        `recentTools item "${item}": toolName segment (after '/') must be non-empty`);
     }
   } finally {
     await agg.shutdown();
