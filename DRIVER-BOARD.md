@@ -8040,3 +8040,35 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GCE PR #1536 CI/review. Next candidate: GCF — freeze `cast:executed` top-level key set when session is active (no focus): base + sessionContext. GBZ froze executed+focus (no session); GCF closes the session-only executed path.
+
+---
+
+### Run ~1817 — 2026-09-27T (automated run)
+
+- **Workstream advanced:** GCJ — freeze cast:plan exact top-level key set (5 tests)
+- **Branch/PR:** `auto/GCJ-plan-exact-toplevel-keyset` → PR pending push
+- **Build:** tsc clean | **Tests:** 4876/0/3 baseline on main; GCJ adds 5 (4881/0/3 locally)
+- **Actions this run:**
+  - Startup: pulled main to b0cef9c (run ~1812). `npm ci` clean. `npm run build` clean. `npm test`: 4876/0/3 baseline confirmed.
+  - Read DRIVER-BOARD.md; confirmed all workstreams A–F done. 35 open PRs (GBU through GCI, #1522–#1541) awaiting human merge.
+  - Checked Notion board — accessible this run (valid session). Confirmed A–E all done; last board entry was run ~1803.
+  - Identified GCJ gap: GU froze EXACT key sets for cast:no_match and cast:resolved; GV froze EXACT key set for cast:executed. No test on main freezes the EXACT top-level key set for cast:plan. EA only checks REQUIRED keys are present, not that no extra keys are added.
+  - Gap confirmed: no GW/GX/GY/GZ files exist; no cast:plan exact-keyset test on main.
+  - Source verified at src-stdio/aggregator.ts line ~1599: cast:plan body = {cast, resolvedBy, intent, latencyMs, ?(focus), ?(scope), ?(explanation), resolved, ?(resolvedFromCatalog), ?(chainContinuation), alternatives, ...related, ?(sessionContext), ?(suggestions), args, hint}.
+  - With suggestionsCatalog:{} (no resources): base = {alternatives, args, cast, hint, intent, latencyMs, resolved, resolvedBy} (8 keys).
+  - Wrote `test/gcj-plan-exact-toplevel-keyset-drift-guard.test.ts` (5 tests: GCJ-1..5):
+    - GCJ-1: base exact key set (8 keys, no session, no focus, no explain)
+    - GCJ-2: +sessionId adds exactly sessionContext (9 keys)
+    - GCJ-3: +explain adds exactly explanation (9 keys)
+    - GCJ-4: absence guard — focus/scope/suggestions/resolvedFromCatalog/chainContinuation absent in base path
+    - GCJ-5: sessionContext absent when no sessionId passed (no bleed from prior session call)
+  - All 5 pass locally. Full suite 4881/0/3. Pushed and opened PR.
+  - Notion board unavailable (plan limit hit — no free blocks); DRIVER-BOARD.md is durable state.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1817 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 36 open drift-guard test PRs (#1505–#1541 + GCJ), all CI green (pending on new GCJ PR), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GCJ PR CI/review. Next candidate: GCK — freeze cast:plan exact key set when session is active (no focus): base + sessionContext. OR GCK could cover the exact `resolved` sub-object key set on cast:plan (tool, server, category, description, score, inputSchema).
