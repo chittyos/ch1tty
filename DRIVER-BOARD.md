@@ -8515,3 +8515,29 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GDG PR #1567 CI/review. Next GDH candidate: freeze `ch1tty/execute` `dryRun` response exact key sets — `dryRun:true` embeds sessionContext inside the dry_run JSON rather than as a separate appended item; the exact keys inside dry_run are not frozen by any prior test (GDC froze the non-dryRun key sets).
+
+---
+
+### Run ~1836 — 2026-09-28T (automated run)
+- **Workstream advanced:** GDL — freeze `ch1tty/execute` dryRun `tool` and `server` field values (5 tests)
+- **Branch/PR:** `auto/GDL-dryrun-tool-server-values` → **PR #1572** (https://github.com/chittyos/ch1tty/pull/1572)
+- **Build:** tsc clean | **Tests (main):** 4879 total / 4876 pass / 0 fail / 3 skip; GDL adds 5 (→ 4884/4881/0/3 on branch)
+- **Actions this run:**
+  - Startup: resumed from compressed context. GDK PR #1571 CI-green (CodeQL + Analyze success).
+  - Branched `auto/GDL-dryrun-tool-server-values` from origin/main.
+  - Verified handleExecute dryRun split logic in dist/aggregator.js: `sepIndex = toolName.indexOf('/')`, `serverId = toolName.slice(0, sepIndex)`, `name = toolName.slice(sepIndex + 1)` — `server: serverId`, `tool: name` in dryRun JSON.
+  - Wrote `test/gdl-execute-dryrun-tool-server-values-drift-guard.test.ts` (5 tests: GDL-1..5):
+    - GDL-1: `tool` is the bare tool name without any serverId prefix
+    - GDL-2: `server` is the serverId only without any tool name suffix
+    - GDL-3: `server + '/' + tool` exactly reconstructs the original namespaced name
+    - GDL-4: both fields split correctly for stripe server (second server)
+    - GDL-5: `tool` contains no '/' character (no namespace leakage)
+  - All 5 pass locally. Full suite: 4884/4881/0/3. Pushed branch, opened PR #1572, subscribed to activity.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1836 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 32 open drift-guard test PRs (#1543–#1572), all CI-green (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GDL PR #1572 CI/review. Next GDM candidate: freeze `ch1tty/execute` dryRun response `status` field value — must be exactly the string `'dry_run'` (not null, not undefined, not 'dryRun', not 'dry-run'). Prior tests check `status` is a required key (EC) but none verify its exact value. Alternatively: freeze the `isError: false` field present on dryRun responses (GDC/GDJ check key sets, none confirm isError value semantics for dryRun).
