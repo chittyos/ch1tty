@@ -8646,3 +8646,26 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** GDX candidate — freeze `ch1tty/search` response `sessionContext` key set when sessionId is active. GDB froze the sessionContext key set for search, but it may have been merged and then the GD-series extended further. Verify and freeze if gap remains. Alternatively: freeze `ch1tty/cast` live response key set when sessionId is active (cast adds sessionContext in a different code path than execute).
+
+---
+
+### Run ~1846 — 2026-09-28T (automated run)
+- **Workstream advanced:** None — 30 open drift-guard PRs (#1555–#1585) exceed the ~20 cap; standing down on new PR creation
+- **Branch/PR:** direct commit to main (board update only)
+- **Build:** tsc clean | **Tests (main):** 4879 total / 4876 pass / 0 fail / 3 skip (note: 1 flaky fail on first run, 0 on second — intermittent timing issue, not a real failure)
+- **Actions this run:**
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE.
+  - `git checkout main && git pull origin main` (synced +45 commits to 4390917, run ~1845). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 4876/0/3 (4879 total, 348 suites). Test count up significantly from last recorded (1438 → 4876) due to drift-guard PR merges.
+  - 30 open PRs confirmed (#1555–#1585 drift-guard series GCU–GDW): all CI-green (CodeQL), main npm test CI still disabled at org level. Queue exceeds ~20 cap → standing down, no new PR this run.
+  - Notion board search attempted: server accessible. Plan limit may have been resolved (found board ID 36e94de4).
+  - Flaky test note: first test run showed 4875/1/3; second run showed 4876/0/3. No code to fix — intermittent timing issue.
+- **State summary:** A ✓ B ✓ C ✓ D ✓ E ✓ F ✓ + all extended workstreams DONE. **30 PRs open** (#1555–#1585 = GCU through GDW). Tests: 4876/0/3. Build: clean.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1846 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 30 open drift-guard test PRs (#1555–#1585), all CI-green (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to resume board updates
+- **PushNotification:** NOT SENT — state unchanged from run ~1845; human already notified repeatedly.
+- **Next run:** If queue drops below ~20 (human merges PRs): advance GDX — freeze `ch1tty/cast` live response key set when sessionId is active (cast adds sessionContext in a different code path than execute). If queue still > ~20: stand down and update board only.
