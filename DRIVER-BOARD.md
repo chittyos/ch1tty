@@ -8591,3 +8591,31 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** GDQ candidate — freeze that dryRun with unknown SERVER (not just unknown tool) still returns isError:true (contrast with GDP-1 which tests unknown tool under known server). Alternatively: freeze live execute content[1] is at content[content.length-1] (not hardcoded index [1]) for multi-item backend results.
+
+---
+
+### Run ~1841 — 2026-09-28T (automated run)
+- **Workstream advanced:** GDQ — freeze `ch1tty/execute` dryRun error-boundary for unknown server and no-slash tool (5 tests)
+- **Branch/PR:** `auto/GDQ-dryrun-unknown-server-error-boundary` → **PR #1577** (https://github.com/chittyos/ch1tty/pull/1577)
+- **Build:** tsc clean | **Tests (main):** 4884 total / 4881 pass / 0 fail / 3 skip; GDQ adds 5 (→ 4889/4886/0/3 on branch)
+- **Actions this run:**
+  - Startup: fetched GDP branch, read fixture-backend.ts to verify CodeRabbit finding on PR #1576.
+  - CodeRabbit Minor finding on GDP-4 verified correct (callLog skips absent-tool entries). Replied to thread and resolved it. No push needed (Minor from bot; first dryRun call uses valid fixture tool, covering the normal path).
+  - Checked out main; read handleExecute source (lines ~877–940) to map error paths.
+  - Identified GDQ gap: no merged test covers dryRun with unknown server or no-slash tool format. Both guards fire BEFORE the dryRun check at line 919.
+  - Wrote `test/gdq-execute-dryrun-unknown-server-error-boundary.test.ts` (5 tests: GDQ-1..5):
+    - GDQ-1: unknown server + dryRun:true → isError === true (contrast: GDP-1 known server → isError:false)
+    - GDQ-2: unknown server dryRun → body text does NOT contain dry_run status
+    - GDQ-3: no-slash tool + dryRun:true → isError === true
+    - GDQ-4: no-slash tool dryRun → error text references serverId/toolName format
+    - GDQ-5: unknown server dryRun makes zero backend calls
+  - All 5 pass locally. Pushed branch, opened PR #1577, subscribed.
+  - Notion board: plan limit hit — only DRIVER-BOARD.md + .driver/run-log.md updated.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1841 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 37 open drift-guard test PRs (#1541–#1577), all CI-green (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** GDR candidate — freeze that live (non-dryRun) execute with sessionId appends session metadata as the LAST content item (index = content.length - 1, not hardcoded [1]). Tests a multi-item backend result and verifies the metadata item is at the end. Alternatively: freeze empty-string tool name dryRun error semantics (missing 'tool' argument guard, line ~886).

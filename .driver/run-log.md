@@ -1906,3 +1906,38 @@
 5. Notion board: plan limit hit — cannot write new content
 
 **Next run:** GDQ — freeze `ch1tty/execute` live (non-dryRun) with sessionId: verify content[1] is the appended metadata item at the LAST position (index = content.length - 1, not hardcoded [1]), so if a backend returns multi-item content the metadata is still appended at the end. EC notes "appended" but no test verifies index semantics. Alternatively: freeze that dryRun with unknown SERVER still returns isError:true (contrast with GDP-1 which tests unknown TOOL under known server).
+
+---
+
+## Run ~1841 — 2026-09-28T (automated)
+
+**Branch:** `auto/GDQ-dryrun-unknown-server-error-boundary` | **PR:** #1577
+
+**Build:** tsc clean (0 errors)
+
+**Tests:** 4886 pass / 0 fail / 3 skip (4889 total; was 4881/0/3 on main, +5 new)
+
+**What was done:**
+- Read pending notifications (5) for PR #1576 — CodeRabbit review complete, 1 Minor finding
+- Verified CodeRabbit finding on GDP-4: `callLog` skips calls to absent fixture tools. Finding valid but labeled Minor (bot, not red-circle) — replied once explaining coverage gap and resolved thread. No push.
+- Checked out main; read `handleExecute` (src-stdio/aggregator.ts lines ~877–940) to map all error paths
+- Identified GDQ gap: no merged test covers dryRun with unknown server (guard B, line ~908) or no-slash tool name (guard A, line ~894). Both fire before the dryRun check at line ~919.
+- Added `test/gdq-execute-dryrun-unknown-server-error-boundary.test.ts` — 5 tests (GDQ-1..5):
+  - GDQ-1: unknown server + dryRun:true → isError === true
+  - GDQ-2: unknown server dryRun body text does not contain dry_run status
+  - GDQ-3: no-slash tool + dryRun:true → isError === true
+  - GDQ-4: no-slash tool dryRun error text references serverId/toolName format
+  - GDQ-5: unknown server dryRun makes zero backend calls (valid fixture tools used so any call would be logged)
+- All 5 pass locally. Full suite: 4889/4886/0/3. Pushed branch, opened PR #1577, subscribed.
+
+**Open PRs (all awaiting human merge — CI disabled):**
+- #1541–#1577: 37 drift-guard PRs
+
+**Standing blockers (human action required):**
+1. GitHub Actions npm test CI disabled — only CodeQL runs
+2. Disable or slow hourly cron (~1841 runs; original workstreams done)
+3. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+4. Stale branch cleanup — 1100+ remote auto/ branches
+5. Notion board: plan limit hit
+
+**Next run:** GDR — freeze live execute with sessionId: session metadata is appended as LAST content item (content.length - 1 index), verified with a multi-item backend result. Alternatively: freeze empty-string tool name error (missing 'tool' argument, line ~886).
