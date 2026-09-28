@@ -1945,3 +1945,39 @@
 5. Notion board: plan limit hit — cannot write new content
 
 **Next run:** GDU — freeze `ch1tty/execute` live (non-dryRun) with sessionId: verify `recentTools` items are strings (not objects). GDS-3 verifies all 3 tools appear in recentTools but doesn't assert the value type of each item. Each item should be a namespaced string like "neon/list_projects" — no nested objects.
+
+---
+
+## Run ~1845 — 2026-09-28
+
+**Branch:** `auto/GDU-execute-sessionid-recenttools-item-types`
+**PR:** #1583
+
+**Build:** tsc clean (0 errors)
+
+**Tests:** 4881 pass / 0 fail / 3 skip (4884 total; was 4876/0/3 on main, +5 new)
+
+**What was done:**
+- Resumed from context-compacted run ~1844. PR #1582 (GDT) CI green: CodeQL success, Analyze(actions) success, Analyze(javascript-typescript) success. CodeRabbit still processing (no final review posted). PR waiting on human merge.
+- Baseline on main: 4876 pass / 0 fail / 3 skip
+- Identified GDU gap: existing tests verify recentTools.includes(tool) and array length cap, but never assert typeof item === 'string'. A refactor serialising items as {tool,count} objects would pass silently.
+- Source invariant: `src-stdio/aggregator.ts` execute branch appends `recentTools = patterns.slice(0,5).map((p) => p.tool)` — each item is a string (`p.tool` is the namespaced tool name). GDU freezes this runtime contract.
+- Added `test/gdu-execute-sessionid-recenttools-item-types.test.ts` — 5 tests:
+  - GDU-1: recentTools is an Array (not undefined, null, or non-array)
+  - GDU-2: every item is typeof 'string'
+  - GDU-3: every item is non-empty
+  - GDU-4: every item contains '/' (namespaced server/tool format)
+  - GDU-5: 3 distinct tool calls → no duplicate entries in recentTools
+- All 5 pass in isolation and full suite. Pushed branch, opened PR #1583, subscribed.
+
+**Open PRs (all awaiting human merge — CI disabled):**
+- #1543 (GCK) through #1583 (GDU): 41 drift-guard PRs
+
+**Standing blockers (human action required):**
+1. **GitHub Actions npm test CI disabled at org level** — only CodeQL runs; auto-merge can't trigger
+2. **Disable or slow hourly cron** — ~1845 runs; all original A–E workstreams done; burning ~50k tokens/run
+3. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+4. Stale branch cleanup — 1100+ remote auto/ branches
+5. Notion board: plan limit hit — cannot write new content
+
+**Next run:** GDV — freeze that `callCount` in sessionContext is a number (typeof === 'number'), not a string. Existing tests assert callCount equals specific values but not its runtime type. If coordinator.getToolPatterns returns counts as strings, callCount could be '3' passing equality checks against 3 in tests.
