@@ -8669,3 +8669,26 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   6. **Notion plan limit** — upgrade or clean to resume board updates
 - **PushNotification:** NOT SENT — state unchanged from run ~1845; human already notified repeatedly.
 - **Next run:** If queue drops below ~20 (human merges PRs): advance GDX — freeze `ch1tty/cast` live response key set when sessionId is active (cast adds sessionContext in a different code path than execute). If queue still > ~20: stand down and update board only.
+
+---
+
+### Run ~1847 — 2026-09-28T~UTC (automated run)
+- **Workstream advanced:** None — 30 open drift-guard PRs (#1555–#1585) still exceed ~20 cap; standing down
+- **Branch/PR:** direct commit to main (board update only)
+- **Build:** tsc clean | **Tests:** 4879 pass / 0 fail / 3 skip (348 suites, ~100s)
+- **Actions this run:**
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 4879/0/3 (same as ~1846 ± 3).
+  - 30 open PRs confirmed (#1555–#1585, GCU–GDW drift-guard series) — unchanged from ~1846.
+  - Verified all workstreams: A ✓ B ✓ (github→api.githubcopilot.com/mcp/) C ✓ (src/focus.ts + focus-profiles.json) D ✓ (scenario.test.ts + 50+ focus scenarios) E ✓ (focus-suggestions.json 1956 lines).
+  - Notion board at plan limit; DRIVER-BOARD.md is the fallback.
+- **State summary:** All workstreams A–E + extended complete. **30 PRs open** (#1555–#1585). Tests: 4879/0/3. Build: clean.
+- **Human-action items (persistent — unchanged):**
+  1. **DISABLE hourly cron** — ~1847 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 30 open drift-guard test PRs (#1555–#1585), all awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to resume board updates
+- **PushNotification:** NOT SENT — state unchanged from ~1846; human already notified.
+- **Next run:** If queue drops below ~20 (human merges PRs): advance GDX — freeze `ch1tty/cast` live response key set with sessionId active. If queue still > ~20: stand down again.
