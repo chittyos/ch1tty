@@ -8596,7 +8596,7 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 ### Run ~1842 — 2026-09-28T (automated run)
 - **Workstream advanced:** GDR — freeze `ch1tty/execute` live sessionId metadata appended at last content position (5 tests)
-- **Branch/PR:** `auto/GDR-execute-live-sessionid-metadata-last` → **PR TBD** (pushed this run)
+- **Branch/PR:** `auto/GDR-execute-live-sessionid-metadata-last` → **PR #1578** (https://github.com/chittyos/ch1tty/pull/1578)
 - **Build:** tsc clean | **Tests (main):** 4876 pass / 0 fail / 3 skip; GDR adds 5 (→ 4881/0/3 on branch)
 - **Actions this run:**
   - Startup: `npm ci` clean; build clean; tests 4876/0/3 on main.

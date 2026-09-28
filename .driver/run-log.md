@@ -1911,7 +1911,7 @@
 
 ## Run ~1842 — 2026-09-28T (automated)
 
-**Branch:** `auto/GDR-execute-live-sessionid-metadata-last` | **PR:** TBD
+**Branch:** `auto/GDR-execute-live-sessionid-metadata-last` | **PR:** #1578 (https://github.com/chittyos/ch1tty/pull/1578)
 
 **Build:** tsc clean (0 errors)
 
