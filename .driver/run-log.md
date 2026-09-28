@@ -1835,3 +1835,36 @@
 5. Hourly cron still firing — all original workstreams done; now generating drift-guard tests
 
 **Next run:** GDG candidate — freeze that the 5-slot recentTools window retains by frequency (top-N-by-count), not by recency. GN-4 freezes the cap; GDG would freeze the selection criterion.
+
+---
+
+## Run log — 2026-09-28T~UTC (automated, run ~1839)
+
+**Workstream advanced:** GDO — execute dryRun+sessionId sessionContext embedded structure drift guard (5 tests)
+
+**Branch/PR:** `auto/GDO-execute-dryrun-sessioncontext-item-structure` → https://github.com/chittyos/ch1tty/pull/1575
+
+**Build:** tsc clean (0 errors)
+
+**Tests:** 4881 pass / 0 fail / 3 skip (+5 over 4876 baseline on main)
+
+**What was done:**
+- Read CLAUDE.md + CHITTY.md; confirmed 5-tool surface invariant
+- npm ci clean; npm run build clean; npm test 4876/0/3 baseline
+- Read Notion board: all A–E done; last board update 2026-09-10. Confirmed 30 open drift-guard PRs (GCK #1543 → GDN #1574) stuck due to CI not running npm test
+- Identified GDO gap: FH-12 (on main) froze the dryRun body key set WITHOUT sessionId; no main-merged test froze: (a) that content has 1 item not 2 when dryRun+sessionId, (b) that sessionContext is embedded in the dryRun JSON body, (c) the exact body key set with session, (d) sessionContext sub-object key set, (e) recentTools is an Array
+- Added `test/gdo-execute-dryrun-sessioncontext-item-structure.test.ts` — 5 tests (GDO-1..5): all pass. Source ref: src-stdio/aggregator.ts ~line 919 dryRun branch; comment on ~line 401 explicitly states sessionContext is embedded in dryRun JSON not a second item
+- Pushed branch, opened PR #1575
+
+**Open PRs (all awaiting human merge — CI disabled):**
+- #1543 (GCK) through #1575 (GDO): 31 drift-guard PRs
+
+**Standing blockers (human action required):**
+1. **GitHub Actions npm test CI disabled at org level** — only CodeQL runs; auto-merge can't trigger
+2. **Disable or slow hourly cron** — ~1839 runs; all original A–E workstreams done; burning ~50k tokens/run
+3. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+4. Stale branch cleanup — 1100+ remote auto/ branches  
+5. Notion board: plan limit hit — cannot write new content
+
+**Next run:** GDP — freeze `ch1tty/execute` real (non-dryRun)+sessionId second content item structure: content[1].text JSON should be `{latencyMs, sessionContext}` (key set, value types). FH covers content[0] from backend but not content[1] from the session metadata append path.
+
