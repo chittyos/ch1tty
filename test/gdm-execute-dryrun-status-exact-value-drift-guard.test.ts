@@ -48,6 +48,7 @@ import { FixtureBackend, FIXTURE_SERVERS } from './fixture-backend.js';
 
 let _seq = 0;
 
+/** Returns a unique temp path for the ledger DLQ. */
 function dlq(): string {
   return join(tmpdir(), `ch1tty-gdm-${Date.now()}-${++_seq}.jsonl`);
 }
@@ -57,6 +58,7 @@ const BASE_CONFIGS: ServerConfig[] = [
   { id: 'stripe', name: 'Stripe',  type: 'remote', access: 'readwrite', category: 'ecosystem', endpoint: 'https://stripe.com/mcp', lazy: true } as ServerConfig,
 ];
 
+/** Creates a test Aggregator wired to FixtureBackend. */
 function makeAgg(): Aggregator {
   const backend = new FixtureBackend();
   backend.defineServer('neon',   FIXTURE_SERVERS.neon);
