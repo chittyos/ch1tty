@@ -1939,3 +1939,24 @@
 5. Notion board: plan limit hit
 
 **Next run:** GDS — freeze `ch1tty/execute` live with sessionId: verify `sessionContext.callCount` increments correctly across multiple execute calls in the same session (callCount = N after N calls), and that `sessionContext.recentTools` contains the tool names from recent calls in reverse-chronological order.
+
+---
+
+## Run ~1843 — 2026-09-28T (automated run)
+
+**Workstream:** GDS — freeze `ch1tty/execute` live sessionId `callCount` increment and `recentTools` frequency sort (5 tests)
+**Branch/PR:** `auto/GDS-execute-live-sessionid-callcount-recenttools` → PR #1579
+
+**Build:** tsc clean | **Tests:** 4881/0/3 on main (GDR branch); GDS adds 5 → 4886/0/3 on branch
+
+**Actions:**
+- Confirmed PR #1578 (GDR) all-green: 3/3 checks passed (CodeQL, Analyze actions, Analyze javascript-typescript).
+- Read coordinator.ts getToolPatterns (~line 235): sorts by `count` descending — NOT chronological. Board note about "reverse-chronological" was incorrect; tests freeze actual behavior.
+- Wrote test/gds-execute-live-sessionid-callcount-recenttools.test.ts (5 tests, all pass):
+  - GDS-1: first execute → callCount === 1, tool in recentTools
+  - GDS-2: 3 sequential executes → callCount increments 1→2→3
+  - GDS-3: 3 distinct tools → all appear in recentTools
+  - GDS-4: most-called tool first in recentTools (frequency sort, not call order)
+  - GDS-5: callCount = total calls, not unique tools
+
+**Next run:** GDT — freeze `ch1tty/execute` live with sessionId: recentTools is capped at 5 entries even after more than 5 distinct tools; capped 5 are the highest-frequency ones.

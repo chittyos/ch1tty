@@ -8617,4 +8617,30 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
-- **Next run:** GDS — freeze `ch1tty/execute` live with sessionId: verify `sessionContext.callCount` increments across multiple execute calls in the same session, and `sessionContext.recentTools` is in reverse-chronological order.
+- **Next run:** GDS — DELIVERED this run (PR #1579).
+
+---
+
+### Run ~1843 — 2026-09-28T (automated run)
+- **Workstream advanced:** GDS — freeze `ch1tty/execute` live sessionId `callCount` increment and `recentTools` frequency sort (5 tests)
+- **Branch/PR:** `auto/GDS-execute-live-sessionid-callcount-recenttools` → **PR #1579** (https://github.com/chittyos/ch1tty/pull/1579)
+- **Build:** tsc clean | **Tests (main):** 4881 pass / 0 fail / 3 skip (GDR branch); GDS adds 5 (→ 4886/0/3 on branch)
+- **Actions this run:**
+  - Confirmed PR #1578 (GDR) all-green (CodeQL + Analyze actions/javascript-typescript — 3/3 checks passed).
+  - Read coordinator.ts: `getToolPatterns` sorts by `count` desc (NOT chronological). `onToolCall` increments count per tool. `callCount` = reduce-sum of all counts.
+  - GDS note: board said "reverse-chronological" but code sorts by frequency — tests freeze ACTUAL behavior.
+  - Wrote `test/gds-execute-live-sessionid-callcount-recenttools.test.ts` (5 tests: GDS-1..5):
+    - GDS-1: first execute → callCount === 1, called tool in recentTools
+    - GDS-2: 3 sequential executes same sessionId → callCount increments (1→2→3)
+    - GDS-3: 3 distinct tools called → all 3 appear in recentTools
+    - GDS-4: most-called tool first in recentTools (sorted by frequency, not call order)
+    - GDS-5: callCount counts total calls, not unique tools (same tool N times → callCount === N)
+  - All 5 pass. Pushed, opened PR #1579, subscribed.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1843 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 39 open drift-guard test PRs (#1541–#1579), all CI-green (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** GDT — freeze `ch1tty/execute` live with sessionId: verify that `recentTools` is capped at 5 entries even after calling more than 5 distinct tools, and that the 5 returned are the highest-frequency ones.
