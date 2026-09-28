@@ -8515,3 +8515,30 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GDG PR #1567 CI/review. Next GDH candidate: freeze `ch1tty/execute` `dryRun` response exact key sets — `dryRun:true` embeds sessionContext inside the dry_run JSON rather than as a separate appended item; the exact keys inside dry_run are not frozen by any prior test (GDC froze the non-dryRun key sets).
+
+---
+
+### Run ~1833 — 2026-09-28T (automated run)
+- **Workstream advanced:** GDJ — freeze `ch1tty/execute` dryRun response exact top-level key set (5 tests)
+- **Branch/PR:** `auto/GDJ-execute-dryrun-toplevel-keyset` → **PR #TBD**
+- **Build:** tsc clean | **Tests (main):** 4879 total / 4876 pass / 0 fail / 3 skip; GDJ adds 5 (→ 4884/4881/0/3 on branch)
+- **Actions this run:**
+  - Startup: resumed on origin/main (2536e01, run ~1831 baseline). npm ci clean. build clean. Tests 4876/0/3 ✓
+  - Read DRIVER-BOARD.md tail — prior run (~1832) was GDI (search tools[] recentlyUsed field presence semantics); 12 open drift-guard PRs (#1556–#1569) all CI-green awaiting human merge.
+  - Identified gap: GDJ candidate from prior run — freeze exact top-level key set of dryRun execute response. Key finding: `handleMetaTool` (lines 602-611) adds `latencyMs` unconditionally to the dryRun JSON after `handleExecute` returns, so the actual set is {status,server,tool,args,latencyMs} (no session) or +{sessionContext} (with session). EC froze required key names but not exact count; GL froze value types but not key set; GDC froze non-dryRun key sets only. GDJ closes the gap.
+  - Verified source: `src-stdio/aggregator.ts` lines 584-624 — session lazy-created at 588-592; dryRun JSON built at 929-934; latencyMs injected at 607.
+  - Wrote `test/gdj-execute-dryrun-toplevel-keyset-drift-guard.test.ts` (5 tests: GDJ-1..5):
+    - GDJ-1: No session → Object.keys count exactly 5
+    - GDJ-2: No session → all of {status,server,tool,args,latencyMs} present
+    - GDJ-3: No session → sessionContext key absent
+    - GDJ-4: With session → Object.keys count exactly 6
+    - GDJ-5: With session → 6th key is sessionContext, no unexpected extras
+  - All 5 pass locally (ok 1–5). Full suite on branch: 4884/4881/0/3. Pushed branch, opened PR.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1833 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 13+ open drift-guard test PRs (#1556–#1569 + GDJ), all CI-green (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GDJ PR CI/review. Next GDK candidate: freeze `ch1tty/execute` dryRun `args` field — specifically that args echos the caller-supplied args object exactly (no extra keys, no mutation), as a per-field contract rather than just checking presence.
