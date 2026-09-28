@@ -8515,3 +8515,25 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GDG PR #1567 CI/review. Next GDH candidate: freeze `ch1tty/execute` `dryRun` response exact key sets — `dryRun:true` embeds sessionContext inside the dry_run JSON rather than as a separate appended item; the exact keys inside dry_run are not frozen by any prior test (GDC froze the non-dryRun key sets).
+
+---
+
+### Run ~1837 — 2026-09-28T (automated run)
+- **Workstream advanced:** GDM — freeze `ch1tty/execute` dryRun `status` exact value (5 tests)
+- **Branch/PR:** `auto/GDM-dryrun-status-exact-value` → **PR #1573** (https://github.com/chittyos/ch1tty/pull/1573)
+- **Build:** tsc clean | **Tests (main):** 4879 total / 4876 pass / 0 fail / 3 skip; GDM adds 5 (→ 4884/4881/0/3 on branch)
+- **Full CI validation (local):** build clean ✓ | npm test 4876/0/3 ✓ | coverage 100% all files ✓ | typecheck:worker clean ✓ | typecheck:apps clean ✓ | npm audit 0 vulnerabilities ✓ | all app suites pass (tasks 90/0, ledger 81/0, session 112/0, evidence 94/0, comms 202/0/1) ✓
+- **Actions this run:**
+  - Startup: read CLAUDE.md + CHITTY.md; npm ci clean; build clean; tests 4876/0/3 on main.
+  - Read DRIVER-BOARD.md + all open PRs (33 open drift-guard PRs #1540–#1572). Verified GitHub entry uses official endpoint (api.githubcopilot.com/mcp/). Coverage is 100% on all gateway files.
+  - GDM candidate identified from prior run note: freeze `status: 'dry_run'` exact string value. Prior tests (EC/GL/GDC/GDJ/GDL) verify key presence and typeof, but none freeze the exact string value.
+  - Wrote `test/gdm-execute-dryrun-status-exact-value-drift-guard.test.ts` (5 tests: GDM-1..5): exact value neon, exact value stripe, typeof string, value with args, value with active sessionId.
+  - All 5 pass locally. Full suite: 4884/4881/0/3. Pushed branch, opened PR #1573, subscribed to activity.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1837 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 33 open drift-guard test PRs (#1540–#1573), all CI-green (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GDM PR #1573 CI/review. Next GDN candidate: freeze `ch1tty/execute` dryRun `isError` field — the call result must have `isError` absent/false (not `true`) for a valid dryRun. Prior tests check error-path semantics but none specifically assert `isError` is not set on a successful dryRun call result.
