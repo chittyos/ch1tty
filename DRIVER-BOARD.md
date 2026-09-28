@@ -8591,3 +8591,31 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** GDQ candidate — freeze that dryRun with unknown SERVER (not just unknown tool) still returns isError:true (contrast with GDP-1 which tests unknown tool under known server). Alternatively: freeze live execute content[1] is at content[content.length-1] (not hardcoded index [1]) for multi-item backend results.
+
+---
+
+### Run ~1841 — 2026-09-28T (automated run)
+- **Workstream advanced:** GDQ — freeze `ch1tty/execute` dryRun WITH SESSION exact body key set (5 tests)
+- **Branch/PR:** `auto/GDQ-dryrun-session-exact-body-keyset` → **PR #1581** (https://github.com/chittyos/ch1tty/pull/1581)
+- **Build:** tsc clean | **Tests (main):** 4879 total / 4876 pass / 0 fail / 3 skip; GDQ adds 5 (→ 4884/4881/0/3 on branch)
+- **Actions this run:**
+  - Startup: read CLAUDE.md + CHITTY.md; npm ci clean; build clean; tests 4876/0/3 on main.
+  - Read DRIVER-BOARD.md tail — prior run (~1840) was GDP (dryRun no-backend-call boundary); 36 open drift-guard PRs awaiting human merge.
+  - Evaluated both GDQ candidates: (1) "unknown SERVER + dryRun → isError:true" — already covered by EC-6; (2) "live execute content[1] at content[content.length-1]" — already covered in execute-session-context.test.ts (lines 355, 370+).
+  - Identified genuine gap: EC froze dryRun body exact key set for NO-SESSION case only; no merged test freezes the WITH-SESSION exact key set (EC only checks sessionContext is present, not that no unexpected key is added).
+  - Wrote `test/gdq-execute-dryrun-session-exact-body-keyset-drift-guard.test.ts` (5 tests: GDQ-1..5):
+    - GDQ-1: dryRun + sessionId → body EXACTLY {status,server,tool,args,latencyMs,sessionContext}
+    - GDQ-2: dryRun + sessionId + sticky focus → body still EXACTLY 6 keys (focus not top-level)
+    - GDQ-3: dryRun + sessionId, no focus → sessionContext EXACTLY {recentTools,callCount}
+    - GDQ-4: dryRun + sessionId + sticky focus → sessionContext EXACTLY {recentTools,callCount,activeSessionFocus}
+    - GDQ-5: dryRun after one live call → body key set unchanged (session growth doesn't expand shape)
+  - All 5 pass locally. Full suite: 4884/4881/0/3. Pushed branch, opened PR #1581, subscribed.
+  - Notion board: plan limit hit — only DRIVER-BOARD.md updated.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1841 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 37 open drift-guard test PRs (#1541–#1581), all CI-green (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GDQ PR #1581 CI/review. Next GDR candidate: freeze `ch1tty/execute` dryRun `server` field value equals the serverId prefix of the `tool` field in the WITH-SESSION response (GL-3 froze this for no-session; no merged test freezes it for WITH-session, though the same code path is used). Alternatively: freeze that `dryRun:true` with `args: {nested: {object: true}}` echoes the full nested args correctly (args passthrough fidelity for complex objects).
