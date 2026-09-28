@@ -1906,3 +1906,42 @@
 5. Notion board: plan limit hit — cannot write new content
 
 **Next run:** GDQ — freeze `ch1tty/execute` live (non-dryRun) with sessionId: verify content[1] is the appended metadata item at the LAST position (index = content.length - 1, not hardcoded [1]), so if a backend returns multi-item content the metadata is still appended at the end. EC notes "appended" but no test verifies index semantics. Alternatively: freeze that dryRun with unknown SERVER still returns isError:true (contrast with GDP-1 which tests unknown TOOL under known server).
+
+---
+
+## Run log — 2026-09-28T~UTC (automated, run ~1844)
+
+**Workstream advanced:** GDT — freeze `ch1tty/execute` live without sessionId → no session metadata appended (5 tests)
+
+**Branch/PR:** `auto/GDT-execute-no-session-no-metadata` → https://github.com/chittyos/ch1tty/pull/1582
+
+**Build:** tsc clean (0 errors)
+
+**Tests:** 4881 pass / 0 fail / 3 skip (4884 total; was 4876/0/3 on main, +5 new)
+
+**What was done:**
+- Read CLAUDE.md + CHITTY.md; confirmed 5-tool surface invariant and buildCastExplanation metric freeze
+- npm ci clean; npm run build clean; npm test 4876/0/3 baseline on main
+- Read .driver/run-log.md — prior run (~1843) was GDS; 39 open drift-guard PRs (#1543–#1581) awaiting human merge
+- Read Notion board (search returned but page too large for inline fetch); confirmed all workstreams A–E + extensions complete; Notion plan limit still blocks new content
+- Identified GDT gap: complement of GDR — no test verifies that when sessionId is ABSENT, content stays exactly 1 item (the raw backend response) with no metadata appended
+- Source: `handleMetaTool` execute branch ~line 613–621; append gated on `if (execSessionId && coordinator.hasSession(execSessionId))` — without sessionId, execSessionId is undefined, push never fires
+- Added `test/gdt-execute-no-session-no-metadata.test.ts` — 5 tests:
+  - GDT-1: execute without sessionId → isError not set
+  - GDT-2: execute without sessionId → content.length === 1 (no metadata appended)
+  - GDT-3: execute without sessionId → content[0].type === 'text' (backend item intact)
+  - GDT-4: execute without sessionId → content[0].text has no top-level latencyMs key
+  - GDT-5: 3 sequential executes without sessionId → content.length stays 1 every call
+- All 5 pass. Full suite: 4884/4881/0/3. Pushed branch, opened PR #1582, subscribed.
+
+**Open PRs (all awaiting human merge — CI disabled):**
+- #1543 (GCK) through #1582 (GDT): 40 drift-guard PRs
+
+**Standing blockers (human action required):**
+1. **GitHub Actions npm test CI disabled at org level** — only CodeQL runs; auto-merge can't trigger
+2. **Disable or slow hourly cron** — ~1844 runs; all original A–E workstreams done; burning ~50k tokens/run
+3. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+4. Stale branch cleanup — 1100+ remote auto/ branches
+5. Notion board: plan limit hit — cannot write new content
+
+**Next run:** GDU — freeze `ch1tty/execute` live (non-dryRun) with sessionId: verify `recentTools` items are strings (not objects). GDS-3 verifies all 3 tools appear in recentTools but doesn't assert the value type of each item. Each item should be a namespaced string like "neon/list_projects" — no nested objects.
