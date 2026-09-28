@@ -8520,7 +8520,7 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 ### Run ~1833 — 2026-09-28T (automated run)
 - **Workstream advanced:** GDJ — freeze `ch1tty/execute` dryRun response exact top-level key set (5 tests)
-- **Branch/PR:** `auto/GDJ-execute-dryrun-toplevel-keyset` → **PR #TBD**
+- **Branch/PR:** `auto/GDJ-execute-dryrun-toplevel-keyset` → **PR #1570** (https://github.com/chittyos/ch1tty/pull/1570)
 - **Build:** tsc clean | **Tests (main):** 4879 total / 4876 pass / 0 fail / 3 skip; GDJ adds 5 (→ 4884/4881/0/3 on branch)
 - **Actions this run:**
   - Startup: resumed on origin/main (2536e01, run ~1831 baseline). npm ci clean. build clean. Tests 4876/0/3 ✓
