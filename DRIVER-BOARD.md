@@ -8619,3 +8619,30 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GDQ PR #1581 CI/review. Next GDR candidate: freeze `ch1tty/execute` dryRun `server` field value equals the serverId prefix of the `tool` field in the WITH-SESSION response (GL-3 froze this for no-session; no merged test freezes it for WITH-session, though the same code path is used). Alternatively: freeze that `dryRun:true` with `args: {nested: {object: true}}` echoes the full nested args correctly (args passthrough fidelity for complex objects).
+
+---
+
+### Run ~1845 — 2026-09-28T12:33Z (automated run)
+- **Workstream advanced:** GDW — freeze `ch1tty/execute` live-path metadata outer JSON key sets (5 tests)
+- **Branch/PR:** `auto/GDW-execute-live-metadata-outer-key-set` → **PR #1585** (https://github.com/chittyos/ch1tty/pull/1585)
+- **Build:** tsc clean | **Tests (main):** 4879 total / 4876 pass / 0 fail / 3 skip; GDW adds 5 (→ 4884/4881/0/3 on branch)
+- **Full CI validation (local):** build clean ✓ | npm test 4881/0/3 on branch ✓
+- **Actions this run:**
+  - Startup: read CLAUDE.md + CHITTY.md; npm ci clean; build clean; tests 4876/0/3 on main.
+  - Read DRIVER-BOARD.md + .driver/run-log.md — prior run (~1844) was GDT; confirmed GDU (#1583) and GDV (#1584) already opened by earlier runs today.
+  - Identified GDW gap: GDR/GDS/GDT/GDU all froze position/values/absence/item-types but none froze the shape (key sets) of the outer metadata JSON or sessionContext sub-object.
+  - Wrote `test/gdw-execute-live-metadata-outer-key-set-drift-guard.test.ts` (5 tests):
+    - GDW-1: outer JSON has EXACTLY {latencyMs, sessionContext}
+    - GDW-2: latencyMs is typeof 'number', isFinite, >= 0
+    - GDW-3: sessionContext without focus has EXACTLY {callCount, recentTools}
+    - GDW-4: sessionContext with active focus has EXACTLY {callCount, recentTools, activeSessionFocus}
+    - GDW-5: metadata content item text is valid JSON
+  - All 5 pass. Full suite: 4884/4881/0/3. Pushed branch, opened PR #1585, subscribed.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1845 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 41+ open drift-guard test PRs, all CI-green (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** GDX candidate — freeze `ch1tty/search` response `sessionContext` key set when sessionId is active. GDB froze the sessionContext key set for search, but it may have been merged and then the GD-series extended further. Verify and freeze if gap remains. Alternatively: freeze `ch1tty/cast` live response key set when sessionId is active (cast adds sessionContext in a different code path than execute).

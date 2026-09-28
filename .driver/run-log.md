@@ -1945,3 +1945,41 @@
 5. Notion board: plan limit hit — cannot write new content
 
 **Next run:** GDU — freeze `ch1tty/execute` live (non-dryRun) with sessionId: verify `recentTools` items are strings (not objects). GDS-3 verifies all 3 tools appear in recentTools but doesn't assert the value type of each item. Each item should be a namespaced string like "neon/list_projects" — no nested objects.
+
+---
+
+## Run log — 2026-09-28T12:33Z (automated, run ~1845)
+
+**Workstream advanced:** GDW — freeze `ch1tty/execute` live metadata outer JSON key sets (5 tests)
+
+**Branch/PR:** `auto/GDW-execute-live-metadata-outer-key-set` → https://github.com/chittyos/ch1tty/pull/1585
+
+**Build:** tsc clean (0 errors)
+
+**Tests:** 4881 pass / 0 fail / 3 skip (4884 total; was 4876/0/3 on main, +5 new)
+
+**What was done:**
+- Read CLAUDE.md + CHITTY.md; confirmed 5-tool surface invariant and buildCastExplanation metric freeze
+- npm ci clean; npm run build clean; npm test 4876/0/3 baseline on main
+- Read DRIVER-BOARD.md + .driver/run-log.md — prior run (~1844) was GDT; confirmed GDU (#1583) and GDV (#1584) already opened by earlier runs
+- Checked Notion board (search found page; still plan-limit blocked for writes)
+- Identified GDW gap: GDR/GDS/GDT/GDU froze position/values/absence/item-types but none froze the key sets of the outer metadata object `{latencyMs, sessionContext}` or the `sessionContext` sub-object `{callCount, recentTools, activeSessionFocus?}`
+- Added `test/gdw-execute-live-metadata-outer-key-set-drift-guard.test.ts` — 5 tests:
+  - GDW-1: outer JSON has EXACTLY {latencyMs, sessionContext} (no extras)
+  - GDW-2: latencyMs is typeof 'number', isFinite, >= 0
+  - GDW-3: sessionContext without active focus: exactly {callCount, recentTools}
+  - GDW-4: sessionContext with active focus: exactly {callCount, recentTools, activeSessionFocus}
+  - GDW-5: metadata content item text is valid JSON
+- All 5 pass locally. Full suite: 4884/4881/0/3. Pushed branch, opened PR #1585, subscribed.
+
+**Open PRs (all awaiting human merge — CI disabled):**
+- #1543 (GCK) through #1585 (GDW): 41+ drift-guard PRs
+
+**Standing blockers (human action required):**
+1. **GitHub Actions npm test CI disabled at org level** — only CodeQL runs; auto-merge can't trigger
+2. **Disable or slow hourly cron** — ~1845 runs; all original A–E workstreams done; burning ~50k tokens/run
+3. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+4. Stale branch cleanup — 1100+ remote auto/ branches
+5. Notion board: plan limit hit — cannot write new content
+
+**Next run:** GDX candidate — freeze `ch1tty/search` response when sessionId active (check if GDB covered this or if a gap remains in the search sessionContext key set). Alternatively: freeze `ch1tty/cast` response sessionContext key set when sessionId is active (cast appends sessionContext in a different code path).
