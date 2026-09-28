@@ -8515,3 +8515,32 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GDG PR #1567 CI/review. Next GDH candidate: freeze `ch1tty/execute` `dryRun` response exact key sets — `dryRun:true` embeds sessionContext inside the dry_run JSON rather than as a separate appended item; the exact keys inside dry_run are not frozen by any prior test (GDC froze the non-dryRun key sets).
+
+---
+
+### Run ~1835 — 2026-09-28T (automated run)
+- **Workstream advanced:** GDK — freeze `ch1tty/execute` dryRun response `args` field exact echo (5 tests)
+- **Branch/PR:** `auto/GDK-dryrun-args-echo-exact` → PR to be opened
+- **Build:** tsc clean | **Tests (main):** 4879 total / 4876 pass / 0 fail / 3 skip; GDK adds 5 (→ 4884/4881/0/3 on branch)
+- **Actions this run:**
+  - Startup: `npm ci` clean, `npm run build` clean (tsc exit 0)
+  - `npm test` baseline on main: **4876 pass / 0 fail / 3 skip** — confirmed green
+  - Read DRIVER-BOARD.md + Notion board; Notion board 401 (plan limit hit); DRIVER-BOARD.md is durable state.
+  - Prior run (~1833 on main was GDG; GDH #1568, GDI #1569, GDJ #1570 are open PRs from runs ~1832-~1834).
+  - Read GDJ PR diff to confirm its "Next run" recommendation: GDK — freeze dryRun args echo semantics.
+  - Confirmed source: `handleExecute` sets `toolArgs = args.args ?? {}` and puts it verbatim into the dryRun JSON; `EC/GL/GDC/GDJ` all checked keys/types at the dryRun JSON top level but none verified args sub-object content.
+  - Wrote `test/gdk-execute-dryrun-args-echo-drift-guard.test.ts` (5 tests: GDK-1..5):
+    - GDK-1: No args → args field is `{}` (not null/undefined)
+    - GDK-2: Flat args deep-equal to caller-supplied object
+    - GDK-3: dryRun/sessionId/timeout do NOT leak into the args field
+    - GDK-4: Nested objects preserved without flattening
+    - GDK-5: Primitive value types (string/number/boolean) preserved without coercion
+  - All 5 pass locally. Full suite: **4884/4881/0/3** (+5 vs 4879 baseline).
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1835 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 30+ open drift-guard test PRs (#1543–#1570 + GDK), all CI-green (CodeQL), awaiting human merge. #1473 (GAK CI fix) should go first.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GDK PR CI/review. Next GDL candidate: freeze `ch1tty/execute` dryRun `tool` and `server` field values — `tool` must be the bare tool name (no server prefix), `server` must be the serverId only. Prior tests check these keys are present but not their value semantics (e.g. that server+'/'+tool reconstructs the original namespaced tool name).
