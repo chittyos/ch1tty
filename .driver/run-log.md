@@ -1906,3 +1906,36 @@
 5. Notion board: plan limit hit — cannot write new content
 
 **Next run:** GDQ — freeze `ch1tty/execute` live (non-dryRun) with sessionId: verify content[1] is the appended metadata item at the LAST position (index = content.length - 1, not hardcoded [1]), so if a backend returns multi-item content the metadata is still appended at the end. EC notes "appended" but no test verifies index semantics. Alternatively: freeze that dryRun with unknown SERVER still returns isError:true (contrast with GDP-1 which tests unknown TOOL under known server).
+
+---
+
+## Run ~1842 — 2026-09-28T (automated)
+
+**Branch:** `auto/GDR-execute-live-sessionid-metadata-last` | **PR:** TBD
+
+**Build:** tsc clean (0 errors)
+
+**Tests on main:** 4876 pass / 0 fail / 3 skip (4879 total). GDR adds 5 → 4881/0/3 on branch.
+
+**What was done:**
+- Startup: read CLAUDE.md + CHITTY.md; `npm ci` clean; build clean; tests 4876/0/3 (no regressions on main)
+- Read Notion board (plan-limit hit, read DRIVER-BOARD.md): confirmed all workstreams A–O done; Run ~1841 added GDQ
+- GDQ (PR #1577) is open and not yet merged (CI disabled at org level)
+- Identified GDR gap (prescribed by prior run): no merged test verifies that session metadata is appended at `content[content.length - 1]` for a multi-item backend result. Existing tests (execute-session-context, GN) only verify `content[1]` under a single-item backend — correct there but wrong mental model for N > 1.
+- Read `handleMetaTool` (src-stdio/aggregator.ts line ~620): confirmed `execResult.content.push(...)` — metadata is always the last item.
+- Wrote `test/gdr-execute-live-sessionid-metadata-last.test.ts` — 5 tests (GDR-1..5):
+  - GDR-1: multi-item backend (3 items) + sessionId → content.length = 4 (3 + metadata)
+  - GDR-2: content[content.length-1] parses as metadata JSON ({ latencyMs, sessionContext })
+  - GDR-3: content[1] is the second backend item ("item-one"), NOT metadata
+  - GDR-4: content[2] is the third backend item ("item-two"), NOT metadata
+  - GDR-5: content[0..2] are original backend items unmodified
+- All 5 pass locally. Full suite: 4881/0/3 (+5). Push + PR next.
+
+**Blockers (unchanged — require human action):**
+1. GitHub Actions npm test CI disabled — only CodeQL runs
+2. Disable or slow hourly cron (~1842 runs; original workstreams done)
+3. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+4. Stale branch cleanup — 1100+ remote auto/ branches
+5. Notion board: plan limit hit
+
+**Next run:** GDS — freeze `ch1tty/execute` live with sessionId: verify `sessionContext.callCount` increments correctly across multiple execute calls in the same session (callCount = N after N calls), and that `sessionContext.recentTools` contains the tool names from recent calls in reverse-chronological order.

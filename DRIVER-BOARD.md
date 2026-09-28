@@ -8591,3 +8591,30 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** GDQ candidate — freeze that dryRun with unknown SERVER (not just unknown tool) still returns isError:true (contrast with GDP-1 which tests unknown tool under known server). Alternatively: freeze live execute content[1] is at content[content.length-1] (not hardcoded index [1]) for multi-item backend results.
+
+---
+
+### Run ~1842 — 2026-09-28T (automated run)
+- **Workstream advanced:** GDR — freeze `ch1tty/execute` live sessionId metadata appended at last content position (5 tests)
+- **Branch/PR:** `auto/GDR-execute-live-sessionid-metadata-last` → **PR TBD** (pushed this run)
+- **Build:** tsc clean | **Tests (main):** 4876 pass / 0 fail / 3 skip; GDR adds 5 (→ 4881/0/3 on branch)
+- **Actions this run:**
+  - Startup: `npm ci` clean; build clean; tests 4876/0/3 on main.
+  - Read Notion board (plan-limit): all workstreams A–O done; Run ~1841 added GDQ (PR #1577, open, CI disabled).
+  - Identified GDR: no merged test covers multi-item backend result with sessionId — existing tests only verify `content[1]` on single-item backends.
+  - Read `handleMetaTool` source (~line 620): `execResult.content.push(...)` confirms metadata always lands at `content.length - 1`.
+  - Wrote `test/gdr-execute-live-sessionid-metadata-last.test.ts` (5 tests: GDR-1..5):
+    - GDR-1: 3-item backend + sessionId → content.length = 4
+    - GDR-2: content[length-1] = metadata JSON ({ latencyMs, sessionContext })
+    - GDR-3: content[1] = "item-one" (NOT metadata)
+    - GDR-4: content[2] = "item-two" (NOT metadata)
+    - GDR-5: content[0..2] are original backend items, unmodified
+  - All 5 pass locally. Pushed, opened PR.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1842 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 38 open drift-guard test PRs (#1541–#1577 + GDR), all CI-green (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** GDS — freeze `ch1tty/execute` live with sessionId: verify `sessionContext.callCount` increments across multiple execute calls in the same session, and `sessionContext.recentTools` is in reverse-chronological order.
