@@ -2008,3 +2008,28 @@
 5. Stale branch cleanup — 1100+ remote auto/ branches
 
 **Next run:** Same standdown until PR count drops below ~20 (requires enabling GitHub Actions so PRs can merge). Once unblocked: GDX candidate (freeze ch1tty/search sessionContext key set when sessionId active — different code path from GDB which froze the key set shape, GDX would freeze the exact presence/absence conditional).
+
+---
+
+## Run ~1849 — 2026-09-28 (automated)
+
+**Workstream:** Standdown — 40+ open PRs (>> ~20 cap); same condition as runs 1846/1847/1848.
+
+**Build/Tests:** tsc clean; 4876 pass / 0 fail / 3 skip
+
+**Open PRs:** 40+ (GCK #1544 through GDW #1585, all drift-guard test PRs; confirmed 20 on page 1, 20 on page 2 with more likely on page 3)
+
+**What was checked:**
+- Read CLAUDE.md + CHITTY.md; confirmed 5-tool surface invariant
+- Notion board: workspace block limit still exceeded — cannot write to Notion; using .driver/run-log.md
+- npm ci clean; tsc clean; npm test 4876/0/3 — all green, no regressions
+- Fetched all remote branches; confirmed 40+ open drift-guard PRs
+
+**Standing blockers (human action required):**
+1. **GitHub Actions CI disabled** — PRs accumulate, can't merge; 40+ queued drift-guard test PRs
+2. **Notion board block limit** — workspace out of free blocks; cannot append run logs to Notion
+3. **Hourly cron standing down each run** — burning ~50k tokens with no deliverable; recommend `/cron delete` or disabling until CI re-enabled
+4. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID/SECRET, CHITTY_TASKS_TOKEN
+5. Stale branch cleanup — 1100+ remote auto/ branches
+
+**Next run:** Same standdown until PR count drops below ~15. Requires human to enable GitHub Actions (Settings → Actions → General → "Allow all actions") so existing PRs can auto-merge. Once unblocked: next workstream is GDX — freeze ch1tty/search response sessionContext key set when sessionId active (different code path from GDB).
