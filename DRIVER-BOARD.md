@@ -8537,3 +8537,30 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GDM PR #1573 CI/review. Next GDN candidate: freeze `ch1tty/execute` dryRun `isError` field — the call result must have `isError` absent/false (not `true`) for a valid dryRun. Prior tests check error-path semantics but none specifically assert `isError` is not set on a successful dryRun call result.
+
+---
+
+### Run ~1838 — 2026-09-28T (automated run)
+- **Workstream advanced:** GDN — freeze `ch1tty/execute` dryRun outer MCP envelope (5 tests)
+- **Branch/PR:** `auto/GDN-dryrun-outer-envelope` → **PR #1574** (https://github.com/chittyos/ch1tty/pull/1574)
+- **Build:** tsc clean | **Tests (main):** 4879 total / 4876 pass / 0 fail / 3 skip; GDN adds 5 (→ 4884/4881/0/3 on branch)
+- **Actions this run:**
+  - Startup: read CLAUDE.md + CHITTY.md; npm ci clean; build clean; tests 4876/0/3 on main.
+  - Read DRIVER-BOARD.md tail — prior run (~1837) was GDM (execute dryRun status exact value); 30+ open drift-guard PRs awaiting human merge.
+  - Next candidate from prior run note: GDN — freeze `isError` field of dryRun result. Expanded scope to full outer MCP envelope (GDA–GDM all parsed body inside content[0].text; none froze the wrapper).
+  - Wrote `test/gdn-execute-dryrun-outer-envelope-drift-guard.test.ts` (5 tests: GDN-1..5):
+    - GDN-1: `isError === false` exactly (not true, not absent)
+    - GDN-2: `content` is an Array (not null, not plain object)
+    - GDN-3: `content.length === 1` — session ctx embedded in JSON body, not appended as item [1] (tested both with and without active session)
+    - GDN-4: `content[0].type === 'text'`
+    - GDN-5: `content[0].text` is valid JSON parseable with JSON.parse
+  - All 5 pass locally. Pushed branch, opened PR #1574.
+  - Notion board update blocked (free block limit).
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1838 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 34 open drift-guard test PRs (#1541–#1574), all awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** GDO candidate — freeze that dryRun response body contains no execution-result fields (no `result`, `output`, `data`, `error` keys that appear in live-execute responses). Alternatively: check if any of the 34 open PRs are failing CI and need attention.
