@@ -2033,3 +2033,30 @@
 5. Stale branch cleanup — 1100+ remote auto/ branches
 
 **Next run:** Same standdown until PR count drops below ~15. Requires human to enable GitHub Actions (Settings → Actions → General → "Allow all actions") so existing PRs can auto-merge. Once unblocked: next workstream is GDX — freeze ch1tty/search response sessionContext key set when sessionId active (different code path from GDB).
+
+---
+
+## Run ~1850 — 2026-09-28T18:37Z (automated)
+
+**Workstream:** Standdown — 23 open PRs (> ~20 cap); down from 40+ last run (some PRs were merged!).
+
+**Build/Tests:** tsc clean; 4876 pass / 0 fail / 3 skip (no regressions on main)
+
+**Open PRs:** 23 total — #1470 (GAH/resources-mimetype), #1471 (GAI/prompts-score), #1472 (GAJ/resources-uri) from older series; #1566 (GDF) through #1585 (GDW) = 20 recent drift-guard test PRs. PRs #1543–#1565 appear to have been merged since last run (40+ → 23 open — significant improvement!)
+
+**What was done:**
+- Read CLAUDE.md + CHITTY.md; confirmed 5-tool surface invariant and buildCastExplanation freeze
+- npm ci clean; tsc clean; npm test 4876/0/3 — all green on main
+- Fetched all remote branches; read DRIVER-BOARD.md and .driver/run-log.md
+- Checked Notion board (search found page; plan block limit still exceeded — cannot write)
+- Counted open PRs: 23 (> ~20 standdown cap) → standdown, no new PR pushed this run
+- Notable: PR count dropped from 40+ to 23 since run ~1849, meaning ~17 PRs were merged/closed by human action
+
+**Standing blockers (human action required):**
+1. **GitHub Actions CI disabled** — 23 queued drift-guard test PRs awaiting merge; enable at: Settings → Actions → General → "Allow all actions"
+2. **Notion board block limit** — workspace out of free blocks; cannot write run logs to Notion
+3. **Hourly cron still standing down** — burning ~50k tokens/run with no deliverable; recommend `/cron delete` until CI re-enabled and PR count drops below ~15
+4. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID/SECRET, CHITTY_TASKS_TOKEN
+5. Stale branch cleanup — 1100+ remote auto/ branches
+
+**Next run:** Standdown until PR count drops below ~15. Once unblocked: GDX — freeze ch1tty/search response sessionContext key set when sessionId active.
