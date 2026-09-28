@@ -16,65 +16,24 @@ import {
   ListPromptsRequestSchema,
   GetPromptRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
-import { z } from 'zod';
 import { Ch1ttyCore, SESSION_IDLE_MS } from './core.js';
 import { LEDGER_FLUSH_INTERVAL_MS } from './ledger.js';
 import type { Env } from './types.js';
 import { toMcpResult } from './mcp-content.js';
 import { VERSION } from './utils.js';
 import { log } from './logger.js';
+import {
+  SearchSchema,
+  ExecuteSchema,
+  CodeSchema,
+  CastSchema,
+  ProvisionSchema,
+  MemoryRecallSchema,
+  MemoryIngestSchema,
+  MemorySummarySchema,
+} from './mcp-agent-schemas.js';
 
 const FLUSH_TICK_SECONDS = Math.max(1, Math.ceil(LEDGER_FLUSH_INTERVAL_MS / 1000));
-
-// ── Zod schemas (all params .describe()d, mirroring the DO's JSON schemas) ──
-
-const SearchSchema = {
-  query: z.string().optional().describe('Search keywords matched against tool names and descriptions'),
-  server: z.string().optional().describe('Filter by server id (e.g. "neon", "chittyos")'),
-  category: z.string().optional().describe('Filter by category (ecosystem, code, search, reasoning, desktop, documents, communication)'),
-  focus: z.string().optional().describe('Focus profile to bias results toward. A soft lens — out-of-focus tools still appear. Use "none" to disable.'),
-  limit: z.number().optional().describe('Max results to return (default 20)'),
-};
-
-const ExecuteSchema = {
-  tool: z.string().describe('Namespaced tool name from search results (e.g. "neon/list_projects")'),
-  args: z.record(z.string(), z.unknown()).optional().describe('Arguments to pass to the tool'),
-};
-
-const CodeSchema = {
-  code: z.string().describe('Async function body. Return the final value. Call upstream namespaces (e.g. await neon.execute("run_sql", {...})).'),
-};
-
-const CastSchema = {
-  intent: z.string().describe('Natural language description of what you want accomplished'),
-  args: z.record(z.string(), z.unknown()).optional().describe('Arguments to pass to the resolved tool (if known)'),
-  confirm: z.boolean().optional().describe('If true, return the execution plan without running it (default false)'),
-  focus: z.string().optional().describe('Focus profile to bias resolution toward. Use "none" to disable.'),
-};
-
-const ProvisionSchema = {
-  intent: z.string().describe('What the provisioned agent should accomplish'),
-  entityId: z.string().describe('ChittyID of the entity to attach the agent to'),
-};
-
-const MemoryRecallSchema = {
-  profile: z.string().describe('Name of the memory profile (e.g. user ID, team name, case ID).'),
-  query: z.string().describe('Natural language question or search query.'),
-};
-
-const MemoryIngestSchema = {
-  profile: z.string().describe('Name of the memory profile to ingest into.'),
-  sessionId: z.string().optional().describe('Optional session identifier to scope extraction.'),
-  messages: z.array(z.object({
-    role: z.enum(['system', 'user', 'assistant']).describe('Message author role'),
-    content: z.string().describe('Message text content'),
-  })).describe('Conversation messages to process'),
-};
-
-const MemorySummarySchema = {
-  profile: z.string().describe('Name of the memory profile to summarize.'),
-  sessionId: z.string().optional().describe('Optional session identifier to scope the summary.'),
-};
 
 export class Ch1ttyMcpAgent extends McpAgent<Env> {
   server = new McpServer(
