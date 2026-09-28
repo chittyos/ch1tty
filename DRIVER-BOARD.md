@@ -8564,3 +8564,30 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** GDO candidate — freeze that dryRun response body contains no execution-result fields (no `result`, `output`, `data`, `error` keys that appear in live-execute responses). Alternatively: check if any of the 34 open PRs are failing CI and need attention.
+
+---
+
+### Run ~1840 — 2026-09-28T (automated run)
+- **Workstream advanced:** GDP — freeze `ch1tty/execute` dryRun no-backend-call boundary (5 tests)
+- **Branch/PR:** `auto/GDP-dryrun-no-backend-call-boundary` → **PR #1576** (https://github.com/chittyos/ch1tty/pull/1576)
+- **Build:** tsc clean | **Tests (main):** 4879 total / 4876 pass / 0 fail / 3 skip; GDP adds 5 (→ 4884/4881/0/3 on branch)
+- **Actions this run:**
+  - Startup: read CLAUDE.md + CHITTY.md; npm ci clean; build clean; tests 4876/0/3 on main.
+  - Read DRIVER-BOARD.md + .driver/run-log.md — prior run (~1839) was GDO (dryRun+sessionId sessionContext item structure); 35 open drift-guard PRs #1541–#1575 awaiting human merge.
+  - Reviewed EC/GL/GN/GDO coverage. Identified GDP gap: no merged test covers unknown-tool dryRun path, zero-backend-call guarantee, or args isolation semantics.
+  - Wrote `test/gdp-execute-dryrun-no-backend-call-boundary.test.ts` (5 tests: GDP-1..5):
+    - GDP-1: known server + nonexistent tool → isError === false
+    - GDP-2: known server + nonexistent tool → body.status === 'dry_run'
+    - GDP-3: nonexistent tool name echoed verbatim in body.tool
+    - GDP-4: dryRun makes ZERO backend calls (FixtureBackend.getCallLog() unchanged)
+    - GDP-5: body.args = nested tool args only; timeout and sessionId absent from body
+  - All 5 pass locally. Full suite: 4884/4881/0/3. Pushed branch, opened PR #1576, subscribed.
+  - Notion board: plan limit hit — only DRIVER-BOARD.md + .driver/run-log.md updated.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1840 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 36 open drift-guard test PRs (#1541–#1576), all CI-green (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** GDQ candidate — freeze that dryRun with unknown SERVER (not just unknown tool) still returns isError:true (contrast with GDP-1 which tests unknown tool under known server). Alternatively: freeze live execute content[1] is at content[content.length-1] (not hardcoded index [1]) for multi-item backend results.

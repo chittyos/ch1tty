@@ -1868,3 +1868,41 @@
 
 **Next run:** GDP — freeze `ch1tty/execute` real (non-dryRun)+sessionId second content item structure: content[1].text JSON should be `{latencyMs, sessionContext}` (key set, value types). FH covers content[0] from backend but not content[1] from the session metadata append path.
 
+
+---
+
+## Run log — 2026-09-28T~UTC (automated, run ~1840)
+
+**Workstream advanced:** GDP — execute dryRun no-backend-call boundary drift guard (5 tests)
+
+**Branch/PR:** `auto/GDP-dryrun-no-backend-call-boundary` → https://github.com/chittyos/ch1tty/pull/1576
+
+**Build:** tsc clean (0 errors)
+
+**Tests:** 4881 pass / 0 fail / 3 skip (4884 total; was 4876/0/3 on main, +5 new)
+
+**What was done:**
+- Read CLAUDE.md + CHITTY.md; confirmed 5-tool surface invariant and buildCastExplanation metric freeze
+- npm ci clean; npm run build clean; npm test 4876/0/3 baseline on main
+- Read DRIVER-BOARD.md + .driver/run-log.md — prior run (~1839) was GDO; 35 open drift-guard PRs awaiting human merge
+- Reviewed existing tests (EC, GL, GN, GDO) to identify genuine gaps in dryRun coverage
+- Identified GDP gap: no merged test covers (a) dryRun with unknown tool name still returns dry_run, (b) zero backend calls, (c) args isolation (nested args only, not top-level params)
+- Added `test/gdp-execute-dryrun-no-backend-call-boundary.test.ts` — 5 tests (GDP-1..5):
+  - GDP-1: known server + nonexistent tool name → isError === false
+  - GDP-2: known server + nonexistent tool name → body.status === 'dry_run'
+  - GDP-3: nonexistent tool name echoed verbatim in body.tool
+  - GDP-4: dryRun makes ZERO backend calls (FixtureBackend callLog unchanged)
+  - GDP-5: body.args contains only nested tool args, not top-level execute params (timeout, sessionId)
+- All 5 pass locally. Full suite: 4884/4881/0/3. Pushed branch, opened PR #1576, subscribed.
+
+**Open PRs (all awaiting human merge — CI disabled):**
+- #1543 (GCK) through #1576 (GDP): 36 drift-guard PRs
+
+**Standing blockers (human action required):**
+1. **GitHub Actions npm test CI disabled at org level** — only CodeQL runs; auto-merge can't trigger
+2. **Disable or slow hourly cron** — ~1840 runs; all original A–E workstreams done; burning ~50k tokens/run
+3. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+4. Stale branch cleanup — 1100+ remote auto/ branches
+5. Notion board: plan limit hit — cannot write new content
+
+**Next run:** GDQ — freeze `ch1tty/execute` live (non-dryRun) with sessionId: verify content[1] is the appended metadata item at the LAST position (index = content.length - 1, not hardcoded [1]), so if a backend returns multi-item content the metadata is still appended at the end. EC notes "appended" but no test verifies index semantics. Alternatively: freeze that dryRun with unknown SERVER still returns isError:true (contrast with GDP-1 which tests unknown TOOL under known server).
