@@ -6082,3 +6082,32 @@ Merge #1341 if CI green. After that: packages coverage is 100%; src-stdio + apps
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
   5. **Upgrade Notion plan** — workspace out of free blocks
 - **Next run:** Merge GR if CI green. Next GS candidate: freeze coordinator.toolsByServer value types (each value is a non-negative integer) + topTools value types (each entry is a non-empty string) — PP and V cover behavior but not type-freeze.
+
+---
+
+## Run log — 2026-09-29 (automated — standdown; run ~1871)
+
+- **Workstream advanced:** standdown — all workstreams A–E (and extended G-series through GDZ) complete
+- **Branch/PR:** `auto/run-1871-board-log` → (this PR)
+- **Build:** tsc clean | **Tests:** 5230 pass / 0 fail / 3 skip (unchanged from run ~1867)
+- **What was done:**
+  1. Read CLAUDE.md + CHITTY.md; guardrails confirmed.
+  2. Synced local main to origin/main (`git reset --hard origin/main`). HEAD = 771ce9b (run ~1867 log).
+  3. `npm ci` clean (audit warns on ip-address CVEs, PR #1598 already open for that fix). `npm run build` clean. `npm test`: 5230/0/3 (no regressions).
+  4. Read Notion board — workspace still at free-block limit; board not updated this run.
+  5. Inspected open PRs (~27): board-log backlog (runs ~1868–1870: PRs #1597, #1599, #1601, #1602), drift-guard test backlog (GDZ #1600, GDY #1596, GDW #1585, GDV #1584, GDU #1583, GDT #1582, etc.), security fix #1598, consolidation #1594, apps test suite #1589, McpAgent schemas #1580). CI still disabled at org level — none can auto-merge.
+  6. Standdown: no new workstream to advance; all original + extended workstreams done.
+- **Open PRs of note (require human action to merge):**
+  - #1598 (`auto/P-npm-audit-fix`) — **security**: ip-address 10.4.0→10.7.2 (GHSA-rpw4-54j3-4h4q, GHSA-2vr4-cq9g-pvrc); ready to merge
+  - #1600 (GDZ), #1596 (GDY), #1585 (GDW), #1584 (GDV), #1583 (GDU), #1582 (GDT) — drift-guard freeze tests; CI-blocked
+  - #1594 — consolidation (+46 tests); CI-blocked
+  - #1589 — apps pqrst output shapes (36 tests); CI-blocked
+  - #1580 (S) — McpAgent Zod schemas + 30 validation tests; CI-blocked
+- **Human-action items (carried forward):**
+  1. **DISABLE hourly cron** — ~1871+ runs; burning ~50k tokens/run with nothing left to do
+  2. **Enable GitHub Actions** (main npm test CI job — CI still only CodeQL, blocks auto-merge)
+  3. **Merge or close ~27 open PRs** — prioritize #1598 (security) first
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Upgrade Notion plan** — workspace out of free blocks
+- **Next run:** Standdown. If cron is not disabled, next run will standdown again. Recommend disabling the cron — all workstreams done.
