@@ -8691,4 +8691,29 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to resume board updates
 - **PushNotification:** NOT SENT — state unchanged from ~1846; human already notified.
+
+---
+
+### Run ~1857 — 2026-09-29T (automated run)
+- **Workstream advanced:** GDX — freeze `cast:executed` sessionContext sub-object exact key set (5 tests)
+- **Branch/PR:** `auto/GDX-cast-executed-sessioncontext-keyset` → **PR #1588** (https://github.com/chittyos/ch1tty/pull/1588)
+- **Build:** tsc clean | **Tests (main):** 4879 total / 4876 pass / 0 fail / 3 skip; GDX adds 5 (→ 4884/4881/0/3 on branch)
+- **Actions this run:**
+  - Startup: read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE). npm ci clean. Build clean. Tests 4876/0/3 on main (synced to origin/main).
+  - Read DRIVER-BOARD.md tail — prior run (~1847) was standing down (30 open PRs exceeded ~20 cap). Current queue: 10 open PRs #1578–#1587 (drift-guard + consolidation).
+  - 10 open PRs: below ~20 cap → advanced a workstream.
+  - PR #1587 CI: CodeQL ✓, Analyze(js-ts) ✓, Analyze(actions) ✓ — all green.
+  - Identified genuine GDX gap: JJ freezes sessionContext presence/values; EG freezes sessionContext as a permitted top-level key; but NO merged test freezes the exact key set of the sessionContext sub-object (EXACTLY {recentTools, callCount} or {recentTools, callCount, activeSessionFocus}).
+  - Wrote `test/gdx-cast-executed-sessioncontext-keyset-drift-guard.test.ts` (5 tests: GDX-1..5): cast:executed no-focus exact keys, cast:executed sticky-focus exact keys, activeSessionFocus value fidelity, key set stable after multiple calls, cast:resolved (dryRun) exact keys.
+  - All 5 pass locally. Full suite: 4884/4881/0/3. Pushed branch, opened PR #1588, subscribed.
+  - Notion board: plan limit hit — DRIVER-BOARD.md updated only.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1857 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 11 open drift-guard/consolidation PRs (#1578–#1588), all CI-green (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to resume board updates
+- **Next run:** If queue drops below ~20 (human merges PRs): advance GDY — freeze cast:executed sessionContext recentTools item runtime types (analogous to GDU for execute). If queue still >= ~20: stand down and update board only.
+- **PushNotification:** NOT SENT — state same as prior run; human already notified repeatedly.
 - **Next run:** If queue drops below ~20 (human merges PRs): advance GDX — freeze `ch1tty/cast` live response key set with sessionId active. If queue still > ~20: stand down again.
