@@ -8775,3 +8775,49 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 - **PR opened**: https://github.com/chittyos/ch1tty/pull/1594
 - **Next run**: Merge PR #1594 if CI passes; close stale PRs; standdown.
 - **Blocker (unchanged)**: Notion board full (page block limit reached — no new blocks accepted).
+
+---
+
+### Run ~1867 — 2026-09-29T (automated run)
+- **Workstream advanced:** GDY — freeze `cast:executed` sessionContext `recentTools` item runtime types (5 tests)
+- **Branch/PR:** `auto/GDY-cast-executed-recenttools-item-types` → **PR #1596** (https://github.com/chittyos/ch1tty/pull/1596)
+- **Build:** tsc clean | **Tests (main):** 5230 pass / 0 fail / 3 skip (5233 total, 364 suites, ~129s); GDY branch: 5235/0/3
+- **Actions this run:**
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE.
+  - `git fetch origin main && git reset --hard origin/main` (synced to 4e7fbfe, run ~1865). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 5230/0/3 (5233 total, 364 suites, ~129s). 0 failures.
+  - Read DRIVER-BOARD.md tail — prior run (~1865) standing down (100+ open PRs). Current queue (GitHub MCP): 10 open PRs (#1584–#1595). Below ~20 cap → advanced GDY.
+  - Identified genuine GDY gap: GDU freezes recentTools item types for execute; GDX freezes sessionContext key set for cast:executed; but no merged test freezes the runtime type of each recentTools item for cast:executed.
+  - Wrote `test/gdy-cast-executed-recenttools-item-types-drift-guard.test.ts` (5 tests: GDY-1..5). All 5 pass locally. Pushed branch, opened PR #1596.
+  - Notion board: plan limit hit — DRIVER-BOARD.md updated only.
+- **State summary:** All workstreams A–E + F + extended DONE. **11 open PRs** (#1584–#1594 + #1596). Tests on main: 5230/0/3. Build: clean.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1867 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 11 open drift-guard/consolidation PRs (#1584–#1596), all CI-green (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to resume board updates
+- **Next run:** If queue drops below ~20: advance GDZ — freeze `cast:resolved` (dryRun) sessionContext recentTools item runtime types (analogous to GDY but for the dryRun path). If queue still >= ~20: stand down.
+- **PushNotification:** NOT SENT — state similar to prior runs; human already notified repeatedly.
+
+---
+
+### Run ~1868 — 2026-09-29T (automated run)
+- **Workstream advanced:** Maintenance — updated 3 open PRs behind main (#1594 consolidation, #1595 board log, #1596 GDY) + this run log
+- **Build:** tsc clean | **Tests (main):** 5230 pass / 0 fail / 3 skip (5233 total)
+- **Actions this run:**
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5 tools, metric freeze active).
+  - `git reset --hard origin/main` (synced to 771ce9b, run ~1867). `npm ci` clean. `npm run build` clean. `npm test`: 5230/0/3. 0 failures.
+  - Read DRIVER-BOARD.md (via Notion fetch) — board last updated Sep 10; all workstreams A–E + extended complete.
+  - Checked open PRs (GitHub MCP): 20 open PRs (#1575–#1596). PR #1594 (consolidation +46 tests), #1595 (board log), #1596 (GDY +5 tests) all marked `behind` main.
+  - Updated all 3 behind PRs: merged origin/main into each branch (only DRIVER-BOARD.md conflict in #1595, resolved by keeping both run entries in order). Verified tests on each: #1594 → 5276/0/3, #1596 → 5235/0/3.
+  - Workstream B confirmed done: `servers.json` github entry already uses `https://api.githubcopilot.com/mcp/`.
+- **State summary:** All workstreams A–E + F + extended DONE. **20 open PRs** (#1575–#1596). PRs #1594, #1596 updated to latest main — ready for merge. Tests on main: 5230/0/3. Build: clean.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1868 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — especially #1594 (+46 tests) and #1596 (+5 tests); both CI-green and now up to date.
+  3. **Enable GitHub Actions** (main npm test CI — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Notion plan limit** — upgrade or clean to resume board updates
+- **Next run:** Stand down if queue >= 20. If queue drops below ~20, advance GDZ — freeze cast:resolved dryRun sessionContext recentTools item runtime types.
+- **PushNotification:** SENT — 3 PRs behind main updated and ready for merge (#1594 +46 tests, #1596 +5 tests).
