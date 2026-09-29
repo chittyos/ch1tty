@@ -18,7 +18,7 @@
  *
  *   GDZ-1: cast:executed alternatives items each have EXACTLY {tool, score, description}
  *   GDZ-2: alternatives `tool` is a non-empty string (namespaced as "serverId/name")
- *   GDZ-3: alternatives `score` is a finite number in the range [0, 1]
+ *   GDZ-3: alternatives `score` is a finite non-negative number
  *   GDZ-4: alternatives `description` is a string
  *   GDZ-5: cast:executed with a single-tool registry → no `alternatives` key at top level
  *
@@ -119,10 +119,10 @@ test('GDZ-1: cast:executed alternatives items each have EXACTLY {tool, score, de
   const cast = parseCast(result);
   assert.equal(cast.cast, 'executed', `expected cast:executed, got ${cast.cast}`);
   const alts = cast.alternatives as Array<Record<string, unknown>> | undefined;
-  if (!Array.isArray(alts) || alts.length === 0) {
-    // With 3 tools all matching "neon", there should be alternatives; skip gracefully if not
-    return;
-  }
+  assert.ok(
+    Array.isArray(alts) && alts.length > 0,
+    `multi-tool cast:executed must include non-empty alternatives; got keys: ${JSON.stringify(Object.keys(cast))}`,
+  );
   for (const alt of alts) {
     const keys = Object.keys(alt).sort();
     assert.deepEqual(
@@ -141,7 +141,10 @@ test('GDZ-2: cast:executed alternatives `tool` is a non-empty string', async () 
   const cast = parseCast(result);
   assert.equal(cast.cast, 'executed', `expected cast:executed, got ${cast.cast}`);
   const alts = cast.alternatives as Array<Record<string, unknown>> | undefined;
-  if (!Array.isArray(alts) || alts.length === 0) return;
+  assert.ok(
+    Array.isArray(alts) && alts.length > 0,
+    `multi-tool cast:executed must include non-empty alternatives; got keys: ${JSON.stringify(Object.keys(cast))}`,
+  );
   for (const alt of alts) {
     assert.equal(typeof alt.tool, 'string', `alternatives[].tool must be a string, got ${typeof alt.tool}`);
     assert.ok((alt.tool as string).length > 0, 'alternatives[].tool must be non-empty');
@@ -156,7 +159,10 @@ test('GDZ-3: cast:executed alternatives `score` is a finite non-negative number'
   const cast = parseCast(result);
   assert.equal(cast.cast, 'executed', `expected cast:executed, got ${cast.cast}`);
   const alts = cast.alternatives as Array<Record<string, unknown>> | undefined;
-  if (!Array.isArray(alts) || alts.length === 0) return;
+  assert.ok(
+    Array.isArray(alts) && alts.length > 0,
+    `multi-tool cast:executed must include non-empty alternatives; got keys: ${JSON.stringify(Object.keys(cast))}`,
+  );
   for (const alt of alts) {
     assert.equal(typeof alt.score, 'number', `alternatives[].score must be a number, got ${typeof alt.score}`);
     assert.ok(Number.isFinite(alt.score as number), `alternatives[].score must be finite, got ${alt.score}`);
@@ -172,7 +178,10 @@ test('GDZ-4: cast:executed alternatives `description` is a string', async () => 
   const cast = parseCast(result);
   assert.equal(cast.cast, 'executed', `expected cast:executed, got ${cast.cast}`);
   const alts = cast.alternatives as Array<Record<string, unknown>> | undefined;
-  if (!Array.isArray(alts) || alts.length === 0) return;
+  assert.ok(
+    Array.isArray(alts) && alts.length > 0,
+    `multi-tool cast:executed must include non-empty alternatives; got keys: ${JSON.stringify(Object.keys(cast))}`,
+  );
   for (const alt of alts) {
     assert.equal(typeof alt.description, 'string', `alternatives[].description must be a string, got ${typeof alt.description}`);
   }
