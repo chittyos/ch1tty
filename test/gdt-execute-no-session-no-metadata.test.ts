@@ -164,6 +164,7 @@ test('GDT-5: multiple sequential executes without sessionId → content.length s
   try {
     for (let i = 1; i <= 3; i++) {
       const result = await execNoSession(agg, 'neon/list_projects');
+      assert.equal(result.isError, undefined, `GDT-5: call ${i} — execute must not return isError`);
       assert.equal(
         result.content.length,
         1,
