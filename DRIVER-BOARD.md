@@ -8717,3 +8717,28 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 - **Next run:** If queue drops below ~20 (human merges PRs): advance GDY — freeze cast:executed sessionContext recentTools item runtime types (analogous to GDU for execute). If queue still >= ~20: stand down and update board only.
 - **PushNotification:** NOT SENT — state same as prior run; human already notified repeatedly.
 - **Next run:** If queue drops below ~20 (human merges PRs): advance GDX — freeze `ch1tty/cast` live response key set with sessionId active. If queue still > ~20: stand down again.
+
+---
+
+### Run ~1861 — 2026-09-29T (automated run)
+- **Workstream advanced:** None — ~100 open PRs exceed ~20 standdown cap
+- **Branch/PR:** `auto/run-1861-board-update` → PR #TBD
+- **Build:** tsc clean | **Tests:** 5230 pass / 0 fail / 3 skip (364 suites, ~122s)
+- **Actions this run:**
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE).
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 5230/0/3 (364 suites, 122s).
+  - Local main had diverged from origin/main (force-pushed by parallel Codex); reset to origin/main (commit 8595205).
+  - Post-reset test count: 5230/0/3 (consolidation PR #1587 merged +349 tests since run ~1857 board entry).
+  - Open PRs: ~100 (GDI–GDX drift-guard series + apps-pqrst + board-update PRs #1586, #1590). Exceeds ~20 cap → standing down.
+  - All workstreams A–E + extended: CONFIRMED DONE (A ✓ B ✓ C ✓ D ✓ E ✓ F–O ✓ AA ✓).
+  - GitHub server: `https://api.githubcopilot.com/mcp/` (B confirmed clean). Focus layer: `src/focus.ts` + `focus-profiles.json` (C confirmed). Metric-freeze: 56 no-focus / 87 focus:code fields enforced.
+- **State summary:** All workstreams complete. ~100 PRs open. Tests: 5230/0/3. Build: clean.
+- **Human-action items (persistent — unchanged):**
+  1. **DISABLE hourly cron** — ~1861 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — ~100 open PRs (#1569–#1590) from parallel Codex + scheduled runs; all awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — only CodeQL runs currently)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to resume board updates
+- **PushNotification:** NOT SENT — state unchanged; human already notified repeatedly.
+- **Next run:** If queue drops below ~20: advance GDY — freeze cast:executed sessionContext recentTools item runtime types (analogous to GDU for execute). If queue still ≥ ~20: stand down again.
