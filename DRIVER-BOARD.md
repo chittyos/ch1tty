@@ -8722,7 +8722,7 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 
 ### Run ~1861 — 2026-09-29T (automated run)
 - **Workstream advanced:** None — ~100 open PRs exceed ~20 standdown cap
-- **Branch/PR:** `auto/run-1861-board-update` → PR #TBD
+- **Branch/PR:** `auto/run-1861-board-update` → PR #1591 (https://github.com/chittyos/ch1tty/pull/1591)
 - **Build:** tsc clean | **Tests:** 5230 pass / 0 fail / 3 skip (364 suites, ~122s)
 - **Actions this run:**
   - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE).
@@ -8735,7 +8735,7 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 - **State summary:** All workstreams complete. ~100 PRs open. Tests: 5230/0/3. Build: clean.
 - **Human-action items (persistent — unchanged):**
   1. **DISABLE hourly cron** — ~1861 runs; burning compute. Disable via `/cron delete` in Claude Code.
-  2. **MERGE open PRs** — ~100 open PRs (#1569–#1590) from parallel Codex + scheduled runs; all awaiting human merge.
+  2. **MERGE open PRs** — ~100 open PRs (recent subset: #1569–#1591; full set spans further back) from parallel Codex + scheduled runs; all awaiting human merge.
   3. **Enable GitHub Actions** (main npm test CI job — only CodeQL runs currently)
   4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
