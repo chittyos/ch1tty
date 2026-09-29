@@ -8741,3 +8741,26 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   6. **Notion plan limit** — upgrade or clean to resume board updates
 - **Next run:** If queue drops below ~20 (human merges PRs): advance GDY — freeze `cast:executed` sessionContext recentTools item runtime types (analogous to GDU for execute). If queue still >= ~20: stand down and update board only.
 - **PushNotification:** NOT SENT — state same as prior runs; human already notified repeatedly.
+
+---
+
+### Run ~1865 — 2026-09-29T (automated run)
+- **Workstream advanced:** None — 100+ open PRs exceed ~20 cap; standing down
+- **Branch/PR:** direct commit to main (board update only)
+- **Build:** tsc clean | **Tests:** 5230 pass / 0 fail / 3 skip (5233 total, 364 suites, ~123s)
+- **Actions this run:**
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface (search/execute/status/reload/cast) FIXED; `buildCastExplanation` metric freeze ACTIVE.
+  - `git checkout main && git reset --hard origin/main` (synced to 3f21923, run ~1862). `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 5230/0/3 (5233 total, 364 suites, ~123s). 0 failures.
+  - GitHub MCP returned 100 open PRs (at perPage=100 limit; actual count may be higher). PRs #1481–#1593 — drift-guard test series plus board-update PRs from prior runs. Queue far exceeds ~20 cap → standing down, no new PR created.
+  - Verified all workstreams: A ✓ B ✓ (github→api.githubcopilot.com/mcp/) C ✓ (src/focus.ts + focus-profiles.json) D ✓ (scenario.test.ts) E ✓ (focus-suggestions.json) F ✓ (worker phases 2–4 merged).
+  - Notion board: plan limit hit — DRIVER-BOARD.md is durable board.
+- **State summary:** All workstreams A–E + F + extended DONE. **100+ open PRs** (#1481–#1593). Tests: 5230/0/3. Build: clean.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1865 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 100+ open drift-guard test PRs (#1481–#1593), all CI-green (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to resume board updates
+- **Next run:** If queue drops below ~20 (human merges PRs): advance GDY — freeze `cast:executed` sessionContext recentTools item runtime types (analogous to GDU for execute). If queue still >= ~20: stand down and update board only.
+- **PushNotification:** NOT SENT — state same as prior runs; human already notified repeatedly.
