@@ -31,6 +31,7 @@ const ENTRY_FIXTURE: LedgerEntry = {
   created_at: '2026-01-01T10:00:00Z',
 };
 
+/** Returns a mock LedgerClient pre-populated with fixture data for freeze tests. */
 function makeMockClient(overrides: Partial<LedgerClient> = {}): LedgerClient {
   return {
     listNamespaces: async () => [NS_FIXTURE],
@@ -47,6 +48,7 @@ function makeMockClient(overrides: Partial<LedgerClient> = {}): LedgerClient {
   } as unknown as LedgerClient;
 }
 
+/** Creates an in-memory MCP client connected to the ledger-mcp server under test. */
 async function setup(overrides?: Partial<LedgerClient>): Promise<{ client: Client; cleanup: () => Promise<void> }> {
   const server = createLedgerServer(makeMockClient(overrides));
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
@@ -56,6 +58,7 @@ async function setup(overrides?: Partial<LedgerClient>): Promise<{ client: Clien
   return { client: mcpClient, cleanup: async () => { await mcpClient.close(); } };
 }
 
+/** Extracts and parses the first text content block from a tool result. */
 function parseText<T>(result: Awaited<ReturnType<Client['callTool']>>): T {
   const content = result.content as Array<{ type: string; text: string }>;
   return JSON.parse(content[0].text) as T;

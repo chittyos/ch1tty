@@ -22,14 +22,17 @@ const OWNER: OwnerIdentity = {
   chittyId: null,
 };
 
+/** Returns a dispatch stub that resolves with an empty result for all calls. */
 function stubDispatch(): CommsDispatch {
   return { async call() { return []; } };
 }
 
+/** Returns a dispatch stub that always throws, simulating a backend failure. */
 function throwingDispatch(): CommsDispatch {
   return { async call() { throw new Error('backend unavailable'); } };
 }
 
+/** Creates an in-memory MCP client connected to the comms-mcp server under test. */
 async function setup(dispatch: CommsDispatch): Promise<{ client: Client; cleanup: () => Promise<void> }> {
   const server = createCommsMcpServer(dispatch, OWNER);
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
@@ -39,6 +42,7 @@ async function setup(dispatch: CommsDispatch): Promise<{ client: Client; cleanup
   return { client: mcpClient, cleanup: async () => { await mcpClient.close(); } };
 }
 
+/** Extracts and parses the first text content block from a tool result. */
 function parseText<T>(result: Awaited<ReturnType<Client['callTool']>>): T {
   const content = result.content as Array<{ type: string; text: string }>;
   return JSON.parse(content[0].text) as T;
@@ -88,6 +92,12 @@ test('R-3: metadata has required keys {resolvedContact, channelsQueried, window}
     for (const k of requiredKeys) {
       assert.ok(Object.prototype.hasOwnProperty.call(metadata, k), `metadata missing required key: ${k}`);
     }
+    assert.ok(
+      metadata.resolvedContact !== null &&
+        typeof metadata.resolvedContact === 'object' &&
+        !Array.isArray(metadata.resolvedContact),
+      'resolvedContact must be a non-null object',
+    );
   } finally {
     await cleanup();
   }

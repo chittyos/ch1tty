@@ -31,6 +31,7 @@ const EVENT_FIXTURE: SessionEvent = {
   created_at: '2026-01-01T10:00:00Z',
 };
 
+/** Returns a mock SessionClient pre-populated with fixture data for freeze tests. */
 function makeMockClient(overrides: Partial<SessionClient> = {}): SessionClient {
   return {
     listSessions: async () => [SESSION_FIXTURE],
@@ -44,6 +45,7 @@ function makeMockClient(overrides: Partial<SessionClient> = {}): SessionClient {
   } as unknown as SessionClient;
 }
 
+/** Creates an in-memory MCP client connected to the session-coordinator-mcp server under test. */
 async function setup(overrides?: Partial<SessionClient>): Promise<{ client: Client; cleanup: () => Promise<void> }> {
   const server = createSessionCoordinatorServer(makeMockClient(overrides));
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
@@ -53,6 +55,7 @@ async function setup(overrides?: Partial<SessionClient>): Promise<{ client: Clie
   return { client: mcpClient, cleanup: async () => { await mcpClient.close(); } };
 }
 
+/** Extracts and parses the first text content block from a tool result. */
 function parseText<T>(result: Awaited<ReturnType<Client['callTool']>>): T {
   const content = result.content as Array<{ type: string; text: string }>;
   return JSON.parse(content[0].text) as T;

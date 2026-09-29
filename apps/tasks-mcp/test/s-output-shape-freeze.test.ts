@@ -31,6 +31,7 @@ const TASK_DONE_FIXTURE: Task = {
 
 // ── Mock client ───────────────────────────────────────────────────────────────
 
+/** Returns a mock TasksClient pre-populated with fixture data for freeze tests. */
 function makeMockClient(overrides: Partial<TasksClient> = {}): TasksClient {
   return {
     listTasks: async (_filter?: ListTasksFilter) => [TASK_FIXTURE],
@@ -47,6 +48,7 @@ function makeMockClient(overrides: Partial<TasksClient> = {}): TasksClient {
 
 // ── Harness ───────────────────────────────────────────────────────────────────
 
+/** Creates an in-memory MCP client connected to the tasks-mcp server under test. */
 async function setup(overrides?: Partial<TasksClient>): Promise<{ client: Client; cleanup: () => Promise<void> }> {
   const server = createTaskServer(makeMockClient(overrides));
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
@@ -56,6 +58,7 @@ async function setup(overrides?: Partial<TasksClient>): Promise<{ client: Client
   return { client: mcpClient, cleanup: async () => { await mcpClient.close(); } };
 }
 
+/** Extracts and parses the first text content block from a tool result. */
 function parseText<T>(result: Awaited<ReturnType<Client['callTool']>>): T {
   const content = result.content as Array<{ type: string; text: string }>;
   return JSON.parse(content[0].text) as T;
