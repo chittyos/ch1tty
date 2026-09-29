@@ -3233,3 +3233,25 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 - **Tests**: 5/5 pass locally. All Ollama errors are expected (embedEnabled: false).
 - **PR**: #1471 (GAI) opened. CI pending.
 - **Open PRs**: #1470 (GAH), #1471 (GAI).
+
+---
+
+## Run ~1863 — 2026-09-29 (standdown; all A–E done; local main re-synced; 5230/0/3)
+
+- **Trigger**: scheduled hourly run
+- **Build**: `tsc` clean (0 errors) | **Tests**: 5233 total — **5230 pass / 0 fail / 3 skip** (132s)
+- **Workstream**: Standdown — all original workstreams A–E confirmed complete
+- **What was done**:
+  - Read CLAUDE.md + CHITTY.md; confirmed 5-tool surface invariant (search/execute/status/reload/cast)
+  - Found local `main` 53 commits behind `origin/main` (diverged at run ~1782); reset to `origin/main` (run ~1862 head)
+  - Ran `npm ci`, `npm run build` (clean), `npm test` (5230/0/3 — no regressions on current main)
+  - Attempted Notion board update: workspace still at free block limit — writing run log here instead
+  - Checked open PRs: ~27 open (drift-guard tests GDJ–GDX, apps-pqrst output shape #1589, McpAgent schemas #1580, board-log PRs #1590–#1591)
+  - All A–E workstream checkboxes confirmed done on Notion board
+- **Open blockers (all require human action)**:
+  1. **Enable GitHub Actions** — Settings → Actions → General → "Allow all actions" (CI disabled at org level; open PRs cannot get CI green)
+  2. **Notion workspace at free block limit** — upgrade plan to resume Notion board updates
+  3. **Env vars missing**: `GITHUB_MCP_AUTHORIZATION`, `CHITTY_CF_ACCESS_CLIENT_ID`, `CHITTY_CF_ACCESS_CLIENT_SECRET`, `CHITTY_TASKS_TOKEN`
+  4. **Stale board-log PRs** (#1590, #1591) — can be merged or closed; their content is now in RUNLOG.md
+- **Open PRs summary**: ~27 open; all drift-guard/test PRs waiting on CI (Actions disabled)
+- **Next run**: Standdown unless Actions is re-enabled or new workstream identified. Once Actions enabled, open drift-guard PRs (#1470–#1589) can be CI-validated and consolidated.
