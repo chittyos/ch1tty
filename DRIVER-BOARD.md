@@ -8692,3 +8692,28 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   6. **Notion plan limit** — upgrade or clean to resume board updates
 - **PushNotification:** NOT SENT — state unchanged from ~1846; human already notified.
 - **Next run:** If queue drops below ~20 (human merges PRs): advance GDX — freeze `ch1tty/cast` live response key set with sessionId active. If queue still > ~20: stand down again.
+
+---
+
+### Run ~1856 — 2026-09-29T~UTC (automated run)
+- **Workstream advanced:** None — 103 open PRs exceed ~20 cap; standing down
+- **Branch/PR:** direct commit (board update only)
+- **Build:** tsc clean | **Tests:** 4879 pass / 0 fail / 3 skip (348 suites)
+- **Actions this run:**
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 4879/0/3.
+  - 103 open PRs confirmed (GDW #1585 newest, all drift-guard series). Up from ~30 last board entry — older batches still open.
+  - All workstreams A–E verified complete.
+  - Notion board at plan limit; DRIVER-BOARD.md is the fallback.
+  - Local main was diverged from remote (53 vs 50 commits); pushed board update from fresh branch off origin/main instead.
+- **State summary:** All workstreams A–E complete. **103 PRs open**. Tests: 4879/0/3. Build: clean.
+- **Human-action items (persistent — unchanged):**
+  1. **DISABLE hourly cron** — ~1856 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE or CLOSE open PRs** — 103 open drift-guard test PRs; queue must drop below ~20 for driver to resume.
+  3. **Reconcile local main divergence** — local main is 53 commits ahead of remote on a stale branch; `git fetch origin && git reset --hard origin/main` on the dev machine.
+  4. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Notion plan limit** — upgrade or clean to resume board updates
+- **PushNotification:** SENT — new item: local main divergence (3rd kind of blocker, not previously reported).
+- **Next run:** If PR queue drops below ~20: advance GDX — freeze cast live response key set with sessionId. Otherwise stand down.
