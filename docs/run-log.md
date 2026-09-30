@@ -717,3 +717,13 @@ Runs ~1234–1239 were idle (same state: 1438/0/3, 0 open PRs). Run ~1240 raised
 - **State**: A ✓ B ✓ C ✓ D ✓ E ✓ + extended workstreams through P ✓. Q opened this run.
 - **Action taken**: Created 20 unit tests for `packages/shared-logger`'s `Logger` class covering level filtering, JSON/text format, `setLevel()`, and `childStderr()`. All green. Committed to `auto/Q-shared-logger-unit-tests`, pushed, opened PR #1316.
 - **Most useful thing for next run**: Advance Workstream R — `packages/shared-types` has no tests (type-only exports; tests could validate shape guards/narrowing), OR check if PRs #1314–#1316 merged and find the next untested path. Check open PRs first.
+
+## Run ~1817 — 2026-09-30T~hourly
+- **Workstream**: Drift guard series — GEH: freeze cast:executed exact keyset for focus+explain+session triple combination
+- **Branch/PR**: `auto/GEH-executed-focus-explain-session-keyset` → PR #1646 https://github.com/chittyos/ch1tty/pull/1646
+- **Build**: tsc clean | **Tests**: 5439 pass / 0 fail / 3 skip (+5 vs baseline 5434)
+- **Guardrails**: 5-tool surface confirmed. `buildCastExplanation` freeze guards: 56 (no-focus) / 87 (focus:code) ✓
+- **Gap closed**: GVF-3 froze executed+focus+explain (no session); GVF-4 froze executed+focus+session (no explain). No test covered the three-way combination. GEG-2 froze the symmetric case for cast:plan; GEH is its counterpart for cast:executed.
+- **Invariants**: GEH-1 (11-key exact set), GEH-2 (explanation absent without explain), GEH-3 (sessionContext absent without session), GEH-4 (explanation is object), GEH-5 (sessionContext is object)
+- **State**: Drift guard series running. Latest on main: GEG (2026-09-30). GEH opened this run.
+- **Next run candidate**: GEI — cast:resolved + focus + explain + session triple combination (symmetric to GEH for resolved mode; GEE covers resolved+explain, GCH covers resolved+focus+session, triple not frozen). Or explore another uncovered conditional combination.
