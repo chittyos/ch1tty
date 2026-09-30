@@ -9063,3 +9063,23 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to restore live board
+
+---
+
+### Run ~1801 — 2026-09-30T (automated run)
+
+- **Workstream advanced:** GBU — freeze `status.focus` null behavior for unknown process default focus
+- **Branch/PR:** `auto/GBU-status-focus-unknown-profile-null` → **PR #1630** (https://github.com/chittyos/ch1tty/pull/1630)
+- **Build:** tsc clean | **Tests:** 5437 pass / 0 fail / 3 skip (+3 vs 5434 baseline)
+- **Actions this run:**
+  - Startup: PR #1521 (GBT) was merged on 2026-09-30. Pulled main; build clean; full suite: 5434/0/3 baseline (many PRs merged since last run).
+  - Identified GBU gap: GBT-1 and FY-7 both assert `status.focus===null` only when no focus is configured (defaultFocus undefined). Neither covers the distinct code path where `defaultFocus` IS set but resolves to an unknown profile. `resolveFocus()` returns `undefined` → `activeFocusSnapshot()` returns null → `status.focus===null`. Behaviorally distinct path, not frozen.
+  - Wrote `test/gbu-status-focus-unknown-profile-null.test.ts` (3 tests: GBU-1..3). All 3 pass; suite 5437/0/3.
+  - Committed, pushed, opened PR #1630. Subscribed to PR activity.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1800+ runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **Enable GitHub Actions** (main npm test CI job)
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** Check GBU PR #1630 CI/review. Next candidate: GBV — freeze `status.focus` when per-call `focus` param (on search/cast) is set to unknown profile; OR freeze `status.availableFocusProfiles` exact element types (each must be a non-empty string).
