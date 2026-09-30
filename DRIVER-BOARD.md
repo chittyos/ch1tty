@@ -8990,7 +8990,6 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to restore live board
 
-
 ---
 
 ### Run ~1816 — 2026-09-30T22:43Z (automated)
@@ -9065,3 +9064,18 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
   5. **Notion plan limit** — upgrade or clean to restore live board
 - **Next run:** Check PR #1640 CI/review. Next candidate: GEJ — scope+focus+explain triple combination.
+
+---
+
+### Run ~1892c — 2026-09-30T (automated — GEH focus+catalog+explain drift guard)
+
+- **Workstream advanced:** GEH — freeze `cast:discovered` exact key set for focus+catalog+explain combos
+- **Branch/PR:** `auto/GEH-discovered-focus-explain-keyset-drift-guard` → PR #1637
+- **Build:** tsc clean | **Tests:** 5439 pass / 0 fail / 3 skip (full suite including 5 new GEH tests)
+- **Gap closed:** GBH-2 froze discovered+explain (7 keys), GCI-2 froze discovered+focus+catalog (8 keys); no prior test covered the three-way combination focus ∧ catalog ∧ explain.
+- **GEH-1:** focus+catalog+explain, no session → EXACTLY 9 keys (base + explanation + resources + suggestions)
+- **GEH-2:** focus+catalog+explain+session → EXACTLY 10 keys (+ sessionContext)
+- **GEH-3:** focus+no-catalog+explain → EXACTLY 7 keys (base + explanation only, no suggestions)
+- **GEH-4:** absence guard — `focus` key never in cast:discovered (asymmetry vs executed/plan/resolved)
+- **GEH-5:** per-call focus+catalog+explain → same 9 keys; `focus` absent; `explanation` present
+- **Key fixtures:** BILLING_FOCUS_PROFILE (ecosystem/billing, boost:0.5) + BILLING_SUGGESTIONS_CATALOG inline; KeywordOnlyCoordinator (routeIntent → null); INTENT='find invoice pdf'
