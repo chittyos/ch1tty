@@ -25,7 +25,7 @@
  *   - buildCastExplanation metric freeze: not applicable (cast:discovered/reload, not explain)
  */
 import assert from 'node:assert/strict';
-import { writeFileSync } from 'node:fs';
+import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
@@ -153,7 +153,8 @@ test('GDAB-3: cast:discovered (prompts path) — top-level key set is EXACTLY {c
 // ── GDAB-4: ch1tty/reload success top-level key set ──────────────────────────
 
 test('GDAB-4: ch1tty/reload — success response key set is EXACTLY {added,catalog,latencyMs,missingEnvVars,removed,reloaded,totalServers}', async () => {
-  const configPath = join(tmpdir(), `ch1tty-gdab-reload-${Date.now()}-${++_seq}.json`);
+  const tmpDir = mkdtempSync(join(tmpdir(), 'ch1tty-gdab-'));
+  const configPath = join(tmpDir, 'config.json');
   writeFileSync(configPath, JSON.stringify({
     servers: [{
       id: 'guide', name: 'Guide', type: 'remote',
@@ -180,7 +181,8 @@ test('GDAB-4: ch1tty/reload — success response key set is EXACTLY {added,catal
 // ── GDAB-5: ch1tty/reload catalog sub-object key set ─────────────────────────
 
 test('GDAB-5: ch1tty/reload — catalog sub-object key set is EXACTLY {phantomServerIds,totalCombos}', async () => {
-  const configPath = join(tmpdir(), `ch1tty-gdab-reload-${Date.now()}-${++_seq}.json`);
+  const tmpDir = mkdtempSync(join(tmpdir(), 'ch1tty-gdab-'));
+  const configPath = join(tmpDir, 'config.json');
   writeFileSync(configPath, JSON.stringify({
     servers: [{
       id: 'guide', name: 'Guide', type: 'remote',
