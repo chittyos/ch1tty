@@ -9280,3 +9280,20 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   3. **Enable GitHub Actions** (npm test CI job)
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
 - **Next run:** Check CI + CodeRabbit on new head. CodeRabbit rate-limit resets ~00:02Z.
+
+---
+
+### Run ~1897 — 2026-09-30T23:41Z (automated — PR #1641 closed without merge)
+
+- **Trigger:** PR #1641 (GEI: cast:executed focus+explain+session keyset) closed without merging
+- **Action:** None — per policy, not reopening or recreating. The 5-test drift-guard (focus+explain+session triple combo) remains unmerged.
+- **Standdown:** Still in effect (open PRs above ~20 threshold).
+- **Note:** If human wants GEI tests merged, the branch `auto/GEI-executed-focus-explain-session-keyset-drift-guard` still contains the work; PR can be reopened manually.
+- **Persistent human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1897 runs
+  2. **MERGE or CLOSE open PRs** — still above ~20 threshold
+  3. **Enable GitHub Actions** (npm test CI)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** When PRs drop below ~20 — next candidate GEJ.
