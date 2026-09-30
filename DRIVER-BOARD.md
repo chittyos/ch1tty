@@ -8832,3 +8832,49 @@ Main is now at a newer state (3 new test files merged since run ~1838: `gee-reso
 CI was green (3/3), Codex P2 thread resolved, CodeRabbit merge risk Low. Closed by human without merge — consistent with the batch-close pattern on this series. Branch and commits remain in the repo. Will NOT reopen or recreate without explicit user instruction.
 
 State: GCO work is available on `auto/GCO-search-infocus-conditional-drift-guard` if needed. Main is unchanged (+0 tests from GCO).
+
+---
+
+### Run ~1826 addendum — 2026-09-30T (automated event)
+- **Event:** PR #1558 (GCX — freeze ch1tty/search suggestions ordering + truncation) closed without merging.
+- **Action:** Logged here only. Per policy, not reopened and no new PR created.
+- **Note for next run:** GCX tests in `test/gcx-search-suggestions-ordering-truncation.test.ts` exist on branch `auto/gcx-search-suggestions-ordering-truncation` (not merged). Main is now at ~5316 tests. A new GCY target should be identified from scratch against the current main (the next run should re-audit what FK/EI/HH/GCX cover vs. what remains unfrozen).
+
+---
+
+### Event: PR #1573 closed without merging — 2026-09-30
+
+- **PR:** #1573 `auto/GDM-dryrun-status-exact-value` — GDM drift-guard: freeze `ch1tty/execute` dryRun `status` exact value = `'dry_run'`
+- **Outcome:** Closed without merging (2026-09-30T19:43Z). PR was CI-green and CodeRabbit-clean at closure.
+- **Action taken:** None. Per policy, not reopened or replaced without explicit user request.
+- **Note:** If the GDM freeze is still wanted, user should re-open #1573 or request a new PR.
+
+---
+
+### Run ~1827 addendum — 2026-09-30T19:44Z
+
+**PR #1559 (`auto/gcy-search-suggestions-count`) closed without merging.**
+
+CI was green (CodeQL 3/3 ✅), CodeRabbit: no actionable comments, merge risk Minimal. Closed by human — consistent with the batch-close pattern on this series. Branch and commits remain on `auto/gcy-search-suggestions-count`. Not reopening without explicit user instruction.
+
+State: GCY work (5 tests freezing suggestions count lower bound) is available on the branch if needed. Main is unchanged (+0 tests from GCY).
+
+---
+
+### Note — 2026-09-30T (automated — PR closed event)
+- PR #1581 (GDQ — freeze execute dryRun WITH SESSION exact body key set) was **closed without merging** by the repository owner.
+- No action taken per rules (do not reopen or re-create unless user explicitly asks).
+- The GDQ test file (`test/gdq-execute-dryrun-session-exact-body-keyset-drift-guard.test.ts`) remains on branch `auto/GDQ-dryrun-session-exact-body-keyset` and is NOT in main.
+
+---
+
+### Run ~1828 follow-up — 2026-09-30T19:43Z
+
+**PRs #1561 (GDA) and #1562 (GDB) closed without merging.** CI was green (3/3), Codex ✅ no findings. Closed by human — consistent with batch-close pattern. Not reopening. Branches preserved if needed.
+
+---
+
+### Run ~1829 addendum — 2026-09-30T19:43Z (automated event)
+- **Event:** PR #1563 (`auto/GDC-execute-exact-keysets-drift-guard`) closed without merging.
+- **Action:** Logged here only. Per policy, not reopened and no new PR created.
+- **Coverage note:** GDC's 5 tests (exact key sets for execute dryRun no-session, dryRun with-session, session-metadata, content item count, status value) were superseded on main by the GDJ–GDW series: `gdj-execute-dryrun-toplevel-keyset-drift-guard.test.ts`, `gdl-execute-dryrun-tool-server-values-drift-guard.test.ts`, `gdm-execute-dryrun-status-exact-value-drift-guard.test.ts`, `gdq-execute-dryrun-session-exact-body-keyset-drift-guard.test.ts`, `gdw-execute-live-metadata-outer-key-set-drift-guard.test.ts`. No coverage gap remains.
