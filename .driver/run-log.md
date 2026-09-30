@@ -2133,3 +2133,38 @@ If the user wants these drift-guard tests reconsidered (e.g. in a different form
 PR #1575 (GDO — execute dryRun+sessionId sessionContext item structure) closed without merging.
 
 Not reopening — standing down per close-without-merge policy.
+
+---
+
+### Run ~1900 — 2026-09-30T~23:30Z (automated)
+
+**Workstream advanced:** GEI — freeze cast:executed scope+focus+explain maximal key sets (5 tests)
+
+**Build:** tsc clean (ch1tty@4.1.0, 0 errors)
+**Tests:** 5442 pass / 0 fail / 3 skip (baseline on main before this run) → **5447/0/3 after GEI added**
+**Metric freeze guards:** 56 fields (no focus) ✓ / 87 fields (focus:code) ✓
+
+**Gap closed:** No prior test (main or open PRs) covered cast:executed with scope, focus, AND explain simultaneously active. The maximal 4-way (scope+session+focus+explain) was entirely unguarded. GBR covered scope+session+explain and scope+session+focus separately; GBZ covered focus-only; GEH PRs (#1629–#1636) covered focus+explain and session+explain without scope.
+
+**Tests added** (5 tests in `test/gei-executed-scope-focus-explain-maximal-keyset-drift-guard.test.ts`):
+- GEI-1: scope+focus+explain (no session) → EXACTLY 13 keys
+- GEI-2: scope+session+focus+explain (maximal) → EXACTLY 14 keys
+- GEI-3: maximal path does NOT inject resolvedFromCatalog/catalogCombo/chainContinuation
+- GEI-4: suggestions has exactly {combos, prompts} under scope+focus+explain
+- GEI-5: explanation and scope are non-null objects under the maximal path
+
+**PR:** #1649 — open, CI pending
+
+**Open PRs:** 30 total
+- Note: PRs #1647, #1648 are also labeled GEI from previous runs — overlap with #1649; human should close redundant ones
+- ~20 drift-guard test PRs awaiting GitHub Actions re-enable
+- ~10 board-log PRs (stale, should be closed)
+
+**Blockers (unchanged):**
+1. GitHub Actions CI disabled — PRs show no CI status. Fix: Settings → Actions → General → "Allow all actions"
+2. Notion workspace at free block limit — can't append board entries
+3. GEI duplicates (#1647, #1648, #1649) need human to close redundant PRs
+4. Prod env vars: GITHUB_MCP_AUTHORIZATION, CF_ACCESS credentials, CHITTY_TASKS_TOKEN
+5. Stale branch accumulation
+
+**Next run candidate:** GEJ (freeze cast:plan scope+focus+explain maximal) — but check if #1645 already covers cast:discovered+focus+explain before duplicating
