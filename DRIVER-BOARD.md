@@ -9006,3 +9006,31 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to restore live board
+  6. **Notion plan limit** — upgrade or clean to restore live board
+
+---
+
+### Run (parallel session) — 2026-09-30T22:43Z (automated — GCI merge)
+
+- **Workstream completed:** GCI — PR #1541 merged ✅
+- **Build:** tsc clean | **Tests:** 5335 pass / 0 fail / 3 skip (+454 vs 4881 baseline — 127 commits merged)
+- **Actions:** Codex P2 finding addressed on GCI-5, PR #1541 merged, synced to main (2bf09c2).
+- **Next run noted:** GCJ — freeze cast:discovered key set when scope+focus both active.
+
+---
+
+### Run ~1892 — 2026-09-30T22:43Z (automated — PR #1542 GCJ merge wake)
+
+- **Workstream advanced:** None — 35 open PRs exceed standdown threshold (~20 cap)
+- **Build:** tsc clean | **Tests:** 5335 pass / 0 fail / 3 skip
+- **Context:** Woke on GCJ (#1542) merge event. Open PRs down from 60+ (run ~1891) to 35.
+- **Open PRs breakdown:** ~25 test PRs + ~10 board-only PRs = 35 total.
+- **Standing down:** No new PR created per standdown policy.
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1892 runs; burning compute. `/cron delete` in Claude Code.
+  2. **MERGE or CLOSE open PRs** — 35 open, down from 60+. Threshold to advance: <20 open.
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next advance target:** After open PRs < 20 — identify next genuine drift-guard gap after GEG. Current: 5335 tests, 430+ test files.
