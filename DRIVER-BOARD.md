@@ -8036,4 +8036,5 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
-- **Next run:** Check GBX PR #1527 CI/review. Next candidate: GBY — freeze `status.evaluator` sub-object key set (evaluator.getStats() shape not yet frozen; a field addition/removal would pass DZ/ED/FY silently).
+- **Follow-up (run ~1805):** PR #1527 CI green (3/3 CodeQL). Codex P2 findings addressed: (1) added disconnected `github` server via `listToolsError:true` so GBX-2/GBX-4 are non-trivial (connectedServers=2 < totalServers=3); (2) wrapped all 5 test bodies in `try/finally { await agg.shutdown() }` for resource cleanup. Committed `110c1c9`, pushed. Codex review on `110c1c9`: no findings. **PR #1527 MERGED 2026-09-30.**
+- **Next run:** PR #1528 (this runlog) open, CI green — waiting on human merge. Next candidate: GBY — freeze `status.evaluator` sub-object key set (evaluator.getStats() shape not yet frozen; a field addition/removal would pass DZ/ED/FY silently).
