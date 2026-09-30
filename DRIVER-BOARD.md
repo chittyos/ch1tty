@@ -8989,3 +8989,19 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to restore live board
+
+---
+
+### Run ~1892 — 2026-09-30T22:46Z (automated — PR #1511 GBJ merge wake)
+
+- **Workstream advanced:** None — standing down (60+ open PRs)
+- **Build:** tsc clean | **Tests:** 5434 pass / 0 fail / 3 skip
+- **Context:** Session woke on PR #1511 (GBJ — cast:no_match conditional keys) merge event. This was the last PR opened by this session (run ~1790) on 2026-09-26; it merged after 4 days.
+- **State:** Main is ~100 commits ahead of session start. Driver has been in standdown since run ~1887 (60–70 open PRs). No new PR created.
+- **Persistent human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1892 runs; burning compute. `/cron delete` in Claude Code.
+  2. **MERGE or CLOSE open PRs** — 60+ open drift-guard test PRs, all CI green.
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
