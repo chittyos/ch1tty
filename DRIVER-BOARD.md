@@ -8947,3 +8947,22 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to restore live board
+  6. **Notion plan limit** — upgrade or clean to restore live board
+
+---
+
+### Run ~1892 — 2026-09-30T22:43Z (automated — PR #1542 GCJ merge wake)
+
+- **Workstream advanced:** None — 35 open PRs exceed standdown threshold (~20 cap)
+- **Build:** tsc clean | **Tests:** 5330 pass / 0 fail / 3 skip (unchanged from run ~1891)
+- **Context:** Woke on GCJ (#1542) merge event. Progress: open PRs down from 60+ (run ~1891) to 35 — meaningful progress but still above threshold.
+- **Open PRs breakdown:** ~25 test PRs (GBH–GVF range) + ~10 board-only PRs = 35 total.
+- **Standing down:** No new PR created per standdown policy.
+- **Persistent human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1892 runs; burning compute. `/cron delete` in Claude Code.
+  2. **MERGE or CLOSE open PRs** — 35 open (25 test + 10 board), down from 60+. Threshold to advance: <20 open.
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next advance target:** After open PRs < 20 — identify next genuine drift-guard gap after GEG (geh and beyond). Current test coverage: 5330 tests across 430+ test files.
