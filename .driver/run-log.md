@@ -2167,3 +2167,13 @@ Not reopening — standing down per close-without-merge policy.
 5. Stale branch cleanup — 1100+ remote auto/ branches
 
 **Next run:** GY — next unfrozen session contract (e.g. session eviction: after TTL expires, sessionContext is absent from the next call; or per-session tool call cap / MAX_RECENT_TOOLS boundary). Alternatively GZ — execute result content[0] is always type:text when live backend responds successfully.
+
+---
+
+## Event note — 2026-09-30T23:39Z
+
+PR #1644 (GX — session isolation drift-guard, 5 tests) **merged** by human.
+
+GX is now on main. New baseline: 5449+ pass (exact count TBD on next run).
+
+Next run: GY — next unfrozen session contract.
