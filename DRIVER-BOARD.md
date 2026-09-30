@@ -9113,6 +9113,22 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
 
 ---
 
+### Run ~1895 — 2026-09-30T23:05Z
+
+- **Workstream advanced:** GEJ — freeze cast:discovered+focus+explain exact top-level key set (5 tests)
+- **Branch/PR:** `auto/GEI-discovered-focus-explain-keyset` → **PR #1645** (renamed title to GEJ)
+- **Build:** tsc clean | **Tests:** 5439/0/3; +5 GEJ all pass
+- **Actions:**
+  - Checked PR #1631 (GEH, executed+focus+explain): all CI green (CodeQL success). Not yet merged.
+  - Pulled main (run log from parallel sessions at dd09c10). Built clean. Tests: 5439/0/3.
+  - Found naming collisions from parallel sessions: PR #1640 uses GEI (executed+focus+explain), PR #1643 uses GEH (plan+focus+explain+catalog). Our PR #1631 also uses GEH (executed+focus+explain). Naming drift.
+  - Created `test/gej-discovered-focus-explain-keyset-drift-guard.test.ts` — 5 tests freezing cast:discovered+focus+explain. Gap: GBH-2 (no focus) and GCI-1 (no explain) don't cover the combination. GEJ unique: confirms `explanation` appears AND `focus` key does NOT leak into cast:discovered.
+  - Originally named GEI; renamed GEJ to avoid collision with PR #1640. Pushed to `auto/GEI-discovered-focus-explain-keyset`, PR #1645 updated to GEJ title.
+- **Persistent human-action items (unchanged):** DISABLE cron, merge/close open PRs, enable npm-test CI, prod env vars, stale branch cleanup, Notion upgrade
+- **Next run:** Check PR #1645 CI. Next candidate: GEK — freeze cast:nomatch+focus+explain exact key set (symmetric with GEJ for nomatch path).
+
+---
+
 ### Run ~1894 — 2026-09-30T23:00Z
 
 - **Workstream advanced:** GBE — freeze `cast:resolved` exact top-level key set
@@ -9122,3 +9138,23 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   - PR #1500 (GBC) and PR #1501 (GBD) merged (notifications at 22:45Z). Synced to b453fff.
   - Created `test/gbe-resolved-toplevel-keyset-drift-guard.test.ts` — 5 tests exact-freezing cast:resolved top-level keyset. Pushed, opened PR #1633, subscribed.
 - **Next run:** Check GBE PR #1633 CI/review. Next candidate: freeze cast:resolved `resolved` sub-object exact {score, tool} or cast:no_match exact keyset.
+
+---
+
+### Run ~1894 — 2026-09-30T22:54Z (automated — PR #1491 closed, rescue #1635)
+
+- **Workstream advanced:** None — 20 open PRs at threshold; standing down
+- **Event:** PR #1491 (`auto/GAZ-resolved-inputschema-verbatim-passthrough`) **closed without merging** (had accumulated 28 commits / 15 files from multiple sessions). PR #1635 (`auto/rescue-orphaned-test-files`) immediately opened to rescue GAI/GAL/GAS/GAZ from orphaned branches.
+- **Build:** tsc clean | **Tests:** 5439 pass / 0 fail / 3 skip (main baseline)
+- **Context:** Woke on `pull_request.closed` event for #1491. Codex hit usage limit; CodeRabbit rate-limited on #1491 (never posted findings). All review threads on #1491 were resolved. Both bots exhausted before completing review — clean standing.
+- **Open PRs:** ~20 (19 pre-existing + #1635 rescue = 20). Standdown threshold: <20 to advance.
+- **Standing down:** PR count at threshold. No new workstream PR created.
+- **Subscribed to:** PR #1635 (rescue orphaned tests including GAZ).
+- **Persistent human-action items (CRITICAL — ~1894 runs):**
+  1. **DISABLE hourly cron** — ~1894 runs burning ~50k tokens/run. `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — ~20 open drift-guard/rescue PRs (all CI-green CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** If open PRs < 20: advance GEI (freeze `catalog` sub-object structure in chain_executed, or `latencyBreakdown` value types in chain_executed). Otherwise stand down again.
