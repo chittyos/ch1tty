@@ -9047,3 +9047,23 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
 - Open PRs include: #1471 (GAI), #1474 (GAL), #1482 (GAS), #1491 (GAZ), #1499 (PQ), #1502 (R), #1503 (GBE), #1508 (ST), #1512 (GBK), #1513 (GBL), #1519 (GBR), and several board-update PRs.
 
 **Next run:** If open PR count drops below 20: identify next genuine drift-guard gap after GEG and advance.
+
+---
+
+### Run ~1893 — 2026-09-30T (automated — GBR #1519 merge wake)
+
+- **Trigger**: PR #1519 (GBR) merged at 2026-09-30T22:48:39Z.
+- **Build:** tsc clean | **Tests:** 4735 pass / 0 fail / 2 skip (main post-merge baseline, 160 commits ahead of prior session's d723556)
+- **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **Open PRs at wake:** 17 (below 20 threshold → advance eligible)
+- **Workstream advanced:** GEI — freeze `cast:executed` exact key set for scope+explain combo (no session, no focus)
+- **Branch/PR:** `auto/GEI-executed-scope-explain-keyset-drift-guard` → **PR #1639** (https://github.com/chittyos/ch1tty/pull/1639)
+- **Tests after GEI:** 4740 pass / 0 fail / 2 skip (+5 vs 4735 baseline)
+- **Gap closed:** GBQ froze scope-only; GBR-3 froze scope+session+explain; GEI fills scope+explain WITHOUT session. Regression dropping scope when explain is active, or injecting sessionContext, would have passed all prior tests silently.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1893 runs; burning compute
+  2. **MERGE open drift-guard PRs** — 17 open, threshold to stand-down: ≥20
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+  5. **Rotate Notion token** — `op://ChittyOS-Integrations/notion/api_token`
+- **Next run:** Check GEI PR #1639 CI/review. Next candidate: GEJ — freeze `cast:executed + focus + session + explain` (3-way combo; GVF-4 covers focus+session without explain; GEH-2 covers session+explain without focus; the 3-way is unfrozen).
