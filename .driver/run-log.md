@@ -2125,3 +2125,11 @@ If the user wants these drift-guard tests reconsidered (e.g. in a different form
 5. Stale branch cleanup — 1100+ remote auto/ branches
 
 **Next run:** Standdown until PR count drops below ~15 (requires enabling GitHub Actions). Once unblocked: GX — next unfrozen contract (session isolation: two different sessionIds don't share callCount/recentTools/focus state).
+
+---
+
+## Event note — 2026-09-30T19:43Z
+
+PR #1575 (GDO — execute dryRun+sessionId sessionContext item structure) closed without merging.
+
+Not reopening — standing down per close-without-merge policy.
