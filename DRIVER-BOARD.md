@@ -9124,3 +9124,23 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   - PR #1500 (GBC) and PR #1501 (GBD) merged (notifications at 22:45Z). Synced to b453fff.
   - Created `test/gbe-resolved-toplevel-keyset-drift-guard.test.ts` — 5 tests exact-freezing cast:resolved top-level keyset. Pushed, opened PR #1633, subscribed.
 - **Next run:** Check GBE PR #1633 CI/review. Next candidate: freeze cast:resolved `resolved` sub-object exact {score, tool} or cast:no_match exact keyset.
+
+---
+
+### Run ~1894 — 2026-09-30T22:54Z (automated — PR #1491 closed, rescue #1635)
+
+- **Workstream advanced:** None — 20 open PRs at threshold; standing down
+- **Event:** PR #1491 (`auto/GAZ-resolved-inputschema-verbatim-passthrough`) **closed without merging** (had accumulated 28 commits / 15 files from multiple sessions). PR #1635 (`auto/rescue-orphaned-test-files`) immediately opened to rescue GAI/GAL/GAS/GAZ from orphaned branches.
+- **Build:** tsc clean | **Tests:** 5439 pass / 0 fail / 3 skip (main baseline)
+- **Context:** Woke on `pull_request.closed` event for #1491. Codex hit usage limit; CodeRabbit rate-limited on #1491 (never posted findings). All review threads on #1491 were resolved. Both bots exhausted before completing review — clean standing.
+- **Open PRs:** ~20 (19 pre-existing + #1635 rescue = 20). Standdown threshold: <20 to advance.
+- **Standing down:** PR count at threshold. No new workstream PR created.
+- **Subscribed to:** PR #1635 (rescue orphaned tests including GAZ).
+- **Persistent human-action items (CRITICAL — ~1894 runs):**
+  1. **DISABLE hourly cron** — ~1894 runs burning ~50k tokens/run. `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — ~20 open drift-guard/rescue PRs (all CI-green CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** If open PRs < 20: advance GEI (freeze `catalog` sub-object structure in chain_executed, or `latencyBreakdown` value types in chain_executed). Otherwise stand down again.
