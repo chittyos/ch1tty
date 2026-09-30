@@ -9375,3 +9375,27 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to restore live board
 - **Next run:** Check GEL PR #1659 CI/review. Next candidate: GEM — freeze cast:resolved `resolved` sub-object exact {score, tool} key set in the maximal combo (or another unguarded resolved combination).
+
+---
+
+### Run ~1905 — 2026-09-30T00:30Z (automated — GEI chain_executed sessionContext keyset)
+
+- **Workstream advanced:** GEI — freeze `cast:chain_executed.sessionContext` exact key set (5 tests)
+- **Branch/PR:** `auto/GEI-chain-executed-sessioncontext-keyset` → **PR #1660** (https://github.com/chittyos/ch1tty/pull/1660)
+- **Build:** tsc clean | **Tests:** 5477/0/3 at branch creation; main now at 5541/0/3 (+64 from parallel sessions)
+- **Gap closed:** GDD froze execute sessionContext; GDX froze cast:executed/resolved sessionContext; GBI-3 checks `sessionContext` PRESENT in chain_executed top-level — but no test went inside the sub-object. The `chainSessionContext` construction at aggregator.ts ~line 1516 is a distinct code path; reachable only when `effectiveSessionId` is set + coordinator has the session.
+  - GEI-1: no per-call focus → sessionContext EXACTLY `{recentTools, callCount}`
+  - GEI-2: per-call focus 'code' → sessionContext EXACTLY `{recentTools, callCount, activeSessionFocus}`
+  - GEI-3: `activeSessionFocus` value equals the per-call focus string ('code')
+  - GEI-4: `recentTools` is an Array of strings
+  - GEI-5: `callCount` is a finite non-negative integer
+- **Note:** Main already has 3 other GEI-prefixed files (gei-discovered-*, gei-executed-scope-*, gei-executed-scope-focus-*) merged from parallel sessions; file suffix is distinct, no collision.
+- **Open PRs:** 11 (#1657–#1661 + stale board-log PRs); all CI-green (CodeQL), awaiting human merge.
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1905 runs; burning compute
+  2. **MERGE open PRs** — 11 open, all CI-green, awaiting human merge
+  3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** Check PR #1660 CI/review. Next candidate: GEJ or GEM (cast:resolved `resolved` sub-object exact {score, tool} key set in maximal combo).
