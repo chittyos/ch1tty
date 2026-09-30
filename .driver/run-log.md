@@ -2089,15 +2089,20 @@
 
 **Next run:** Standdown condition will persist until GitHub Actions is enabled. Once unblocked: GDX — freeze ch1tty/search response sessionContext key set when sessionId active. Consider disabling cron to stop token burn.
 
+---
+
+## Event note — 2026-09-30T19:42Z
+
+PRs #1582 (GDT) and #1583 (GDU) were both closed without merging.
+
+Not reopening — standing down per close-without-merge policy. Both branches remain in the repo.
+
+If the user wants these drift-guard tests reconsidered (e.g. in a different form, squashed, or rebased), they should reopen or ask for a fresh PR.
 
 ---
 
-## Event log — 2026-09-30T19:43Z (automated, PR watch wake)
+## Event note — 2026-09-30T19:43Z
 
-**Event:** PR #1575 (GDO) closed without merging.
+PR #1575 (GDO — execute dryRun+sessionId sessionContext item structure) closed without merging.
 
-**Action:** No action taken per PR activity rules — do not reopen or create new PR for same change without explicit user request.
-
-**Impact:** GDO test file (`test/gdo-execute-dryrun-sessioncontext-item-structure.test.ts`) not on main. The freeze for execute dryRun+sessionId sessionContext embedded structure was NOT landed.
-
-**Open PRs:** #1543 (GCK) through #1574 (GDN): 30 drift-guard PRs remain open (GDO #1575 now closed).
+Not reopening — standing down per close-without-merge policy. Branch remains in repo.
