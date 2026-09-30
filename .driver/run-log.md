@@ -2089,3 +2089,12 @@
 
 **Next run:** Standdown condition will persist until GitHub Actions is enabled. Once unblocked: GDX — freeze ch1tty/search response sessionContext key set when sessionId active. Consider disabling cron to stop token burn.
 
+---
+
+## Event note — 2026-09-30T19:42Z
+
+PRs #1582 (GDT) and #1583 (GDU) were both closed without merging.
+
+Not reopening — standing down per close-without-merge policy. Both branches remain in the repo.
+
+If the user wants these drift-guard tests reconsidered (e.g. in a different form, squashed, or rebased), they should reopen or ask for a fresh PR.
