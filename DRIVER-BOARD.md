@@ -9077,3 +9077,22 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   - Gap: GEG suppresses catalog; GCA-2 has no explain; neither covers three-way combination
   - GEH-1: 14 keys; GEH-2: +session (15); GEH-3: absence guard; GEH-4: +scope (15); GEH-5: type guard
 - **Persistent human-action items (unchanged):** DISABLE cron, merge/close open PRs, enable npm-test CI, prod env vars, stale branch cleanup, Notion upgrade
+
+---
+
+### Run ~1894 — 2026-09-30 (automated run — GEI PR #1641 CI check)
+
+- **Trigger:** Continuation of run ~1893 (context compaction resumed)
+- **Build:** skipped (board-only run) | **Tests:** baseline 5439 pass / 0 fail / 3 skip (main)
+- **Open PRs:** 27 (above ~20 standdown threshold) → **STANDDOWN — no new PR**
+- **PR #1641 (GEI) status:** CI all green (3/3: CodeQL ✓, Analyze(actions) ✓, Analyze(javascript-typescript) ✓). No review findings (Codex + CodeRabbit both rate-limited). **Ready for human merge.**
+- **GEI scope:** `test/gei-executed-focus-explain-session-keyset-drift-guard.test.ts` — 5 tests freezing cast:executed exact key sets for focus+explain+session triple combo (11 keys) and +scope quadruple (12 keys), plus absence guard and type guards.
+- **Parallel driver activity:** Runs ~1891–1892 on main opened PRs #1640 (GEI scope+explain), #1643 (GEH cast:plan+focus+explain+catalog), #1644–1645 (GX session isolation). Note: multiple GEI-prefixed PRs exist (#1639–1641) from parallel runs — only #1641 covers the focus+explain+session triple.
+- **Persistent human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1894 runs; burning compute
+  2. **MERGE or CLOSE open PRs** — 27 open; threshold to advance: <20
+  3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** After open PRs drop below 20 — next gap candidate is GEJ: freeze cast:chain_executed exact key set for focus+explain+session combos (GBI covers chain_executed conditional keys but not the triple).
