@@ -9121,7 +9121,60 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
 
 ---
 
-### Run ~1896 — 2026-09-30T23:30Z
+### Run ~1893 — 2026-09-30T22:54Z (automated — GAS re-submission)
+
+- **Workstream:** GAS re-submission — PR #1482 was closed without merging on 2026-09-30T22:54Z (CI was green; 29 accumulated commits from other sessions; closed by unknown action). All 14 other test files from that branch are already in main via separate PRs. Only `gas-alternatives-executed-exact-keyset-drift-guard.test.ts` was missing.
+- **Branch/PR:** `auto/GAS-v2-alternatives-exact-keyset` → **PR #1638** (https://github.com/chittyos/ch1tty/pull/1638)
+- **Build:** tsc clean | **Tests:** 5 GAS tests pass against current main (5434 base + GAU etc. already merged)
+- **Actions this run:**
+  - Read notifications: PR #1482 closed at 22:54Z (CI was green, state=closed merged=false).
+  - Unsubscribed from PR #1482.
+  - Confirmed 13 of 14 files from closed branch are in main; only GAS test file missing.
+  - Cherry-picked `b04f5d9` + `9439d2a` onto fresh branch from current main.
+  - All 5 GAS tests pass. Pushed and opened PR #1638. Subscribed to PR activity.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1893+ runs; burning compute.
+  2. **Merge open PRs** — including #1638 (GAS) and others
+  3. **Enable GitHub Actions** (npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+- **Next run:** Check GAS PR #1638 CI/review. If merged, next gap continues from wherever run ~1892 left off (GBV or later).
+
+---
+
+### Run ~1894 — 2026-09-30T23:00Z (automated — GBE resolved top-level keyset)
+
+- **Workstream advanced:** GBE — freeze `cast:resolved` exact top-level key set
+- **Branch/PR:** `auto/GBE-resolved-toplevel-keyset-drift-guard` → **PR #1633**
+- **Build:** tsc clean | **Tests:** 5434/0/3 baseline; +5 GBE pass
+- **Actions:**
+  - PR #1500 (GBC) and PR #1501 (GBD) merged (notifications at 22:45Z). Synced to b453fff.
+  - Created `test/gbe-resolved-toplevel-keyset-drift-guard.test.ts` — 5 tests exact-freezing cast:resolved top-level keyset. Pushed, opened PR #1633, subscribed.
+- **Next run:** Check GBE PR #1633 CI/review. Next candidate: freeze cast:resolved `resolved` sub-object exact {score, tool} or cast:no_match exact keyset.
+
+---
+
+### Run ~1894b — 2026-09-30T23:05Z (automated — GAS PR #1638 merge conflict fix)
+
+- **Workstream:** PR #1638 (GAS drift guard) — CI green (all 3 checks pass: CodeQL, Analyze javascript-typescript, Analyze actions). Detected `mergeable_state: dirty` — merge conflict in DRIVER-BOARD.md between GAS branch and main (other sessions had advanced main). Resolved by merging main into branch (kept both sides: main's updated "next run" note + our run ~1893 entry).
+- **Branch/PR:** `auto/GAS-v2-alternatives-exact-keyset` → **PR #1638** (https://github.com/chittyos/ch1tty/pull/1638)
+- **Build:** tsc clean | **Tests:** 5 GAS tests pass
+- **Actions this run:**
+  - Detected CI green (all 3 checks passed on head `8fa9aa0`).
+  - Detected `mergeable_state: dirty` — DRIVER-BOARD.md conflict.
+  - Merged origin/main into branch; resolved conflict; committed merge + run ~1894 entry.
+  - Pushed to origin.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1894+ runs; burning compute.
+  2. **Merge open PRs** — including #1638 (GAS) and others
+  3. **Enable GitHub Actions** (npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+- **Next run:** Check PR #1638 CI/review after merge commit push. If CodeRabbit posts no blocking findings, PR is waiting on human merge.
+
+---
+
+### Run ~1896 — 2026-09-30T23:30Z (automated — GEH chain_executed step item keyset)
 
 - **Workstream advanced:** GEH — freeze cast:chain_executed step item exact key set (ok:true and ok:false branches)
 - **Gap closed:** EJ (2026-09-19) used PERMITTED/REQUIRED checks for step items, NOT exact equality per branch. A regression adding `error` to ok:true steps (or `content` to ok:false steps) passed EJ silently. GEH freezes:
@@ -9162,7 +9215,7 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
 
 ---
 
-### Run ~1895 — 2026-09-30T23:05Z
+### Run ~1895 — 2026-09-30T23:05Z (automated — GEJ discovered+focus+explain keyset)
 
 - **Workstream advanced:** GEJ — freeze cast:discovered+focus+explain exact top-level key set (5 tests)
 - **Branch/PR:** `auto/GEI-discovered-focus-explain-keyset` → **PR #1645** (renamed title to GEJ)
@@ -9178,19 +9231,7 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
 
 ---
 
-### Run ~1894 — 2026-09-30T23:00Z
-
-- **Workstream advanced:** GBE — freeze `cast:resolved` exact top-level key set
-- **Branch/PR:** `auto/GBE-resolved-toplevel-keyset-drift-guard` → **PR #1633**
-- **Build:** tsc clean | **Tests:** 5434/0/3 baseline; +5 GBE pass
-- **Actions:**
-  - PR #1500 (GBC) and PR #1501 (GBD) merged (notifications at 22:45Z). Synced to b453fff.
-  - Created `test/gbe-resolved-toplevel-keyset-drift-guard.test.ts` — 5 tests exact-freezing cast:resolved top-level keyset. Pushed, opened PR #1633, subscribed.
-- **Next run:** Check GBE PR #1633 CI/review. Next candidate: freeze cast:resolved `resolved` sub-object exact {score, tool} or cast:no_match exact keyset.
-
----
-
-### Run ~1894 — 2026-09-30T22:54Z (automated — PR #1491 closed, rescue #1635)
+### Run ~1894c — 2026-09-30T22:54Z (automated — PR #1491 closed, rescue #1635)
 
 - **Workstream advanced:** None — 20 open PRs at threshold; standing down
 - **Event:** PR #1491 (`auto/GAZ-resolved-inputschema-verbatim-passthrough`) **closed without merging** (had accumulated 28 commits / 15 files from multiple sessions). PR #1635 (`auto/rescue-orphaned-test-files`) immediately opened to rescue GAI/GAL/GAS/GAZ from orphaned branches.
@@ -9207,3 +9248,35 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to restore live board
 - **Next run:** If open PRs < 20: advance GEI (freeze `catalog` sub-object structure in chain_executed, or `latencyBreakdown` value types in chain_executed). Otherwise stand down again.
+
+---
+
+### Run ~1896b — 2026-09-30T23:15Z (automated — GAS PR #1638 second merge conflict fix)
+
+- **Workstream:** PR #1638 (GAS drift guard) — CI green on `6d750a0` (all 3 checks pass). Detected `mergeable_state: dirty` again — main advanced 5 more commits (runs ~1892/~1894/~1895 from other sessions). Resolved DRIVER-BOARD.md conflict (kept all entries from both sides in chronological order; renamed colliding run ~1894 to ~1894b).
+- **Branch/PR:** `auto/GAS-v2-alternatives-exact-keyset` → **PR #1638** (https://github.com/chittyos/ch1tty/pull/1638)
+- **CI:** All 3 checks green on previous head. CodeRabbit rate-limited (~57 min reset). No open review threads.
+- **Actions this run:**
+  - Fetched origin/main: 5 new commits (b2a6e54). Merged into branch, resolved conflict.
+  - Appended run ~1896b entry. Committing and pushing.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1896+ runs; burning compute.
+  2. **Merge open PRs** — including #1638 (GAS) and ~26 others
+  3. **Enable GitHub Actions** (npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+- **Next run:** Wait for CodeRabbit rate-limit reset + CI on new head. PR #1638 waiting on human merge once clear.
+
+---
+
+### Run ~1897 — 2026-09-30T23:10Z (automated — GAS PR #1638 third merge conflict fix)
+
+- **Workstream:** PR #1638 (GAS drift guard) — CI green on `3b7e804` (all 3 checks: CodeQL ✅, Analyze javascript-typescript ✅, Analyze actions ✅). Detected `mergeable_state: dirty` again — main advanced 5 more commits (runs ~1895/~1896/~1894c from parallel sessions). Two DRIVER-BOARD.md conflicts; resolved by keeping all unique entries from both sides.
+- **Branch/PR:** `auto/GAS-v2-alternatives-exact-keyset` → **PR #1638** (https://github.com/chittyos/ch1tty/pull/1638)
+- **Actions this run:** Merged origin/main (e5297e5); resolved 2 DRIVER-BOARD.md conflicts; pushed.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1897+ runs; burning compute.
+  2. **Merge open PRs** — including #1638 (GAS) and ~27 others
+  3. **Enable GitHub Actions** (npm test CI job)
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches
+- **Next run:** Check CI + CodeRabbit on new head. CodeRabbit rate-limit resets ~00:02Z.
