@@ -9062,9 +9062,22 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   1. **DISABLE hourly cron** — ~1893 runs; burning compute
   2. **MERGE or CLOSE open PRs** (18+ open)
   3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
-  4. **Stale branch cleanup** — 1100+ remote auto/ branches
-  5. **Notion plan limit** — upgrade or clean to restore live board
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
 - **Next run:** Check PR #1640 CI/review. Next candidate: GEJ — scope+focus+explain triple combination.
+
+---
+
+### Run ~1892 — 2026-09-30 (automated run — PR #1490 GAY merge wake)
+
+- **Trigger:** PR #1490 (GAY drift guard) merged at 2026-09-30T22:45Z
+- **Build:** tsc clean | **Tests:** 5439 pass / 0 fail / 3 skip (+5 vs 5434 baseline)
+- **Open PRs:** 16 (below ~20 standdown threshold) → **PR created**
+- **Work done:** GEH drift-guard PR #1643 — freezes cast:plan + focus + explain + catalog exact key set (5 tests, 14 keys base variant)
+  - Gap: GEG suppresses catalog; GCA-2 has no explain; neither covers three-way combination
+  - GEH-1: 14 keys; GEH-2: +session (15); GEH-3: absence guard; GEH-4: +scope (15); GEH-5: type guard
+- **Persistent human-action items (unchanged):** DISABLE cron, merge/close open PRs, enable npm-test CI, prod env vars, stale branch cleanup, Notion upgrade
 
 ---
 
@@ -9089,7 +9102,19 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
 
 ---
 
-### Run ~1894 — 2026-09-30T23:05Z (automated — GAS PR #1638 merge conflict fix)
+### Run ~1894 — 2026-09-30T23:00Z (automated — GBE resolved top-level keyset)
+
+- **Workstream advanced:** GBE — freeze `cast:resolved` exact top-level key set
+- **Branch/PR:** `auto/GBE-resolved-toplevel-keyset-drift-guard` → **PR #1633**
+- **Build:** tsc clean | **Tests:** 5434/0/3 baseline; +5 GBE pass
+- **Actions:**
+  - PR #1500 (GBC) and PR #1501 (GBD) merged (notifications at 22:45Z). Synced to b453fff.
+  - Created `test/gbe-resolved-toplevel-keyset-drift-guard.test.ts` — 5 tests exact-freezing cast:resolved top-level keyset. Pushed, opened PR #1633, subscribed.
+- **Next run:** Check GBE PR #1633 CI/review. Next candidate: freeze cast:resolved `resolved` sub-object exact {score, tool} or cast:no_match exact keyset.
+
+---
+
+### Run ~1894b — 2026-09-30T23:05Z (automated — GAS PR #1638 merge conflict fix)
 
 - **Workstream:** PR #1638 (GAS drift guard) — CI green (all 3 checks pass: CodeQL, Analyze javascript-typescript, Analyze actions). Detected `mergeable_state: dirty` — merge conflict in DRIVER-BOARD.md between GAS branch and main (other sessions had advanced main). Resolved by merging main into branch (kept both sides: main's updated "next run" note + our run ~1893 entry).
 - **Branch/PR:** `auto/GAS-v2-alternatives-exact-keyset` → **PR #1638** (https://github.com/chittyos/ch1tty/pull/1638)
@@ -9106,3 +9131,39 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
 - **Next run:** Check PR #1638 CI/review after merge commit push. If CodeRabbit posts no blocking findings, PR is waiting on human merge.
+
+---
+
+### Run ~1895 — 2026-09-30T23:13Z (automated — PR #1640 CI follow-up)
+
+- **Workstream advanced:** None — 26 open PRs exceed ~20 standdown threshold
+- **Build:** N/A (no new work) | **Tests:** N/A
+- **Context:** PR #1640 (GEI focus+explain) — CI confirmed green: CodeQL ✅, Analyze(javascript-typescript) ✅, Analyze(actions) ✅. No review findings (CodeRabbit/Codex still rate-limited at time of check). PR waiting on human merge.
+- **Open PRs:** 26 (threshold ~20). Multiple parallel sessions created PRs this cycle: #1629–1645.
+- **Standing down:** No new PR. Human merge queue must drain before next advance.
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1895 runs; burning compute
+  2. **MERGE or CLOSE open PRs** — 26 open PRs (many duplicates from parallel sessions: #1631/#1632/#1640 all cover GEH/GEI executed+focus+explain)
+  3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** If PRs merge below ~20, next candidate: GEJ — freeze cast:executed + focus + session + explain (3-way combo).
+
+---
+
+### Run ~1896 — 2026-09-30T23:15Z (automated — GAS PR #1638 second merge conflict fix)
+
+- **Workstream:** PR #1638 (GAS drift guard) — CI green on `6d750a0` (all 3 checks pass). Detected `mergeable_state: dirty` again — main advanced 5 more commits (runs ~1892/~1894/~1895 from other sessions). Resolved DRIVER-BOARD.md conflict (kept all entries from both sides in chronological order; renamed colliding run ~1894 to ~1894b).
+- **Branch/PR:** `auto/GAS-v2-alternatives-exact-keyset` → **PR #1638** (https://github.com/chittyos/ch1tty/pull/1638)
+- **CI:** All 3 checks green on previous head. CodeRabbit rate-limited (~57 min reset). No open review threads.
+- **Actions this run:**
+  - Fetched origin/main: 5 new commits (b2a6e54). Merged into branch, resolved conflict.
+  - Appended run ~1896 entry. Committing and pushing.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1896+ runs; burning compute.
+  2. **Merge open PRs** — including #1638 (GAS) and ~26 others
+  3. **Enable GitHub Actions** (npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+- **Next run:** Wait for CodeRabbit rate-limit reset + CI on new head. PR #1638 waiting on human merge once clear.
