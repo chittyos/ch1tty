@@ -8832,3 +8832,10 @@ Main is now at a newer state (3 new test files merged since run ~1838: `gee-reso
 CI was green (3/3), Codex P2 thread resolved, CodeRabbit merge risk Low. Closed by human without merge — consistent with the batch-close pattern on this series. Branch and commits remain in the repo. Will NOT reopen or recreate without explicit user instruction.
 
 State: GCO work is available on `auto/GCO-search-infocus-conditional-drift-guard` if needed. Main is unchanged (+0 tests from GCO).
+
+---
+
+### Run ~1826 addendum — 2026-09-30T (automated event)
+- **Event:** PR #1558 (GCX — freeze ch1tty/search suggestions ordering + truncation) closed without merging.
+- **Action:** Logged here only. Per policy, not reopened and no new PR created.
+- **Note for next run:** GCX tests in `test/gcx-search-suggestions-ordering-truncation.test.ts` exist on branch `auto/gcx-search-suggestions-ordering-truncation` (not merged). Main is now at ~5316 tests. A new GCY target should be identified from scratch against the current main (the next run should re-audit what FK/EI/HH/GCX cover vs. what remains unfrozen).
