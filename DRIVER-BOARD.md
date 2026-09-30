@@ -9034,3 +9034,31 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to restore live board
 - **Next advance target:** After open PRs < 20 — identify next genuine drift-guard gap after GEG. Current: 5335 tests, 430+ test files.
+
+---
+
+### Run ~1893 — 2026-09-30T22:48Z (automated — GBK/GBL merge wake)
+
+- **Workstream advanced:** GEI — freeze cast:executed exact key set for focus+explain+session combos
+- **Branch:** `auto/GEI-executed-focus-explain-session-keyset-drift-guard` → **PR pending**
+- **Build:** tsc clean | **Tests (file only):** 5 pass / 0 fail
+- **Baseline (full suite on main):** 5439 pass / 0 fail / 3 skip
+- **Actions this run:**
+  - Woke on GBK (#1512) and GBL (#1513) merge events (both merged by chitcommit at 22:48:33/36Z).
+  - Synced main: found 127+ additional commits landed since last session (GBM–GEG); tests now at 5439 (up from 5330).
+  - Open PRs: 17 (below the 20-PR standdown threshold — can advance).
+  - Gap identified: GVF-3 covers +focus+explain (no session), GEH (#1629, open) covers +session+explain (no focus). Neither covers the triple combo: focus+explain+session nor the quadruple (with scope).
+  - Created `test/gei-executed-focus-explain-session-keyset-drift-guard.test.ts` (5 tests):
+    - GEI-1: +focus+explain+session → 11 keys
+    - GEI-2: +focus+explain+session+scope(servers) → 12 keys
+    - GEI-3: +focus+explain+session+scope(categories) → 12 keys
+    - GEI-4: absence guard — no {resolvedFromCatalog, chainContinuation, suggestions, scope, resources}
+    - GEI-5: value types: explanation=object, focus=string, sessionContext=object
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1893 runs; burning compute
+  2. **MERGE or CLOSE open PRs** — 17 open (below threshold now — advance enabled)
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** Check GEI PR CI/review. Next candidate: GEJ — freeze cast:chain_executed exact key set with focus+explain+session combos (GBI covers chain_executed conditional keys but not the triple).
