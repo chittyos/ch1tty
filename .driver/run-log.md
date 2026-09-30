@@ -2133,3 +2133,37 @@ If the user wants these drift-guard tests reconsidered (e.g. in a different form
 PR #1575 (GDO — execute dryRun+sessionId sessionContext item structure) closed without merging.
 
 Not reopening — standing down per close-without-merge policy.
+
+---
+
+## Run ~1893 — 2026-09-30T (automated)
+
+**Workstream:** GX — session isolation drift-guard (5 tests)
+
+**Build/Tests:** tsc clean; 5444 pass / 0 fail / 3 skip (+5 vs run ~1887 baseline of 5439; previous runs had 5321 which means many PRs merged in between)
+
+**PR opened:** #1644 `test(GX): freeze session isolation invariant — two distinct sessionIds maintain independent state`
+
+**What was done:**
+- npm ci clean; tsc clean; npm test 5444/0/3 — all green on main (up from last logged 5321; many PRs merged since run ~1887)
+- Read CLAUDE.md + CHITTY.md; confirmed 5-tool surface invariant and buildCastExplanation metric freeze ACTIVE
+- Open PR check: 15 open PRs (below ~20 standdown cap — resuming work)
+- Remote branch `auto/GX-session-isolation-drift-guard` existed from prior run (~1801) with GX test already committed but no PR opened and messy board commits stacked on top
+- Created clean branch `auto/GX-session-isolation-drift-guard-clean` from main, cherry-picked `e0a137e` (the GX test commit), validated 5/5 pass, pushed, opened PR #1644
+- Subscribed to PR #1644 for CI/review events
+
+**GX tests (5 total):**
+- GX-1: session-a execute → session-b callCount === 0
+- GX-2: session-a execute → session-b recentTools === []
+- GX-3: sticky focus on session-a absent from session-b activeSessionFocus
+- GX-4: session-a callCount exactly 3 even after session-b ran 5 executes first
+- GX-5: two sessions, each sees only its own tools in recentTools
+
+**Standing blockers (human action required):**
+1. **GitHub Actions CI disabled** — drift-guard test PRs queue without automated test CI. Fix: GitHub Settings → Actions → General → "Allow all actions" for chittyos/ch1tty
+2. **15 open PRs** — below standdown cap, working again
+3. **Notion board** — workspace block limit; using .driver/run-log.md
+4. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID/SECRET, CHITTY_TASKS_TOKEN
+5. Stale branch cleanup — 1100+ remote auto/ branches
+
+**Next run:** GY — next unfrozen session contract (e.g. session eviction: after TTL expires, sessionContext is absent from the next call; or per-session tool call cap / MAX_RECENT_TOOLS boundary). Alternatively GZ — execute result content[0] is always type:text when live backend responds successfully.
