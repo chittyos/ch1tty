@@ -8822,3 +8822,13 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 **Note:** PR #1574 (`auto/GDN-dryrun-outer-envelope`) was closed without merging by a human on 2026-09-30. Branch preserved. Change not in main. Not reopening — human decision.
 
 Main is now at a newer state (3 new test files merged since run ~1838: `gee-resolved-explain-keyset-drift-guard.test.ts`, `gef-resolved-catalogcombo-explain-keyset-drift-guard.test.ts`, `gw-search-sessioncontext-value-types-drift-guard.test.ts`).
+
+---
+
+### Run ~1818 addendum — 2026-09-30T19:44Z
+
+**PR #1548 (`auto/GCO-search-infocus-conditional-drift-guard`) closed without merging.**
+
+CI was green (3/3), Codex P2 thread resolved, CodeRabbit merge risk Low. Closed by human without merge — consistent with the batch-close pattern on this series. Branch and commits remain in the repo. Will NOT reopen or recreate without explicit user instruction.
+
+State: GCO work is available on `auto/GCO-search-infocus-conditional-drift-guard` if needed. Main is unchanged (+0 tests from GCO).
