@@ -8504,3 +8504,12 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 **PR #1567** (`auto/GDG-recenttools-count-vs-recency-ordering`): All Codex P2 threads resolved. Awaiting CI + human merge.
 
 **Next**: Continue drift-guard series (next label after GDG).
+
+---
+## Run ~1900 — 2026-09-30
+
+**Status**: PR #1567 closed without merging
+
+**PR #1567** (`auto/GDG-recenttools-count-vs-recency-ordering`): Closed without merging by a human on 2026-09-30. Branch still exists with all GDG drift-guard tests (6/6 passing, all Codex P2 findings resolved, CI was green at close time). Not reopened — awaiting owner decision.
+
+**Action required**: Human decision on whether to reopen/merge or discard the GDG work.
