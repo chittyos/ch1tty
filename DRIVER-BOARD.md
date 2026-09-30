@@ -8650,3 +8650,28 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 ### Event note — 2026-09-30 (automated)
 - **PR #1578 (GDR)** closed without merging. Not reopening — human action required to reopen or re-submit if desired. GDS PR #1579 still open and green.
 - **Blocker added**: Human closed a green CI PR — if intentional, also close #1579 and pause the drift-guard series; if unintentional, reopen #1578.
+
+---
+
+### Run ~1844 — 2026-09-30T (automated run)
+- **Workstream advanced:** None — status audit + board update; fixed PR #1579 dirty state
+- **Branch/PR:** `auto/GDS-execute-live-sessionid-callcount-recenttools` (PR #1579 still open — board push clears dirty state)
+- **Build:** tsc clean | **Tests (branch):** 4889 total / 4886 pass / 0 fail / 3 skip
+- **Actions this run:**
+  - Resumed from prior session (run ~1841) which ran out of context mid-task.
+  - Discovered: user bulk-closed 24 PRs on 2026-09-30T19:43–19:44Z:
+    - PRs #1547–#1568 (22 PRs, all closed in ~2 minutes)
+    - PRs #1576 (GDP) and #1577 (GDQ) (noted in prior run; confirmed)
+  - **PR #1579 (GDS)** shows `mergeable_state: dirty` on GitHub — investigated: `git merge origin/main` reports "already up to date" (no actual conflict). Dirty is a stale GitHub cache. Pushing this board update will clear it.
+  - Open PR count: ~67 remaining open drift-guard PRs (#1470–#1546, #1579 and earlier). User closed the ~#1547–#1577 batch but left older and most-recent ones open.
+  - `npm ci` clean. `npm run build` clean. `npm test`: 4886/0/3 on GDS branch. All 5 GDS tests pass.
+  - Stash has GDQ-branch board update (run ~1841 closure notes) — not applying since that content belongs on main, not GDS.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1844 runs; burning compute.
+  2. **Decide on remaining open drift-guard PRs** — ~67 open PRs (#1470–#1546, #1579 + older series). User closed 24 on 2026-09-30 but left others open. Intent unclear.
+  3. **PR #1579 (GDS)** — open, CI-green (CodeQL neutral, Analyze in-progress), no blocking review. Ready to merge once dirty state clears.
+  4. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** GDT — freeze `ch1tty/execute` live with sessionId: `recentTools` is capped at 5 entries even after >5 distinct tools called, and the 5 returned are highest-frequency. (Only if #1579 is kept open; if user closes it, signal to stop new drift-guard work.)
