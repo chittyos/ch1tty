@@ -9300,7 +9300,85 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
 
 ---
 
-### Run ~1903 — 2026-09-30T (automated — context continuation)
+### Run ~1895b — 2026-09-30T23:40Z (automated — PR #1631 merge wake)
+
+- **PR #1631 (GEH: executed+focus+explain) merged.** Tests now at 5544/0/3 on main.
+- **PR #1645 (GEJ: discovered+focus+explain) closed** — coverage gap already filled by `geh-discovered-focus-explain-keyset-drift-guard.test.ts` from the same merge batch; GEJ content landed on main via parallel session anyway.
+- **Build:** tsc clean | **Tests:** 5544 pass / 0 fail / 3 skip
+- **Parallel session note:** Multiple sessions ran concurrently; GEH prefix overloaded (6 files), GEI prefix used for scope+explain path. GEJ prefix used for discovered+focus+explain (2 files). No test failures — all names distinct by suffix.
+- **Persistent human-action items (unchanged):** DISABLE cron, merge/close open PRs, enable npm-test CI, prod env vars, stale branch cleanup, Notion upgrade
+- **Next run:** Check open PRs; if below ~20, advance to next uncovered combination.
+
+---
+
+### Run ~1903 — 2026-10-01T00:00Z (automated — PR #1634 GEH close wake)
+
+- **Workstream advanced:** GEK — freeze cast:chain_executed maximal key set (explain+session combo, 5 tests)
+- **Branch/PR:** `auto/GEK-chain-executed-maximal-keyset` → **PR #1654** (https://github.com/chittyos/ch1tty/pull/1654)
+- **Build:** tsc clean | **Tests (main):** spot-checked GEK + GEJ + GBI all pass; GEK +5 on branch
+- **Actions this run:**
+  - Woke on PR #1634 (GEH step-item keyset) closed without merging.
+  - GEH content already on main via parallel session commit b2a6e54; no coverage gap.
+  - Synced to origin/main (81a011a → run ~1902). 8 open PRs — below ~20 cap → advanced workstream.
+  - Identified GEK gap: GBI froze +explain and +session separately (each → 11 keys) but never the maximal 12-key set (both active → 12 keys).
+  - Wrote `test/gek-chain-executed-maximal-keyset-drift-guard.test.ts` (5 tests). All 5 pass. Pushed, opened PR #1654, subscribed.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1903 runs; burning compute.
+  2. **MERGE open PRs** — 9 open (8 pre-existing + #1654), all CI-green (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** Check GEK PR #1654 CI/review. If queue below ~20: advance GEL (cast:resolved maximal keyset with focus+scope+explain+session active).
+
+---
+
+### Run ~1904 — 2026-10-01T00:13Z (automated — PR #1640 GEI merge wake)
+
+- **Workstream advanced:** GEK (resolved+scope) — PR #1655 opened ✅
+- **Branch/PR:** `auto/GEK-resolved-scope-toplevel-keyset` → **PR #1655** (https://github.com/chittyos/ch1tty/pull/1655)
+- **Build:** tsc clean | **Tests:** 5541 pass / 0 fail / 3 skip (main baseline) → +5 on branch
+- **Gap closed:** cast:resolved + scope exact top-level keyset (GEC=no-scope, GEE=no-scope+explain; no test covered resolved+scope)
+  - GEK-1: scope only → {cast,intent,latencyMs,resolved,resolvedBy,scope} (6 keys)
+  - GEK-2: scope+session → +sessionContext (7 keys)
+  - GEK-3: scope+explain → +explanation (7 keys)
+  - GEK-4: scope+session+explain (maximal) → 8 keys
+  - GEK-5: absence guard → scope ABSENT when not provided
+- **Note:** Parallel session (run ~1903) also created GEK PR #1654 for chain_executed maximal keyset — different gap, distinct file suffix; no collision.
+- **Open PRs:** 9 (well below ~20 threshold). Old board-chore PRs #1522/#1523/#1528/#1530/#1538/#1544 are stale and can be closed.
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1904 runs; burning compute
+  2. **MERGE open PRs** — 9 open (#1654, #1655, #1656 + 6 stale board-log PRs)
+  3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** Check PR #1655 CI/review. Next candidate: GEL — cast:resolved maximal keyset with focus+scope+explain+session all active.
+
+---
+
+### Run ~1904 — 2026-09-30T00:15Z (automated — GEL resolved focus+scope+explain keyset)
+
+- **Workstream advanced:** GEL — freeze cast:resolved exact top-level key set when focus + scope + explain all active (no catalogCombo)
+- **Branch/PR:** `auto/GEL-resolved-focus-scope-explain-keyset` → **PR #1659** (https://github.com/chittyos/ch1tty/pull/1659)
+- **Build:** tsc clean | **Tests:** 5 GEL pass locally (5/0/0)
+- **Actions this run:**
+  - PR #1654 (GEK chain_executed maximal): all 3 CI checks green (CodeQL ✅, Analyze javascript-typescript ✅, Analyze actions ✅). No review findings. Waiting on human merge.
+  - Synced to 2b8e362 (main). 9 open PRs — below ~20 cap → advanced workstream.
+  - Identified GEL gap: GCH-3 has focus+session+scope (no explain); GCH-4 has focus+session+explain (no scope); GEF has scope+explain but always with catalogCombo. The four-way focus+scope+explain+session WITHOUT catalogCombo was unguarded.
+  - Wrote `test/gel-resolved-focus-scope-explain-keyset-drift-guard.test.ts` (5 tests). All 5 pass. Pushed, opened PR #1659, subscribed.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1904 runs; burning compute.
+  2. **MERGE open PRs** — 10 open (9 pre-existing + #1659), all CI-green (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** Check GEL PR #1659 CI/review. Next candidate: GEM — freeze cast:resolved `resolved` sub-object exact {score, tool} key set in the maximal combo (or another unguarded resolved combination).
+
+---
+
+### Run ~1903 — 2026-09-30T (automated — context continuation, session_01J7yaWJABZWH3uc68QC3bFC)
 
 - **Workstream completed:** GY — PR #1661 opened ✅
 - **Build:** tsc clean | **Tests:** 5541 pass / 0 fail / 3 skip (5 new from GY)
