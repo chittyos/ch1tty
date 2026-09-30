@@ -8645,7 +8645,35 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
-- **Next run:** GDX candidate — freeze `ch1tty/search` response `sessionContext` key set when sessionId is active. GDB froze the sessionContext key set for search, but it may have been merged and then the GD-series extended further. Verify and freeze if gap remains. Alternatively: freeze `ch1tty/cast` live response key set when sessionId is active (cast adds sessionContext in a different code path than execute).
+- **Next run:** GDX delivered (PR #1624). Next candidate: GDY — freeze `ch1tty/cast` live-response sessionContext key set when sessionId is active (cast appends sessionContext in a different code path from execute; the gr/gs drift guards froze value types but not the exact key set). Alternatively: freeze `ch1tty/reload` response key set (no existing test freezes the exact shape of the reload success/error envelope).
+
+---
+
+### Run ~1846 — 2026-09-30T (automated run)
+- **Workstream advanced:** GDX — freeze `ch1tty/search` `sessionContext` exact key sets (5 tests)
+- **Branch/PR:** `auto/GDX-search-sessioncontext-exact-key-set` → **PR #1624** (https://github.com/chittyos/ch1tty/pull/1624)
+- **Build:** tsc clean | **Tests (main):** 5324 total / 5321 pass / 0 fail / 3 skip (many PRs merged since last run); GDX adds 5 (→ 5329/5326/0/3 on branch)
+- **Actions this run:**
+  - Startup: read CLAUDE.md + CHITTY.md; npm ci clean; build clean; tests 5321/0/3 on main (significant jump from 4876 — many drift-guard PRs merged).
+  - Read DRIVER-BOARD.md tail — prior run (~1845) was GDW (PR #1585, closed without merging per prior context summary).
+  - Confirmed GDX gap: FF workstream froze individual sessionContext field values but never exact key set; FI froze keyword envelope WITHOUT sessionId only. Neither froze the sessionContext shape in search responses.
+  - Verified `gw-search-sessioncontext-value-types-drift-guard.test.ts` merged on main — it freezes value types but NOT key sets, confirming gap.
+  - Wrote `test/gdx-search-sessioncontext-exact-key-set-drift-guard.test.ts` (5 tests):
+    - GDX-1: keyword-path sessionContext EXACTLY {callCount, recentTools} — no focus
+    - GDX-2: keyword-path sessionContext EXACTLY {activeSessionFocus, callCount, recentTools} — with sticky focus
+    - GDX-3: server-summary-path sessionContext EXACTLY {callCount, recentTools} — no focus
+    - GDX-4: server-summary-path sessionContext EXACTLY {activeSessionFocus, callCount, recentTools} — with sticky focus
+    - GDX-5: keyword-path envelope EXACTLY {latencyMs, matches, sessionContext, sessionId, total, tools} when sessionId active
+  - All 5 pass. Pushed branch, opened PR #1624, subscribed.
+  - Notion board: plan limit hit — only DRIVER-BOARD.md updated.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1846 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — many open drift-guard test PRs, all CI-green (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit hit** — upgrade or clean to resume board updates
+- **Next run:** GDY candidate — freeze `ch1tty/cast` live-response sessionContext exact key set when sessionId is active (gr/gs froze value types; key sets not frozen).
 
 ---
 
@@ -8881,17 +8909,24 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
 
 ---
 
+### Run ~1887 — 2026-09-30T (automated run)
+- **Workstream advanced:** None — 65 open PRs exceed ~20 cap; standing down
+- **Build:** tsc clean | **Tests:** 5321 pass / 0 fail / 3 skip
+- **State summary:** All workstreams A–E + F + extended DONE. **65 open PRs**. Tests: 5321/0/3.
+- **Next run:** If queue drops below ~20: advance GEG or identify next genuine drift-guard gap after GEF.
+
+---
+
 ### Run ~1888 — 2026-09-30 (automated)
 
 - **Build:** clean (`npm run build` succeeded)
 - **Tests:** 4619 total / 4617 pass / 2 skip / 0 fail (430 test files)
 - **Board push:** resolved after repeated rebase conflicts (concurrent sessions) — merged with origin/main via merge commit.
 - **Open PRs:** 50 (>= 20 threshold) → **standing down, no new PR created**
-- **PR queue (50 open):** Includes 4 board-log PRs (#1623, #1625, #1530, #1538 range) + ~46 drift-guard test PRs (#1502–#1626 range). No changes since run ~1885.
 - **No action taken beyond board update.**
 - **Persistent human-action items (unchanged):**
   1. Disable hourly cron — all workstreams A–F done; only drift-guard PRs remain
-  2. Merge or close 50 open PRs (board-log noise + drift-guard test PRs)
+  2. Merge or close 50+ open PRs (board-log noise + drift-guard test PRs)
   3. Enable GitHub Actions npm test CI (only CodeQL runs currently)
   4. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
   5. Stale branch cleanup (1100+ remote auto/ branches)

@@ -2098,3 +2098,30 @@ PRs #1582 (GDT) and #1583 (GDU) were both closed without merging.
 Not reopening — standing down per close-without-merge policy. Both branches remain in the repo.
 
 If the user wants these drift-guard tests reconsidered (e.g. in a different form, squashed, or rebased), they should reopen or ask for a fresh PR.
+
+---
+
+## Run ~1887 — 2026-09-30T (automated)
+
+**Workstream:** Standdown — 50 open PRs (>> ~20 cap); continued standdown.
+
+**Build/Tests:** tsc clean; 5321 pass / 0 fail / 3 skip (no regressions on main; +445 vs run ~1851 — drift-guard PRs merged since then)
+
+**Open PRs:** 50 total (PRs #1499–#1623; latest board log is #1623 "run ~1886"). New drift-guard PRs added after prior standdown runs.
+
+**What was done:**
+- npm ci clean; tsc clean; npm test 5321/0/3 — all green on main
+- Read CLAUDE.md + CHITTY.md; confirmed 5-tool surface invariant (search/execute/status/reload/cast) and buildCastExplanation metric freeze ACTIVE
+- Checked open PRs: 50 total (all drift-guard test PRs #1499–#1623) — cap exceeded
+- GEF is latest merged drift-guard test (freeze cast:resolved catalogCombo+explain exact key sets)
+- PRs #1582 (GDT) and #1583 (GDU) confirmed closed without merging (from remote merge conflict)
+- Continued standdown — no new PR pushed this run
+
+**Standing blockers (human action required):**
+1. **GitHub Actions CI disabled** — 50 queued drift-guard test PRs; auto-merge blocked. Fix: GitHub Settings → Actions → General → "Allow all actions" for chittyos/ch1tty
+2. **50 open PRs** — standdown cap (>>20) continues to block new work
+3. **Notion board block limit** — workspace out of free blocks; using .driver/run-log.md instead
+4. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID/SECRET, CHITTY_TASKS_TOKEN
+5. Stale branch cleanup — 1100+ remote auto/ branches
+
+**Next run:** Standdown until PR count drops below ~15 (requires enabling GitHub Actions). Once unblocked: GX — next unfrozen contract (session isolation: two different sessionIds don't share callCount/recentTools/focus state).
