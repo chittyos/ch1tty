@@ -8881,7 +8881,7 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
 
 ---
 
-### Run ~1887 — 2026-09-30T (automated run)
+### Run ~1887 — 2026-09-30T~19:54Z (automated run)
 - **Workstream advanced:** None — 50 open PRs exceed ~20 cap; standing down
 - **Branch/PR:** direct commit to main (board update only)
 - **Build:** tsc clean | **Tests:** 5321 pass / 0 fail / 3 skip (5324 total, 364 suites, ~131s)
@@ -8895,7 +8895,7 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
 - **Human-action items (persistent):**
   1. **DISABLE hourly cron** — ~1887 runs; burning compute; all workstreams done. Disable via `/cron delete` in Claude Code.
   2. **CLOSE stale board-log/chore-driver PRs** — ~20 PRs (#1522/#1523 chore(driver), #1530/#1538/#1544 chore(board) run-logs, etc.); close them to reduce queue noise.
-  3. **MERGE open drift-guard test PRs** — ~30 PRs (#1500–#1543, #1579, #1624), all CI-green (CodeQL); awaiting human merge.
+  3. **MERGE open drift-guard test PRs** — ~30 PRs (#1500–#1521, #1524–#1529, #1531–#1537, #1539–#1543, #1579, #1624), all CI-green (CodeQL); awaiting human merge. (Excludes stale PRs #1522, #1523, #1530, #1538 listed above for closure.)
   4. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
   5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
   6. **Stale branch cleanup** — 1100+ remote auto/ branches
