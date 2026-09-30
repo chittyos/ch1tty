@@ -3208,27 +3208,68 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 
 ---
 
-## Run ~1755 — 2026-09-21 (PR #1468/#1469 CI green; GAH PR #1470 opened)
+## Run ~1757 — 2026-09-21 (GAI PR #1471 opened)
 
 - **Trigger**: scheduled run
-- **PRs confirmed green**: #1468 (GAG resources score range/finitude/sort) 3/3, #1469 (bulk-recover DN-Q) 3/3
-- **Gap audit**: Board noted mimeType type as GAH gap, but EP already checks
-  `typeof r['mimeType'] === 'string'` (ep-executed-discovered-related-shapes.test.ts:289).
-  Correct GAH gap: prompts score finitude/upper bound/sort order (EO/EP check `>= 0` but
-  not `Number.isFinite`, not `<= 1.0`, not non-increasing order, not filter > 0.1).
-- **Workstream**: GAH — `cast:plan/executed/discovered` prompts score range, finitude, sort
+- **Context**: Runs ~1755/1756 (parallel sessions) already merged GAG and opened GAH (#1470
+  for resources mimeType non-empty). This run identified and opened the next gap: GAI.
+- **Gap audit**: Board noted mimeType type as next GAH gap, but EP already checks
+  `typeof r['mimeType'] === 'string'` (line 289). GAH #1470 covers mimeType non-empty.
+  GAI gap = prompts score finitude/upper bound/sort order (EO/EP check `>= 0` but not
+  `Number.isFinite`, not `<= 1.0`, not non-increasing order, not filter > 0.1).
+- **Workstream**: GAI — `cast:plan/executed/discovered` prompts score range, finitude, sort
 - **File**: `test/gah-prompts-score-range-order-drift-guard.test.ts`
 - **Tests**:
-  - GAH-1: cast:executed — prompts scores finite and ≤ 1.0
-  - GAH-2: cast:executed — prompts items in non-increasing score order (≥ 2 items)
-  - GAH-3: cast:executed — zero-score prompts absent (filter threshold > 0.1 frozen)
-  - GAH-4: cast:discovered — same finitude/upper bound/order/filter invariants
-  - GAH-5: cast:plan (confirm:true) — same invariants
+  - GAI-1: cast:executed — prompts scores finite and ≤ 1.0
+  - GAI-2: cast:executed — prompts items in non-increasing score order (≥ 2 items)
+  - GAI-3: cast:executed — zero-score prompts absent (filter threshold > 0.1 frozen)
+  - GAI-4: cast:discovered — same finitude/upper bound/order/filter invariants
+  - GAI-5: cast:plan (confirm:true) — same invariants
 - **Gap source**: EO/EP `typeof p['score'] === 'number' && p['score'] >= 0`; `Infinity >= 0`
   passes but `Number.isFinite(Infinity)` is false; upper bound and sort order unguarded.
   Scoring formula: `Math.round((matchCount / terms.length) * 100) / 100` → always finite,
   always ≤ 1.0, always sorted — these invariants are now frozen.
 - **Fixture domain**: "list cosmos blockchain validators" (4 terms); 1.0/0.5-scored prompts.
 - **Tests**: 5/5 pass locally. All Ollama errors are expected (embedEnabled: false).
-- **PR**: #1471 opened. CI pending.
-- **Open PRs**: #1468 (GAG), #1469 (bulk-recover DN-Q), #1471 (GAH).
+- **PR**: #1471 (GAI) opened. CI pending.
+- **Open PRs**: #1470 (GAH), #1471 (GAI).
+
+---
+
+## Run ~1808 — 2026-09-26 (GCA PR #1532 opened)
+
+- **Trigger**: scheduled hourly run
+- **Build**: tsc clean | **Tests**: 4876 pass / 0 fail / 3 skipped (main)
+- **Workstream**: GCA — freeze cast:plan top-level key set when focus profile is active
+- **Context**: GBZ (#1531) froze cast:executed+focus key set; GCA is the symmetric
+  complement for cast:plan (confirm:true). No existing test froze the exact key set for
+  plan when focus is active — EA only checks required keys, not exact set, and has no
+  focus-active variant.
+- **File**: `test/gca-cast-plan-focus-active-toplevel-keyset-drift-guard.test.ts`
+- **Tests**:
+  - GCA-1: cast:plan+focus (no catalog) adds exactly `focus` to EA base set
+  - GCA-2: cast:plan+focus+catalog adds `focus` + `suggestions` + catalog keys
+  - GCA-3: scope/resolvedFromCatalog/chainContinuation/explanation/sessionContext absent when not applicable
+  - GCA-4: focus value is a non-empty string equal to the active profile name
+  - GCA-5: suggestions object has exactly {combos, prompts} when present
+- **Tests**: 5/5 pass locally. Ollama errors expected (embedEnabled: false).
+- **PR**: #1532 opened (https://github.com/chittyos/ch1tty/pull/1532). CI pending.
+- **Open PRs**: 21 open (#1512–#1532), all waiting human merge.
+- **Next**: GCA CI should pass. Next gap = GCB (cast:no_match top-level key set when focus is active — complement of GBK/GBL but for focus, not scope/session).
+
+---
+
+## Run ~1891 — 2026-09-30 (automated)
+
+- **Trigger**: Scheduled hourly run (woken by PR #1532 GCA merge notification)
+- **Build**: tsc clean | **Tests**: 5321 pass / 0 fail / 3 skip
+- **PR #1532 (GCA)**: Merged. cast:plan+focus keyset freeze now on main.
+- **Open PRs**: 61 (≥20 threshold) → **standing down, no new PR created**
+- **State**: All workstreams A–F done. Many drift-guard PRs in queue (#1470–#1628 range, 61 open).
+- **Persistent human-action items (unchanged)**:
+  1. Disable hourly cron — all workstreams A–F done; only drift-guard PRs remain
+  2. Merge or close 61+ open PRs (queue blocking new work)
+  3. Enable GitHub Actions npm test CI (only CodeQL runs currently)
+  4. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. Stale branch cleanup (1100+ remote auto/ branches)
+- **Next run**: If queue drops below ~20, advance GEH (next genuine drift-guard gap after GEG).
