@@ -8796,3 +8796,12 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 - **Tests on main:** 5276 pass / 0 fail / 3 skip (5279 total)
 - **PR #1596** (GDY +5 tests): CI 3/3 ✅ on updated head `b8b057f`; awaiting human merge
 - Next merge → 5281/0/3 on main
+
+---
+
+### Run ~1868 addendum 2 — 2026-09-30T~00:10Z (PR #1596 + #1600 merged)
+- **PR #1596 MERGED** — test(drift-guard): GDY +5 tests (cast:executed recentTools item types)
+- **PR #1600 MERGED** — test(drift-guard): GDZ +5 tests (cast:executed alternatives item key set)
+- **Tests on main:** 5286 pass / 0 fail / 3 skip (5289 total; was 5276 before GDY+GDZ)
+- **PR #1606** (board addendum): CI 3/3 ✅; awaiting human merge
+- **State:** All workstreams A–E + extended DONE. Good momentum — human merging open PRs.
