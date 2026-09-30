@@ -9354,3 +9354,24 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to restore live board
 - **Next run:** Check PR #1655 CI/review. Next candidate: GEL — cast:resolved maximal keyset with focus+scope+explain+session all active.
+
+---
+
+### Run ~1904 — 2026-09-30T00:15Z (automated — GEL resolved focus+scope+explain keyset)
+
+- **Workstream advanced:** GEL — freeze cast:resolved exact top-level key set when focus + scope + explain all active (no catalogCombo)
+- **Branch/PR:** `auto/GEL-resolved-focus-scope-explain-keyset` → **PR #1659** (https://github.com/chittyos/ch1tty/pull/1659)
+- **Build:** tsc clean | **Tests:** 5 GEL pass locally (5/0/0)
+- **Actions this run:**
+  - PR #1654 (GEK chain_executed maximal): all 3 CI checks green (CodeQL ✅, Analyze javascript-typescript ✅, Analyze actions ✅). No review findings. Waiting on human merge.
+  - Synced to 2b8e362 (main). 9 open PRs — below ~20 cap → advanced workstream.
+  - Identified GEL gap: GCH-3 has focus+session+scope (no explain); GCH-4 has focus+session+explain (no scope); GEF has scope+explain but always with catalogCombo. The four-way focus+scope+explain+session WITHOUT catalogCombo was unguarded.
+  - Wrote `test/gel-resolved-focus-scope-explain-keyset-drift-guard.test.ts` (5 tests). All 5 pass. Pushed, opened PR #1659, subscribed.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1904 runs; burning compute.
+  2. **MERGE open PRs** — 10 open (9 pre-existing + #1659), all CI-green (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** Check GEL PR #1659 CI/review. Next candidate: GEM — freeze cast:resolved `resolved` sub-object exact {score, tool} key set in the maximal combo (or another unguarded resolved combination).
