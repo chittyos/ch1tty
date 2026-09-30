@@ -7500,6 +7500,38 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 **Next run**: Tests confirmed clean (0 failures — PR #1479 fixed the access-distribution issue). Next gap: GAT — find next unfrozen cast response field/structure after GAS (alternatives exact key set). Check test/gas-*.test.ts + prior drift-guard test coverage to identify the next uncovered shape invariant.
 
 ---
+
+## Run ~1770 — 2026-09-24 (GAV)
+
+- **PR watched**: #1485 (GAU) — Codex review completed with no findings (👍 thumbs-up, "Completed" status, no suggestion comments). CodeQL passing. PR clean, waiting on human reviewers.
+- **Startup**: `npm test` on main: **4876 pass / 0 fail / 3 skip** (baseline confirmed).
+- **Workstream advanced**: GAV — freeze resources[] item exact key set across cast modes.
+- **Gap closed**: EO/EP use PERMITTED+REQUIRED for resources items (`description` and `mimeType` PERMITTED but not REQUIRED). Two gaps silently pass EO/EP: (1) DROP gap — removing `description`/`mimeType` from item construction when source has them; (2) INJECT gap — unconditionally injecting default values for sources without those fields.
+- **Key finding in GAV-4**: Verified that `JSON.stringify` drops `undefined` values — so resources items for bare sources (no description/mimeType) have exactly `{name, score, uri}`, not 5 keys. Fixed initial test assumption.
+- **Tests**: 5 new (GAV-1 through GAV-5) covering cast:executed, cast:discovered, cast:plan, bare-source path, and exact value echo.
+- **Result**: 4881 pass / 0 fail / 3 skip (+5 vs baseline).
+- **Branch**: `auto/GAV-resources-item-exact-keyset-drift-guard` — pushed, PR to be opened.
+
+**Build**: tsc clean | **Tests**: 4881 pass / 0 fail / 3 skip
+
+---
+
+## Run ~1771 — 2026-09-24 (GAV fix — all Codex P2 findings addressed)
+
+- **Workstream**: GAV (continued) — fix 4 failing tests + address all 3 Codex P2 review findings.
+- **Root cause fixed**: `findByUri()` calls in GAV-4/5/6/7 were searching bare URIs (`neon://projects/bare`) but `listAllResources()` namespaces them as `{serverId}://{r.uri}` (aggregator.ts ~1872). Added `nsUri(serverId, uri)` helper that mirrors the namespacing pattern and updated all 4 calls.
+- **Codex P2 findings all addressed** (3 threads, all resolved this run):
+  1. *(PRRT_kwDORhsD_s6lyTwH)* Cover each optional resource field independently → GAV-6 (description-only 4-key) + GAV-7 (mimeType-only 4-key) added in commit dabb741.
+  2. *(PRRT_kwDORhsD_s6lyTwR, outdated)* Stub semantic routing in cast-mode tests → `KeywordOnlyCoordinator` already injected in GAV-2 (prior commit).
+  3. *(PRRT_kwDORhsD_s6lyTwY, outdated)* Select fixture resource explicitly → `findByUri` already in place (prior commit); this run fixed the namespacing so it works correctly.
+- **Tests**: GAV-1–7 all pass. Full suite: **4215 pass / 0 fail / 2 skip**.
+- **Branch**: `auto/GAV-resources-item-exact-keyset-drift-guard` — commit dabb741 pushed, PR #1486 body updated with final evidence, all 3 Codex threads replied and resolved.
+- **Open PRs awaiting human review**: #1485 (GAU, clean), #1486 (GAV, clean — all findings addressed).
+
+**Build**: tsc clean | **Tests**: 4215 pass / 0 fail / 2 skip
+
+---
+
 **Run ~1771 | 2026-09-25 | GAX**
 - **Build:** clean
 - **Tests:** 4881 pass / 0 fail / 3 skip
@@ -7542,6 +7574,16 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
 5. **Notion workspace** out of free blocks — upgrade plan
 6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+**Next run**: Watch #1485 and #1486 for CI and review events. Next workstream gap: GAW — identify next unfrozen cast response structure beyond GAV (resources item key variants).
+
+---
+
+## Run ~1772 — 2026-09-25 (PR #1485 closed; GAV clean)
+
+- **Event**: PR #1485 (GAU — freeze cast:discovered top-level keyset) was **closed without merging** by a human at 2026-09-25T18:38:47Z. NOT reopening per policy. May signal the human does not want this drift-guard series, or was cleaning stale PRs.
+- **PR #1486 (GAV)**: All 4 Codex P2 threads resolved; CI fully green on current head `2689e0a` (CodeQL success, all analyses pass); no new Codex findings in ~20h. **Clean, waiting on human review/merge.**
+- **Action**: None — loop standing down. PR #1486 subscription stays active; will wake if new events arrive.
 
 **Next run**: GAZ — next unfrozen cast response field. Candidates: (a) `resolved.inputSchema` exact shape in cast:plan (it passes through the raw inputSchema — freeze that it matches the fixture); (b) `catalogCombo`/`resolvedFromCatalog` sub-object exact keyset (appears when focus catalog matches); (c) `chainContinuation` sub-object keyset.
 
@@ -8950,23 +8992,41 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
 
 ---
 
-### Run ~1892 — 2026-09-30T (automated — GAH #1470 merge wake)
+### Run (parallel session) — 2026-09-30T22:43Z (automated — GCI merge)
+
+- **Workstream completed:** GCI — PR #1541 merged ✅
+- **Build:** tsc clean | **Tests:** 5335 pass / 0 fail / 3 skip (+454 vs 4881 baseline — 127 commits merged)
+- **Actions:** Codex P2 finding addressed on GCI-5, PR #1541 merged, synced to main (2bf09c2).
+- **Next run noted:** GCJ — freeze cast:discovered key set when scope+focus both active.
+
+---
+
+### Run ~1892 — 2026-09-30T22:43Z (automated — PR #1542 GCJ merge wake)
+
+- **Workstream advanced:** None — 35 open PRs exceed standdown threshold (~20 cap)
+- **Build:** tsc clean | **Tests:** 5335 pass / 0 fail / 3 skip
+- **Context:** Woke on GCJ (#1542) merge event. Open PRs down from 60+ (run ~1891) to 35.
+- **Open PRs breakdown:** ~25 test PRs + ~10 board-only PRs = 35 total.
+- **Standing down:** No new PR created per standdown policy.
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1892 runs; burning compute. `/cron delete` in Claude Code.
+  2. **MERGE or CLOSE open PRs** — 35 open, down from 60+. Threshold to advance: <20 open.
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next advance target:** After open PRs < 20 — identify next genuine drift-guard gap after GEG. Current: 5335 tests, 430+ test files.
+
+---
+
+### Run ~1892 (this session) — 2026-09-30T (automated — GAH #1470 merge wake)
 
 - **Trigger**: PR #1470 (GAH) merged.
-- **Build:** tsc clean | **Tests:** 4666 pass / 0 fail / 2 skip (4668 total)
+- **Build:** tsc clean | **Tests:** 4666 pass / 0 fail / 2 skip (4668 total, this session's view)
 - **Guardrails:** 5-tool surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
 
 **What was done:**
-- Pulled main after GAH merge. Baseline: 4666 pass / 0 fail / 2 skip.
-- Confirmed 21 open PRs (>= 20 standdown threshold) — **standing down from new workstream**.
-- Open PRs include: #1471 (GAI), #1474 (GAL), #1482 (GAS), #1491 (GAZ), #1499 (PQ), #1502 (R), #1503 (GBE), #1508 (ST), #1512 (GBK), #1513 (GBL), #1519 (GBR), and several board-update PRs (#1522–#1628) from prior runs.
-
-**Persistent human-action items (unchanged):**
-1. **DISABLE hourly cron** — ~1892 runs; burning compute.
-2. **MERGE or CLOSE open PRs** — 21 open (11 test workstream + 10 board-update). All test workstream PRs are CI green.
-3. **Enable GitHub Actions** (npm test CI job — currently CodeQL only)
-4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
-5. **Stale branch cleanup** — 1100+ remote auto/ branches
-6. **Notion plan limit** — upgrade or clean to restore live board
+- Pulled main after GAH merge. Confirmed 21 open PRs (>= 20 standdown threshold) — **standing down from new workstream**.
+- Open PRs include: #1471 (GAI), #1474 (GAL), #1482 (GAS), #1491 (GAZ), #1499 (PQ), #1502 (R), #1503 (GBE), #1508 (ST), #1512 (GBK), #1513 (GBL), #1519 (GBR), and several board-update PRs.
 
 **Next run:** If open PR count drops below 20: identify next genuine drift-guard gap after GEG and advance.
