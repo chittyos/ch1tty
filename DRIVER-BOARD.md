@@ -8835,6 +8835,22 @@ State: GCO work is available on `auto/GCO-search-infocus-conditional-drift-guard
 
 ---
 
+### Run ~1826 addendum — 2026-09-30T (automated event)
+- **Event:** PR #1558 (GCX — freeze ch1tty/search suggestions ordering + truncation) closed without merging.
+- **Action:** Logged here only. Per policy, not reopened and no new PR created.
+- **Note for next run:** GCX tests in `test/gcx-search-suggestions-ordering-truncation.test.ts` exist on branch `auto/gcx-search-suggestions-ordering-truncation` (not merged). Main is now at ~5316 tests. A new GCY target should be identified from scratch against the current main (the next run should re-audit what FK/EI/HH/GCX cover vs. what remains unfrozen).
+
+---
+
+### Event: PR #1573 closed without merging — 2026-09-30
+
+- **PR:** #1573 `auto/GDM-dryrun-status-exact-value` — GDM drift-guard: freeze `ch1tty/execute` dryRun `status` exact value = `'dry_run'`
+- **Outcome:** Closed without merging (2026-09-30T19:43Z). PR was CI-green and CodeRabbit-clean at closure.
+- **Action taken:** None. Per policy, not reopened or replaced without explicit user request.
+- **Note:** If the GDM freeze is still wanted, user should re-open #1573 or request a new PR.
+
+---
+
 ### Note — 2026-09-30T (automated — PR closed event)
 - PR #1581 (GDQ — freeze execute dryRun WITH SESSION exact body key set) was **closed without merging** by the repository owner.
 - No action taken per rules (do not reopen or re-create unless user explicitly asks).
