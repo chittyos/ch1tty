@@ -8788,3 +8788,11 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   6. **Notion plan limit** — upgrade or clean to resume board updates
 - **Next run:** If queue drops below ~20: advance GDZ — freeze `cast:resolved` (dryRun) sessionContext recentTools item runtime types (analogous to GDY but for the dryRun path). If queue still >= ~20: stand down.
 - **PushNotification:** NOT SENT — state similar to prior runs; human already notified repeatedly.
+
+---
+
+### Run ~1868 addendum — 2026-09-30T~00:00Z (PR #1594 merged)
+- **PR #1594 MERGED** — test(consolidation): GDT+GDV+pqrst +46 tests on main
+- **Tests on main:** 5276 pass / 0 fail / 3 skip (5279 total)
+- **PR #1596** (GDY +5 tests): CI 3/3 ✅ on updated head `b8b057f`; awaiting human merge
+- Next merge → 5281/0/3 on main
