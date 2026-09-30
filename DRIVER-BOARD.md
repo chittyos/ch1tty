@@ -9095,6 +9095,29 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
 
 ---
 
+### Run ~1896 — 2026-09-30T23:30Z
+
+- **Workstream advanced:** GEH — freeze cast:chain_executed step item exact key set (ok:true and ok:false branches)
+- **Gap closed:** EJ (2026-09-19) used PERMITTED/REQUIRED checks for step items, NOT exact equality per branch. A regression adding `error` to ok:true steps (or `content` to ok:false steps) passed EJ silently. GEH freezes:
+  - GEH-1: ok:true step EXACTLY {content, ok, step, tool}
+  - GEH-2: ok:false step EXACTLY {error, ok, step, tool}
+  - GEH-3: ok:true: `error` key absent (dedicated absence guard)
+  - GEH-4: ok:false: `content` key absent (dedicated absence guard)
+  - GEH-5: step index values are 0-based ascending integers
+- **Commit:** b2a6e54 — pushed directly to main (26 open PRs exceed threshold; no feature branch created this run)
+- **Tests:** 5442 pass / 0 fail / 3 skip (baseline 5437, +5 GEH)
+- **Note:** Naming conflict — prior session run logs mention "GEH PR #1646 (executed focus+explain+session)" — that PR was not yet merged; my GEH test covers a different shape (chain_executed step items) with a distinct filename. If PR #1646 targets the same test ID, its filename needs renaming before merge.
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1896 runs; burning compute
+  2. **MERGE or CLOSE open PRs** — many duplicate GEH/GEI PRs from parallel sessions
+  3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** Next candidate: GEI — freeze cast:chain_executed step item value types (content must be array, error must be string, step must be number, tool must be string — per branch).
+
+---
+
 ### Run ~1895 — 2026-09-30T23:13Z (automated — PR #1640 CI follow-up)
 
 - **Workstream advanced:** None — 26 open PRs exceed ~20 standdown threshold
