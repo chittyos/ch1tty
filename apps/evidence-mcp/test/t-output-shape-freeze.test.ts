@@ -41,6 +41,7 @@ const SEARCH_RESULT_FIXTURE: SearchDocumentsResult = {
 
 // ── Mock client ───────────────────────────────────────────────────────────────
 
+/** Returns a mock EvidenceClient pre-populated with fixture data for freeze tests. */
 function makeMockClient(overrides: Partial<EvidenceClient> = {}): EvidenceClient {
   return {
     ingestDocument: async (_input: IngestDocumentInput) => ({ ...DOC_FIXTURE, id: 'doc-t-new' }),
@@ -54,6 +55,7 @@ function makeMockClient(overrides: Partial<EvidenceClient> = {}): EvidenceClient
 
 // ── Harness ───────────────────────────────────────────────────────────────────
 
+/** Creates an in-memory MCP client connected to the evidence-mcp server under test. */
 async function setup(overrides?: Partial<EvidenceClient>): Promise<{ client: Client; cleanup: () => Promise<void> }> {
   const server = createEvidenceServer(makeMockClient(overrides));
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
@@ -63,6 +65,7 @@ async function setup(overrides?: Partial<EvidenceClient>): Promise<{ client: Cli
   return { client: mcpClient, cleanup: async () => { await mcpClient.close(); } };
 }
 
+/** Extracts and parses the first text content block from a tool result. */
 function parseText<T>(result: Awaited<ReturnType<Client['callTool']>>): T {
   const content = result.content as Array<{ type: string; text: string }>;
   return JSON.parse(content[0].text) as T;
@@ -130,6 +133,12 @@ test('T-4: list_documents documents is array, has_more is boolean', async () => 
     assert.ok(!result.isError, 'expected success');
     const res = parseText<ListDocumentsResult>(result);
     assert.ok(Array.isArray(res.documents), 'documents must be array');
+    assert.ok(res.documents.length > 0, 'documents must not be empty');
+    const doc = res.documents[0];
+    for (const k of ['id', 'canonical_uri', 'kind', 'created_at']) {
+      assert.ok(Object.prototype.hasOwnProperty.call(doc, k), `Document missing required key: ${k}`);
+      assert.equal(typeof (doc as Record<string, unknown>)[k], 'string', `${k} must be string`);
+    }
     assert.equal(typeof res.has_more, 'boolean', 'has_more must be boolean');
   } finally {
     await cleanup();
@@ -177,6 +186,12 @@ test('T-7: search_documents documents is array, total is number', async () => {
     assert.ok(!result.isError, 'expected success');
     const res = parseText<SearchDocumentsResult>(result);
     assert.ok(Array.isArray(res.documents), 'documents must be array');
+    assert.ok(res.documents.length > 0, 'documents must not be empty');
+    const doc = res.documents[0];
+    for (const k of ['id', 'canonical_uri', 'kind', 'created_at']) {
+      assert.ok(Object.prototype.hasOwnProperty.call(doc, k), `Document missing required key: ${k}`);
+      assert.equal(typeof (doc as Record<string, unknown>)[k], 'string', `${k} must be string`);
+    }
     assert.equal(typeof res.total, 'number', 'total must be number');
   } finally {
     await cleanup();

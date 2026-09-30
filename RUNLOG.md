@@ -3233,3 +3233,43 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 - **Tests**: 5/5 pass locally. All Ollama errors are expected (embedEnabled: false).
 - **PR**: #1471 (GAI) opened. CI pending.
 - **Open PRs**: #1470 (GAH), #1471 (GAI).
+
+---
+
+## Run ~1808 — 2026-09-26 (GCA PR #1532 opened)
+
+- **Trigger**: scheduled hourly run
+- **Build**: tsc clean | **Tests**: 4876 pass / 0 fail / 3 skipped (main)
+- **Workstream**: GCA — freeze cast:plan top-level key set when focus profile is active
+- **Context**: GBZ (#1531) froze cast:executed+focus key set; GCA is the symmetric
+  complement for cast:plan (confirm:true). No existing test froze the exact key set for
+  plan when focus is active — EA only checks required keys, not exact set, and has no
+  focus-active variant.
+- **File**: `test/gca-cast-plan-focus-active-toplevel-keyset-drift-guard.test.ts`
+- **Tests**:
+  - GCA-1: cast:plan+focus (no catalog) adds exactly `focus` to EA base set
+  - GCA-2: cast:plan+focus+catalog adds `focus` + `suggestions` + catalog keys
+  - GCA-3: scope/resolvedFromCatalog/chainContinuation/explanation/sessionContext absent when not applicable
+  - GCA-4: focus value is a non-empty string equal to the active profile name
+  - GCA-5: suggestions object has exactly {combos, prompts} when present
+- **Tests**: 5/5 pass locally. Ollama errors expected (embedEnabled: false).
+- **PR**: #1532 opened (https://github.com/chittyos/ch1tty/pull/1532). CI pending.
+- **Open PRs**: 21 open (#1512–#1532), all waiting human merge.
+- **Next**: GCA CI should pass. Next gap = GCB (cast:no_match top-level key set when focus is active — complement of GBK/GBL but for focus, not scope/session).
+
+---
+
+## Run ~1891 — 2026-09-30 (automated)
+
+- **Trigger**: Scheduled hourly run (woken by PR #1532 GCA merge notification)
+- **Build**: tsc clean | **Tests**: 5321 pass / 0 fail / 3 skip
+- **PR #1532 (GCA)**: Merged. cast:plan+focus keyset freeze now on main.
+- **Open PRs**: 61 (≥20 threshold) → **standing down, no new PR created**
+- **State**: All workstreams A–F done. Many drift-guard PRs in queue (#1470–#1628 range, 61 open).
+- **Persistent human-action items (unchanged)**:
+  1. Disable hourly cron — all workstreams A–F done; only drift-guard PRs remain
+  2. Merge or close 61+ open PRs (queue blocking new work)
+  3. Enable GitHub Actions npm test CI (only CodeQL runs currently)
+  4. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. Stale branch cleanup (1100+ remote auto/ branches)
+- **Next run**: If queue drops below ~20, advance GEH (next genuine drift-guard gap after GEG).
