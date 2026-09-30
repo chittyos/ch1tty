@@ -8848,3 +8848,9 @@ State: GCO work is available on `auto/GCO-search-infocus-conditional-drift-guard
 - **Outcome:** Closed without merging (2026-09-30T19:43Z). PR was CI-green and CodeRabbit-clean at closure.
 - **Action taken:** None. Per policy, not reopened or replaced without explicit user request.
 - **Note:** If the GDM freeze is still wanted, user should re-open #1573 or request a new PR.
+
+---
+
+### Run ~1828 follow-up — 2026-09-30T19:43Z
+
+**PRs #1561 (GDA) and #1562 (GDB) closed without merging.** CI was green (3/3), Codex ✅ no findings. Closed by human — consistent with batch-close pattern. Not reopening. Branches preserved if needed.
