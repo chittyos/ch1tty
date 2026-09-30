@@ -8989,3 +8989,25 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to restore live board
+
+
+---
+
+### Run ~1816 — 2026-09-30T22:43Z (automated)
+
+- **Workstream completed:** GCI — PR #1541 merged ✅
+- **Build:** tsc clean | **Tests:** 5335 pass / 0 fail / 3 skip (new main baseline; +454 vs run ~1815 baseline of 4881 — 127 commits merged from other PRs)
+- **Actions this run:**
+  - Resolved DRIVER-BOARD.md merge conflict (HEAD vs main), pushed merge commit.
+  - Codex P2 finding on GCI-5 test 2: added `suggestions` presence assertion to confirm per-call focus arg is applied (not just that `focus` key is absent). Pushed `9e5444e`.
+  - CodeRabbit: no actionable comments, merge risk Minimal. Docstring coverage ⚠️ warning non-blocking (advisory only).
+  - PR #1541 merged 2026-09-30T22:43Z.
+  - Synced to main (2bf09c2), confirmed 5335/0/3.
+- **Human-action items (carried forward):**
+  1. **DISABLE hourly cron** — ~1816+ runs; burning compute. Use `/cron delete` in Claude Code.
+  2. **MERGE remaining open PRs** — confirm count (127 commits now on main; many may be merged already)
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion token** — `op://ChittyOS-Integrations/notion/api_token` (currently 404/connection-failed)
+- **Next run:** GCJ — freeze `cast:discovered` key set when scope+focus are BOTH active (no prior test combines scope and focus on discovered path). Confirm this gap still exists after main sync.
