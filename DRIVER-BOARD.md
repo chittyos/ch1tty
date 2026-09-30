@@ -9099,6 +9099,22 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
 
 ---
 
+### Run ~1895 — 2026-09-30T23:05Z
+
+- **Workstream advanced:** GEJ — freeze cast:discovered+focus+explain exact top-level key set (5 tests)
+- **Branch/PR:** `auto/GEI-discovered-focus-explain-keyset` → **PR #1645** (renamed title to GEJ)
+- **Build:** tsc clean | **Tests:** 5439/0/3; +5 GEJ all pass
+- **Actions:**
+  - Checked PR #1631 (GEH, executed+focus+explain): all CI green (CodeQL success). Not yet merged.
+  - Pulled main (run log from parallel sessions at dd09c10). Built clean. Tests: 5439/0/3.
+  - Found naming collisions from parallel sessions: PR #1640 uses GEI (executed+focus+explain), PR #1643 uses GEH (plan+focus+explain+catalog). Our PR #1631 also uses GEH (executed+focus+explain). Naming drift.
+  - Created `test/gej-discovered-focus-explain-keyset-drift-guard.test.ts` — 5 tests freezing cast:discovered+focus+explain. Gap: GBH-2 (no focus) and GCI-1 (no explain) don't cover the combination. GEJ unique: confirms `explanation` appears AND `focus` key does NOT leak into cast:discovered.
+  - Originally named GEI; renamed GEJ to avoid collision with PR #1640. Pushed to `auto/GEI-discovered-focus-explain-keyset`, PR #1645 updated to GEJ title.
+- **Persistent human-action items (unchanged):** DISABLE cron, merge/close open PRs, enable npm-test CI, prod env vars, stale branch cleanup, Notion upgrade
+- **Next run:** Check PR #1645 CI. Next candidate: GEK — freeze cast:nomatch+focus+explain exact key set (symmetric with GEJ for nomatch path).
+
+---
+
 ### Run ~1894 — 2026-09-30T23:00Z
 
 - **Workstream advanced:** GBE — freeze `cast:resolved` exact top-level key set
