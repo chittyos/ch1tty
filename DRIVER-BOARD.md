@@ -9297,3 +9297,27 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to restore live board
 - **Next run:** When PRs drop below ~20 — next candidate GEJ.
+
+---
+
+### Run ~1898 — 2026-09-30T23:41Z (automated — PR #1648 GEI merge wake)
+
+- **Trigger:** PR #1648 (GEI: cast:discovered explain+session keyset) merged at 2026-09-30T23:40Z
+- **Build:** tsc clean | **Tests:** 5 new GEK pass / 0 fail (baseline ~5447 pass / 0 fail / 3 skip)
+- **Open PRs at start:** 6 (below ~20 standdown threshold → advanced workstream)
+- **Workstream advanced:** GEK — freeze cast:chain_executed step item VALUE TYPES (5 tests)
+  - Gap: GEH froze exact key sets per branch (ok:true → {content,ok,step,tool}; ok:false → {error,ok,step,tool}). GEH does NOT assert value types. A regression serialising `content` as a string, `step` as a string "0", or `ok` as 1/0 passes GEH silently.
+  - GEK-1: ok:true step — `content` is an Array
+  - GEK-2: ok:true step — `ok` is strict boolean true (not 1 or "true")
+  - GEK-3: ok:true step — `step` is a number (integer ≥ 0)
+  - GEK-4: ok:true step — `tool` is a non-empty string
+  - GEK-5: ok:false step — `error` is a string (not Error object or null)
+  - Branch: `auto/GEK-chain-executed-step-value-types-drift-guard`
+- **Persistent human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1898 runs; burning compute. Use `/cron delete` in Claude Code.
+  2. **MERGE or CLOSE open PRs** — still multiple open drift-guard PRs from parallel sessions
+  3. **Enable GitHub Actions** (main npm test CI job — only CodeQL runs currently)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** Check GEK PR CI/review. Next candidate: GEL — freeze cast:chain_executed top-level value types (latencyMs is number, steps is array, cast is string 'chain_executed', etc.).
