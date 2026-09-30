@@ -9398,3 +9398,28 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **36 moderate Dependabot vulnerabilities** on default branch
+
+---
+
+### Run ~1905 — 2026-09-30 (automated — context-resume run)
+
+- **Workstream advanced:** GEK (nomatch+focus+explain keyset) — PR #1658 opened ✅
+- **Branch/PR:** `auto/GEK-nomatch-focus-explain-keyset` → **PR #1658** (https://github.com/chittyos/ch1tty/pull/1658)
+- **Build:** tsc clean | **Tests:** 5541 pass / 0 fail / 3 skip (main baseline, after GEI+GEJ merged) → +5 on branch (5546 total)
+- **Gap closed:** cast:no_match + focus + explain exact top-level keyset (symmetric with GEF for nomatch path)
+  - GEK-1: focus+explain, no suggestions → {cast,explanation,hint,intent,latencyMs,resolvedBy} (6 keys)
+  - GEK-2: +session → +sessionContext (7 keys)
+  - GEK-3: +scope → +scope (7 keys)
+  - GEK-4: +catalog suggestions → +suggestions (7 keys)
+  - GEK-5: absence guard → explanation absent when explain not set (focus+suggestions active)
+  - Key invariant: `focus` is NEVER a top-level key on cast:no_match (unlike cast:resolved/plan)
+- **Note:** Prior sessions used GEK label for other gaps (PR #1654, #1655). Naming has drifted; this file uses a unique suffix `gek-nomatch-focus-explain-keyset-drift-guard.test.ts`.
+- **Open PRs:** checked main — GEI/GEJ tests merged. PR #1658 new.
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — burning compute on automated runs
+  2. **MERGE open PRs** — awaiting human merge
+  3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** Check PR #1658 CI/review. Next candidate: GEM — cast:no_match scope exact keyset (scope present/absent on no_match path, extending GEK).
