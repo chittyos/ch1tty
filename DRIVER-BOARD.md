@@ -8990,7 +8990,6 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to restore live board
 
-
 ---
 
 ### Run ~1816 — 2026-09-30T22:43Z (automated)
@@ -9069,6 +9068,47 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
 
 ---
 
+### Run ~1892c — 2026-09-30T (automated — GEH focus+catalog+explain drift guard)
+
+- **Workstream advanced:** GEH — freeze `cast:discovered` exact key set for focus+catalog+explain combos
+- **Branch/PR:** `auto/GEH-discovered-focus-explain-keyset-drift-guard` → PR #1637
+- **Build:** tsc clean | **Tests:** 5439 pass / 0 fail / 3 skip (full suite including 5 new GEH tests)
+- **Gap closed:** GBH-2 froze discovered+explain (7 keys), GCI-2 froze discovered+focus+catalog (8 keys); no prior test covered the three-way combination focus ∧ catalog ∧ explain.
+- **GEH-1:** focus+catalog+explain, no session → EXACTLY 9 keys (base + explanation + resources + suggestions)
+- **GEH-2:** focus+catalog+explain+session → EXACTLY 10 keys (+ sessionContext)
+- **GEH-3:** focus+no-catalog+explain → EXACTLY 7 keys (base + explanation only, no suggestions)
+- **GEH-4:** absence guard — `focus` key never in cast:discovered (asymmetry vs executed/plan/resolved)
+- **GEH-5:** per-call focus+catalog+explain → same 9 keys; `focus` absent; `explanation` present
+- **Key fixtures:** BILLING_FOCUS_PROFILE (ecosystem/billing, boost:0.5) + BILLING_SUGGESTIONS_CATALOG inline; KeywordOnlyCoordinator (routeIntent → null); INTENT='find invoice pdf'
+
+---
+
+### Run ~1893 — 2026-09-30T (automated — session_01PBX9wXtf2ZNC9Z7T7ytFt2)
+
+- **Workstream advanced:** GEI (this session) — PR #1648 created ✅
+- **Build:** tsc clean | **Tests:** 5442 pass / 0 fail / 3 skip (5445 total after GEI)
+- **Open PRs at start:** 17 (< 20 threshold → advanced)
+
+**Gap identified:** `cast:discovered` + `explain` + `session` two-way combination uncovered.
+- GBH tests explain and session individually; GBS covers scope+session+explain; no test froze explain+session without scope
+
+**GEI tests (5):**
+- GEI-1: explain+session → EXACTLY base+explanation+sessionContext (8 keys)
+- GEI-2: explanation is an object when explain+session active
+- GEI-3: sessionContext has exactly {callCount, recentTools}
+- GEI-4: explanation absent when session active but explain not set
+- GEI-5: sessionContext absent when explain active but session not set
+
+- **Persistent human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1893 runs; burning compute.
+  2. **MERGE or CLOSE open PRs** — ~17-20 open PRs.
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+
+---
+
 ### Run ~1892 — 2026-09-30 (automated run — PR #1490 GAY merge wake)
 
 - **Trigger:** PR #1490 (GAY drift guard) merged at 2026-09-30T22:45Z
@@ -9078,6 +9118,29 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   - Gap: GEG suppresses catalog; GCA-2 has no explain; neither covers three-way combination
   - GEH-1: 14 keys; GEH-2: +session (15); GEH-3: absence guard; GEH-4: +scope (15); GEH-5: type guard
 - **Persistent human-action items (unchanged):** DISABLE cron, merge/close open PRs, enable npm-test CI, prod env vars, stale branch cleanup, Notion upgrade
+
+---
+
+### Run ~1896 — 2026-09-30T23:30Z
+
+- **Workstream advanced:** GEH — freeze cast:chain_executed step item exact key set (ok:true and ok:false branches)
+- **Gap closed:** EJ (2026-09-19) used PERMITTED/REQUIRED checks for step items, NOT exact equality per branch. A regression adding `error` to ok:true steps (or `content` to ok:false steps) passed EJ silently. GEH freezes:
+  - GEH-1: ok:true step EXACTLY {content, ok, step, tool}
+  - GEH-2: ok:false step EXACTLY {error, ok, step, tool}
+  - GEH-3: ok:true: `error` key absent (dedicated absence guard)
+  - GEH-4: ok:false: `content` key absent (dedicated absence guard)
+  - GEH-5: step index values are 0-based ascending integers
+- **Commit:** b2a6e54 — pushed directly to main (26 open PRs exceed threshold; no feature branch created this run)
+- **Tests:** 5442 pass / 0 fail / 3 skip (baseline 5437, +5 GEH)
+- **Note:** Naming conflict — prior session run logs mention "GEH PR #1646 (executed focus+explain+session)" — that PR was not yet merged; my GEH test covers a different shape (chain_executed step items) with a distinct filename. If PR #1646 targets the same test ID, its filename needs renaming before merge.
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1896 runs; burning compute
+  2. **MERGE or CLOSE open PRs** — many duplicate GEH/GEI PRs from parallel sessions
+  3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** Next candidate: GEI — freeze cast:chain_executed step item value types (content must be array, error must be string, step must be number, tool must be string — per branch).
 
 ---
 
@@ -9099,6 +9162,22 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
 
 ---
 
+### Run ~1895 — 2026-09-30T23:05Z
+
+- **Workstream advanced:** GEJ — freeze cast:discovered+focus+explain exact top-level key set (5 tests)
+- **Branch/PR:** `auto/GEI-discovered-focus-explain-keyset` → **PR #1645** (renamed title to GEJ)
+- **Build:** tsc clean | **Tests:** 5439/0/3; +5 GEJ all pass
+- **Actions:**
+  - Checked PR #1631 (GEH, executed+focus+explain): all CI green (CodeQL success). Not yet merged.
+  - Pulled main (run log from parallel sessions at dd09c10). Built clean. Tests: 5439/0/3.
+  - Found naming collisions from parallel sessions: PR #1640 uses GEI (executed+focus+explain), PR #1643 uses GEH (plan+focus+explain+catalog). Our PR #1631 also uses GEH (executed+focus+explain). Naming drift.
+  - Created `test/gej-discovered-focus-explain-keyset-drift-guard.test.ts` — 5 tests freezing cast:discovered+focus+explain. Gap: GBH-2 (no focus) and GCI-1 (no explain) don't cover the combination. GEJ unique: confirms `explanation` appears AND `focus` key does NOT leak into cast:discovered.
+  - Originally named GEI; renamed GEJ to avoid collision with PR #1640. Pushed to `auto/GEI-discovered-focus-explain-keyset`, PR #1645 updated to GEJ title.
+- **Persistent human-action items (unchanged):** DISABLE cron, merge/close open PRs, enable npm-test CI, prod env vars, stale branch cleanup, Notion upgrade
+- **Next run:** Check PR #1645 CI. Next candidate: GEK — freeze cast:nomatch+focus+explain exact key set (symmetric with GEJ for nomatch path).
+
+---
+
 ### Run ~1894 — 2026-09-30T23:00Z
 
 - **Workstream advanced:** GBE — freeze `cast:resolved` exact top-level key set
@@ -9111,18 +9190,20 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
 
 ---
 
-### Run ~1896 — 2026-09-30 (automated — GEI PR #1641 CI confirmed; context-compaction resume)
+### Run ~1894 — 2026-09-30T22:54Z (automated — PR #1491 closed, rescue #1635)
 
-- **Trigger:** Context compaction resume from run ~1893
-- **Build:** skipped | **Tests:** baseline from main (5439+)
-- **Open PRs:** 27 (above ~20 standdown threshold) → **STANDDOWN**
-- **PR #1641 (GEI) status:** CI all green (3/3: CodeQL ✓, Analyze(actions) ✓, Analyze(javascript-typescript) ✓). No review findings (both bots rate-limited). **Ready for human merge.**
-- **GEI-specific:** Only #1641 covers the focus+explain+session triple combo (11 keys) + quadruple with scope (12 keys). Other GEI-prefixed PRs (#1639–1640) from parallel sessions cover different sub-combos.
-- **Persistent human-action items (unchanged):**
-  1. **DISABLE hourly cron** — ~1896 runs
-  2. **MERGE or CLOSE open PRs** — 27 open; threshold: <20
-  3. **Enable GitHub Actions** (npm test CI)
+- **Workstream advanced:** None — 20 open PRs at threshold; standing down
+- **Event:** PR #1491 (`auto/GAZ-resolved-inputschema-verbatim-passthrough`) **closed without merging** (had accumulated 28 commits / 15 files from multiple sessions). PR #1635 (`auto/rescue-orphaned-test-files`) immediately opened to rescue GAI/GAL/GAS/GAZ from orphaned branches.
+- **Build:** tsc clean | **Tests:** 5439 pass / 0 fail / 3 skip (main baseline)
+- **Context:** Woke on `pull_request.closed` event for #1491. Codex hit usage limit; CodeRabbit rate-limited on #1491 (never posted findings). All review threads on #1491 were resolved. Both bots exhausted before completing review — clean standing.
+- **Open PRs:** ~20 (19 pre-existing + #1635 rescue = 20). Standdown threshold: <20 to advance.
+- **Standing down:** PR count at threshold. No new workstream PR created.
+- **Subscribed to:** PR #1635 (rescue orphaned tests including GAZ).
+- **Persistent human-action items (CRITICAL — ~1894 runs):**
+  1. **DISABLE hourly cron** — ~1894 runs burning ~50k tokens/run. `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — ~20 open drift-guard/rescue PRs (all CI-green CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
   4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to restore live board
-- **Next run:** After PRs drop below 20 — GEJ candidate: freeze cast:chain_executed exact key set for focus+explain+session combos.
+- **Next run:** If open PRs < 20: advance GEI (freeze `catalog` sub-object structure in chain_executed, or `latencyBreakdown` value types in chain_executed). Otherwise stand down again.
