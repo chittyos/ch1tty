@@ -8822,3 +8822,10 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
 **Note:** PR #1574 (`auto/GDN-dryrun-outer-envelope`) was closed without merging by a human on 2026-09-30. Branch preserved. Change not in main. Not reopening — human decision.
 
 Main is now at a newer state (3 new test files merged since run ~1838: `gee-resolved-explain-keyset-drift-guard.test.ts`, `gef-resolved-catalogcombo-explain-keyset-drift-guard.test.ts`, `gw-search-sessioncontext-value-types-drift-guard.test.ts`).
+
+---
+
+### Note — 2026-09-30T (automated — PR closed event)
+- PR #1581 (GDQ — freeze execute dryRun WITH SESSION exact body key set) was **closed without merging** by the repository owner.
+- No action taken per rules (do not reopen or re-create unless user explicitly asks).
+- The GDQ test file (`test/gdq-execute-dryrun-session-exact-body-keyset-drift-guard.test.ts`) remains on branch `auto/GDQ-dryrun-session-exact-body-keyset` and is NOT in main.
