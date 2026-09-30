@@ -2133,3 +2133,32 @@ If the user wants these drift-guard tests reconsidered (e.g. in a different form
 PR #1575 (GDO — execute dryRun+sessionId sessionContext item structure) closed without merging.
 
 Not reopening — standing down per close-without-merge policy.
+
+---
+
+## Run ~1889 — 2026-09-30T~20:00Z (automated)
+
+**Workstream:** Standdown — ~70 open PRs (>> ~20 cap); continued standdown.
+
+**Build/Tests:** tsc clean; 5321 pass / 0 fail / 3 skip (no regressions on main; same as run ~1887)
+
+**Open PRs:** ~70 total (PRs from #1486 through #1626 visible across 2 pages + overflow; all drift-guard test PRs). Count increased from 50 → ~70 since last run (~1887) despite some PRs (#1575 GDO, #1582 GDT, #1583 GDU) closing without merge.
+
+**What was done:**
+- Read CLAUDE.md + CHITTY.md; confirmed 5-tool surface invariant (search/execute/status/reload/cast) and buildCastExplanation metric freeze
+- npm ci clean; tsc clean; npm test 5321/0/3 — all green on main
+- Fetched all remote branches; inspected open PRs (pages 1–3 = 70+ confirmed)
+- Confirmed all `apps/*-mcp` directories have `mcp-tool-layer.test.ts` and output-shape-freeze tests already
+- Attempted Notion board update: BLOCKED — workspace out of free blocks (entitlement_required)
+- Checked .driver/run-log.md for cross-run state — confirmed ~1887 was last run entry
+- Standdown cap (~20 open PRs) far exceeded → no new PR pushed this run
+
+**Standing blockers (human action required):**
+1. **GitHub Actions CI disabled** — ~70 queued drift-guard test PRs can't merge. Fix: GitHub Settings → Actions → General → "Allow all actions" for chittyos/ch1tty
+2. **~70 open PRs** — standdown cap far exceeded; driver has no viable workstream
+3. **Notion board block limit** — workspace at free tier block cap; can't append run logs to Notion
+4. **Hourly cron burning ~50k tokens/run** — recommend `/cron delete` until CI re-enabled and PR count < ~15
+5. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID/SECRET, CHITTY_TASKS_TOKEN
+6. Stale branch cleanup — 1100+ remote auto/ branches
+
+**Next run:** Standdown condition persists until GitHub Actions enabled. Once unblocked: GX — session isolation: two different sessionIds don't share callCount/recentTools/focus state (per run ~1887 next-run recommendation).
