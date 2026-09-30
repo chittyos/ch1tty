@@ -8788,3 +8788,26 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   6. **Notion plan limit** — upgrade or clean to resume board updates
 - **Next run:** If queue drops below ~20: advance GDZ — freeze `cast:resolved` (dryRun) sessionContext recentTools item runtime types (analogous to GDY but for the dryRun path). If queue still >= ~20: stand down.
 - **PushNotification:** NOT SENT — state similar to prior runs; human already notified repeatedly.
+
+---
+
+### Run ~1881 — 2026-09-30T (automated run)
+- **Workstream advanced:** None — all A–E + extensions (F–O+) DONE; standdown
+- **Build:** tsc clean (0 errors) | **Tests (main):** 5286 pass / 0 fail / 3 skip
+- **Actions this run:**
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE.
+  - `npm ci` clean. `npm run build` clean. `npm test`: 5286/0/3 (~75 open PRs' test branches not yet merged, but main is green).
+  - Checked open PRs via GitHub MCP: ~75 open (board-log PRs #1590–#1613 + drift-guard test PRs #1470–#1608).
+  - Verified workstream B (github entry): `servers.json` already uses `https://api.githubcopilot.com/mcp/` ✓. Workstream C: `focus-profiles.json` present ✓. A–E all checked on Notion board.
+  - Attempted Notion board update — blocked: "workspace has used all of its free blocks."
+  - State: no new workstreams to advance. Repo is healthy but PR backlog continues to grow.
+- **State summary:** All workstreams A–E + extended DONE. **~75 open PRs** (#1470–#1613), all CI-blocked (GitHub Actions disabled). Tests on main: 5286/0/3. Build: clean.
+- **Human-action items (persistent, escalating):**
+  1. **DISABLE hourly cron** — ~1881 runs; burning ~50k tokens/run with zero new work. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — ~75 open drift-guard/board-log PRs, all locally tested green; batch-merging would clear the backlog.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs at org level).
+  4. **Notion plan limit** — workspace at free block limit; board updates blocked. Upgrade or delete old blocks.
+  5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN.
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches accumulating.
+- **Next run:** Standdown. No new workstreams. Recommend disabling the cron until human resolves the blockers above.
+- **PushNotification:** SENT — escalating; repo healthy but cron burning tokens with no work to do.
