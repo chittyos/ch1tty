@@ -8825,6 +8825,16 @@ Main is now at a newer state (3 new test files merged since run ~1838: `gee-reso
 
 ---
 
+### Run ~1818 addendum — 2026-09-30T19:44Z
+
+**PR #1548 (`auto/GCO-search-infocus-conditional-drift-guard`) closed without merging.**
+
+CI was green (3/3), Codex P2 thread resolved, CodeRabbit merge risk Low. Closed by human without merge — consistent with the batch-close pattern on this series. Branch and commits remain in the repo. Will NOT reopen or recreate without explicit user instruction.
+
+State: GCO work is available on `auto/GCO-search-infocus-conditional-drift-guard` if needed. Main is unchanged (+0 tests from GCO).
+
+---
+
 ### Note — 2026-09-30T (automated — PR closed event)
 - PR #1581 (GDQ — freeze execute dryRun WITH SESSION exact body key set) was **closed without merging** by the repository owner.
 - No action taken per rules (do not reopen or re-create unless user explicitly asks).
