@@ -2167,3 +2167,38 @@ Not reopening — standing down per close-without-merge policy.
 5. Stale branch cleanup — 1100+ remote auto/ branches
 
 **Next run:** GY — next unfrozen session contract (e.g. session eviction: after TTL expires, sessionContext is absent from the next call; or per-session tool call cap / MAX_RECENT_TOOLS boundary). Alternatively GZ — execute result content[0] is always type:text when live backend responds successfully.
+
+---
+
+## Run ~1901 — 2026-09-30
+
+**Trigger:** Scheduled autonomous run (continued from run ~1900 context compaction).
+
+**PR activity check:** PR #1649 (GEI) received check_suite.completed notification. No CI failures (Actions disabled at org level).
+
+**Baseline:** main pulled, 34 commits ahead (no merges); build OK; tests **4742 pass / 0 fail / 2 skip**.
+
+**Workstream advanced — GEJ:**
+- Gap identified: `cast:plan + scope + focus + explain` 3-way and maximal 4-way combinations were uncovered.
+  - GBP covers scope+explain and scope+focus for plan separately (not together)
+  - GBO covers scope+session+explain and scope+session+focus separately (not together)
+  - GEG covers focus+explain (no scope)
+  - No open PR addressed scope+focus+explain simultaneously for plan mode
+- Created `test/gej-plan-scope-focus-explain-maximal-keyset-drift-guard.test.ts` (5 tests, all pass)
+- GEJ-1: scope+focus+explain (no session) → 11 keys
+- GEJ-2: scope+session+focus+explain (maximal) → 12 keys
+- GEJ-3: scope+focus (no explain) → absence guard for explanation
+- GEJ-4: scope+explain (no focus) → absence guard for focus
+- GEJ-5: explanation is non-null object; focus equals active profile name
+- Committed, pushed → PR #1651
+
+**Open PRs:** ~31 open (many GEH/GEI duplicates from prior runs; needs human triage).
+
+**Blockers (unchanged):**
+1. GitHub Actions CI disabled at org level
+2. Notion workspace at free block limit
+3. Duplicate GEH/GEI PRs (#1629–1649) need deduplication by human
+4. Prod env vars missing
+5. Stale branch accumulation (1100+ remote auto/ branches)
+
+**Next run:** GEK — next uncovered gap. Candidates: cast:discovered + scope + focus + explain maximal (if no open PR covers it — check PR #1645 first); or cast:resolved + scope + focus + explain (check GBN + GEE coverage gaps).
