@@ -2136,31 +2136,34 @@ Not reopening — standing down per close-without-merge policy.
 
 ---
 
-## Run ~1892 — 2026-09-30T22:45Z (automated, triggered by GAU merge)
+## Run ~1893 — 2026-09-30T (automated)
 
-**Workstream:** Standdown — 17 open PRs (> ~15 threshold); approaching clear.
+**Workstream:** GX — session isolation drift-guard (5 tests)
 
-**Build/Tests:** tsc clean; 5434 pass / 0 fail / 3 skip (+113 vs run ~1887 — GEG and others merged since then)
+**Build/Tests:** tsc clean; 5444 pass / 0 fail / 3 skip (+5 vs run ~1887 baseline of 5439; previous runs had 5321 which means many PRs merged in between)
 
-**Open PRs (17 total):**
-- Test drift-guard PRs (7): #1471 (GAI), #1474 (GAL), #1482 (GAS), #1491 (GAZ), #1499 (PQ), #1629 (GEH), #1630 (GBU)
-- Board/chore PRs (10): #1522, #1523, #1528, #1530, #1538, #1544, #1623, #1625, #1627, #1628
-
-**Triggered by:** PR #1504 (GAU — cast:plan/executed alternatives asymmetry) merged by human.
+**PR opened:** #1644 `test(GX): freeze session isolation invariant — two distinct sessionIds maintain independent state`
 
 **What was done:**
-- git pull origin main → 147 new commits (GEG and many others merged since run ~1887)
-- npm test: 5434/0/3 — all green, no regressions
-- Checked open PRs: 17 total; 7 test PRs, 10 board/chore PRs
-- GEG (cast:plan focus+explain keyset) confirmed merged on main
-- PR #1629 (GEH: executed+session+explain) and #1630 (GBU: status.focus null) are next in queue
-- Standdown cap ~15 not yet reached (17 > 15) → no new PR pushed
+- npm ci clean; tsc clean; npm test 5444/0/3 — all green on main (up from last logged 5321; many PRs merged since run ~1887)
+- Read CLAUDE.md + CHITTY.md; confirmed 5-tool surface invariant and buildCastExplanation metric freeze ACTIVE
+- Open PR check: 15 open PRs (below ~20 standdown cap — resuming work)
+- Remote branch `auto/GX-session-isolation-drift-guard` existed from prior run (~1801) with GX test already committed but no PR opened and messy board commits stacked on top
+- Created clean branch `auto/GX-session-isolation-drift-guard-clean` from main, cherry-picked `e0a137e` (the GX test commit), validated 5/5 pass, pushed, opened PR #1644
+- Subscribed to PR #1644 for CI/review events
+
+**GX tests (5 total):**
+- GX-1: session-a execute → session-b callCount === 0
+- GX-2: session-a execute → session-b recentTools === []
+- GX-3: sticky focus on session-a absent from session-b activeSessionFocus
+- GX-4: session-a callCount exactly 3 even after session-b ran 5 executes first
+- GX-5: two sessions, each sees only its own tools in recentTools
 
 **Standing blockers (human action required):**
-1. **GitHub Actions CI still unreliable** — PRs accumulate without auto-merge; 7 test drift-guard PRs queued
-2. **17 open PRs** (> ~15 standdown threshold) — continue to hold new work
-3. **Notion board block limit** — workspace out of free blocks; using .driver/run-log.md instead
+1. **GitHub Actions CI disabled** — drift-guard test PRs queue without automated test CI. Fix: GitHub Settings → Actions → General → "Allow all actions" for chittyos/ch1tty
+2. **15 open PRs** — below standdown cap, working again
+3. **Notion board** — workspace block limit; using .driver/run-log.md
 4. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID/SECRET, CHITTY_TASKS_TOKEN
 5. Stale branch cleanup — 1100+ remote auto/ branches
 
-**Next run:** Once open PR count drops below ~15, advance to GEI — freeze cast:executed exact key set when BOTH session AND explain are active (completes the session+explain combination matrix; GEH covers this scenario but may not be merged yet).
+**Next run:** GY — next unfrozen session contract (e.g. session eviction: after TTL expires, sessionContext is absent from the next call; or per-session tool call cap / MAX_RECENT_TOOLS boundary). Alternatively GZ — execute result content[0] is always type:text when live backend responds successfully.

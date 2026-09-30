@@ -9061,8 +9061,9 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   1. **DISABLE hourly cron** — ~1893 runs; burning compute
   2. **MERGE or CLOSE open PRs** (18+ open)
   3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
-  4. **Stale branch cleanup** — 1100+ remote auto/ branches
-  5. **Notion plan limit** — upgrade or clean to restore live board
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
 - **Next run:** Check PR #1640 CI/review. Next candidate: GEJ — scope+focus+explain triple combination.
 
 ---
@@ -9079,3 +9080,45 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
 - **GEH-4:** absence guard — `focus` key never in cast:discovered (asymmetry vs executed/plan/resolved)
 - **GEH-5:** per-call focus+catalog+explain → same 9 keys; `focus` absent; `explanation` present
 - **Key fixtures:** BILLING_FOCUS_PROFILE (ecosystem/billing, boost:0.5) + BILLING_SUGGESTIONS_CATALOG inline; KeywordOnlyCoordinator (routeIntent → null); INTENT='find invoice pdf'
+
+---
+
+### Run ~1892 — 2026-09-30 (automated run — PR #1490 GAY merge wake)
+
+- **Trigger:** PR #1490 (GAY drift guard) merged at 2026-09-30T22:45Z
+- **Build:** tsc clean | **Tests:** 5439 pass / 0 fail / 3 skip (+5 vs 5434 baseline)
+- **Open PRs:** 16 (below ~20 standdown threshold) → **PR created**
+- **Work done:** GEH drift-guard PR #1643 — freezes cast:plan + focus + explain + catalog exact key set (5 tests, 14 keys base variant)
+  - Gap: GEG suppresses catalog; GCA-2 has no explain; neither covers three-way combination
+  - GEH-1: 14 keys; GEH-2: +session (15); GEH-3: absence guard; GEH-4: +scope (15); GEH-5: type guard
+- **Persistent human-action items (unchanged):** DISABLE cron, merge/close open PRs, enable npm-test CI, prod env vars, stale branch cleanup, Notion upgrade
+
+---
+
+### Run ~1895 — 2026-09-30T23:13Z (automated — PR #1640 CI follow-up)
+
+- **Workstream advanced:** None — 26 open PRs exceed ~20 standdown threshold
+- **Build:** N/A (no new work) | **Tests:** N/A
+- **Context:** PR #1640 (GEI focus+explain) — CI confirmed green: CodeQL ✅, Analyze(javascript-typescript) ✅, Analyze(actions) ✅. No review findings (CodeRabbit/Codex still rate-limited at time of check). PR waiting on human merge.
+- **Open PRs:** 26 (threshold ~20). Multiple parallel sessions created PRs this cycle: #1629–1645.
+- **Standing down:** No new PR. Human merge queue must drain before next advance.
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1895 runs; burning compute
+  2. **MERGE or CLOSE open PRs** — 26 open PRs (many duplicates from parallel sessions: #1631/#1632/#1640 all cover GEH/GEI executed+focus+explain)
+  3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** If PRs merge below ~20, next candidate: GEJ — freeze cast:executed + focus + session + explain (3-way combo).
+
+---
+
+### Run ~1894 — 2026-09-30T23:00Z
+
+- **Workstream advanced:** GBE — freeze `cast:resolved` exact top-level key set
+- **Branch/PR:** `auto/GBE-resolved-toplevel-keyset-drift-guard` → **PR #1633**
+- **Build:** tsc clean | **Tests:** 5434/0/3 baseline; +5 GBE pass
+- **Actions:**
+  - PR #1500 (GBC) and PR #1501 (GBD) merged (notifications at 22:45Z). Synced to b453fff.
+  - Created `test/gbe-resolved-toplevel-keyset-drift-guard.test.ts` — 5 tests exact-freezing cast:resolved top-level keyset. Pushed, opened PR #1633, subscribed.
+- **Next run:** Check GBE PR #1633 CI/review. Next candidate: freeze cast:resolved `resolved` sub-object exact {score, tool} or cast:no_match exact keyset.
