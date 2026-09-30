@@ -9297,3 +9297,26 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to restore live board
 - **Next run:** When PRs drop below ~20 — next candidate GEJ.
+
+---
+
+### Run ~1903 — 2026-09-30T (automated — context continuation)
+
+- **Workstream completed:** GY — PR #1661 opened ✅
+- **Build:** tsc clean | **Tests:** 5541 pass / 0 fail / 3 skip (5 new from GY)
+- **Open PRs at run start:** 6 (below standdown threshold of 20 → advancing)
+- **What was done:**
+  - Pulled main (3234f6e — run ~1902 merged 18 PRs, closed 8 stale). Build clean. Tests 5541/0/3.
+  - Confirmed main has GEI, GEJ, GX all merged. Next gap: GY (session eviction reset).
+  - Created `test/gy-session-eviction-resets-state-drift-guard.test.ts` (5 tests)
+  - All 5 GY tests pass. GY-1: post-eviction callCount=1; GY-2: recentTools reset; GY-3: eviction return count; GY-4/5: no cross-session contamination.
+  - PR #1661 opened and subscribed for CI events.
+- **Guardrails:** 5-tool public surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **Next advance target:** GZ — execute result content[0] is always type:text when live backend responds successfully (or another unfrozen session/cast contract).
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1903+ runs; burning compute.
+  2. **MERGE or CLOSE open PRs** — 6 open (was 35+ last recorded run; human batch-merging ✅)
+  3. **Enable GitHub Actions** (main npm test CI job — currently CodeQL only)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **36 moderate Dependabot vulnerabilities** on default branch
