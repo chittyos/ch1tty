@@ -9032,3 +9032,21 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean blocks to restore live board
+
+---
+
+### Run ~1893 — 2026-09-30T22:44Z (wake: PR #1481 GAR merged → main batch pulled)
+
+- **Workstream completed:** GEI — PR #1640 opened ✅
+- **Branch:** `auto/GEI-executed-focus-explain-keyset`
+- **Build:** tsc clean | **Tests:** 4 new (GEI-1–4) all pass
+- **Context:** Woke on PR #1481 (GAR) merged event. Pulled main → 103-file batch landed (GEG latest). Open PRs: 17 → below ~20 threshold → advanced.
+- **Gap identified:** cast:executed + focus ∧ explain not covered (GV-4 = explain no focus; GBZ-1 = focus no explain; GEH PR #1629 = session+explain no focus; no test covered focus+explain).
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1893 runs; burning compute
+  2. **MERGE or CLOSE 18 open PRs** (now 17 + #1640 = 18)
+  3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** Check PR #1640 CI/review. Next candidate: GEJ — freeze cast:executed key set for scope+focus+explain triple combination.
