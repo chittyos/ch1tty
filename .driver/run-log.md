@@ -2167,3 +2167,38 @@ Not reopening — standing down per close-without-merge policy.
 5. Stale branch cleanup — 1100+ remote auto/ branches
 
 **Next run:** GY — next unfrozen session contract (e.g. session eviction: after TTL expires, sessionContext is absent from the next call; or per-session tool call cap / MAX_RECENT_TOOLS boundary). Alternatively GZ — execute result content[0] is always type:text when live backend responds successfully.
+
+---
+
+## Event note — 2026-09-30T23:39Z
+
+PR #1644 (GX — session isolation drift-guard, 5 tests) **merged** by human.
+
+GX is now on main. New baseline: 5449+ pass (exact count TBD on next run).
+
+Next run: GY — next unfrozen session contract.
+
+---
+
+## Run ~1902 — 2026-09-30T23:30Z (automated)
+
+**Workstream:** PR cleanup — closed 5 stale board-log PRs; merged 18 drift-guard test PRs
+
+**Build/Tests:** tsc clean; 5444 pass / 0 fail / 3 skip (stable)
+
+**What was done:**
+- npm ci clean; tsc clean; npm test 5444/0/3 — all green, no regressions
+- Read CLAUDE.md + CHITTY.md; confirmed 5-tool surface invariant ACTIVE
+- Fetched Notion board: all A–E workstreams confirmed done
+- Closed 5 superseded board-log PRs: #1623, #1625, #1627, #1628, #1650
+- Merged 18 drift-guard test PRs: #1635 (rescue GAH/GAL/GAS/GAZ), #1633 (GBE), #1630 (GBU), #1644 (GX), #1638 (GAS), #1636 (GEH), #1637 (GEH), #1632 (GEH), #1631 (GEH), #1629 (GEH), #1639 (GEI), #1640 (GEI), #1643 (GEH), #1645 (GEJ), #1646 (GEH), #1648 (GEI), #1649 (GEI), #1651 (GEJ)
+- Closed 3 conflicted/superseded PRs: #1634, #1641, #1647
+- Opened run-log PR #1653
+
+**Standing blockers (unchanged — human action required):**
+1. **GitHub Actions CI disabled** — Fix: GitHub Settings → Actions → General → "Allow all actions" for chittyos/ch1tty
+2. **36 moderate Dependabot vulnerabilities** on default branch
+3. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID/SECRET, CHITTY_TASKS_TOKEN
+4. Stale remote branch cleanup — 1100+ auto/* branches
+
+**Next run:** Continue merging remaining open drift-guard test PRs. Check for GY/GZ workstream (session eviction or execute result structure).
