@@ -1,5 +1,5 @@
 /**
- * GEI drift guard: freeze cast:discovered exact top-level key set when BOTH a
+ * GEJ drift guard: freeze cast:discovered exact top-level key set when BOTH a
  * focus profile is active AND explain:true is set.
  *
  * Prior tests cover the two conditionals independently:
@@ -31,28 +31,28 @@
  *   }
  *
  * Notable: `focus: focusName` is NOT spread in cast:discovered (unlike
- * cast:executed / cast:resolved / cast:plan). GEI confirms explanation
+ * cast:executed / cast:resolved / cast:plan). GEJ confirms explanation
  * appears without `focus` leaking alongside it.
  *
- * GEI freezes:
+ * GEJ freezes:
  *
- *   GEI-1  cast:discovered + focus active + explain:true → EXACTLY
+ *   GEJ-1  cast:discovered + focus active + explain:true → EXACTLY
  *          {cast, explanation, hint, intent, latencyMs, prompts, resolvedBy} — 7 keys.
  *          (GBH-2 base set + focus profile active; confirms explanation survives
  *           the focus code path and `focus` key does NOT leak.)
  *
- *   GEI-2  cast:discovered + focus active + explain:true + sessionId → EXACTLY
- *          GEI-1 set PLUS sessionContext — 8 keys.
+ *   GEJ-2  cast:discovered + focus active + explain:true + sessionId → EXACTLY
+ *          GEJ-1 set PLUS sessionContext — 8 keys.
  *          (Confirms sessionContext adds alongside focus+explanation without
  *           displacing or blocking either.)
  *
- *   GEI-3  cast:discovered + focus active + explain:false → exactly GCI-1 base set,
+ *   GEJ-3  cast:discovered + focus active + explain:false → exactly GCI-1 base set,
  *          NO `explanation` key — absence guard.
  *
- *   GEI-4  `explanation` is present and is an object (not null, not a
+ *   GEJ-4  `explanation` is present and is an object (not null, not a
  *          primitive) when explain:true is set with focus active.
  *
- *   GEI-5  `explanation` sub-object has a string `method` key when explain:true
+ *   GEJ-5  `explanation` sub-object has a string `method` key when explain:true
  *          is set with focus active.
  *
  * Fixture: billing server (manage_subscription tool, retrieve_invoice prompt).
@@ -128,7 +128,7 @@ class KeywordOnlyCoordinator extends SessionCoordinator {
 
 let _seq = 0;
 function dlq(): string {
-  return join(tmpdir(), `ch1tty-gei-${Date.now()}-${++_seq}.jsonl`);
+  return join(tmpdir(), `ch1tty-gej-${Date.now()}-${++_seq}.jsonl`);
 }
 
 function makeAgg(): Aggregator {
@@ -194,82 +194,82 @@ async function discovered(
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
-test('GEI-1: cast:discovered + focus active + explain:true → EXACTLY base + explanation (7 keys, no `focus` key)', async () => {
+test('GEJ-1: cast:discovered + focus active + explain:true → EXACTLY base + explanation (7 keys, no `focus` key)', async () => {
   const agg = makeAgg();
   try {
     const body = await discovered(agg, { explain: true });
-    assertExactKeys(body, DISCOVERED_FOCUS_EXPLAIN, 'GEI-1 discovered+focus+explain');
+    assertExactKeys(body, DISCOVERED_FOCUS_EXPLAIN, 'GEJ-1 discovered+focus+explain');
     assert.ok(
       !Object.prototype.hasOwnProperty.call(body, 'focus'),
-      'GEI-1: `focus` key must be absent in cast:discovered (unlike cast:executed/resolved/plan)',
+      'GEJ-1: `focus` key must be absent in cast:discovered (unlike cast:executed/resolved/plan)',
     );
   } finally {
     await agg.shutdown();
   }
 });
 
-test('GEI-2: cast:discovered + focus + explain + sessionId → EXACTLY base + explanation + sessionContext (8 keys)', async () => {
+test('GEJ-2: cast:discovered + focus + explain + sessionId → EXACTLY base + explanation + sessionContext (8 keys)', async () => {
   const agg = makeAgg();
   try {
     const SID = 'gei-session-2';
     // Warm session so sessionContext is populated.
     await agg.callTool('ch1tty/cast', { intent: INTENT, sessionId: SID });
     const body = await discovered(agg, { explain: true, sessionId: SID });
-    assertExactKeys(body, DISCOVERED_FOCUS_EXPLAIN_SESSION, 'GEI-2 discovered+focus+explain+session');
+    assertExactKeys(body, DISCOVERED_FOCUS_EXPLAIN_SESSION, 'GEJ-2 discovered+focus+explain+session');
   } finally {
     await agg.shutdown();
   }
 });
 
-test('GEI-3: cast:discovered + focus active WITHOUT explain → exactly base (6 keys), NO explanation key', async () => {
+test('GEJ-3: cast:discovered + focus active WITHOUT explain → exactly base (6 keys), NO explanation key', async () => {
   const agg = makeAgg();
   try {
     const body = await discovered(agg);
-    assertExactKeys(body, DISCOVERED_BASE, 'GEI-3 discovered+focus (no explain)');
+    assertExactKeys(body, DISCOVERED_BASE, 'GEJ-3 discovered+focus (no explain)');
     assert.ok(
       !Object.prototype.hasOwnProperty.call(body, 'explanation'),
-      'GEI-3: explanation must be absent when explain is not set',
+      'GEJ-3: explanation must be absent when explain is not set',
     );
   } finally {
     await agg.shutdown();
   }
 });
 
-test('GEI-4: explanation is an object (not null, not primitive) when explain:true is set with focus active', async () => {
+test('GEJ-4: explanation is an object (not null, not primitive) when explain:true is set with focus active', async () => {
   const agg = makeAgg();
   try {
     const body = await discovered(agg, { explain: true });
     assert.ok(
       Object.prototype.hasOwnProperty.call(body, 'explanation'),
-      'GEI-4: explanation must be present when explain:true is set',
+      'GEJ-4: explanation must be present when explain:true is set',
     );
     const exp = body['explanation'];
     assert.ok(
       exp !== null && typeof exp === 'object' && !Array.isArray(exp),
-      `GEI-4: explanation must be a non-null, non-array object; got ${typeof exp} (${JSON.stringify(exp)})`,
+      `GEJ-4: explanation must be a non-null, non-array object; got ${typeof exp} (${JSON.stringify(exp)})`,
     );
   } finally {
     await agg.shutdown();
   }
 });
 
-test('GEI-5: explanation sub-object has a string method key when explain:true is set with focus active', async () => {
+test('GEJ-5: explanation sub-object has a string method key when explain:true is set with focus active', async () => {
   const agg = makeAgg();
   try {
     const body = await discovered(agg, { explain: true });
     const explanation = body['explanation'] as Record<string, unknown>;
     assert.ok(
       explanation !== null && typeof explanation === 'object' && !Array.isArray(explanation),
-      'GEI-5: explanation must be a non-null, non-array object',
+      'GEJ-5: explanation must be a non-null, non-array object',
     );
     assert.equal(
       typeof explanation['method'],
       'string',
-      `GEI-5: explanation.method must be a string; got ${typeof explanation['method']}`,
+      `GEJ-5: explanation.method must be a string; got ${typeof explanation['method']}`,
     );
     assert.ok(
       (explanation['method'] as string).length > 0,
-      'GEI-5: explanation.method must be a non-empty string',
+      'GEJ-5: explanation.method must be a non-empty string',
     );
   } finally {
     await agg.shutdown();
