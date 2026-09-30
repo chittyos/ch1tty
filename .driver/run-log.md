@@ -2133,3 +2133,34 @@ If the user wants these drift-guard tests reconsidered (e.g. in a different form
 PR #1575 (GDO — execute dryRun+sessionId sessionContext item structure) closed without merging.
 
 Not reopening — standing down per close-without-merge policy.
+
+---
+
+## Run ~1892 — 2026-09-30T22:45Z (automated, triggered by GAU merge)
+
+**Workstream:** Standdown — 17 open PRs (> ~15 threshold); approaching clear.
+
+**Build/Tests:** tsc clean; 5434 pass / 0 fail / 3 skip (+113 vs run ~1887 — GEG and others merged since then)
+
+**Open PRs (17 total):**
+- Test drift-guard PRs (7): #1471 (GAI), #1474 (GAL), #1482 (GAS), #1491 (GAZ), #1499 (PQ), #1629 (GEH), #1630 (GBU)
+- Board/chore PRs (10): #1522, #1523, #1528, #1530, #1538, #1544, #1623, #1625, #1627, #1628
+
+**Triggered by:** PR #1504 (GAU — cast:plan/executed alternatives asymmetry) merged by human.
+
+**What was done:**
+- git pull origin main → 147 new commits (GEG and many others merged since run ~1887)
+- npm test: 5434/0/3 — all green, no regressions
+- Checked open PRs: 17 total; 7 test PRs, 10 board/chore PRs
+- GEG (cast:plan focus+explain keyset) confirmed merged on main
+- PR #1629 (GEH: executed+session+explain) and #1630 (GBU: status.focus null) are next in queue
+- Standdown cap ~15 not yet reached (17 > 15) → no new PR pushed
+
+**Standing blockers (human action required):**
+1. **GitHub Actions CI still unreliable** — PRs accumulate without auto-merge; 7 test drift-guard PRs queued
+2. **17 open PRs** (> ~15 standdown threshold) — continue to hold new work
+3. **Notion board block limit** — workspace out of free blocks; using .driver/run-log.md instead
+4. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID/SECRET, CHITTY_TASKS_TOKEN
+5. Stale branch cleanup — 1100+ remote auto/ branches
+
+**Next run:** Once open PR count drops below ~15, advance to GEI — freeze cast:executed exact key set when BOTH session AND explain are active (completes the session+explain combination matrix; GEH covers this scenario but may not be merged yet).
