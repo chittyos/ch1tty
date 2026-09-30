@@ -1868,3 +1868,17 @@
 
 **Next run:** GDP — freeze `ch1tty/execute` real (non-dryRun)+sessionId second content item structure: content[1].text JSON should be `{latencyMs, sessionContext}` (key set, value types). FH covers content[0] from backend but not content[1] from the session metadata append path.
 
+---
+
+## Event log — 2026-09-30T19:43Z (automated, PR watch wake)
+
+**Event:** PR #1575 (GDO) closed without merging by a human reviewer.
+
+**Action:** No action taken per PR activity rules — do not reopen or create new PR for same change without explicit user request.
+
+**Impact:** GDO test file (`test/gdo-execute-dryrun-sessioncontext-item-structure.test.ts`) and its branch (`auto/GDO-execute-dryrun-sessioncontext-item-structure`) still exist remotely but are not on main. The freeze for execute dryRun+sessionId sessionContext embedded structure was NOT landed.
+
+**Standing note:** Human closed the PR — this may be intentional (duplicate freeze, rethought approach, or branch cleanup). GDP candidate (real+sessionId content[1] shape) may also be affected by same reasoning. Recommend human clarify before next run advances GDP.
+
+**Open PRs:** #1543 (GCK) through #1574 (GDN): 30 drift-guard PRs remain open (GDO #1575 is now closed).
+
