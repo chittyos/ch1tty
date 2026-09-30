@@ -1,3 +1,13 @@
+## 2026-09-30T — ~1869th run (GEA PR #1608: +5 tests, cast:resolved catalogCombo keyset)
+
+- **Build**: clean (tsc, 0 errors)
+- **Tests (GEA file)**: 5 pass / 0 fail (GEA-1..5)
+- **Work done**: New drift guard `gea-resolved-catalogcombo-toplevel-keyset-drift-guard.test.ts`
+  - Gap: EK froze `catalogCombo` sub-object shape but never asserted the full sorted top-level key set of `cast:resolved` when `catalogCombo` is present; GU/GBM/GCH all use empty catalog to avoid non-determinism
+  - Frozen: exact key sets for cast:resolved WITH catalogCombo across 4 combinations (no session/scope, +session, +scope, +session+scope); absence guard when focus inactive
+- **Branch**: `auto/GEA-resolved-catalogcombo-keyset` → PR #1608 (open, watching)
+- **Next**: PR #1602 (board log) and PR #1608 (GEA) both await human merge
+
 ## 2026-09-02T11:31:00Z — ~1464th run (idle; all workstreams A–F done)
 
 - **Build**: clean (tsc, 0 errors)
