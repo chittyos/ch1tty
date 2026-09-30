@@ -8851,6 +8851,16 @@ State: GCO work is available on `auto/GCO-search-infocus-conditional-drift-guard
 
 ---
 
+### Run ~1827 addendum — 2026-09-30T19:44Z
+
+**PR #1559 (`auto/gcy-search-suggestions-count`) closed without merging.**
+
+CI was green (CodeQL 3/3 ✅), CodeRabbit: no actionable comments, merge risk Minimal. Closed by human — consistent with the batch-close pattern on this series. Branch and commits remain on `auto/gcy-search-suggestions-count`. Not reopening without explicit user instruction.
+
+State: GCY work (5 tests freezing suggestions count lower bound) is available on the branch if needed. Main is unchanged (+0 tests from GCY).
+
+---
+
 ### Run ~1828 follow-up — 2026-09-30T19:43Z
 
 **PRs #1561 (GDA) and #1562 (GDB) closed without merging.** CI was green (3/3), Codex ✅ no findings. Closed by human — consistent with batch-close pattern. Not reopening. Branches preserved if needed.
