@@ -9062,8 +9062,9 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   1. **DISABLE hourly cron** — ~1893 runs; burning compute
   2. **MERGE or CLOSE open PRs** (18+ open)
   3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
-  4. **Stale branch cleanup** — 1100+ remote auto/ branches
-  5. **Notion plan limit** — upgrade or clean to restore live board
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
 - **Next run:** Check PR #1640 CI/review. Next candidate: GEJ — scope+focus+explain triple combination.
 
 ---
@@ -9077,3 +9078,15 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   - Gap: GEG suppresses catalog; GCA-2 has no explain; neither covers three-way combination
   - GEH-1: 14 keys; GEH-2: +session (15); GEH-3: absence guard; GEH-4: +scope (15); GEH-5: type guard
 - **Persistent human-action items (unchanged):** DISABLE cron, merge/close open PRs, enable npm-test CI, prod env vars, stale branch cleanup, Notion upgrade
+
+---
+
+### Run ~1894 — 2026-09-30T23:00Z
+
+- **Workstream advanced:** GBE — freeze `cast:resolved` exact top-level key set
+- **Branch/PR:** `auto/GBE-resolved-toplevel-keyset-drift-guard` → **PR #1633**
+- **Build:** tsc clean | **Tests:** 5434/0/3 baseline; +5 GBE pass
+- **Actions:**
+  - PR #1500 (GBC) and PR #1501 (GBD) merged (notifications at 22:45Z). Synced to b453fff.
+  - Created `test/gbe-resolved-toplevel-keyset-drift-guard.test.ts` — 5 tests exact-freezing cast:resolved top-level keyset. Pushed, opened PR #1633, subscribed.
+- **Next run:** Check GBE PR #1633 CI/review. Next candidate: freeze cast:resolved `resolved` sub-object exact {score, tool} or cast:no_match exact keyset.
