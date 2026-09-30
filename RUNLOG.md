@@ -3256,3 +3256,20 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 - **PR**: #1532 opened (https://github.com/chittyos/ch1tty/pull/1532). CI pending.
 - **Open PRs**: 21 open (#1512–#1532), all waiting human merge.
 - **Next**: GCA CI should pass. Next gap = GCB (cast:no_match top-level key set when focus is active — complement of GBK/GBL but for focus, not scope/session).
+
+---
+
+## Run ~1891 — 2026-09-30 (automated)
+
+- **Trigger**: Scheduled hourly run (woken by PR #1532 GCA merge notification)
+- **Build**: tsc clean | **Tests**: 5321 pass / 0 fail / 3 skip
+- **PR #1532 (GCA)**: Merged. cast:plan+focus keyset freeze now on main.
+- **Open PRs**: 61 (≥20 threshold) → **standing down, no new PR created**
+- **State**: All workstreams A–F done. Many drift-guard PRs in queue (#1470–#1628 range, 61 open).
+- **Persistent human-action items (unchanged)**:
+  1. Disable hourly cron — all workstreams A–F done; only drift-guard PRs remain
+  2. Merge or close 61+ open PRs (queue blocking new work)
+  3. Enable GitHub Actions npm test CI (only CodeQL runs currently)
+  4. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. Stale branch cleanup (1100+ remote auto/ branches)
+- **Next run**: If queue drops below ~20, advance GEH (next genuine drift-guard gap after GEG).
