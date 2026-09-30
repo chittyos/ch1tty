@@ -8902,3 +8902,9 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   7. **Notion plan limit** — upgrade or clean to resume board updates
 - **Next run:** If queue drops below ~20: identify next genuine drift-guard gap after GEF (candidate: GEG — freeze `cast:resolved` dryRun sessionContext recentTools item runtime types, the dryRun-path analog of GDY). If queue still ≥ ~20: stand down.
 - **PushNotification:** NOT SENT — same standdown state as run ~1885/~1886; user already notified.
+
+---
+
+### Run ~1887 addendum — 2026-09-30T23:37Z
+
+**PR #1625 (`auto/run-1887-board-log`) closed without merging** — consistent with the batch-close pattern on board-log PRs. Not reopening. The run ~1887 board entry exists on branch `auto/run-1887-board-log` but is not on main.
