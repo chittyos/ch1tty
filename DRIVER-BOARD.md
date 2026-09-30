@@ -8851,30 +8851,25 @@ State: GCO work is available on `auto/GCO-search-infocus-conditional-drift-guard
 
 ---
 
-### Run ~1827 addendum — 2026-09-30T19:44Z
-
-**PR #1559 (`auto/gcy-search-suggestions-count`) closed without merging.**
-
-CI was green (CodeQL 3/3 ✅), CodeRabbit: no actionable comments, merge risk Minimal. Closed by human — consistent with the batch-close pattern on this series. Branch and commits remain on `auto/gcy-search-suggestions-count`. Not reopening without explicit user instruction.
-
-State: GCY work (5 tests freezing suggestions count lower bound) is available on the branch if needed. Main is unchanged (+0 tests from GCY).
-
----
-
-### Note — 2026-09-30T (automated — PR closed event)
-- PR #1581 (GDQ — freeze execute dryRun WITH SESSION exact body key set) was **closed without merging** by the repository owner.
-- No action taken per rules (do not reopen or re-create unless user explicitly asks).
-- The GDQ test file (`test/gdq-execute-dryrun-session-exact-body-keyset-drift-guard.test.ts`) remains on branch `auto/GDQ-dryrun-session-exact-body-keyset` and is NOT in main.
-
----
-
-### Run ~1828 follow-up — 2026-09-30T19:43Z
-
-**PRs #1561 (GDA) and #1562 (GDB) closed without merging.** CI was green (3/3), Codex ✅ no findings. Closed by human — consistent with batch-close pattern. Not reopening. Branches preserved if needed.
-
----
-
-### Run ~1829 addendum — 2026-09-30T19:43Z (automated event)
-- **Event:** PR #1563 (`auto/GDC-execute-exact-keysets-drift-guard`) closed without merging.
-- **Action:** Logged here only. Per policy, not reopened and no new PR created.
-- **Coverage note:** GDC's 5 tests (exact key sets for execute dryRun no-session, dryRun with-session, session-metadata, content item count, status value) were superseded on main by the GDJ–GDW series: `gdj-execute-dryrun-toplevel-keyset-drift-guard.test.ts`, `gdl-execute-dryrun-tool-server-values-drift-guard.test.ts`, `gdm-execute-dryrun-status-exact-value-drift-guard.test.ts`, `gdq-execute-dryrun-session-exact-body-keyset-drift-guard.test.ts`, `gdw-execute-live-metadata-outer-key-set-drift-guard.test.ts`. No coverage gap remains.
+### Run ~1887 — 2026-09-30T (automated run)
+- **Workstream advanced:** None — 65 open PRs exceed ~20 cap; standing down
+- **Branch/PR:** direct commit to main (board update only)
+- **Build:** tsc clean | **Tests:** 5321 pass / 0 fail / 3 skip (5324 total, 364 suites, ~141s)
+- **Actions this run:**
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED; `buildCastExplanation` metric freeze ACTIVE.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 5321/0/3. 0 failures.
+  - Fetched latest main: 51 commits ahead since last local; new merges include GEB (consolidation), GEC, GED, GDAA, GEE, GEF, GW. Latest commit on main: c3b759b (note PR #1573 closed).
+  - Checked open PRs: **65 open PRs** (perPage=100). Cap ~20 → standing down; no new PR created.
+  - Open PRs span: #1470–#1624 (mix of ~30 drift-guard test PRs + ~30 stale board-log / chore(driver) PRs). PR #1624 is a new GDX-search search sessionContext keyset PR (may conflict with existing gdx on main).
+  - GW (`gw-search-sessioncontext-value-types-drift-guard.test.ts`) confirmed merged to main.
+  - Tests: 5321/0/3 — unchanged vs run ~1886 (no new merges since c3b759b).
+- **State summary:** All workstreams A–E + F + extended DONE. **65 open PRs**. Tests: 5321/0/3. Build: clean. 0 vulns.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1887 runs; burning compute; all workstreams done.
+  2. **MERGE or CLOSE stale board-log/chore PRs** — ~30 PRs are "chore(board): standdown" or "chore(driver): idle" entries; close them to reduce queue noise.
+  3. **MERGE open drift-guard test PRs** — ~35 PRs (#1470–#1624): GAH through GDX, all CI-green (CodeQL); awaiting human merge.
+  4. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Notion plan limit** — upgrade or clean to resume board updates
+- **Next run:** If queue drops below ~20: advance GEG or identify next genuine drift-guard gap after GEF. If queue still >= ~20: stand down and update board only.
