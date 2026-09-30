@@ -3233,3 +3233,26 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
 - **Tests**: 5/5 pass locally. All Ollama errors are expected (embedEnabled: false).
 - **PR**: #1471 (GAI) opened. CI pending.
 - **Open PRs**: #1470 (GAH), #1471 (GAI).
+
+---
+
+## Run ~1808 — 2026-09-26 (GCA PR #1532 opened)
+
+- **Trigger**: scheduled hourly run
+- **Build**: tsc clean | **Tests**: 4876 pass / 0 fail / 3 skipped (main)
+- **Workstream**: GCA — freeze cast:plan top-level key set when focus profile is active
+- **Context**: GBZ (#1531) froze cast:executed+focus key set; GCA is the symmetric
+  complement for cast:plan (confirm:true). No existing test froze the exact key set for
+  plan when focus is active — EA only checks required keys, not exact set, and has no
+  focus-active variant.
+- **File**: `test/gca-cast-plan-focus-active-toplevel-keyset-drift-guard.test.ts`
+- **Tests**:
+  - GCA-1: cast:plan+focus (no catalog) adds exactly `focus` to EA base set
+  - GCA-2: cast:plan+focus+catalog adds `focus` + `suggestions` + catalog keys
+  - GCA-3: scope/resolvedFromCatalog/chainContinuation/explanation/sessionContext absent when not applicable
+  - GCA-4: focus value is a non-empty string equal to the active profile name
+  - GCA-5: suggestions object has exactly {combos, prompts} when present
+- **Tests**: 5/5 pass locally. Ollama errors expected (embedEnabled: false).
+- **PR**: #1532 opened (https://github.com/chittyos/ch1tty/pull/1532). CI pending.
+- **Open PRs**: 21 open (#1512–#1532), all waiting human merge.
+- **Next**: GCA CI should pass. Next gap = GCB (cast:no_match top-level key set when focus is active — complement of GBK/GBL but for focus, not scope/session).
