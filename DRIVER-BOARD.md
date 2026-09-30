@@ -9062,8 +9062,9 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   1. **DISABLE hourly cron** — ~1893 runs; burning compute
   2. **MERGE or CLOSE open PRs** (18+ open)
   3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
-  4. **Stale branch cleanup** — 1100+ remote auto/ branches
-  5. **Notion plan limit** — upgrade or clean to restore live board
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
 - **Next run:** Check PR #1640 CI/review. Next candidate: GEJ — scope+focus+explain triple combination.
 
 ---
@@ -9080,19 +9081,48 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
 
 ---
 
-### Run ~1894 — 2026-09-30 (automated run — GEI PR #1641 CI check)
+### Run ~1895 — 2026-09-30T23:13Z (automated — PR #1640 CI follow-up)
 
-- **Trigger:** Continuation of run ~1893 (context compaction resumed)
-- **Build:** skipped (board-only run) | **Tests:** baseline 5439 pass / 0 fail / 3 skip (main)
-- **Open PRs:** 27 (above ~20 standdown threshold) → **STANDDOWN — no new PR**
-- **PR #1641 (GEI) status:** CI all green (3/3: CodeQL ✓, Analyze(actions) ✓, Analyze(javascript-typescript) ✓). No review findings (Codex + CodeRabbit both rate-limited). **Ready for human merge.**
-- **GEI scope:** `test/gei-executed-focus-explain-session-keyset-drift-guard.test.ts` — 5 tests freezing cast:executed exact key sets for focus+explain+session triple combo (11 keys) and +scope quadruple (12 keys), plus absence guard and type guards.
-- **Parallel driver activity:** Runs ~1891–1892 on main opened PRs #1640 (GEI scope+explain), #1643 (GEH cast:plan+focus+explain+catalog), #1644–1645 (GX session isolation). Note: multiple GEI-prefixed PRs exist (#1639–1641) from parallel runs — only #1641 covers the focus+explain+session triple.
-- **Persistent human-action items (unchanged):**
-  1. **DISABLE hourly cron** — ~1894 runs; burning compute
-  2. **MERGE or CLOSE open PRs** — 27 open; threshold to advance: <20
+- **Workstream advanced:** None — 26 open PRs exceed ~20 standdown threshold
+- **Build:** N/A (no new work) | **Tests:** N/A
+- **Context:** PR #1640 (GEI focus+explain) — CI confirmed green: CodeQL ✅, Analyze(javascript-typescript) ✅, Analyze(actions) ✅. No review findings (CodeRabbit/Codex still rate-limited at time of check). PR waiting on human merge.
+- **Open PRs:** 26 (threshold ~20). Multiple parallel sessions created PRs this cycle: #1629–1645.
+- **Standing down:** No new PR. Human merge queue must drain before next advance.
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1895 runs; burning compute
+  2. **MERGE or CLOSE open PRs** — 26 open PRs (many duplicates from parallel sessions: #1631/#1632/#1640 all cover GEH/GEI executed+focus+explain)
   3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
   4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to restore live board
-- **Next run:** After open PRs drop below 20 — next gap candidate is GEJ: freeze cast:chain_executed exact key set for focus+explain+session combos (GBI covers chain_executed conditional keys but not the triple).
+- **Next run:** If PRs merge below ~20, next candidate: GEJ — freeze cast:executed + focus + session + explain (3-way combo).
+
+---
+
+### Run ~1894 — 2026-09-30T23:00Z
+
+- **Workstream advanced:** GBE — freeze `cast:resolved` exact top-level key set
+- **Branch/PR:** `auto/GBE-resolved-toplevel-keyset-drift-guard` → **PR #1633**
+- **Build:** tsc clean | **Tests:** 5434/0/3 baseline; +5 GBE pass
+- **Actions:**
+  - PR #1500 (GBC) and PR #1501 (GBD) merged (notifications at 22:45Z). Synced to b453fff.
+  - Created `test/gbe-resolved-toplevel-keyset-drift-guard.test.ts` — 5 tests exact-freezing cast:resolved top-level keyset. Pushed, opened PR #1633, subscribed.
+- **Next run:** Check GBE PR #1633 CI/review. Next candidate: freeze cast:resolved `resolved` sub-object exact {score, tool} or cast:no_match exact keyset.
+
+---
+
+### Run ~1896 — 2026-09-30 (automated — GEI PR #1641 CI confirmed; context-compaction resume)
+
+- **Trigger:** Context compaction resume from run ~1893
+- **Build:** skipped | **Tests:** baseline from main (5439+)
+- **Open PRs:** 27 (above ~20 standdown threshold) → **STANDDOWN**
+- **PR #1641 (GEI) status:** CI all green (3/3: CodeQL ✓, Analyze(actions) ✓, Analyze(javascript-typescript) ✓). No review findings (both bots rate-limited). **Ready for human merge.**
+- **GEI-specific:** Only #1641 covers the focus+explain+session triple combo (11 keys) + quadruple with scope (12 keys). Other GEI-prefixed PRs (#1639–1640) from parallel sessions cover different sub-combos.
+- **Persistent human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1896 runs
+  2. **MERGE or CLOSE open PRs** — 27 open; threshold: <20
+  3. **Enable GitHub Actions** (npm test CI)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** After PRs drop below 20 — GEJ candidate: freeze cast:chain_executed exact key set for focus+explain+session combos.
