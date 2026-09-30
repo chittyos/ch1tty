@@ -8859,3 +8859,10 @@ State: GCO work is available on `auto/GCO-search-infocus-conditional-drift-guard
 ### Run ~1828 follow-up — 2026-09-30T19:43Z
 
 **PRs #1561 (GDA) and #1562 (GDB) closed without merging.** CI was green (3/3), Codex ✅ no findings. Closed by human — consistent with batch-close pattern. Not reopening. Branches preserved if needed.
+
+---
+
+### Run ~1829 addendum — 2026-09-30T19:43Z (automated event)
+- **Event:** PR #1563 (`auto/GDC-execute-exact-keysets-drift-guard`) closed without merging.
+- **Action:** Logged here only. Per policy, not reopened and no new PR created.
+- **Coverage note:** GDC's 5 tests (exact key sets for execute dryRun no-session, dryRun with-session, session-metadata, content item count, status value) were superseded on main by the GDJ–GDW series: `gdj-execute-dryrun-toplevel-keyset-drift-guard.test.ts`, `gdl-execute-dryrun-tool-server-values-drift-guard.test.ts`, `gdm-execute-dryrun-status-exact-value-drift-guard.test.ts`, `gdq-execute-dryrun-session-exact-body-keyset-drift-guard.test.ts`, `gdw-execute-live-metadata-outer-key-set-drift-guard.test.ts`. No coverage gap remains.
