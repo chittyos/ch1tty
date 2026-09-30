@@ -8866,3 +8866,23 @@ State: GCO work is available on `auto/GCO-search-infocus-conditional-drift-guard
 - **Event:** PR #1563 (`auto/GDC-execute-exact-keysets-drift-guard`) closed without merging.
 - **Action:** Logged here only. Per policy, not reopened and no new PR created.
 - **Coverage note:** GDC's 5 tests (exact key sets for execute dryRun no-session, dryRun with-session, session-metadata, content item count, status value) were superseded on main by the GDJ–GDW series: `gdj-execute-dryrun-toplevel-keyset-drift-guard.test.ts`, `gdl-execute-dryrun-tool-server-values-drift-guard.test.ts`, `gdm-execute-dryrun-status-exact-value-drift-guard.test.ts`, `gdq-execute-dryrun-session-exact-body-keyset-drift-guard.test.ts`, `gdw-execute-live-metadata-outer-key-set-drift-guard.test.ts`. No coverage gap remains.
+
+---
+
+### Run ~1842 — 2026-09-30T (automated)
+
+**Build/test:** `npm ci` ✅, `npm run build` ✅, 550 drift-guard tests pass / 0 fail.
+
+**Board housekeeping:** Resolved DRIVER-BOARD.md merge conflict (GDQ #1581 closed note vs. Run~1828 GDA/GDB follow-up). Kept both sides. Pushed to main.
+
+**GEG — new drift-guard test (PR #1626):**
+- **File:** `test/geg-cast-plan-focus-explain-keyset-drift-guard.test.ts`
+- **Gap:** `cast:plan + focus active + explain:true` exact top-level key set — GCJ-3 covered plan+explain without focus; GCA-1 covered plan+focus without explain; neither covered the combination.
+- **Tests:** 4 — (1) focus+explain → EXACTLY 10 keys; (2) focus+explain+sessionId → 11 keys; (3) focus without explain → 9 keys, no explanation; (4) explanation is an object type-guard.
+- **Status:** PR #1626 open, CI pending.
+- **Branch:** `auto/GEG-cast-plan-focus-explain-keyset`
+
+**Persistent human actions still required:**
+1. DISABLE hourly cron (`/cron delete` in Claude Code) — ~1842 runs, burning compute
+2. MERGE open drift-guard PRs (large batch: #1541–#1626 range, all CI-green CodeQL)
+3. Enable GitHub Actions main npm test CI job (currently only CodeQL runs)
