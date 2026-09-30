@@ -9083,3 +9083,27 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   4. **Stale branch cleanup** — 1100+ remote auto/ branches
   5. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** Check GBU PR #1630 CI/review. Next candidate: GBV — freeze `status.focus` when per-call `focus` param (on search/cast) is set to unknown profile; OR freeze `status.availableFocusProfiles` exact element types (each must be a non-empty string).
+
+---
+
+### Run ~1893 — 2026-09-30T22:50Z (automated — PR #1509+#1510 merge wake)
+
+- **Workstream advanced:** GEH — freeze `cast:chain_executed` steps[] item exact key sets (5 tests)
+- **Branch/PR:** `auto/GEH-chain-executed-step-item-exact-keyset` → **PR #1634** (https://github.com/chittyos/ch1tty/pull/1634)
+- **Build:** tsc clean | **Tests (main):** 5335 pass / 0 fail / 3 skip; GEH adds 5 (→ 5340/0/3 on branch)
+- **Actions this run:**
+  - Woke on PR #1509 (GBH) merged + PR #1510 (GBI) merged notifications (22:45Z).
+  - Synced to origin/main (b453fff, run ~1892). `npm ci` clean. `npm run build` clean. `npm test`: 0 fail / 3 skip confirmed.
+  - Checked open PRs: 18 open — below ~20 cap → advanced workstream.
+  - Identified GEH gap: EJ uses PERMITTED superset check on step items but never exact-freezes key set per success/failure variant. Regression adding/removing a field would pass EJ silently.
+  - Source: aggregator.ts ~1465,1501,1509 — success step: {step,tool,ok,content}; failure step: {step,tool,ok,error}.
+  - GBI (just merged) freezes top-level chain_executed keys; GEH freezes per-step item keys.
+  - Wrote `test/geh-chain-executed-step-item-exact-keyset-drift-guard.test.ts` (5 tests). All 5 pass. Pushed, opened PR #1634, subscribed.
+- **Human-action items (persistent):**
+  1. **DISABLE hourly cron** — ~1893 runs; burning compute. Disable via `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 19 open drift-guard/consolidation PRs (18 pre-existing + #1634), all CI-green (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — currently only CodeQL runs)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** Check GEH PR #1634 CI/review. If queue drops below ~20: advance GEI — next genuine drift-guard gap (candidates: freeze `catalog` sub-object structure in chain_executed, or `latencyBreakdown.executionMs`/`scoringMs` value types in chain_executed context).
