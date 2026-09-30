@@ -8644,3 +8644,9 @@ _(Board not updated during these runs; entries were in git commit log / RUNLOG.m
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit hit** — upgrade or clean to resume board updates
 - **Next run:** GDT — freeze `ch1tty/execute` live with sessionId: verify that `recentTools` is capped at 5 entries even after calling more than 5 distinct tools, and that the 5 returned are the highest-frequency ones.
+
+---
+
+### Event note — 2026-09-30 (automated)
+- **PR #1578 (GDR)** closed without merging. Not reopening — human action required to reopen or re-submit if desired. GDS PR #1579 still open and green.
+- **Blocker added**: Human closed a green CI PR — if intentional, also close #1579 and pause the drift-guard series; if unintentional, reopen #1578.

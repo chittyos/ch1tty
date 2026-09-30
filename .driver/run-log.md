@@ -1960,3 +1960,15 @@
   - GDS-5: callCount = total calls, not unique tools
 
 **Next run:** GDT — freeze `ch1tty/execute` live with sessionId: recentTools is capped at 5 entries even after more than 5 distinct tools; capped 5 are the highest-frequency ones.
+
+---
+
+## Event — 2026-09-30 (automated)
+
+**PR #1578 (GDR)** was closed without merging (2026-09-30T19:42:44Z). Session unsubscribed from #1578 automatically.
+
+Not reopening — per policy, only the user can direct a reopen.
+
+**GDS PR #1579** is still open and all-green (3/3 CodeQL checks passed 2026-09-28).
+
+**Human note needed:** If closure was intentional, consider also closing #1579 and pausing the drift-guard series. If unintentional (accidental close), reopen #1578.
