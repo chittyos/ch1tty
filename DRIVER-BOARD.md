@@ -8855,3 +8855,7 @@ State: GCO work is available on `auto/GCO-search-infocus-conditional-drift-guard
 - PR #1581 (GDQ — freeze execute dryRun WITH SESSION exact body key set) was **closed without merging** by the repository owner.
 - No action taken per rules (do not reopen or re-create unless user explicitly asks).
 - The GDQ test file (`test/gdq-execute-dryrun-session-exact-body-keyset-drift-guard.test.ts`) remains on branch `auto/GDQ-dryrun-session-exact-body-keyset` and is NOT in main.
+
+### Run ~1828 follow-up — 2026-09-30T19:43Z
+
+**PRs #1561 (GDA) and #1562 (GDB) closed without merging.** CI was green (3/3), Codex ✅ no findings. Closed by human — consistent with batch-close pattern. Not reopening. Branches preserved if needed.
