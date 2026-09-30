@@ -9063,3 +9063,26 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to restore live board
+
+---
+
+### Run (this session) — 2026-09-30T (automated — context continuation)
+
+- **Workstream completed:** GEI — PR #1647 opened ✅
+- **Build:** tsc clean | **Tests:** 5444 pass / 0 fail / 3 skip (+5 from GEI)
+- **Open PRs at run start:** 17 (below standdown threshold of 20 → advancing)
+- **What was done:**
+  - Pulled main (fac60cb — 8 commits ahead after GBR/GBL/GBK/ST merges)
+  - Identified next gap: scope×focus×explain×session matrix for cast:executed missing the triple combo (scope+focus+explain)
+  - Created `test/gei-executed-scope-focus-explain-keyset-drift-guard.test.ts` (5 tests)
+  - All 5 GEI tests pass; full suite 5444/0/3
+  - PR #1647 pushed and subscribed for CI watch
+- **Guardrails:** 5-tool public surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **Next advance target:** GEJ — after GEI merges, next gap in cast drift-guard matrix.
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1892+ runs; burning compute.
+  2. **MERGE or CLOSE open PRs** — 17+ open (was 35+ last run; human is batch-merging ✅)
+  3. **Enable GitHub Actions** (main npm test CI job)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
