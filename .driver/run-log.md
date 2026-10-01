@@ -2227,3 +2227,33 @@ Next run: GY — next unfrozen session contract.
 4. Stale remote branch cleanup — 1100+ auto/* branches
 
 **Next run:** Merge PR #1671 (GZ) if green; then advance to next workstream (GEP or GAA-series cast combinations, or search error-path drift-guard).
+
+---
+
+## Run ~1916 — 2026-10-01T00:00Z (automated)
+
+**Workstream:** GFB — cast:executed outer content array passthrough drift-guard (5 tests)
+
+**Build/Tests:** tsc clean; npm test all passing on main (GEQ + GEL merged, 4972+ pass / 0 fail)
+
+**What was done:**
+- Resumed from context-compacted session; identified GFB gap from prior session research
+- Confirmed `src-stdio/aggregator.ts` ~line 1671: `...result.content,` spreads backend items into outer content array; ~line 1673: `isError: result.isError` hoisted from backend
+- Confirmed prior tests only freeze `content[0]` (cast metadata); `go` checks `content.length >= 2` but no test freezes: exact count, `content[1].type`, `content[1].text` passthrough, outer isError, or multi-item passthrough
+- Wrote `test/gfb-cast-executed-outer-content-passthrough-drift-guard.test.ts` (5 tests, all pass locally)
+- Opened PR #1689 (`auto/GFB-cast-executed-outer-content-passthrough-drift-guard`), subscribed to activity
+
+**Tests added:**
+- GFB-1: `content.length === 2` for single-item backend (go only checked `>= 2`)
+- GFB-2: `content[1].type === 'text'` (backend item type preserved verbatim)
+- GFB-3: `content[1].text` equals backend response text exactly (passthrough)
+- GFB-4: Outer `isError` is `undefined` when backend succeeds
+- GFB-5: Multi-item backend: all N items at `content[1..N]` match exactly
+
+**Standing blockers (unchanged — human action required):**
+1. **GitHub Actions CI disabled** — Fix: GitHub Settings → Actions → General → "Allow all actions" for chittyos/ch1tty
+2. **36 moderate Dependabot vulnerabilities** on default branch
+3. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID/SECRET, CHITTY_TASKS_TOKEN
+4. Stale remote branch cleanup — 1100+ auto/* branches
+
+**Next run:** Merge PR #1689 (GFB) if green; advance to GFC (next uncovered cast:executed gap).
