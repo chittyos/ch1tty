@@ -9632,3 +9632,24 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   6. **Stale branch cleanup** — 1100+ remote auto/ branches
   7. **Notion plan limit / API error** — upgrade or clean to restore live board
 - **Next run:** GEY-1/2/3 freeze chain/verified fields; GEY-4/5 freeze prompts fields. Next candidate: **GEZ** — freeze `combos[i].name` and `combos[i].accomplishes` as non-empty strings (completing the value-type coverage for all combos[i] fields), OR freeze `cast:chain_executed` `resolvedBy` value type as a non-empty string (not explicitly typed in chain context).
+
+### 2026-10-01 (run ~1917 — GEZ: suggestions combos string field value types)
+- **Workstream**: Extended drift-guard series — GEZ (combos[i] string field value types + resolvedBy type)
+- **Branch/PR**: `auto/GEZ-chain-executed-suggestions-combos-name-accomplishes-types` → PR #1684
+- **Build**: clean (tsc exit 0) | **Tests**: 5/0/0 (new GEZ only; full suite from run ~1916: 5599 total, 5596/0/3)
+- **Actions**:
+  - Startup: PR #1683 (GEY) CI checked — all 3 checks green (CodeQL success). No reviews yet. Waits human merge.
+  - Gap identified: GEY froze combos[i].chain (Array), chain items (non-empty strings), verified (boolean). NOT frozen: name (non-empty string), accomplishes (non-empty string), notes when present (non-empty string). Also: resolvedBy value type not frozen for chain_executed specifically (EF Suite 3 only confirms key presence; EA/EG cover other cast types).
+  - Wrote `test/gez-chain-executed-suggestions-combos-string-fields-drift-guard.test.ts` (5 tests). All 5 pass locally.
+  - GEZ-1: combos is non-empty; GEZ-2: name is non-empty string; GEZ-3: accomplishes is non-empty string; GEZ-4: notes when present is non-empty string (fixture has combo with notes so guard fires); GEZ-5: resolvedBy is non-empty string in chain_executed context.
+  - Pushed, opened PR #1684, subscribed.
+  - Notion board unavailable (persistent API error); fell back to DRIVER-BOARD.md.
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1917 runs; burning compute.
+  2. **MERGE open PRs** — 17 open (#1668–#1684), all CI-pending (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — only CodeQL runs currently)
+  4. **36 moderate Dependabot vulnerabilities** on default branch
+  5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Notion plan limit / API error** — upgrade or clean to restore live board
+- **Next run:** GEZ completes value-type coverage for all suggestions.combos[i] fields. Remaining drift-guard opportunities: freeze `cast:chain_executed` `intent` field as non-empty string; freeze `latencyMs` as non-negative number in chain_executed context; OR start a new sub-series for cast:plan output shape (if not already frozen). Check DRIVER-BOARD + existing tests at startup to identify the clearest unfrozen gap.
