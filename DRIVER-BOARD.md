@@ -9405,3 +9405,19 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to restore live board
 - **Next run:** Check GEK PR CI/review. Next candidate: GEL — freeze cast:chain_executed top-level value types (latencyMs is number, steps is array, cast is string 'chain_executed', etc.).
+
+---
+
+### Run ~1903b — 2026-10-01T04:48Z (automated — PR #1661 GY merged)
+
+- **Event:** PR #1661 (GY — session eviction reset) **merged** ✅
+- **Build:** tsc clean | **Tests:** 5596 pass / 0 fail / 3 skip
+- **Parallel merges since last entry:** GEI #1660 (chain_executed sessionContext keyset), GEM #1662 (discovered+scope+focus+explain), GEN #1664 (plan+session+explain), GEO #1666 (resolved+focus+catalogCombo+explain) — all landed on main.
+- **Next advance target:** GEP or GZ — next unguarded combination (GEP likely: nomatch+focus+explain+session maximal, or GZ: execute content[0] type:text invariant).
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1903+ runs; burning compute.
+  2. **Merge remaining open PRs** — check count, several GEK/GEL still queued.
+  3. **Enable GitHub Actions** (main npm test CI job — currently CodeQL only)
+  4. **36 moderate Dependabot vulnerabilities** on default branch
+  5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
