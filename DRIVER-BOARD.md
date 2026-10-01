@@ -9708,3 +9708,29 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   6. **Stale branch cleanup** — 1100+ remote auto/ branches
   7. **Notion plan limit / API error** — rotate `NOTION_API_TOKEN` (op://ChittyOS-Integrations/notion/api_token)
 - **Next run:** Check PR #1685 CI/review. Next candidates: GFB — freeze `cast:executed` `score` as exactly one of a small range (e.g. 0–1) OR freeze `cast:chain_executed` `latencyMs` as finite (Number.isFinite, complementing LLLL-6 which checks ≥ 0 but not isFinite).
+
+---
+
+### Run ~1910b — 2026-10-01T14:38Z (automated — PR #1672 GZ merged)
+
+- **Event:** PR #1672 (GZ — execute content[0] type+shape drift guard) **merged** ✅
+- **Parallel merges since last board entry:** GEN catalog value types, GEP plan scope no-focus keyset, GER latencyBreakdown value types, GES chain_executed recentTools item types, GET chain_executed activeSessionFocus, GEU chain_executed steps correlation, GEV latencyBreakdown ordinal invariants, GZ error passthrough (parallel session), GFA intent echo — all merged to main.
+- **Build:** tsc clean | **Tests:** 5644 pass / 0 fail / 3 skip (new baseline, up from 5599)
+- **Open PRs:** ~18 (#1668–#1685) per last entry — all CI-green CodeQL, awaiting human merge.
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1910+ runs; burning compute.
+  2. **MERGE open PRs** — ~18 queued, all CI-green.
+  3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+  4. **36 moderate Dependabot vulnerabilities** on default branch
+  5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+- **Next advance target:** GFB or next uncovered combination.
+
+---
+
+### Run ~1911b — 2026-10-01T14:38Z (automated — PR #1674 GER merged)
+
+- **Event:** PR #1674 (GER — latencyBreakdown value types) **merged** ✅
+- **Parallel merges since ~1911:** GET (sessionContext.activeSessionFocus constraints), GEU (steps↔catalog structural correlation), GEV (latencyBreakdown ordinal invariants), GEW (catalog+suggestions exact keysets), GEX (suggestions item keysets) — all landed on main from parallel sessions.
+- **Build:** tsc clean | **Tests:** GER 5/5 still pass on updated main
+- **Next run:** Advance GEY — next unguarded combination in chain_executed (suggestions item VALUE TYPES, or latencyMs top-level value type guard, or cast:nomatch latencyBreakdown).
