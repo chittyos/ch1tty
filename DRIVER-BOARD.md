@@ -9609,3 +9609,26 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   6. **Stale branch cleanup** — 1100+ remote auto/ branches
   7. **Notion plan limit** — upgrade or clean to restore live board
 - **Next run:** Check PR #1682 CI/review. Next candidate: GEY — e.g. freeze `suggestions.combos[i].chain` is an Array of strings (GEX-1 checks `chain` key is present, but not that it's an Array or that each element is a string), or `cast:chain_executed` `steps` length equals `catalog.chain` length.
+
+---
+
+### 2026-10-01 (run ~1916 — GEY: suggestions inner value types)
+- **Workstream**: Extended drift-guard series — GEY (suggestions sub-object inner value types)
+- **Branch/PR**: `auto/GEY-chain-executed-suggestions-inner-value-types` → PR #1683
+- **Build**: clean (tsc exit 0) | **Tests**: 5599 total, 5596 pass / 0 fail / 3 skip (new GEY: 5/0/0)
+- **Actions**:
+  - Startup: fetched all branches; reset local main to origin/main (c004597 = run ~1915 base); confirmed all A–E workstreams DONE.
+  - Reviewed open PRs #1668–#1682: full GEP–GEX drift-guard batch, all open and CI-pending.
+  - Gap identified: GEX (PR #1682) froze suggestions item KEYSETS but not VALUE TYPES. Specifically: `combos[i].chain` was confirmed to be a key but not an Array; `verified` not confirmed boolean; `prompts[i].text`/`resolves_to` not confirmed non-empty strings. A serialisation regression would pass GEX silently.
+  - Wrote `test/gey-chain-executed-suggestions-inner-value-types-drift-guard.test.ts` (5 tests). All 5 pass locally.
+  - Pushed `auto/GEY-chain-executed-suggestions-inner-value-types`, opened PR #1683, subscribed.
+  - Notion board update failed (cross-cell memcached 500 error); fell back to DRIVER-BOARD.md.
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1916 runs; burning compute.
+  2. **MERGE open PRs** — 16 open (#1668–#1683), all CI-pending (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — only CodeQL runs currently)
+  4. **36 moderate Dependabot vulnerabilities** on default branch
+  5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Notion plan limit / API error** — upgrade or clean to restore live board
+- **Next run:** GEY-1/2/3 freeze chain/verified fields; GEY-4/5 freeze prompts fields. Next candidate: **GEZ** — freeze `combos[i].name` and `combos[i].accomplishes` as non-empty strings (completing the value-type coverage for all combos[i] fields), OR freeze `cast:chain_executed` `resolvedBy` value type as a non-empty string (not explicitly typed in chain context).
