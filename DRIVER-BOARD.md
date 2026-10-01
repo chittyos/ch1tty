@@ -9587,3 +9587,25 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   6. **Stale branch cleanup** — 1100+ remote auto/ branches
   7. **Notion plan limit** — upgrade or clean to restore live board
 - **Next run:** Check PR #1678 CI/review. Next candidate: GEW — e.g. freeze `cast:chain_executed` `scope` sub-object key set when scope param is passed alongside `chain:true` (scope not yet frozen for chain_executed path specifically), or `cast:plan` `alternatives` item key set.
+
+---
+
+### 2026-10-01 (run ~1915 — GEX: suggestions item keysets)
+- **Workstream**: Extended drift-guard series — GEX (suggestions.combos/prompts item-level exact keysets)
+- **Branch/PR**: `auto/GEX-chain-executed-suggestions-item-keyset` → PR #1682
+- **Build**: clean (tsc exit 0) | **Tests**: 5596 pass / 0 fail / 3 skip (prior full run; new GEX: 5/0/0)
+- **Actions**:
+  - Read notifications: PR #1680 (GEW) CI check_suite.completed ✓; CodeRabbit reviewed — no actionable findings; Docstring Coverage ⚠️ Warning (quantitative threshold, project style says no comments, not a blocker); PR #1681 CI check_suite.completed ✓.
+  - Confirmed GEH already froze step item exact keyset (`{content,ok,step,tool}` / `{error,ok,step,tool}`). GEX is the next uncovered gap: suggestions.combos[i] and suggestions.prompts[i] item-level keysets.
+  - Source confirms: `SuggestedCombo` = `{name,chain,accomplishes,verified,notes?}`; `SuggestedPrompt` = `{text,resolves_to}`. getSuggestionsForFocus passes these through directly (no stripping); distinct from `catalog` which strips verified/notes.
+  - Wrote `test/gex-chain-executed-suggestions-item-keyset-drift-guard.test.ts` (5 tests). All 5 pass locally.
+  - Pushed, opened PR #1682, subscribed.
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1915 runs; burning compute.
+  2. **MERGE open PRs** — 15 open (#1668–#1682), all CI-pending (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — only CodeQL runs currently)
+  4. **36 moderate Dependabot vulnerabilities** on default branch
+  5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** Check PR #1682 CI/review. Next candidate: GEY — e.g. freeze `suggestions.combos[i].chain` is an Array of strings (GEX-1 checks `chain` key is present, but not that it's an Array or that each element is a string), or `cast:chain_executed` `steps` length equals `catalog.chain` length.
