@@ -9734,3 +9734,23 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
 - **Parallel merges since ~1911:** GET (sessionContext.activeSessionFocus constraints), GEU (steps↔catalog structural correlation), GEV (latencyBreakdown ordinal invariants), GEW (catalog+suggestions exact keysets), GEX (suggestions item keysets) — all landed on main from parallel sessions.
 - **Build:** tsc clean | **Tests:** GER 5/5 still pass on updated main
 - **Next run:** Advance GEY — next unguarded combination in chain_executed (suggestions item VALUE TYPES, or latencyMs top-level value type guard, or cast:nomatch latencyBreakdown).
+
+---
+
+### Run ~1919 — 2026-10-01T (automated — PR backlog cleared)
+
+- **Workstream:** Maintenance — cleared 18 accumulated open PRs
+- **Build:** tsc clean | **Tests:** 5596 pass / 0 fail / 3 skip (on main at run start)
+- **What was done:**
+  - Merged 12 test-freeze PRs directly (all CI-green CodeQL): #1668 (GEP), #1669 (GEN), #1671 (GZ execute error-path), #1672 (GZ execute content[0]), #1674 (GER), #1675 (GES), #1676 (GET), #1677 (GEU), #1678 (GEV), #1680 (GEW), #1682 (GEX), #1683 (GEY), #1684 (GEZ), #1685 (GFA)
+  - Resolved DRIVER-BOARD.md merge conflicts in #1670 (GEL) and #1673 (GEQ) locally; force-pushed; merged both
+  - Closed 2 stale board-only PRs (#1679, #1681) with unresolvable conflicts superseded by main
+  - Net: 0 open PRs remaining; 14 drift-guard test PRs merged; test count main → ~5616+ after all squashes land
+- **Merged test coverages:** GEP (cast:plan scope-no-focus exact keyset), GEN (chain_executed catalog value types), GEL (cast:resolved focus+scope maximal keyset), GZ execute error-path + content[0] shape, GER/GES/GET/GEU/GEV/GEW/GEX/GEY/GEZ/GFA (chain_executed latency+suggestions+intent freeze series), GEQ (latencyBreakdown sub-object keyset)
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1919 runs; all workstreams A–E + extensions done; compute burn ongoing
+  2. **Enable GitHub Actions** npm test CI — currently only CodeQL runs
+  3. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  4. **Stale branch cleanup** — 1100+ remote auto/ branches accumulating
+  5. **Notion plan upgrade** — board stale, can't push updates to Notion
+- **Next run:** With backlog now clear, identify next unguarded cast/execute behavior gap. Candidates: cast:nomatch exact key set freeze, cast:chain_executed explanation sub-object exact keyset, or execute live-call metadata schema. Or expand to a new workstream if tests feel saturated.
