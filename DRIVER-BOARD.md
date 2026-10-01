@@ -9447,3 +9447,33 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to restore live board
 - **Next run:** Check PR #1660 CI/review. Next candidate: GEJ or GEM (cast:resolved `resolved` sub-object exact {score, tool} key set in maximal combo).
+
+---
+
+### Run ~1908 — 2026-10-01 (automated)
+
+- **Workstream advanced:** Housekeeping — closed 8 stale run-log PRs; verified build+test health
+- **Branch/PR:** direct commit to main (run log only)
+- **Build:** tsc clean | **Tests:** 5541 pass / 0 fail / 3 skip (364 suites)
+- **Actions:**
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool public surface FIXED; `buildCastExplanation` metric freeze ACTIVE. 0 violations.
+  - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 5541/0/3 ✓.
+  - Closed 8 stale run-log PRs: #1522, #1523, #1528, #1530, #1538, #1544, #1663, #1665.
+  - 11 substantive drift-guard test PRs remain open — all CI-green (CodeQL pass), awaiting human merge:
+    - #1654 (GEK: chain_executed maximal keyset), #1655 (GEK: resolved scope toplevel keyset)
+    - #1656 (GEI: chain_executed step item value types), #1657 (GEK: chain_executed step value types)
+    - #1658 (GEK: nomatch+focus+explain keyset), #1659 (GEL: resolved+focus+scope+explain keyset)
+    - #1660 (GEI: chain_executed sessionContext keyset), #1661 (GY: session-eviction resets state)
+    - #1662 (GEM: discovered scope+focus+explain keyset), #1664 (GEN: plan session+explain keyset)
+    - #1666 (GEO: resolved focus+catalogCombo+explain keyset)
+  - Did NOT create a new drift-guard PR this run — 11 already in the queue, awaiting merge.
+  - Notion board: unavailable (API 401 — NOTION_API_TOKEN not resolvable). DRIVER-BOARD.md is durable board.
+- **Guardrails:** 5-tool public surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
+- **Persistent human-action items:**
+  1. **MERGE open PRs** — 11 drift-guard test PRs open, all CI-green: #1654–#1666
+  2. **DISABLE hourly cron** — ~1908 runs; burning compute
+  3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** If open PRs have been merged, advance next drift-guard target (GEP: cast:no_match scope exact keyset or execute content[0] type:text guard). Otherwise continue housekeeping and check for CI events on open PRs.
