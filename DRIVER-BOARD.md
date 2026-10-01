@@ -9421,3 +9421,26 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   4. **36 moderate Dependabot vulnerabilities** on default branch
   5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
   6. **Stale branch cleanup** — 1100+ remote auto/ branches
+
+---
+
+### Run ~1909 — 2026-10-01 (automated — GEP plan scope no-focus keyset)
+
+- **Workstream advanced:** GEP — freeze `cast:plan` exact top-level key set when scope is active WITHOUT focus (5 tests)
+- **Branch/PR:** `auto/GEP-plan-scope-nofocus-keyset` → **PR #1668** (https://github.com/chittyos/ch1tty/pull/1668)
+- **Tests:** All 5 GEP tests pass locally (5/0 pass/fail). Probed: scope only → 9 keys; +session → 10; +explain → 10; maximal → 11.
+- **Gap closed:** cast:plan + scope WITHOUT focus exact keyset. GEJ covers scope+focus+explain for plan; GEP closes the no-focus variant.
+  - GEP-1: scope only → EXACTLY 9 keys {alternatives, args, cast, hint, intent, latencyMs, resolved, resolvedBy, scope}
+  - GEP-2: scope + session → 10 keys (+sessionContext)
+  - GEP-3: scope + explain → 10 keys (+explanation)
+  - GEP-4: scope + session + explain (maximal, no focus) → 11 keys
+  - GEP-5: absence guard — scope absent when param not provided
+- **Fixture:** stripe only; FixtureBackend; suggestionsCatalog:{}; intent: 'list stripe payments'
+- **Persistent human-action items:**
+  1. **MERGE open PRs** — drift-guard test PRs open: #1654–#1668 (all CI-green CodeQL)
+  2. **DISABLE hourly cron** — ~1909 runs; burning compute
+  3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** Check PR #1668 CI/review. Next candidate: identify next uncovered combination (e.g. cast:plan discovered+scope no-focus, or cast:plan alternatives sub-object exact shape).
