@@ -9530,3 +9530,28 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to restore live board
 - **Next run:** Check PR #1672 CI/review. Next candidate: GZA or next uncovered execute/cast combination.
+
+---
+
+### Run ~1911 — 2026-10-01T05:00Z (automated — GEQ chain_executed latencyBreakdown keyset)
+
+- **Workstream advanced:** GEQ — freeze `cast:chain_executed` `latencyBreakdown` sub-object exact key set and value types (5 tests)
+- **Branch/PR:** `auto/geo-chain-executed-latencybreakdown-keyset` → **PR #1673** (pending)
+- **Tests:** All 5 GEQ tests pass locally (5/0 pass/fail).
+- **Gap closed:** ET froze latencyBreakdown shape for `cast:executed` only. GT froze it more precisely for `cast:executed` (scoringMs/executionMs individually present, exact permitted set, brainMs absent on keyword route). Neither covers `cast:chain_executed`. GBA freezes latencyBreakdown is present in chain_executed top-level key set but never inspects its contents.
+  - GEQ-1: latencyBreakdown.scoringMs is individually present on chain_executed
+  - GEQ-2: latencyBreakdown.executionMs is individually present on chain_executed
+  - GEQ-3: latencyBreakdown.registryMs is individually present on chain_executed
+  - GEQ-4: no unrecognised keys — exact permitted set {scoringMs, executionMs, registryMs, brainMs?}
+  - GEQ-5: brainMs absent on keyword route (embedEnabled:false → castRoute=keyword, no brain)
+- **Source:** src-stdio/aggregator.ts line ~1535 (chain_executed latencyBreakdown build)
+- **Fixture:** neon 2-step combo (list_projects → create_project), same as GBA/GEI/GEN
+- **Open PRs at start:** 4 (#1669 GEN catalog, #1670 GEL, #1671 GZ execute, #1668 GEP) — CodeRabbit no actionable findings on GEN, CI green 3/3 on GEN
+- **Persistent human-action items:**
+  1. **MERGE open PRs** — #1668 GEP, #1669 GEN, #1670 GEL, #1671 GZ, #1673 GEQ (all CI-green CodeQL)
+  2. **DISABLE hourly cron** — ~1911 runs; burning compute
+  3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** Check PR #1673 CI/review. Next candidate: cast:chain_executed latencyBreakdown value types (all numeric, finite, ≥0) or explanation sub-object exact keyset for chain_executed.
