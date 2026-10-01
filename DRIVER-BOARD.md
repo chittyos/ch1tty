@@ -9384,14 +9384,27 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
 
 ---
 
-### Run ~1895b — 2026-09-30T23:40Z (automated — PR #1631 merge wake)
+### Run ~1898 — 2026-09-30T23:41Z (automated — PR #1648 GEI merge wake)
 
-- **PR #1631 (GEH: executed+focus+explain) merged.** Tests now at 5544/0/3 on main.
-- **PR #1645 (GEJ: discovered+focus+explain) closed** — coverage gap already filled by `geh-discovered-focus-explain-keyset-drift-guard.test.ts` from the same merge batch; GEJ content landed on main via parallel session anyway.
-- **Build:** tsc clean | **Tests:** 5544 pass / 0 fail / 3 skip
-- **Parallel session note:** Multiple sessions ran concurrently; GEH prefix overloaded (6 files), GEI prefix used for scope+explain path. GEJ prefix used for discovered+focus+explain (2 files). No test failures — all names distinct by suffix.
-- **Persistent human-action items (unchanged):** DISABLE cron, merge/close open PRs, enable npm-test CI, prod env vars, stale branch cleanup, Notion upgrade
-- **Next run:** Check open PRs; if below ~20, advance to next uncovered combination.
+- **Trigger:** PR #1648 (GEI: cast:discovered explain+session keyset) merged at 2026-09-30T23:40Z
+- **Build:** tsc clean | **Tests:** 5 new GEK pass / 0 fail (baseline ~5447 pass / 0 fail / 3 skip)
+- **Open PRs at start:** 6 (below ~20 standdown threshold → advanced workstream)
+- **Workstream advanced:** GEK — freeze cast:chain_executed step item VALUE TYPES (5 tests)
+  - Gap: GEH froze exact key sets per branch (ok:true → {content,ok,step,tool}; ok:false → {error,ok,step,tool}). GEH does NOT assert value types. A regression serialising `content` as a string, `step` as a string "0", or `ok` as 1/0 passes GEH silently.
+  - GEK-1: ok:true step — `content` is an Array
+  - GEK-2: ok:true step — `ok` is strict boolean true (not 1 or "true")
+  - GEK-3: ok:true step — `step` is a number (integer ≥ 0)
+  - GEK-4: ok:true step — `tool` is a non-empty string
+  - GEK-5: ok:false step — `error` is a string (not Error object or null)
+  - Branch: `auto/GEK-chain-executed-step-value-types-drift-guard`
+- **Persistent human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1898 runs; burning compute. Use `/cron delete` in Claude Code.
+  2. **MERGE or CLOSE open PRs** — still multiple open drift-guard PRs from parallel sessions
+  3. **Enable GitHub Actions** (main npm test CI job — only CodeQL runs currently)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** Check GEK PR CI/review. Next candidate: GEL — freeze cast:chain_executed top-level value types (latencyMs is number, steps is array, cast is string 'chain_executed', etc.).
 
 ---
 
