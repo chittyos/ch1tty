@@ -9587,3 +9587,34 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   6. **Stale branch cleanup** — 1100+ remote auto/ branches
   7. **Notion plan limit** — upgrade or clean to restore live board
 - **Next run:** Check PR #1678 CI/review. Next candidate: GEW — e.g. freeze `cast:chain_executed` `scope` sub-object key set when scope param is passed alongside `chain:true` (scope not yet frozen for chain_executed path specifically), or `cast:plan` `alternatives` item key set.
+
+---
+
+### Run ~1914 — 2026-10-01 (automated — GEW chain_executed catalog+suggestions exact keysets)
+
+- **Workstream advanced:** GEW — freeze `cast:chain_executed` `catalog` and `suggestions` sub-object EXACT keysets (5 tests)
+- **Branch/PR:** `auto/GEW-chain-executed-catalog-suggestions-exact-keyset` → **PR #1680** (https://github.com/chittyos/ch1tty/pull/1680)
+- **Build:** tsc clean (0 errors) | **Tests:** 5596 pass / 0 fail / 3 skip (main baseline); +5 on GEW branch (all pass)
+- **Actions this run:**
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface fixed; metric freeze active).
+  - `npm ci` clean. Build: tsc clean. Tests: 5596/0/3 — no regressions on main.
+  - Fetched Notion board (36e94de4): A–N + O complete per last board entry (2026-09-10). Board too large to update (plan limit).
+  - Read DRIVER-BOARD.md: last run was ~1913 (GEV CodeRabbit fix, PR #1678 pending). PR #1678 was `mergeable_state: "behind"` → merged main into GEV branch, pushed update (merge commit 0585e68).
+  - 12 open PRs at session start (#1668–#1679 including board-update #1679 for run ~1913).
+  - **Gap identified (GEW):** `ef-cast-discovered-chain-shape-drift` checks `catalog` required fields via missing-key assert (permissive). No test does an exact `deepEqual` keyset freeze — a regression adding `verified`, `notes`, or `id` to the catalog response would pass silently. Similarly, no test freezes the top-level key set of `suggestions` (`{combos, prompts}` — exactly 2 keys). GEW closes both gaps.
+    - GEW-1: catalog has EXACTLY {accomplishes, chain, name}
+    - GEW-2: catalog EXACT keyset stable with explain:true
+    - GEW-3: suggestions has EXACTLY {combos, prompts} at top level
+    - GEW-4: suggestions.combos and suggestions.prompts are Arrays
+    - GEW-5: both catalog and suggestions always present on minimal chain_executed call
+  - All 5 GEW tests pass locally. Pushed, opened PR #1680, subscribed.
+  - Also: rebased PR #1678 (GEV) onto main (was 1 commit behind — run ~1912 board log).
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1914 runs; burning compute. Use `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 13 open (#1668–#1680), all CI-pending (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — only CodeQL runs currently)
+  4. **36 moderate Dependabot vulnerabilities** on default branch
+  5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** Check PR #1680 CI/review. Next candidate: GEX — e.g. freeze `cast:chain_executed` `steps` array item EXACT keyset (GEK-step-value-types checks value types but not exact keyset; a regression adding `error`, `toolName`, or `index` field to step items would pass silently), or `cast:chain_executed` `suggestions.combos` item exact keyset.
