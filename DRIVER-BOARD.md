@@ -9758,3 +9758,27 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
 - **Parallel merges since ~1911:** GET (sessionContext.activeSessionFocus constraints), GEU (steps↔catalog structural correlation), GEV (latencyBreakdown ordinal invariants), GEW (catalog+suggestions exact keysets), GEX (suggestions item keysets) — all landed on main from parallel sessions.
 - **Build:** tsc clean | **Tests:** GER 5/5 still pass on updated main
 - **Next run:** Advance GEY — next unguarded combination in chain_executed (suggestions item VALUE TYPES, or latencyMs top-level value type guard, or cast:nomatch latencyBreakdown).
+
+---
+
+### 2026-10-01 (run ~1919 — GFB: cast:executed alternatives score ordinal invariants)
+- **Workstream**: Extended drift-guard series — GFB (cast:executed alternatives[i].score finiteness + ordinal invariants)
+- **Branch/PR**: `auto/GFB-executed-alternatives-score-ordinal-invariants` → **PR #1687** (https://github.com/chittyos/ch1tty/pull/1687)
+- **Build**: clean (tsc exit 0) | **Tests**: 5/0/0 (new GFB only; baseline from main includes GFA, GEZ, GEY, GEX)
+- **Actions**:
+  - Read notifications: CodeRabbit in-progress review on PR #1679 (board-update). No actionable findings yet.
+  - Fetched open PRs: only 4 open (#1670 GEL, #1673 GEQ, #1679 board-update, #1681 runlog-GEW). Most drift-guard PRs from runs ~1915–~1918 already merged into main by parallel sessions.
+  - Read DRIVER-BOARD.md: last active workstream was GFB per run ~1918 "Next candidates". Confirmed GEV-4 already freezes chain_executed latencyMs isFinite (GFB chain_executed option already done).
+  - **Gap identified:** EH (eh-alternatives-item-shape.test.ts) freezes `cast:plan` alternatives[i].score as `Number.isFinite` (line 305) but only freezes `cast:executed` alternatives[i].score as `typeof 'number'` (line 164) — the finiteness guard is asymmetric. No test freezes the ordinal relationships: runner-up ≤ winner, descending sort, or filter threshold > 0.1.
+  - GJ-3 freezes top-level cast:executed score as `>= 0 && Number.isFinite`. GFB extends this to the alternatives sub-array.
+  - Wrote `test/gfb-executed-alternatives-score-ordinal-drift-guard.test.ts` (5 tests). All 5 pass locally.
+  - Pushed, opened PR #1687, subscribed.
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1919 runs; burning compute. Use `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 5 open (#1670, #1673, #1679, #1681, #1687), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — only CodeQL runs currently)
+  4. **36 moderate Dependabot vulnerabilities** on default branch
+  5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Notion API token** — rotate `NOTION_API_TOKEN` (op://ChittyOS-Integrations/notion/api_token)
+- **Next run:** Check PR #1687 CI/review. Next candidate: GFC — freeze `cast:plan` alternatives[i].score <= body.score (ordinal invariant for plan path, parallel to GFB-3) OR freeze `cast:resolved` resolved.score <= 1.3 (upper-bound complement to GI-10 which checks >= 0 and isFinite). Alternatively: freeze `cast:executed` alternatives ordering against cast:plan ordering (cross-path consistency). Identify the clearest unfrozen gap at startup.
