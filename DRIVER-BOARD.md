@@ -9531,3 +9531,26 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to restore live board
 - **Next run:** Check PR #1668 CI/review. Next candidate: identify next uncovered combination (e.g. cast:plan discovered+scope no-focus, or cast:plan alternatives sub-object exact shape).
+
+---
+
+### Run ~1910 — 2026-10-01 (automated — GZ execute content[0] shape drift guard)
+
+- **Workstream advanced:** GZ — freeze `ch1tty/execute` live-path `content[0]` type+shape invariants when sessionId is active (5 tests)
+- **Branch/PR:** `auto/GZ-execute-content0-type-shape-drift-guard` → **PR #1672** (https://github.com/chittyos/ch1tty/pull/1672)
+- **Tests:** All 5 GZ tests pass (5/0 pass/fail). Baseline: 5599 pass / 0 fail / 3 skip.
+- **Gap closed:** GDT-3 covers content[0].type === 'text' without sessionId; GDR-5 covers it for a custom multi-item backend with sessionId. Neither uses a standard single-item fixture with sessionId.
+  - GZ-1: content[0].type === 'text' (standard stripe fixture + sessionId)
+  - GZ-2: content[0].text is a non-empty string (sessionId active)
+  - GZ-3: content[0] has EXACTLY {type, text} keys — no annotations, id, or extra fields
+  - GZ-4: content[0].text !== content[last].text (backend result ≠ appended metadata)
+  - GZ-5: content[0].text does NOT contain latencyMs+sessionContext (raw backend response only at [0])
+- **Open PRs at start:** 3 (#1668 GEP, #1669 GEN catalog, #1670 GEL) — all CI passing/in-progress
+- **Persistent human-action items:**
+  1. **MERGE open PRs** — #1668, #1669, #1670, #1672 and any others queued
+  2. **DISABLE hourly cron** — ~1910 runs; burning compute
+  3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** Check PR #1672 CI/review. Next candidate: GZA or next uncovered execute/cast combination.
