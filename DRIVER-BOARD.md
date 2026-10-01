@@ -9761,24 +9761,46 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
 
 ---
 
-### 2026-10-01 (run ~1919 — GFB: cast:executed alternatives score ordinal invariants)
+### 2026-10-01 (run ~1919a — GFB: cast:executed alternatives score ordinal invariants)
 - **Workstream**: Extended drift-guard series — GFB (cast:executed alternatives[i].score finiteness + ordinal invariants)
 - **Branch/PR**: `auto/GFB-executed-alternatives-score-ordinal-invariants` → **PR #1687** (https://github.com/chittyos/ch1tty/pull/1687)
 - **Build**: clean (tsc exit 0) | **Tests**: 5/0/0 (new GFB only; baseline from main includes GFA, GEZ, GEY, GEX)
 - **Actions**:
-  - Read notifications: CodeRabbit in-progress review on PR #1679 (board-update). No actionable findings yet.
-  - Fetched open PRs: only 4 open (#1670 GEL, #1673 GEQ, #1679 board-update, #1681 runlog-GEW). Most drift-guard PRs from runs ~1915–~1918 already merged into main by parallel sessions.
-  - Read DRIVER-BOARD.md: last active workstream was GFB per run ~1918 "Next candidates". Confirmed GEV-4 already freezes chain_executed latencyMs isFinite (GFB chain_executed option already done).
-  - **Gap identified:** EH (eh-alternatives-item-shape.test.ts) freezes `cast:plan` alternatives[i].score as `Number.isFinite` (line 305) but only freezes `cast:executed` alternatives[i].score as `typeof 'number'` (line 164) — the finiteness guard is asymmetric. No test freezes the ordinal relationships: runner-up ≤ winner, descending sort, or filter threshold > 0.1.
-  - GJ-3 freezes top-level cast:executed score as `>= 0 && Number.isFinite`. GFB extends this to the alternatives sub-array.
-  - Wrote `test/gfb-executed-alternatives-score-ordinal-drift-guard.test.ts` (5 tests). All 5 pass locally.
+  - Gap identified: EH freezes cast:plan alternatives[i].score as `Number.isFinite` but only cast:executed as `typeof 'number'` — asymmetric. No ordinal guards on either path.
+  - Wrote `test/gfb-executed-alternatives-score-ordinal-drift-guard.test.ts` (5 tests: isFinite, >=0, <=winner, non-increasing, >0.1). All 5 pass.
   - Pushed, opened PR #1687, subscribed.
+
+### Run ~1919b — 2026-10-01T (automated — PR backlog cleared)
+
+- **Workstream:** Maintenance — cleared 18 accumulated open PRs
+- **Build:** tsc clean | **Tests:** 5596 pass / 0 fail / 3 skip (on main at run start)
+- **What was done:**
+  - Merged 14 test-freeze PRs: #1668 (GEP), #1669 (GEN), #1671 (GZ execute error-path), #1672 (GZ execute content[0]), #1674 (GER), #1675 (GES), #1676 (GET), #1677 (GEU), #1678 (GEV), #1680 (GEW), #1682 (GEX), #1683 (GEY), #1684 (GEZ), #1685 (GFA)
+  - Resolved DRIVER-BOARD.md merge conflicts in #1670 (GEL) and #1673 (GEQ); merged both. Closed stale #1679 and #1681.
+  - Net: 0 open PRs remaining after maintenance.
+
+---
+
+### Run ~1920 — 2026-10-01T (automated — GFB checked; GFC opened)
+
+- **Workstream:** GFC — freeze `cast:plan` alternatives[i].score ordinal invariants (4 tests)
+- **Branch/PR**: `auto/GFC-plan-alternatives-score-ordinal-invariants` → **PR #1690** (https://github.com/chittyos/ch1tty/pull/1690)
+- **Build:** tsc clean | **Tests:** 5644 pass / 0 fail / 3 skip (baseline on main); +4 on GFC branch (all pass)
+- **Open PRs at run start:** #1687 (GFB — CI green, CodeRabbit rate-limited), #1688 (board-update — CI green)
+- **What was done:**
+  - Confirmed PR #1687 (GFB) CI green, no review yet. PR #1688 CI green, no review.
+  - Gap: EH already froze `typeof + isFinite` for cast:plan alternatives[i].score. GFC freezes the 4 ordinal guards missing on plan path. Key constraint: cast:plan has NO top-level `score` (GBD-5); winner score is in `body.resolved.score`.
+  - GFC-1: alternatives[i].score >= 0 (non-negative)
+  - GFC-2: alternatives[i].score <= resolved.score (runner-up ≤ winner in resolved sub-object)
+  - GFC-3: alternatives in non-increasing score order
+  - GFC-4: alternatives[i].score > 0.1 (filter threshold preserved)
+  - 4/4 pass locally. Pushed, opened PR #1690, subscribed.
 - **Persistent human-action items:**
-  1. **DISABLE hourly cron** — ~1919 runs; burning compute. Use `/cron delete` in Claude Code.
-  2. **MERGE open PRs** — 5 open (#1670, #1673, #1679, #1681, #1687), awaiting human merge.
-  3. **Enable GitHub Actions** (main npm test CI job — only CodeQL runs currently)
+  1. **DISABLE hourly cron** — ~1920 runs; burning compute
+  2. **MERGE open PRs** — #1687 (GFB), #1688 (board-update), #1690 (GFC) — all CI-green
+  3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
   4. **36 moderate Dependabot vulnerabilities** on default branch
   5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
   6. **Stale branch cleanup** — 1100+ remote auto/ branches
   7. **Notion API token** — rotate `NOTION_API_TOKEN` (op://ChittyOS-Integrations/notion/api_token)
-- **Next run:** Check PR #1687 CI/review. Next candidate: GFC — freeze `cast:plan` alternatives[i].score <= body.score (ordinal invariant for plan path, parallel to GFB-3) OR freeze `cast:resolved` resolved.score <= 1.3 (upper-bound complement to GI-10 which checks >= 0 and isFinite). Alternatively: freeze `cast:executed` alternatives ordering against cast:plan ordering (cross-path consistency). Identify the clearest unfrozen gap at startup.
+- **Next run:** Check PR #1690 (GFC) CI/review. Next candidates: GFD — freeze `cast:plan` resolved.score ordinal invariants (GI-10 covers cast:resolved resolved.score >= 0 + isFinite, but no test covers cast:plan resolved.score similarly); OR freeze `cast:executed` + `cast:plan` alternatives[i].tool slash-validation (namespaced format — EH checks slash presence for executed but not plan in describe EH cast:plan block).
