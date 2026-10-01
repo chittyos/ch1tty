@@ -9348,6 +9348,31 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
 
 ---
 
+### Run ~1899 — 2026-10-01T04:47Z (automated — PR #1657 GEK merge wake)
+
+- **Trigger:** PR #1657 (GEK: chain_executed step item value types) merged
+- **Build:** tsc clean | **Tests:** 5 new GEN pass / 0 fail (baseline ~5550+ pass / 0 fail / 3 skip)
+- **Open PRs at start:** 2 (below ~20 standdown threshold → advanced workstream)
+- **Workstream advanced:** GEN — freeze cast:chain_executed `catalog` sub-object VALUE TYPES (5 tests)
+  - Gap: EJ froze catalog exact KEY SET `{accomplishes, chain, name}`. EJ does NOT assert value types. A regression storing `chain` as a stringified JSON array, or `name` as null, passes EJ silently.
+  - GEN-1: `catalog.name` is a non-empty string
+  - GEN-2: `catalog.accomplishes` is a non-empty string
+  - GEN-3: `catalog.chain` is an Array (not a stringified JSON or object)
+  - GEN-4: each `catalog.chain[i]` is a string with exactly one '/' (namespaced tool name)
+  - GEN-5: `catalog.chain` is non-empty (at least one step)
+  - Branch: `auto/GEN-chain-executed-catalog-value-types-drift-guard`
+- **Note:** Main had gained GEK (multiple files from parallel sessions), GEL, GEM test files since last run. GEN identifier confirmed available.
+- **Persistent human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1899 runs; burning compute. Use `/cron delete` in Claude Code.
+  2. **MERGE or CLOSE open PRs** — multiple open drift-guard PRs from parallel sessions
+  3. **Enable GitHub Actions** (main npm test CI job — only CodeQL runs currently)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** Check GEN PR CI/review. Next candidate: GEO (taken by open PR #1666) → GEP.
+
+---
+
 ### Run ~1898 — 2026-09-30T23:39Z (automated — GAS merged, advancing next workstream)
 
 - **Workstream completed:** GAS drift guard — PR #1638 **merged** at 23:39Z. `test/gas-alternatives-executed-exact-keyset-drift-guard.test.ts` now in main. 5 tests exact-freeze the `{description, score, tool}` key set for alternatives[] items in cast:executed and cast:plan.
