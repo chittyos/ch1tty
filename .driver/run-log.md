@@ -2202,3 +2202,28 @@ Next run: GY — next unfrozen session contract.
 4. Stale remote branch cleanup — 1100+ auto/* branches
 
 **Next run:** Continue merging remaining open drift-guard test PRs. Check for GY/GZ workstream (session eviction or execute result structure).
+
+---
+
+## Run ~1908 — 2026-10-01T00:00Z (automated)
+
+**Workstream:** GZ — execute error-path passthrough drift-guard (5 tests)
+
+**Build/Tests:** tsc clean; 5541 pass / 0 fail / 3 skip (stable, confirmed before branching)
+
+**What was done:**
+- Resumed from context-compacted prior session; confirmed main at 60bad16 (GEO merged, GY merged)
+- Read aggregator.ts execute/handleExecute paths to identify genuinely uncovered gap:
+  - `if (!execResult.isError)` guards metadata append (~line 601) — error path passes through unchanged
+  - `coordinator.onToolCall()` fires unconditionally after backend.callTool() (~line 942) — errors ARE tracked
+  - No prior GD test covers this combination; GDT/GDR/GDW/GDD all cover success paths only
+- Wrote `test/gz-execute-error-passthrough-drift-guard.test.ts` (5 tests, all pass locally)
+- Opened PR #1671 (`auto/GZ-execute-error-passthrough-drift-guard`), subscribed to activity
+
+**Standing blockers (unchanged — human action required):**
+1. **GitHub Actions CI disabled** — Fix: GitHub Settings → Actions → General → "Allow all actions" for chittyos/ch1tty
+2. **36 moderate Dependabot vulnerabilities** on default branch
+3. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID/SECRET, CHITTY_TASKS_TOKEN
+4. Stale remote branch cleanup — 1100+ auto/* branches
+
+**Next run:** Merge PR #1671 (GZ) if green; then advance to next workstream (GEP or GAA-series cast combinations, or search error-path drift-guard).
