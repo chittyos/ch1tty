@@ -9530,3 +9530,30 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to restore live board
 - **Next run:** Check PR #1672 CI/review. Next candidate: GZA or next uncovered execute/cast combination.
+
+---
+
+### Run ~1911 — 2026-10-01T05:31Z (automated — GER latencyBreakdown value types)
+
+- **Workstream advanced:** GER — freeze `cast:chain_executed` + `cast:executed` `latencyBreakdown` sub-object value types (5 tests)
+- **Branch/PR:** `auto/GER-latencybreakdown-value-types-drift-guard` → **PR #1674** (https://github.com/chittyos/ch1tty/pull/1674)
+- **Build:** tsc clean (0 errors) | **Tests:** 5596 pass / 0 fail / 3 skip (main baseline); +5 on branch
+- **Actions this run:**
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface fixed; metric freeze active).
+  - `npm ci` clean. Build: tsc clean. Tests: 5596/0/3 — no regressions on main.
+  - Fetched Notion board (36e94de4): A–N + AA all complete per last board entry (2026-09-10). Board too large to update (plan limit).
+  - Read DRIVER-BOARD.md: last run was ~1910 (GZ PR #1672 execute content[0] shape). 6 open PRs (#1668–#1673), below ~20 threshold → advanced.
+  - **Gap identified:** GEQ (PR #1673) freezes `latencyBreakdown` key set. No test freezes that sub-object's VALUE TYPES. A regression emitting `scoringMs: "12"` or `registryMs: -1` passes GEQ silently.
+  - Also: `registryMs ≤ scoringMs` sub-component invariant (per aggregator docs) was never frozen.
+  - Also: `cast:executed` (separate code path ~line 1657) has same latencyBreakdown sub-object — no value-type guard.
+  - Wrote `test/ger-latencybreakdown-value-types-drift-guard.test.ts` (5 tests). All 5 pass locally.
+  - Pushed, opened PR #1674, subscribed.
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1911 runs; burning compute. Use `/cron delete` in Claude Code.
+  2. **MERGE open PRs** — 7 open (#1668–#1674), all CI-pending (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — only CodeQL runs currently)
+  4. **36 moderate Dependabot vulnerabilities** on default branch
+  5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** Check GER PR #1674 CI/review. If queue below ~20: advance GES — freeze `latencyBreakdown.registryMs` ≤ `latencyMs` top-level invariant, or `cast:nomatch` latencyBreakdown (not yet frozen independently).
