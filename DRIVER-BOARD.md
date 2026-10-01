@@ -9447,3 +9447,27 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to restore live board
 - **Next run:** Check PR #1660 CI/review. Next candidate: GEJ or GEM (cast:resolved `resolved` sub-object exact {score, tool} key set in maximal combo).
+
+---
+
+### Run ~1906 — 2026-10-01T UTC (automated — GEM cast:discovered scope+focus+explain keyset)
+
+- **Workstream advanced:** GEM — freeze `cast:discovered` exact key set when scope+focus+explain are simultaneously active (3-way + maximal 4-way)
+- **Branch/PR:** `auto/GEM-discovered-scope-focus-explain-keyset` → **PR #1662** (https://github.com/chittyos/ch1tty/pull/1662)
+- **Build:** tsc clean | **Tests:** 5546/0/3 (was 5541/0/3, +5)
+- **Gap closed:** GEH covered scope+focus (no explain); GEJ covered focus+explain (no scope); no test on main frozen the 3-way combination. Two silent regressions possible: (a) scope suppressing `explanation` when focus also active, (b) `focus` key leaking into cast:discovered when scope+focus+explain all active (by analogy with cast:executed/plan/resolved which DO carry `focus`).
+  - GEM-1: scope+focus+explain, no catalog, no session → 8 keys (base + scope + explanation)
+  - GEM-2: +sessionId → 9 keys (+sessionContext)
+  - GEM-3: +catalog, no session → 10 keys (+resources +suggestions)
+  - GEM-4: maximal (scope+focus+explain+catalog+session) → 11 keys
+  - GEM-5: absence guard — `focus` key NEVER present in any variant
+- **Open PRs at end of run:** 15 total (9 test-freeze: #1654–#1662; 6 stale board-log: #1522–#1544)
+- **Notion board:** Cannot update — workspace at free block limit. Board last live-updated run ~1541 (2026-09-10). Run log entry stored in DRIVER-BOARD.md only.
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1906 runs; burning compute; all original A–E workstreams complete
+  2. **MERGE open PRs** — 15 open, all CI-green (CodeQL), awaiting human merge
+  3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board sync
+- **Next run:** GEN candidate — freeze `cast:plan` exact key set when only sessionId is active (no focus, no explain). GS froze VALUE TYPES for plan+session but not the exact key set. OR continue GEM pattern: freeze cast:no_match key set when scope is active (GEK covered focus+explain on no_match; scope on no_match untested).
