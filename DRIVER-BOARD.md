@@ -9348,6 +9348,31 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
 
 ---
 
+### Run ~1899 — 2026-10-01T04:47Z (automated — PR #1657 GEK merge wake)
+
+- **Trigger:** PR #1657 (GEK: chain_executed step item value types) merged
+- **Build:** tsc clean | **Tests:** 5 new GEN pass / 0 fail (baseline ~5550+ pass / 0 fail / 3 skip)
+- **Open PRs at start:** 2 (below ~20 standdown threshold → advanced workstream)
+- **Workstream advanced:** GEN — freeze cast:chain_executed `catalog` sub-object VALUE TYPES (5 tests)
+  - Gap: EJ froze catalog exact KEY SET `{accomplishes, chain, name}`. EJ does NOT assert value types. A regression storing `chain` as a stringified JSON array, or `name` as null, passes EJ silently.
+  - GEN-1: `catalog.name` is a non-empty string
+  - GEN-2: `catalog.accomplishes` is a non-empty string
+  - GEN-3: `catalog.chain` is an Array (not a stringified JSON or object)
+  - GEN-4: each `catalog.chain[i]` is a string with exactly one '/' (namespaced tool name)
+  - GEN-5: `catalog.chain` is non-empty (at least one step)
+  - Branch: `auto/GEN-chain-executed-catalog-value-types-drift-guard`
+- **Note:** Main had gained GEK (multiple files from parallel sessions), GEL, GEM test files since last run. GEN identifier confirmed available.
+- **Persistent human-action items (unchanged):**
+  1. **DISABLE hourly cron** — ~1899 runs; burning compute. Use `/cron delete` in Claude Code.
+  2. **MERGE or CLOSE open PRs** — multiple open drift-guard PRs from parallel sessions
+  3. **Enable GitHub Actions** (main npm test CI job — only CodeQL runs currently)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** Check GEN PR CI/review. Next candidate: GEO (taken by open PR #1666) → GEP.
+
+---
+
 ### Run ~1898 — 2026-09-30T23:39Z (automated — GAS merged, advancing next workstream)
 
 - **Workstream completed:** GAS drift guard — PR #1638 **merged** at 23:39Z. `test/gas-alternatives-executed-exact-keyset-drift-guard.test.ts` now in main. 5 tests exact-freeze the `{description, score, tool}` key set for alternatives[] items in cast:executed and cast:plan.
@@ -9603,3 +9628,107 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   - Pushed fix (699587d). Replied on CodeRabbit thread.
 - **PR #1678 state:** CI green (CodeQL + Analyze pass). One CodeRabbit finding addressed. Waiting on human review + merge.
 - **Next run:** If PR #1678 still open — check review state. If merged — advance GEW (freeze `cast:chain_executed` scope sub-object key set when scope param + chain:true, or cast:plan alternatives item key set).
+
+---
+
+### Run ~1914 — 2026-10-01 (automated — GEV PR #1678 merged)
+
+- **Workstream:** GEV — merged ✅
+- **Branch/PR:** PR #1678 merged into main at 14:38 UTC.
+- **Actions this run:** Received merge event; confirmed CI green on merge commit (0585e688). Board updated (PR #1679). No new workstream advanced this run — subsequent runs handled GEW onward.
+
+---
+
+### 2026-10-01 (run ~1915 — GEX: suggestions item keysets)
+- **Workstream**: Extended drift-guard series — GEX (suggestions.combos/prompts item-level exact keysets)
+- **Branch/PR**: `auto/GEX-chain-executed-suggestions-item-keyset` → PR #1682
+- **Build**: clean (tsc exit 0) | **Tests**: 5596 pass / 0 fail / 3 skip (prior full run; new GEX: 5/0/0)
+- **Actions**:
+  - Read notifications: PR #1680 (GEW) CI check_suite.completed ✓; CodeRabbit reviewed — no actionable findings; Docstring Coverage ⚠️ Warning (quantitative threshold, project style says no comments, not a blocker); PR #1681 CI check_suite.completed ✓.
+  - Confirmed GEH already froze step item exact keyset (`{content,ok,step,tool}` / `{error,ok,step,tool}`). GEX is the next uncovered gap: suggestions.combos[i] and suggestions.prompts[i] item-level keysets.
+  - Source confirms: `SuggestedCombo` = `{name,chain,accomplishes,verified,notes?}`; `SuggestedPrompt` = `{text,resolves_to}`. getSuggestionsForFocus passes these through directly (no stripping); distinct from `catalog` which strips verified/notes.
+  - Wrote `test/gex-chain-executed-suggestions-item-keyset-drift-guard.test.ts` (5 tests). All 5 pass locally.
+  - Pushed, opened PR #1682, subscribed.
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1915 runs; burning compute.
+  2. **MERGE open PRs** — 15 open (#1668–#1682), all CI-pending (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — only CodeQL runs currently)
+  4. **36 moderate Dependabot vulnerabilities** on default branch
+  5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** Check PR #1682 CI/review. Next candidate: GEY — e.g. freeze `suggestions.combos[i].chain` is an Array of strings (GEX-1 checks `chain` key is present, but not that it's an Array or that each element is a string), or `cast:chain_executed` `steps` length equals `catalog.chain` length.
+
+---
+
+### 2026-10-01 (run ~1916 — GEY: suggestions inner value types)
+- **Workstream**: Extended drift-guard series — GEY (suggestions sub-object inner value types)
+- **Branch/PR**: `auto/GEY-chain-executed-suggestions-inner-value-types` → PR #1683
+- **Build**: clean (tsc exit 0) | **Tests**: 5599 total, 5596 pass / 0 fail / 3 skip (new GEY: 5/0/0)
+- **Actions**:
+  - Startup: fetched all branches; reset local main to origin/main (c004597 = run ~1915 base); confirmed all A–E workstreams DONE.
+  - Reviewed open PRs #1668–#1682: full GEP–GEX drift-guard batch, all open and CI-pending.
+  - Gap identified: GEX (PR #1682) froze suggestions item KEYSETS but not VALUE TYPES. Specifically: `combos[i].chain` was confirmed to be a key but not an Array; `verified` not confirmed boolean; `prompts[i].text`/`resolves_to` not confirmed non-empty strings. A serialisation regression would pass GEX silently.
+  - Wrote `test/gey-chain-executed-suggestions-inner-value-types-drift-guard.test.ts` (5 tests). All 5 pass locally.
+  - Pushed `auto/GEY-chain-executed-suggestions-inner-value-types`, opened PR #1683, subscribed.
+  - Notion board update failed (cross-cell memcached 500 error); fell back to DRIVER-BOARD.md.
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1916 runs; burning compute.
+  2. **MERGE open PRs** — 16 open (#1668–#1683), all CI-pending (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — only CodeQL runs currently)
+  4. **36 moderate Dependabot vulnerabilities** on default branch
+  5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Notion plan limit / API error** — upgrade or clean to restore live board
+- **Next run:** GEY-1/2/3 freeze chain/verified fields; GEY-4/5 freeze prompts fields. Next candidate: **GEZ** — freeze `combos[i].name` and `combos[i].accomplishes` as non-empty strings (completing the value-type coverage for all combos[i] fields), OR freeze `cast:chain_executed` `resolvedBy` value type as a non-empty string (not explicitly typed in chain context).
+
+### 2026-10-01 (run ~1917 — GEZ: suggestions combos string field value types)
+- **Workstream**: Extended drift-guard series — GEZ (combos[i] string field value types + resolvedBy type)
+- **Branch/PR**: `auto/GEZ-chain-executed-suggestions-combos-name-accomplishes-types` → PR #1684
+- **Build**: clean (tsc exit 0) | **Tests**: 5/0/0 (new GEZ only; full suite from run ~1916: 5599 total, 5596/0/3)
+- **Actions**:
+  - Startup: PR #1683 (GEY) CI checked — all 3 checks green (CodeQL success). No reviews yet. Waits human merge.
+  - Gap identified: GEY froze combos[i].chain (Array), chain items (non-empty strings), verified (boolean). NOT frozen: name (non-empty string), accomplishes (non-empty string), notes when present (non-empty string). Also: resolvedBy value type not frozen for chain_executed specifically (EF Suite 3 only confirms key presence; EA/EG cover other cast types).
+  - Wrote `test/gez-chain-executed-suggestions-combos-string-fields-drift-guard.test.ts` (5 tests). All 5 pass locally.
+  - GEZ-1: combos is non-empty; GEZ-2: name is non-empty string; GEZ-3: accomplishes is non-empty string; GEZ-4: notes when present is non-empty string (fixture has combo with notes so guard fires); GEZ-5: resolvedBy is non-empty string in chain_executed context.
+  - Pushed, opened PR #1684, subscribed.
+  - Notion board unavailable (persistent API error); fell back to DRIVER-BOARD.md.
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1917 runs; burning compute.
+  2. **MERGE open PRs** — 17 open (#1668–#1684), all CI-pending (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — only CodeQL runs currently)
+  4. **36 moderate Dependabot vulnerabilities** on default branch
+  5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Notion plan limit / API error** — upgrade or clean to restore live board
+- **Next run:** GEZ completes value-type coverage for all suggestions.combos[i] fields. Remaining drift-guard opportunities: freeze `cast:chain_executed` `intent` field as non-empty string; freeze `latencyMs` as non-negative number in chain_executed context; OR start a new sub-series for cast:plan output shape (if not already frozen). Check DRIVER-BOARD + existing tests at startup to identify the clearest unfrozen gap.
+
+---
+
+### 2026-10-01 (run ~1918 — GFA: cast:executed + cast:chain_executed intent echo)
+- **Workstream**: Extended drift-guard series — GFA (intent echo for cast:executed and cast:chain_executed)
+- **Branch/PR**: `auto/GFA-cast-intent-echo-drift-guard` → **PR #1685** (https://github.com/chittyos/ch1tty/pull/1685)
+- **Build**: clean (tsc exit 0) | **Tests**: 5596 pass / 0 fail / 3 skip (main baseline); +5 on branch (all GFA pass)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface fixed; metric freeze active).
+  - `npm ci` clean. Build: tsc clean. Tests: 5596/0/3 — no regressions on main.
+  - Notion board unavailable (401 — NOTION_API_TOKEN needs rotation); used DRIVER-BOARD.md as cross-run state.
+  - Read DRIVER-BOARD.md: last run was ~1917 (GEZ PR #1684 suggestions combos string fields). 17 open PRs (#1668–#1684), all CI-pending (CodeQL).
+  - Confirmed: PR #1684 (GEZ) CI green (3/3 CodeQL checks passed).
+  - **Gap identified**: GJ-9 (no_match), GK-3 (plan), GK-6 (resolved) froze intent echo. cast:executed and cast:chain_executed only had key-presence guards (GBA, gv*). LLLL-6 covers chain_executed latencyMs ≥ 0 (already handled). The unfrozen gap: intent as non-empty string + echo invariant for both executed modes.
+  - Wrote `test/gfa-cast-intent-echo-drift-guard.test.ts` (5 tests). All 5 pass locally.
+    - GFA-1: cast:executed intent is a non-empty string
+    - GFA-2: cast:executed intent echoes the input exactly
+    - GFA-3: cast:executed intent has whitespace stripped
+    - GFA-4: cast:chain_executed intent is a non-empty string
+    - GFA-5: cast:chain_executed intent echoes the input exactly
+  - Pushed, opened PR #1685, subscribed.
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1918 runs; burning compute.
+  2. **MERGE open PRs** — 18 open (#1668–#1685), all CI-pending (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — only CodeQL runs currently)
+  4. **36 moderate Dependabot vulnerabilities** on default branch
+  5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Notion plan limit / API error** — rotate `NOTION_API_TOKEN` (op://ChittyOS-Integrations/notion/api_token)
+- **Next run:** Check PR #1685 CI/review. Next candidates: GFB — freeze `cast:executed` `score` as exactly one of a small range (e.g. 0–1) OR freeze `cast:chain_executed` `latencyMs` as finite (Number.isFinite, complementing LLLL-6 which checks ≥ 0 but not isFinite).
