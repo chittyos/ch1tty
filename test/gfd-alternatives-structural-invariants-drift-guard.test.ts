@@ -138,25 +138,22 @@ const TOOL_REFUND = {
 const MULTI_TOOLS = [TOOL_LIST, TOOL_BALANCE, TOOL_CREATE];
 const MANY_TOOLS = [TOOL_LIST, TOOL_BALANCE, TOOL_CREATE, TOOL_CANCEL, TOOL_REFUND];
 
-// ── GFD-1: alternatives count <= 3 ───────────────────────────────────────────
+// ── GFD-1: alternatives count === 3 (slice(1,4) cap) ────────────────────────
 
-test('GFD-1: cast:executed alternatives count is at most 3', async () => {
-  // Use 5 tools (winner + 4 runner-ups) so the cap assertion is non-trivial.
+test('GFD-1: cast:executed alternatives count is exactly 3 with 5-tool fixture', async () => {
+  // Use 5 tools (winner + 4 runner-ups) so slice(1,4) must hit its cap of 3.
   const agg = makeAgg('gfd-1', MANY_TOOLS);
   try {
     const body = await castExecuted(agg);
-    const alternatives = body['alternatives'] as Array<unknown> | undefined;
-    if (alternatives === undefined) {
-      // No alternatives at all is also valid (cast:executed omits key when empty).
-      return;
-    }
+    const alternatives = body['alternatives'];
     assert.ok(
       Array.isArray(alternatives),
       `alternatives must be an array, got ${typeof alternatives}`,
     );
-    assert.ok(
-      alternatives.length <= 3,
-      `alternatives count must be <= 3 (slice(1,4) cap), got ${alternatives.length}`,
+    assert.equal(
+      alternatives.length,
+      3,
+      `5-tool fixture must hit the slice(1,4) cap of 3, got ${alternatives.length}`,
     );
   } finally {
     await agg.shutdown();
