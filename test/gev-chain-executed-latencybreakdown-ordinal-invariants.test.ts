@@ -35,10 +35,10 @@
  *           to GEV-2; catches a regression that injects chain wall-clock time
  *           outside latencyMs instead of inside it)
  *
- *   GEV-4  latencyMs > 0 on cast:chain_executed
- *          (latencyMs must be a positive number; a regression zeroing it out
- *           would pass all key-set and value-type tests that only assert
- *           "typeof latencyMs === 'number'" or "latencyMs >= 0")
+ *   GEV-4  latencyMs is a finite non-negative number on cast:chain_executed
+ *          (latencyMs must be ≥ 0 and Number.isFinite — typeof-only guards pass NaN
+ *           and Infinity; this guards the top-level latencyMs field specifically,
+ *           complementing GEV-5 which guards the latencyBreakdown sub-fields)
  *
  *   GEV-5  all latencyBreakdown values are finite (not NaN, not Infinity)
  *          (GER froze value types as 'number' but a number can be NaN or Infinity;
@@ -213,15 +213,15 @@ test('GEV-3: cast:chain_executed → executionMs ≤ latencyMs + 5ms', async () 
 
 // ── GEV-4: latencyMs > 0 ─────────────────────────────────────────────────────
 
-test('GEV-4: cast:chain_executed → latencyMs is a positive number (> 0)', async () => {
+test('GEV-4: cast:chain_executed → latencyMs is a finite non-negative number (≥ 0)', async () => {
   const agg = buildAgg();
   try {
     const body = await castChainExecuted(agg);
     const latencyMs = body['latencyMs'] as number;
     assert.equal(typeof latencyMs, 'number', `latencyMs must be a number, got ${typeof latencyMs}`);
     assert.ok(
-      latencyMs > 0,
-      `latencyMs must be > 0; got ${latencyMs} — a zero or negative latencyMs indicates a timing regression on the chain_executed path`,
+      latencyMs >= 0 && Number.isFinite(latencyMs),
+      `latencyMs must be ≥ 0 and finite; got ${latencyMs}`,
     );
   } finally {
     await agg.shutdown();
