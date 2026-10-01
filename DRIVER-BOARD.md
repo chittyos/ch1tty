@@ -9653,3 +9653,33 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   6. **Stale branch cleanup** — 1100+ remote auto/ branches
   7. **Notion plan limit / API error** — upgrade or clean to restore live board
 - **Next run:** GEZ completes value-type coverage for all suggestions.combos[i] fields. Remaining drift-guard opportunities: freeze `cast:chain_executed` `intent` field as non-empty string; freeze `latencyMs` as non-negative number in chain_executed context; OR start a new sub-series for cast:plan output shape (if not already frozen). Check DRIVER-BOARD + existing tests at startup to identify the clearest unfrozen gap.
+
+---
+
+### 2026-10-01 (run ~1918 — GFA: cast:executed + cast:chain_executed intent echo)
+- **Workstream**: Extended drift-guard series — GFA (intent echo for cast:executed and cast:chain_executed)
+- **Branch/PR**: `auto/GFA-cast-intent-echo-drift-guard` → **PR #1685** (https://github.com/chittyos/ch1tty/pull/1685)
+- **Build**: clean (tsc exit 0) | **Tests**: 5596 pass / 0 fail / 3 skip (main baseline); +5 on branch (all GFA pass)
+- **Actions**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed (5-tool surface fixed; metric freeze active).
+  - `npm ci` clean. Build: tsc clean. Tests: 5596/0/3 — no regressions on main.
+  - Notion board unavailable (401 — NOTION_API_TOKEN needs rotation); used DRIVER-BOARD.md as cross-run state.
+  - Read DRIVER-BOARD.md: last run was ~1917 (GEZ PR #1684 suggestions combos string fields). 17 open PRs (#1668–#1684), all CI-pending (CodeQL).
+  - Confirmed: PR #1684 (GEZ) CI green (3/3 CodeQL checks passed).
+  - **Gap identified**: GJ-9 (no_match), GK-3 (plan), GK-6 (resolved) froze intent echo. cast:executed and cast:chain_executed only had key-presence guards (GBA, gv*). LLLL-6 covers chain_executed latencyMs ≥ 0 (already handled). The unfrozen gap: intent as non-empty string + echo invariant for both executed modes.
+  - Wrote `test/gfa-cast-intent-echo-drift-guard.test.ts` (5 tests). All 5 pass locally.
+    - GFA-1: cast:executed intent is a non-empty string
+    - GFA-2: cast:executed intent echoes the input exactly
+    - GFA-3: cast:executed intent has whitespace stripped
+    - GFA-4: cast:chain_executed intent is a non-empty string
+    - GFA-5: cast:chain_executed intent echoes the input exactly
+  - Pushed, opened PR #1685, subscribed.
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1918 runs; burning compute.
+  2. **MERGE open PRs** — 18 open (#1668–#1685), all CI-pending (CodeQL), awaiting human merge.
+  3. **Enable GitHub Actions** (main npm test CI job — only CodeQL runs currently)
+  4. **36 moderate Dependabot vulnerabilities** on default branch
+  5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Notion plan limit / API error** — rotate `NOTION_API_TOKEN` (op://ChittyOS-Integrations/notion/api_token)
+- **Next run:** Check PR #1685 CI/review. Next candidates: GFB — freeze `cast:executed` `score` as exactly one of a small range (e.g. 0–1) OR freeze `cast:chain_executed` `latencyMs` as finite (Number.isFinite, complementing LLLL-6 which checks ≥ 0 but not isFinite).
