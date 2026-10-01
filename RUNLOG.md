@@ -3290,3 +3290,27 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   3. Notion workspace out of free blocks
 - **Note**: Cron still firing, all workstreams exhausted. No new goals added.
 - **Next run**: Same — unless new workstream goals are added to prompt or cron is deleted.
+
+---
+
+## Run ~1922 — 2026-10-01 (GFM: resolved.inputSchema drift guard)
+
+- **Trigger**: Scheduled hourly run
+- **Build**: tsc clean | **Tests**: 5728 pass / 0 fail / 3 skip (was 5723; +5 GFM tests)
+- **Workstream advanced**: **GFM** — freeze cast:plan resolved.inputSchema invariants
+- **What was done**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED, buildCastExplanation metric freeze ACTIVE
+  - npm ci clean; npm run build tsc clean; npm test 5723/0/3 (baseline)
+  - Checked open PRs: 3 open (#1697 GFI, #1698 GFJ, #1700 GFL) — all CI green (3/3 checks pass), waiting human merge
+  - PR queue: 3 (below 20 threshold → advance next gap)
+  - Identified GFM gap: resolved object = { tool, server, category, description, score, inputSchema }; GFH–GFL froze all fields except inputSchema
+  - Wrote test/gfm-plan-resolved-inputschema-drift-guard.test.ts: 5 tests (GFM-1 type check, GFM-2 'type' key, GFM-3 non-empty type, GFM-4 round-trip 'object', GFM-5 stability)
+  - Tests: 5/5 pass; full suite 5728/0/3
+  - Branch auto/GFM-plan-resolved-inputschema → PR #1701 (https://github.com/chittyos/ch1tty/pull/1701)
+- **Blockers (unchanged, all require human action)**:
+  1. Disable hourly cron — all workstreams A–F done; ~1922 runs
+  2. Merge open PRs #1697, #1698, #1700, #1701 — all CI green
+  3. Enable GitHub Actions npm test CI (only CodeQL runs)
+  4. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. Stale branch cleanup (1100+ remote auto/ branches)
+- **Next run**: After resolved.inputSchema (GFM) is merged, next gap = resolved object key-set exact freeze (no extra keys may appear — drift guard for accidental field addition). Or advance to cast:executed resolved.inputSchema symmetric gap.
