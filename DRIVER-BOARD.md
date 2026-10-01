@@ -9554,3 +9554,21 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to restore live board
 - **Next run:** Check PR #1672 CI/review. Next candidate: GZA or next uncovered execute/cast combination.
+
+---
+
+### Run ~1911 — 2026-10-01 (automated — GEL PR #1670 sync to main)
+
+- **Workstream advanced:** GEL — bringing `auto/GEL-resolved-focus-scope-toplevel-keyset` up to date with main (merged run ~1910 board entry); PR #1670 now current
+- **Branch/PR:** `auto/GEL-resolved-focus-scope-toplevel-keyset` → **PR #1670** (https://github.com/chittyos/ch1tty/pull/1670)
+- **Tests:** GEL 5 tests already passing; baseline at run ~1906: 4852/0/2
+- **CI on PR #1670:** 3/3 green (CodeQL, Analyze javascript-typescript, Analyze actions). Clean after merge.
+- **Open PRs at start:** #1670 (GEL), #1672 (GZ execute content[0] shape) — both CI passing
+- **Persistent human-action items:**
+  1. **MERGE open PRs** — #1670, #1672 (and any others queued); all CI-green
+  2. **DISABLE hourly cron** — ~1911 runs; burning compute
+  3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** After GEL merges, identify next coverage gap. Candidates: cast:plan sub-object shape with scope, or GEL-follow-on (resolved+catalog or chain combinations not yet covered).
