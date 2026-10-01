@@ -9536,7 +9536,7 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
 ### Run ~1911 — 2026-10-01T05:00Z (automated — GEQ chain_executed latencyBreakdown keyset)
 
 - **Workstream advanced:** GEQ — freeze `cast:chain_executed` `latencyBreakdown` sub-object exact key set and value types (5 tests)
-- **Branch/PR:** `auto/geo-chain-executed-latencybreakdown-keyset` → **PR #1673** (pending)
+- **Branch/PR:** `auto/geo-chain-executed-latencybreakdown-keyset` → **PR #1673** (https://github.com/chittyos/ch1tty/pull/1673)
 - **Tests:** All 5 GEQ tests pass locally (5/0 pass/fail).
 - **Gap closed:** ET froze latencyBreakdown shape for `cast:executed` only. GT froze it more precisely for `cast:executed` (scoringMs/executionMs individually present, exact permitted set, brainMs absent on keyword route). Neither covers `cast:chain_executed`. GBA freezes latencyBreakdown is present in chain_executed top-level key set but never inspects its contents.
   - GEQ-1: latencyBreakdown.scoringMs is individually present on chain_executed
