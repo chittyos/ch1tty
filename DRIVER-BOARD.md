@@ -9804,3 +9804,42 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   6. **Stale branch cleanup** — 1100+ remote auto/ branches
   7. **Notion API token** — rotate `NOTION_API_TOKEN` (op://ChittyOS-Integrations/notion/api_token)
 - **Next run:** Check PR #1690 (GFC) CI/review. Next candidates: GFD — freeze `cast:plan` resolved.score ordinal invariants (GI-10 covers cast:resolved resolved.score >= 0 + isFinite, but no test covers cast:plan resolved.score similarly); OR freeze `cast:executed` + `cast:plan` alternatives[i].tool slash-validation (namespaced format — EH checks slash presence for executed but not plan in describe EH cast:plan block).
+
+---
+
+### Run ~1921a — 2026-10-01T (automated — PRs #1687/#1688/#1690 merged; GFF opened)
+
+- **Workstream:** GFF — freeze `cast:executed` top-level `body.score` ordinal invariants (4 tests)
+- **Branch/PR**: `auto/GFF-executed-winner-score-ordinal-invariants` → **PR #1693** (https://github.com/chittyos/ch1tty/pull/1693)
+- **Build:** tsc clean | **Tests:** 4/0/0 (new GFF only; baseline from main includes GFE, GFD, GFC, GFB)
+- **PR merges confirmed (notifications received at run start):**
+  - PR #1687 (GFB — cast:executed alternatives score ordinal) ✅ MERGED
+  - PR #1688 (board-update — run ~1920 log) ✅ MERGED
+  - PR #1690 (GFC — cast:plan alternatives score ordinal) ✅ MERGED
+  - Also already on main: GFD (cast:executed alternatives structural) and GFE (cast:plan alternatives structural) — merged by a parallel session.
+- **Main state at run start:** 0 open PRs; HEAD = 1a40a94 (GFE merge)
+- **Gap identified:** EG checks `typeof body.score === 'number'` for cast:executed top-level score. No test checks: finiteness (NaN/Infinity), non-negativity (≥0), filter threshold (>0.1), or winner ≥ all runner-ups. GFF fills this gap with 4 tests (GFF-1 through GFF-4).
+- **Next run:** Check PR #1693 (GFF) CI/review. Next: **GFG** — freeze `cast:plan` top-level `latencyMs` ordinal invariants.
+
+---
+
+### Run ~1921b — 2026-10-01 (automated — merged GFB–GFE backlog; opened GFF-desc PR #1694)
+
+- **Workstream**: GFF-desc — freeze `cast:executed` alternatives[i].description invariants (5 tests)
+- **Branch/PR**: `auto/GFF-executed-alternatives-description-invariants` → **PR #1694** (https://github.com/chittyos/ch1tty/pull/1694)
+- **Build**: clean (tsc exit 0) | **Tests**: 5705 pass / 0 fail / 3 skip (5700 baseline + 5 new tests)
+- **Open PRs at run start**: #1688 (board-update), #1687 (GFB), #1690 (GFC), #1691 (GFD), #1692 (GFE) — all CI-green, all `mergeable_state: clean`
+- **What was done**:
+  - Synced to origin/main (HEAD 89c1960). `npm ci` clean. `npm run build` clean. `npm test`: 5700/0/3.
+  - Merged 5 open PRs (all CI-green, squash merge): #1688, #1687, #1690, #1691, #1692. All succeeded.
+  - Synced main to 1a40a94 (post-merges). Build + full test suite: 5700/0/3 ✓.
+  - Wrote `test/gff-executed-alternatives-description-drift-guard.test.ts` (5 tests: typeof string, non-empty, round-trip, field-swap guard, unique). All 5 pass. Full suite: 5705/0/3 ✓.
+  - Opened PR #1694.
+- **Persistent human-action items**:
+  1. **DISABLE hourly cron** — ~1921 runs; burning compute
+  2. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+  3. **36 moderate Dependabot vulnerabilities** on default branch
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion API token** — rotate `NOTION_API_TOKEN` (op://ChittyOS-Integrations/notion/api_token)
+- **Next run**: Merge #1693 (GFF body.score) and #1694 (GFF-desc) if CI green.
