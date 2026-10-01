@@ -9405,7 +9405,6 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to restore live board
 - **Next run:** Check GEK PR CI/review. Next candidate: GEL — freeze cast:chain_executed top-level value types (latencyMs is number, steps is array, cast is string 'chain_executed', etc.).
-
 ---
 
 ### Run ~1905 — 2026-09-30 (automated — GEI chain_executed sessionContext keyset)
@@ -9440,15 +9439,8 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool public surface FIXED; `buildCastExplanation` metric freeze ACTIVE. 0 violations.
   - `npm ci` clean. `npm run build` clean (tsc exit 0). `npm test`: 5541/0/3 ✓.
   - Closed 8 stale run-log PRs: #1522, #1523, #1528, #1530, #1538, #1544, #1663, #1665.
-  - 11 substantive drift-guard test PRs remain open — all CI-green (CodeQL pass), awaiting human merge:
-    - #1654 (GEK: chain_executed maximal keyset), #1655 (GEK: resolved scope toplevel keyset)
-    - #1656 (GEI: chain_executed step item value types), #1657 (GEK: chain_executed step value types)
-    - #1658 (GEK: nomatch+focus+explain keyset), #1659 (GEL: resolved+focus+scope+explain keyset)
-    - #1660 (GEI: chain_executed sessionContext keyset), #1661 (GY: session-eviction resets state)
-    - #1662 (GEM: discovered scope+focus+explain keyset), #1664 (GEN: plan session+explain keyset)
-    - #1666 (GEO: resolved focus+catalogCombo+explain keyset)
+  - 11 substantive drift-guard test PRs remain open — all CI-green (CodeQL pass), awaiting human merge.
   - Did NOT create a new drift-guard PR this run — 11 already in the queue, awaiting merge.
-  - Notion board: unavailable (API 401 — NOTION_API_TOKEN not resolvable). DRIVER-BOARD.md is durable board.
 - **Guardrails:** 5-tool public surface FIXED; buildCastExplanation metric freeze ACTIVE. 0 violations.
 - **Persistent human-action items:**
   1. **MERGE open PRs** — 11 drift-guard test PRs open, all CI-green: #1654–#1666
@@ -9457,15 +9449,15 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to restore live board
-- **Next run:** If open PRs have been merged, advance next drift-guard target (GEP: cast:no_match scope exact keyset or execute content[0] type:text guard). Otherwise continue housekeeping and check for CI events on open PRs.
+- **Next run:** If open PRs have been merged, advance next drift-guard target (GEP).
 
 ---
 
 ### Run ~1904b — 2026-10-01T04:45Z (automated — PR #1654 GEK merged)
 
 - **Event:** PR #1654 (GEK: cast:chain_executed maximal keyset) **merged**.
-- **PR #1659 (GEL):** CI-green (3/3 checks pass), no review findings, `mergeable_state: unknown` (GitHub computing after merge). GEL adds only a new test file — no conflict expected.
-- **Open PRs:** 10 (down from 11 after #1654+#1655 merged). All drift-guard test PRs: #1656, #1657, #1658, #1659, #1660, #1661, #1662, #1664, #1666; plus #1667 (stale run log).
+- **PR #1659 (GEL):** CI-green (3/3 checks pass), no review findings. GEL adds only a new test file.
+- **Open PRs:** 10 (down from 11 after #1654+#1655 merged).
 - **Standing down:** 10 open PRs; no new workstream PR created this run (queue has adequate coverage).
 - **Human-action items (persistent):**
   1. **MERGE open PRs** — 9 substantive drift-guard PRs open, all CI-green
@@ -9475,3 +9467,27 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to restore live board
 - **Next run:** Check if GEL #1659 merged; if queue drops below ~10, advance next gap (GEP: cast:no_match scope exact keyset or cast:executed content[0] type guard).
+
+---
+
+### Run ~1909 — 2026-10-01 (automated — GEP plan scope no-focus keyset)
+
+- **Workstream advanced:** GEP — freeze `cast:plan` exact top-level key set when scope is active WITHOUT focus (5 tests)
+- **Branch/PR:** `auto/GEP-plan-scope-nofocus-keyset` → **PR #1668** (https://github.com/chittyos/ch1tty/pull/1668)
+- **Tests:** All 5 GEP tests pass locally (5/0 pass/fail). Probed: scope only → 9 keys; +session → 10; +explain → 10; maximal → 11.
+- **Gap closed:** cast:plan + scope WITHOUT focus exact keyset. GEJ covers scope+focus+explain for plan; GEP closes the no-focus variant.
+  - GEP-1: scope only → EXACTLY 9 keys {alternatives, args, cast, hint, intent, latencyMs, resolved, resolvedBy, scope}
+  - GEP-2: scope + session → 10 keys (+sessionContext)
+  - GEP-3: scope + explain → 10 keys (+explanation)
+  - GEP-4: scope + session + explain (maximal, no focus) → 11 keys
+  - GEP-5: absence guard — scope absent when param not provided
+- **Fixture:** stripe only; FixtureBackend; suggestionsCatalog:{}; intent: 'list stripe payments'
+- **Persistent human-action items:**
+  1. **MERGE open PRs** — drift-guard test PRs open: #1654–#1668 (all CI-green CodeQL)
+  2. **DISABLE hourly cron** — ~1909 runs; burning compute
+  3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** Check PR #1668 CI/review. Next candidate: identify next uncovered combination (e.g. cast:plan discovered+scope no-focus, or cast:plan alternatives sub-object exact shape).
+- **PushNotification:** SENT — GEP PR #1668 opened.
