@@ -9447,3 +9447,27 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion plan limit** — upgrade or clean to restore live board
 - **Next run:** Check PR #1660 CI/review. Next candidate: GEJ or GEM (cast:resolved `resolved` sub-object exact {score, tool} key set in maximal combo).
+
+---
+
+### Run ~1907 — 2026-10-01T UTC (automated — GEN cast:plan session+explain keyset)
+
+- **Workstream advanced:** GEN — freeze `cast:plan + session + explain` exact top-level key set (5 tests)
+- **Branch/PR:** `auto/GEN-plan-session-keyset` → **PR #1664** (https://github.com/chittyos/ch1tty/pull/1664)
+- **Build:** tsc clean | **Tests:** 5549/0/3 (was 5544/0/3 on main, +5)
+- **Gap closed:** Prior tests covered session-only (GBF-4 → 9 keys), explain-only (GCJ-3 → 9 keys), focus+explain (GBF-3/GEG-1 → 10 keys), focus+session+explain (GCG-4 → 11 keys) — but NOT the symmetric session+explain (no focus, no scope) = 10 keys case. A regression dropping `explanation` when `sessionId` is active (or dropping `sessionContext` when `explain:true` is active) would pass all prior tests silently.
+  - GEN-1: plan+session+explain → exactly base + sessionContext + explanation (10 keys)
+  - GEN-2: explanation is a non-null object in the session+explain path
+  - GEN-3: absence guard — session without explain has no explanation key
+  - GEN-4: absence guard — explain without session has no sessionContext key
+  - GEN-5: sessionContext has exactly {callCount, recentTools} (no activeSessionFocus when focus not set via setSessionFocus)
+- **Note:** Notion plan limit prevents board updates; run log in DRIVER-BOARD.md only.
+- **Open PRs:** 12 (#1654, #1655, #1656, #1657, #1658, #1659, #1660, #1661, #1662, #1663, #1664 + stale board-log PRs); all CI-green (CodeQL), awaiting human merge.
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1907 runs; burning compute
+  2. **MERGE open PRs** — 12 open, all CI-green, awaiting human merge
+  3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+  4. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  5. **Stale branch cleanup** — 1100+ remote auto/ branches
+  6. **Notion plan limit** — upgrade or clean to restore live board
+- **Next run:** GEO candidate — freeze `cast:plan` base key set when catalog is active (resolvedFromCatalog, resources, suggestions path) combined with session, to close GCA-2 session gap. Or continue next discover/resolved/executed conditional combo.
