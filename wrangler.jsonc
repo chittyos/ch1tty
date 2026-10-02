@@ -60,22 +60,19 @@
     { "binding": "OAUTH_KV", "id": "PLACEHOLDER_OAUTH_KV_ID" }
   ],
   "observability": {
-    "enabled": true,
+    "enabled": false,
     "logs": {
-      "enabled": true,
-      "head_sampling_rate": 1,
-      "invocation_logs": true,
+      "enabled": false,
+      "head_sampling_rate": 0,
+      "invocation_logs": false,
       "destinations": ["chittytrack-logs"]
     },
     "traces": {
-      "enabled": true,
-      "head_sampling_rate": 1,
+      "enabled": false,
+      "head_sampling_rate": 0,
       "destinations": ["chittytrack-traces"],
       "persist": false
     }
   },
-  "upload_source_maps": true,
-  "tail_consumers": [
-    { "service": "chittytrack" }
-  ]
+  "upload_source_maps": true
 }
