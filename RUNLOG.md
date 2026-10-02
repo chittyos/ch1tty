@@ -3339,3 +3339,25 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   2. GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID/SECRET, CHITTY_TASKS_TOKEN unset
   3. Notion workspace out of free blocks (board update via RUNLOG only)
 - **Next run**: Advance GFO (next gap after GFN). Candidate: cast:plan hint string value invariants — hint is a hardcoded constant; currently no test freezes its exact string value or verifies it is a non-empty string.
+
+---
+
+## Run ~2023 — 2026-10-02 (GFR: plan/executed hint/args/score-location asymmetry)
+
+- **Trigger**: Scheduled hourly run
+- **Build**: tsc clean | **Tests**: 5723 pass / 0 fail / 3 skip (baseline); +5 GFR = 5728 pass on branch
+- **Workstream advanced**: **GFR** — freeze cast plan/executed structural asymmetry for `hint`, `args`, and `score` location
+- **What was done**:
+  - Read CLAUDE.md + CHITTY.md; guardrails confirmed: 5-tool surface FIXED, buildCastExplanation metric freeze ACTIVE
+  - npm ci clean; npm run build tsc clean; npm test 5723/0/3 (baseline on main)
+  - Found 8 open PRs (#1697 GFI – #1705 GFQ) all CodeRabbit "success"; merged all 8 (GFI, GFJ, GFL, GFM, GFO, GFP, GFQ squash-merged; GFN had RUNLOG conflict — resolved, pushed, squash-merged)
+  - Workstreams A–Q all confirmed done (ledger-mcp and session-coordinator-mcp have factory+test pattern)
+  - Identified GFR gap: no test freezes hint/args presence/absence across plan vs executed, or score-location asymmetry (score top-level in executed, nested in resolved for plan)
+  - Wrote test/gfr-plan-executed-hint-args-score-location-drift-guard.test.ts: 5 tests (GFR-1 executed no hint, GFR-2 executed no args, GFR-3 plan has hint non-empty, GFR-4 plan has args object, GFR-5 score-location asymmetry)
+  - Tests: 5/5 pass locally (tsx loader)
+  - Branch auto/GFR-plan-executed-hint-args-score-location → PR opened
+- **Blockers (unchanged, all require human action)**:
+  1. GitHub Actions ci.yml disabled — drift-guard PRs need manual merge (CodeRabbit only)
+  2. Prod env vars unset: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  3. Stale branch cleanup (1100+ remote auto/ branches accumulating)
+- **Next run**: GFS gap — identify next unguarded cast output field. Candidate: cast:executed exact key-set for a minimal no-focus no-alternatives run (freeze that ONLY the expected keys appear, no extra keys may silently accumulate).
