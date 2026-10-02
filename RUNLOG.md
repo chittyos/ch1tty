@@ -3290,3 +3290,28 @@ _Notion board unavailable in this environment (no `/home/ubuntu/.local/bin/notio
   3. Notion workspace out of free blocks
 - **Note**: Cron still firing, all workstreams exhausted. No new goals added.
 - **Next run**: Same — unless new workstream goals are added to prompt or cron is deleted.
+
+---
+
+## Run ~1803 — 2026-10-02 (GFN PR #1702 opened)
+
+- **Trigger**: scheduled hourly run
+- **Build**: tsc clean | **Tests**: 5723 pass / 0 fail / 3 skip
+- **Workstream advanced**: drift-guard GFN — cast resolvedBy value invariants
+- **Gap**: Prior tests checked resolvedBy as a KEY (GBF, GCC, GU, etc.) but never froze its VALUE. The two-literal enum 'brain'|'keyword' was unguarded; typeof check and set-membership check were both absent.
+- **File**: test/gfn-resolvedby-value-type-drift-guard.test.ts (5 tests)
+  - GFN-1: cast:plan resolvedBy typeof === 'string'
+  - GFN-2: cast:plan resolvedBy in {"brain","keyword"} (strict enum)
+  - GFN-3: keyword-only coordinator → resolvedBy="keyword" on plan path
+  - GFN-4: keyword-only coordinator → resolvedBy="keyword" on executed path
+  - GFN-5: resolvedBy stable across two plan calls
+- **Source**: src/core.ts castRoute ternary at ~line 932
+- **Tests**: 5/5 pass locally
+- **PR**: #1702 (https://github.com/chittyos/ch1tty/pull/1702) opened. CI pending.
+- **Open PRs**: 5 (#1697 GFI, #1698 GFJ, #1700 GFL, #1701 GFM, #1702 GFN)
+- **All workstreams A–E**: complete
+- **Blockers (unchanged)**:
+  1. GitHub Actions ci.yml disabled — drift-guard PRs need manual merge
+  2. GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID/SECRET, CHITTY_TASKS_TOKEN unset
+  3. Notion workspace out of free blocks (board update via RUNLOG only)
+- **Next run**: Advance GFO (next gap after GFN). Candidate: cast:plan hint string value invariants — hint is a hardcoded constant; currently no test freezes its exact string value or verifies it is a non-empty string.
