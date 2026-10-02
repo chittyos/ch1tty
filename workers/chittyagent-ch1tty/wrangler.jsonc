@@ -46,11 +46,6 @@
           "binding": "OAUTH_KV",
           "id": "257ed804b1414a30aaec301cd6233089"
         }
-      ],
-      "tail_consumers": [
-        {
-          "service": "chittytrack"
-        }
       ]
     }
   },
@@ -71,18 +66,18 @@
     }
   ],
   "observability": {
-    "enabled": true,
+    "enabled": false,
     "logs": {
-      "enabled": true,
-      "head_sampling_rate": 1,
-      "invocation_logs": true,
+      "enabled": false,
+      "head_sampling_rate": 0,
+      "invocation_logs": false,
       "destinations": [
         "chittytrack-logs"
       ]
     },
     "traces": {
-      "enabled": true,
-      "head_sampling_rate": 1,
+      "enabled": false,
+      "head_sampling_rate": 0,
       "destinations": [
         "chittytrack-traces"
       ],
