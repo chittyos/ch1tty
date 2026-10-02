@@ -25,7 +25,7 @@ visibility: PUBLIC
 | Domain | `ch1tty.chitty.cc` |
 | Status | Active |
 
-> **Note on infra**: This repo deploys as the local stdio gateway + optional HTTP server (`CH1TTY_PORT`). The public `ch1tty.chitty.cc` Worker (with `[[tail_consumers]] = chittytrack` and ChittyAuth-issued token validation) is fronted by `chittyagent-ch1tty` in a separate repo, which is why this repo has no `wrangler.toml`.
+> **Note on infra**: This repo deploys as the local stdio gateway + optional HTTP server (`CH1TTY_PORT`). The public `ch1tty.chitty.cc` Worker (with ChittyAuth-issued token validation) is fronted by `chittyagent-ch1tty` in a separate repo, which is why this repo has no `wrangler.toml`.
 
 ## Purpose
 
