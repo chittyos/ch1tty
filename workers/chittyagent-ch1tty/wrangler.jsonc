@@ -67,20 +67,15 @@
   ],
   "observability": {
     "enabled": false,
+    "head_sampling_rate": 0,
     "logs": {
       "enabled": false,
       "head_sampling_rate": 0,
-      "invocation_logs": false,
-      "destinations": [
-        "chittytrack-logs"
-      ]
+      "invocation_logs": false
     },
     "traces": {
       "enabled": false,
       "head_sampling_rate": 0,
-      "destinations": [
-        "chittytrack-traces"
-      ],
       "persist": false
     }
   }
