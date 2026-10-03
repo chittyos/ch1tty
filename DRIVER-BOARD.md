@@ -9843,3 +9843,31 @@ State: GCY work (5 tests freezing suggestions count lower bound) is available on
   5. **Stale branch cleanup** — 1100+ remote auto/ branches
   6. **Notion API token** — rotate `NOTION_API_TOKEN` (op://ChittyOS-Integrations/notion/api_token)
 - **Next run**: Merge #1693 (GFF body.score) and #1694 (GFF-desc) if CI green.
+
+---
+
+### Run ~1970 — 2026-10-03 (automated — GGF focusMargin presence freeze)
+
+- **Workstream:** GGF — freeze `focusMargin` presence in verbosity:medium + absence in verbosity:low
+- **Branch/PR:** `auto/GGF-verbosity-medium-focus-margin-presence` → PR pending
+- **Build:** tsc clean | **Tests:** 5793 pass / 0 fail / 3 skip (baseline); new file: 5/0/0
+- **State at run start:**
+  - 9 open PRs: GFX #1714, GFY #1715, GFZ #1716, GGA #1717, GGB #1718, GGC #1719, GGD #1720, GGE #1722, brace-expansion vuln fix #1721 — all CI-green, mergeable_state: clean
+  - 1 high-severity npm vulnerability (brace-expansion) — fixed in open PR #1721
+  - Tests: 5793/0/3 (up from 5705 reported in last board entry)
+- **Gap identified:** GGB froze focusRank/focusRankDelta/focusConfidence in verbosity:medium focus block. No test specifically isolated `focusMargin` presence (medium+focus+2-candidate) vs absence in verbosity:low, single-candidate, or no-focus scenarios.
+- **GGF tests (5):**
+  - GGF-1: focusMargin PRESENT in verbosity:medium + 2-candidate + focus:code
+  - GGF-2: focusMargin is finite non-negative number
+  - GGF-3: focusMargin ABSENT in verbosity:low + 2-candidate + focus:code (medium-only)
+  - GGF-4: focusMargin ABSENT in verbosity:medium + 1-candidate + focus:code (no runner-up)
+  - GGF-5: focusMargin ABSENT in verbosity:medium + 2-candidate + no focus (focus required)
+- **Persistent human-action items:**
+  1. **DISABLE hourly cron** — ~1970 runs; burning compute with no deliverable when idle
+  2. **MERGE open PRs** — #1714–#1722 all CI-green; security fix #1721 especially urgent
+  3. **Enable GitHub Actions** (npm test CI — currently CodeQL only)
+  4. **36 moderate Dependabot vulnerabilities** on default branch
+  5. **Prod env vars**: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET, CHITTY_TASKS_TOKEN
+  6. **Stale branch cleanup** — 1100+ remote auto/ branches
+  7. **Notion API token** — rotate `NOTION_API_TOKEN` (op://ChittyOS-Integrations/notion/api_token)
+- **Next run:** Check GGF PR CI/review. If GFX–GGF all merge, next: GGG — freeze `focusDecisive` ABSENT in verbosity:medium single-candidate (GBB tested its presence for multi-candidate; no test isolates the single-candidate absence in medium specifically). Alternatively: merge backlog first if >10 PRs open.
