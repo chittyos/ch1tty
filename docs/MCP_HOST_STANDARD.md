@@ -2,6 +2,25 @@
 
 This document defines the canonical external MCP host pattern across ChittyOS and ch1tty-adjacent surfaces.
 
+
+## 2026-10-11: `mcp.ch1tty.com` is NOT presently a verified custom slim-MCP
+
+Operator architecture intends this hostname to serve the intelligent thin-MCP
+surface. Direct Cloudflare inventory instead shows three conflicting owners:
+
+1. A proxied CNAME for `mcp.ch1tty.com` points to `gateway.agents.cloudflare.com`.
+2. A zone Worker route `mcp.ch1tty.com/*` points to `chittyagent-ch1tty`.
+3. An Access application named `ChittyIdentity Agents` uses `type=mcp_portal`
+   at that hostname, while the same account's native MCP Portal API has no
+   corresponding portal object.
+
+This is **unresolved ownership drift**. Do not assert that the host currently
+serves the custom Worker or silently convert it to a native portal. A live
+authorized MCP Inspector handshake, scoped route/DNS review, and determination
+of the intended Access application are mandatory before altering ownership.
+The public `mcp.chitty.cc` Cloudflare-managed portal is a separate, verified
+object and must remain untouched.
+
 ## Goal
 
 Give every major client class a predictable entrypoint without forcing each product team to rediscover route, OAuth, and discovery behavior.
