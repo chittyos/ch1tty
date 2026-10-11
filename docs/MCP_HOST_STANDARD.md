@@ -9,7 +9,7 @@ Give every major client class a predictable entrypoint without forcing each prod
 The standard is:
 
 - One canonical "smart" aggregate MCP host
-- One canonical "dumb" aggregate MCP host
+- One canonical Cloudflare-managed native MCP Portal host
 - Optional client-branded aliases that preserve the same semantics
 - Cloudflare-managed auth at the edge where possible
 - Public discovery docs, protected `/mcp`
@@ -23,12 +23,12 @@ The standard is:
 - Behavior: broad discovery, orchestration-friendly, intended to be the "paste this into a connector" primary endpoint
 - Current worker owner: `chittyagent-ch1tty`
 
-### Dumb aggregate
+### Managed aggregate (native Cloudflare MCP Portal)
 
 - Host: `mcp.chitty.cc`
-- Semantics: plain aggregate MCP
-- Behavior: direct aggregate surface without the "intelligent MCP" positioning
-- Current worker owner: `chittyconnect`
+- Semantics: Cloudflare-managed native MCP Portal (`chitty-mcp`)
+- Behavior: Cloudflare-owned federation of registered upstream tools/prompts under `/mcp`; not a custom Worker route or per-service proxy namespace
+- Runtime owner: Cloudflare One MCP Portals; ChittyRegister/ChittyRegistry retain governed registration and catalog ownership
 - Auth model: Cloudflare Access Managed OAuth
 
 ### Smart ChatGPT alias
@@ -38,7 +38,7 @@ The standard is:
 - Behavior: same discovery shape as `mcp.ch1tty.com`, client-specific hostname only
 - Current worker owner: `chittyagent-ch1tty`
 
-### Dumb ChatGPT alias
+### Native-portal ChatGPT alias (separate route)
 
 - Host: `chatgpt.chitty.cc`
 - Semantics: branded alias for the dumb aggregate
@@ -99,17 +99,22 @@ The public host contract spans multiple repos today. That is acceptable only if 
 
 ### Current ownership
 
+- **Cloudflare One MCP Portals**
+  - owns native portal `chitty-mcp` at `mcp.chitty.cc`, its Access, OAuth, server membership and tool/prompt projections
+  - retains sole route/DNS ownership for the host, via proxied CNAME `gateway.agents.cloudflare.com`
+- **ChittyRegister / ChittyRegistry**
+  - own governed registration and canonical service catalog; historical Worker manifests are not authoritative
 - `chittyconnect`
-  - owns the dumb aggregate semantics at `mcp.chitty.cc`
-  - owns the public service catalog used to populate `/.well-known/chitty.json`
+  - brokers runtime authorization/secret insertion, not the managed portal's HTTP routes
 - `chittyentity`
   - currently owns the smart aggregate worker surface for `mcp.ch1tty.com` and `chatgpt.ch1tty.com`
 - `chittymcp`
-  - currently owns the ChatGPT-facing dumb alias worker at `chatgpt.chitty.cc` via `chittymcp-gateway`
+  - owns legacy service-binding aggregation at `mcp-aggregator.chitty.cc`, not `mcp.chitty.cc`
+  - maintains the separate ChatGPT-facing dumb-alias worker projection `chittymcp-gateway` (verify current deployed ownership independently)
 
 ### Guardrail
 
-DNS, worker routes, and discovery handlers must be treated as one logical contract. Do not update only one of the three.
+DNS, managed portal configurations, Access, Worker routes, and discovery handlers must be treated as one logical contract. For `mcp.chitty.cc`, the native Cloudflare portal supersedes any historical Worker claim. Do not recreate `mcp.chitty.cc/*` Worker routes.
 
 Any host rollout or migration must verify:
 
@@ -119,16 +124,18 @@ Any host rollout or migration must verify:
 4. `/.well-known/mcp.json` returns `200`
 5. `/health` returns `200`
 6. `/mcp` is reachable under the intended auth model
+7. Managed portal `chitty-mcp` has sole hostname ownership and its upstream mappings are current
+8. MCP Inspector authorizes and invokes a real tool; `Ready` sync status alone is not an end-to-end proof
 
 ## Repeated Pattern
 
 For a new canonical or alias host, the repeated pattern is:
 
-1. Create proxied DNS
-2. Bind worker route
-3. Expose public discovery docs
-4. Protect `/mcp`
-5. Verify the rewritten discovery payload uses that exact hostname
+1. Classify a host as a Cloudflare-managed portal or a custom Worker (never both)
+2. For managed portal hosts, create the native MCP Portal with Access and a proxied CNAME to `gateway.agents.cloudflare.com`, not a Worker route
+3. For custom Worker hosts, bind a Worker route on its own hostname
+4. Expose host-appropriate public discovery and protect `/mcp`
+5. Verify hostname-matched metadata and complete an authenticated MCP Inspector tool call
 
 This keeps ChatGPT, Claude, Claude Code, Codex, mobile clients, and other remote MCP consumers on the same predictable shape.
 
@@ -139,3 +146,19 @@ This keeps ChatGPT, Claude, Claude Code, Codex, mobile clients, and other remote
 - Do not make route ownership implicit across repos
 - Do not publish a hostname unless DNS, route, and discovery are all present
 - Do not add another custom OAuth layer when Cloudflare Managed OAuth already covers the need
+
+## Managed versus internal aggregate — reconciler safeguard (2026-10-11)
+
+**Public:** `https://mcp.chitty.cc/mcp` is native Cloudflare portal `chitty-mcp`.
+Cloudflare owns OAuth, Access, upstream membership, and tool/prompt exposure.
+This host does not expose legacy `/{service}/mcp` or `/v0.1/servers` routes.
+
+**Legacy internal:** `https://mcp-aggregator.chitty.cc/mcp` is the separate
+`chittymcp` service-binding Worker. It may be retained for internal
+compatibility but never owns the native portal's hostname. Its OAuth and
+liveness must be validated separately.
+
+**Role portals:** `dev.chitty.cc`, `chode.chitty.cc`, `cf.chitty.cc`,
+`msg.chitty.cc`, `portal.gws.chitty.cc`, `apify.portal.chitty.cc`,
+and `vm.ch1tty.com` are distinct native Cloudflare MCP portal projections.
+Do not blindly copy membership or authorization between role portals.
