@@ -15,6 +15,7 @@ import { Ch1ttyApiAgent } from './api-agent.js';
 import { handleAuthorize } from './oauth-authorize.js';
 import { handleMcpDeprecated } from './mcp-deprecated.js';
 import { checkBearerAuth } from './worker-auth.js';
+import { normalizeMcpRequest } from './mcp-request-alias.js';
 import type { Env } from './types.js';
 import { VERSION } from './utils.js';
 
@@ -22,8 +23,9 @@ export { Ch1ttyDO, Ch1ttyMcpAgent, Ch1ttyApiAgent };
 
 // The McpAgent handler for /mcp2 — receives requests that passed OAuth validation.
 const mcp2Handler = {
-  fetch(req: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-    return Ch1ttyMcpAgent.serve('/mcp2', { binding: 'MCP_OBJECT' }).fetch(req, env, ctx);
+  async fetch(req: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const normalized = await normalizeMcpRequest(req);
+    return Ch1ttyMcpAgent.serve('/mcp2', { binding: 'MCP_OBJECT' }).fetch(normalized, env, ctx);
   },
 };
 
