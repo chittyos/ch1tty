@@ -19,6 +19,9 @@ function agg(): Aggregator {
 const VARIANTS = [
   'ch1tty/status',          // canonical
   'ch1tty.status',          // dot-notation from ASDK wrappers
+  'ch1tty.ch1tty/status', // actual ChatGPT connector spelling
+  'ch1tty.ch1tty.status', // fully dotted wrapper
+  'ch1tty/ch1tty.status', // mixed slash/dot wrapper
   'ch1tty/ch1tty/status',   // doubled namespace
   'status',                 // bare verb
   'gateway_status',         // stale alias from older ASDK manifests

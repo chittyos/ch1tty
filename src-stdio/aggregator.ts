@@ -1779,10 +1779,9 @@ export class Aggregator {
     let name = raw;
     const prefix = `${META_SERVER_ID}${SEPARATOR}`;
     // "Ch1tty/ch1tty/<verb>" or "ch1tty/ch1tty/<verb>" -> "ch1tty/<verb>"
-    const doubled = name.toLowerCase();
-    if (doubled.startsWith(`${prefix}${META_SERVER_ID}`)) {
-      name = name.slice(prefix.length);
-    }
+    // ChatGPT wrappers can double the namespace with dots, slashes, or both.
+    // Match whole namespace segments so unrelated prefixes remain rejected.
+    name = name.replace(/^ch1tty[/.]ch1tty[/.]/i, prefix);
     // Dot-notation: "ch1tty.<verb>" -> "ch1tty/<verb>"
     if (name.toLowerCase().startsWith(`${META_SERVER_ID}.`)) {
       name = `${prefix}${name.slice(META_SERVER_ID.length + 1)}`;
