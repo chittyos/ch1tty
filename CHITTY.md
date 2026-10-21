@@ -67,7 +67,7 @@ AI Client (Claude Code / Codex)
     │
     └── RemoteProxy ───► Remote MCP endpoints (HTTP)
                          └ mcp.chitty.cc, mcp.cloudflare.com,
-                           browser.mcp.cloudflare.com, scrape.chitty.cc, ...
+                           browser.mcp.cloudflare.com, agent.chitty.cc/scrape, ...
 
 Remote AI Client (Claude web / ChatGPT / CF Agents)
     │ Streamable HTTP (/mcp)
