@@ -8,7 +8,7 @@ test('worker registry includes canonical durable scrape-agent upstream', () => {
   assert.equal(scrape.type, 'remote');
   assert.equal(scrape.endpoint, 'https://agent.chitty.cc/scrape/mcp');
   assert.equal(scrape.authTokenKey, 'chittymcp');
-  assert.equal(scrape.access, 'read');
+  assert.equal(scrape.access, 'readwrite');
 });
 
 test('worker registry does not add ChittyFinance without an actor propagation path', () => {
