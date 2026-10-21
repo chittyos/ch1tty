@@ -19,7 +19,7 @@ Dynamic/Code Mode calls eventually dispatch through `ch1tty/execute`. A domain i
 3. upstream authentication is valid, and
 4. any downstream actor/tenant authorization can be preserved.
 
-ChittyScrape satisfies this path with server ID `scrape` and the shared ChittyMCP token.
+The durable `chittyagent-scrape` surface satisfies this path with server ID `scrape`; it delegates portal I/O to ChittyScrape and exposes completed task results through `get_job`.
 
 ChittyFinance is intentionally excluded from Ch1tty's executable registry until verified actor identity can be propagated into Finance. Do not use a hard-coded `X-Chitty-User-Id`, shared super-user, or invented automation principal to bypass the existing L2/L4 trust path.
 
