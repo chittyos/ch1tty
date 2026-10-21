@@ -66,14 +66,18 @@ AI Client (Claude Code / Codex)
     │                    └ neon, context7, thinking, fs, playwright
     │
     └── RemoteProxy ───► Remote MCP endpoints (HTTP)
-                         └ mcp-portal.chitty.cc, mcp.cloudflare.com,
-                           browser.mcp.cloudflare.com, ...
+                         └ mcp.chitty.cc, mcp.cloudflare.com,
+                           browser.mcp.cloudflare.com, scrape.chitty.cc, ...
 
 Remote AI Client (Claude web / ChatGPT / CF Agents)
     │ Streamable HTTP (/mcp)
     ▼
   Ch1tty (same aggregator, same 5 tools)
 ```
+
+### Finance execution boundary
+
+ChittyFinance may publish static discovery metadata, but it is intentionally **not** embedded as an executable Ch1tty remote backend yet. Its MCP execution path binds writes to a real Finance user plus tenant role (L2/L4). Ch1tty's current OAuth grant identifies the operator as `admin` and does not propagate a verified Finance actor downstream. The gateway therefore fails closed rather than inventing an agent user or bypassing Finance authorization.
 
 ## Consumers
 
