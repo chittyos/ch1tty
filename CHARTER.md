@@ -25,7 +25,7 @@ visibility: PUBLIC
 | Domain | `ch1tty.chitty.cc` |
 | Status | Active |
 
-> **Note on infra**: This repo deploys as the local stdio gateway + optional HTTP server (`CH1TTY_PORT`). The public `ch1tty.chitty.cc` Worker (with ChittyAuth-issued token validation) is fronted by `chittyagent-ch1tty` in a separate repo, which is why this repo has no `wrangler.toml`.
+> **Runtime note**: This repo owns both the local stdio gateway and the Cloudflare Worker at `ch1tty.chitty.cc` (`wrangler.jsonc`). The Worker embeds its remote-server registry in `src/config-data.ts`; keep that projection reconciled with `servers.json`.
 
 ## Purpose
 
@@ -60,6 +60,7 @@ Passthrough — returns union of all backend prompts, namespaced as `{serverId}/
 - `chitty-mcp-token` — Auth token helper (1Password-backed, via `chittycanon://core/services/auth`)
 - Local MCP servers (filesystem, context7, sequential-thinking, etc.)
 - Cloudflare MCP endpoints (`mcp.cloudflare.com`, `autorag.mcp.cloudflare.com`, `browser.mcp.cloudflare.com`)
+- ChittyScrape (`https://scrape.chitty.cc/mcp`) — read-only portal/snapshot execution using the shared ChittyMCP bearer
 
 ### Downstream (depends on Ch1tty)
 - Claude Code (via `.mcp.json`)
@@ -80,6 +81,7 @@ Passthrough — returns union of all backend prompts, namespaced as `{serverId}/
 - Config path interpolation (~ and env vars)
 
 ### Out of Scope
-- Multi-step tool chaining (v2: brain backend)
+- Direct ChittyFinance execution until Ch1tty can propagate a verified Finance actor (or a separately governed Finance automation principal is explicitly provisioned)
+- Multi-step tool chaining outside Code Mode / cast composition
 - OAuth authorization server (handled by cloud Worker)
 - Pattern learning from usage
