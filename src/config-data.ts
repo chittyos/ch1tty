@@ -154,6 +154,17 @@ export const REMOTE_SERVERS: ServerConfig[] = [
     enabled: true,
   },
   {
+    id: 'scrape',
+    name: 'ChittyScrape',
+    type: 'remote',
+    access: 'read',
+    category: 'search',
+    endpoint: 'https://scrape.chitty.cc/mcp',
+    authTokenKey: 'chittymcp',
+    lazy: true,
+    enabled: true,
+  },
+  {
     id: 'ship',
     name: 'Ship (Deploy)',
     type: 'remote',
