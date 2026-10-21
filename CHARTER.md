@@ -60,7 +60,7 @@ Passthrough — returns union of all backend prompts, namespaced as `{serverId}/
 - `chitty-mcp-token` — Auth token helper (1Password-backed, via `chittycanon://core/services/auth`)
 - Local MCP servers (filesystem, context7, sequential-thinking, etc.)
 - Cloudflare MCP endpoints (`mcp.cloudflare.com`, `autorag.mcp.cloudflare.com`, `browser.mcp.cloudflare.com`)
-- ChittyScrape (`https://scrape.chitty.cc/mcp`) — read-only portal/snapshot execution using the shared ChittyMCP bearer
+- ChittyScrape (`https://agent.chitty.cc/scrape/mcp`) — read-only portal/snapshot execution using the shared ChittyMCP bearer
 
 ### Downstream (depends on Ch1tty)
 - Claude Code (via `.mcp.json`)
