@@ -2,6 +2,29 @@
 
 ---
 
+### run ~1800 — 2026-10-03 — steady state: build clean, 5793 pass, 100% coverage, CI blocked
+
+- **Build**: tsc clean | **Tests**: 5793 pass / 0 fail / 3 skip | **Coverage**: 100% stmts/lines/funcs, 100% branches (src-stdio/)
+- **Workstream advanced**: None — all A-E complete; no new branch this run
+- **What was done**:
+  - npm ci + npm run build (clean), npm test (5793/0/3), npm run coverage (100% all metrics, exit 0)
+  - Checked 9 open PRs: GGA-GGH (drift-guard verbosity tests) + P (brace-expansion security fix)
+  - All 9 PRs: CodeQL green, ci.yml conclusion:failure / 0 jobs — GitHub Actions workers never execute
+  - Root cause confirmed: GitHub Actions disabled in repo settings (persistent since ~run 1438)
+  - Notion board accessible this run; DRIVER-LOG.md remains active cross-run fallback
+- **Open PRs (all need manual merge after Actions enabled)**:
+  - #1721 brace-expansion >=5.0.12 (3 DoS CVEs) — SECURITY FIX
+  - #1717-1720, #1722-1724: GGA-GGH drift-guard verbosity tests (0 new buildCastExplanation fields each)
+- **Blockers (all require human action)**:
+  1. **Enable GitHub Actions** — Settings → Actions → General → Allow all actions (ci.yml never runs)
+  2. **DISABLE the hourly cron** — ~1800 runs, no new workstreams exist; burning tokens
+  3. **Merge #1721** (security) — brace-expansion bump, CodeQL green, diff clean
+  4. Prod env vars: GITHUB_MCP_AUTHORIZATION, CHITTY_CF_ACCESS_CLIENT_ID, CHITTY_CF_ACCESS_CLIENT_SECRET
+  5. Stale branch cleanup (1100+ remote auto/ branches)
+- **Next run**: If Actions enabled: confirm GG* PRs green + suggest merge. Else: GGI — freeze verbosity:full key superset (every medium field must appear in full, plus full-only additions).
+
+---
+
 ### run ~1672 — 2026-09-16 — fix(build): build both shared-types + shared-logger before tsc
 
 - **Build**: tsc clean | **Tests**: 2503 pass / 0 fail / 3 skip
