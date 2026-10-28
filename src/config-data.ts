@@ -155,7 +155,7 @@ export const REMOTE_SERVERS: ServerConfig[] = [
   },
   {
     id: 'scrape',
-    name: 'ChittyScrape',
+    name: 'ChittyAgent Scrape',
     type: 'remote',
     access: 'readwrite',
     category: 'search',
