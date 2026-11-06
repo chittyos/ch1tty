@@ -9,6 +9,12 @@ Ch1tty is a **sibling** of ChittyOS, not one of its services. It registers with 
 
 Ch1tty is **greater than the sum of its backends**. Through the Alchemist daemon + ContextConsciousness memory (in ChittyConnect), it watches how its registered services are composed in practice and can spawn new MCP services from existing ones — promoting recurring cross-backend patterns into their own focused surfaces under `apps/*-mcp`. See CHITTY.md for the self-composition mechanism.
 
+## Memory authority
+
+Ch1tty may use provider-native memory features as runtime-local projections or caches. Those stores are not canonical ChittyOS memory and must not become an independent source of truth. Canonical cross-session semantic/episodic memory is owned by ChittyConnect MemoryCloude; Ch1tty discovers or invokes that capability through the ecosystem surface when canonical memory is required.
+
+The Worker currently exposes Cloudflare Agent Memory-backed `memory_recall`, `memory_ingest`, and `memory_summary` operations. Treat them as Ch1tty-runtime-local until they are explicitly proxied to the canonical MemoryCloude API.
+
 ## Canonical Contract
 
 Ch1tty is a **fractal viewport orchestrator**, not a flat tool dump.

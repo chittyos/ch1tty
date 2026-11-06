@@ -29,7 +29,7 @@ visibility: PUBLIC
 
 ## Purpose
 
-Universal MCP gateway with slim-MCP surface. Aggregates all MCP servers behind 5 tools: `search`, `execute`, `status`, `reload`, `cast`. Clients discover and invoke capabilities on-demand instead of loading 100+ tool definitions into context. `cast` is the wizard layer — intent in, execution out.
+Universal MCP gateway with a slim-MCP surface. The certified core contract is `search`, `execute`, `status`, `reload`, and `cast`; current implementation also contains experimental/extended meta-tools (`code`, `provision`, and provider-local memory operations). Those extensions do not change ownership of the underlying canonical capabilities.
 
 Dual transport: stdio for local clients, Streamable HTTP for remote clients.
 
@@ -81,6 +81,7 @@ Passthrough — returns union of all backend prompts, namespaced as `{serverId}/
 - Config path interpolation (~ and env vars)
 
 ### Out of Scope
+- Canonical persistent-memory ownership. ChittyConnect MemoryCloude is the ChittyOS authority for cross-session semantic/episodic memory; any provider-native Agent Memory attached to Ch1tty is runtime-local projection/cache only.
 - Direct ChittyFinance execution until Ch1tty can propagate a verified Finance actor (or a separately governed Finance automation principal is explicitly provisioned)
 - Multi-step tool chaining outside Code Mode / cast composition
 - OAuth authorization server (handled by cloud Worker)
