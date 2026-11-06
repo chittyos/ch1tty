@@ -392,7 +392,7 @@ export class Ch1ttyCore {
       },
       {
         name: `${META_SERVER_ID}${SEPARATOR}memory_recall`,
-        description: 'Search stored memories in a profile. Returns a synthesized answer grounded in the stored content.',
+        description: 'Search Ch1tty runtime-local Cloudflare Agent Memory for a profile. This is a provider projection/cache, not canonical ChittyOS MemoryCloude.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -404,7 +404,7 @@ export class Ch1ttyCore {
       },
       {
         name: `${META_SERVER_ID}${SEPARATOR}memory_ingest`,
-        description: 'Extract structured memories from a conversation. Identifies facts, events, instructions, and tasks automatically.',
+        description: 'Ingest conversation content into Ch1tty runtime-local Cloudflare Agent Memory. This does not write canonical ChittyOS MemoryCloude.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -428,7 +428,7 @@ export class Ch1ttyCore {
       },
       {
         name: `${META_SERVER_ID}${SEPARATOR}memory_summary`,
-        description: 'Generate a structured Markdown summary of everything stored in a memory profile.',
+        description: 'Summarize a Ch1tty runtime-local Cloudflare Agent Memory profile. Canonical cross-session memory remains in ChittyConnect MemoryCloude.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -678,7 +678,10 @@ export class Ch1ttyCore {
     };
   }
 
-  // ── Agent Memory ─────────────────────────────────────────────
+  // ── Runtime-local Agent Memory projection ─────────────────────
+  // Cloudflare Agent Memory is a provider-native projection/cache for Ch1tty.
+  // It is NOT the canonical ChittyOS persistent-memory authority. Canonical
+  // cross-session semantic/episodic memory remains ChittyConnect MemoryCloude.
 
   private async handleMemoryRecall(args: Record<string, unknown>): Promise<ToolCallResult> {
     if (!this.memoryNs) return { content: [{ type: 'text', text: 'Agent Memory not configured.' }], isError: true };
