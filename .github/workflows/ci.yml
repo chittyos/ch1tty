@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [20, 22]
+        node-version: [22]
 
     steps:
       - uses: actions/checkout@v4
@@ -36,7 +36,8 @@ jobs:
         run: npm run coverage
 
       - name: Verify servers.json is valid JSON
-        run: node -e "JSON.parse(require(\"fs\").readFileSync(\"servers.json\",\"utf8\")); console.log(\"servers.json: valid\")"
+        run: |
+          node -e "JSON.parse(require(\"fs\").readFileSync(\"servers.json\",\"utf8\")); console.log(\"servers.json: valid\")"
 
       - name: Typecheck Worker/DO codebase (src/)
         run: npm run typecheck:worker
@@ -68,6 +69,13 @@ jobs:
       - name: Install dependencies (root workspace)
         run: npm ci
 
+      - name: Build shared packages
+        run: npm run build --workspace=packages/shared-types --workspace=packages/shared-logger --workspace=packages/shared-mcp
+
+      - name: Install focused app dependencies
+        working-directory: apps/${{ matrix.app }}
+        run: npm ci --workspaces=false --install-links
+
       - name: Build (${{ matrix.app }})
         working-directory: apps/${{ matrix.app }}
         run: npm run build
@@ -82,10 +90,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Use Node.js 20
+      - name: Use Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
@@ -94,22 +102,29 @@ jobs:
       - name: Audit dependencies
         run: npm audit --omit=dev
 
+      - name: Audit high and critical build dependencies
+        run: npm audit --audit-level=high
+
       - name: Audit apps/tasks-mcp
         working-directory: apps/tasks-mcp
-        run: npm ci --ignore-scripts && npm audit --omit=dev
+        run: npm ci --ignore-scripts --workspaces=false --install-links && npm audit --omit=dev --workspaces=false
 
       - name: Audit apps/ledger-mcp
         working-directory: apps/ledger-mcp
-        run: npm ci --ignore-scripts && npm audit --omit=dev
+        run: npm ci --ignore-scripts --workspaces=false --install-links && npm audit --omit=dev --workspaces=false
 
       - name: Audit apps/session-coordinator-mcp
         working-directory: apps/session-coordinator-mcp
-        run: npm ci --ignore-scripts && npm audit --omit=dev
+        run: npm ci --ignore-scripts --workspaces=false --install-links && npm audit --omit=dev --workspaces=false
 
       - name: Audit apps/evidence-mcp
         working-directory: apps/evidence-mcp
-        run: npm ci --ignore-scripts && npm audit --omit=dev
+        run: npm ci --ignore-scripts --workspaces=false --install-links && npm audit --omit=dev --workspaces=false
 
       - name: Audit apps/comms-mcp
         working-directory: apps/comms-mcp
-        run: npm ci --ignore-scripts && npm audit --omit=dev
+        run: npm ci --ignore-scripts --workspaces=false --install-links && npm audit --omit=dev --workspaces=false
+
+      - name: Audit shared MCP build dependencies
+        working-directory: packages/shared-mcp
+        run: npm ci --ignore-scripts --workspaces=false && npm audit --workspaces=false

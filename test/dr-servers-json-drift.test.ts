@@ -214,13 +214,14 @@ describe('category distribution', () => {
     byCat.set(s.category, (byCat.get(s.category) ?? 0) + 1);
   }
 
+  // The durable scrape orchestrator is a search backend (AGENTS.md).
   const expected: Record<string, number> = {
-    ecosystem: 39,
+    ecosystem: 38,
     desktop: 6,
     code: 4,
     documents: 4,
     communication: 4,
-    search: 1,
+    search: 2,
     reasoning: 1,
   };
 
@@ -245,9 +246,10 @@ describe('access distribution', () => {
     byAccess.set(s.access, (byAccess.get(s.access) ?? 0) + 1);
   }
 
+  // Scrape mutates durable task state; portal I/O remains read-only.
   const expected: Record<string, number> = {
-    readwrite: 45,
-    read: 13,
+    readwrite: 46,
+    read: 12,
     write: 1,
   };
 

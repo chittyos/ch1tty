@@ -14,8 +14,8 @@
  *   - TypeScript version groups in packages/ (TS-7 migration in progress):
  *       shared-mcp + shared-types → ^7.0.0 (migrated)
  *       shared-logger → ^5.7.0 (pre-migration)
- *   - SDK version lag: shared-mcp (@modelcontextprotocol/sdk) is one minor
- *     behind apps/ — documented here so the lag is visible and intentional
+ *   - SDK declarations: apps pin patched 1.32.1 while shared-mcp retains its
+ *     compatible ^1.29.0 peer range
  *   - SDK peer/dev alignment: shared-mcp peerDependencies and devDependencies
  *     must declare the same SDK version (independent peer drift is caught)
  *   - Each workspace has a non-empty "name" and "version" in its package.json
@@ -150,12 +150,12 @@ describe('apps/* key dep consistency', () => {
     });
   }
 
-  test('@modelcontextprotocol/sdk is ^1.30.0 in all apps', () => {
+  test('@modelcontextprotocol/sdk is 1.32.1 in all apps', () => {
     for (const pkg of appPkgs) {
       assert.equal(
         allDeps(pkg)['@modelcontextprotocol/sdk'],
-        '^1.30.0',
-        `${pkg.name}: @modelcontextprotocol/sdk must be ^1.30.0`,
+        '1.32.1',
+        `${pkg.name}: @modelcontextprotocol/sdk must be 1.32.1`,
       );
     }
   });
@@ -242,19 +242,19 @@ describe('packages/* typescript migration state', () => {
   });
 });
 
-// ── SDK version lag: shared-mcp behind apps ──────────────────────────────────
-// shared-mcp declares @modelcontextprotocol/sdk ^1.29.0 while all apps are
-// on ^1.30.0. Document this known lag so any unexpected change (further drift
-// or accidental sync) is caught.
+// ── SDK declarations: patched apps within shared-mcp's peer range ────────────
+// shared-mcp retains @modelcontextprotocol/sdk ^1.29.0 for compatibility.
+// Apps pin patched 1.32.1, which satisfies that peer range. Keep the declared
+// contracts visible so an unexpected dependency or peer change is caught.
 
 describe('@modelcontextprotocol/sdk version across groups', () => {
-  test('shared-mcp devDependencies declares @modelcontextprotocol/sdk ^1.29.0 (one minor behind apps)', () => {
+  test('shared-mcp devDependencies declares @modelcontextprotocol/sdk ^1.29.0', () => {
     const pkg = packagePkgs.find(p => p.name === '@ch1tty/shared-mcp')!;
     assert.ok(pkg, 'shared-mcp not found');
     assert.equal(
       pkg.devDependencies?.['@modelcontextprotocol/sdk'],
       '^1.29.0',
-      'shared-mcp: devDependencies @modelcontextprotocol/sdk must be ^1.29.0 — update this test when the lag is resolved',
+      'shared-mcp: devDependencies @modelcontextprotocol/sdk must be ^1.29.0 — update this test when the declaration changes',
     );
   });
 
@@ -278,14 +278,14 @@ describe('@modelcontextprotocol/sdk version across groups', () => {
     assert.equal(peerSdk, devSdk, `shared-mcp peer/dev SDK declarations diverged: peer=${peerSdk} dev=${devSdk}`);
   });
 
-  test('apps declare @modelcontextprotocol/sdk ^1.30.0 (one minor ahead of shared-mcp)', () => {
+  test('apps declare patched @modelcontextprotocol/sdk 1.32.1', () => {
     const appsWithSdk = appPkgs.filter(p => '@modelcontextprotocol/sdk' in allDeps(p));
     assert.equal(appsWithSdk.length, APPS.length, `all ${APPS.length} apps must declare @modelcontextprotocol/sdk`);
     for (const pkg of appsWithSdk) {
       assert.equal(
         allDeps(pkg)['@modelcontextprotocol/sdk'],
-        '^1.30.0',
-        `${pkg.name}: @modelcontextprotocol/sdk must be ^1.30.0`,
+        '1.32.1',
+        `${pkg.name}: @modelcontextprotocol/sdk must be 1.32.1`,
       );
     }
   });

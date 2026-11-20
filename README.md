@@ -43,3 +43,23 @@ This profile keeps only the intended orchestration backends enabled and reduces 
 Ch1tty aggregates all MCP servers behind 5 tools: `search`, `execute`, `status`, `reload`, `cast`. The full tool registry (100+ tools across local stdio children and remote HTTP endpoints) stays internal — clients discover capabilities via search, invoke them via execute, and can use cast as the intent-to-execution wizard layer, keeping context windows minimal.
 
 **Dual transport**: stdio for local clients, Streamable HTTP (`/mcp`) for remote clients.
+
+## Development and focused app installs
+
+Use Node.js 22 for the root workspace. Focused apps under `apps/` are also tested on Node.js 20. Each app keeps its own lockfile for an independent dependency install within a full repository checkout. Its build uses the root TypeScript type definitions and built shared packages; some app tests also exercise gateway source from the checkout.
+
+For example, build and test the tasks app with its own locked dependencies:
+
+```bash
+# From the repository root:
+npm ci
+npm run build --workspace=packages/shared-types --workspace=packages/shared-logger --workspace=packages/shared-mcp
+
+cd apps/tasks-mcp
+npm ci --workspaces=false --install-links
+npm run build
+npm test
+npm audit --omit=dev --workspaces=false
+```
+
+Use both install flags when installing or refreshing an app lockfile. `--workspaces=false` selects that app's lockfile, and `--install-links` installs the local shared package into the app so both resolve the same app-local MCP SDK. Rebuild the shared packages and reinstall the focused app after changing shared-package source. CI checks this installation path for all five apps on Node.js 20 and 22, and audits each app lockfile separately.
