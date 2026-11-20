@@ -536,11 +536,11 @@
     },
     {
       "id": "scrape",
-      "name": "Scraper",
+      "name": "ChittyAgent Scrape",
       "type": "remote",
-      "access": "read",
-      "category": "ecosystem",
-      "endpoint": "https://scrape.chitty.cc/mcp",
+      "access": "readwrite",
+      "category": "search",
+      "endpoint": "https://agent.chitty.cc/scrape/mcp",
       "authTokenKey": "chittymcp",
       "lazy": true,
       "enabled": true
