@@ -5,6 +5,7 @@ import type { ServerConfig, RemoteServerConfig, ResourceEntry, ResourceTemplateE
 import { VERSION, withTimeout, normalizeToolResult } from './utils.js';
 import { log } from './logger.js';
 import { CircuitBreaker } from './circuit-breaker.js';
+import { StreamGovernor } from './stream-governor.js';
 
 /**
  * Pluggable auth-token retrieval. The stdio gateway shells out to the
@@ -88,6 +89,8 @@ export class RemoteProxy implements Backend {
   private connecting = new Map<string, Promise<RemoteConnection>>();
   private tokenCaches = new Map<string, TokenCache>();
   private breaker = new CircuitBreaker();
+  // One per server, kept across evict-and-reconnect, so a reconnect cannot reset the throttle.
+  private streamGovernors = new Map<string, StreamGovernor>();
   private tokenSource: TokenSource;
 
   constructor(tokenSource: TokenSource = new CliTokenSource()) {
@@ -208,10 +211,18 @@ export class RemoteProxy implements Backend {
     log.info(`[Diagnostic] Bearer token: ${token ? 'present' : 'absent'}`, config.id);
 
     const url = new URL(config.endpoint);
+    let governor = this.streamGovernors.get(config.id);
+    if (!governor) {
+      governor = new StreamGovernor(config.id);
+      this.streamGovernors.set(config.id, governor);
+    }
     const transport = new StreamableHTTPClientTransport(url, {
       requestInit: {
         headers,
       },
+      // The SDK reopens the standalone event stream with no growing delay and no
+      // retry limit when a backend closes it cleanly. See stream-governor.ts.
+      fetch: governor.wrap(),
     });
 
     const client = new Client(
