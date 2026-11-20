@@ -102,6 +102,9 @@ jobs:
       - name: Audit dependencies
         run: npm audit --omit=dev
 
+      - name: Audit high and critical build dependencies
+        run: npm audit --audit-level=high
+
       - name: Audit apps/tasks-mcp
         working-directory: apps/tasks-mcp
         run: npm ci --ignore-scripts --workspaces=false --install-links && npm audit --omit=dev --workspaces=false
