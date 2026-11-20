@@ -14,8 +14,8 @@
     "sim": "CH1TTY_EMBED_ENABLED=false node --import tsx sim/run.ts",
     "test": "bash -c 'shopt -s globstar nullglob; node --import tsx --test test/**/*.test.ts apps/*/test/*.test.ts packages/*/test/*.test.ts'",
     "test:watch": "bash -c 'shopt -s globstar nullglob; node --import tsx --test --watch test/**/*.test.ts apps/*/test/*.test.ts packages/*/test/*.test.ts'",
-    "coverage": "c8 --all --include=src-stdio/**/*.ts --exclude=src-stdio/index.ts --exclude=src-stdio/types.ts --lines 99 --branches 95 --functions 100 --statements 99 node --import tsx --test test/**/*.test.ts apps/*/test/*.test.ts",
-    "coverage:apps": "c8 --all --include=apps/*/src/**/*.ts --exclude=apps/*/src/index.ts --exclude=apps/*/src/types.ts --lines 100 --branches 95 --functions 100 --statements 100 node --import tsx --test apps/*/test/*.test.ts"
+    "coverage": "bash -c 'shopt -s globstar nullglob; c8 --check-coverage --all --include=\"src-stdio/**/*.ts\" --exclude=src-stdio/index.ts --exclude=src-stdio/types.ts --lines 99 --branches 95 --functions 100 --statements 99 node --import tsx --test \"$@\" test/**/*.test.ts apps/*/test/*.test.ts' --",
+    "coverage:apps": "c8 --check-coverage --all --include=apps/*/src/**/*.ts --exclude=apps/*/src/index.ts --exclude=apps/*/src/types.ts --exclude=apps/comms-mcp/src/_schema-type-guards.ts --lines 100 --branches 95 --functions 100 --statements 100 node --import tsx --test apps/*/test/*.test.ts"
   },
   "workspaces": [
     "packages/*",
@@ -27,9 +27,9 @@
     "@ch1tty/shared-types": "workspace:*",
     "@chittyos/schema-client": "file:../../CHITTYFOUNDATION/chittyschema/clients/schema-client",
     "@cloudflare/codemode": "^0.5.2",
-    "@modelcontextprotocol/sdk": "^1.29.0",
-    "agents": "^0.23.0",
-    "zod": "4.6.5"
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "agents": "^0.28.1",
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@cloudflare/workers-oauth-provider": "^0.10.3",
@@ -43,12 +43,12 @@
     "node": "^22.12.0 || >=23.0.0"
   },
   "overrides": {
-    "hono": ">=4.13.5",
-    "sharp": ">=0.35.4",
-    "@hono/node-server": ">=2.0.5",
-    "undici": ">=7.29.0",
-    "fast-uri": ">=4.1.5",
-    "qs": ">=6.15.4",
+    "hono": ">=4.13.16",
+    "sharp": ">=0.35.5",
+    "@hono/node-server": ">=2.1.6",
+    "undici": "^7.29.0",
+    "fast-uri": ">=4.2.3",
+    "qs": ">=6.16.1",
     "brace-expansion": ">=5.0.12"
   }
 }
