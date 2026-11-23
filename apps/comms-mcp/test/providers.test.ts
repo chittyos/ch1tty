@@ -26,13 +26,13 @@ describe('quoProvider', () => {
 
   it('binding.tools has all three abstract ops with correct tool names', () => {
     const tools = quoProvider.binding?.tools ?? {};
-    assert.equal(tools['resolveContact'], 'quo_lookup_contact_context');
-    assert.equal(tools['listMessages'], 'quo_recent_messages_local');
-    assert.equal(tools['getMessage'], 'quo_get_message');
+    assert.equal(tools['resolveContact'], 'resolve_contact_context');
+    assert.equal(tools['listMessages'], 'list_recent_messages_local');
+    assert.equal(tools['getMessage'], 'get_message');
   });
 
   it('listMessages uses the local-cache op (not the live-API op)', () => {
-    assert.equal(quoProvider.binding?.tools?.['listMessages'], 'quo_recent_messages_local');
+    assert.equal(quoProvider.binding?.tools?.['listMessages'], 'list_recent_messages_local');
   });
 
   it('resolveContact op name matches abstract op', () => {

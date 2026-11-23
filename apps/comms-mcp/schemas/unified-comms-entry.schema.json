@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schema.chitty.cc/comms/v1/unified-comms-entry.schema.json",
   "title": "UnifiedCommsEntry",
-  "description": "One normalized communication event across channels (quo/openphone SMS+call, imessage, email/gmail, twilio). The intersection that survives every channel, plus channel-discriminated optional fields. This is the FROZEN SHAPE of the comms.recentLog combo (ALCHEMICAL_PROMOTION.md §2b) — provider responses are reshaped TO this by codemode. Modeled on the canonical contextual.messages + contextual.party_identifiers relation that imessage_unified_with_quo and quo_recent_messages_local already read. @canon: chittycanon://gov/governance#core-types",
+  "description": "One normalized communication event across channels (quo/openphone SMS+call, imessage, email/gmail, twilio). The intersection that survives every channel, plus channel-discriminated optional fields. This is the FROZEN SHAPE of the comms.recentLog combo (ALCHEMICAL_PROMOTION.md §2b) — provider responses are reshaped TO this by codemode. Modeled on the canonical contextual.messages + contextual.party_identifiers relation that imessage_unified_with_quo and list_recent_messages_local already read. @canon: chittycanon://gov/governance#core-types",
   "type": "object",
   "required": ["channel", "direction", "occurredAt", "participants", "providerMessageId"],
   "additionalProperties": false,

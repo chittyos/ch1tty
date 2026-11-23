@@ -36,13 +36,13 @@ pattern and the Schema Owner Manifest (`GET https://schema.chitty.cc/api/owners`
 `comms` is **not** a Neon database — it is a schema namespace for a cross-channel
 view. No new table tree is minted; the underlying durable rows already live in the
 canonical `contextual.messages` + `contextual.party_identifiers` relation that
-`quo_recent_messages_local` and `imessage_unified_with_quo` read.
+`list_recent_messages_local` and `imessage_unified_with_quo` read.
 
 ## Real backend shapes observed (no invented fields)
 
 Bound to live responses captured during design (no mocks):
 
-- **quo / openphone** (`quo_recent_messages_local`, reads `contextual.messages
+- **quo / openphone** (`list_recent_messages_local`, reads `contextual.messages
   where source='openphone'`): `message_id` (internal), `external_id` (AC…,
   provider), `external_thread_id` (AC…), `direction` (`inbound`/`outbound`),
   `body_text`, `sent_at` (RFC3339), `parties[]` of `{role: sender|recipient,
@@ -76,10 +76,10 @@ Bound to live responses captured during design (no mocks):
 These are exactly the mismatches the codemode joint exists to absorb, and are
 live drift findings for ChittySchema:
 
-- `quo_lookup_contact_context` sends `maxResults=100` but the OpenPhone API caps
+- `resolve_contact_context` sends `maxResults=100` but the OpenPhone API caps
   it at 50 → HTTP 400. The adapter over-asks.
 - `quo_list_messages` 400s without a `participants[]` array (live API requires it);
-  the local-cache path (`quo_recent_messages_local`) does not. The combo should
+  the local-cache path (`list_recent_messages_local`) does not. The combo should
   bind the **local** op as `listMessages` to avoid this.
 - `imessage_unified_with_quo` and `imessage_top_contacts` currently error on this
   node (`column m.id does not exist` / `relation communications.imessages does not

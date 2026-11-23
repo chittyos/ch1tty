@@ -37,18 +37,18 @@
           "type": "object",
           "additionalProperties": { "type": "string" },
           "examples": [
-            { "resolveContact": "quo_lookup_contact_context", "listMessages": "quo_recent_messages_local", "getMessage": "quo_get_message" },
+            { "resolveContact": "resolve_contact_context", "listMessages": "list_recent_messages_local", "getMessage": "get_message" },
             { "resolveContact": "search_threads", "listMessages": "search_threads", "getMessage": "get_thread" }
           ]
         }
       }
     },
     "resolveContact": {
-      "description": "Abstract op: (contactRef) -> provider-native identifiers for that Person. Maps a person/contact ref to the endpoint identifiers (E.164 numbers, email addresses) the provider's listMessages needs. Quo: quo_lookup_contact_context. Gmail: a from:/to: query builder. Output feeds listMessages.",
+      "description": "Abstract op: (contactRef) -> provider-native identifiers for that Person. Maps a person/contact ref to the endpoint identifiers (E.164 numbers, email addresses) the provider's listMessages needs. Quo: resolve_contact_context. Gmail: a from:/to: query builder. Output feeds listMessages.",
       "$ref": "#/$defs/Operation"
     },
     "listMessages": {
-      "description": "Abstract op: (identifiers, window, limit) -> RAW provider message rows. The provider's native list call. Quo live: quo_list_messages (requires participants[] array — see drift note). Quo local: quo_recent_messages_local / quo_recent_events (no participants needed). Gmail: search_threads + get_thread. Twilio: list_messages (from/to). Returns the provider's untouched shape; rawToUnified normalizes it.",
+      "description": "Abstract op: (identifiers, window, limit) -> RAW provider message rows. The provider's native list call. Quo live: quo_list_messages (requires participants[] array — see drift note). Quo local: list_recent_messages_local / quo_recent_events (no participants needed). Gmail: search_threads + get_thread. Twilio: list_messages (from/to). Returns the provider's untouched shape; rawToUnified normalizes it.",
       "$ref": "#/$defs/Operation"
     },
     "getMessage": {

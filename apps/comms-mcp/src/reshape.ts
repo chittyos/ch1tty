@@ -49,7 +49,7 @@ function isSelf(id: string, owner: OwnerIdentity): boolean {
 }
 
 // ---- quo / openphone -----------------------------------------------------------
-// Real shape (quo_recent_messages_local, reads contextual.messages where
+// Real shape (list_recent_messages_local, reads contextual.messages where
 // source='openphone'): { message_id, external_id (AC…), external_thread_id (AC…),
 // direction (inbound|outbound), body_text, sent_at (RFC3339), parties[]
 // {role: sender|recipient, identifier (E.164|email)}, source }.
