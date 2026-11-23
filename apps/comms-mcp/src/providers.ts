@@ -12,12 +12,12 @@ const UNIFIED_REF =
 /**
  * quo / openphone.
  *
- * binding.tools binds the LOCAL op (`quo_recent_messages_local`) as listMessages.
+ * binding.tools binds the LOCAL op (`list_recent_messages_local`) as listMessages.
  * This deliberately avoids two documented live-API bugs (schemas/README § "Real
  * provider-contract bugs found"):
  *   - `quo_list_messages` 400s without a participants[] array (the local-cache
  *     path does not require it).
- *   - `quo_lookup_contact_context` over-asks with maxResults=100 (OpenPhone caps
+ *   - `resolve_contact_context` over-asks with maxResults=100 (OpenPhone caps
  *     at 50 → HTTP 400); the combo caps its resolveContact request at ≤50.
  */
 export const quoProvider: MessagesProvider = {
@@ -27,9 +27,9 @@ export const quoProvider: MessagesProvider = {
   binding: {
     mcpServerId: 'chittyagent-quo',
     tools: {
-      resolveContact: 'quo_lookup_contact_context',
-      listMessages: 'quo_recent_messages_local',
-      getMessage: 'quo_get_message',
+      resolveContact: 'resolve_contact_context',
+      listMessages: 'list_recent_messages_local',
+      getMessage: 'get_message',
     },
   },
   resolveContact: {

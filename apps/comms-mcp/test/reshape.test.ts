@@ -12,7 +12,7 @@ const OWNER: OwnerIdentity = {
   chittyId: '03-1-USA-5537-P-2602-0-38',
 };
 
-// Real quo_recent_messages_local shape (contextual.messages source=openphone).
+// Real list_recent_messages_local shape (contextual.messages source=openphone).
 const QUO_ROW_INBOUND: QuoRawRow = {
   message_id: '16884',
   external_id: 'OPdf1a2b3c4d5e6f7a8b9c0d1e2f3a4b5',

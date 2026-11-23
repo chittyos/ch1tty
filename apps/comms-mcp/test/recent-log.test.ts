@@ -56,7 +56,7 @@ function dispatchReturning(map: Record<string, unknown>, fail?: Set<string>): Co
 }
 
 const HAPPY_MAP = {
-  'chittyagent-quo/quo_recent_messages_local': QUO_ROWS,
+  'chittyagent-quo/list_recent_messages_local': QUO_ROWS,
   'chittyagent-google/search_threads': GMAIL_THREADS,
 };
 

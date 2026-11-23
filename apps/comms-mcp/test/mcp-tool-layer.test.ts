@@ -167,7 +167,7 @@ test('comms.recentLog channels:[quo] dispatches to chittyagent-quo', async () =>
     assert.ok(calls.length >= 1, 'dispatch should have been called at least once');
     const quoCall = calls.find((c) => c.mcpServerId === 'chittyagent-quo');
     assert.ok(quoCall, 'expected a dispatch call to chittyagent-quo');
-    assert.equal(quoCall!.tool, 'quo_recent_messages_local');
+    assert.equal(quoCall!.tool, 'list_recent_messages_local');
   } finally {
     await cleanup();
   }
